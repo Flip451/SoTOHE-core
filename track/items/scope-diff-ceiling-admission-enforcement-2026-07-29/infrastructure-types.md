@@ -4,17 +4,17 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| BatchPlanCodecError | error_type | add | InvalidJson, UnsupportedSchemaVersion, InvalidDocument | 🟡 | 🔵 |
+| BatchPlanCodecError | error_type | add | InvalidJson, UnsupportedSchemaVersion, InvalidDocument | 🔵 | 🔵 |
 
 ## DTOs
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| BatchDeclarationDto | dto | add | — | 🟡 | 🔵 |
-| BatchPlanDocumentDto | dto | add | — | 🟡 | 🔵 |
-| ImplPlanTaskDto | dto | modify | — | 🟡 | 🔵 |
-| ScopeLineEstimateDto | dto | add | — | 🟡 | 🔵 |
-| TaskEstimateDto | dto | add | — | 🟡 | 🔵 |
+| BatchDeclarationDto | dto | add | — | 🔵 | 🔵 |
+| BatchPlanDocumentDto | dto | add | — | 🔵 | 🔵 |
+| ImplPlanTaskDto | dto | modify | — | 🔵 | 🔵 |
+| ScopeLineEstimateDto | dto | add | — | 🔵 | 🔵 |
+| TaskEstimateDto | dto | add | — | 🔵 | 🔵 |
 
 ## Secondary Adapters
 
@@ -29,5 +29,5 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| infrastructure::batch_plan_codec::decode | free_function | add | fn(json: &str) -> Result<domain::batch_plan::BatchPlanDocument, BatchPlanCodecError> | 🟡 | 🔵 |
+| infrastructure::batch_plan_codec::decode | free_function | add | fn(json: &str) -> Result<domain::batch_plan::BatchPlanDocument, BatchPlanCodecError> | 🔵 | 🔵 |
 

@@ -2,16 +2,16 @@
 //!
 //! Holds the per-task line estimates the planner declares for each review scope,
 //! the ordered batches those tasks are assigned to, the rejections that are
-//! decidable from the plan file alone, and the Phase 3 terminal gate that
-//! compares the declared plan against the scope configuration and the planned
-//! tasks. The transition admission guard consumes these values but is owned
-//! elsewhere.
+//! decidable from the plan file alone, the Phase 3 terminal gate that compares
+//! the declared plan against the scope configuration and the planned tasks, and
+//! the admission guard a `todo -> in_progress` transition passes through.
 //!
 //! See ADR 2026-07-28-1521-scope-diff-ceiling-admission-enforcement.
 
-use crate::TrackTask;
 use crate::review_v2::{ReviewScopeConfig, ScopeName};
+use crate::{TaskId, TrackTask};
 
+mod admission;
 mod batch;
 mod document;
 mod error;
@@ -23,6 +23,9 @@ mod line_count;
 #[allow(clippy::indexing_slicing, clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests;
 
+pub use admission::{
+    AdmissionDecision, AdmissionEvaluationError, AdmissionRejection, NonZeroLineCount,
+};
 pub use batch::{BatchDeclaration, BatchId};
 pub use document::BatchPlanDocument;
 pub use error::BatchPlanValidationError;
@@ -200,4 +203,123 @@ fn contributors_to<'a>(
         .filter_map(|task_id| plan.estimate_for(task_id))
         .filter(|estimate| estimate.estimate_for(scope).is_some())
         .collect()
+}
+
+// ── evaluate_admission ────────────────────────────────────────────────────────
+
+/// Judges a `todo -> in_progress` transition for `candidate`
+/// (IN-09 / IN-10 / IN-11 / AC-10 / AC-11 / AC-12 / AC-13 / CN-03).
+///
+/// Pure, and settled by arithmetic and membership alone. Two things are asked
+/// in turn:
+///
+/// 1. **Membership** — the candidate must belong to the batch currently being
+///    consumed: the earliest declared batch that still has an uncommitted
+///    member. A task from a later batch is refused until the current one is
+///    committed.
+/// 2. **Measured guard** — for each scope the candidate declares an estimate
+///    for, the prior contribution (the measured per-scope diff plus the
+///    declared estimates of the members already in progress) plus the
+///    candidate's own estimate is compared with the resolved ceiling. A scope
+///    whose prior contribution is zero admits the candidate whatever it
+///    declares, so the first contribution to a scope always gets through and
+///    the guard cannot deadlock. Scopes the candidate does not add to are not
+///    examined, so an existing excess elsewhere does not block the transition.
+///
+/// # Errors
+///
+/// Returns [`AdmissionEvaluationError::MissingTaskEstimate`] when the batch plan
+/// holds no estimate for `candidate`: without one there is nothing to compare,
+/// and the transition is an error rather than a silent pass.
+pub fn evaluate_admission(
+    plan: &BatchPlanDocument,
+    scope_config: &ReviewScopeConfig,
+    candidate: &TaskId,
+    committed_task_ids: &std::collections::BTreeSet<TaskId>,
+    in_progress_task_ids: &std::collections::BTreeSet<TaskId>,
+    measured: &[MeasuredScopeDiff],
+) -> Result<AdmissionDecision, AdmissionEvaluationError> {
+    let Some(candidate_estimate) = plan.estimate_for(candidate) else {
+        return Err(AdmissionEvaluationError::MissingTaskEstimate { task_id: candidate.clone() });
+    };
+
+    if let Some(rejection) = membership_rejection(plan, candidate, committed_task_ids) {
+        return Ok(AdmissionDecision::Rejected(rejection));
+    }
+
+    for scope_estimate in candidate_estimate.scope_estimates() {
+        let scope = scope_estimate.scope();
+        let Some(prior_contribution) = NonZeroLineCount::try_new(prior_contribution(
+            plan,
+            candidate,
+            in_progress_task_ids,
+            measured,
+            scope,
+        )) else {
+            // First contribution to this scope: always admitted (CN-03).
+            continue;
+        };
+
+        let ceiling = ScopeCeiling::resolve(scope_config.diff_ceiling_for_scope(scope));
+        let would_reach = prior_contribution.get().saturating_add(&scope_estimate.total());
+        if ceiling.admits(&would_reach) {
+            continue;
+        }
+        let Some(limit) = ceiling.limit() else { continue };
+
+        return Ok(AdmissionDecision::Rejected(AdmissionRejection::ScopeCeilingWouldBeExceeded {
+            scope: scope.clone(),
+            prior_contribution,
+            candidate_estimate: scope_estimate.total(),
+            ceiling: limit,
+        }));
+    }
+
+    Ok(AdmissionDecision::Admitted)
+}
+
+/// Refuses a candidate that belongs to a batch other than the one being
+/// consumed. With every batch committed there is no batch left to consume, and
+/// membership cannot be violated.
+fn membership_rejection(
+    plan: &BatchPlanDocument,
+    candidate: &TaskId,
+    committed_task_ids: &std::collections::BTreeSet<TaskId>,
+) -> Option<AdmissionRejection> {
+    let task_batch = plan.batch_of(candidate)?;
+    let current_batch = plan.current_batch(committed_task_ids)?;
+    if task_batch.id() == current_batch.id() {
+        return None;
+    }
+    Some(AdmissionRejection::NotCurrentBatchMember {
+        task_id: candidate.clone(),
+        task_batch: task_batch.id().clone(),
+        current_batch: current_batch.id().clone(),
+    })
+}
+
+/// Sums what `scope` already carries: the measured diff plus the declared
+/// estimates of the members already in progress.
+///
+/// The candidate itself is excluded, and counting a member's measured work
+/// alongside its declared estimate is deliberate — the resulting overcount errs
+/// towards a smaller batch (CN-04).
+fn prior_contribution(
+    plan: &BatchPlanDocument,
+    candidate: &TaskId,
+    in_progress_task_ids: &std::collections::BTreeSet<TaskId>,
+    measured: &[MeasuredScopeDiff],
+    scope: &ScopeName,
+) -> LineCount {
+    let measured_lines = measured
+        .iter()
+        .find(|diff| diff.scope() == scope)
+        .map_or_else(|| LineCount::new(0), MeasuredScopeDiff::lines);
+
+    in_progress_task_ids
+        .iter()
+        .filter(|task_id| *task_id != candidate)
+        .filter_map(|task_id| plan.estimate_for(task_id))
+        .filter_map(|estimate| estimate.estimate_for(scope))
+        .fold(measured_lines, |total, estimate| total.saturating_add(&estimate.total()))
 }

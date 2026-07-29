@@ -83,6 +83,46 @@ fn violations_of(outcome: &BatchPlanGateOutcome) -> &[BatchPlanGateViolation] {
     outcome.violations().map_or(&[], NonEmptyGateViolations::as_slice)
 }
 
+/// The same set shape as [`committed`], named for the in-progress argument.
+fn in_progress(task_ids: &[&str]) -> BTreeSet<TaskId> {
+    committed(task_ids)
+}
+
+fn measured(entries: &[(&str, u32)]) -> Vec<MeasuredScopeDiff> {
+    entries
+        .iter()
+        .map(|(name, lines)| MeasuredScopeDiff::new(scope(name), LineCount::new(*lines)))
+        .collect()
+}
+
+/// B1 = T001 (domain 150) + T002 (domain 300); B2 = T003 (usecase 75).
+fn admission_plan() -> BatchPlanDocument {
+    planned_plan(
+        vec![
+            estimate(
+                "T001",
+                vec![scope_estimate("domain", 100, 50)],
+                TaskDecomposition::Decomposable,
+            ),
+            estimate(
+                "T002",
+                vec![scope_estimate("domain", 200, 100)],
+                TaskDecomposition::Decomposable,
+            ),
+            estimate(
+                "T003",
+                vec![scope_estimate("usecase", 50, 25)],
+                TaskDecomposition::Decomposable,
+            ),
+        ],
+        vec![declaration("B1", &["T001", "T002"]), declaration("B2", &["T003"])],
+    )
+}
+
+fn admission_config() -> ReviewScopeConfig {
+    scope_config(&[("domain", Some(500)), ("usecase", Some(500))])
+}
+
 // ── LineCount ─────────────────────────────────────────────────────────────────
 
 #[test]
@@ -1193,4 +1233,211 @@ fn test_an_unknown_task_id_is_reported_once_because_estimates_and_batch_members_
         violations_of(&outcome),
         &[BatchPlanGateViolation::UnknownTaskRef { task_id: task("T404") }]
     );
+}
+
+// ── NonZeroLineCount / AdmissionDecision ──────────────────────────────────────
+
+#[test]
+fn test_a_zero_quantity_cannot_become_a_non_zero_line_count() {
+    assert!(NonZeroLineCount::try_new(LineCount::new(0)).is_none());
+    assert_eq!(
+        NonZeroLineCount::try_new(LineCount::new(250)).map(|count| count.get()),
+        Some(LineCount::new(250))
+    );
+}
+
+#[test]
+fn test_an_admission_decision_carries_its_rejection_only_when_it_refuses() {
+    let rejection = AdmissionRejection::NotCurrentBatchMember {
+        task_id: task("T003"),
+        task_batch: batch_id("B2"),
+        current_batch: batch_id("B1"),
+    };
+
+    assert!(AdmissionDecision::Admitted.is_admitted());
+    assert!(AdmissionDecision::Admitted.rejection().is_none());
+
+    let refused = AdmissionDecision::Rejected(rejection.clone());
+    assert!(!refused.is_admitted());
+    assert_eq!(refused.rejection(), Some(&rejection));
+}
+
+#[test]
+fn test_a_rejection_renders_the_arithmetic_it_carries() {
+    let not_a_member = AdmissionRejection::NotCurrentBatchMember {
+        task_id: task("T003"),
+        task_batch: batch_id("B2"),
+        current_batch: batch_id("B1"),
+    };
+    let rendered = not_a_member.to_string();
+    assert!(rendered.contains("T003"), "rendered as: {rendered}");
+    assert!(rendered.contains("B2") && rendered.contains("B1"), "rendered as: {rendered}");
+
+    let over_ceiling = AdmissionRejection::ScopeCeilingWouldBeExceeded {
+        scope: scope("domain"),
+        prior_contribution: NonZeroLineCount::try_new(LineCount::new(250)).unwrap(),
+        candidate_estimate: LineCount::new(300),
+        ceiling: LineCount::new(500),
+    };
+    let rendered = over_ceiling.to_string();
+    assert!(rendered.contains("domain"), "rendered as: {rendered}");
+    assert!(rendered.contains("250") && rendered.contains("300"), "rendered as: {rendered}");
+    assert!(rendered.contains("500"), "rendered as: {rendered}");
+}
+
+// ── evaluate_admission ────────────────────────────────────────────────────────
+
+#[test]
+fn test_admission_admits_a_current_batch_member_within_every_ceiling() {
+    let decision = evaluate_admission(
+        &admission_plan(),
+        &admission_config(),
+        &task("T001"),
+        &committed(&[]),
+        &in_progress(&[]),
+        &measured(&[]),
+    )
+    .unwrap();
+
+    assert_eq!(decision, AdmissionDecision::Admitted);
+}
+
+#[test]
+fn test_admission_refuses_a_later_batch_task_until_the_current_batch_is_committed() {
+    let plan = admission_plan();
+    let config = admission_config();
+
+    let refused = evaluate_admission(
+        &plan,
+        &config,
+        &task("T003"),
+        &committed(&[]),
+        &in_progress(&[]),
+        &measured(&[]),
+    )
+    .unwrap();
+    assert_eq!(
+        refused,
+        AdmissionDecision::Rejected(AdmissionRejection::NotCurrentBatchMember {
+            task_id: task("T003"),
+            task_batch: batch_id("B2"),
+            current_batch: batch_id("B1"),
+        })
+    );
+
+    let admitted = evaluate_admission(
+        &plan,
+        &config,
+        &task("T003"),
+        &committed(&["T001", "T002"]),
+        &in_progress(&[]),
+        &measured(&[]),
+    )
+    .unwrap();
+    assert_eq!(admitted, AdmissionDecision::Admitted, "B2 opens once B1 is committed");
+}
+
+#[test]
+fn test_admission_admits_any_estimate_when_the_scope_carries_nothing_yet() {
+    let plan = planned_plan(
+        vec![estimate(
+            "T001",
+            vec![scope_estimate("domain", 900, 200)],
+            TaskDecomposition::Indivisible(justification("the transition table cannot be split")),
+        )],
+        vec![declaration("B1", &["T001"])],
+    );
+
+    let decision = evaluate_admission(
+        &plan,
+        &admission_config(),
+        &task("T001"),
+        &committed(&[]),
+        &in_progress(&[]),
+        &measured(&[]),
+    )
+    .unwrap();
+
+    assert_eq!(
+        decision,
+        AdmissionDecision::Admitted,
+        "1100 declared lines against a 500 ceiling still get in as the first contribution"
+    );
+}
+
+#[test]
+fn test_admission_refuses_when_the_prior_contribution_plus_the_estimate_passes_the_ceiling() {
+    let decision = evaluate_admission(
+        &admission_plan(),
+        &admission_config(),
+        &task("T002"),
+        &committed(&[]),
+        &in_progress(&[]),
+        &measured(&[("domain", 250)]),
+    )
+    .unwrap();
+
+    assert_eq!(
+        decision,
+        AdmissionDecision::Rejected(AdmissionRejection::ScopeCeilingWouldBeExceeded {
+            scope: scope("domain"),
+            prior_contribution: NonZeroLineCount::try_new(LineCount::new(250)).unwrap(),
+            candidate_estimate: LineCount::new(300),
+            ceiling: LineCount::new(500),
+        })
+    );
+}
+
+#[test]
+fn test_admission_counts_the_measured_diff_and_the_in_progress_estimates_together() {
+    // 100 measured + T001's declared 150 = 250 prior, plus T002's 300 = 550.
+    let decision = evaluate_admission(
+        &admission_plan(),
+        &admission_config(),
+        &task("T002"),
+        &committed(&[]),
+        &in_progress(&["T001"]),
+        &measured(&[("domain", 100)]),
+    )
+    .unwrap();
+
+    let Some(AdmissionRejection::ScopeCeilingWouldBeExceeded { prior_contribution, .. }) =
+        decision.rejection()
+    else {
+        panic!("the accumulated contribution must refuse the transition: {decision:?}");
+    };
+    assert_eq!(prior_contribution.get(), LineCount::new(250));
+}
+
+#[test]
+fn test_admission_leaves_scopes_the_candidate_does_not_declare_out_of_the_comparison() {
+    // T003 declares usecase only; domain is far over its ceiling already.
+    let decision = evaluate_admission(
+        &admission_plan(),
+        &admission_config(),
+        &task("T003"),
+        &committed(&["T001", "T002"]),
+        &in_progress(&[]),
+        &measured(&[("domain", 9_000)]),
+    )
+    .unwrap();
+
+    assert_eq!(decision, AdmissionDecision::Admitted);
+}
+
+#[test]
+fn test_admission_errors_when_the_batch_plan_holds_no_estimate_for_the_candidate() {
+    let result = evaluate_admission(
+        &admission_plan(),
+        &admission_config(),
+        &task("T404"),
+        &committed(&[]),
+        &in_progress(&[]),
+        &measured(&[]),
+    );
+
+    let Err(AdmissionEvaluationError::MissingTaskEstimate { task_id }) = result else {
+        panic!("an unestimated candidate must be an error, not a silent pass");
+    };
+    assert_eq!(task_id, task("T404"));
 }

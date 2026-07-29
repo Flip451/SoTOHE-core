@@ -14,6 +14,7 @@ pub mod adr_baseline;
 pub mod arch;
 pub mod baseline_capture;
 pub mod baseline_graph_workflow;
+pub mod batch_plan;
 pub mod branch_strategy;
 pub mod capability_exec;
 pub mod catalog_gen;

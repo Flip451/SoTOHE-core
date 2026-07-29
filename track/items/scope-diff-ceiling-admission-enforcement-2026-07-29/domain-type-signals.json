@@ -1,15 +1,15 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-29T08:51:18Z",
+  "generated_at": "2026-07-29T10:00:37Z",
   "declaration_hash": "aea7ea7270e640cf83c18fff9de37437185c176a51acfa8b3eb75060c3164e89",
-  "implementation_input_hash": "20c84323ee646c761c1a79aed28913d84acc08d874c8477ccf42cfc6de58fe49",
+  "implementation_input_hash": "8d4afbfa5c9a50ee6a3edd08826d6f28a2b62dcec6d8d4647cb5aa82f0385000",
   "signals": [
     {
       "type_name": "AdmissionDecision",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -19,9 +19,9 @@
     {
       "type_name": "AdmissionEvaluationError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Debug",
         "Display",
         "Error"
@@ -30,9 +30,9 @@
     {
       "type_name": "AdmissionRejection",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Display",
@@ -165,9 +165,9 @@
     {
       "type_name": "NonZeroLineCount",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Copy",
         "Debug",
@@ -260,8 +260,8 @@
     {
       "type_name": "domain::batch_plan::evaluate_admission",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "ReviewScopeConfig",

@@ -4,8 +4,8 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| AdmissionDecision | enum | add | Admitted, Rejected | 🟡 | 🔵 |
-| AdmissionRejection | enum | add | NotCurrentBatchMember, ScopeCeilingWouldBeExceeded | 🟡 | 🔵 |
+| AdmissionDecision | enum | add | Admitted, Rejected | 🔵 | 🔵 |
+| AdmissionRejection | enum | add | NotCurrentBatchMember, ScopeCeilingWouldBeExceeded | 🔵 | 🔵 |
 | BatchPlanGateOutcome | enum | add | Passed, Blocked | 🔵 | 🔵 |
 | BatchPlanGateViolation | enum | add | CeilingExceeded, OversizeScopeHasMultipleContributors, UnknownTaskRef, UnplannedTask, DependencyInLaterBatch | 🔵 | 🔵 |
 | ScopeCeiling | enum | add | Unconstrained, Limited | 🔵 | 🔵 |
@@ -22,7 +22,7 @@
 | LineCount | value_object | add | — | 🔵 | 🔵 |
 | MeasuredScopeDiff | value_object | add | — | 🔵 | 🔵 |
 | NonEmptyGateViolations | value_object | add | — | 🔵 | 🔵 |
-| NonZeroLineCount | value_object | add | — | 🟡 | 🔵 |
+| NonZeroLineCount | value_object | add | — | 🔵 | 🔵 |
 | ScopeLineEstimate | value_object | add | — | 🔵 | 🔵 |
 | TaskEstimate | value_object | add | — | 🔵 | 🔵 |
 
@@ -30,7 +30,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| AdmissionEvaluationError | error_type | add | MissingTaskEstimate | 🟡 | 🔵 |
+| AdmissionEvaluationError | error_type | add | MissingTaskEstimate | 🔵 | 🔵 |
 | BatchPlanValidationError | error_type | add | EmptyJustification, EmptyBatchId, EmptyBatch, DuplicateTaskEstimate, DuplicateScopeEstimate, DuplicateBatchId, MissingTaskEstimate, UnassignedTask, DuplicateBatchMembership | 🔵 | 🔵 |
 | ValidationError | error_type | modify | EmptyString, InvalidTrackId, InvalidTaskId, InvalidCommitHash, InvalidTimestamp, InvalidTrackBranch, BranchIdMismatch, StatusOverrideMismatch, EmptyTrackTitle, EmptyTaskDescription, EmptyPlanSectionId, EmptyPlanSectionTitle, DuplicateTaskId, DuplicatePlanSectionId, UnknownTaskReference, DuplicateTaskReference, UnreferencedTask, OverrideIncompatibleWithResolvedTasks, TrackActivationRequiresPlanningOnly, TrackActivationRequiresSchemaV3, TrackAlreadyMaterialized, UnsupportedTargetStatus, SectionNotFound, NoSectionsAvailable, TaskDescriptionMutated, TaskRemoved, DuplicateElementId, InvalidLayerId, InvalidSpecElementId, EmptyAdrAnchor, EmptyConventionAnchor, InvalidContentHash, EmptyInformalGroundSummary, MultiLineInformalGroundSummary, EmptyDecisionGroundRef, InvalidObligationMinimum, InvalidDetectionRate, UnknownDependencyReference, DependencyCycle, PlanOrderViolatesDependency | 🔵 | 🔵 |
 
@@ -45,7 +45,7 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | domain::batch_plan::check_batch_plan | free_function | add | fn(plan: &BatchPlanDocument, scope_config: &ReviewScopeConfig, planned_tasks: &[TrackTask]) -> BatchPlanGateOutcome | 🔵 | 🔵 |
-| domain::batch_plan::evaluate_admission | free_function | add | fn(plan: &BatchPlanDocument, scope_config: &ReviewScopeConfig, candidate: &TaskId, committed_task_ids: &std::collections::BTreeSet<TaskId>, in_progress_task_ids: &std::collections::BTreeSet<TaskId>, measured: &[MeasuredScopeDiff]) -> Result<AdmissionDecision, AdmissionEvaluationError> | 🟡 | 🔵 |
+| domain::batch_plan::evaluate_admission | free_function | add | fn(plan: &BatchPlanDocument, scope_config: &ReviewScopeConfig, candidate: &TaskId, committed_task_ids: &std::collections::BTreeSet<TaskId>, in_progress_task_ids: &std::collections::BTreeSet<TaskId>, measured: &[MeasuredScopeDiff]) -> Result<AdmissionDecision, AdmissionEvaluationError> | 🔵 | 🔵 |
 
 ## Entities
 

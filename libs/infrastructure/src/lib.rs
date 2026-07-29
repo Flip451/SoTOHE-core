@@ -6,6 +6,7 @@ extern crate self as infrastructure;
 pub mod adr_baseline;
 pub mod adr_decision;
 pub mod agent_profiles;
+pub mod batch_plan_codec;
 pub mod branch_strategy;
 pub use branch_strategy::{
     BranchStrategyConfigError, JsonConfigBranchStrategyAdapter, SnapshotBranchStrategyAdapter,

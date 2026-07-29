@@ -22,32 +22,33 @@
     {
       "id": "T003",
       "description": "T019 の完了後に `libs/domain/src/batch_plan/` へ check_batch_plan、BatchPlanGateOutcome、NonEmptyGateViolations、BatchPlanGateViolation を実装し、ReviewScopeConfig を参照して declared-dependency batch-order validation を追加する。IN-06、IN-07、AC-06、AC-07、AC-08、CN-02。",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "185d6f08"
     },
     {
       "id": "T004",
       "description": "`libs/domain/src/batch_plan/` に evaluate_admission、AdmissionDecision、AdmissionRejection、AdmissionEvaluationError、NonZeroLineCount を実装する。IN-09、IN-10、IN-11、AC-10、AC-11、AC-12、AC-13、AC-14、CN-03、CN-04。",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T005",
       "description": "`libs/usecase/src/batch_plan/` に BatchPlanReaderPort、PlannedTaskReaderPort、ScopeConfigReaderPort、ScopeDiffMeasurePort と各 error 型を定義する。IN-01、AC-01、AC-05、CN-09。",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T006",
       "description": "`libs/usecase/src/batch_plan/` に BatchPlanCheckService、BatchPlanCheckCommand、BatchPlanCheckError、BatchPlanCheckInteractor を実装する。IN-06、IN-07、AC-05、AC-06、AC-07、CN-09。",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T007",
       "description": "`libs/infrastructure/src/batch_plan_codec/` に BatchPlanDocumentDto、TaskEstimateDto、ScopeLineEstimateDto、BatchDeclarationDto、BatchPlanCodecError、decode を実装する。IN-01、IN-02、IN-03、IN-04、IN-05、AC-01、AC-02、AC-03、AC-04。",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T020",
       "description": "`libs/infrastructure/` の ImplPlanTaskDto に serde default 付きの depends_on を追加し、impl-plan codec の schema read/write を更新する。IN-19、IN-20、AC-05、AC-21、AC-22。",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T008",

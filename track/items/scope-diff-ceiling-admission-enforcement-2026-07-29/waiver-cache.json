@@ -120,6 +120,222 @@
         "citation": "\"Domain model of batch-plan.json.\"; \"wire-format metadata stays in the infrastructure DTO and codec\""
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ScopeDiffMeasureError",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-14"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ScopeDiffMeasureError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-14"
+      },
+      "key": {
+        "waived_reason_hash": "d5573592adcb7ad164b4b47aecfa9a77a779c3c47ec45c3bc7e04fc4f425a5f6",
+        "declaration_hash": "41c3533968a4d0fee82f5a7ecd50b2ff494d7ac6d50b681386a3d4b3ce6cb34e",
+        "anchor_text_hash": "ffdc22721890fd01dada6c95d08bcde7973a523171d5a1657e8f7ab3596e20e2"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TypeEntry { action: Add, role: ErrorType, kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"MeasureFailed\")), payload: Struct([FieldDecl { name: FieldName(Identifier(\"message\")), ty: TypeRef(\"domain::FreeText\") }]) }]"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ScopeDiffMeasureError",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-17"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ScopeDiffMeasureError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-17"
+      },
+      "key": {
+        "waived_reason_hash": "222b5a9478d6175efa958eec0a1fe15a67f41e52c30d4e717162488ab94237ca",
+        "declaration_hash": "41c3533968a4d0fee82f5a7ecd50b2ff494d7ac6d50b681386a3d4b3ce6cb34e",
+        "anchor_text_hash": "88b0b5d03fd4d86a87adeccb80ba003f2c27cb47ea187dfb176beb5f14792fb8"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Failure of the per-scope diff measurement port. Type-design: covers only a measurement that could not be produced"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BatchPlanDocumentDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BatchPlanDocumentDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "waived_reason_hash": "993aab98dbf05d6cec10a0eb105500eed93d3cd805ba9abc88e7fcbad6cca02e",
+        "declaration_hash": "0e23f59877e5d73de6a7e8cb8226f83f9ac6b94e2795fae6b8287cef0189d111",
+        "anchor_text_hash": "0f13d211aab11d6e0b46e0830657059fb92e8b2b8968baa9983b5702f958c101"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Deserialization mirror of batch-plan.json; derives Deserialize only."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BatchPlanReadError",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BatchPlanReadError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "waived_reason_hash": "af5f69236ec908472aa4f6f9ce858a8a557022d7b845cdf74a17121622594eb7",
+        "declaration_hash": "b4f3423b756b64f3f59b5372b292919cca93a4fb5af3685b1b446b84f3ff9814",
+        "anchor_text_hash": "9683b81e7639049c9f0d9fcc535e1fd9d50c190e2b084ae0cea60372eb6684b3"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "書き手は impl-planner のみ（1 file = 1 writer）で、admission を判定する CLI は読むだけである。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PlannedTaskReadError",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PlannedTaskReadError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-07"
+      },
+      "key": {
+        "waived_reason_hash": "316b033a23f7bbe8206a1d8b42b5eeffc53ed99c758dda293438f48ebac85707",
+        "declaration_hash": "53d70cabd44cd9b6b3b44ecc0463a9a3b033aa063bcd31560edc55dad4a55097",
+        "anchor_text_hash": "c2929a4e1e266bb67ee1550b8f08cbe7d63072dc726a0c6c09dbed623a4d1678"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "NotFound is its own variant so an absent implementation plan is reported rather than treated as an empty task list"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BatchPlanReaderPort",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BatchPlanReaderPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:read"
+      },
+      "key": {
+        "waived_reason_hash": "8174994efe298e13ddcf0c9665aee4e66da7d7da4ab20a93bea48ea74e00799b",
+        "declaration_hash": "d29b543fdbe3830f63ce3dbe16524b8665f095bc89e4c04beaddef5b908d296f",
+        "anchor_text_hash": "0f13d211aab11d6e0b46e0830657059fb92e8b2b8968baa9983b5702f958c101"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Driven port with a single read operation returning a validated domain document; no write operation."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ScopeDiffMeasurePort",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-14"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ScopeDiffMeasurePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:measure_scope_diff"
+      },
+      "key": {
+        "waived_reason_hash": "9ca56cd50f9678ed70c4bc44916f4e0fa39d04b4d68014338de6902252631b32",
+        "declaration_hash": "6c9df4eec20d2963cd93c250fa0fafe1c170d079bcdcd8cebdfa192d91b158b2",
+        "anchor_text_hash": "ffdc22721890fd01dada6c95d08bcde7973a523171d5a1657e8f7ab3596e20e2"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"the port surface exposes only the resulting figures — the counting definition and base resolution are the adapter's responsibility\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ScopeDiffMeasurePort",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-17"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ScopeDiffMeasurePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:measure_scope_diff"
+      },
+      "key": {
+        "waived_reason_hash": "25affb781feae7faf5ada4bb24447536cbf56b3403aff4dbc0efffc2c684d052",
+        "declaration_hash": "6c9df4eec20d2963cd93c250fa0fafe1c170d079bcdcd8cebdfa192d91b158b2",
+        "anchor_text_hash": "88b0b5d03fd4d86a87adeccb80ba003f2c27cb47ea187dfb176beb5f14792fb8"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Type-design: the port surface exposes only the resulting figures — the counting definition and base resolution are the adapter's responsibility."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ScopeDiffMeasurePort",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "CN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ScopeDiffMeasurePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:measure_scope_diff"
+      },
+      "key": {
+        "waived_reason_hash": "57262e216f82f668cb7d7a357c274918c2dcc15c887853d09e764159b3cdf05a",
+        "declaration_hash": "6c9df4eec20d2963cd93c250fa0fafe1c170d079bcdcd8cebdfa192d91b158b2",
+        "anchor_text_hash": "6f39c6a6690cc059399beb1b142b4869ea15ad8ee0648aa396dfba14c22d4fb2"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Driven port that measures the actual per-scope diff for a track. Type-design: the port surface exposes only the resulting figures — the counting definition and base resolution are the adapter's responsibility."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     }
   ]
 }

@@ -1982,6 +1982,3302 @@
           "test_name": "test_the_gate_ignores_the_batch_placement_of_tasks_that_declare_no_dependency"
         }
       ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "domain::batch_plan::evaluate_admission",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "domain::batch_plan::evaluate_admission",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "14c44226ae1f6b8b3bb01f49efba15c8f5080306fad9aa1cd31b5df3abb2fe88",
+        "declaration_hash": "95f903f88ef2be1d46516dde7c81c5dde9898e8185cafac0217f99b77c8d0b58",
+        "anchor_text_hash": "2b3c24ea936179e964f93c56a5e410861b7a62acf600d103c965bdf9dc5924af"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(refused,\n        AdmissionDecision::Rejected(AdmissionRejection::NotCurrentBatchMember {\n            task_id: task(\"T003\"),\n            task_batch: batch_id(\"B2\"),\n            current_batch: batch_id(\"B1\"),\n        })\n    );\n\n    let admitted = evaluate_admission(\n        &plan,\n        &config,\n        &task(\"T003\"),\n        &committed(&[\"T001\", \"T002\"]),\n        &in_progress(&[]),\n        &measured(&[]),\n    )\n    .unwrap();\n    assert_eq!(admitted, AdmissionDecision::Admitted, \"B2 opens once B1 is committed\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_admits_a_current_batch_member_within_every_ceiling"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_refuses_a_later_batch_task_until_the_current_batch_is_committed"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_admits_any_estimate_when_the_scope_carries_nothing_yet"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_refuses_when_the_prior_contribution_plus_the_estimate_passes_the_ceiling"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_counts_the_measured_diff_and_the_in_progress_estimates_together"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_leaves_scopes_the_candidate_does_not_declare_out_of_the_comparison"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_errors_when_the_batch_plan_holds_no_estimate_for_the_candidate"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "domain::batch_plan::evaluate_admission",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "domain::batch_plan::evaluate_admission",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "14c44226ae1f6b8b3bb01f49efba15c8f5080306fad9aa1cd31b5df3abb2fe88",
+        "declaration_hash": "95f903f88ef2be1d46516dde7c81c5dde9898e8185cafac0217f99b77c8d0b58",
+        "anchor_text_hash": "95f3aa6927f09837b3f404c8ffe20837feae78d7b9c33b8e60168b0adc31f8e1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"// 100 measured + T001's declared 150 = 250 prior, plus T002's 300 = 550.\\n    let decision = evaluate_admission(\\n        &admission_plan(),\\n        &admission_config(),\\n        &task(\\\"T002\\\"),\\n        &committed(&[]),\\n        &in_progress(&[\\\"T001\\\"]),\\n        &measured(&[(\\\"domain\\\", 100)]),\\n    )\"; \"// T003 declares usecase only; domain is far over its ceiling already.\\n    let decision = evaluate_admission(\\n        &admission_plan(),\\n        &admission_config(),\\n        &task(\\\"T003\\\"),\\n        &committed(&[\\\"T001\\\", \\\"T002\\\"]),\\n        &in_progress(&[]),\\n        &measured(&[(\\\"domain\\\", 9_000)]),\\n    );\\n\\n    assert_eq!(decision, AdmissionDecision::Admitted);\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_admits_a_current_batch_member_within_every_ceiling"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_refuses_a_later_batch_task_until_the_current_batch_is_committed"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_admits_any_estimate_when_the_scope_carries_nothing_yet"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_refuses_when_the_prior_contribution_plus_the_estimate_passes_the_ceiling"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_counts_the_measured_diff_and_the_in_progress_estimates_together"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_leaves_scopes_the_candidate_does_not_declare_out_of_the_comparison"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_errors_when_the_batch_plan_holds_no_estimate_for_the_candidate"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "domain::batch_plan::evaluate_admission",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-11"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "domain::batch_plan::evaluate_admission",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "14c44226ae1f6b8b3bb01f49efba15c8f5080306fad9aa1cd31b5df3abb2fe88",
+        "declaration_hash": "95f903f88ef2be1d46516dde7c81c5dde9898e8185cafac0217f99b77c8d0b58",
+        "anchor_text_hash": "ba23e05f2306cfc98569a4c3576e0b0323683ee52300232acc6f1b07f4a9d0f4"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let Err(AdmissionEvaluationError::MissingTaskEstimate { task_id }) = result else {\n        panic!(\"an unestimated candidate must be an error, not a silent pass\");\n    };\n    assert_eq!(task_id, task(\"T404\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_admits_a_current_batch_member_within_every_ceiling"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_refuses_a_later_batch_task_until_the_current_batch_is_committed"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_admits_any_estimate_when_the_scope_carries_nothing_yet"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_refuses_when_the_prior_contribution_plus_the_estimate_passes_the_ceiling"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_counts_the_measured_diff_and_the_in_progress_estimates_together"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_leaves_scopes_the_candidate_does_not_declare_out_of_the_comparison"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_errors_when_the_batch_plan_holds_no_estimate_for_the_candidate"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "domain::batch_plan::evaluate_admission",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "domain::batch_plan::evaluate_admission",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "14c44226ae1f6b8b3bb01f49efba15c8f5080306fad9aa1cd31b5df3abb2fe88",
+        "declaration_hash": "95f903f88ef2be1d46516dde7c81c5dde9898e8185cafac0217f99b77c8d0b58",
+        "anchor_text_hash": "7669b3f2178d882d0e0caa12e2ca90dacb12def84e7b001e4c49181fa2beb7e5"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n        refused,\n        AdmissionDecision::Rejected(AdmissionRejection::NotCurrentBatchMember {\n            task_id: task(\"T003\"),\n            task_batch: batch_id(\"B2\"),\n            current_batch: batch_id(\"B1\"),\n        })\n    );\n\n    let admitted = evaluate_admission(\n        &plan,\n        &config,\n        &task(\"T003\"),\n        &committed(&[\"T001\", \"T002\"]),\n        &in_progress(&[]),\n        &measured(&[]),\n    )\n    .unwrap();\n    assert_eq!(admitted, AdmissionDecision::Admitted, \"B2 opens once B1 is committed\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_admits_a_current_batch_member_within_every_ceiling"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_refuses_a_later_batch_task_until_the_current_batch_is_committed"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_admits_any_estimate_when_the_scope_carries_nothing_yet"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_refuses_when_the_prior_contribution_plus_the_estimate_passes_the_ceiling"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_counts_the_measured_diff_and_the_in_progress_estimates_together"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_leaves_scopes_the_candidate_does_not_declare_out_of_the_comparison"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_errors_when_the_batch_plan_holds_no_estimate_for_the_candidate"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "domain::batch_plan::evaluate_admission",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-11"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "domain::batch_plan::evaluate_admission",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "14c44226ae1f6b8b3bb01f49efba15c8f5080306fad9aa1cd31b5df3abb2fe88",
+        "declaration_hash": "95f903f88ef2be1d46516dde7c81c5dde9898e8185cafac0217f99b77c8d0b58",
+        "anchor_text_hash": "cd6dba41e9744a8b9c420f05a6ed4c430ae8e451896c2b15e05780901a2525ad"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"1100 declared lines against a 500 ceiling still get in as the first contribution\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_admits_a_current_batch_member_within_every_ceiling"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_refuses_a_later_batch_task_until_the_current_batch_is_committed"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_admits_any_estimate_when_the_scope_carries_nothing_yet"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_refuses_when_the_prior_contribution_plus_the_estimate_passes_the_ceiling"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_counts_the_measured_diff_and_the_in_progress_estimates_together"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_leaves_scopes_the_candidate_does_not_declare_out_of_the_comparison"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_errors_when_the_batch_plan_holds_no_estimate_for_the_candidate"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "domain::batch_plan::evaluate_admission",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-12"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "domain::batch_plan::evaluate_admission",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "14c44226ae1f6b8b3bb01f49efba15c8f5080306fad9aa1cd31b5df3abb2fe88",
+        "declaration_hash": "95f903f88ef2be1d46516dde7c81c5dde9898e8185cafac0217f99b77c8d0b58",
+        "anchor_text_hash": "d9b08a85d66d49d33298ae5cb8b1a9adf29f78988d1086b6c203d164cf23e094"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n        decision,\n        AdmissionDecision::Rejected(AdmissionRejection::ScopeCeilingWouldBeExceeded {\n            scope: scope(\"domain\"),\n            prior_contribution: NonZeroLineCount::try_new(LineCountCount::new(250)).unwrap(),\n            candidate_estimate: LineCount::new(300),\n            ceiling: LineCount::new(500),\n        })\n    );\n\n    // T003 declares usecase only; domain is far over its ceiling already.\n    let decision = evaluate_admission(\n        &admission_plan(),\n        &admission_config(),\n        &task(\"T003\"),\n        &committed(&[\"T001\", \"T002\"]),\n        &in_progress(&[]),\n        &measured(&[(\"domain\", 9_000)]),\n    )\n    .unwrap();\n\n    assert_eq!(decision, AdmissionDecision::Admitted);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_admits_a_current_batch_member_within_every_ceiling"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_refuses_a_later_batch_task_until_the_current_batch_is_committed"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_admits_any_estimate_when_the_scope_carries_nothing_yet"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_refuses_when_the_prior_contribution_plus_the_estimate_passes_the_ceiling"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_counts_the_measured_diff_and_the_in_progress_estimates_together"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_leaves_scopes_the_candidate_does_not_declare_out_of_the_comparison"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_errors_when_the_batch_plan_holds_no_estimate_for_the_candidate"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "domain::batch_plan::evaluate_admission",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "domain::batch_plan::evaluate_admission",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "14c44226ae1f6b8b3bb01f49efba15c8f5080306fad9aa1cd31b5df3abb2fe88",
+        "declaration_hash": "95f903f88ef2be1d46516dde7c81c5dde9898e8185cafac0217f99b77c8d0b58",
+        "anchor_text_hash": "debd8e5c6de40d604edc5f2398b882e836ba46f04e27cce0d3793b4c0a7c3337"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(decision, AdmissionDecision::Admitted);\n\nassert_eq!(\n        decision,\n        AdmissionDecision::Admitted,\n        \"1100 declared lines against a 500 ceiling still get in as the first contribution\"\n    );\n\nassert_eq!(decision, AdmissionDecision::Admitted);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_admits_a_current_batch_member_within_every_ceiling"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_refuses_a_later_batch_task_until_the_current_batch_is_committed"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_admits_any_estimate_when_the_scope_carries_nothing_yet"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_refuses_when_the_prior_contribution_plus_the_estimate_passes_the_ceiling"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_counts_the_measured_diff_and_the_in_progress_estimates_together"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_leaves_scopes_the_candidate_does_not_declare_out_of_the_comparison"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_errors_when_the_batch_plan_holds_no_estimate_for_the_candidate"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BatchPlanCheckInteractor",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BatchPlanCheckInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "1090508d529aa8b4d4f8ec9e70e415124e4517b724015b40d081410055c7f371",
+        "declaration_hash": "91d160b3449094d35c4f53e02f543f2cc389641be4765546cbf49efd75a8e38b",
+        "anchor_text_hash": "b55569ed0491a6dd15393ae8f789f1f315e56164fe0fe4ce8a5b7f28f50b1836"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n        outcome.violations().map(NonEmptyGateViolations::as_slice),\n        Some(\n            &[BatchPlanGateViolation::CeilingExceeded {\n                batch_id: BatchId::try_new(\"B1\").unwrap(),\n                scope: scope(\"domain\"),\n                total: LineCount::new(650),\n                ceiling: LineCount::new(500),\n            }][..]\n        )\n    );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_returns_the_domain_verdict_for_a_conforming_plan"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_returns_the_blocked_verdict_with_the_findings_it_carries"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_reports_an_absent_batch_plan_as_an_error_rather_than_a_pass"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_maps_each_port_failure_to_its_own_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_passes_the_commands_track_and_directory_to_every_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_returns_a_fail_closed_error_when_a_batch_scope_sum_passes_the_ceiling"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_lets_an_over_ceiling_scope_through_for_a_single_justified_contributor"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_leaves_a_scope_with_no_resolved_ceiling_out_of_the_comparison"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_reports_a_batch_plan_task_the_implementation_plan_does_not_have"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_reports_a_declared_dependency_that_sits_in_a_later_batch"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_leaves_the_batch_placement_of_undeclared_task_pairs_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_judges_each_scope_of_a_batch_on_its_own"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_a_plan_placing_one_task_in_two_batches_can_never_reach_the_check"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BatchPlanCheckInteractor",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BatchPlanCheckInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "1090508d529aa8b4d4f8ec9e70e415124e4517b724015b40d081410055c7f371",
+        "declaration_hash": "91d160b3449094d35c4f53e02f543f2cc389641be4765546cbf49efd75a8e38b",
+        "anchor_text_hash": "eb481557772cce6c718a0698518d721bb1cfe4faed60c6fa68d0cf0d5979cd4f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome.violations().map(NonEmptyGateViolations::as_slice), Some(&[BatchPlanGateViolation::UnknownTaskRef { task_id: task(\"T404\") }][..])); ... assert_eq!(outcome.violations().map(NonEmptyGateViolations::as_slice), Some(&[BatchPlanGateViolation::DependencyInLaterBatch { task_id: task(\"T001\"), task_batch: BatchId::try_new(\"B1\").unwrap(), dependency: task(\"T002\"), dependency_batch: BatchId::try_new(\"B2\").unwrap(), }][..])); ... assert_eq!(shared.violations().map(NonEmptyGateViolations::as_slice), Some(&[BatchPlanGateViolation::OversizeScopeHasMultipleContributors { batch_id: BatchId::try_new(\"B1\").unwrap(), scope: scope(\"domain\"), indivisible_task: task(\"T001\"), other_contributors: vec![task(\"T002\")], }][..]));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_returns_the_domain_verdict_for_a_conforming_plan"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_returns_the_blocked_verdict_with_the_findings_it_carries"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_reports_an_absent_batch_plan_as_an_error_rather_than_a_pass"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_maps_each_port_failure_to_its_own_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_passes_the_commands_track_and_directory_to_every_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_returns_a_fail_closed_error_when_a_batch_scope_sum_passes_the_ceiling"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_lets_an_over_ceiling_scope_through_for_a_single_justified_contributor"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_leaves_a_scope_with_no_resolved_ceiling_out_of_the_comparison"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_reports_a_batch_plan_task_the_implementation_plan_does_not_have"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_reports_a_declared_dependency_that_sits_in_a_later_batch"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_leaves_the_batch_placement_of_undeclared_task_pairs_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_judges_each_scope_of_a_batch_on_its_own"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_a_plan_placing_one_task_in_two_batches_can_never_reach_the_check"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BatchPlanCheckInteractor",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BatchPlanCheckInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "1090508d529aa8b4d4f8ec9e70e415124e4517b724015b40d081410055c7f371",
+        "declaration_hash": "91d160b3449094d35c4f53e02f543f2cc389641be4765546cbf49efd75a8e38b",
+        "anchor_text_hash": "8e8d05a0035149984760943bc7b4bdbf4d40df418d55a93c78eea4316bb4d6b0"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome.violations().map(NonEmptyGateViolations::as_slice),\n        Some(\n            &[BatchPlanGateViolation::CeilingExceeded {\n                batch_id: BatchId::try_new(\"B1\").unwrap(),\n                scope: scope(\"domain\"),\n                total: LineCount::new(650),\n                ceiling: LineCount::new(500),\n            }][..]\n        )\n    );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_returns_the_domain_verdict_for_a_conforming_plan"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_returns_the_blocked_verdict_with_the_findings_it_carries"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_reports_an_absent_batch_plan_as_an_error_rather_than_a_pass"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_maps_each_port_failure_to_its_own_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_passes_the_commands_track_and_directory_to_every_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_returns_a_fail_closed_error_when_a_batch_scope_sum_passes_the_ceiling"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_lets_an_over_ceiling_scope_through_for_a_single_justified_contributor"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_leaves_a_scope_with_no_resolved_ceiling_out_of_the_comparison"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_reports_a_batch_plan_task_the_implementation_plan_does_not_have"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_reports_a_declared_dependency_that_sits_in_a_later_batch"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_leaves_the_batch_placement_of_undeclared_task_pairs_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_judges_each_scope_of_a_batch_on_its_own"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_a_plan_placing_one_task_in_two_batches_can_never_reach_the_check"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BatchPlanCheckInteractor",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BatchPlanCheckInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "1090508d529aa8b4d4f8ec9e70e415124e4517b724015b40d081410055c7f371",
+        "declaration_hash": "91d160b3449094d35c4f53e02f543f2cc389641be4765546cbf49efd75a8e38b",
+        "anchor_text_hash": "c2929a4e1e266bb67ee1550b8f08cbe7d63072dc726a0c6c09dbed623a4d1678"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n        outcome.violations().map(NonEmptyGateViolations::as_slice),\n        Some(&[BatchPlanGateViolation::UnplannedTask { task_id: task(\"T002\") }][..])\n    );\n\nSome(&[BatchPlanGateViolation::UnknownTaskRef { task_id: task(\"T404\") }][..])\n\n&[BatchPlanGateViolation::DependencyInLaterBatch {\n                task_id: task(\"T001\"),\n                task_batch: BatchId::try_new(\"B1\").unwrap(),\n                dependency: task(\"T002\"),\n                dependency_batch: BatchId::try_new(\"B2\").unwrap(),\n            }][..]\n\n&[BatchPlanGateViolation::OversizeScopeHasMultipleContributors {\n                batch_id: BatchId::try_new(\"B1\").unwrap(),\n                scope: scope(\"domain\"),\n                indivisible_task: task(\"T001\"),\n                other_contributors: vec![task(\"T002\")],\n            }][..]\n\nassert_eq!(outcome, BatchPlanGateOutcome::Passed);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_returns_the_domain_verdict_for_a_conforming_plan"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_returns_the_blocked_verdict_with_the_findings_it_carries"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_reports_an_absent_batch_plan_as_an_error_rather_than_a_pass"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_maps_each_port_failure_to_its_own_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_passes_the_commands_track_and_directory_to_every_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_returns_a_fail_closed_error_when_a_batch_scope_sum_passes_the_ceiling"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_lets_an_over_ceiling_scope_through_for_a_single_justified_contributor"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_leaves_a_scope_with_no_resolved_ceiling_out_of_the_comparison"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_reports_a_batch_plan_task_the_implementation_plan_does_not_have"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_reports_a_declared_dependency_that_sits_in_a_later_batch"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_leaves_the_batch_placement_of_undeclared_task_pairs_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_judges_each_scope_of_a_batch_on_its_own"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_a_plan_placing_one_task_in_two_batches_can_never_reach_the_check"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BatchPlanCheckInteractor",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BatchPlanCheckInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "1090508d529aa8b4d4f8ec9e70e415124e4517b724015b40d081410055c7f371",
+        "declaration_hash": "91d160b3449094d35c4f53e02f543f2cc389641be4765546cbf49efd75a8e38b",
+        "anchor_text_hash": "c2d1440f1b318188f82fe538fe00e9fc3111a783e04547965c1c10b3437045dc"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n        outcome,\n        BatchPlanGateOutcome::Passed,\n        \"an unresolved ceiling cannot be exceeded, whatever the total\"\n    );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_returns_the_domain_verdict_for_a_conforming_plan"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_returns_the_blocked_verdict_with_the_findings_it_carries"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_reports_an_absent_batch_plan_as_an_error_rather_than_a_pass"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_maps_each_port_failure_to_its_own_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_passes_the_commands_track_and_directory_to_every_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_returns_a_fail_closed_error_when_a_batch_scope_sum_passes_the_ceiling"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_lets_an_over_ceiling_scope_through_for_a_single_justified_contributor"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_leaves_a_scope_with_no_resolved_ceiling_out_of_the_comparison"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_reports_a_batch_plan_task_the_implementation_plan_does_not_have"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_reports_a_declared_dependency_that_sits_in_a_later_batch"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_leaves_the_batch_placement_of_undeclared_task_pairs_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_judges_each_scope_of_a_batch_on_its_own"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_a_plan_placing_one_task_in_two_batches_can_never_reach_the_check"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BatchPlanCheckService",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BatchPlanCheckService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:check"
+      },
+      "key": {
+        "bound_tests_set_hash": "a2ee47817d7030290c5448fba98d0201e4174063428532422ff8b51664321215",
+        "declaration_hash": "af9ae2c84bb675db5da08cc36041bc6f17542e3c944c332210d963cd115cd1fb",
+        "anchor_text_hash": "b55569ed0491a6dd15393ae8f789f1f315e56164fe0fe4ce8a5b7f28f50b1836"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"B1 = T001 (300 + 100) + T002 (200 + 50) = 650 domain lines against 500.\" ... \"BatchPlanGateViolation::CeilingExceeded\"; \"1000 domain lines against 500, declared by the one task that says why it cannot be split.\" ... \"assert_eq!(exempt, BatchPlanGateOutcome::Passed)\"; \"The same excess with a second contributor is not exempt.\"; \"only the over-budget scope is reported\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_returns_the_domain_verdict_for_a_conforming_plan"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_returns_the_blocked_verdict_with_the_findings_it_carries"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_maps_each_port_failure_to_its_own_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_command_carries_the_track_and_the_items_directory"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_returns_a_fail_closed_error_when_a_batch_scope_sum_passes_the_ceiling"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_lets_an_over_ceiling_scope_through_for_a_single_justified_contributor"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_leaves_a_scope_with_no_resolved_ceiling_out_of_the_comparison"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_reports_a_batch_plan_task_the_implementation_plan_does_not_have"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_reports_a_declared_dependency_that_sits_in_a_later_batch"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_leaves_the_batch_placement_of_undeclared_task_pairs_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_judges_each_scope_of_a_batch_on_its_own"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_a_plan_placing_one_task_in_two_batches_can_never_reach_the_check"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_names_an_unknown_task_once_because_a_plan_cannot_separate_the_two_sides"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_accepts_a_declared_dependency_in_the_same_batch_or_an_earlier_one"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BatchPlanCheckService",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BatchPlanCheckService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:check"
+      },
+      "key": {
+        "bound_tests_set_hash": "a2ee47817d7030290c5448fba98d0201e4174063428532422ff8b51664321215",
+        "declaration_hash": "af9ae2c84bb675db5da08cc36041bc6f17542e3c944c332210d963cd115cd1fb",
+        "anchor_text_hash": "eb481557772cce6c718a0698518d721bb1cfe4faed60c6fa68d0cf0d5979cd4f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"// T001 depends on T002, but T002 is batched after it.\" ... \"DependencyInLaterBatch\"; \"// The same placement as the previous case, with no dependency declared.\" ... \"BatchPlanGateOutcome::Passed\"; \"// T002 depends on T001, and both sit in B1.\" ... \"assert_eq!(same_batch, BatchPlanGateOutcome::Passed);\"; \"// The same edge with the dependency one batch earlier.\" ... \"assert_eq!(earlier_batch, BatchPlanGateOutcome::Passed);\"; \"DuplicateBatchMembership\"; \"UnassignedTask\"; \"MissingTaskEstimate\"; \"UnknownTaskRef\"; \"OversizeScopeHasMultipleContributors\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_returns_the_domain_verdict_for_a_conforming_plan"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_returns_the_blocked_verdict_with_the_findings_it_carries"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_maps_each_port_failure_to_its_own_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_command_carries_the_track_and_the_items_directory"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_returns_a_fail_closed_error_when_a_batch_scope_sum_passes_the_ceiling"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_lets_an_over_ceiling_scope_through_for_a_single_justified_contributor"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_leaves_a_scope_with_no_resolved_ceiling_out_of_the_comparison"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_reports_a_batch_plan_task_the_implementation_plan_does_not_have"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_reports_a_declared_dependency_that_sits_in_a_later_batch"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_leaves_the_batch_placement_of_undeclared_task_pairs_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_judges_each_scope_of_a_batch_on_its_own"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_a_plan_placing_one_task_in_two_batches_can_never_reach_the_check"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_names_an_unknown_task_once_because_a_plan_cannot_separate_the_two_sides"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_accepts_a_declared_dependency_in_the_same_batch_or_an_earlier_one"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BatchPlanCheckService",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BatchPlanCheckService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:check"
+      },
+      "key": {
+        "bound_tests_set_hash": "a2ee47817d7030290c5448fba98d0201e4174063428532422ff8b51664321215",
+        "declaration_hash": "af9ae2c84bb675db5da08cc36041bc6f17542e3c944c332210d963cd115cd1fb",
+        "anchor_text_hash": "8e8d05a0035149984760943bc7b4bdbf4d40df418d55a93c78eea4316bb4d6b0"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome.violations().map(NonEmptyGateViolations::as_slice),\n        Some(\n            &[BatchPlanGateViolation::CeilingExceeded {\n                batch_id: BatchId::try_new(\"B1\").unwrap(),\n                scope: scope(\"domain\"),\n                total: LineCount::new(650),\n                ceiling: LineCount::new(500),\n            }][..]\n        )\n    );\n\nassert_eq!(exempt, BatchPlanGateOutcome::Passed);\n\nassert_eq!(violations.len(), 1, \"only the over-budget scope is reported: {violations:?}\");\nassert!(matches!(\n        violations.first(),\n        Some(BatchPlanGateViolation::CeilingExceeded { total, .. }) if *total == LineCount::new(650)\n    ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_returns_the_domain_verdict_for_a_conforming_plan"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_returns_the_blocked_verdict_with_the_findings_it_carries"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_maps_each_port_failure_to_its_own_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_command_carries_the_track_and_the_items_directory"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_returns_a_fail_closed_error_when_a_batch_scope_sum_passes_the_ceiling"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_lets_an_over_ceiling_scope_through_for_a_single_justified_contributor"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_leaves_a_scope_with_no_resolved_ceiling_out_of_the_comparison"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_reports_a_batch_plan_task_the_implementation_plan_does_not_have"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_reports_a_declared_dependency_that_sits_in_a_later_batch"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_leaves_the_batch_placement_of_undeclared_task_pairs_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_judges_each_scope_of_a_batch_on_its_own"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_a_plan_placing_one_task_in_two_batches_can_never_reach_the_check"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_names_an_unknown_task_once_because_a_plan_cannot_separate_the_two_sides"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_accepts_a_declared_dependency_in_the_same_batch_or_an_earlier_one"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BatchPlanCheckService",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BatchPlanCheckService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:check"
+      },
+      "key": {
+        "bound_tests_set_hash": "a2ee47817d7030290c5448fba98d0201e4174063428532422ff8b51664321215",
+        "declaration_hash": "af9ae2c84bb675db5da08cc36041bc6f17542e3c944c332210d963cd115cd1fb",
+        "anchor_text_hash": "c2929a4e1e266bb67ee1550b8f08cbe7d63072dc726a0c6c09dbed623a4d1678"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "Some(&[BatchPlanGateViolation::UnplannedTask { task_id: task(\"T002\") }][..])\n\nSome(&[BatchPlanGateViolation::UnknownTaskRef { task_id: task(\"T404\") }][..])\n\nSome(\n            &[BatchPlanGateViolation::DependencyInLaterBatch {\n                task_id: task(\"T001\"),\n                task_batch: BatchId::try_new(\"B1\").unwrap(),\n                dependency: task(\"T002\"),\n                dependency_batch: BatchId::try_new(\"B2\").unwrap(),\n            }][..]\n        )\n\nSome(\n            &[BatchPlanGateViolation::OversizeScopeHasMultipleContributors {\n                batch_id: BatchId::try_new(\"B1\").unwrap(),\n                scope: scope(\"domain\"),\n                indivisible_task: task(\"T001\"),\n                other_contributors: vec![task(\"T002\")],\n            }][..]\n        )\n\nassert_eq!(outcome, BatchPlanGateOutcome::Passed);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_returns_the_domain_verdict_for_a_conforming_plan"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_returns_the_blocked_verdict_with_the_findings_it_carries"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_maps_each_port_failure_to_its_own_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_command_carries_the_track_and_the_items_directory"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_returns_a_fail_closed_error_when_a_batch_scope_sum_passes_the_ceiling"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_lets_an_over_ceiling_scope_through_for_a_single_justified_contributor"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_leaves_a_scope_with_no_resolved_ceiling_out_of_the_comparison"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_reports_a_batch_plan_task_the_implementation_plan_does_not_have"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_reports_a_declared_dependency_that_sits_in_a_later_batch"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_leaves_the_batch_placement_of_undeclared_task_pairs_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_judges_each_scope_of_a_batch_on_its_own"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_a_plan_placing_one_task_in_two_batches_can_never_reach_the_check"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_names_an_unknown_task_once_because_a_plan_cannot_separate_the_two_sides"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_accepts_a_declared_dependency_in_the_same_batch_or_an_earlier_one"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BatchPlanReaderPort",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BatchPlanReaderPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:read"
+      },
+      "key": {
+        "bound_tests_set_hash": "02b26681e3d8daa1d43e501d777feae8bfa8594a42d96726c61dfad5b89c1f01",
+        "declaration_hash": "d29b543fdbe3830f63ce3dbe16524b8665f095bc89e4c04beaddef5b908d296f",
+        "anchor_text_hash": "9683b81e7639049c9f0d9fcc535e1fd9d50c190e2b084ae0cea60372eb6684b3"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let document = reader.read(&items_dir(), &track()).unwrap();\n\nassert_eq!(document.track_id(), &track());\n\nassert!(matches!(absent.read(&items_dir(), &track()), Err(BatchPlanReadError::NotFound)));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_batch_plan_reader_port_hands_the_document_it_read_to_its_caller"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_batch_plan_reader_port_reports_an_absent_plan_apart_from_a_read_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_reports_an_absent_batch_plan_as_an_error_rather_than_a_pass"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BatchPlanReaderPort",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BatchPlanReaderPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:read"
+      },
+      "key": {
+        "bound_tests_set_hash": "02b26681e3d8daa1d43e501d777feae8bfa8594a42d96726c61dfad5b89c1f01",
+        "declaration_hash": "d29b543fdbe3830f63ce3dbe16524b8665f095bc89e4c04beaddef5b908d296f",
+        "anchor_text_hash": "e9cf369179b1f393ace511957edfcf54e9bf015b5bcde5c51923fa50053471da"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(absent.read(&items_dir(), &track()), Err(BatchPlanReadError::NotFound)));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_batch_plan_reader_port_hands_the_document_it_read_to_its_caller"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_batch_plan_reader_port_reports_an_absent_plan_apart_from_a_read_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_reports_an_absent_batch_plan_as_an_error_rather_than_a_pass"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PlannedTaskReaderPort",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PlannedTaskReaderPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:read_planned_tasks"
+      },
+      "key": {
+        "bound_tests_set_hash": "983f438eeb47b6dab96ceef70d17e10ed194962dbfec5fe449d6440d8384ae12",
+        "declaration_hash": "164ca385f89d868d9966cc74ac471ec4b0177a8ab7d56a5409bf319796c372dc",
+        "anchor_text_hash": "eb481557772cce6c718a0698518d721bb1cfe4faed60c6fa68d0cf0d5979cd4f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(tasks[1].depends_on(), &[task(\"T001\")]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_planned_task_reader_port_returns_the_tasks_with_their_declared_dependencies"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_planned_task_reader_port_reports_an_absent_plan_apart_from_a_read_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_an_absent_implementation_plan_stops_the_gate_instead_of_checking_an_empty_task_list"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PlannedTaskReaderPort",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PlannedTaskReaderPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:read_planned_tasks"
+      },
+      "key": {
+        "bound_tests_set_hash": "983f438eeb47b6dab96ceef70d17e10ed194962dbfec5fe449d6440d8384ae12",
+        "declaration_hash": "164ca385f89d868d9966cc74ac471ec4b0177a8ab7d56a5409bf319796c372dc",
+        "anchor_text_hash": "c2929a4e1e266bb67ee1550b8f08cbe7d63072dc726a0c6c09dbed623a4d1678"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(tasks[1].depends_on(), &[task(\"T001\")]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_planned_task_reader_port_returns_the_tasks_with_their_declared_dependencies"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_planned_task_reader_port_reports_an_absent_plan_apart_from_a_read_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_an_absent_implementation_plan_stops_the_gate_instead_of_checking_an_empty_task_list"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ScopeConfigReaderPort",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ScopeConfigReaderPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:read"
+      },
+      "key": {
+        "bound_tests_set_hash": "59aee22c8bc83f78287ef35bd558d3ef0c4154095f8a89cc5aad3db52d4ada77",
+        "declaration_hash": "853a059465b998378db4eca52fbce7adbea36db3307e1c9f947140d8861edd24",
+        "anchor_text_hash": "b55569ed0491a6dd15393ae8f789f1f315e56164fe0fe4ce8a5b7f28f50b1836"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(config.diff_ceiling_for_scope(&scope(\"domain\")), Some(500));\n    assert_eq!(config.diff_ceiling_for_scope(&scope(\"usecase\")), None);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_scope_config_reader_port_returns_the_configuration_the_ceilings_come_from"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ScopeConfigReaderPort",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ScopeConfigReaderPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:read"
+      },
+      "key": {
+        "bound_tests_set_hash": "59aee22c8bc83f78287ef35bd558d3ef0c4154095f8a89cc5aad3db52d4ada77",
+        "declaration_hash": "853a059465b998378db4eca52fbce7adbea36db3307e1c9f947140d8861edd24",
+        "anchor_text_hash": "c2d1440f1b318188f82fe538fe00e9fc3111a783e04547965c1c10b3437045dc"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(config.diff_ceiling_for_scope(&scope(\"usecase\")), None);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_scope_config_reader_port_returns_the_configuration_the_ceilings_come_from"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ScopeDiffMeasurePort",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ScopeDiffMeasurePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:measure_scope_diff"
+      },
+      "key": {
+        "bound_tests_set_hash": "aab135417e71ce160d1a842c08513d225046c1c4182d875c6c418f1155579eab",
+        "declaration_hash": "6c9df4eec20d2963cd93c250fa0fafe1c170d079bcdcd8cebdfa192d91b158b2",
+        "anchor_text_hash": "95f3aa6927f09837b3f404c8ffe20837feae78d7b9c33b8e60168b0adc31f8e1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(measured[0].scope(), &scope(\"domain\"));\n    assert_eq!(measured[0].lines(), LineCount::new(412));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_scope_diff_measure_port_returns_one_measured_figure_per_scope"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "infrastructure::batch_plan_codec::decode",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::batch_plan_codec::decode",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "1139dba488298528aefb9f342a543bd44b5ab92b1614244cfc717e5706c9c18e",
+        "declaration_hash": "6d3eb1d9cfa8e286a47963daecf97acbad186b33112f77f568cf566a04b9ba99",
+        "anchor_text_hash": "b9f5e83a9863c95ab642c68f0860766cc06b000b96527823d9680291c5f0ecce"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let err = decode(&json).unwrap_err();\n\n        assert!(\n            matches!(\n                err,\n                BatchPlanCodecError::InvalidDocument {\n                    source: BatchPlanValidationError::UnassignedTask { .. }\n                }\n            ),\n            \"unexpected error: {err}\"\n        );\n\nlet err = decode(&json).unwrap_err();\n\n        assert!(\n            matches!(\n                err,\n                BatchPlanCodecError::InvalidDocument {\n                    source: BatchPlanValidationError::MissingTaskEstimate { .. }\n                }\n            ),\n            \"unexpected error: {err}\"\n        );\n\nlet err = decode(&json).unwrap_err();\n\n        assert!(\n            matches!(\n                err,\n                BatchPlanCodecError::InvalidDocument {\n                    source: BatchPlanValidationError::DuplicateBatchMembership { .. }\n                }\n            ),\n            \"unexpected error: {err}\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_reads_a_declared_batch_plan_into_the_domain_document"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_reads_the_reserved_other_scope_name"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_reads_a_null_justification_as_a_decomposable_task"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_reads_a_stated_justification_as_an_indivisible_task"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_reads_an_omitted_justification_the_same_as_an_explicit_null"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_a_schema_version_it_does_not_read"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_text_that_is_not_the_declared_json"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_an_unrecognised_field"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_refuses_a_value_that_is_not_the_identifier_it_stands_for"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_hands_a_file_internal_inconsistency_to_the_domain_unchanged"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_a_batch_member_with_no_declared_estimate"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_a_task_claimed_by_more_than_one_batch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_reads_each_batch_member_list_into_domain_task_ids"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_a_batch_entry_that_declares_a_line_figure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_a_per_scope_estimate_it_cannot_read"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "infrastructure::batch_plan_codec::decode",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::batch_plan_codec::decode",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "1139dba488298528aefb9f342a543bd44b5ab92b1614244cfc717e5706c9c18e",
+        "declaration_hash": "6d3eb1d9cfa8e286a47963daecf97acbad186b33112f77f568cf566a04b9ba99",
+        "anchor_text_hash": "220331a95d2bc318a00f3048c4098bfa0ace56170fb5604b5f6a202aa8f306ca"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "        // T002 is estimated but no batch claims it.\n        let json = VALID_JSON.replace(\"{\\\"id\\\": \\\"B2\\\", \\\"task_ids\\\": [\\\"T002\\\"]}\", \"\");\n        let json = json.replace(\n            \"{\\\"id\\\": \\\"B1\\\", \\\"task_ids\\\": [\\\"T001\\\"]},\",\n            \"{\\\"id\\\": \\\"B1\\\", \\\"task_ids\\\": [\\\"T001\\\"]}\"\n        );\n\n        let err = decode(&json).unwrap_err();\n\n        assert!(\n            matches!(\n                err,\n                BatchPlanCodecError::InvalidDocument {\n                    source: BatchPlanValidationError::UnassignedTask { .. }\n                }\n            ),\n            \"unexpected error: {err}\"\n        );\n    }\n{\n        let json = VALID_JSON.replace(\n            \"{\\\"id\\\": \\\"B1\\\", \\\"task_ids\\\": [\\\"T001\\\"]}\",\n            \"{\\\"id\\\": \\\"B1\\\", \\\"task_ids\\\": [\\\"T001\\\", \\\"T003\\\"]}\",\n        );\n\n        let err = decode(&json).unwrap_err();\n\n        assert!(\n            matches!(\n                err,\n                BatchPlanCodecError::InvalidDocument {\n                    source: BatchPlanValidationError::MissingTaskEstimate { .. }\n                }\n            ),\n            \"unexpected error: {err}\"\n        );\n    }\n{\n        let json = VALID_JSON.replace(\n            \"{\\\"id\\\": \\\"B2\\\", \\\"task_ids\\\": [\\\"T002\\\"]}\",\n            \"{\\\"id\\\": \\\"B2\\\", \\\"task_ids\\\": [\\\"T002\\\", \\\"T001\\\"]}\",\n        );\n\n        let err = decode(&json).unwrap_err();\n\n        assert!(\n            matches!(\n                err,\n                BatchPlanCodecError::InvalidDocument {\n                    source: BatchPlanValidationError::DuplicateBatchMembership { .. }\n                }\n            ),\n            \"unexpected error: {err}\"\n        );\n    }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_reads_a_declared_batch_plan_into_the_domain_document"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_reads_the_reserved_other_scope_name"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_reads_a_null_justification_as_a_decomposable_task"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_reads_a_stated_justification_as_an_indivisible_task"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_reads_an_omitted_justification_the_same_as_an_explicit_null"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_a_schema_version_it_does_not_read"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_text_that_is_not_the_declared_json"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_an_unrecognised_field"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_refuses_a_value_that_is_not_the_identifier_it_stands_for"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_hands_a_file_internal_inconsistency_to_the_domain_unchanged"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_a_batch_member_with_no_declared_estimate"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_a_task_claimed_by_more_than_one_batch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_reads_each_batch_member_list_into_domain_task_ids"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_a_batch_entry_that_declares_a_line_figure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_a_per_scope_estimate_it_cannot_read"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdmissionDecision",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdmissionDecision",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-09"
+      },
+      "key": {
+        "bound_tests_set_hash": "774129da1e9b1ede2a19ff1c32815502ab0673f2b4315e35e470a098dbeda6a6",
+        "declaration_hash": "8835f02693cbee133cc1e893a05b277285a7823104bf119d6df3c7562053901b",
+        "anchor_text_hash": "2b3c24ea936179e964f93c56a5e410861b7a62acf600d103c965bdf9dc5924af"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n        refused,\n        AdmissionDecision::Rejected(AdmissionRejection::NotCurrentBatchMember {\n            task_id: task(\"T003\"),\n            task_batch: batch_id(\"B2\"),\n            current_batch: batch_id(\"B1\"),\n        })\n    );\n\n    let admitted = evaluate_admission(\n        &plan,\n        &config,\n        &task(\"T003\"),\n        &committed(&[\"T001\", \"T002\"]),\n        &in_progress(&[]),\n        &measured(&[]),\n    )\n    .unwrap();\n    assert_eq!(admitted, AdmissionDecision::Admitted, \"B2 opens once B1 is committed\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_refuses_a_later_batch_task_until_the_current_batch_is_committed"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_an_admission_decision_carries_its_rejection_only_when_it_refuses"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdmissionDecision",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdmissionDecision",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-10"
+      },
+      "key": {
+        "bound_tests_set_hash": "088369618c0795fdd8a92e03da4a7e1a7db1dd8cf7ee41b7e5e89519a1f9b39e",
+        "declaration_hash": "8835f02693cbee133cc1e893a05b277285a7823104bf119d6df3c7562053901b",
+        "anchor_text_hash": "95f3aa6927f09837b3f404c8ffe20837feae78d7b9c33b8e60168b0adc31f8e1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n        decision,\n        AdmissionDecision::Rejected(AdmissionRejection::ScopeCeilingWouldBeExceeded {\n            scope: scope(\"domain\"),\n            prior_contribution: NonZeroLineCount::try_new(LineCount::new(250)).unwrap(),\n            candidate_estimate: LineCount::new(300),\n            ceiling: LineCount::new(500),\n        })\n    );\n\n    assert_eq!(decision, AdmissionDecision::Admitted);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_refuses_when_the_prior_contribution_plus_the_estimate_passes_the_ceiling"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_admits_a_current_batch_member_within_every_ceiling"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_an_admission_decision_carries_its_rejection_only_when_it_refuses"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdmissionDecision",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdmissionDecision",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-10"
+      },
+      "key": {
+        "bound_tests_set_hash": "f49c5141d0f7e14a64833de9c4133186ccfad921cea773fca0b78ff5600afe8d",
+        "declaration_hash": "8835f02693cbee133cc1e893a05b277285a7823104bf119d6df3c7562053901b",
+        "anchor_text_hash": "7669b3f2178d882d0e0caa12e2ca90dacb12def84e7b001e4c49181fa2beb7e5"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n        refused,\n        AdmissionDecision::Rejected(AdmissionRejection::NotCurrentBatchMember {\n            task_id: task(\"T003\"),\n            task_batch: batch_id(\"B2\"),\n            current_batch: batch_id(\"B1\"),\n        })\n    );\n\n    let admitted = evaluate_admission(\n        &plan,\n        &config,\n        &task(\"T003\"),\n        &committed(&[\"T001\", \"T002\"]),\n        &in_progress(&[]),\n        &measured(&[]),\n    )\n    .unwrap();\n    assert_eq!(admitted, AdmissionDecision::Admitted, \"B2 opens once B1 is committed\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_refuses_a_later_batch_task_until_the_current_batch_is_committed"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_admits_a_current_batch_member_within_every_ceiling"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdmissionDecision",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-11"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdmissionDecision",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-11"
+      },
+      "key": {
+        "bound_tests_set_hash": "79f25c861b6c8503d54ce7946fe8d9c57ec2951547a1b049bf6a866ca6a13c74",
+        "declaration_hash": "8835f02693cbee133cc1e893a05b277285a7823104bf119d6df3c7562053901b",
+        "anchor_text_hash": "cd6dba41e9744a8b9c420f05a6ed4c430ae8e451896c2b15e05780901a2525ad"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "decision,\n        AdmissionDecision::Admitted,\n        \"1100 declared lines against a 500 ceiling still get in as the first contribution\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_admits_any_estimate_when_the_scope_carries_nothing_yet"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_an_admission_decision_carries_its_rejection_only_when_it_refuses"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdmissionRejection",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdmissionRejection",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-09"
+      },
+      "key": {
+        "bound_tests_set_hash": "7787dbd2cf9a34661c9ae3eca385e94562b801c26e193bfd14538cfbdca81533",
+        "declaration_hash": "12d17992a46009567302f4787692e7ef0f28822eb2c73d739ebf593e6ff8e8ac",
+        "anchor_text_hash": "2b3c24ea936179e964f93c56a5e410861b7a62acf600d103c965bdf9dc5924af"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n        refused,\n        AdmissionDecision::Rejected(AdmissionRejection::NotCurrentBatchMember {\n            task_id: task(\"T003\"),\n            task_batch: batch_id(\"B2\"),\n            current_batch: batch_id(\"B1\"),\n        })\n    );\n\n    let admitted = evaluate_admission(\n        &plan,\n        &config,\n        &task(\"T003\"),\n        &committed(&[\"T001\", \"T002\"]),\n        &in_progress(&[]),\n        &measured(&[]),\n    )\n    .unwrap();\n    assert_eq!(admitted, AdmissionDecision::Admitted, \"B2 opens once B1 is committed\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_refuses_a_later_batch_task_until_the_current_batch_is_committed"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_rejection_renders_the_arithmetic_it_carries"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdmissionRejection",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdmissionRejection",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-10"
+      },
+      "key": {
+        "bound_tests_set_hash": "ae907388211d1760459b739a3de702a57d4df1e6ad25331ef00d60991bcc2cdd",
+        "declaration_hash": "12d17992a46009567302f4787692e7ef0f28822eb2c73d739ebf593e6ff8e8ac",
+        "anchor_text_hash": "95f3aa6927f09837b3f404c8ffe20837feae78d7b9c33b8e60168b0adc31f8e1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "decision,\n        AdmissionDecision::Rejected(AdmissionRejection::ScopeCeilingWouldBeExceeded {\n            scope: scope(\"domain\"),\n            prior_contribution: NonZeroLineCount::try_new(LineCount::new(250)).unwrap(),\n            candidate_estimate: LineCount::new(300),\n            ceiling: LineCount::new(500),\n        })"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_refuses_when_the_prior_contribution_plus_the_estimate_passes_the_ceiling"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_counts_the_measured_diff_and_the_in_progress_estimates_together"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdmissionRejection",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdmissionRejection",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-10"
+      },
+      "key": {
+        "bound_tests_set_hash": "7787dbd2cf9a34661c9ae3eca385e94562b801c26e193bfd14538cfbdca81533",
+        "declaration_hash": "12d17992a46009567302f4787692e7ef0f28822eb2c73d739ebf593e6ff8e8ac",
+        "anchor_text_hash": "7669b3f2178d882d0e0caa12e2ca90dacb12def84e7b001e4c49181fa2beb7e5"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let refused = evaluate_admission(\n        &plan,\n        &config,\n        &task(\"T003\"),\n        &committed(&[]),\n        &in_progress(&[]),\n        &measured(&[]),\n    )\n    .unwrap();\n    assert_eq!(\n        refused,\n        AdmissionDecision::Rejected(AdmissionRejection::NotCurrentBatchMember {\n            task_id: task(\"T003\"),\n            task_batch: batch_id(\"B2\"),\n            current_batch: batch_id(\"B1\"),\n        })\n    );\n\n    let admitted = evaluate_admission(\n        &plan,\n        &config,\n        &task(\"T003\"),\n        &committed(&[\"T001\", \"T002\"]),\n        &in_progress(&[]),\n        &measured(&[]),\n    )\n    .unwrap();\n    assert_eq!(admitted, AdmissionDecision::Admitted, \"B2 opens once B1 is committed\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_refuses_a_later_batch_task_until_the_current_batch_is_committed"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_rejection_renders_the_arithmetic_it_carries"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdmissionRejection",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-12"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdmissionRejection",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-12"
+      },
+      "key": {
+        "bound_tests_set_hash": "9170fea983461b37a026a634c54ea6fb509644da27b65979daafdad97667613e",
+        "declaration_hash": "12d17992a46009567302f4787692e7ef0f28822eb2c73d739ebf593e6ff8e8ac",
+        "anchor_text_hash": "d9b08a85d66d49d33298ae5cb8b1a9adf29f78988d1086b6c203d164cf23e094"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n        decision,\n        AdmissionDecision::Rejected(AdmissionRejection::ScopeCeilingWouldBeExceeded {\n            scope: scope(\"domain\"),\n            prior_contribution: NonZeroLineCount::try_new(LineCount::new(250)).unwrap(),\n            candidate_estimate: LineCount::new(300),\n            ceiling: LineCount::new(500),\n        })\n    );\n\n// T003 declares usecase only; domain is far over its ceiling already.\nassert_eq!(decision, AdmissionDecision::Admitted);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_refuses_when_the_prior_contribution_plus_the_estimate_passes_the_ceiling"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_leaves_scopes_the_candidate_does_not_declare_out_of_the_comparison"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdmissionEvaluationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-11"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdmissionEvaluationError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-11"
+      },
+      "key": {
+        "bound_tests_set_hash": "be00f59c8f529a7da30128036db7da4df76997bcee04b4137d8ba816e808440b",
+        "declaration_hash": "d5a920608fe5de7fbc9b2aec9d60c4d785cc3fc95f39ffca96432622708de0ad",
+        "anchor_text_hash": "ba23e05f2306cfc98569a4c3576e0b0323683ee52300232acc6f1b07f4a9d0f4"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let Err(AdmissionEvaluationError::MissingTaskEstimate { task_id }) = result else {\n        panic!(\"an unestimated candidate must be an error, not a silent pass\");\n    };\n    assert_eq!(task_id, task(\"T404\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_errors_when_the_batch_plan_holds_no_estimate_for_the_candidate"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdmissionEvaluationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-13"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdmissionEvaluationError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-13"
+      },
+      "key": {
+        "bound_tests_set_hash": "be00f59c8f529a7da30128036db7da4df76997bcee04b4137d8ba816e808440b",
+        "declaration_hash": "d5a920608fe5de7fbc9b2aec9d60c4d785cc3fc95f39ffca96432622708de0ad",
+        "anchor_text_hash": "8729f7c817db6afd215a120adad4df45ae5dba370f55d1cfe59c3227ff1dda4c"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let result = evaluate_admission(\n        &admission_plan(),\n        &admission_config(),\n        &task(\"T404\"),\n        &committed(&[]),\n        &in_progress(&[]),\n        &measured(&[]),\n    );\n\n    let Err(AdmissionEvaluationError::MissingTaskEstimate { task_id }) = result else {\n        panic!(\"an unestimated candidate must be an error, not a silent pass\");\n    };"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_errors_when_the_batch_plan_holds_no_estimate_for_the_candidate"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "NonZeroLineCount",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "NonZeroLineCount",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "13e8d933b7436992cc8d83e3893554311ad6bfc005df718ac1adc8a6615969c0",
+        "declaration_hash": "33034657258464e05530539313da41b2faf13411b6c4772e8f88cb51fb244a76",
+        "anchor_text_hash": "debd8e5c6de40d604edc5f2398b882e836ba46f04e27cce0d3793b4c0a7c3337"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"1100 declared lines against a 500 ceiling still get in as the first contribution\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_zero_quantity_cannot_become_a_non_zero_line_count"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_admits_any_estimate_when_the_scope_carries_nothing_yet"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "NonZeroLineCount",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "NonZeroLineCount",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-10"
+      },
+      "key": {
+        "bound_tests_set_hash": "684bf759803670d26ff54d6c10bcb5d9e65f8a205e00ade99cbbde190d2d55de",
+        "declaration_hash": "33034657258464e05530539313da41b2faf13411b6c4772e8f88cb51fb244a76",
+        "anchor_text_hash": "95f3aa6927f09837b3f404c8ffe20837feae78d7b9c33b8e60168b0adc31f8e1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(prior_contribution.get(), LineCount::new(250));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_counts_the_measured_diff_and_the_in_progress_estimates_together"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_refuses_when_the_prior_contribution_plus_the_estimate_passes_the_ceiling"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "NonZeroLineCount",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-11"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "NonZeroLineCount",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-11"
+      },
+      "key": {
+        "bound_tests_set_hash": "13e8d933b7436992cc8d83e3893554311ad6bfc005df718ac1adc8a6615969c0",
+        "declaration_hash": "33034657258464e05530539313da41b2faf13411b6c4772e8f88cb51fb244a76",
+        "anchor_text_hash": "cd6dba41e9744a8b9c420f05a6ed4c430ae8e451896c2b15e05780901a2525ad"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n        decision,\n        AdmissionDecision::Admitted,\n        \"1100 declared lines against a 500 ceiling still get in as the first contribution\"\n    );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_zero_quantity_cannot_become_a_non_zero_line_count"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_admits_any_estimate_when_the_scope_carries_nothing_yet"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BatchPlanCheckCommand",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BatchPlanCheckCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "3e811be640cd81ed90d75a6e8aadadd91553c8121e2e41c734b030a35f35d0aa",
+        "declaration_hash": "dd6d81c33437c2e50afae750832787203cd9f627908448f35c5e076d5bbe7592",
+        "anchor_text_hash": "b55569ed0491a6dd15393ae8f789f1f315e56164fe0fe4ce8a5b7f28f50b1836"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(cmd.track_id, track());\n    assert_eq!(cmd.items_dir, items_dir());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_command_carries_the_track_and_the_items_directory"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_passes_the_commands_track_and_directory_to_every_port"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BatchPlanCheckCommand",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BatchPlanCheckCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "7b835978acc204085b5909f1e820af6ca57ef1daedf086dcef89d227251eeee6",
+        "declaration_hash": "dd6d81c33437c2e50afae750832787203cd9f627908448f35c5e076d5bbe7592",
+        "anchor_text_hash": "8e8d05a0035149984760943bc7b4bdbf4d40df418d55a93c78eea4316bb4d6b0"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(exempt, BatchPlanGateOutcome::Passed);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_command_carries_the_track_and_the_items_directory"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_returns_a_fail_closed_error_when_a_batch_scope_sum_passes_the_ceiling"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_lets_an_over_ceiling_scope_through_for_a_single_justified_contributor"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BatchPlanCheckError",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BatchPlanCheckError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "3cce07ab903b54311d34e639cb5777c547939c6dc1aac59a5b55de5ca8106475",
+        "declaration_hash": "e0111a1f36092317be6654795b75eaa073e4540c7b716516666c12392963ece2",
+        "anchor_text_hash": "b55569ed0491a6dd15393ae8f789f1f315e56164fe0fe4ce8a5b7f28f50b1836"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n        unreadable_plan.check(command()),\n        Err(BatchPlanCheckError::BatchPlanReadFailed { .. })\n    ));\n\nassert!(matches!(\n        absent_impl_plan.check(command()),\n        Err(BatchPlanCheckError::ImplPlanNotFound)\n    ));\n\nassert!(matches!(\n        unreadable_impl_plan.check(command()),\n        Err(BatchPlanCheckError::ImplPlanReadFailed { .. })\n    ));\n\nassert!(matches!(\n        unreadable_config.check(command()),\n        Err(BatchPlanCheckError::ScopeConfigReadFailed { .. })\n    ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_maps_each_port_failure_to_its_own_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_returns_a_fail_closed_error_when_a_batch_scope_sum_passes_the_ceiling"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_lets_an_over_ceiling_scope_through_for_a_single_justified_contributor"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BatchPlanCheckError",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BatchPlanCheckError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "d898d4fa777d3038e176db1f3bf0db43e4fcee3811c507b3f3feba21a512c131",
+        "declaration_hash": "e0111a1f36092317be6654795b75eaa073e4540c7b716516666c12392963ece2",
+        "anchor_text_hash": "e9cf369179b1f393ace511957edfcf54e9bf015b5bcde5c51923fa50053471da"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(service.check(command()), Err(BatchPlanCheckError::BatchPlanNotFound)));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_reports_an_absent_batch_plan_as_an_error_rather_than_a_pass"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_maps_each_port_failure_to_its_own_error"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BatchPlanCheckError",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BatchPlanCheckError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "19a60fc047a821b504c170476d6eb408a4445c22ea266fc4a439b37c7f5dd43d",
+        "declaration_hash": "e0111a1f36092317be6654795b75eaa073e4540c7b716516666c12392963ece2",
+        "anchor_text_hash": "8e8d05a0035149984760943bc7b4bdbf4d40df418d55a93c78eea4316bb4d6b0"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome.violations().map(NonEmptyGateViolations::as_slice),\n        Some(\n            &[BatchPlanGateViolation::CeilingExceeded {\n                batch_id: BatchId::try_new(\"B1\").unwrap(),\n                scope: scope(\"domain\"),\n                total: LineCount::new(650),\n                ceiling: LineCount::new(500),\n            }][..]\n        )\n    );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_reports_an_absent_batch_plan_as_an_error_rather_than_a_pass"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_returns_a_fail_closed_error_when_a_batch_scope_sum_passes_the_ceiling"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_lets_an_over_ceiling_scope_through_for_a_single_justified_contributor"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_judges_each_scope_of_a_batch_on_its_own"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_maps_each_port_failure_to_its_own_error"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BatchPlanReadError",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BatchPlanReadError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "f17712da482ddd4110f6c3259e6f205012e168ff82c4c0ad9d8344c5228170c7",
+        "declaration_hash": "b4f3423b756b64f3f59b5372b292919cca93a4fb5af3685b1b446b84f3ff9814",
+        "anchor_text_hash": "e9cf369179b1f393ace511957edfcf54e9bf015b5bcde5c51923fa50053471da"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(service.check(command()), Err(BatchPlanCheckError::BatchPlanNotFound)));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_batch_plan_reader_port_reports_an_absent_plan_apart_from_a_read_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_reports_an_absent_batch_plan_as_an_error_rather_than_a_pass"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PlannedTaskReadError",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PlannedTaskReadError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "6856f0a0cddf2aa3c97c4056a2314b7f2728484cff65fb6f224ee0aa6b0fbb20",
+        "declaration_hash": "53d70cabd44cd9b6b3b44ecc0463a9a3b033aa063bcd31560edc55dad4a55097",
+        "anchor_text_hash": "eb481557772cce6c718a0698518d721bb1cfe4faed60c6fa68d0cf0d5979cd4f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(service.check(command()), Err(BatchPlanCheckError::ImplPlanNotFound)));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_an_absent_implementation_plan_stops_the_gate_instead_of_checking_an_empty_task_list"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_planned_task_reader_port_reports_an_absent_plan_apart_from_a_read_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_planned_task_reader_port_returns_the_tasks_with_their_declared_dependencies"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ScopeConfigReadError",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ScopeConfigReadError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "bf97748db277ea49f6b316d787a072381c178c8c436e35aee71299079ba2a55e",
+        "declaration_hash": "afe0a9b6295e8f6c869a53dc9f16eb4b6db1b181c449317338ea8054f11bbf30",
+        "anchor_text_hash": "b55569ed0491a6dd15393ae8f789f1f315e56164fe0fe4ce8a5b7f28f50b1836"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n        StubScopeConfigReader::failing().read(&items_dir(), &track()),\n        Err(ScopeConfigReadError::ReadFailed { .. })\n    ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_scope_config_reader_port_returns_the_configuration_the_ceilings_come_from"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_interactor_maps_each_port_failure_to_its_own_error"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ScopeConfigReadError",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ScopeConfigReadError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-08"
+      },
+      "key": {
+        "bound_tests_set_hash": "5d24cb73bb4cb7d62fc092767996ee3bce82fadc063b06e222fcc9b59aad6b42",
+        "declaration_hash": "afe0a9b6295e8f6c869a53dc9f16eb4b6db1b181c449317338ea8054f11bbf30",
+        "anchor_text_hash": "c2d1440f1b318188f82fe538fe00e9fc3111a783e04547965c1c10b3437045dc"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n        outcome,\n        BatchPlanGateOutcome::Passed,\n        \"an unresolved ceiling cannot be exceeded, whatever the total\"\n    );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_scope_config_reader_port_returns_the_configuration_the_ceilings_come_from"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_leaves_a_scope_with_no_resolved_ceiling_out_of_the_comparison"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BatchPlanDocumentDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BatchPlanDocumentDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "f9212549a733b9f7a6e9980739b8fe33c322cb46ab59df125b67010d9605cded",
+        "declaration_hash": "0e23f59877e5d73de6a7e8cb8226f83f9ac6b94e2795fae6b8287cef0189d111",
+        "anchor_text_hash": "9683b81e7639049c9f0d9fcc535e1fd9d50c190e2b084ae0cea60372eb6684b3"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let plan = decode(VALID_JSON).unwrap();"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_reads_a_declared_batch_plan_into_the_domain_document"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_a_schema_version_it_does_not_read"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BatchPlanDocumentDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BatchPlanDocumentDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "ced6d8c376a0653cf334ac62eeafff39523dcc34db76180dd534f7f8e732c3ad",
+        "declaration_hash": "0e23f59877e5d73de6a7e8cb8226f83f9ac6b94e2795fae6b8287cef0189d111",
+        "anchor_text_hash": "b9f5e83a9863c95ab642c68f0860766cc06b000b96527823d9680291c5f0ecce"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let err = decode(&json).unwrap_err();\n\n        assert!(\n            matches!(\n                err,\n                BatchPlanCodecError::InvalidDocument {\n                    source: BatchPlanValidationError::MissingTaskEstimate { .. }\n                }\n            ),\n            \"unexpected error: {err}\"\n        );\n\nlet err = decode(&json).unwrap_err();\n\n        assert!(\n            matches!(\n                err,\n                BatchPlanCodecError::InvalidDocument {\n                    source: BatchPlanValidationError::DuplicateBatchMembership { .. }\n                }\n            ),\n            \"unexpected error: {err}\"\n        );\n\nlet err = decode(&json).unwrap_err();\n\n        assert!(\n            matches!(\n                err,\n                BatchPlanCodecError::InvalidDocument {\n                    source: BatchPlanValidationError::UnassignedTask { .. }\n                }\n            ),\n            \"unexpected error: {err}\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_a_batch_member_with_no_declared_estimate"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_a_task_claimed_by_more_than_one_batch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_hands_a_file_internal_inconsistency_to_the_domain_unchanged"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_a_schema_version_it_does_not_read"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_an_unrecognised_field"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BatchPlanDocumentDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BatchPlanDocumentDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "5dbbfc7c5a8ddfe1844369178c5a1ef74054df61af22330ef7d9a7d684393632",
+        "declaration_hash": "0e23f59877e5d73de6a7e8cb8226f83f9ac6b94e2795fae6b8287cef0189d111",
+        "anchor_text_hash": "220331a95d2bc318a00f3048c4098bfa0ace56170fb5604b5f6a202aa8f306ca"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let err = decode(&json).unwrap_err(); ... BatchPlanValidationError::MissingTaskEstimate { .. } ... BatchPlanValidationError::UnassignedTask { .. } ... BatchPlanValidationError::DuplicateBatchMembership { .. }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_a_batch_member_with_no_declared_estimate"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_hands_a_file_internal_inconsistency_to_the_domain_unchanged"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_a_task_claimed_by_more_than_one_batch"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskEstimateDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskEstimateDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "cbea15014c905850df3f005bd49eb63888c2052ff615963364845cb160c2b5b9",
+        "declaration_hash": "6fb5058f2fe0cc01ef5b6e8075d04f9d52d0a51c0699049c2840f688cc2c0d73",
+        "anchor_text_hash": "d8de42db992de765998a5464b3b4da9852019d9036e59fb2b3f3501b9c14c5b3"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(domain_estimate.production_lines(), LineCount::new(100));\n        assert_eq!(domain_estimate.test_lines(), LineCount::new(50));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_reads_a_declared_batch_plan_into_the_domain_document"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskEstimateDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskEstimateDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "cbea15014c905850df3f005bd49eb63888c2052ff615963364845cb160c2b5b9",
+        "declaration_hash": "6fb5058f2fe0cc01ef5b6e8075d04f9d52d0a51c0699049c2840f688cc2c0d73",
+        "anchor_text_hash": "f200e4cf5e631db8bce89f041ac137d6fba827394dd40604074d73483f2a2cdc"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(domain_estimate.production_lines(), LineCount::new(100));\n        assert_eq!(domain_estimate.test_lines(), LineCount::new(50));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_reads_a_declared_batch_plan_into_the_domain_document"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskEstimateDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskEstimateDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "77d72cac3e3c38b92167627fdeeb014c02a022e501a17c2247562a1682b68217",
+        "declaration_hash": "6fb5058f2fe0cc01ef5b6e8075d04f9d52d0a51c0699049c2840f688cc2c0d73",
+        "anchor_text_hash": "8187fcf3fc0928bb8bdd99a55992af8f4d58fc1532a2e8b235553bec4c5327d8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(!decomposable.decomposition().is_indivisible());\n        assert!(decomposable.decomposition().justification().is_none());\n\n        assert!(indivisible.decomposition().is_indivisible());\n        assert_eq!(\n            indivisible.decomposition().justification().map(|reason| reason.as_str()),\n            Some(\"the transition table cannot be split\")\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_reads_a_null_justification_as_a_decomposable_task"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_reads_a_stated_justification_as_an_indivisible_task"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_reads_an_omitted_justification_the_same_as_an_explicit_null"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskEstimateDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskEstimateDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "1af3b0ba8bb62b2a91fd3114fcdae1dac2b1932d87e4093df69a6394d08a9f75",
+        "declaration_hash": "6fb5058f2fe0cc01ef5b6e8075d04f9d52d0a51c0699049c2840f688cc2c0d73",
+        "anchor_text_hash": "b44058bf93f66a07fa038f2e376711a61d20b87ac9eb3d4983c509889eefb624"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(!decomposable.decomposition().is_indivisible());\n        assert!(decomposable.decomposition().justification().is_none());\n\n        assert!(indivisible.decomposition().is_indivisible());\n        assert_eq!(\n            indivisible.decomposition().justification().map(|reason| reason.as_str()),\n            Some(\"the transition table cannot be split\")\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_reads_a_null_justification_as_a_decomposable_task"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_reads_a_stated_justification_as_an_indivisible_task"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskEstimateDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskEstimateDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "6e89f5c66925e1703ac21aedadb83f5d67fa42c521700e8499d576060392a406",
+        "declaration_hash": "6fb5058f2fe0cc01ef5b6e8075d04f9d52d0a51c0699049c2840f688cc2c0d73",
+        "anchor_text_hash": "b9f5e83a9863c95ab642c68f0860766cc06b000b96527823d9680291c5f0ecce"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "// T002 is estimated but no batch claims it.\nlet err = decode(&json).unwrap_err();\n\nassert!(\n    matches!(\n        err,\n        BatchPlanCodecError::InvalidDocument {\n            source: BatchPlanValidationError::UnassignedTask { .. }\n        }\n    ),\n    \"unexpected error: {err}\"\n);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_refuses_a_value_that_is_not_the_identifier_it_stands_for"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_an_unrecognised_field"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_hands_a_file_internal_inconsistency_to_the_domain_unchanged"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ScopeLineEstimateDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ScopeLineEstimateDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "c8995557e5a5cb9f7995c46b67fa436877a8de1fd875ea91787b60701639a346",
+        "declaration_hash": "f9a20e55006acb32a3a8d85faa3338798c4773d027272357cfb52786fcf75ec7",
+        "anchor_text_hash": "d8de42db992de765998a5464b3b4da9852019d9036e59fb2b3f3501b9c14c5b3"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(domain_estimate.production_lines(), LineCount::new(100));\n        assert_eq!(domain_estimate.test_lines(), LineCount::new(50));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_reads_a_declared_batch_plan_into_the_domain_document"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_reads_the_reserved_other_scope_name"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ScopeLineEstimateDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ScopeLineEstimateDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "cbea15014c905850df3f005bd49eb63888c2052ff615963364845cb160c2b5b9",
+        "declaration_hash": "f9a20e55006acb32a3a8d85faa3338798c4773d027272357cfb52786fcf75ec7",
+        "anchor_text_hash": "f200e4cf5e631db8bce89f041ac137d6fba827394dd40604074d73483f2a2cdc"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(domain_estimate.production_lines(), LineCount::new(100));\nassert_eq!(domain_estimate.test_lines(), LineCount::new(50));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_reads_a_declared_batch_plan_into_the_domain_document"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ScopeLineEstimateDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ScopeLineEstimateDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "165c03892acea7e679096d75b873e978ff1d4e0d927472fcdc35366e43fa6c32",
+        "declaration_hash": "f9a20e55006acb32a3a8d85faa3338798c4773d027272357cfb52786fcf75ec7",
+        "anchor_text_hash": "b9f5e83a9863c95ab642c68f0860766cc06b000b96527823d9680291c5f0ecce"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"BatchPlanValidationError::MissingTaskEstimate { .. }\"; \"BatchPlanValidationError::UnassignedTask { .. }\"; \"BatchPlanValidationError::DuplicateBatchMembership { .. }\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_a_per_scope_estimate_it_cannot_read"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_a_batch_member_with_no_declared_estimate"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_hands_a_file_internal_inconsistency_to_the_domain_unchanged"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_a_task_claimed_by_more_than_one_batch"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BatchDeclarationDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BatchDeclarationDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "3ba111783901526d2c44869b6661ddb68de2b4fceba0490534ebc2ff42725cc5",
+        "declaration_hash": "e06ea7edf4e8c38802fc4db8917fcdd7fbcad24453678c3b1ee07e373a73a3e7",
+        "anchor_text_hash": "c2d1665526dbe53575d8e4cc71ca9fe7bbddcb9660c86b5cf0afdb4ab1a99cd8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let first = plan.batches().first().unwrap();\n        let second = plan.batches().get(1).unwrap();\n        assert_eq!(first.id().as_str(), \"B1\");\n        assert_eq!(first.task_ids(), &[TaskId::try_new(\"T001\").unwrap()]);\n        assert_eq!(second.id().as_str(), \"B2\");\n        assert_eq!(second.task_ids(), &[TaskId::try_new(\"T002\").unwrap()]);\n\n        ...\n\n        assert!(\n            matches!(err, BatchPlanCodecError::InvalidJson { .. }),\n            \"a batch declares member ids only: {err}\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_reads_each_batch_member_list_into_domain_task_ids"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_a_batch_entry_that_declares_a_line_figure"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BatchDeclarationDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BatchDeclarationDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "3ba111783901526d2c44869b6661ddb68de2b4fceba0490534ebc2ff42725cc5",
+        "declaration_hash": "e06ea7edf4e8c38802fc4db8917fcdd7fbcad24453678c3b1ee07e373a73a3e7",
+        "anchor_text_hash": "b44058bf93f66a07fa038f2e376711a61d20b87ac9eb3d4983c509889eefb624"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let first = plan.batches().first().unwrap();\n        let second = plan.batches().get(1).unwrap();\n        assert_eq!(first.id().as_str(), \"B1\");\n        assert_eq!(first.task_ids(), &[TaskId::try_new(\"T001\").unwrap()]);\n        assert_eq!(second.id().as_str(), \"B2\");\n        assert_eq!(second.task_ids(), &[TaskId::try_new(\"T002\").unwrap()]);\n\n        let json = VALID_JSON.replace(\n            \"{\\\"id\\\": \\\"B1\\\", \\\"task_ids\\\": [\\\"T001\\\"]}\",\n            \"{\\\"id\\\": \\\"B1\\\", \\\"task_ids\\\": [\\\"T001\\\"], \\\"lines\\\": 150}\",\n        );\n\n        let err = decode(&json).unwrap_err();\n\n        assert!(\n            matches!(err, BatchPlanCodecError::InvalidJson { .. }),\n            \"a batch declares member ids only: {err}\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_reads_each_batch_member_list_into_domain_task_ids"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_a_batch_entry_that_declares_a_line_figure"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BatchDeclarationDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BatchDeclarationDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "4cd7d5b9482584d841c53f321a5655300e3c231f738d19613db5567d00431b39",
+        "declaration_hash": "e06ea7edf4e8c38802fc4db8917fcdd7fbcad24453678c3b1ee07e373a73a3e7",
+        "anchor_text_hash": "b9f5e83a9863c95ab642c68f0860766cc06b000b96527823d9680291c5f0ecce"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(\n            matches!(\n                err,\n                BatchPlanCodecError::InvalidDocument {\n                    source: BatchPlanValidationError::DuplicateBatchMembership { .. }\n                }\n            ),"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_a_task_claimed_by_more_than_one_batch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_a_batch_member_with_no_declared_estimate"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_a_batch_entry_that_declares_a_line_figure"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BatchPlanCodecError",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BatchPlanCodecError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "4e47adf8ae0095c12bcf497d1993ad4c61a134819598fbad6bd9f8335e66c3d5",
+        "declaration_hash": "ee4f8e86caba8dbc6dff090e259ba374557b0d185d407a23f21e391134aeada7",
+        "anchor_text_hash": "b9f5e83a9863c95ab642c68f0860766cc06b000b96527823d9680291c5f0ecce"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "matches!(\n                err,\n                BatchPlanCodecError::InvalidDocument {\n                    source: BatchPlanValidationError::UnassignedTask { .. }\n                }\n            )"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_text_that_is_not_the_declared_json"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_a_schema_version_it_does_not_read"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_hands_a_file_internal_inconsistency_to_the_domain_unchanged"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_an_unrecognised_field"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BatchPlanCodecError",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BatchPlanCodecError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "5dbbfc7c5a8ddfe1844369178c5a1ef74054df61af22330ef7d9a7d684393632",
+        "declaration_hash": "ee4f8e86caba8dbc6dff090e259ba374557b0d185d407a23f21e391134aeada7",
+        "anchor_text_hash": "220331a95d2bc318a00f3048c4098bfa0ace56170fb5604b5f6a202aa8f306ca"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let err = decode(&json).unwrap_err();\n\n        assert!(\n            matches!(\n                err,\n                BatchPlanCodecError::InvalidDocument {\n                    source: BatchPlanValidationError::MissingTaskEstimate { .. }\n                }\n            ),"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_a_batch_member_with_no_declared_estimate"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_hands_a_file_internal_inconsistency_to_the_domain_unchanged"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_a_task_claimed_by_more_than_one_batch"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanTaskDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-19"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanTaskDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-19"
+      },
+      "key": {
+        "bound_tests_set_hash": "555f885d3ba3b71bee6bebf58d1f3c38dd78eba0cd4af7649aac30777933af30",
+        "declaration_hash": "010b9a9fd31d6514d49ba94885e85ff57673d13f58fce6ac726c2758b1b9b65f",
+        "anchor_text_hash": "46c4b0a4ef9e34a5f2f8fc0777b2661ad4f579b9382e9940e3db6b1fdeafdf48"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(doc.tasks()[0].depends_on().is_empty());\nassert_eq!(doc.tasks()[1].depends_on(), &[TaskId::try_new(\"T001\").unwrap()]);\nassert!(doc.tasks().iter().all(|task| task.depends_on().is_empty()));\nassert_eq!(parsed[\"schema_version\"], 2);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::impl_plan_codec::tests",
+          "test_name": "test_decode_reads_the_dependencies_a_schema_two_task_declares"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::impl_plan_codec::tests",
+          "test_name": "test_decode_reads_a_schema_one_task_as_declaring_no_dependency"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::impl_plan_codec::tests",
+          "test_name": "test_encode_omits_an_empty_dependency_list_and_writes_a_declared_one"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::impl_plan_codec::tests",
+          "test_name": "test_encode_writes_schema_two_even_for_a_document_read_as_schema_one"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanTaskDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-21"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanTaskDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-21"
+      },
+      "key": {
+        "bound_tests_set_hash": "56fae16420706626cd0bc827b196e42955c7f3512f6c8d92d11b710fe6bfcba4",
+        "declaration_hash": "010b9a9fd31d6514d49ba94885e85ff57673d13f58fce6ac726c2758b1b9b65f",
+        "anchor_text_hash": "3be4d8a0dad98f21c741e35f11d4adccffd970ecffe5bb734fcc3dd5f727315f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(\n            doc.tasks()[0].depends_on().is_empty(),\n            \"an empty list is the same unstated state as an omitted one\"\n        );\n        // And it round-trips as an omission rather than as an empty array.\n        let parsed: serde_json::Value = serde_json::from_str(&encode(&doc).unwrap()).unwrap();\n        assert!(parsed[\"tasks\"][0].get(\"depends_on\").is_none());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::impl_plan_codec::tests",
+          "test_name": "test_decode_reads_an_explicit_empty_dependency_list_as_declaring_nothing"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::impl_plan_codec::tests",
+          "test_name": "test_decode_reads_a_schema_one_task_document_that_carries_no_depends_on_key"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::impl_plan_codec::tests",
+          "test_name": "test_encode_omits_an_empty_dependency_list_and_writes_a_declared_one"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::impl_plan_codec::tests",
+          "test_name": "test_encode_writes_schema_two_even_for_a_document_read_as_schema_one"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanTaskDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanTaskDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "fea3dad375dee323ee853e002af5842c9a850af3e574d670bdd249b92a3e1e6e",
+        "declaration_hash": "010b9a9fd31d6514d49ba94885e85ff57673d13f58fce6ac726c2758b1b9b65f",
+        "anchor_text_hash": "e9cf369179b1f393ace511957edfcf54e9bf015b5bcde5c51923fa50053471da"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let doc = decode(json).unwrap();\n\n        assert_eq!(doc.tasks().len(), 2);\n        assert!(doc.tasks()[0].depends_on().is_empty());\n        assert!(doc.tasks()[1].depends_on().is_empty());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::impl_plan_codec::tests",
+          "test_name": "test_decode_reads_a_schema_one_task_document_that_carries_no_depends_on_key"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::impl_plan_codec::tests",
+          "test_name": "test_decode_accepts_both_schema_one_and_schema_two"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::impl_plan_codec::tests",
+          "test_name": "test_decode_reads_an_explicit_empty_dependency_list_as_declaring_nothing"
+        }
+      ]
     }
   ]
 }
