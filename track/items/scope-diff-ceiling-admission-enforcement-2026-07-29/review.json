@@ -1,6 +1,199 @@
 {
   "schema_version": 2,
   "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d9427b3c62e5f31c24c6912abf9797960c9ac949f209fb3ec4d4d17f5fb11a1f",
+          "at": "2026-07-29T01:36:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d9427b3c62e5f31c24c6912abf9797960c9ac949f209fb3ec4d4d17f5fb11a1f",
+          "at": "2026-07-29T01:38:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9c5cd89f3a5b511f4002e275ee28a9e9c0fed66b775a774641eff2d724c48104",
+          "at": "2026-07-29T07:05:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9c5cd89f3a5b511f4002e275ee28a9e9c0fed66b775a774641eff2d724c48104",
+          "at": "2026-07-29T07:09:12Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Tasks T001–T018 have target and operation text but no permitted anchor cite (`AC-NN`, `IN-NN`, `CN-NN`, or spec-element ID); catalogue-entry names do not satisfy the executable-task anchor requirement.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/impl-plan.json",
+              "line": 6,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T016 leaves the writes-forbidden propagation boundary open with `spec-designer / type-designer / adr-editor / rollback-diagnoser 等`; the executor must invent which peer capability contracts are included.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/impl-plan.json",
+              "line": 96,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T001–T004 append upstream behavioral/design-contract prose such as `Unconstrained ... ceiling 照合を行わない`, `graceful skip は設けない`, and the detailed admission arithmetic. The permitted task form is target + operation + anchor cite only. See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T005–T009 append upstream port, error-handling, codec, and diff-counting contract prose beyond target + operation + anchor cite. See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/impl-plan.json",
+              "line": 30,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T010–T012 append upstream CLI behavior and fail-closed output-contract prose beyond target + operation + anchor cite. See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/impl-plan.json",
+              "line": 60,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T013–T018 append upstream rationale and behavior constraints, including ceiling semantics, gate chaining boundaries, greedy-planner removal, and self-blocking sequencing. See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/impl-plan.json",
+              "line": 78,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`plan.summary` and section descriptions S1–S5 restate the upstream design rationale and behavior contract (for example, fail-closed ceiling enforcement, layer ordering, and the no-retroactive-rollout rationale), rather than serving as concise executable-plan metadata. See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/impl-plan.json",
+              "line": 115,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:cb5ea5c55f86d5f4df85796b8c400ab068214b0f6e87df1214f8d26333bf0be0",
+          "at": "2026-07-29T01:37:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8f6eb90706827dfbfdee612e81f73523a8565ea3d5e9079f75173498879e6655",
+          "at": "2026-07-29T01:42:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan.summary` is empty although the upstream spec declares GO-01 through GO-03. GO elements cannot be mapped in `task-coverage.json`, so this removes all required goal-to-task traceability. Add anchor-only GO-to-task or GO-to-section mappings here.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/impl-plan.json",
+              "line": 114,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "The current domain catalogue contains 51 entries, including the `action: add` entry `NonZeroLineCount` for CN-03/IN-10/AC-11, but `task-contract.json` attributes only the other 50. Attribute `NonZeroLineCount` to its carrier task and name it in that task's description; otherwise refreshed task-contract coverage will report an orphan entry.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/task-contract.json",
+              "line": 26,
+              "category": "task-contract attribution mismatch"
+            },
+            {
+              "message": "T016 names the peer capability contracts but leaves the additional target as only `対応 command / skill adapter`. This does not identify the files the executor must update—at minimum the Claude command and Codex skill adapters—and therefore requires inventing the task boundary. Name each adapter path and its update operation explicitly.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/impl-plan.json",
+              "line": 96,
+              "category": "task description non-executable"
+            }
+          ],
+          "hash": "rvw1:sha256:8f6eb90706827dfbfdee612e81f73523a8565ea3d5e9079f75173498879e6655",
+          "at": "2026-07-29T01:49:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a26090d644bb46ecb10369f702393257424cda81519fcea881f7860d38b64298",
+          "at": "2026-07-29T01:55:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f30ad50a28845e6b213302404a3305a54142316e3ff2a9db967fbf427aed1458",
+          "at": "2026-07-29T05:50:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T019 restates the upstream contract in prose: 「省略と空列はいずれも未宣言」 and the exact three dependency invariants duplicate IN-19/IN-20 and AC-21/AC-22. Per `.harness/policies/no-upstream-restatement.md`, retain the target symbols and operations but rely on the anchors for these semantics.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/impl-plan.json",
+              "line": 18,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T003's second sentence restates IN-07/AC-07's complete dependency-edge predicate, error outcome, and undeclared-pair exclusion. Replace it with a concise operation such as adding declared-dependency batch-order validation and keep the existing anchors, as required by `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/impl-plan.json",
+              "line": 24,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T020 restates upstream behavior through 「schema 1 は未宣言として読む」 and the full inactive-track registry/views compatibility outcome from IN-19, AC-05, and AC-21. Under `.harness/policies/no-upstream-restatement.md`, the description should stop at the codec/DTO schema-read/write operations plus anchor cites.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/impl-plan.json",
+              "line": 54,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:f30ad50a28845e6b213302404a3305a54142316e3ff2a9db967fbf427aed1458",
+          "at": "2026-07-29T05:53:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d07bbfc19fc11e5f4cf8b820131caa5d4c6b0eee1e458d75ee5ea0cf5514ee18",
+          "at": "2026-07-29T05:56:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9c99fe15aa91c506959f2e12b15a94c5557f7c6239997772133faab7b7456e24",
+          "at": "2026-07-29T07:05:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9c99fe15aa91c506959f2e12b15a94c5557f7c6239997772133faab7b7456e24",
+          "at": "2026-07-29T07:09:12Z"
+        }
+      ]
+    },
     "adr": {
       "rounds": [
         {
@@ -139,6 +332,71 @@
           "findings": [],
           "hash": "rvw1:sha256:967376e4c09ef86aef43dc8466f3a7a370ed283c12a5b0f3966a0b1cfd04875d",
           "at": "2026-07-29T05:17:38Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`LineCount::saturating_add` collapses totals above `u32::MAX` to `u32::MAX`, so an actual sum exceeding a maximum ceiling is incorrectly admitted. For example, production `u32::MAX` plus one test line becomes `u32::MAX`, and `ScopeCeiling::resolve(Some(u32::MAX)).admits(...)` returns true. Use checked overflow handling and fail closed.",
+              "severity": "P0",
+              "file": "libs/domain/src/batch_plan/line_count.rs",
+              "line": 33,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:93f226ecde9ebf4753aa13ab06d42cd483c3bc5ba0cd58cdc0abf150006e4729",
+          "at": "2026-07-29T07:05:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:87d19e34f18611acc2f565ec048cdf43a0ac1d1dafaffeeb2507b65e89429b68",
+          "at": "2026-07-29T07:09:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:87d19e34f18611acc2f565ec048cdf43a0ac1d1dafaffeeb2507b65e89429b68",
+          "at": "2026-07-29T07:15:17Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc6af2cf839f5ed501ac956d02bfb5bee1e3631c5897003bc84fb845b5458eec",
+          "at": "2026-07-29T01:37:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc6af2cf839f5ed501ac956d02bfb5bee1e3631c5897003bc84fb845b5458eec",
+          "at": "2026-07-29T01:42:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:981d6ce819d3be287021d32a6c6882d3d4cd8b9cb8550ae2329c9e7dafc65992",
+          "at": "2026-07-29T05:28:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:981d6ce819d3be287021d32a6c6882d3d4cd8b9cb8550ae2329c9e7dafc65992",
+          "at": "2026-07-29T05:31:01Z"
         }
       ]
     },
@@ -417,203 +675,6 @@
           "findings": [],
           "hash": "rvw1:sha256:bbbfd5199452d48d011927cc33655ddb5f82870eb8694556648074738ba4fa9d",
           "at": "2026-07-29T06:13:55Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d9427b3c62e5f31c24c6912abf9797960c9ac949f209fb3ec4d4d17f5fb11a1f",
-          "at": "2026-07-29T01:36:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d9427b3c62e5f31c24c6912abf9797960c9ac949f209fb3ec4d4d17f5fb11a1f",
-          "at": "2026-07-29T01:38:31Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bc6af2cf839f5ed501ac956d02bfb5bee1e3631c5897003bc84fb845b5458eec",
-          "at": "2026-07-29T01:37:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bc6af2cf839f5ed501ac956d02bfb5bee1e3631c5897003bc84fb845b5458eec",
-          "at": "2026-07-29T01:42:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:981d6ce819d3be287021d32a6c6882d3d4cd8b9cb8550ae2329c9e7dafc65992",
-          "at": "2026-07-29T05:28:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:981d6ce819d3be287021d32a6c6882d3d4cd8b9cb8550ae2329c9e7dafc65992",
-          "at": "2026-07-29T05:31:01Z"
-        }
-      ]
-    },
-    "impl-plan": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Tasks T001–T018 have target and operation text but no permitted anchor cite (`AC-NN`, `IN-NN`, `CN-NN`, or spec-element ID); catalogue-entry names do not satisfy the executable-task anchor requirement.",
-              "severity": "P1",
-              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/impl-plan.json",
-              "line": 6,
-              "category": "task description non-executable"
-            },
-            {
-              "message": "T016 leaves the writes-forbidden propagation boundary open with `spec-designer / type-designer / adr-editor / rollback-diagnoser 等`; the executor must invent which peer capability contracts are included.",
-              "severity": "P1",
-              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/impl-plan.json",
-              "line": 96,
-              "category": "task description non-executable"
-            },
-            {
-              "message": "T001–T004 append upstream behavioral/design-contract prose such as `Unconstrained ... ceiling 照合を行わない`, `graceful skip は設けない`, and the detailed admission arithmetic. The permitted task form is target + operation + anchor cite only. See `.harness/policies/no-upstream-restatement.md`.",
-              "severity": "P1",
-              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/impl-plan.json",
-              "line": 6,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T005–T009 append upstream port, error-handling, codec, and diff-counting contract prose beyond target + operation + anchor cite. See `.harness/policies/no-upstream-restatement.md`.",
-              "severity": "P1",
-              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/impl-plan.json",
-              "line": 30,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T010–T012 append upstream CLI behavior and fail-closed output-contract prose beyond target + operation + anchor cite. See `.harness/policies/no-upstream-restatement.md`.",
-              "severity": "P1",
-              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/impl-plan.json",
-              "line": 60,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T013–T018 append upstream rationale and behavior constraints, including ceiling semantics, gate chaining boundaries, greedy-planner removal, and self-blocking sequencing. See `.harness/policies/no-upstream-restatement.md`.",
-              "severity": "P1",
-              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/impl-plan.json",
-              "line": 78,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "`plan.summary` and section descriptions S1–S5 restate the upstream design rationale and behavior contract (for example, fail-closed ceiling enforcement, layer ordering, and the no-retroactive-rollout rationale), rather than serving as concise executable-plan metadata. See `.harness/policies/no-upstream-restatement.md`.",
-              "severity": "P1",
-              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/impl-plan.json",
-              "line": 115,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:cb5ea5c55f86d5f4df85796b8c400ab068214b0f6e87df1214f8d26333bf0be0",
-          "at": "2026-07-29T01:37:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8f6eb90706827dfbfdee612e81f73523a8565ea3d5e9079f75173498879e6655",
-          "at": "2026-07-29T01:42:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`plan.summary` is empty although the upstream spec declares GO-01 through GO-03. GO elements cannot be mapped in `task-coverage.json`, so this removes all required goal-to-task traceability. Add anchor-only GO-to-task or GO-to-section mappings here.",
-              "severity": "P1",
-              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/impl-plan.json",
-              "line": 114,
-              "category": "task-coverage gap"
-            },
-            {
-              "message": "The current domain catalogue contains 51 entries, including the `action: add` entry `NonZeroLineCount` for CN-03/IN-10/AC-11, but `task-contract.json` attributes only the other 50. Attribute `NonZeroLineCount` to its carrier task and name it in that task's description; otherwise refreshed task-contract coverage will report an orphan entry.",
-              "severity": "P1",
-              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/task-contract.json",
-              "line": 26,
-              "category": "task-contract attribution mismatch"
-            },
-            {
-              "message": "T016 names the peer capability contracts but leaves the additional target as only `対応 command / skill adapter`. This does not identify the files the executor must update—at minimum the Claude command and Codex skill adapters—and therefore requires inventing the task boundary. Name each adapter path and its update operation explicitly.",
-              "severity": "P1",
-              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/impl-plan.json",
-              "line": 96,
-              "category": "task description non-executable"
-            }
-          ],
-          "hash": "rvw1:sha256:8f6eb90706827dfbfdee612e81f73523a8565ea3d5e9079f75173498879e6655",
-          "at": "2026-07-29T01:49:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a26090d644bb46ecb10369f702393257424cda81519fcea881f7860d38b64298",
-          "at": "2026-07-29T01:55:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f30ad50a28845e6b213302404a3305a54142316e3ff2a9db967fbf427aed1458",
-          "at": "2026-07-29T05:50:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T019 restates the upstream contract in prose: 「省略と空列はいずれも未宣言」 and the exact three dependency invariants duplicate IN-19/IN-20 and AC-21/AC-22. Per `.harness/policies/no-upstream-restatement.md`, retain the target symbols and operations but rely on the anchors for these semantics.",
-              "severity": "P1",
-              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/impl-plan.json",
-              "line": 18,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T003's second sentence restates IN-07/AC-07's complete dependency-edge predicate, error outcome, and undeclared-pair exclusion. Replace it with a concise operation such as adding declared-dependency batch-order validation and keep the existing anchors, as required by `.harness/policies/no-upstream-restatement.md`.",
-              "severity": "P1",
-              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/impl-plan.json",
-              "line": 24,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T020 restates upstream behavior through 「schema 1 は未宣言として読む」 and the full inactive-track registry/views compatibility outcome from IN-19, AC-05, and AC-21. Under `.harness/policies/no-upstream-restatement.md`, the description should stop at the codec/DTO schema-read/write operations plus anchor cites.",
-              "severity": "P1",
-              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/impl-plan.json",
-              "line": 54,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:f30ad50a28845e6b213302404a3305a54142316e3ff2a9db967fbf427aed1458",
-          "at": "2026-07-29T05:53:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d07bbfc19fc11e5f4cf8b820131caa5d4c6b0eee1e458d75ee5ea0cf5514ee18",
-          "at": "2026-07-29T05:56:23Z"
         }
       ]
     }

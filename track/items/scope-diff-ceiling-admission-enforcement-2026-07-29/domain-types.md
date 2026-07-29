@@ -8,30 +8,30 @@
 | AdmissionRejection | enum | add | NotCurrentBatchMember, ScopeCeilingWouldBeExceeded | 🟡 | 🔵 |
 | BatchPlanGateOutcome | enum | add | Passed, Blocked | 🟡 | 🔵 |
 | BatchPlanGateViolation | enum | add | CeilingExceeded, OversizeScopeHasMultipleContributors, UnknownTaskRef, UnplannedTask, DependencyInLaterBatch | 🟡 | 🔵 |
-| ScopeCeiling | enum | add | Unconstrained, Limited | 🟡 | 🔵 |
-| TaskDecomposition | enum | add | Decomposable, Indivisible | 🟡 | 🔵 |
+| ScopeCeiling | enum | add | Unconstrained, Limited | 🔵 | 🔵 |
+| TaskDecomposition | enum | add | Decomposable, Indivisible | 🔵 | 🔵 |
 
 ## Value Objects
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| BatchDeclaration | value_object | add | — | 🟡 | 🔵 |
-| BatchId | value_object | add | — | 🟡 | 🔵 |
-| BatchPlanDocument | value_object | add | — | 🟡 | 🔵 |
-| IndivisibilityJustification | value_object | add | — | 🟡 | 🔵 |
-| LineCount | value_object | add | — | 🟡 | 🔵 |
-| MeasuredScopeDiff | value_object | add | — | 🟡 | 🔵 |
+| BatchDeclaration | value_object | add | — | 🔵 | 🔵 |
+| BatchId | value_object | add | — | 🔵 | 🔵 |
+| BatchPlanDocument | value_object | add | — | 🔵 | 🔵 |
+| IndivisibilityJustification | value_object | add | — | 🔵 | 🔵 |
+| LineCount | value_object | add | — | 🔵 | 🔵 |
+| MeasuredScopeDiff | value_object | add | — | 🔵 | 🔵 |
 | NonEmptyGateViolations | value_object | add | — | 🟡 | 🔵 |
 | NonZeroLineCount | value_object | add | — | 🟡 | 🔵 |
-| ScopeLineEstimate | value_object | add | — | 🟡 | 🔵 |
-| TaskEstimate | value_object | add | — | 🟡 | 🔵 |
+| ScopeLineEstimate | value_object | add | — | 🔵 | 🔵 |
+| TaskEstimate | value_object | add | — | 🔵 | 🔵 |
 
 ## Error Types
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | AdmissionEvaluationError | error_type | add | MissingTaskEstimate | 🟡 | 🔵 |
-| BatchPlanValidationError | error_type | add | EmptyJustification, EmptyBatchId, EmptyBatch, DuplicateTaskEstimate, DuplicateScopeEstimate, DuplicateBatchId, MissingTaskEstimate, UnassignedTask, DuplicateBatchMembership | 🟡 | 🔵 |
+| BatchPlanValidationError | error_type | add | EmptyJustification, EmptyBatchId, EmptyBatch, DuplicateTaskEstimate, DuplicateScopeEstimate, DuplicateBatchId, MissingTaskEstimate, UnassignedTask, DuplicateBatchMembership | 🔵 | 🔵 |
 | ValidationError | error_type | modify | EmptyString, InvalidTrackId, InvalidTaskId, InvalidCommitHash, InvalidTimestamp, InvalidTrackBranch, BranchIdMismatch, StatusOverrideMismatch, EmptyTrackTitle, EmptyTaskDescription, EmptyPlanSectionId, EmptyPlanSectionTitle, DuplicateTaskId, DuplicatePlanSectionId, UnknownTaskReference, DuplicateTaskReference, UnreferencedTask, OverrideIncompatibleWithResolvedTasks, TrackActivationRequiresPlanningOnly, TrackActivationRequiresSchemaV3, TrackAlreadyMaterialized, UnsupportedTargetStatus, SectionNotFound, NoSectionsAvailable, TaskDescriptionMutated, TaskRemoved, DuplicateElementId, InvalidLayerId, InvalidSpecElementId, EmptyAdrAnchor, EmptyConventionAnchor, InvalidContentHash, EmptyInformalGroundSummary, MultiLineInformalGroundSummary, EmptyDecisionGroundRef, InvalidObligationMinimum, InvalidDetectionRate, UnknownDependencyReference, DependencyCycle, PlanOrderViolatesDependency | 🟡 | 🔵 |
 
 ## Domain Services

@@ -1,1 +1,658 @@
-{"track_id": "scope-diff-ceiling-admission-enforcement-2026-07-29", "records": []}
+{
+  "track_id": "scope-diff-ceiling-admission-enforcement-2026-07-29",
+  "records": [
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "LineCount",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_line_count_carries_the_declared_figure"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_line_count_sums_a_production_and_a_test_figure"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "LineCount",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_line_count_carries_the_declared_figure"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_line_count_sums_a_production_and_a_test_figure"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_line_count_saturates_instead_of_wrapping_at_the_maximum"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ScopeCeiling",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_scope_ceiling_resolves_a_configured_limit_into_a_line_count"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_limited_scope_ceiling_admits_a_total_at_the_limit_and_refuses_one_above_it"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_line_counts_order_by_magnitude"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ScopeCeiling",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_scope_ceiling_resolves_an_absent_configuration_as_unconstrained"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_unconstrained_scope_ceiling_admits_every_total"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "IndivisibilityJustification",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_indivisibility_justification_carries_the_stated_reason"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_indivisibility_justification_rejects_a_blank_reason_instead_of_dropping_it"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "IndivisibilityJustification",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_indivisibility_justification_carries_the_stated_reason"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_indivisibility_justification_rejects_a_blank_reason_instead_of_dropping_it"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TaskDecomposition",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_indivisible_decomposition_reports_the_justification_it_carries"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_decomposable_decomposition_reports_no_justification"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TaskDecomposition",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_indivisible_decomposition_reports_the_justification_it_carries"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_decomposable_decomposition_reports_no_justification"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ScopeLineEstimate",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_scope_line_estimate_keeps_production_and_test_figures_separate"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_scope_line_estimate_totals_production_and_test_lines"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ScopeLineEstimate",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_scope_line_estimate_keeps_production_and_test_figures_separate"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_scope_line_estimate_totals_production_and_test_lines"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "BatchDeclaration",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_batch_declaration_preserves_the_declared_member_order"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_batch_declaration_reports_whether_a_task_is_one_of_its_members"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "BatchDeclaration",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_batch_declaration_preserves_the_declared_member_order"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_batch_declaration_with_no_members_is_rejected_rather_than_skipped"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "BatchDeclaration",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "reason": "CN-01 asks for two things: a batch declares no line figure, and a batch's per-scope total is derived from its member task estimates instead, so no second declaration can drift away from the first. The part concerning BatchDeclaration is the absence, and that absence is guaranteed by the type rather than by behaviour. The declaration holds an identifier and an ordered list of member task ids; its whole declared surface — new(id, task_ids), id(), task_ids(), contains(task_id) — takes no line quantity in, stores none, and returns none. There is therefore no state in which a declared batch total could exist to disagree with the members it summarises, and no run-time observation that could distinguish a compliant declaration from a non-compliant one: a non-compliant one is not constructible. The remaining half of the constraint, the derivation of the per-scope total as the sum of the member estimates, is not this entry's either — BatchDeclaration is handed no estimate at all, and the derivation is declared on the aggregate that holds the estimates. Nothing in this declaration is left over that a test could exercise for CN-01."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "MeasuredScopeDiff",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-10"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_measured_scope_diff_carries_the_measured_figure_for_its_scope"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "MeasuredScopeDiff",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-14"
+        }
+      },
+      "reason": "IN-14 moves the source of truth for counting a scope's lines out of workflow prose and into the CLI implementation, and fixes that definition: a scope's line figure is additions plus deletions over the committed, staged and unstaged changes measured from the base, untracked files are counted in full as additions, and scope classification reuses the existing review-scope classification mechanism. MeasuredScopeDiff decides none of that. Its declared surface is new(scope, lines), scope() and lines(): it receives a ScopeName and an already-obtained LineCount, stores them, and hands them back unchanged. It reads no worktree, resolves no base, distinguishes no committed from unstaged change, and classifies no file, so not one of the three counting rules is expressible through it. A test bound here could only pass a number to the constructor and read the same number back, which would show the arrangement of the test rather than the counting definition IN-14 promises. That definition is realised by the adapter that produces the figure — a different entry, which does read the worktree and does classify."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "MeasuredScopeDiff",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-17"
+        }
+      },
+      "reason": "AC-17 is checked by observing that the scope line computation exists on the CLI side and that it behaves per the fixed definition: additions plus deletions summed, untracked files counted in full as additions, and the existing review-scope classification mechanism reused. MeasuredScopeDiff is the value that crosses the boundary once such a computation has finished, not the computation. Its declaration — new(scope, lines), scope(), lines() — stores a ScopeName next to a LineCount and returns them unchanged; it holds exactly the same value however the figure was arrived at, so neither the location of the computation nor any of its three counting rules can be observed through it. A test bound to this entry would assert the constructor's storage rather than AC-17's promise. The entry that can exhibit that promise is the one that performs the measurement."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TaskEstimate",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_task_estimate_holds_one_estimate_per_touched_scope"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_task_estimate_declares_the_production_and_test_figures_of_each_touched_scope"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_task_estimate_rejects_two_figures_for_the_same_scope"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TaskEstimate",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_task_estimate_declares_the_production_and_test_figures_of_each_touched_scope"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_scope_line_estimate_declares_test_lines_as_one_total_including_obligation_derived_tests"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_task_estimate_rejects_two_figures_for_the_same_scope"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TaskEstimate",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_an_estimate_above_the_resolved_ceiling_states_why_its_task_is_indivisible"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_task_estimate_carries_the_decomposition_state_of_its_task"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TaskEstimate",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_an_estimate_above_the_resolved_ceiling_states_why_its_task_is_indivisible"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_plan_tells_an_oversize_indivisible_task_apart_from_an_ordinary_one"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "BatchId",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_plan_keeps_its_batches_in_declaration_order_under_their_identifiers"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_every_planned_task_belongs_to_exactly_one_declared_batch"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_plan_rejects_a_task_claimed_by_more_than_one_batch"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_plan_rejects_an_estimated_task_that_no_batch_claims"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "BatchId",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_plan_keeps_its_batches_in_declaration_order_under_their_identifiers"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_plan_rejects_a_batch_identifier_declared_more_than_once"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_plan_derives_a_batch_scope_total_from_its_member_estimates"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "BatchPlanValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_plan_rejects_a_batch_member_without_a_declared_estimate"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_plan_rejects_an_estimated_task_that_no_batch_claims"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_plan_rejects_a_task_claimed_by_more_than_one_batch"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_batch_declaration_with_no_members_is_rejected_rather_than_skipped"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_task_estimate_rejects_two_figures_for_the_same_scope"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "BatchPlanValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_plan_rejects_a_batch_member_without_a_declared_estimate"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_plan_rejects_an_estimated_task_that_no_batch_claims"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_plan_rejects_a_task_claimed_by_more_than_one_batch"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "BatchPlanDocument",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "reason": "IN-01 promises four things: that batch-plan.json is added as the fourth terminal Phase 3 planning artifact, that impl-planner alone writes it, that the admission-deciding CLI only reads it, and that Phase 3 authoring proceeds in the stated dependency order with each file completed in a single write. BatchPlanDocument is the in-memory model of that artifact's content and reaches none of those facts. It touches no file system, so it cannot observe that the artifact exists or where it sits among the Phase 3 outputs. It holds no notion of an author, a capability contract or a writes-forbidden list, so the single-writer restriction is invisible to it. It carries no history of how the value was produced, so the same document results from any authoring order and from any number of writes; nothing in it distinguishes one authoring sequence from another. The one part that might look testable — that consumers only read — is a property of the declaration rather than of behaviour: the type offers a constructor and borrowing accessors (track_id, task_estimates, batches, estimate_for, batch_of, scope_total, current_batch) and no mutator at all, so a consumer that edits a plan through this type is not expressible and no test can tell a read-only consumer from a writing one. Whatever a test asserted here would restate the type system or the absence of file access rather than IN-01's promise; the evidence the anchor asks for lives in the capability contracts, the workflow's authoring sequence and the CLI wiring, none of which this declaration reaches."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "BatchPlanDocument",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_plan_rejects_a_batch_member_without_a_declared_estimate"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_plan_rejects_an_estimated_task_that_no_batch_claims"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_plan_rejects_a_task_claimed_by_more_than_one_batch"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_plan_rejects_a_task_estimated_more_than_once"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_plan_rejects_a_batch_identifier_declared_more_than_once"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "BatchPlanDocument",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "reason": "AC-01 is checked by two observations: that batch-plan.json exists as a Phase 3 planning artifact, and that its writer is restricted to impl-planner — recorded in the peer capability contracts' writes-forbidden lists, with the admission-deciding CLI reading only. BatchPlanDocument is the in-memory model of that artifact's content and touches no file system, so it cannot observe whether the file exists, and it holds no notion of an author, a capability contract or a writes-forbidden list. The one part that might look testable — that consumers only read — is a property of the declaration rather than of behaviour: the type offers a constructor and borrowing accessors (track_id, task_estimates, batches, estimate_for, batch_of, scope_total, current_batch) and no mutator at all, so a consumer that edits a plan through this type is not expressible and no test can distinguish a read-only consumer from a writing one. Whatever a test asserted here would restate the type system or the absence of file access rather than AC-01's promise; the evidence the anchor asks for lives in the capability contracts and in the CLI wiring."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "BatchPlanDocument",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_plan_rejects_a_batch_member_without_a_declared_estimate"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_plan_rejects_an_estimated_task_that_no_batch_claims"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_plan_rejects_a_task_claimed_by_more_than_one_batch"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "BatchPlanDocument",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_plan_derives_a_batch_scope_total_from_its_member_estimates"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_plan_reports_no_lines_for_a_scope_no_member_touches"
+        }
+      ]
+    }
+  ]
+}
