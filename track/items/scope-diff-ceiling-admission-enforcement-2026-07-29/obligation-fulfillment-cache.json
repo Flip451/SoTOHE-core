@@ -1118,6 +1118,870 @@
           "test_name": "test_new_rejects_a_plan_order_that_places_a_task_before_its_dependency"
         }
       ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "domain::batch_plan::check_batch_plan",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "domain::batch_plan::check_batch_plan",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "980e3d83062e051658fe930f56eabe26d9b3935f9326641c9009d52260692080",
+        "declaration_hash": "1c122f44c9929355694c61a470ab5a8c672a53de3d2643a34a8a9d05c1d729cc",
+        "anchor_text_hash": "b55569ed0491a6dd15393ae8f789f1f315e56164fe0fe4ce8a5b7f28f50b1836"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "`assert_eq!(violations_of(&outcome), &[BatchPlanGateViolation::CeilingExceeded { batch_id: batch_id(\"B1\"), scope: scope(\"domain\"), total: LineCount::new(650), ceiling: LineCount::new(500), }])` and `assert_eq!(outcome, BatchPlanGateOutcome::Passed);` for the sole `TaskDecomposition::Indivisible(...)` contributor, plus `// domain is over at 650; usecase stays at 60 and is checked as usual.`"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_passes_a_plan_whose_batches_stay_within_every_resolved_ceiling"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_a_batch_whose_scope_total_exceeds_the_ceiling"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_judges_each_scope_of_a_batch_separately"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_exempts_a_scope_whose_only_contributor_states_why_it_cannot_be_split"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_an_oversize_scope_that_has_more_than_one_contributor"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_does_not_compare_a_scope_with_no_resolved_ceiling"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_a_plan_that_names_a_task_the_implementation_plan_does_not_have"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_a_planned_task_that_belongs_to_no_batch"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_a_declared_dependency_whose_target_sits_in_a_later_batch"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_accepts_a_declared_dependency_in_the_same_batch_or_an_earlier_one"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_ignores_the_batch_placement_of_tasks_that_declare_no_dependency"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_reports_every_violation_it_finds_rather_than_stopping_at_the_first"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_task_claimed_by_two_batches_never_reaches_the_gate"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_an_unknown_task_id_is_reported_once_because_estimates_and_batch_members_are_one_set"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "domain::batch_plan::check_batch_plan",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "domain::batch_plan::check_batch_plan",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "980e3d83062e051658fe930f56eabe26d9b3935f9326641c9009d52260692080",
+        "declaration_hash": "1c122f44c9929355694c61a470ab5a8c672a53de3d2643a34a8a9d05c1d729cc",
+        "anchor_text_hash": "eb481557772cce6c718a0698518d721bb1cfe4faed60c6fa68d0cf0d5979cd4f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"DependencyInLaterBatch {\\n            task_id: task(\\\"T001\\\"),\\n            task_batch: batch_id(\\\"B1\\\"),\\n            dependency: task(\\\"T002\\\"),\\n            dependency_batch: batch_id(\\\"B2\\\"),\\n        }\"; \"OversizeScopeHasMultipleContributors {\\n            batch_id: batch_id(\\\"B1\\\"),\\n            scope: scope(\\\"domain\\\"),\\n            indivisible_task: task(\\\"T001\\\"),\\n            other_contributors: vec![task(\\\"T002\\\")],\\n        }\"; \"UnknownTaskRef { task_id: task(\\\"T404\\\") }\"; \"UnplannedTask { task_id: task(\\\"T002\\\") }\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_passes_a_plan_whose_batches_stay_within_every_resolved_ceiling"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_a_batch_whose_scope_total_exceeds_the_ceiling"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_judges_each_scope_of_a_batch_separately"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_exempts_a_scope_whose_only_contributor_states_why_it_cannot_be_split"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_an_oversize_scope_that_has_more_than_one_contributor"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_does_not_compare_a_scope_with_no_resolved_ceiling"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_a_plan_that_names_a_task_the_implementation_plan_does_not_have"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_a_planned_task_that_belongs_to_no_batch"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_a_declared_dependency_whose_target_sits_in_a_later_batch"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_accepts_a_declared_dependency_in_the_same_batch_or_an_earlier_one"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_ignores_the_batch_placement_of_tasks_that_declare_no_dependency"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_reports_every_violation_it_finds_rather_than_stopping_at_the_first"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_task_claimed_by_two_batches_never_reaches_the_gate"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_an_unknown_task_id_is_reported_once_because_estimates_and_batch_members_are_one_set"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "domain::batch_plan::check_batch_plan",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "domain::batch_plan::check_batch_plan",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "980e3d83062e051658fe930f56eabe26d9b3935f9326641c9009d52260692080",
+        "declaration_hash": "1c122f44c9929355694c61a470ab5a8c672a53de3d2643a34a8a9d05c1d729cc",
+        "anchor_text_hash": "8e8d05a0035149984760943bc7b4bdbf4d40df418d55a93c78eea4316bb4d6b0"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(violations_of(&outcome), &[BatchPlanGateViolation::CeilingExceeded { batch_id: batch_id(\"B1\"), scope: scope(\"domain\"), total: LineCount::new(650), ceiling: LineCount::new(500), }]);\n\nassert_eq!(outcome, BatchPlanGateOutcome::Passed);\n\n// domain is over at 650; usecase stays at 60 and is checked as usual.\nlet over_budget = scope(\"domain\");\nassert_eq!(violations_of(&outcome).len(), 1);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_passes_a_plan_whose_batches_stay_within_every_resolved_ceiling"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_a_batch_whose_scope_total_exceeds_the_ceiling"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_judges_each_scope_of_a_batch_separately"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_exempts_a_scope_whose_only_contributor_states_why_it_cannot_be_split"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_an_oversize_scope_that_has_more_than_one_contributor"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_does_not_compare_a_scope_with_no_resolved_ceiling"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_a_plan_that_names_a_task_the_implementation_plan_does_not_have"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_a_planned_task_that_belongs_to_no_batch"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_a_declared_dependency_whose_target_sits_in_a_later_batch"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_accepts_a_declared_dependency_in_the_same_batch_or_an_earlier_one"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_ignores_the_batch_placement_of_tasks_that_declare_no_dependency"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_reports_every_violation_it_finds_rather_than_stopping_at_the_first"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_task_claimed_by_two_batches_never_reaches_the_gate"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_an_unknown_task_id_is_reported_once_because_estimates_and_batch_members_are_one_set"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "domain::batch_plan::check_batch_plan",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "domain::batch_plan::check_batch_plan",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "980e3d83062e051658fe930f56eabe26d9b3935f9326641c9009d52260692080",
+        "declaration_hash": "1c122f44c9929355694c61a470ab5a8c672a53de3d2643a34a8a9d05c1d729cc",
+        "anchor_text_hash": "c2929a4e1e266bb67ee1550b8f08cbe7d63072dc726a0c6c09dbed623a4d1678"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"BatchPlanGateViolation::UnplannedTask { task_id: task(\\\"T002\\\") }\"; \"BatchPlanGateViolation::UnknownTaskRef { task_id: task(\\\"T404\\\") }\"; \"BatchPlanGateViolation::DependencyInLaterBatch { task_id: task(\\\"T001\\\"), task_batch: batch_id(\\\"B1\\\"), dependency: task(\\\"T002\\\"), dependency_batch: batch_id(\\\"B2\\\") }\"; \"BatchPlanGateViolation::OversizeScopeHasMultipleContributors { batch_id: batch_id(\\\"B1\\\"), scope: scope(\\\"domain\\\"), indivisible_task: task(\\\"T001\\\"), other_contributors: vec![task(\\\"T002\\\")] }\"; \"check_batch_plan(&same_batch, &config, &planned_tasks), BatchPlanGateOutcome::Passed\"; \"check_batch_plan(&earlier_batch, &config, &planned_tasks), BatchPlanGateOutcome::Passed\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_passes_a_plan_whose_batches_stay_within_every_resolved_ceiling"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_a_batch_whose_scope_total_exceeds_the_ceiling"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_judges_each_scope_of_a_batch_separately"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_exempts_a_scope_whose_only_contributor_states_why_it_cannot_be_split"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_an_oversize_scope_that_has_more_than_one_contributor"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_does_not_compare_a_scope_with_no_resolved_ceiling"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_a_plan_that_names_a_task_the_implementation_plan_does_not_have"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_a_planned_task_that_belongs_to_no_batch"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_a_declared_dependency_whose_target_sits_in_a_later_batch"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_accepts_a_declared_dependency_in_the_same_batch_or_an_earlier_one"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_ignores_the_batch_placement_of_tasks_that_declare_no_dependency"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_reports_every_violation_it_finds_rather_than_stopping_at_the_first"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_task_claimed_by_two_batches_never_reaches_the_gate"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_an_unknown_task_id_is_reported_once_because_estimates_and_batch_members_are_one_set"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "domain::batch_plan::check_batch_plan",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "domain::batch_plan::check_batch_plan",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "980e3d83062e051658fe930f56eabe26d9b3935f9326641c9009d52260692080",
+        "declaration_hash": "1c122f44c9929355694c61a470ab5a8c672a53de3d2643a34a8a9d05c1d729cc",
+        "anchor_text_hash": "c2d1440f1b318188f82fe538fe00e9fc3111a783e04547965c1c10b3437045dc"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome, BatchPlanGateOutcome::Passed, \"an unconstrained scope changes no verdict\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_passes_a_plan_whose_batches_stay_within_every_resolved_ceiling"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_a_batch_whose_scope_total_exceeds_the_ceiling"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_judges_each_scope_of_a_batch_separately"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_exempts_a_scope_whose_only_contributor_states_why_it_cannot_be_split"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_an_oversize_scope_that_has_more_than_one_contributor"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_does_not_compare_a_scope_with_no_resolved_ceiling"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_a_plan_that_names_a_task_the_implementation_plan_does_not_have"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_a_planned_task_that_belongs_to_no_batch"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_a_declared_dependency_whose_target_sits_in_a_later_batch"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_accepts_a_declared_dependency_in_the_same_batch_or_an_earlier_one"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_ignores_the_batch_placement_of_tasks_that_declare_no_dependency"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_reports_every_violation_it_finds_rather_than_stopping_at_the_first"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_task_claimed_by_two_batches_never_reaches_the_gate"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_an_unknown_task_id_is_reported_once_because_estimates_and_batch_members_are_one_set"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BatchPlanGateOutcome",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BatchPlanGateOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "bfc1768583577c506a3a9ce995703eeb2dff8bc5f93ca93d20e93618c68063c5",
+        "declaration_hash": "ad4becd46d50828fb0807fee71c8ef34cbcd3e35a00e3d2840092b4f7f787b32",
+        "anchor_text_hash": "b55569ed0491a6dd15393ae8f789f1f315e56164fe0fe4ce8a5b7f28f50b1836"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let outcome = BatchPlanGateOutcome::from_violations(Vec::new());\n\n    assert_eq!(outcome, BatchPlanGateOutcome::Passed);\n    assert!(outcome.violations().is_none());\n\nlet finding = BatchPlanGateViolation::UnplannedTask { task_id: task(\"T009\") };\n\n    let outcome = BatchPlanGateOutcome::from_violations(vec![finding.clone()]);\n\n    assert_eq!(violations_of(&outcome), &[finding]);\n\nassert_eq!(\n        violations_of(&outcome),\n        &[BatchPlanGateViolation::CeilingExceeded {\n            batch_id: batch_id(\"B1\"),\n            scope: scope(\"domain\"),\n            total: LineCount::new(650),\n            ceiling: LineCount::new(500),\n        }]\n    );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_gate_run_with_no_findings_is_a_passed_verdict"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_gate_run_with_findings_is_a_blocked_verdict_carrying_them"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_a_batch_whose_scope_total_exceeds_the_ceiling"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BatchPlanGateOutcome",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BatchPlanGateOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "b1cd91c46de7d3110fc9282df56fa2f22655ed5bc02bee4f9ee9c85baac16b92",
+        "declaration_hash": "ad4becd46d50828fb0807fee71c8ef34cbcd3e35a00e3d2840092b4f7f787b32",
+        "anchor_text_hash": "8e8d05a0035149984760943bc7b4bdbf4d40df418d55a93c78eea4316bb4d6b0"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n        violations_of(&outcome),\n        &[BatchPlanGateViolation::CeilingExceeded {\n            batch_id: batch_id(\"B1\"),\n            scope: scope(\"domain\"),\n            total: LineCount::new(650),\n            ceiling: LineCount::new(500),\n        }]\n    );\n\n    assert_eq!(outcome, BatchPlanGateOutcome::Passed);\n\n    assert_eq!(violations_of(&outcome).len(), 1);\n    assert!(matches!(\n        violations_of(&outcome).first(),\n        Some(BatchPlanGateViolation::CeilingExceeded { scope, .. }) if *scope == over_budget\n    ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_a_batch_whose_scope_total_exceeds_the_ceiling"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_exempts_a_scope_whose_only_contributor_states_why_it_cannot_be_split"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_judges_each_scope_of_a_batch_separately"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "NonEmptyGateViolations",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "NonEmptyGateViolations",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "aa761d9f607c4259ea65bf9f8610ba0545191704d051d7360663e95681b034aa",
+        "declaration_hash": "8b1f01c8216b03c429ab0af9708cc2907ad3d00287b9fbb64babe12e062f08a6",
+        "anchor_text_hash": "b55569ed0491a6dd15393ae8f789f1f315e56164fe0fe4ce8a5b7f28f50b1836"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(NonEmptyGateViolations::try_new(Vec::new()).is_none());\n\n    let findings = vec![\n        BatchPlanGateViolation::UnplannedTask { task_id: task(\"T009\") },\n        BatchPlanGateViolation::UnknownTaskRef { task_id: task(\"T404\") },\n    ];\n    let wrapped = NonEmptyGateViolations::try_new(findings.clone()).unwrap();\n    assert_eq!(wrapped.as_slice(), findings.as_slice());\n    assert_eq!(wrapped.into_vec(), findings);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_an_empty_violation_list_cannot_become_a_blocked_verdict"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_gate_run_with_no_findings_is_a_passed_verdict"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "NonEmptyGateViolations",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "NonEmptyGateViolations",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "09009af8a610457b1a089280d3130a2fdb668fecebb9811c40b15cfa87fb8bd4",
+        "declaration_hash": "8b1f01c8216b03c429ab0af9708cc2907ad3d00287b9fbb64babe12e062f08a6",
+        "anchor_text_hash": "8e8d05a0035149984760943bc7b4bdbf4d40df418d55a93c78eea4316bb4d6b0"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(NonEmptyGateViolations::try_new(Vec::new()).is_none());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_an_empty_violation_list_cannot_become_a_blocked_verdict"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_gate_run_with_findings_is_a_blocked_verdict_carrying_them"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "NonEmptyGateViolations",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "NonEmptyGateViolations",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "5918359ff6fdb9fd27210f761bfbf05c0a66ece7822be5ddd73887f2956ab267",
+        "declaration_hash": "8b1f01c8216b03c429ab0af9708cc2907ad3d00287b9fbb64babe12e062f08a6",
+        "anchor_text_hash": "c2929a4e1e266bb67ee1550b8f08cbe7d63072dc726a0c6c09dbed623a4d1678"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let outcome = BatchPlanGateOutcome::from_violations(vec![finding.clone()]);\n\n    assert_eq!(violations_of(&outcome), &[finding]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_gate_run_with_findings_is_a_blocked_verdict_carrying_them"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_reports_every_violation_it_finds_rather_than_stopping_at_the_first"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BatchPlanGateViolation",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BatchPlanGateViolation",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "d689070bcc1e2e8e28efd2f79388a5bb53ff32b0edd533f4798960103c246fc2",
+        "declaration_hash": "a00c3ff166cf30f630bb8ad0b6d7530b5a5e8190bf35a833643d3337290b1b38",
+        "anchor_text_hash": "b55569ed0491a6dd15393ae8f789f1f315e56164fe0fe4ce8a5b7f28f50b1836"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n        violations_of(&outcome),\n        &[BatchPlanGateViolation::CeilingExceeded {\n            batch_id: batch_id(\"B1\"),\n            scope: scope(\"domain\"),\n            total: LineCount::new(650),\n            ceiling: LineCount::new(500),\n        }]\n    );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_a_batch_whose_scope_total_exceeds_the_ceiling"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_an_oversize_scope_that_has_more_than_one_contributor"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_judges_each_scope_of_a_batch_separately"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BatchPlanGateViolation",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BatchPlanGateViolation",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "6aacd3b0d4ee16157081cb0864f4938acb029a016af7e15bd68da98e9c8a59fa",
+        "declaration_hash": "a00c3ff166cf30f630bb8ad0b6d7530b5a5e8190bf35a833643d3337290b1b38",
+        "anchor_text_hash": "eb481557772cce6c718a0698518d721bb1cfe4faed60c6fa68d0cf0d5979cd4f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n        violations_of(&outcome),\n        &[BatchPlanGateViolation::OversizeScopeHasMultipleContributors {\n            batch_id: batch_id(\"B1\"),\n            scope: scope(\"domain\"),\n            indivisible_task: task(\"T001\"),\n            other_contributors: vec![task(\"T002\")],\n        }]\n    );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_a_plan_that_names_a_task_the_implementation_plan_does_not_have"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_a_planned_task_that_belongs_to_no_batch"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_a_declared_dependency_whose_target_sits_in_a_later_batch"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_accepts_a_declared_dependency_in_the_same_batch_or_an_earlier_one"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_ignores_the_batch_placement_of_tasks_that_declare_no_dependency"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_an_oversize_scope_that_has_more_than_one_contributor"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_task_claimed_by_two_batches_never_reaches_the_gate"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_an_unknown_task_id_is_reported_once_because_estimates_and_batch_members_are_one_set"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BatchPlanGateViolation",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BatchPlanGateViolation",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "02a8f931b4cd26f43c443ae85a4b05e474c7315a86eab4b5f695712f38d5c91c",
+        "declaration_hash": "a00c3ff166cf30f630bb8ad0b6d7530b5a5e8190bf35a833643d3337290b1b38",
+        "anchor_text_hash": "8e8d05a0035149984760943bc7b4bdbf4d40df418d55a93c78eea4316bb4d6b0"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n        violations_of(&outcome),\n        &[BatchPlanGateViolation::CeilingExceeded {\n            batch_id: batch_id(\"B1\"),\n            scope: scope(\"domain\"),\n            total: LineCount::new(650),\n            ceiling: LineCount::new(500),\n        }]\n    );\n\nassert_eq!(outcome, BatchPlanGateOutcome::Passed);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_a_batch_whose_scope_total_exceeds_the_ceiling"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_exempts_a_scope_whose_only_contributor_states_why_it_cannot_be_split"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BatchPlanGateViolation",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BatchPlanGateViolation",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "fe90743d6ce15be8cd890011d18de3746f5f2b0e0ab0eab060227f2ee95d749f",
+        "declaration_hash": "a00c3ff166cf30f630bb8ad0b6d7530b5a5e8190bf35a833643d3337290b1b38",
+        "anchor_text_hash": "c2929a4e1e266bb67ee1550b8f08cbe7d63072dc726a0c6c09dbed623a4d1678"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(violations_of(&outcome), &[BatchPlanGateViolation::UnplannedTask { task_id: task(\"T002\") }]); ... assert_eq!(violations_of(&outcome), &[BatchPlanGateViolation::UnknownTaskRef { task_id: task(\"T404\") }]); ... assert_eq!(violations_of(&outcome), &[BatchPlanGateViolation::DependencyInLaterBatch { task_id: task(\"T001\"), task_batch: batch_id(\"B1\"), dependency: task(\"T002\"), dependency_batch: batch_id(\"B2\") }]); ... assert_eq!(violations_of(&outcome), &[BatchPlanGateViolation::OversizeScopeHasMultipleContributors { batch_id: batch_id(\"B1\"), scope: scope(\"domain\"), indivisible_task: task(\"T001\"), other_contributors: vec![task(\"T002\")] }]); ... assert_eq!(outcome, BatchPlanGateOutcome::Passed);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_a_planned_task_that_belongs_to_no_batch"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_a_plan_that_names_a_task_the_implementation_plan_does_not_have"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_a_declared_dependency_whose_target_sits_in_a_later_batch"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_an_oversize_scope_that_has_more_than_one_contributor"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_ignores_the_batch_placement_of_tasks_that_declare_no_dependency"
+        }
+      ]
     }
   ]
 }

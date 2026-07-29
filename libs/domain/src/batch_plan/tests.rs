@@ -3,8 +3,8 @@
 use std::collections::BTreeSet;
 
 use super::*;
-use crate::review_v2::{MainScopeName, ScopeName};
-use crate::{TaskId, TrackId};
+use crate::review_v2::{MainScopeName, ReviewScopeConfig, ScopeName};
+use crate::{NonEmptyString, TaskId, TaskStatus, TrackId, TrackTask};
 
 fn scope(name: &str) -> ScopeName {
     ScopeName::Main(MainScopeName::new(name).unwrap())
@@ -45,6 +45,42 @@ fn declaration(id: &str, members: &[&str]) -> BatchDeclaration {
 
 fn committed(task_ids: &[&str]) -> BTreeSet<TaskId> {
     task_ids.iter().map(|id| task(id)).collect()
+}
+
+/// A scope configuration declaring `entries` as `(scope name, per-scope
+/// ceiling)`, with no global default ceiling.
+fn scope_config(entries: &[(&str, Option<u32>)]) -> ReviewScopeConfig {
+    ReviewScopeConfig::new(
+        &track(),
+        entries
+            .iter()
+            .map(|(name, ceiling)| {
+                ((*name).to_owned(), vec![format!("libs/{name}/**")], None, *ceiling)
+            })
+            .collect(),
+        Vec::new(),
+        Vec::new(),
+        None,
+    )
+    .unwrap()
+}
+
+fn planned_plan(estimates: Vec<TaskEstimate>, batches: Vec<BatchDeclaration>) -> BatchPlanDocument {
+    BatchPlanDocument::new(track(), estimates, batches).unwrap()
+}
+
+/// An implementation-plan task declaring `depends_on`.
+fn planned(id: &str, depends_on: &[&str]) -> TrackTask {
+    TrackTask::with_dependencies(
+        task(id),
+        NonEmptyString::try_new(format!("task {id}")).unwrap(),
+        TaskStatus::Todo,
+        depends_on.iter().map(|dependency| task(dependency)).collect(),
+    )
+}
+
+fn violations_of(outcome: &BatchPlanGateOutcome) -> &[BatchPlanGateViolation] {
+    outcome.violations().map_or(&[], NonEmptyGateViolations::as_slice)
 }
 
 // ── LineCount ─────────────────────────────────────────────────────────────────
@@ -694,4 +730,467 @@ fn test_the_plan_tells_an_oversize_indivisible_task_apart_from_an_ordinary_one()
         .collect();
     assert_eq!(justified, oversize);
     assert!(plan.estimate_for(&task("T003")).unwrap().decomposition().justification().is_none());
+}
+
+// ── BatchPlanGateOutcome / NonEmptyGateViolations ─────────────────────────────
+
+#[test]
+fn test_a_gate_run_with_no_findings_is_a_passed_verdict() {
+    let outcome = BatchPlanGateOutcome::from_violations(Vec::new());
+
+    assert_eq!(outcome, BatchPlanGateOutcome::Passed);
+    assert!(outcome.violations().is_none());
+}
+
+#[test]
+fn test_a_gate_run_with_findings_is_a_blocked_verdict_carrying_them() {
+    let finding = BatchPlanGateViolation::UnplannedTask { task_id: task("T009") };
+
+    let outcome = BatchPlanGateOutcome::from_violations(vec![finding.clone()]);
+
+    assert_eq!(violations_of(&outcome), &[finding]);
+}
+
+#[test]
+fn test_an_empty_violation_list_cannot_become_a_blocked_verdict() {
+    assert!(NonEmptyGateViolations::try_new(Vec::new()).is_none());
+
+    let findings = vec![
+        BatchPlanGateViolation::UnplannedTask { task_id: task("T009") },
+        BatchPlanGateViolation::UnknownTaskRef { task_id: task("T404") },
+    ];
+    let wrapped = NonEmptyGateViolations::try_new(findings.clone()).unwrap();
+    assert_eq!(wrapped.as_slice(), findings.as_slice());
+    assert_eq!(wrapped.into_vec(), findings);
+}
+
+// ── check_batch_plan ──────────────────────────────────────────────────────────
+
+#[test]
+fn test_the_gate_passes_a_plan_whose_batches_stay_within_every_resolved_ceiling() {
+    let plan = planned_plan(
+        vec![
+            estimate(
+                "T001",
+                vec![scope_estimate("domain", 200, 100), scope_estimate("usecase", 40, 20)],
+                TaskDecomposition::Decomposable,
+            ),
+            estimate(
+                "T002",
+                vec![scope_estimate("domain", 60, 40)],
+                TaskDecomposition::Decomposable,
+            ),
+        ],
+        vec![declaration("B1", &["T001", "T002"])],
+    );
+
+    let outcome = check_batch_plan(
+        &plan,
+        &scope_config(&[("domain", Some(500)), ("usecase", Some(500))]),
+        &[planned("T001", &[]), planned("T002", &["T001"])],
+    );
+
+    assert_eq!(outcome, BatchPlanGateOutcome::Passed);
+}
+
+#[test]
+fn test_the_gate_blocks_a_batch_whose_scope_total_exceeds_the_ceiling() {
+    let plan = planned_plan(
+        vec![
+            estimate(
+                "T001",
+                vec![scope_estimate("domain", 300, 100)],
+                TaskDecomposition::Decomposable,
+            ),
+            estimate(
+                "T002",
+                vec![scope_estimate("domain", 200, 50)],
+                TaskDecomposition::Decomposable,
+            ),
+        ],
+        vec![declaration("B1", &["T001", "T002"])],
+    );
+
+    let outcome = check_batch_plan(
+        &plan,
+        &scope_config(&[("domain", Some(500))]),
+        &[planned("T001", &[]), planned("T002", &[])],
+    );
+
+    assert_eq!(
+        violations_of(&outcome),
+        &[BatchPlanGateViolation::CeilingExceeded {
+            batch_id: batch_id("B1"),
+            scope: scope("domain"),
+            total: LineCount::new(650),
+            ceiling: LineCount::new(500),
+        }]
+    );
+}
+
+#[test]
+fn test_the_gate_judges_each_scope_of_a_batch_separately() {
+    let plan = planned_plan(
+        vec![estimate(
+            "T001",
+            vec![scope_estimate("domain", 400, 250), scope_estimate("usecase", 40, 20)],
+            TaskDecomposition::Decomposable,
+        )],
+        vec![declaration("B1", &["T001"])],
+    );
+
+    let outcome = check_batch_plan(
+        &plan,
+        &scope_config(&[("domain", Some(500)), ("usecase", Some(500))]),
+        &[planned("T001", &[])],
+    );
+
+    // domain is over at 650; usecase stays at 60 and is checked as usual.
+    let over_budget = scope("domain");
+    assert_eq!(violations_of(&outcome).len(), 1);
+    assert!(matches!(
+        violations_of(&outcome).first(),
+        Some(BatchPlanGateViolation::CeilingExceeded { scope, .. }) if *scope == over_budget
+    ));
+}
+
+#[test]
+fn test_the_gate_exempts_a_scope_whose_only_contributor_states_why_it_cannot_be_split() {
+    let plan = planned_plan(
+        vec![estimate(
+            "T001",
+            vec![scope_estimate("domain", 700, 300)],
+            TaskDecomposition::Indivisible(justification("the transition table cannot be split")),
+        )],
+        vec![declaration("B1", &["T001"])],
+    );
+
+    let outcome =
+        check_batch_plan(&plan, &scope_config(&[("domain", Some(500))]), &[planned("T001", &[])]);
+
+    assert_eq!(outcome, BatchPlanGateOutcome::Passed);
+}
+
+#[test]
+fn test_the_gate_blocks_an_oversize_scope_that_has_more_than_one_contributor() {
+    let plan = planned_plan(
+        vec![
+            estimate(
+                "T001",
+                vec![scope_estimate("domain", 700, 300)],
+                TaskDecomposition::Indivisible(justification(
+                    "the transition table cannot be split",
+                )),
+            ),
+            estimate(
+                "T002",
+                vec![scope_estimate("domain", 10, 5)],
+                TaskDecomposition::Decomposable,
+            ),
+        ],
+        vec![declaration("B1", &["T001", "T002"])],
+    );
+
+    let outcome = check_batch_plan(
+        &plan,
+        &scope_config(&[("domain", Some(500))]),
+        &[planned("T001", &[]), planned("T002", &[])],
+    );
+
+    assert_eq!(
+        violations_of(&outcome),
+        &[BatchPlanGateViolation::OversizeScopeHasMultipleContributors {
+            batch_id: batch_id("B1"),
+            scope: scope("domain"),
+            indivisible_task: task("T001"),
+            other_contributors: vec![task("T002")],
+        }]
+    );
+}
+
+#[test]
+fn test_the_gate_does_not_compare_a_scope_with_no_resolved_ceiling() {
+    let plan = planned_plan(
+        vec![estimate(
+            "T001",
+            vec![scope_estimate("domain", 5_000, 5_000)],
+            TaskDecomposition::Decomposable,
+        )],
+        vec![declaration("B1", &["T001"])],
+    );
+
+    let outcome =
+        check_batch_plan(&plan, &scope_config(&[("domain", None)]), &[planned("T001", &[])]);
+
+    assert_eq!(outcome, BatchPlanGateOutcome::Passed, "an unconstrained scope changes no verdict");
+}
+
+#[test]
+fn test_the_gate_blocks_a_plan_that_names_a_task_the_implementation_plan_does_not_have() {
+    let plan = planned_plan(
+        vec![
+            estimate(
+                "T001",
+                vec![scope_estimate("domain", 10, 5)],
+                TaskDecomposition::Decomposable,
+            ),
+            estimate(
+                "T404",
+                vec![scope_estimate("domain", 10, 5)],
+                TaskDecomposition::Decomposable,
+            ),
+        ],
+        vec![declaration("B1", &["T001", "T404"])],
+    );
+
+    let outcome =
+        check_batch_plan(&plan, &scope_config(&[("domain", Some(500))]), &[planned("T001", &[])]);
+
+    assert_eq!(
+        violations_of(&outcome),
+        &[BatchPlanGateViolation::UnknownTaskRef { task_id: task("T404") }]
+    );
+}
+
+#[test]
+fn test_the_gate_blocks_a_planned_task_that_belongs_to_no_batch() {
+    let plan = planned_plan(
+        vec![estimate(
+            "T001",
+            vec![scope_estimate("domain", 10, 5)],
+            TaskDecomposition::Decomposable,
+        )],
+        vec![declaration("B1", &["T001"])],
+    );
+
+    let outcome = check_batch_plan(
+        &plan,
+        &scope_config(&[("domain", Some(500))]),
+        &[planned("T001", &[]), planned("T002", &[])],
+    );
+
+    assert_eq!(
+        violations_of(&outcome),
+        &[BatchPlanGateViolation::UnplannedTask { task_id: task("T002") }]
+    );
+}
+
+#[test]
+fn test_the_gate_blocks_a_declared_dependency_whose_target_sits_in_a_later_batch() {
+    let plan = planned_plan(
+        vec![
+            estimate(
+                "T001",
+                vec![scope_estimate("domain", 10, 5)],
+                TaskDecomposition::Decomposable,
+            ),
+            estimate(
+                "T002",
+                vec![scope_estimate("domain", 10, 5)],
+                TaskDecomposition::Decomposable,
+            ),
+        ],
+        vec![declaration("B1", &["T001"]), declaration("B2", &["T002"])],
+    );
+
+    let outcome = check_batch_plan(
+        &plan,
+        &scope_config(&[("domain", Some(500))]),
+        &[planned("T001", &["T002"]), planned("T002", &[])],
+    );
+
+    assert_eq!(
+        violations_of(&outcome),
+        &[BatchPlanGateViolation::DependencyInLaterBatch {
+            task_id: task("T001"),
+            task_batch: batch_id("B1"),
+            dependency: task("T002"),
+            dependency_batch: batch_id("B2"),
+        }]
+    );
+}
+
+#[test]
+fn test_the_gate_accepts_a_declared_dependency_in_the_same_batch_or_an_earlier_one() {
+    let estimates = || {
+        vec![
+            estimate(
+                "T001",
+                vec![scope_estimate("domain", 10, 5)],
+                TaskDecomposition::Decomposable,
+            ),
+            estimate(
+                "T002",
+                vec![scope_estimate("domain", 10, 5)],
+                TaskDecomposition::Decomposable,
+            ),
+        ]
+    };
+    let planned_tasks = [planned("T001", &[]), planned("T002", &["T001"])];
+    let config = scope_config(&[("domain", Some(500))]);
+
+    let same_batch = planned_plan(estimates(), vec![declaration("B1", &["T001", "T002"])]);
+    let earlier_batch =
+        planned_plan(estimates(), vec![declaration("B1", &["T001"]), declaration("B2", &["T002"])]);
+
+    assert_eq!(
+        check_batch_plan(&same_batch, &config, &planned_tasks),
+        BatchPlanGateOutcome::Passed
+    );
+    assert_eq!(
+        check_batch_plan(&earlier_batch, &config, &planned_tasks),
+        BatchPlanGateOutcome::Passed
+    );
+}
+
+#[test]
+fn test_the_gate_ignores_the_batch_placement_of_tasks_that_declare_no_dependency() {
+    let plan = planned_plan(
+        vec![
+            estimate(
+                "T001",
+                vec![scope_estimate("domain", 10, 5)],
+                TaskDecomposition::Decomposable,
+            ),
+            estimate(
+                "T002",
+                vec![scope_estimate("domain", 10, 5)],
+                TaskDecomposition::Decomposable,
+            ),
+        ],
+        // T002 is batched before T001, which would violate an edge if one existed.
+        vec![declaration("B1", &["T002"]), declaration("B2", &["T001"])],
+    );
+
+    let outcome = check_batch_plan(
+        &plan,
+        &scope_config(&[("domain", Some(500))]),
+        &[planned("T001", &[]), planned("T002", &[])],
+    );
+
+    assert_eq!(outcome, BatchPlanGateOutcome::Passed);
+}
+
+#[test]
+fn test_the_gate_reports_every_violation_it_finds_rather_than_stopping_at_the_first() {
+    let plan = planned_plan(
+        vec![
+            estimate(
+                "T001",
+                vec![scope_estimate("domain", 300, 100)],
+                TaskDecomposition::Decomposable,
+            ),
+            estimate(
+                "T404",
+                vec![scope_estimate("domain", 200, 50)],
+                TaskDecomposition::Decomposable,
+            ),
+        ],
+        vec![declaration("B1", &["T001", "T404"])],
+    );
+
+    let outcome = check_batch_plan(
+        &plan,
+        &scope_config(&[("domain", Some(500))]),
+        &[planned("T001", &[]), planned("T002", &[])],
+    );
+
+    assert_eq!(
+        violations_of(&outcome),
+        &[
+            BatchPlanGateViolation::UnknownTaskRef { task_id: task("T404") },
+            BatchPlanGateViolation::UnplannedTask { task_id: task("T002") },
+            BatchPlanGateViolation::CeilingExceeded {
+                batch_id: batch_id("B1"),
+                scope: scope("domain"),
+                total: LineCount::new(650),
+                ceiling: LineCount::new(500),
+            },
+        ]
+    );
+}
+
+#[test]
+fn test_a_task_claimed_by_two_batches_never_reaches_the_gate() {
+    let estimates = || {
+        vec![
+            estimate(
+                "T001",
+                vec![scope_estimate("domain", 10, 5)],
+                TaskDecomposition::Decomposable,
+            ),
+            estimate(
+                "T002",
+                vec![scope_estimate("domain", 10, 5)],
+                TaskDecomposition::Decomposable,
+            ),
+        ]
+    };
+
+    // The half of "exactly one batch" that is not UnplannedTask: a plan that
+    // lists T001 in two batches cannot be assembled at all, so no such plan can
+    // be handed to the gate.
+    let doubly_claimed = BatchPlanDocument::new(
+        track(),
+        estimates(),
+        vec![declaration("B1", &["T001", "T002"]), declaration("B2", &["T001"])],
+    );
+    let Err(BatchPlanValidationError::DuplicateBatchMembership { task_id, batch_ids }) =
+        doubly_claimed
+    else {
+        panic!("a task claimed by two batches must be refused before the gate sees it");
+    };
+    assert_eq!(task_id, task("T001"));
+    assert_eq!(batch_ids, vec![batch_id("B1"), batch_id("B2")]);
+
+    // Every plan the gate does receive therefore places each planned task in
+    // exactly one batch, and passes the membership half of the check.
+    let plan =
+        planned_plan(estimates(), vec![declaration("B1", &["T001"]), declaration("B2", &["T002"])]);
+    for member in ["T001", "T002"] {
+        let claiming = plan.batches().iter().filter(|batch| batch.contains(&task(member))).count();
+        assert_eq!(claiming, 1, "{member} must be claimed by exactly one batch");
+    }
+    assert_eq!(
+        check_batch_plan(
+            &plan,
+            &scope_config(&[("domain", Some(500))]),
+            &[planned("T001", &[]), planned("T002", &[])]
+        ),
+        BatchPlanGateOutcome::Passed
+    );
+}
+
+#[test]
+fn test_an_unknown_task_id_is_reported_once_because_estimates_and_batch_members_are_one_set() {
+    let known =
+        || estimate("T001", vec![scope_estimate("domain", 10, 5)], TaskDecomposition::Decomposable);
+    let unknown =
+        || estimate("T404", vec![scope_estimate("domain", 10, 5)], TaskDecomposition::Decomposable);
+
+    // A batch member with no estimate is not assemblable …
+    assert!(matches!(
+        BatchPlanDocument::new(track(), vec![known()], vec![declaration("B1", &["T001", "T404"])]),
+        Err(BatchPlanValidationError::MissingTaskEstimate { .. })
+    ));
+    // … and neither is an estimate no batch claims …
+    assert!(matches!(
+        BatchPlanDocument::new(
+            track(),
+            vec![known(), unknown()],
+            vec![declaration("B1", &["T001"])]
+        ),
+        Err(BatchPlanValidationError::UnassignedTask { .. })
+    ));
+
+    // … so an id unknown to the implementation plan is always both an estimate
+    // id and a batch-member id, and the gate names it exactly once.
+    let plan = planned_plan(vec![known(), unknown()], vec![declaration("B1", &["T001", "T404"])]);
+    let outcome =
+        check_batch_plan(&plan, &scope_config(&[("domain", Some(500))]), &[planned("T001", &[])]);
+
+    assert_eq!(
+        violations_of(&outcome),
+        &[BatchPlanGateViolation::UnknownTaskRef { task_id: task("T404") }]
+    );
 }

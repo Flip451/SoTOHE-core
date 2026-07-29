@@ -16,12 +16,13 @@
     {
       "id": "T019",
       "description": "`libs/domain/` の TrackTask に depends_on とアクセサ・それを受理する constructor を追加し、ValidationError variant と plan document constructor の検査を更新する。IN-19、IN-20、AC-21、AC-22。",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "7573d1c1"
     },
     {
       "id": "T003",
       "description": "T019 の完了後に `libs/domain/src/batch_plan/` へ check_batch_plan、BatchPlanGateOutcome、NonEmptyGateViolations、BatchPlanGateViolation を実装し、ReviewScopeConfig を参照して declared-dependency batch-order validation を追加する。IN-06、IN-07、AC-06、AC-07、AC-08、CN-02。",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T004",

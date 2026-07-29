@@ -6,8 +6,8 @@
 |------|------|--------|---------|--------|----------|
 | AdmissionDecision | enum | add | Admitted, Rejected | 🟡 | 🔵 |
 | AdmissionRejection | enum | add | NotCurrentBatchMember, ScopeCeilingWouldBeExceeded | 🟡 | 🔵 |
-| BatchPlanGateOutcome | enum | add | Passed, Blocked | 🟡 | 🔵 |
-| BatchPlanGateViolation | enum | add | CeilingExceeded, OversizeScopeHasMultipleContributors, UnknownTaskRef, UnplannedTask, DependencyInLaterBatch | 🟡 | 🔵 |
+| BatchPlanGateOutcome | enum | add | Passed, Blocked | 🔵 | 🔵 |
+| BatchPlanGateViolation | enum | add | CeilingExceeded, OversizeScopeHasMultipleContributors, UnknownTaskRef, UnplannedTask, DependencyInLaterBatch | 🔵 | 🔵 |
 | ScopeCeiling | enum | add | Unconstrained, Limited | 🔵 | 🔵 |
 | TaskDecomposition | enum | add | Decomposable, Indivisible | 🔵 | 🔵 |
 
@@ -21,7 +21,7 @@
 | IndivisibilityJustification | value_object | add | — | 🔵 | 🔵 |
 | LineCount | value_object | add | — | 🔵 | 🔵 |
 | MeasuredScopeDiff | value_object | add | — | 🔵 | 🔵 |
-| NonEmptyGateViolations | value_object | add | — | 🟡 | 🔵 |
+| NonEmptyGateViolations | value_object | add | — | 🔵 | 🔵 |
 | NonZeroLineCount | value_object | add | — | 🟡 | 🔵 |
 | ScopeLineEstimate | value_object | add | — | 🔵 | 🔵 |
 | TaskEstimate | value_object | add | — | 🔵 | 🔵 |
@@ -44,7 +44,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| domain::batch_plan::check_batch_plan | free_function | add | fn(plan: &BatchPlanDocument, scope_config: &ReviewScopeConfig, planned_tasks: &[TrackTask]) -> BatchPlanGateOutcome | 🟡 | 🔵 |
+| domain::batch_plan::check_batch_plan | free_function | add | fn(plan: &BatchPlanDocument, scope_config: &ReviewScopeConfig, planned_tasks: &[TrackTask]) -> BatchPlanGateOutcome | 🔵 | 🔵 |
 | domain::batch_plan::evaluate_admission | free_function | add | fn(plan: &BatchPlanDocument, scope_config: &ReviewScopeConfig, candidate: &TaskId, committed_task_ids: &std::collections::BTreeSet<TaskId>, in_progress_task_ids: &std::collections::BTreeSet<TaskId>, measured: &[MeasuredScopeDiff]) -> Result<AdmissionDecision, AdmissionEvaluationError> | 🟡 | 🔵 |
 
 ## Entities

@@ -7,14 +7,14 @@ GO-01 → T001–T012、T019、T020、T013、T016、T018: 宣言された batch 
 GO-02 → T003、T004、T006、T012、T018: Phase 3 終端と todo → in_progress 遷移の実装開始前 gate を配置する。
 GO-03 → T001、T002、T019、T020、T007、T008、T013、T014、T017: batch と依存宣言を Phase 3 宣言成果物へ移し、impl-plan review と full-cycle consumption の対象にする。
 
-## Tasks (3/20 resolved)
+## Tasks (4/20 resolved)
 
 ### S1 — ドメイン中核 — 見積り・batch 宣言と 2 つの純粋判定
 
 - [x] **T001**: `libs/domain/src/batch_plan/` に LineCount、ScopeCeiling、IndivisibilityJustification、TaskDecomposition、ScopeLineEstimate、TaskEstimate、BatchId、BatchDeclaration、MeasuredScopeDiff、BatchPlanValidationError を実装する。IN-02、IN-03、IN-04、AC-02、AC-03。 (`8ee295dd`)
 - [x] **T002**: `libs/domain/src/batch_plan/` に BatchPlanDocument 集約を実装する。IN-05、AC-04、CN-01。 (`8ee295dd`)
-- [x] **T019**: `libs/domain/` の TrackTask に depends_on とアクセサ・それを受理する constructor を追加し、ValidationError variant と plan document constructor の検査を更新する。IN-19、IN-20、AC-21、AC-22。
-- [ ] **T003**: T019 の完了後に `libs/domain/src/batch_plan/` へ check_batch_plan、BatchPlanGateOutcome、NonEmptyGateViolations、BatchPlanGateViolation を実装し、ReviewScopeConfig を参照して declared-dependency batch-order validation を追加する。IN-06、IN-07、AC-06、AC-07、AC-08、CN-02。
+- [x] **T019**: `libs/domain/` の TrackTask に depends_on とアクセサ・それを受理する constructor を追加し、ValidationError variant と plan document constructor の検査を更新する。IN-19、IN-20、AC-21、AC-22。 (`7573d1c1`)
+- [x] **T003**: T019 の完了後に `libs/domain/src/batch_plan/` へ check_batch_plan、BatchPlanGateOutcome、NonEmptyGateViolations、BatchPlanGateViolation を実装し、ReviewScopeConfig を参照して declared-dependency batch-order validation を追加する。IN-06、IN-07、AC-06、AC-07、AC-08、CN-02。
 - [ ] **T004**: `libs/domain/src/batch_plan/` に evaluate_admission、AdmissionDecision、AdmissionRejection、AdmissionEvaluationError、NonZeroLineCount を実装する。IN-09、IN-10、IN-11、AC-10、AC-11、AC-12、AC-13、AC-14、CN-03、CN-04。
 
 ### S2 — 適用層と外界接続 — port / gate service / codec / adapter

@@ -781,6 +781,344 @@
           "test_name": "test_new_rejects_a_plan_order_that_places_a_task_before_its_dependency"
         }
       ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "domain::batch_plan::check_batch_plan",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_passes_a_plan_whose_batches_stay_within_every_resolved_ceiling"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_a_batch_whose_scope_total_exceeds_the_ceiling"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_judges_each_scope_of_a_batch_separately"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_exempts_a_scope_whose_only_contributor_states_why_it_cannot_be_split"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_an_oversize_scope_that_has_more_than_one_contributor"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_does_not_compare_a_scope_with_no_resolved_ceiling"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_a_plan_that_names_a_task_the_implementation_plan_does_not_have"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_a_planned_task_that_belongs_to_no_batch"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_a_declared_dependency_whose_target_sits_in_a_later_batch"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_accepts_a_declared_dependency_in_the_same_batch_or_an_earlier_one"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_ignores_the_batch_placement_of_tasks_that_declare_no_dependency"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_reports_every_violation_it_finds_rather_than_stopping_at_the_first"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_task_claimed_by_two_batches_never_reaches_the_gate"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_an_unknown_task_id_is_reported_once_because_estimates_and_batch_members_are_one_set"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "BatchPlanGateOutcome",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_gate_run_with_no_findings_is_a_passed_verdict"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_gate_run_with_findings_is_a_blocked_verdict_carrying_them"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_a_batch_whose_scope_total_exceeds_the_ceiling"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "BatchPlanGateOutcome",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_a_batch_whose_scope_total_exceeds_the_ceiling"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_exempts_a_scope_whose_only_contributor_states_why_it_cannot_be_split"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_judges_each_scope_of_a_batch_separately"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "NonEmptyGateViolations",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_an_empty_violation_list_cannot_become_a_blocked_verdict"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_gate_run_with_no_findings_is_a_passed_verdict"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "NonEmptyGateViolations",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_an_empty_violation_list_cannot_become_a_blocked_verdict"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_gate_run_with_findings_is_a_blocked_verdict_carrying_them"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "NonEmptyGateViolations",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_gate_run_with_findings_is_a_blocked_verdict_carrying_them"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_reports_every_violation_it_finds_rather_than_stopping_at_the_first"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "BatchPlanGateViolation",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_a_batch_whose_scope_total_exceeds_the_ceiling"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_an_oversize_scope_that_has_more_than_one_contributor"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_judges_each_scope_of_a_batch_separately"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "BatchPlanGateViolation",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_a_plan_that_names_a_task_the_implementation_plan_does_not_have"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_a_planned_task_that_belongs_to_no_batch"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_a_declared_dependency_whose_target_sits_in_a_later_batch"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_accepts_a_declared_dependency_in_the_same_batch_or_an_earlier_one"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_ignores_the_batch_placement_of_tasks_that_declare_no_dependency"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_an_oversize_scope_that_has_more_than_one_contributor"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_task_claimed_by_two_batches_never_reaches_the_gate"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_an_unknown_task_id_is_reported_once_because_estimates_and_batch_members_are_one_set"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "BatchPlanGateViolation",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_a_batch_whose_scope_total_exceeds_the_ceiling"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_exempts_a_scope_whose_only_contributor_states_why_it_cannot_be_split"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "BatchPlanGateViolation",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_a_planned_task_that_belongs_to_no_batch"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_a_plan_that_names_a_task_the_implementation_plan_does_not_have"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_a_declared_dependency_whose_target_sits_in_a_later_batch"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_an_oversize_scope_that_has_more_than_one_contributor"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_ignores_the_batch_placement_of_tasks_that_declare_no_dependency"
+        }
+      ]
     }
   ]
 }
