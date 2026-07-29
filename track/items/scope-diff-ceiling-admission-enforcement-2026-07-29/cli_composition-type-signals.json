@@ -1,15 +1,16 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-29T01:53:07Z",
-  "declaration_hash": "01510f62ffe6a2bec65ed4d09348e003fbc7966b9c991f093a7896674006c529",
-  "implementation_input_hash": "c493241682afc2e291cc4460188f9fe7d03f1c319701630a6ac5eccdd99a306a",
+  "generated_at": "2026-07-29T12:54:17Z",
+  "declaration_hash": "2ac352f0a27b2ce270e8afdff5bcee59f21e5aeaf78702a4ae5756cedfc6a39a",
+  "implementation_input_hash": "41945fc904bc6d524ff07f86807a3cbefb2bf1aefaeab22586f00d8673e18199",
   "signals": [
     {
       "type_name": "BatchPlanCompositionRoot",
       "kind_tag": "composition_root",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Debug",
         "Default"
       ]
     }

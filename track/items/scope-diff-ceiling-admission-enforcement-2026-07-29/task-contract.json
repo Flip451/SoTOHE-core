@@ -40,9 +40,8 @@
     ],
     "T005": [
       { "layer": "usecase", "entry_key": "BatchPlanReaderPort" },
-      { "layer": "usecase", "entry_key": "BatchPlanReadError" },
       { "layer": "usecase", "entry_key": "PlannedTaskReaderPort" },
-      { "layer": "usecase", "entry_key": "PlannedTaskReadError" },
+      { "layer": "usecase", "entry_key": "PlanArtifactReadError" },
       { "layer": "usecase", "entry_key": "ScopeConfigReaderPort" },
       { "layer": "usecase", "entry_key": "ScopeConfigReadError" },
       { "layer": "usecase", "entry_key": "ScopeDiffMeasurePort" },
@@ -52,7 +51,10 @@
       { "layer": "usecase", "entry_key": "BatchPlanCheckService" },
       { "layer": "usecase", "entry_key": "BatchPlanCheckCommand" },
       { "layer": "usecase", "entry_key": "BatchPlanCheckError" },
-      { "layer": "usecase", "entry_key": "BatchPlanCheckInteractor" }
+      { "layer": "usecase", "entry_key": "BatchPlanCheckInteractor" },
+      { "layer": "usecase", "entry_key": "BatchPlanCheckOutput" },
+      { "layer": "usecase", "entry_key": "BatchPlanViolationOutput" },
+      { "layer": "usecase", "entry_key": "NonEmptyViolationOutputs" }
     ],
     "T007": [
       { "layer": "infrastructure", "entry_key": "BatchPlanDocumentDto" },
@@ -75,6 +77,8 @@
       { "layer": "cli_driver", "entry_key": "BatchPlanInput" }
     ],
     "T011": [
+      { "layer": "usecase", "entry_key": "BranchReaderPort" },
+      { "layer": "infrastructure", "entry_key": "LazyBranchReader" },
       { "layer": "cli_composition", "entry_key": "BatchPlanCompositionRoot" }
     ],
     "T012": [
@@ -86,7 +90,8 @@
     "T018": [
       { "layer": "usecase", "entry_key": "TaskOperationInteractor" },
       { "layer": "usecase", "entry_key": "TaskOperationService" },
-      { "layer": "usecase", "entry_key": "TaskTransitionOutcome" }
+      { "layer": "usecase", "entry_key": "TaskTransitionOutcome" },
+      { "layer": "usecase", "entry_key": "AdmissionRejectionOutput" }
     ]
   }
 }

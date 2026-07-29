@@ -17,24 +17,32 @@ use domain::review_v2::ReviewScopeConfig;
 use domain::{FreeText, TrackId, TrackTask};
 use thiserror::Error;
 
-// ── BatchPlanReaderPort ───────────────────────────────────────────────────────
+// ── PlanArtifactReadError ─────────────────────────────────────────────────────
 
-/// Failure of the batch-plan reading port (`IN-01`, `AC-05`).
+/// Failure of reading a track planning artifact (`IN-01`, `IN-07`, `AC-05`,
+/// `AC-07`).
 ///
-/// An absent plan is its own variant because the callers act on it distinctly
+/// Shared by the batch-plan and planned-task ports: both read a per-track JSON
+/// artifact that may be absent or unreadable, so they carry one contract rather
+/// than two identical enums. Which artifact failed is already known at the call
+/// site, and the gate's own error keeps the two apart for the operator.
+///
+/// An absent artifact is its own variant because callers act on it distinctly
 /// rather than folding it into a generic read failure.
 #[derive(Debug, Error)]
-pub enum BatchPlanReadError {
-    /// The track declares no batch plan.
-    #[error("the track declares no batch plan")]
+pub enum PlanArtifactReadError {
+    /// The track declares no such artifact.
+    #[error("the track declares no such planning artifact")]
     NotFound,
-    /// The batch plan exists but could not be read.
-    #[error("the batch plan could not be read: {message}")]
+    /// The artifact exists but could not be read.
+    #[error("the planning artifact could not be read: {message}")]
     ReadFailed {
         /// Opaque adapter diagnostic.
         message: FreeText,
     },
 }
+
+// ── BatchPlanReaderPort ───────────────────────────────────────────────────────
 
 /// Reads a track's declared batch plan as a validated domain document.
 ///
@@ -46,34 +54,17 @@ pub trait BatchPlanReaderPort: Send + Sync {
     ///
     /// # Errors
     ///
-    /// Returns [`BatchPlanReadError::NotFound`] when the track declares no
-    /// batch plan, and [`BatchPlanReadError::ReadFailed`] when one exists but
-    /// could not be read or decoded.
+    /// Returns [`PlanArtifactReadError::NotFound`] when the track declares no
+    /// batch plan, and [`PlanArtifactReadError::ReadFailed`] when one exists
+    /// but could not be read or decoded.
     fn read(
         &self,
         items_dir: &Path,
         track_id: &TrackId,
-    ) -> Result<BatchPlanDocument, BatchPlanReadError>;
+    ) -> Result<BatchPlanDocument, PlanArtifactReadError>;
 }
 
 // ── PlannedTaskReaderPort ─────────────────────────────────────────────────────
-
-/// Failure of the planned-task reading port (`IN-07`, `AC-07`).
-///
-/// An absent implementation plan is its own variant so it is reported rather
-/// than read as an empty task list.
-#[derive(Debug, Error)]
-pub enum PlannedTaskReadError {
-    /// The track declares no implementation plan.
-    #[error("the track declares no implementation plan")]
-    NotFound,
-    /// The implementation plan exists but could not be read.
-    #[error("the implementation plan could not be read: {message}")]
-    ReadFailed {
-        /// Opaque adapter diagnostic.
-        message: FreeText,
-    },
-}
 
 /// Reads a track's planned tasks, keeping their status and declared
 /// dependencies.
@@ -88,14 +79,15 @@ pub trait PlannedTaskReaderPort: Send + Sync {
     ///
     /// # Errors
     ///
-    /// Returns [`PlannedTaskReadError::NotFound`] when the track declares no
-    /// implementation plan, and [`PlannedTaskReadError::ReadFailed`] when one
+    /// Returns [`PlanArtifactReadError::NotFound`] when the track declares no
+    /// implementation plan — an absent plan is reported rather than read as an
+    /// empty task list — and [`PlanArtifactReadError::ReadFailed`] when one
     /// exists but could not be read or decoded.
     fn read_planned_tasks(
         &self,
         items_dir: &Path,
         track_id: &TrackId,
-    ) -> Result<Vec<TrackTask>, PlannedTaskReadError>;
+    ) -> Result<Vec<TrackTask>, PlanArtifactReadError>;
 }
 
 // ── ScopeConfigReaderPort ─────────────────────────────────────────────────────

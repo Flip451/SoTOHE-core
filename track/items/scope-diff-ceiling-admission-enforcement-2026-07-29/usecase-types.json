@@ -20,6 +20,10 @@
             {
               "name": "scope_config_reader",
               "ty": "std::sync::Arc<dyn ScopeConfigReaderPort>"
+            },
+            {
+              "name": "track_resolver",
+              "ty": "std::sync::Arc<dyn crate::track_resolution::ActiveTrackResolveService>"
             }
           ],
           "returns": "BatchPlanCheckInteractor"
@@ -35,10 +39,43 @@
           "name": "rejection",
           "params": [],
           "receiver": "&self",
-          "returns": "Option<&domain::batch_plan::AdmissionRejection>"
+          "returns": "Option<&AdmissionRejectionOutput>"
         }
       ],
       "type_name": "TaskTransitionOutcome"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "violations",
+              "ty": "Vec<BatchPlanViolationOutput>"
+            }
+          ],
+          "returns": "Option<NonEmptyViolationOutputs>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_slice",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[BatchPlanViolationOutput]"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "into_vec",
+          "params": [],
+          "receiver": "self",
+          "returns": "Vec<BatchPlanViolationOutput>"
+        }
+      ],
+      "type_name": "NonEmptyViolationOutputs"
     }
   ],
   "layer": "usecase",
@@ -50,15 +87,15 @@
       "trait_ref": "TaskOperationService"
     },
     {
-      "for_type": "BatchPlanReadError",
+      "for_type": "PlanArtifactReadError",
       "trait_ref": "core::fmt::Debug"
     },
     {
-      "for_type": "BatchPlanReadError",
+      "for_type": "PlanArtifactReadError",
       "trait_ref": "core::fmt::Display"
     },
     {
-      "for_type": "BatchPlanReadError",
+      "for_type": "PlanArtifactReadError",
       "trait_ref": "core::error::Error"
     },
     {
@@ -106,18 +143,6 @@
       "trait_ref": "BatchPlanCheckService"
     },
     {
-      "for_type": "PlannedTaskReadError",
-      "trait_ref": "core::fmt::Debug"
-    },
-    {
-      "for_type": "PlannedTaskReadError",
-      "trait_ref": "core::fmt::Display"
-    },
-    {
-      "for_type": "PlannedTaskReadError",
-      "trait_ref": "core::error::Error"
-    },
-    {
       "for_type": "ScopeConfigReadError",
       "trait_ref": "core::fmt::Debug"
     },
@@ -132,12 +157,76 @@
     {
       "for_type": "TaskTransitionOutcome",
       "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "BatchPlanViolationOutput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "BatchPlanViolationOutput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "BatchPlanViolationOutput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "BatchPlanViolationOutput",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "BatchPlanCheckOutput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "BatchPlanCheckOutput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "BatchPlanCheckOutput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "BatchPlanCheckOutput",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "AdmissionRejectionOutput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "AdmissionRejectionOutput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "AdmissionRejectionOutput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "AdmissionRejectionOutput",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "NonEmptyViolationOutputs",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "NonEmptyViolationOutputs",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "NonEmptyViolationOutputs",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "NonEmptyViolationOutputs",
+      "trait_ref": "core::cmp::Eq"
     }
   ],
   "traits": {
     "BatchPlanCheckService": {
       "action": "add",
-      "docs": "Primary port for the Phase 3 gate, driven by the CLI batch-plan check command. Type-design: the verdict is returned as data and the error channel is reserved for failures that prevented the check, so the two stay distinguishable at the adapter boundary. IN-06, IN-07, AC-06, AC-07.",
+      "docs": "Primary port for the Phase 3 gate, driven by the CLI batch-plan check command. Type-design: the verdict is returned as data and the error channel is reserved for failures that prevented the check, so the two stay distinguishable at the adapter boundary. The success type is this crate's own output DTO rather than the domain verdict, so no domain value object crosses into the adapter. IN-06, IN-07, AC-06, AC-07.",
       "informal_grounds": [],
       "methods": [
         {
@@ -151,7 +240,7 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<domain::batch_plan::BatchPlanGateOutcome, BatchPlanCheckError>"
+          "returns": "Result<BatchPlanCheckOutput, BatchPlanCheckError>"
         }
       ],
       "module_path": "batch_plan",
@@ -201,10 +290,10 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<domain::batch_plan::BatchPlanDocument, BatchPlanReadError>"
+          "returns": "Result<domain::batch_plan::BatchPlanDocument, PlanArtifactReadError>"
         }
       ],
-      "module_path": "batch_plan",
+      "module_path": "batch_plan::ports",
       "role": {
         "SecondaryPort": {}
       },
@@ -219,6 +308,39 @@
         },
         {
           "anchor": "AC-05",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
+    "BranchReaderPort": {
+      "action": "reference",
+      "docs": "Pre-existing driven port supplying the current git branch; unchanged by this track, declared because a new secondary adapter in this change set implements it (R7 — without the declaration the adapter's impl edge is dropped from the contract map). Blocking: the implementing adapter shells out to git and the callers are single-shot CLI gates with no async runtime on this path, so is_async is false. AC-05, CN-09.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "current_branch",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Result<Option<String>, BranchReadError>"
+        }
+      ],
+      "module_path": "track_resolution",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "CN-09",
           "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
         }
       ],
@@ -247,10 +369,10 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<Vec<domain::TrackTask>, PlannedTaskReadError>"
+          "returns": "Result<Vec<domain::TrackTask>, PlanArtifactReadError>"
         }
       ],
-      "module_path": "batch_plan",
+      "module_path": "batch_plan::ports",
       "role": {
         "SecondaryPort": {}
       },
@@ -292,7 +414,7 @@
           "returns": "Result<domain::review_v2::ReviewScopeConfig, ScopeConfigReadError>"
         }
       ],
-      "module_path": "batch_plan",
+      "module_path": "batch_plan::ports",
       "role": {
         "SecondaryPort": {}
       },
@@ -334,7 +456,7 @@
           "returns": "Result<Vec<domain::batch_plan::MeasuredScopeDiff>, ScopeDiffMeasureError>"
         }
       ],
-      "module_path": "batch_plan",
+      "module_path": "batch_plan::ports",
       "role": {
         "SecondaryPort": {}
       },
@@ -440,9 +562,86 @@
     }
   },
   "types": {
+    "AdmissionRejectionOutput": {
+      "action": "add",
+      "docs": "Usecase-owned mirror of an admission refusal, produced for the driver. Type-design: the transition path is brought into line with the gate path — the interactor maps the domain refusal here so no domain value object reaches the adapter, and the driver renders only this type. Variant names and payload arity mirror the domain refusal one-to-one so the figures survive the crossing (R11), and prior_contribution keeps a non-zero type because that is what makes the refusal well-formed: a ceiling refusal is only reachable once the prior contribution is non-zero, so flattening it to a plain count would drop the very guarantee the domain encodes (CN-03, AC-12). The remaining payloads are display Strings and counts because this is the presentation boundary and the values were validated upstream (R9 boundary justification), matching the existing usecase output DTOs in this crate. IN-09, IN-10, AC-10, AC-12.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NotCurrentBatchMember",
+            "payload": {
+              "fields": [
+                {
+                  "name": "task_id",
+                  "ty": "String"
+                },
+                {
+                  "name": "task_batch",
+                  "ty": "String"
+                },
+                {
+                  "name": "current_batch",
+                  "ty": "String"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ScopeCeilingWouldBeExceeded",
+            "payload": {
+              "fields": [
+                {
+                  "name": "scope",
+                  "ty": "String"
+                },
+                {
+                  "name": "prior_contribution",
+                  "ty": "core::num::NonZeroU32"
+                },
+                {
+                  "name": "candidate_estimate",
+                  "ty": "u32"
+                },
+                {
+                  "name": "ceiling",
+                  "ty": "u32"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "task_ops",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-10",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
     "BatchPlanCheckCommand": {
       "action": "add",
-      "docs": "Command object for the Phase 3 gate. Type-design: track_id is the domain identifier so the primary adapter validates once at the CLI boundary (R9); items_dir is a raw path with no domain meaning and travels with the command rather than with construction, which keeps the composition root a zero-argument wiring accessor. IN-06, AC-06.",
+      "docs": "Command object for the Phase 3 gate, carrying the track context unresolved. Type-design: track_id is Option<String> because resolving it is part of this use case rather than a separate step the adapter performs first — the interactor owns both resolution and the check, so a request maps to one interactor. The raw String is the deliberately-unresolved transport value; converting it to a domain identifier is exactly the resolution the interactor does (R9 boundary case). items_dir is a raw path with no domain meaning and travels with the command rather than with construction, which keeps the composition root a zero-argument wiring accessor. IN-06, AC-06.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -450,7 +649,7 @@
           "fields": [
             {
               "name": "track_id",
-              "ty": "domain::TrackId"
+              "ty": "Option<String>"
             },
             {
               "name": "items_dir",
@@ -479,7 +678,7 @@
     },
     "BatchPlanCheckError": {
       "action": "add",
-      "docs": "Failures that prevented the Phase 3 gate from running, kept separate from the verdict (structural findings are data inside BatchPlanGateOutcome::Blocked). Type-design: message payloads use FreeText because they are opaque adapter diagnostics with no domain structure (R9 truly-opaque case). Construction owner: BatchPlanCheckInteractor mapping its port errors. IN-06, AC-05, AC-06, CN-09.",
+      "docs": "Failures that prevented the Phase 3 gate from running, kept separate from the verdict (structural findings are data inside BatchPlanCheckOutput::Blocked). TrackResolutionFailed covers an unresolvable track context, which is now part of this use case rather than of the adapter. Type-design: message payloads use FreeText because they are opaque adapter diagnostics with no domain structure (R9 truly-opaque case). Construction owner: BatchPlanCheckInteractor mapping its port and resolver errors. IN-06, AC-05, AC-06, CN-09.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -531,6 +730,18 @@
               ],
               "kind": "struct"
             }
+          },
+          {
+            "name": "TrackResolutionFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "message",
+                  "ty": "domain::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
           }
         ]
       },
@@ -556,7 +767,7 @@
     },
     "BatchPlanCheckInteractor": {
       "action": "add",
-      "docs": "Implements BatchPlanCheckService: reads the batch plan, the planned tasks and the scope config through its three injected ports and delegates to check_batch_plan. Type-design: holds no ceiling arithmetic of its own, and an absent batch plan is mapped to an error rather than a pass — the opposite of the pre-review task-contract gate's absent-artifact tolerance. IN-06, IN-07, AC-05, AC-06, AC-07, AC-08, CN-09.",
+      "docs": "Implements BatchPlanCheckService: resolves the track context with READ semantics through the pre-existing resolve service, reads the batch plan, the planned tasks and the scope config through its three injected ports, and delegates to check_batch_plan, then maps the domain verdict into this crate's output DTO. Type-design: resolution is absorbed here rather than performed by the adapter beforehand, so one request drives one interactor; it reuses the shared resolve service instead of a second mechanism. The domain-to-DTO mapping lives here so the domain verdict stops at this layer. Holds no ceiling arithmetic of its own, and an absent batch plan is mapped to an error rather than a pass — the opposite of the pre-review task-contract gate's absent-artifact tolerance. IN-06, IN-07, AC-05, AC-06, AC-07, AC-08, CN-09.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -594,9 +805,213 @@
         }
       ]
     },
-    "BatchPlanReadError": {
+    "BatchPlanCheckOutput": {
       "action": "add",
-      "docs": "Failure of the batch-plan reading port. Type-design: NotFound is its own variant because both callers act on it distinctly rather than folding it into a generic read failure; the message payload uses FreeText as an opaque adapter diagnostic (R9 truly-opaque case). IN-01, AC-05.",
+      "docs": "Usecase-owned verdict returned to the driver. Type-design: enum-first, mirroring the domain verdict so Passed carries nothing and Blocked carries the findings; the interactor maps the domain value into this type so no domain verdict reaches the adapter. Blocked carries NonEmptyViolationOutputs, so an empty blocked verdict stays unrepresentable on this side of the boundary too rather than relying on the upstream invariant. IN-06, AC-06.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Passed",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Blocked",
+            "payload": {
+              "fields": [
+                {
+                  "name": "violations",
+                  "ty": "NonEmptyViolationOutputs"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "batch_plan",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "BatchPlanViolationOutput": {
+      "action": "add",
+      "docs": "Usecase-owned mirror of one gate finding, produced for the driver. Type-design: it exists so the domain verdict stops at this layer — a primary adapter must not destructure domain value objects, so the interactor maps each finding here and the driver renders only this type. Variant names and payload arity mirror the domain finding one-to-one so nothing is lost in the crossing (R11); payloads are display Strings and counts because this is the presentation boundary, the values were validated upstream, and the driver only renders them — matching the existing usecase output DTOs in this crate (R9 boundary justification). IN-06, IN-07, AC-06, AC-07.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "CeilingExceeded",
+            "payload": {
+              "fields": [
+                {
+                  "name": "batch_id",
+                  "ty": "String"
+                },
+                {
+                  "name": "scope",
+                  "ty": "String"
+                },
+                {
+                  "name": "total",
+                  "ty": "u32"
+                },
+                {
+                  "name": "ceiling",
+                  "ty": "u32"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "OversizeScopeHasMultipleContributors",
+            "payload": {
+              "fields": [
+                {
+                  "name": "batch_id",
+                  "ty": "String"
+                },
+                {
+                  "name": "scope",
+                  "ty": "String"
+                },
+                {
+                  "name": "indivisible_task",
+                  "ty": "String"
+                },
+                {
+                  "name": "other_contributors",
+                  "ty": "Vec<String>"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "UnknownTaskRef",
+            "payload": {
+              "fields": [
+                {
+                  "name": "task_id",
+                  "ty": "String"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "UnplannedTask",
+            "payload": {
+              "fields": [
+                {
+                  "name": "task_id",
+                  "ty": "String"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "DependencyInLaterBatch",
+            "payload": {
+              "fields": [
+                {
+                  "name": "task_id",
+                  "ty": "String"
+                },
+                {
+                  "name": "task_batch",
+                  "ty": "String"
+                },
+                {
+                  "name": "dependency",
+                  "ty": "String"
+                },
+                {
+                  "name": "dependency_batch",
+                  "ty": "String"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "batch_plan",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "NonEmptyViolationOutputs": {
+      "action": "add",
+      "docs": "Boundary mirror of the domain's non-empty violation collection. Type-design: without it a Blocked output could carry an empty list, so the guarantee the domain establishes would be dropped exactly where the adapter consumes it; this type carries it across instead, keeping the mirror faithful in structure and not only in variant names. try_new returns Option because emptiness is a shape question at the mapping site, not an error the use case reports. Private tuple newtype, mirroring the domain collection's surface. IN-06, AC-06, AC-07.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "batch_plan",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "PlanArtifactReadError": {
+      "action": "add",
+      "docs": "Failure of reading a track planning artifact, shared by the batch-plan and planned-task ports. Type-design: both ports read a per-track JSON artifact that may be absent or unreadable, so they share one contract rather than declaring identical enums; which artifact failed is already carried by the call site, and BatchPlanCheckError keeps separate variants for the two. NotFound is its own variant because callers act on it distinctly rather than folding it into a generic read failure; the message payload uses FreeText as an opaque adapter diagnostic (R9 truly-opaque case). IN-01, IN-07, AC-05, AC-07.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -634,42 +1049,7 @@
         {
           "anchor": "AC-05",
           "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
-        }
-      ]
-    },
-    "PlannedTaskReadError": {
-      "action": "add",
-      "docs": "Failure of the planned-task reading port. Type-design: NotFound is its own variant so an absent implementation plan is reported rather than treated as an empty task list; the message payload uses FreeText as an opaque adapter diagnostic (R9 truly-opaque case). IN-07, AC-07.",
-      "informal_grounds": [],
-      "kind": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "NotFound",
-            "payload": {
-              "kind": "unit"
-            }
-          },
-          {
-            "name": "ReadFailed",
-            "payload": {
-              "fields": [
-                {
-                  "name": "message",
-                  "ty": "domain::FreeText"
-                }
-              ],
-              "kind": "struct"
-            }
-          }
-        ]
-      },
-      "methods": [],
-      "module_path": "batch_plan",
-      "role": {
-        "ErrorType": {}
-      },
-      "spec_refs": [
+        },
         {
           "anchor": "IN-07",
           "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
@@ -823,7 +1203,7 @@
     },
     "TaskTransitionOutcome": {
       "action": "add",
-      "docs": "Result of transition_task: the transition happened, or it was refused with the typed reason. Type-design: an admission refusal is a legitimate result rather than an exceptional condition, so it travels as data and keeps its scope, contribution, ceiling and batch payloads intact — the same outcome-as-data shape the Phase 3 gate uses for BatchPlanGateOutcome, instead of collapsing to a rendered string in the error channel. This also leaves TaskOperationError's declared shape identical to its baseline. Role Dto in usecase (R1 △, justification): it is the output carrier of the pre-existing TaskOperationOutput DTO in this same module, crossing the usecase-to-driver boundary; it is not identified by value equality, so ValueObject would be the wrong classification. IN-09, IN-10, AC-10, AC-12.",
+      "docs": "Result of transition_task: the transition happened, or it was refused with the typed reason. Type-design: an admission refusal is a legitimate result rather than an exceptional condition, so it travels as data and keeps its scope, contribution, ceiling and batch payloads intact — the same outcome-as-data shape the Phase 3 gate path uses, instead of collapsing to a rendered string in the error channel. The refusal is carried as this crate's own output DTO, so no domain value object reaches the adapter. This also leaves TaskOperationError's declared shape identical to its baseline. Role Dto in usecase (R1 △, justification): it is the output carrier of the pre-existing TaskOperationOutput DTO in this same module, crossing the usecase-to-driver boundary; it is not identified by value equality, so ValueObject would be the wrong classification. IN-09, IN-10, AC-10, AC-12.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -841,7 +1221,7 @@
             "name": "Rejected",
             "payload": {
               "fields": [
-                "domain::batch_plan::AdmissionRejection"
+                "AdmissionRejectionOutput"
               ],
               "kind": "tuple"
             }

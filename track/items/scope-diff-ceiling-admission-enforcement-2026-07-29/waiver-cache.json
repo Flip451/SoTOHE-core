@@ -195,49 +195,25 @@
     },
     {
       "edge_id": {
-        "entry_key": "BatchPlanReadError",
+        "entry_key": "PlanArtifactReadError",
         "anchor_id": {
           "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
           "element_id": "IN-01"
         }
       },
       "obligation_id": {
-        "entry_key": "BatchPlanReadError",
+        "entry_key": "PlanArtifactReadError",
         "obligation_kind": "logic",
         "item_identifier": "voluntary:IN-01"
       },
       "key": {
-        "waived_reason_hash": "af5f69236ec908472aa4f6f9ce858a8a557022d7b845cdf74a17121622594eb7",
-        "declaration_hash": "b4f3423b756b64f3f59b5372b292919cca93a4fb5af3685b1b446b84f3ff9814",
+        "waived_reason_hash": "c3d126181f18a5bf31eac4f2067c49c3b22b603c87925042b07a0e9e3531396d",
+        "declaration_hash": "03613e42886c99dcbdd909cb12f6796f1ad7c081d9c2384454cf4b6ff0640534",
         "anchor_text_hash": "9683b81e7639049c9f0d9fcc535e1fd9d50c190e2b084ae0cea60372eb6684b3"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "書き手は impl-planner のみ（1 file = 1 writer）で、admission を判定する CLI は読むだけである。"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "entry_key": "PlannedTaskReadError",
-        "anchor_id": {
-          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
-          "element_id": "AC-07"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "PlannedTaskReadError",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:AC-07"
-      },
-      "key": {
-        "waived_reason_hash": "316b033a23f7bbe8206a1d8b42b5eeffc53ed99c758dda293438f48ebac85707",
-        "declaration_hash": "53d70cabd44cd9b6b3b44ecc0463a9a3b033aa063bcd31560edc55dad4a55097",
-        "anchor_text_hash": "c2929a4e1e266bb67ee1550b8f08cbe7d63072dc726a0c6c09dbed623a4d1678"
-      },
-      "verdict": {
-        "kind": "waived",
-        "citation": "NotFound is its own variant so an absent implementation plan is reported rather than treated as an empty task list"
+        "citation": "admission を判定する CLI は読むだけである。"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -256,12 +232,12 @@
       },
       "key": {
         "waived_reason_hash": "8174994efe298e13ddcf0c9665aee4e66da7d7da4ab20a93bea48ea74e00799b",
-        "declaration_hash": "d29b543fdbe3830f63ce3dbe16524b8665f095bc89e4c04beaddef5b908d296f",
+        "declaration_hash": "9ac49b003adf688f1c663c8c01c9c2facb0a3682111fbf3cb816c2053a8831c2",
         "anchor_text_hash": "0f13d211aab11d6e0b46e0830657059fb92e8b2b8968baa9983b5702f958c101"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "Driven port with a single read operation returning a validated domain document; no write operation."
+        "citation": "TraitEntry { action: Add, role: SecondaryPort, methods: [MethodDeclaration { name: MethodName(Identifier(\"read\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"items_dir\")), ty: TypeRef(\"&std::path::Path\") }, ParamDeclaration { name: ParamName(Identifier(\"track_id\")), ty: TypeRef(\"&domain::TrackId\") }], returns: TypeRef(\"Result<domain::batch_plan::BatchPlanDocument, PlanArtifactReadError>\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], docs: None }]"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -280,12 +256,12 @@
       },
       "key": {
         "waived_reason_hash": "9ca56cd50f9678ed70c4bc44916f4e0fa39d04b4d68014338de6902252631b32",
-        "declaration_hash": "6c9df4eec20d2963cd93c250fa0fafe1c170d079bcdcd8cebdfa192d91b158b2",
+        "declaration_hash": "2011fd1565081b3218f735c7de89ee31f7b7a849490088eeaa3acad00c6914d3",
         "anchor_text_hash": "ffdc22721890fd01dada6c95d08bcde7973a523171d5a1657e8f7ab3596e20e2"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "\"the port surface exposes only the resulting figures — the counting definition and base resolution are the adapter's responsibility\""
+        "citation": "Driven port that measures the actual per-scope diff for a track. Type-design: the port surface exposes only the resulting figures — the counting definition and base resolution are the adapter's responsibility."
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -304,12 +280,12 @@
       },
       "key": {
         "waived_reason_hash": "25affb781feae7faf5ada4bb24447536cbf56b3403aff4dbc0efffc2c684d052",
-        "declaration_hash": "6c9df4eec20d2963cd93c250fa0fafe1c170d079bcdcd8cebdfa192d91b158b2",
+        "declaration_hash": "2011fd1565081b3218f735c7de89ee31f7b7a849490088eeaa3acad00c6914d3",
         "anchor_text_hash": "88b0b5d03fd4d86a87adeccb80ba003f2c27cb47ea187dfb176beb5f14792fb8"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "Type-design: the port surface exposes only the resulting figures — the counting definition and base resolution are the adapter's responsibility."
+        "citation": "\"the port surface exposes only the resulting figures — the counting definition and base resolution are the adapter's responsibility\""
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -328,12 +304,108 @@
       },
       "key": {
         "waived_reason_hash": "57262e216f82f668cb7d7a357c274918c2dcc15c887853d09e764159b3cdf05a",
-        "declaration_hash": "6c9df4eec20d2963cd93c250fa0fafe1c170d079bcdcd8cebdfa192d91b158b2",
+        "declaration_hash": "2011fd1565081b3218f735c7de89ee31f7b7a849490088eeaa3acad00c6914d3",
         "anchor_text_hash": "6f39c6a6690cc059399beb1b142b4869ea15ad8ee0648aa396dfba14c22d4fb2"
       },
       "verdict": {
         "kind": "waived",
         "citation": "Driven port that measures the actual per-scope diff for a track. Type-design: the port surface exposes only the resulting figures — the counting definition and base resolution are the adapter's responsibility."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PlanArtifactReadError",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PlanArtifactReadError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-07"
+      },
+      "key": {
+        "waived_reason_hash": "893d499880ef7dacc19091b644e16616b89131867b0991254b81313b6eddd180",
+        "declaration_hash": "03613e42886c99dcbdd909cb12f6796f1ad7c081d9c2384454cf4b6ff0640534",
+        "anchor_text_hash": "eb481557772cce6c718a0698518d721bb1cfe4faed60c6fa68d0cf0d5979cd4f"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "依存辺の検査の入力は `impl-plan.json` の依存宣言と `batches[]` のみであり、`batch-plan.json` 側に新しい宣言フィールドを要求しない。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PlanArtifactReadError",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PlanArtifactReadError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-07"
+      },
+      "key": {
+        "waived_reason_hash": "d30c7435bdc13cda6d6b3bd91fd610683b9e5deff39a8825f7979f5586e87841",
+        "declaration_hash": "03613e42886c99dcbdd909cb12f6796f1ad7c081d9c2384454cf4b6ff0640534",
+        "anchor_text_hash": "c2929a4e1e266bb67ee1550b8f08cbe7d63072dc726a0c6c09dbed623a4d1678"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Failure of reading a track planning artifact... that may be absent or unreadable"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "LazyBranchReader",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "LazyBranchReader",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::track_resolution::BranchReaderPort"
+      },
+      "key": {
+        "waived_reason_hash": "c91138932f63006b1102cbc4e270a53fa94570e4bf404afd3d2f6a6d94b22af1",
+        "declaration_hash": "7e3db81799b9b15841d72271f5d15f229b7e8e388fefe87ce4dc8c0addc90516",
+        "anchor_text_hash": "e9cf369179b1f393ace511957edfcf54e9bf015b5bcde5c51923fa50053471da"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Pre-existing driven port supplying the current git branch"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "LazyBranchReader",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "CN-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "LazyBranchReader",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::track_resolution::BranchReaderPort"
+      },
+      "key": {
+        "waived_reason_hash": "5596088c738c4b90e12df30f9dbd1d90fcc78504037f0653b95187d236b0df49",
+        "declaration_hash": "7e3db81799b9b15841d72271f5d15f229b7e8e388fefe87ce4dc8c0addc90516",
+        "anchor_text_hash": "a3d4ceb216addd32b3c31cf1bd82e44f74116cfc4d0847739b5b7d0678c0a867"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"Pre-existing driven port supplying the current git branch\""
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     }

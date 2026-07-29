@@ -3,7 +3,7 @@
   "functions": {
     "cli::commands::batch_plan::execute": {
       "action": "add",
-      "docs": "Entry point for the batch-plan command group: resolves the track identifier, builds the wired driver through the composition root and returns its exit code. Type-design: fail-closed when no active track resolves, matching the other track-aware gate commands. IN-06, AC-06.",
+      "docs": "Entry point for the batch-plan command group: builds the wired driver through the composition root, hands the parsed arguments over as driver input and returns the rendered exit code. Type-design: thin bin — it reads no working directory, resolves no track and renders no failure of its own; the optional track id passes through unresolved and every decision belongs to the driver and the layers beneath it. IN-06, AC-06.",
       "informal_grounds": [],
       "is_async": false,
       "params": [
@@ -76,7 +76,7 @@
   "types": {
     "BatchPlanCheckArgs": {
       "action": "add",
-      "docs": "clap arguments for the batch-plan check subcommand. Type-design: both fields stay raw transport types because clap owns this surface and the driver validates the identifier immediately afterwards (R9 transport-boundary case, same treatment as the existing gate commands). IN-06, AC-06.",
+      "docs": "clap arguments for the batch-plan check subcommand. Type-design: both fields stay raw transport types because clap owns this surface and nothing between here and the use case decides anything about them — the optional track id is forwarded unresolved, and resolving it, validating it into a domain identifier and failing closed when no active track can be resolved all belong to the interactor (R9 transport-boundary case, same treatment as the existing gate commands). IN-06, AC-06.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",

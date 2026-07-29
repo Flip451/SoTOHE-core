@@ -4,11 +4,11 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| BatchPlanInput | enum | add | Check | 🟡 | 🔵 |
+| BatchPlanInput | enum | add | Check | 🔵 | 🔵 |
 
 ## Primary Adapters
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| BatchPlanDriver | primary_adapter | add | — | 🟡 | 🔵 |
+| BatchPlanDriver | primary_adapter | add | — | 🔵 | 🔵 |
 

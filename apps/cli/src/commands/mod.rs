@@ -7,6 +7,7 @@ use cli_driver::CommandOutcome as DriverOutcome;
 
 pub mod adr_baseline;
 pub mod arch;
+pub mod batch_plan;
 pub mod capability;
 pub mod catalog;
 pub mod catalogue_lint;

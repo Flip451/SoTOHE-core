@@ -1,9 +1,21 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-29T10:00:45Z",
-  "declaration_hash": "3de80797f25897dfb766a04cb071f52d1de1370eff180aec5324305456739e82",
-  "implementation_input_hash": "915e4be728415321d8cbb44c9abd051fb02fd0b109028c41981445f4ac490986",
+  "generated_at": "2026-07-29T15:21:50Z",
+  "declaration_hash": "fe72c11aed5a1940722aa148ede04bbade2363fc2df2c4d5a9f37a90e661d22d",
+  "implementation_input_hash": "998b95a1c4263050b9380ef888f9eae5075b3346bb233d9ce0c53c2c61701eab",
   "signals": [
+    {
+      "type_name": "AdmissionRejectionOutput",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
     {
       "type_name": "BatchPlanCheckCommand",
       "kind_tag": "command",
@@ -37,21 +49,22 @@
       ]
     },
     {
+      "type_name": "BatchPlanCheckOutput",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
       "type_name": "BatchPlanCheckService",
       "kind_tag": "application_service",
       "signal": "blue",
       "found_type": true
-    },
-    {
-      "type_name": "BatchPlanReadError",
-      "kind_tag": "error_type",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Debug",
-        "Display",
-        "Error"
-      ]
     },
     {
       "type_name": "BatchPlanReaderPort",
@@ -60,7 +73,31 @@
       "found_type": true
     },
     {
-      "type_name": "PlannedTaskReadError",
+      "type_name": "BatchPlanViolationOutput",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "NonEmptyViolationOutputs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "PlanArtifactReadError",
       "kind_tag": "error_type",
       "signal": "blue",
       "found_type": true,
@@ -133,6 +170,12 @@
       "missing_items": [
         "Debug"
       ]
+    },
+    {
+      "type_name": "BranchReaderPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
     }
   ]
 }

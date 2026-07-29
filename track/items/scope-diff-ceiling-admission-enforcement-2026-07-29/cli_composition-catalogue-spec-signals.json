@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "01510f62ffe6a2bec65ed4d09348e003fbc7966b9c991f093a7896674006c529",
+  "catalogue_declaration_hash": "2ac352f0a27b2ce270e8afdff5bcee59f21e5aeaf78702a4ae5756cedfc6a39a",
   "signals": [
     {
       "type_name": "BatchPlanCompositionRoot",
       "signal": "blue",
-      "entry_hash": "b13839683a7585e5f39755876090b483d3c00c880c2ad76bcd774f18c355888b"
+      "entry_hash": "952cfb9b9c06a7541cb7544b5287bb7eafb6b91f28a71e36f7c7d22972e30867"
     }
   ]
 }

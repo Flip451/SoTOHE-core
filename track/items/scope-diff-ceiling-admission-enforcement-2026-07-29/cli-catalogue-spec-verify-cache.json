@@ -3,7 +3,7 @@
   "layer": "cli",
   "entries": [
     {
-      "claim_hash": "33877b657d70683c853483beb5fbb0710dd52ac7687c4c24d49b91aa19f733a7",
+      "claim_hash": "f0ecf8e17102d94fc642e52ae5189b64c6627ec93aa442bf3c5bd3e3cd7e5ae3",
       "evidence_hash": "b37a6e46c2e61d04067a1e3d5768cf0bf32d08ac8e339b479b2db31f0ba7ce51",
       "verdict": {
         "kind": "pass",
@@ -27,7 +27,7 @@
       }
     },
     {
-      "claim_hash": "33877b657d70683c853483beb5fbb0710dd52ac7687c4c24d49b91aa19f733a7",
+      "claim_hash": "f0ecf8e17102d94fc642e52ae5189b64c6627ec93aa442bf3c5bd3e3cd7e5ae3",
       "evidence_hash": "124fd9e53dd13fb3a968f9e2349cd276d067b5be9d2104dcec09e2d544526c63",
       "verdict": {
         "kind": "pass",
@@ -147,11 +147,11 @@
       }
     },
     {
-      "claim_hash": "b45ab980c80f3fab9da6262f7536734dee7afa6fb071f7bef97889f7b80635f0",
+      "claim_hash": "c47d27e6e867602ec35560f3acb0ded3a24c9b2ae4d876453f806f5bdc8278fe",
       "evidence_hash": "b37a6e46c2e61d04067a1e3d5768cf0bf32d08ac8e339b479b2db31f0ba7ce51",
       "verdict": {
         "kind": "pass",
-        "citation": "Phase 3 の終端 gate として、宣言された各 batch について member task 見積りの per-scope Σ（`production_lines + test_lines`）を `diff_ceiling_for_scope` の解決値と照合する binary check を追加する。超過は fail-closed で Phase 3 を完了させず"
+        "citation": "Phase 3 の終端 gate として、宣言された各 batch について member task 見積りの per-scope Σ（`production_lines + test_lines`）を `diff_ceiling_for_scope` の解決値と照合する binary check を追加する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -171,7 +171,7 @@
       }
     },
     {
-      "claim_hash": "b45ab980c80f3fab9da6262f7536734dee7afa6fb071f7bef97889f7b80635f0",
+      "claim_hash": "c47d27e6e867602ec35560f3acb0ded3a24c9b2ae4d876453f806f5bdc8278fe",
       "evidence_hash": "124fd9e53dd13fb3a968f9e2349cd276d067b5be9d2104dcec09e2d544526c63",
       "verdict": {
         "kind": "pass",

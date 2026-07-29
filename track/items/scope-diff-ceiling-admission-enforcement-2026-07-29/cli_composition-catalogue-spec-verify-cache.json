@@ -3,7 +3,7 @@
   "layer": "cli_composition",
   "entries": [
     {
-      "claim_hash": "b13839683a7585e5f39755876090b483d3c00c880c2ad76bcd774f18c355888b",
+      "claim_hash": "952cfb9b9c06a7541cb7544b5287bb7eafb6b91f28a71e36f7c7d22972e30867",
       "evidence_hash": "b37a6e46c2e61d04067a1e3d5768cf0bf32d08ac8e339b479b2db31f0ba7ce51",
       "verdict": {
         "kind": "pass",
@@ -27,7 +27,7 @@
       }
     },
     {
-      "claim_hash": "b13839683a7585e5f39755876090b483d3c00c880c2ad76bcd774f18c355888b",
+      "claim_hash": "952cfb9b9c06a7541cb7544b5287bb7eafb6b91f28a71e36f7c7d22972e30867",
       "evidence_hash": "124fd9e53dd13fb3a968f9e2349cd276d067b5be9d2104dcec09e2d544526c63",
       "verdict": {
         "kind": "pass",

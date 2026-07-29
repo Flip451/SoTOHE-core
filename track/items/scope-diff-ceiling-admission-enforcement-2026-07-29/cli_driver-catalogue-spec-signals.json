@@ -1,16 +1,16 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "aba774a0dc5597034e0f1da024c3c3f28b2e0ecae50e6e22d1f91022e2b77514",
+  "catalogue_declaration_hash": "6d443c097434e44bfa47dc9157f3a09c95bdd57def1e9e72a284eee66947d5f5",
   "signals": [
     {
       "type_name": "BatchPlanDriver",
       "signal": "blue",
-      "entry_hash": "589de2af61127bded450f5e213580a52601380faf25e3c793a9b1b293db85741"
+      "entry_hash": "1e2125796e5a281011fed7950777d4245aa3dd3ee7fcef848669f39aafa735bc"
     },
     {
       "type_name": "BatchPlanInput",
       "signal": "blue",
-      "entry_hash": "5b68d80e5db6cf7c3186ff7e8a48c6af40f07b63112c86eee46294d8b94df89a"
+      "entry_hash": "60b8731ceabd8689379443d27aa83393bc4181dec467fe3fa4ae5d3405daa6b7"
     }
   ]
 }

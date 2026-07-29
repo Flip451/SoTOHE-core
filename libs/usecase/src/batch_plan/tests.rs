@@ -4,17 +4,21 @@ use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
 
 use domain::batch_plan::{
-    BatchDeclaration, BatchId, BatchPlanDocument, BatchPlanGateOutcome, BatchPlanGateViolation,
-    BatchPlanValidationError, IndivisibilityJustification, LineCount, MeasuredScopeDiff,
-    NonEmptyGateViolations, ScopeLineEstimate, TaskDecomposition, TaskEstimate,
+    BatchDeclaration, BatchId, BatchPlanDocument, BatchPlanValidationError,
+    IndivisibilityJustification, LineCount, MeasuredScopeDiff, ScopeLineEstimate,
+    TaskDecomposition, TaskEstimate,
 };
 use domain::review_v2::{MainScopeName, ReviewScopeConfig, ScopeName};
 use domain::{FreeText, NonEmptyString, TaskId, TaskStatus, TrackId, TrackTask};
 
 use super::{
-    BatchPlanCheckCommand, BatchPlanCheckError, BatchPlanCheckInteractor, BatchPlanCheckService,
-    BatchPlanReadError, BatchPlanReaderPort, PlannedTaskReadError, PlannedTaskReaderPort,
-    ScopeConfigReadError, ScopeConfigReaderPort, ScopeDiffMeasureError, ScopeDiffMeasurePort,
+    BatchPlanCheckCommand, BatchPlanCheckError, BatchPlanCheckInteractor, BatchPlanCheckOutput,
+    BatchPlanCheckService, BatchPlanReaderPort, BatchPlanViolationOutput, NonEmptyViolationOutputs,
+    PlanArtifactReadError, PlannedTaskReaderPort, ScopeConfigReadError, ScopeConfigReaderPort,
+    ScopeDiffMeasureError, ScopeDiffMeasurePort,
+};
+use crate::track_resolution::{
+    ActiveTrackResolveError, ActiveTrackResolveService, BranchReadError,
 };
 
 // ── fixtures ──────────────────────────────────────────────────────────────────
@@ -66,7 +70,50 @@ fn plan_document() -> BatchPlanDocument {
 }
 
 fn command() -> BatchPlanCheckCommand {
-    BatchPlanCheckCommand { track_id: track(), items_dir: items_dir() }
+    BatchPlanCheckCommand { track_id: Some(track().as_ref().to_owned()), items_dir: items_dir() }
+}
+
+/// The same command with the track left for the interactor to resolve.
+fn command_without_track() -> BatchPlanCheckCommand {
+    BatchPlanCheckCommand { track_id: None, items_dir: items_dir() }
+}
+
+/// Resolves an omitted id to `self_resolved`, or fails when it is `None`.
+struct StubTrackResolver {
+    self_resolved: Option<String>,
+}
+
+impl StubTrackResolver {
+    fn resolving_to_the_track() -> Self {
+        Self { self_resolved: Some(track().as_ref().to_owned()) }
+    }
+}
+
+impl ActiveTrackResolveService for StubTrackResolver {
+    fn resolve_active_track(&self) -> Result<String, ActiveTrackResolveError> {
+        self.self_resolved.clone().ok_or_else(|| {
+            ActiveTrackResolveError::BranchRead(BranchReadError::ReadFailed(
+                "not a track branch".to_owned(),
+            ))
+        })
+    }
+
+    fn resolve_for_read(
+        &self,
+        explicit_id: Option<String>,
+    ) -> Result<String, ActiveTrackResolveError> {
+        match explicit_id {
+            Some(id) => Ok(id),
+            None => self.resolve_active_track(),
+        }
+    }
+
+    fn resolve_for_write(
+        &self,
+        explicit_id: Option<String>,
+    ) -> Result<String, ActiveTrackResolveError> {
+        self.resolve_for_read(explicit_id)
+    }
 }
 
 // ── stubs ─────────────────────────────────────────────────────────────────────
@@ -97,13 +144,13 @@ impl BatchPlanReaderPort for StubBatchPlanReader {
         &self,
         items_dir: &Path,
         track_id: &TrackId,
-    ) -> Result<BatchPlanDocument, BatchPlanReadError> {
+    ) -> Result<BatchPlanDocument, PlanArtifactReadError> {
         self.calls.lock().unwrap().push((items_dir.to_path_buf(), track_id.clone()));
         match &self.stub {
             BatchPlanStub::Document => Ok(plan_document()),
-            BatchPlanStub::NotFound => Err(BatchPlanReadError::NotFound),
+            BatchPlanStub::NotFound => Err(PlanArtifactReadError::NotFound),
             BatchPlanStub::ReadFailed => {
-                Err(BatchPlanReadError::ReadFailed { message: FreeText::new("unreadable") })
+                Err(PlanArtifactReadError::ReadFailed { message: FreeText::new("unreadable") })
             }
             BatchPlanStub::Plan(plan) => Ok(plan.clone()),
         }
@@ -132,13 +179,13 @@ impl PlannedTaskReaderPort for StubPlannedTaskReader {
         &self,
         items_dir: &Path,
         track_id: &TrackId,
-    ) -> Result<Vec<TrackTask>, PlannedTaskReadError> {
+    ) -> Result<Vec<TrackTask>, PlanArtifactReadError> {
         self.calls.lock().unwrap().push((items_dir.to_path_buf(), track_id.clone()));
         match &self.stub {
             PlannedTaskStub::Tasks(tasks) => Ok(tasks.clone()),
-            PlannedTaskStub::NotFound => Err(PlannedTaskReadError::NotFound),
+            PlannedTaskStub::NotFound => Err(PlanArtifactReadError::NotFound),
             PlannedTaskStub::ReadFailed => {
-                Err(PlannedTaskReadError::ReadFailed { message: FreeText::new("unreadable") })
+                Err(PlanArtifactReadError::ReadFailed { message: FreeText::new("unreadable") })
             }
         }
     }
@@ -212,6 +259,7 @@ fn interactor(
         Arc::new(StubBatchPlanReader::new(batch_plan)),
         Arc::new(StubPlannedTaskReader::new(planned)),
         Arc::new(scope_config),
+        Arc::new(StubTrackResolver::resolving_to_the_track()),
     )
 }
 
@@ -221,7 +269,7 @@ fn gate_over(
     plan: BatchPlanDocument,
     planned: Vec<TrackTask>,
     ceiling: Option<u32>,
-) -> BatchPlanGateOutcome {
+) -> BatchPlanCheckOutput {
     interactor(
         BatchPlanStub::Plan(plan),
         PlannedTaskStub::Tasks(planned),
@@ -269,12 +317,57 @@ fn plan_of(estimates: Vec<TaskEstimate>, batches: Vec<BatchDeclaration>) -> Batc
 // ── BatchPlanCheckCommand ─────────────────────────────────────────────────────
 
 #[test]
-fn test_the_check_command_carries_the_track_and_the_items_directory() {
-    let cmd = command();
+fn test_the_check_command_carries_the_track_context_unresolved() {
+    let explicit = command();
+    assert_eq!(explicit.track_id.as_deref(), Some(track().as_ref()));
+    assert_eq!(explicit.items_dir, items_dir());
+    assert_eq!(explicit.clone(), explicit);
 
-    assert_eq!(cmd.track_id, track());
-    assert_eq!(cmd.items_dir, items_dir());
-    assert_eq!(cmd.clone(), cmd);
+    // An omitted track is carried as such, for the interactor to resolve.
+    assert_eq!(command_without_track().track_id, None);
+}
+
+#[test]
+fn test_the_interactor_resolves_an_omitted_track_before_reading_anything() {
+    let service = interactor(
+        BatchPlanStub::Document,
+        PlannedTaskStub::Tasks(vec![planned_task("T001", &[])]),
+        StubScopeConfigReader::new(Some(500)),
+    );
+
+    let outcome = service.check(command_without_track()).unwrap();
+
+    assert_eq!(outcome, BatchPlanCheckOutput::Passed, "the resolved track drives the reads");
+}
+
+#[test]
+fn test_a_track_that_cannot_be_resolved_is_an_error_of_its_own() {
+    let service = BatchPlanCheckInteractor::new(
+        Arc::new(StubBatchPlanReader::new(BatchPlanStub::Document)),
+        Arc::new(StubPlannedTaskReader::new(PlannedTaskStub::Tasks(Vec::new()))),
+        Arc::new(StubScopeConfigReader::new(Some(500))),
+        Arc::new(StubTrackResolver { self_resolved: None }),
+    );
+
+    assert!(matches!(
+        service.check(command_without_track()),
+        Err(BatchPlanCheckError::TrackResolutionFailed { .. })
+    ));
+}
+
+#[test]
+fn test_a_resolved_value_that_is_not_a_track_id_is_refused_before_any_read() {
+    let service = BatchPlanCheckInteractor::new(
+        Arc::new(StubBatchPlanReader::new(BatchPlanStub::Document)),
+        Arc::new(StubPlannedTaskReader::new(PlannedTaskStub::Tasks(Vec::new()))),
+        Arc::new(StubScopeConfigReader::new(Some(500))),
+        Arc::new(StubTrackResolver { self_resolved: Some("Not A Track".to_owned()) }),
+    );
+
+    assert!(matches!(
+        service.check(command_without_track()),
+        Err(BatchPlanCheckError::TrackResolutionFailed { .. })
+    ));
 }
 
 // ── driven ports ──────────────────────────────────────────────────────────────
@@ -295,10 +388,10 @@ fn test_the_batch_plan_reader_port_reports_an_absent_plan_apart_from_a_read_fail
     let absent = StubBatchPlanReader::new(BatchPlanStub::NotFound);
     let unreadable = StubBatchPlanReader::new(BatchPlanStub::ReadFailed);
 
-    assert!(matches!(absent.read(&items_dir(), &track()), Err(BatchPlanReadError::NotFound)));
+    assert!(matches!(absent.read(&items_dir(), &track()), Err(PlanArtifactReadError::NotFound)));
     assert!(matches!(
         unreadable.read(&items_dir(), &track()),
-        Err(BatchPlanReadError::ReadFailed { .. })
+        Err(PlanArtifactReadError::ReadFailed { .. })
     ));
 }
 
@@ -324,11 +417,11 @@ fn test_the_planned_task_reader_port_reports_an_absent_plan_apart_from_a_read_fa
 
     assert!(matches!(
         absent.read_planned_tasks(&items_dir(), &track()),
-        Err(PlannedTaskReadError::NotFound)
+        Err(PlanArtifactReadError::NotFound)
     ));
     assert!(matches!(
         unreadable.read_planned_tasks(&items_dir(), &track()),
-        Err(PlannedTaskReadError::ReadFailed { .. })
+        Err(PlanArtifactReadError::ReadFailed { .. })
     ));
 }
 
@@ -379,7 +472,9 @@ fn test_the_interactor_returns_the_domain_verdict_for_a_conforming_plan() {
 
     let outcome = service.check(command()).unwrap();
 
-    assert_eq!(outcome, BatchPlanGateOutcome::Passed);
+    // The domain verdict arrives as this crate's own record, so the adapter
+    // never holds a domain value.
+    assert_eq!(outcome, BatchPlanCheckOutput::Passed);
 }
 
 #[test]
@@ -394,8 +489,13 @@ fn test_the_interactor_returns_the_blocked_verdict_with_the_findings_it_carries(
     let outcome = service.check(command()).unwrap();
 
     assert_eq!(
-        outcome.violations().map(NonEmptyGateViolations::as_slice),
-        Some(&[BatchPlanGateViolation::UnplannedTask { task_id: task("T002") }][..])
+        outcome,
+        BatchPlanCheckOutput::Blocked {
+            violations: NonEmptyViolationOutputs::try_new(vec![
+                BatchPlanViolationOutput::UnplannedTask { task_id: "T002".to_owned() }
+            ])
+            .unwrap()
+        }
     );
 }
 
@@ -454,6 +554,106 @@ fn test_the_interactor_maps_each_port_failure_to_its_own_error() {
 }
 
 #[test]
+fn test_a_gate_that_could_not_run_is_reported_apart_from_the_verdict_it_would_have_produced() {
+    // Inputs the gate can read produce a verdict …
+    let readable = interactor(
+        BatchPlanStub::Document,
+        PlannedTaskStub::Tasks(vec![planned_task("T001", &[])]),
+        StubScopeConfigReader::new(Some(500)),
+    );
+    assert_eq!(readable.check(command()).unwrap(), BatchPlanCheckOutput::Passed);
+
+    // … while a track that declares no batch plan yields no verdict at all: the
+    // absence travels through the error channel, so it can never be read as a
+    // plan that conforms.
+    let absent = interactor(
+        BatchPlanStub::NotFound,
+        PlannedTaskStub::Tasks(vec![planned_task("T001", &[])]),
+        StubScopeConfigReader::new(Some(500)),
+    );
+    let error = absent.check(command()).unwrap_err();
+    assert!(matches!(error, BatchPlanCheckError::BatchPlanNotFound));
+    assert_eq!(error.to_string(), "the track declares no batch plan");
+
+    // A track that cannot be resolved stops the gate one step earlier, and is a
+    // failure of its own rather than the same one: nothing was read, so there is
+    // no plan to judge.
+    let unresolvable = BatchPlanCheckInteractor::new(
+        Arc::new(StubBatchPlanReader::new(BatchPlanStub::Document)),
+        Arc::new(StubPlannedTaskReader::new(PlannedTaskStub::Tasks(vec![planned_task(
+            "T001",
+            &[],
+        )]))),
+        Arc::new(StubScopeConfigReader::new(Some(500))),
+        Arc::new(StubTrackResolver { self_resolved: None }),
+    );
+    let error = unresolvable.check(command_without_track()).unwrap_err();
+    assert!(matches!(error, BatchPlanCheckError::TrackResolutionFailed { .. }));
+    assert!(
+        error.to_string().starts_with("no active track could be resolved"),
+        "rendered as: {error}"
+    );
+
+    // A plan that does not conform is the other side of the distinction: the
+    // findings are a value the gate returned, not a failure to run it.
+    let blocked = gate_over(
+        plan_of(
+            vec![
+                estimate("T001", &[("domain", 300, 100)], None),
+                estimate("T002", &[("domain", 200, 50)], None),
+            ],
+            vec![batch("B1", &["T001", "T002"])],
+        ),
+        vec![planned_task("T001", &[]), planned_task("T002", &[])],
+        Some(500),
+    );
+    assert!(matches!(blocked, BatchPlanCheckOutput::Blocked { .. }));
+}
+
+#[test]
+fn test_a_blocked_verdict_cannot_be_assembled_with_nothing_to_report() {
+    // An empty list is not a findings list: the wrapper refuses it, so the
+    // domain's non-emptiness survives the crossing instead of being dropped
+    // where the adapter consumes the verdict.
+    assert_eq!(NonEmptyViolationOutputs::try_new(Vec::new()), None);
+
+    // One finding is enough, and the findings come back in the order they were
+    // given, through either accessor.
+    let violations = NonEmptyViolationOutputs::try_new(vec![
+        BatchPlanViolationOutput::UnplannedTask { task_id: "T002".to_owned() },
+        BatchPlanViolationOutput::UnknownTaskRef { task_id: "T404".to_owned() },
+    ])
+    .unwrap();
+    assert_eq!(
+        violations.as_slice(),
+        &[
+            BatchPlanViolationOutput::UnplannedTask { task_id: "T002".to_owned() },
+            BatchPlanViolationOutput::UnknownTaskRef { task_id: "T404".to_owned() },
+        ][..]
+    );
+    assert_eq!(violations.into_vec().len(), 2);
+
+    // A blocked verdict the gate produced carries that wrapper rather than a
+    // bare list: T002 is planned but the batch plan places only T001.
+    let outcome = interactor(
+        BatchPlanStub::Document,
+        PlannedTaskStub::Tasks(vec![planned_task("T001", &[]), planned_task("T002", &[])]),
+        StubScopeConfigReader::new(Some(500)),
+    )
+    .check(command())
+    .unwrap();
+    assert_eq!(
+        outcome,
+        BatchPlanCheckOutput::Blocked {
+            violations: NonEmptyViolationOutputs::try_new(vec![
+                BatchPlanViolationOutput::UnplannedTask { task_id: "T002".to_owned() }
+            ])
+            .unwrap()
+        }
+    );
+}
+
+#[test]
 fn test_the_check_returns_a_fail_closed_error_when_a_batch_scope_sum_passes_the_ceiling() {
     // B1 = T001 (300 + 100) + T002 (200 + 50) = 650 domain lines against 500.
     let outcome = gate_over(
@@ -469,15 +669,18 @@ fn test_the_check_returns_a_fail_closed_error_when_a_batch_scope_sum_passes_the_
     );
 
     assert_eq!(
-        outcome.violations().map(NonEmptyGateViolations::as_slice),
-        Some(
-            &[BatchPlanGateViolation::CeilingExceeded {
-                batch_id: BatchId::try_new("B1").unwrap(),
-                scope: scope("domain"),
-                total: LineCount::new(650),
-                ceiling: LineCount::new(500),
-            }][..]
-        )
+        outcome,
+        BatchPlanCheckOutput::Blocked {
+            violations: NonEmptyViolationOutputs::try_new(vec![
+                BatchPlanViolationOutput::CeilingExceeded {
+                    batch_id: "B1".to_owned(),
+                    scope: "domain".to_owned(),
+                    total: 650,
+                    ceiling: 500,
+                }
+            ])
+            .unwrap()
+        }
     );
 }
 
@@ -493,7 +696,7 @@ fn test_the_check_lets_an_over_ceiling_scope_through_for_a_single_justified_cont
         vec![planned_task("T001", &[])],
         Some(500),
     );
-    assert_eq!(exempt, BatchPlanGateOutcome::Passed);
+    assert_eq!(exempt, BatchPlanCheckOutput::Passed);
 
     // The same excess with a second contributor is not exempt.
     let shared = gate_over(
@@ -508,15 +711,18 @@ fn test_the_check_lets_an_over_ceiling_scope_through_for_a_single_justified_cont
         Some(500),
     );
     assert_eq!(
-        shared.violations().map(NonEmptyGateViolations::as_slice),
-        Some(
-            &[BatchPlanGateViolation::OversizeScopeHasMultipleContributors {
-                batch_id: BatchId::try_new("B1").unwrap(),
-                scope: scope("domain"),
-                indivisible_task: task("T001"),
-                other_contributors: vec![task("T002")],
-            }][..]
-        )
+        shared,
+        BatchPlanCheckOutput::Blocked {
+            violations: NonEmptyViolationOutputs::try_new(vec![
+                BatchPlanViolationOutput::OversizeScopeHasMultipleContributors {
+                    batch_id: "B1".to_owned(),
+                    scope: "domain".to_owned(),
+                    indivisible_task: "T001".to_owned(),
+                    other_contributors: vec!["T002".to_owned()],
+                }
+            ])
+            .unwrap()
+        }
     );
 }
 
@@ -534,7 +740,7 @@ fn test_the_check_leaves_a_scope_with_no_resolved_ceiling_out_of_the_comparison(
 
     assert_eq!(
         outcome,
-        BatchPlanGateOutcome::Passed,
+        BatchPlanCheckOutput::Passed,
         "an unresolved ceiling cannot be exceeded, whatever the total"
     );
 }
@@ -554,8 +760,13 @@ fn test_the_check_reports_a_batch_plan_task_the_implementation_plan_does_not_hav
     );
 
     assert_eq!(
-        outcome.violations().map(NonEmptyGateViolations::as_slice),
-        Some(&[BatchPlanGateViolation::UnknownTaskRef { task_id: task("T404") }][..])
+        outcome,
+        BatchPlanCheckOutput::Blocked {
+            violations: NonEmptyViolationOutputs::try_new(vec![
+                BatchPlanViolationOutput::UnknownTaskRef { task_id: "T404".to_owned() }
+            ])
+            .unwrap()
+        }
     );
 }
 
@@ -575,15 +786,18 @@ fn test_the_check_reports_a_declared_dependency_that_sits_in_a_later_batch() {
     );
 
     assert_eq!(
-        outcome.violations().map(NonEmptyGateViolations::as_slice),
-        Some(
-            &[BatchPlanGateViolation::DependencyInLaterBatch {
-                task_id: task("T001"),
-                task_batch: BatchId::try_new("B1").unwrap(),
-                dependency: task("T002"),
-                dependency_batch: BatchId::try_new("B2").unwrap(),
-            }][..]
-        )
+        outcome,
+        BatchPlanCheckOutput::Blocked {
+            violations: NonEmptyViolationOutputs::try_new(vec![
+                BatchPlanViolationOutput::DependencyInLaterBatch {
+                    task_id: "T001".to_owned(),
+                    task_batch: "B1".to_owned(),
+                    dependency: "T002".to_owned(),
+                    dependency_batch: "B2".to_owned(),
+                }
+            ])
+            .unwrap()
+        }
     );
 }
 
@@ -602,7 +816,7 @@ fn test_the_check_leaves_the_batch_placement_of_undeclared_task_pairs_alone() {
         Some(500),
     );
 
-    assert_eq!(outcome, BatchPlanGateOutcome::Passed);
+    assert_eq!(outcome, BatchPlanCheckOutput::Passed);
 }
 
 #[test]
@@ -617,11 +831,14 @@ fn test_the_check_judges_each_scope_of_a_batch_on_its_own() {
         Some(500),
     );
 
-    let violations = outcome.violations().map(NonEmptyGateViolations::as_slice).unwrap_or(&[]);
+    let BatchPlanCheckOutput::Blocked { violations } = outcome else {
+        panic!("the over-budget scope must be reported");
+    };
+    let violations = violations.as_slice();
     assert_eq!(violations.len(), 1, "only the over-budget scope is reported: {violations:?}");
     assert!(matches!(
         violations.first(),
-        Some(BatchPlanGateViolation::CeilingExceeded { total, .. }) if *total == LineCount::new(650)
+        Some(BatchPlanViolationOutput::CeilingExceeded { total, .. }) if *total == 650
     ));
 }
 
@@ -660,9 +877,69 @@ fn test_the_check_names_an_unknown_task_once_because_a_plan_cannot_separate_the_
         Some(500),
     );
     assert_eq!(
-        outcome.violations().map(NonEmptyGateViolations::as_slice),
-        Some(&[BatchPlanGateViolation::UnknownTaskRef { task_id: task("T404") }][..])
+        outcome,
+        BatchPlanCheckOutput::Blocked {
+            violations: NonEmptyViolationOutputs::try_new(vec![
+                BatchPlanViolationOutput::UnknownTaskRef { task_id: "T404".to_owned() }
+            ])
+            .unwrap()
+        }
     );
+}
+
+#[test]
+fn test_a_batch_member_no_task_provides_is_reported_whichever_batch_claims_it() {
+    // A batch member without an estimate is refused before any check runs, so a
+    // membership id always carries an estimate: the two surfaces hold the same
+    // ids and the check reaches a member through either of them.
+    let member_without_estimate = BatchPlanDocument::new(
+        track(),
+        vec![estimate("T001", &[("domain", 10, 5)], None)],
+        vec![batch("B1", &["T001"]), batch("B2", &["T404"])],
+    );
+    assert!(matches!(
+        member_without_estimate,
+        Err(BatchPlanValidationError::MissingTaskEstimate { .. })
+    ));
+
+    // With every estimate well formed, an id only the second batch claims is
+    // still named: membership is read across all batches, not just the first.
+    let outcome = gate_over(
+        plan_of(
+            vec![
+                estimate("T001", &[("domain", 10, 5)], None),
+                estimate("T404", &[("domain", 10, 5)], None),
+            ],
+            vec![batch("B1", &["T001"]), batch("B2", &["T404"])],
+        ),
+        vec![planned_task("T001", &[])],
+        Some(500),
+    );
+    assert_eq!(
+        outcome,
+        BatchPlanCheckOutput::Blocked {
+            violations: NonEmptyViolationOutputs::try_new(vec![
+                BatchPlanViolationOutput::UnknownTaskRef { task_id: "T404".to_owned() }
+            ])
+            .unwrap()
+        }
+    );
+
+    // The same two batches with both members planned pass, so the finding
+    // follows the ids a task list does not provide rather than the batch a
+    // member sits in.
+    let both_planned = gate_over(
+        plan_of(
+            vec![
+                estimate("T001", &[("domain", 10, 5)], None),
+                estimate("T404", &[("domain", 10, 5)], None),
+            ],
+            vec![batch("B1", &["T001"]), batch("B2", &["T404"])],
+        ),
+        vec![planned_task("T001", &[]), planned_task("T404", &[])],
+        Some(500),
+    );
+    assert_eq!(both_planned, BatchPlanCheckOutput::Passed);
 }
 
 #[test]
@@ -679,7 +956,7 @@ fn test_the_check_accepts_a_declared_dependency_in_the_same_batch_or_an_earlier_
         vec![planned_task("T001", &[]), planned_task("T002", &["T001"])],
         Some(500),
     );
-    assert_eq!(same_batch, BatchPlanGateOutcome::Passed);
+    assert_eq!(same_batch, BatchPlanCheckOutput::Passed);
 
     // The same edge with the dependency one batch earlier.
     let earlier_batch = gate_over(
@@ -693,7 +970,7 @@ fn test_the_check_accepts_a_declared_dependency_in_the_same_batch_or_an_earlier_
         vec![planned_task("T001", &[]), planned_task("T002", &["T001"])],
         Some(500),
     );
-    assert_eq!(earlier_batch, BatchPlanGateOutcome::Passed);
+    assert_eq!(earlier_batch, BatchPlanCheckOutput::Passed);
 }
 
 #[test]
@@ -736,7 +1013,7 @@ fn test_a_plan_placing_one_task_in_two_batches_can_never_reach_the_check() {
             vec![planned_task("T001", &[]), planned_task("T002", &[])],
             Some(500)
         ),
-        BatchPlanGateOutcome::Passed
+        BatchPlanCheckOutput::Passed
     );
 }
 
@@ -766,6 +1043,7 @@ fn test_the_interactor_passes_the_commands_track_and_directory_to_every_port() {
         Arc::clone(&batch_plan_reader) as Arc<dyn BatchPlanReaderPort>,
         Arc::clone(&planned_task_reader) as Arc<dyn PlannedTaskReaderPort>,
         Arc::clone(&scope_config_reader) as Arc<dyn ScopeConfigReaderPort>,
+        Arc::new(StubTrackResolver::resolving_to_the_track()),
     );
 
     service.check(command()).unwrap();

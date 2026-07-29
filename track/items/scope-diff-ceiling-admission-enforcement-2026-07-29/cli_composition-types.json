@@ -28,6 +28,10 @@
   "trait_impls": [
     {
       "for_type": "BatchPlanCompositionRoot",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "BatchPlanCompositionRoot",
       "trait_ref": "core::default::Default"
     }
   ],
@@ -35,7 +39,7 @@
   "types": {
     "BatchPlanCompositionRoot": {
       "action": "add",
-      "docs": "Composition root for the batch-plan command family: wires the batch-plan reader, planned-task reader and scope-config reader into the gate interactor and hands it to the driver. Type-design: pure DI — batch_plan_driver takes no argument and returns no error, because the items directory travels with the driver input and each adapter resolves paths per call. IN-06, AC-06.",
+      "docs": "Composition root for the batch-plan command family: constructs the batch-plan reader, planned-task reader, scope-config reader and branch-reader adapters, injects the resolve interactor and those readers into the gate interactor, and hands that single service to the driver. Type-design: construction and injection only — it declares no adapter of its own, so no port implementation lives in this layer. Pure DI: batch_plan_driver takes no argument and returns no error, because the items directory travels with the driver input and each adapter resolves paths per call. IN-06, AC-06.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",

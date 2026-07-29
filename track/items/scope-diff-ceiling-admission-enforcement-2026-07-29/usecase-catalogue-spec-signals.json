@@ -1,31 +1,46 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "3de80797f25897dfb766a04cb071f52d1de1370eff180aec5324305456739e82",
+  "catalogue_declaration_hash": "fe72c11aed5a1940722aa148ede04bbade2363fc2df2c4d5a9f37a90e661d22d",
   "signals": [
+    {
+      "type_name": "AdmissionRejectionOutput",
+      "signal": "blue",
+      "entry_hash": "b039626a14c458e0a51e9203da34b3b51cf4217a8d7b74a8d7b20c1a4c43bd64"
+    },
     {
       "type_name": "BatchPlanCheckCommand",
       "signal": "blue",
-      "entry_hash": "7ec4e1c1a36492dd60bb30993df8faae9f12a6ed0dd6ac01ce4371386685e914"
+      "entry_hash": "422fc8698da63379d3baadf9c6fad7896f93c9f8ea1e26f718958df8301a60fa"
     },
     {
       "type_name": "BatchPlanCheckError",
       "signal": "blue",
-      "entry_hash": "e036a801cbcbab1fbdb6492fbb560eee48bdc443b14f2b341d587efb95e8696d"
+      "entry_hash": "f8506613404ed2ecc9c4e2445de8bc15223d1bf3452cc7bfa1a9e4b8713aae14"
     },
     {
       "type_name": "BatchPlanCheckInteractor",
       "signal": "blue",
-      "entry_hash": "2eb42475a3d413957feba41d1a9125a8578c031a8638d44b602f6f8e3af14fb9"
+      "entry_hash": "f97266a8951bc64945c04823c93c0c54438c57dc59fec4a0c191e81c1d38f5db"
     },
     {
-      "type_name": "BatchPlanReadError",
+      "type_name": "BatchPlanCheckOutput",
       "signal": "blue",
-      "entry_hash": "691d60776d210c0e283b0d062a605f4dbf6d783dea5f73e08e910707e07420af"
+      "entry_hash": "94a10a0f9cc85aa9724179c10c3e510b8d8c73f1a1f1af4ff122bd5756968413"
     },
     {
-      "type_name": "PlannedTaskReadError",
+      "type_name": "BatchPlanViolationOutput",
       "signal": "blue",
-      "entry_hash": "24955f44b7ca4a0f49020f980b88f8f4bf92389c1d0d420bb16cecc23ad4906e"
+      "entry_hash": "36844801cfc33ee5f307b32d9073a5bc6eff91b03e3d883d28669fe2cfa1f9d9"
+    },
+    {
+      "type_name": "NonEmptyViolationOutputs",
+      "signal": "blue",
+      "entry_hash": "8ff2a2b585e33fad48ad979235f6d615a27c02db3769c125f3ae58a1092b80da"
+    },
+    {
+      "type_name": "PlanArtifactReadError",
+      "signal": "blue",
+      "entry_hash": "ac123800040223ff956c0c64f30e388f834af39f6e7e1cd77c8bea35699bce4e"
     },
     {
       "type_name": "ScopeConfigReadError",
@@ -45,32 +60,37 @@
     {
       "type_name": "TaskTransitionOutcome",
       "signal": "blue",
-      "entry_hash": "62908c6d4423be66e4ddd81cf90704f34be3dc769bdc3b94641ea5db23eec1e2"
+      "entry_hash": "4d2f8f9067d142026578201b5b7a3af88bd88b63d2ee34ee4873bc24eefa7d55"
     },
     {
       "type_name": "BatchPlanCheckService",
       "signal": "blue",
-      "entry_hash": "41fe404f0e9c9aa37645c2cac4e1ff564b53810e817a402a372a95a6b03725f7"
+      "entry_hash": "df43ced3b9d6cbb01bc1fd806d39c7462bf3c31a55b83005d6f7c0a86d52f68a"
     },
     {
       "type_name": "BatchPlanReaderPort",
       "signal": "blue",
-      "entry_hash": "8185c3cd9a4888c4dfe5af43d2f58dd179f958ab100772239ef097cdf434893a"
+      "entry_hash": "262b520d21cc53f6446a2f58286ed800e44029964083971d4620e7b9bd1531d3"
+    },
+    {
+      "type_name": "BranchReaderPort",
+      "signal": "blue",
+      "entry_hash": "b749246ac374bcb7d78236b365f26a9f0f1e4475045453b911b7ebdda4ecd1ce"
     },
     {
       "type_name": "PlannedTaskReaderPort",
       "signal": "blue",
-      "entry_hash": "2251eabb4194ea4eb4c6f6bba98a3d945defaf70f4f003d72d95a2eb3957950c"
+      "entry_hash": "22fbc53cbde9227fc0395f0473b6092f6d1171f3bc3e8f4d4cd4fefb34dea3fa"
     },
     {
       "type_name": "ScopeConfigReaderPort",
       "signal": "blue",
-      "entry_hash": "f862a2e68eb8947849d1e05b3889e18a87ec018df7fd23a0c8d42a005bc77def"
+      "entry_hash": "0ea8fc52fa1b103b6a3ef9c5b5a32bda2e3497a1a3c6a836b84df9284c0113bf"
     },
     {
       "type_name": "ScopeDiffMeasurePort",
       "signal": "blue",
-      "entry_hash": "8d5d7431abc35f178b2b1843b15a9489d7f686bcddaf9dc0652f9833634ab249"
+      "entry_hash": "e6da3114ceb3a4518d2ccde0348fba5ab306c718a8607974749591f22860c2d4"
     },
     {
       "type_name": "TaskOperationService",

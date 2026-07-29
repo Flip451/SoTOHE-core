@@ -105,7 +105,7 @@
         "role": "Interactor"
       },
       "brief": "Author a result test covering 'entry' of BatchPlanCheckInteractor",
-      "declaration_hash": "91d160b3449094d35c4f53e02f543f2cc389641be4765546cbf49efd75a8e38b",
+      "declaration_hash": "23dde6c29223874f520749c52b5bc29444e89810683af0d7b3d5c65c2393d129",
       "spec_refs": [
         {
           "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
@@ -177,7 +177,7 @@
         "role": "ApplicationService"
       },
       "brief": "Author a result test covering 'trait_method:check' of BatchPlanCheckService",
-      "declaration_hash": "af9ae2c84bb675db5da08cc36041bc6f17542e3c944c332210d963cd115cd1fb",
+      "declaration_hash": "8e6e3d5e7e37bd3ac1802d386f8715492e29506bb469b70b1fa64adcd5e1a4a3",
       "spec_refs": [
         {
           "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
@@ -213,7 +213,7 @@
         "role": "SecondaryPort"
       },
       "brief": "Author a contract test covering 'trait_method:read' of BatchPlanReaderPort",
-      "declaration_hash": "d29b543fdbe3830f63ce3dbe16524b8665f095bc89e4c04beaddef5b908d296f",
+      "declaration_hash": "9ac49b003adf688f1c663c8c01c9c2facb0a3682111fbf3cb816c2053a8831c2",
       "spec_refs": [
         {
           "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
@@ -245,7 +245,7 @@
         "role": "SecondaryPort"
       },
       "brief": "Author a contract test covering 'trait_method:read_planned_tasks' of PlannedTaskReaderPort",
-      "declaration_hash": "164ca385f89d868d9966cc74ac471ec4b0177a8ab7d56a5409bf319796c372dc",
+      "declaration_hash": "003dbcd2b723eef6ce937929036c3ed91a655051a09cbc2c3760ca5648770089",
       "spec_refs": [
         {
           "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
@@ -273,7 +273,7 @@
         "role": "SecondaryPort"
       },
       "brief": "Author a contract test covering 'trait_method:read' of ScopeConfigReaderPort",
-      "declaration_hash": "853a059465b998378db4eca52fbce7adbea36db3307e1c9f947140d8861edd24",
+      "declaration_hash": "3f513f4859864ff0dab32315802c8d8b362a584d84ceb6ec0b2110dfb1eeaf67",
       "spec_refs": [
         {
           "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
@@ -301,7 +301,7 @@
         "role": "SecondaryPort"
       },
       "brief": "Author a contract test covering 'trait_method:measure_scope_diff' of ScopeDiffMeasurePort",
-      "declaration_hash": "6c9df4eec20d2963cd93c250fa0fafe1c170d079bcdcd8cebdfa192d91b158b2",
+      "declaration_hash": "2011fd1565081b3218f735c7de89ee31f7b7a849490088eeaa3acad00c6914d3",
       "spec_refs": [
         {
           "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
@@ -465,7 +465,7 @@
       "id": {
         "entry_key": "FsBatchPlanReader",
         "obligation_kind": "contract_conformance",
-        "item_identifier": "trait_impl:usecase::batch_plan::BatchPlanReaderPort"
+        "item_identifier": "trait_impl:usecase::batch_plan::ports::BatchPlanReaderPort"
       },
       "target_entry": {
         "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/infrastructure-types.json",
@@ -476,8 +476,8 @@
         "kind": "trait_impl",
         "role": "SecondaryPort"
       },
-      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::batch_plan::BatchPlanReaderPort' of FsBatchPlanReader",
-      "declaration_hash": "955a8b0b11085fce8613e19c93f26b3bccf505d096432d2c4cdf8c53ab85620a",
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::batch_plan::ports::BatchPlanReaderPort' of FsBatchPlanReader",
+      "declaration_hash": "146844950e2d3d2f36e3326e0bf62d525138911bbac845c819ce44ec22b89f7b",
       "spec_refs": [
         {
           "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
@@ -497,7 +497,7 @@
       "id": {
         "entry_key": "GitScopeDiffMeasurer",
         "obligation_kind": "contract_conformance",
-        "item_identifier": "trait_impl:usecase::batch_plan::ScopeDiffMeasurePort"
+        "item_identifier": "trait_impl:usecase::batch_plan::ports::ScopeDiffMeasurePort"
       },
       "target_entry": {
         "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/infrastructure-types.json",
@@ -508,8 +508,8 @@
         "kind": "trait_impl",
         "role": "SecondaryPort"
       },
-      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::batch_plan::ScopeDiffMeasurePort' of GitScopeDiffMeasurer",
-      "declaration_hash": "dcd8d140e6336753282bd80e7e2d61794bbe8004f0a179d5e6ae0c377be98117",
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::batch_plan::ports::ScopeDiffMeasurePort' of GitScopeDiffMeasurer",
+      "declaration_hash": "61109d5cb0f522559552e8238cbd76bf82bf8a7b612e5a6ca0622b30b03eedbd",
       "spec_refs": [
         {
           "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
@@ -533,7 +533,7 @@
       "id": {
         "entry_key": "FsPlannedTaskReader",
         "obligation_kind": "contract_conformance",
-        "item_identifier": "trait_impl:usecase::batch_plan::PlannedTaskReaderPort"
+        "item_identifier": "trait_impl:usecase::batch_plan::ports::PlannedTaskReaderPort"
       },
       "target_entry": {
         "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/infrastructure-types.json",
@@ -544,8 +544,8 @@
         "kind": "trait_impl",
         "role": "SecondaryPort"
       },
-      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::batch_plan::PlannedTaskReaderPort' of FsPlannedTaskReader",
-      "declaration_hash": "adc6962169d8885fb1c9ca37910a89ee970ffa88441df30a940e06ba9a94715a",
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::batch_plan::ports::PlannedTaskReaderPort' of FsPlannedTaskReader",
+      "declaration_hash": "052403c2128f813b7307eca6730b138dfc3a554fd0eb2b1e6288dc6662b48ddd",
       "spec_refs": [
         {
           "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
@@ -561,7 +561,7 @@
       "id": {
         "entry_key": "FsReviewScopeConfigReader",
         "obligation_kind": "contract_conformance",
-        "item_identifier": "trait_impl:usecase::batch_plan::ScopeConfigReaderPort"
+        "item_identifier": "trait_impl:usecase::batch_plan::ports::ScopeConfigReaderPort"
       },
       "target_entry": {
         "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/infrastructure-types.json",
@@ -572,8 +572,8 @@
         "kind": "trait_impl",
         "role": "SecondaryPort"
       },
-      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::batch_plan::ScopeConfigReaderPort' of FsReviewScopeConfigReader",
-      "declaration_hash": "5990046f8952d2cfa1bf3565ff0a2fe31bb5f3266f2e5cd413b70458c9ec7759",
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::batch_plan::ports::ScopeConfigReaderPort' of FsReviewScopeConfigReader",
+      "declaration_hash": "f910c7e27385107d80429b8f19836feaf7f8501a80aa9b9886dd50f25b23fbea",
       "spec_refs": [
         {
           "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
@@ -582,6 +582,34 @@
         {
           "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
           "element_id": "AC-08"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "LazyBranchReader",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::track_resolution::BranchReaderPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "LazyBranchReader"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::track_resolution::BranchReaderPort' of LazyBranchReader",
+      "declaration_hash": "7e3db81799b9b15841d72271f5d15f229b7e8e388fefe87ce4dc8c0addc90516",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-05"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "CN-09"
         }
       ]
     },
@@ -601,7 +629,7 @@
         "role": "FreeFunction"
       },
       "brief": "Author a logic test covering 'entry' of cli::commands::batch_plan::execute",
-      "declaration_hash": "fc65eb11b0d287e758057db9c3e7d4ae1bafe3a072c8f843d54d89a8eaea4edd",
+      "declaration_hash": "6efdd6b553196cac19f52d112aec642163520265d54b4bd31e4dd55b39d5aed3",
       "spec_refs": [
         {
           "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",

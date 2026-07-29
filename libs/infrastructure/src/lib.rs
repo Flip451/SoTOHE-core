@@ -7,6 +7,8 @@ pub mod adr_baseline;
 pub mod adr_decision;
 pub mod agent_profiles;
 pub mod batch_plan_codec;
+pub mod batch_plan_reader;
+pub mod branch_reader;
 pub mod branch_strategy;
 pub use branch_strategy::{
     BranchStrategyConfigError, JsonConfigBranchStrategyAdapter, SnapshotBranchStrategyAdapter,
@@ -27,15 +29,18 @@ pub mod git_cli;
 pub mod impl_catalog_signal_reader;
 pub mod impl_plan_codec;
 pub mod impl_plan_reader;
+pub mod planned_task_reader;
 pub mod pr;
 pub mod pr_review;
 pub mod provider_session;
 pub mod ref_verify;
+pub mod review_scope_config_reader;
 pub mod review_v2;
 pub mod schema_export;
 pub mod schema_export_codec;
 #[cfg(test)]
 mod schema_export_tests;
+pub mod scope_diff_measure;
 #[cfg(feature = "semantic-dup")]
 pub mod semantic_dup;
 pub mod shell;
@@ -51,6 +56,7 @@ pub mod template_conventions;
 pub mod template_export;
 pub mod test_obligation;
 pub mod track;
+pub(crate) mod track_artifact;
 pub use dry_check::noop_approval::NoOpDryApprovalService;
 pub use dry_check::recording_agent::RecordingDryAgent;
 pub use git_cli::workflow_adapter::FsGitWorkflowAdapter;

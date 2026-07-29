@@ -1,15 +1,15 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-29T02:02:12Z",
-  "declaration_hash": "02a56198d05fafc1a5c43e0f331bb1402ba09313d8ee9104656a9c90ba557c5b",
-  "implementation_input_hash": "ae641fad618659e03e056a5abbe44d86f8dca8fc9cba9578182e2cdb3d7b796a",
+  "generated_at": "2026-07-29T14:43:42Z",
+  "declaration_hash": "8a79f89be590789925cbdb83b702689579c588e06694fd477bd7d576d1aba737",
+  "implementation_input_hash": "cdd14a3fa4406a7bb7dc5fa2a2927e302e5d158c975a1924cf38dc8246913214",
   "signals": [
     {
       "type_name": "BatchPlanCheckArgs",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Args",
         "Clone",
         "Debug",
@@ -19,9 +19,9 @@
     {
       "type_name": "BatchPlanCommand",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "FromArgMatches",
@@ -31,7 +31,7 @@
     {
       "type_name": "CliCommand",
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "FromArgMatches",
@@ -41,8 +41,8 @@
     {
       "type_name": "cli::commands::batch_plan::execute",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     }
   ]
 }

@@ -74,6 +74,18 @@
         }
       ],
       "type_name": "FsReviewScopeConfigReader"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "LazyBranchReader"
+        }
+      ],
+      "type_name": "LazyBranchReader"
     }
   ],
   "layer": "infrastructure",
@@ -157,7 +169,7 @@
     },
     {
       "for_type": "FsBatchPlanReader",
-      "trait_ref": "usecase::batch_plan::BatchPlanReaderPort"
+      "trait_ref": "usecase::batch_plan::ports::BatchPlanReaderPort"
     },
     {
       "for_type": "GitScopeDiffMeasurer",
@@ -165,7 +177,7 @@
     },
     {
       "for_type": "GitScopeDiffMeasurer",
-      "trait_ref": "usecase::batch_plan::ScopeDiffMeasurePort"
+      "trait_ref": "usecase::batch_plan::ports::ScopeDiffMeasurePort"
     },
     {
       "for_type": "FsPlannedTaskReader",
@@ -177,7 +189,7 @@
     },
     {
       "for_type": "FsPlannedTaskReader",
-      "trait_ref": "usecase::batch_plan::PlannedTaskReaderPort"
+      "trait_ref": "usecase::batch_plan::ports::PlannedTaskReaderPort"
     },
     {
       "for_type": "FsReviewScopeConfigReader",
@@ -189,7 +201,19 @@
     },
     {
       "for_type": "FsReviewScopeConfigReader",
-      "trait_ref": "usecase::batch_plan::ScopeConfigReaderPort"
+      "trait_ref": "usecase::batch_plan::ports::ScopeConfigReaderPort"
+    },
+    {
+      "for_type": "LazyBranchReader",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "LazyBranchReader",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "for_type": "LazyBranchReader",
+      "trait_ref": "usecase::track_resolution::BranchReaderPort"
     }
   ],
   "traits": {},
@@ -514,6 +538,28 @@
         },
         {
           "anchor": "AC-21",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "LazyBranchReader": {
+      "action": "add",
+      "docs": "Implements BranchReaderPort by discovering the repository on each call and mapping the git failure into the port's error. Type-design: this is adapter work — repository discovery and error translation — so it belongs in this layer rather than inside a composition root, which may only construct and inject. Discovery is deferred to the call so wiring succeeds in contexts without a repository. Unit struct constructed with no arguments so composition roots stay zero-argument wiring accessors. AC-05.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "branch_reader",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-05",
           "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
         }
       ]

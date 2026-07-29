@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-29T10:21:44Z",
-  "declaration_hash": "c0337345d380c4769d4f068a62be3837fa3e2358e8fae6cc50265170e870b8c2",
-  "implementation_input_hash": "5db838f0cc846ed5561a17ecdf011bb1283eecfbffef425eed6cb6e5433766f0",
+  "generated_at": "2026-07-29T15:32:36Z",
+  "declaration_hash": "15acfed3509a6a017d8fa0939d04d4ae753a74bab89b2ddec3ac1dacd4775948",
+  "implementation_input_hash": "a51dcf8761491ae3a986e61315c455f514b6f897c5cf7c61aa363f3c792ab994",
   "signals": [
     {
       "type_name": "BatchDeclarationDto",
@@ -38,45 +38,45 @@
     {
       "type_name": "FsBatchPlanReader",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Debug",
         "Default",
-        "usecase::batch_plan::BatchPlanReaderPort"
+        "usecase::batch_plan::ports::BatchPlanReaderPort"
       ]
     },
     {
       "type_name": "FsPlannedTaskReader",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Debug",
         "Default",
-        "usecase::batch_plan::PlannedTaskReaderPort"
+        "usecase::batch_plan::ports::PlannedTaskReaderPort"
       ]
     },
     {
       "type_name": "FsReviewScopeConfigReader",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Debug",
         "Default",
-        "usecase::batch_plan::ScopeConfigReaderPort"
+        "usecase::batch_plan::ports::ScopeConfigReaderPort"
       ]
     },
     {
       "type_name": "GitScopeDiffMeasurer",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Debug",
         "Default",
-        "usecase::batch_plan::ScopeDiffMeasurePort"
+        "usecase::batch_plan::ports::ScopeDiffMeasurePort"
       ]
     },
     {
@@ -89,6 +89,17 @@
         "Debug",
         "Deserialize<'de>",
         "Serialize"
+      ]
+    },
+    {
+      "type_name": "LazyBranchReader",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Debug",
+        "Default",
+        "usecase::track_resolution::BranchReaderPort"
       ]
     },
     {

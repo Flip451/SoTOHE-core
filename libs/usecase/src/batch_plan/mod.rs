@@ -7,32 +7,40 @@
 //! interactor reads and delegates, and holds no ceiling arithmetic.
 
 mod check_service;
+mod output;
 mod ports;
 
 use std::path::PathBuf;
 
-use domain::TrackId;
-
 pub use check_service::{BatchPlanCheckError, BatchPlanCheckInteractor, BatchPlanCheckService};
+// The gate verdict crosses the boundary as this crate's own record: the
+// interactor maps the domain value here, so the adapter never holds one.
+pub use output::{BatchPlanCheckOutput, BatchPlanViolationOutput, NonEmptyViolationOutputs};
 pub use ports::{
-    BatchPlanReadError, BatchPlanReaderPort, PlannedTaskReadError, PlannedTaskReaderPort,
-    ScopeConfigReadError, ScopeConfigReaderPort, ScopeDiffMeasureError, ScopeDiffMeasurePort,
+    BatchPlanReaderPort, PlanArtifactReadError, PlannedTaskReaderPort, ScopeConfigReadError,
+    ScopeConfigReaderPort, ScopeDiffMeasureError, ScopeDiffMeasurePort,
 };
 
 #[cfg(test)]
 #[allow(clippy::indexing_slicing, clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests;
 
-/// What to run the Phase 3 gate over (`IN-06`, `AC-06`).
+/// What to run the Phase 3 gate over, carrying the track context unresolved
+/// (`IN-06`, `AC-06`).
 ///
-/// `track_id` is the domain identifier, so the primary adapter validates it
-/// once at the CLI boundary; `items_dir` is a raw path with no domain meaning
-/// and travels with the command rather than with construction, which keeps the
-/// composition root a zero-argument wiring accessor.
+/// `track_id` is optional because resolving it is part of this use case rather
+/// than a step the adapter performs first: the interactor owns both the
+/// resolution and the check, so one request drives one interactor. The raw
+/// string is the deliberately unresolved transport value, and turning it into a
+/// domain identifier is exactly the resolution the interactor does. `items_dir`
+/// is a raw path with no domain meaning and travels with the command rather
+/// than with construction, which keeps the composition root a zero-argument
+/// wiring accessor.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct BatchPlanCheckCommand {
-    /// The track whose plan is checked.
-    pub track_id: TrackId,
+    /// The track whose plan is checked, or `None` to resolve it from the
+    /// current branch.
+    pub track_id: Option<String>,
     /// The directory the track's artifacts live under.
     pub items_dir: PathBuf,
 }

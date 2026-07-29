@@ -53,254 +53,292 @@
           "findings": [],
           "hash": "rvw1:sha256:01b697256223ab85828115421c4dbebd56c5a40a7da41f993b280ce294d51850",
           "at": "2026-07-29T10:23:26Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bc6af2cf839f5ed501ac956d02bfb5bee1e3631c5897003bc84fb845b5458eec",
-          "at": "2026-07-29T01:37:18Z"
         },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bc6af2cf839f5ed501ac956d02bfb5bee1e3631c5897003bc84fb845b5458eec",
-          "at": "2026-07-29T01:42:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:981d6ce819d3be287021d32a6c6882d3d4cd8b9cb8550ae2329c9e7dafc65992",
-          "at": "2026-07-29T05:28:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:981d6ce819d3be287021d32a6c6882d3d4cd8b9cb8550ae2329c9e7dafc65992",
-          "at": "2026-07-29T05:31:01Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`LineCount::saturating_add` collapses totals above `u32::MAX` to `u32::MAX`, so an actual sum exceeding a maximum ceiling is incorrectly admitted. For example, production `u32::MAX` plus one test line becomes `u32::MAX`, and `ScopeCeiling::resolve(Some(u32::MAX)).admits(...)` returns true. Use checked overflow handling and fail closed.",
-              "severity": "P0",
-              "file": "libs/domain/src/batch_plan/line_count.rs",
-              "line": 33,
+              "message": "Untracked paths from `git ls-files --others` are read with `std::fs::read_to_string` without rejecting symlinks. A repository symlink can therefore redirect measurement to an external file, violating the infrastructure symlink-boundary policy and allowing gate-relevant diff counts to be influenced by outside the trusted repository. Apply the existing symlink guard before reading each path.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/scope_diff_measure.rs",
+              "line": 158,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "`git diff --numstat` output is parsed as a literal path, but Git may emit rename paths in `old => new` form when rename detection is enabled. Such changes are then classified under a non-existent/incorrect path and can be omitted from their actual scope, producing incorrect scope ceilings. Disable rename detection or parse the destination path explicitly.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/scope_diff_measure.rs",
+              "line": 119,
+              "category": "adapter correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:d432dc15fa63894f1603c77798877005b06b53335220cb505cc3037e4f4eba9c",
+          "at": "2026-07-29T11:32:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Git paths are parsed from line-delimited, non-`-z` output. Valid filenames containing newlines or characters Git quotes are split or returned with escape/quote syntax, so `parse_numstat` and `untracked_additions` can omit or misclassify changed files and undercount the gate-relevant diff. Request NUL-delimited output and parse records accordingly.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/scope_diff_measure.rs",
+              "line": 126,
+              "category": "adapter correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:13ab88c82a5b75eddac0a376114256c62aa47fb626387ece1ea732bbf4e2e4da",
+          "at": "2026-07-29T11:40:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b41d575e30e564c7f1240060052f4b0e449804abf677ddda7783c6c9f8590fdf",
+          "at": "2026-07-29T11:45:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a56a9bd0b4554c0e75bf0bf8ca9319f42f3291332fa0d95f4d9415bad1b9d158",
+          "at": "2026-07-29T12:26:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The decoded batch plan is returned without verifying that `plan.track_id()` equals the requested `track_id`. A stale or copied plan from another track can therefore drive this track's gate and admission decisions; no downstream check compares the identities. Return `ReadFailed` on mismatch.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/batch_plan_reader.rs",
+              "line": 51,
+              "category": "correctness"
+            },
+            {
+              "message": "Diff-base fallback reads the live global branch-strategy configuration. Post-initialization operations must use the immutable `metadata.json#branch_strategy_snapshot`; otherwise a later config change can select the wrong base and undercount the admission diff. Load the track snapshot and pass its base branch to `FsDiffBaseResolverAdapter`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/scope_diff_measure.rs",
+              "line": 96,
+              "category": "architecture"
+            },
+            {
+              "message": "`git_bytes` buffers the complete stdout of both `git diff` and `git ls-files` without a limit. A repository with sufficiently many or long paths can exhaust memory during the admission gate. Stream or cap process output and fail closed when the bound is exceeded.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/scope_diff_measure.rs",
+              "line": 108,
+              "category": "resource_exhaustion"
+            },
+            {
+              "message": "Every `read_to_string` failure is silently skipped. Consequently, non-UTF-8 or otherwise unreadable untracked files contribute zero instead of their full line count, violating IN-14/AC-17 and making admission fail open. Count line separators from bytes and propagate genuine I/O failures as `MeasureFailed`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/scope_diff_measure.rs",
+              "line": 181,
+              "category": "error_handling"
+            },
+            {
+              "message": "Each untracked file is read wholly into a `String` without a size bound, so one arbitrarily large file can exhaust memory. Use bounded streaming line counting or reject files above a documented limit with `MeasureFailed`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/scope_diff_measure.rs",
+              "line": 181,
+              "category": "resource_exhaustion"
+            }
+          ],
+          "hash": "rvw1:sha256:a56a9bd0b4554c0e75bf0bf8ca9319f42f3291332fa0d95f4d9415bad1b9d158",
+          "at": "2026-07-29T12:34:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The untracked-file line counter reads each untracked file until EOF without any size bound. A repository can contain an arbitrarily large untracked file, forcing the gate to consume unbounded I/O and potentially exhaust resources. Check file metadata and enforce a maximum (or bounded read that fails closed) before counting.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/scope_diff_measure.rs",
+              "line": 237,
+              "category": "unbounded I/O"
+            }
+          ],
+          "hash": "rvw1:sha256:153f5427072450c46d7596065aaab13def22a0080c9ecde91544b28d56b12dbc",
+          "at": "2026-07-29T13:11:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2980714893279a567df4ca9e5cc827ff37715d46efbeae76b41c1beb837f5e0d",
+          "at": "2026-07-29T13:15:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The metadata length check does not bound the subsequent `std::fs::read`, and non-regular files are accepted. A file can grow after `symlink_metadata`, while a FIFO or device with length zero can block or produce unbounded input. Open once, reject non-regular files using handle metadata, and read through a `max_bytes + 1` bound before decoding.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track_artifact.rs",
+              "line": 82,
+              "category": "unbounded_io"
+            },
+            {
+              "message": "All untracked paths are guarded and read before `ReviewScopeConfig::classify` applies operational and other-track exclusions. Consequently, an oversized, unreadable, or symlinked file that the configuration explicitly excludes can consume the shared budget or fail the active track's admission measurement. Classify/filter paths before reading their contents.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/scope_diff_measure.rs",
+              "line": 220,
+              "category": "correctness"
+            },
+            {
+              "message": "When one path appears in both numstat and the untracked inventory—for example, a tracked file is staged for deletion or rename and then recreated untracked—`scope_files` contains the path twice, but `find` returns the first count for both occurrences. This duplicates the deletion count and discards the recreated file's line count, potentially undercounting the admission baseline. Coalesce records by path with saturating addition before classification.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/scope_diff_measure.rs",
+              "line": 330,
               "category": "correctness"
             }
           ],
-          "hash": "rvw1:sha256:93f226ecde9ebf4753aa13ab06d42cd483c3bc5ba0cd58cdc0abf150006e4729",
-          "at": "2026-07-29T07:05:31Z"
+          "hash": "rvw1:sha256:2980714893279a567df4ca9e5cc827ff37715d46efbeae76b41c1beb837f5e0d",
+          "at": "2026-07-29T13:24:00Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:87d19e34f18611acc2f565ec048cdf43a0ac1d1dafaffeeb2507b65e89429b68",
-          "at": "2026-07-29T07:09:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:87d19e34f18611acc2f565ec048cdf43a0ac1d1dafaffeeb2507b65e89429b68",
-          "at": "2026-07-29T07:15:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cc5ad75c51442352bff92aa180e19067024c36684a0de01c4a97a0f79807dd64",
-          "at": "2026-07-29T07:48:47Z"
+          "hash": "rvw1:sha256:aa7b11dac735e1f0a1ce9ba3f36dcf34df2db88eee28a356ef1d7206fc418913",
+          "at": "2026-07-29T13:45:16Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The recursive dependency walk consumes one stack frame per edge in a dependency chain, while task count/depth is unbounded. A valid sufficiently deep acyclic plan can therefore stack-overflow inside `ImplPlanDocument::new`, aborting instead of returning `Result`. Use an iterative DFS with an explicit stack (or enforce a validated depth bound).",
-              "severity": "P0",
-              "file": "libs/domain/src/track.rs",
-              "line": 629,
-              "category": "panic-safety"
-            }
-          ],
-          "hash": "rvw1:sha256:cc5ad75c51442352bff92aa180e19067024c36684a0de01c4a97a0f79807dd64",
-          "at": "2026-07-29T07:54:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The deep-chain regression test never creates a deep DFS traversal: tasks are visited from T1 upward, while each Tn depends on the already-settled T(n-1), so the traversal stack stays at depth one and the previous recursive implementation would also pass. Reverse the task order (or dependency direction) so this test actually protects the prior stack-overflow boundary.",
+              "message": "The regular-file check happens only after `File::open`. Opening a FIFO for reading blocks until a writer connects, so a non-regular `batch-plan.json`, `impl-plan.json`, or `metadata.json` can hang the adapter before it is rejected. Check `symlink_metadata().file_type().is_file()` before opening, while retaining the handle-level validation and bounded read.",
               "severity": "P1",
-              "file": "libs/domain/src/track.rs",
-              "line": 899,
-              "category": "test-coverage"
+              "file": "libs/infrastructure/src/track_artifact.rs",
+              "line": 58,
+              "category": "unbounded_io"
+            },
+            {
+              "message": "`count_file_lines` likewise opens the path before checking whether it is a regular file. An included untracked FIFO can therefore block admission measurement indefinitely before the byte budget applies. Reject non-regular paths with `symlink_metadata` before `File::open`, then keep the post-open metadata and bounded-reader checks.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/scope_diff_measure.rs",
+              "line": 257,
+              "category": "unbounded_io"
             }
           ],
-          "hash": "rvw1:sha256:98a18876d761bf0ee82091c334f8b976bf72cc2560d43fb82661636a66b4b922",
-          "at": "2026-07-29T08:02:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2a578f9a0d2786c4d41dffaf51d3cb604724b8c58f34dfd20efd8b779323af09",
-          "at": "2026-07-29T08:06:20Z"
+          "hash": "rvw1:sha256:aa7b11dac735e1f0a1ce9ba3f36dcf34df2db88eee28a356ef1d7206fc418913",
+          "at": "2026-07-29T13:48:15Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b900e68071494f8a73f8ad76893f115541eae3533e695987254a7a33b048c81f",
-          "at": "2026-07-29T08:55:03Z"
+          "hash": "rvw1:sha256:a1a56cbe5edd10296065cc33e2427785510227bdca49d655d001b16cb9e92be8",
+          "at": "2026-07-29T14:48:56Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b900e68071494f8a73f8ad76893f115541eae3533e695987254a7a33b048c81f",
-          "at": "2026-07-29T09:01:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:22055b4661269f31e5fbcfb5d22b69fb328114130171ec8e42bdef703e499698",
-          "at": "2026-07-29T10:02:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:22055b4661269f31e5fbcfb5d22b69fb328114130171ec8e42bdef703e499698",
-          "at": "2026-07-29T10:17:53Z"
+          "hash": "rvw1:sha256:227c4564975c034c7a00ff7a619236bda182b742e519bec8256c46329a0b0787",
+          "at": "2026-07-29T14:59:54Z"
         }
       ]
     },
-    "other": {
+    "cli_driver": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d9427b3c62e5f31c24c6912abf9797960c9ac949f209fb3ec4d4d17f5fb11a1f",
-          "at": "2026-07-29T01:36:56Z"
+          "hash": "rvw1:sha256:d2a151bea698fa149932db93d3982572f4eef52e43ff573f2ae06777ef99da86",
+          "at": "2026-07-29T11:31:35Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d9427b3c62e5f31c24c6912abf9797960c9ac949f209fb3ec4d4d17f5fb11a1f",
-          "at": "2026-07-29T01:38:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9c5cd89f3a5b511f4002e275ee28a9e9c0fed66b775a774641eff2d724c48104",
-          "at": "2026-07-29T07:05:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9c5cd89f3a5b511f4002e275ee28a9e9c0fed66b775a774641eff2d724c48104",
-          "at": "2026-07-29T07:09:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6b4ee7d243c2795084448dde546359b6c5cdab1c4869826f6bbd25734024345a",
-          "at": "2026-07-29T07:50:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The file now contains 33 records, not the 29 covered by the briefing. The four newly appended bindings (TrackTask IN-19/AC-21 and ValidationError IN-20/AC-22) do not have verdicts frozen against the current catalogue declarations: `test-obligation check` fails with `DeclChanged` for all four edges. Re-evaluate these bindings against the current declarations before treating the obligation gate as passing.",
-              "severity": "P1",
-              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/test-bindings.json",
-              "line": 658,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:6b4ee7d243c2795084448dde546359b6c5cdab1c4869826f6bbd25734024345a",
-          "at": "2026-07-29T07:57:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6b4ee7d243c2795084448dde546359b6c5cdab1c4869826f6bbd25734024345a",
-          "at": "2026-07-29T08:08:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6b4ee7d243c2795084448dde546359b6c5cdab1c4869826f6bbd25734024345a",
-          "at": "2026-07-29T08:10:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:15dbb04119a742fd0c2e13938e67b5bb5ef6b3cadb925bd2367b9de5e510666f",
-          "at": "2026-07-29T08:54:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:15dbb04119a742fd0c2e13938e67b5bb5ef6b3cadb925bd2367b9de5e510666f",
-          "at": "2026-07-29T09:02:50Z"
+          "hash": "rvw1:sha256:d2a151bea698fa149932db93d3982572f4eef52e43ff573f2ae06777ef99da86",
+          "at": "2026-07-29T11:37:00Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The file’s current diff adds 58 records (8 fulfillment, 41 voluntary_binding, and 9 waiver), whereas the briefing defines Batch A as 29 records (24 voluntary_binding and 5 waiver). The extra fulfillment records and four additional waivers make the artifact inconsistent with the stated review scope and gate evidence; reconcile the binding set before acceptance.",
+              "message": "`handle_check` invokes two separate use-case services: `track_resolver.resolve_for_read` and then `check_service.check` (lines 91 and 104). This makes the primary adapter orchestrate track resolution plus the batch-plan gate, violating the single-interactor-per-request rule. Compose this into one use-case application service/interactor before calling it from the driver.",
               "severity": "P1",
-              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/test-bindings.json",
-              "line": 1126,
-              "category": "structural consistency"
+              "file": "apps/cli-driver/src/batch_plan.rs",
+              "line": 91,
+              "category": "primary-adapter orchestration"
             }
           ],
-          "hash": "rvw1:sha256:1b15bb7484ffc44387b2e5e743b3a5266a31e2565dd0bec1bc485d369ba879ce",
-          "at": "2026-07-29T10:03:29Z"
+          "hash": "rvw1:sha256:26ab5a0c43c771c622f5b9b66022bcd7b2d332f3791727267c40b1451ebfc5f2",
+          "at": "2026-07-29T12:26:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`handle_check` invokes two separate use-case services in sequence: `ActiveTrackResolveService::resolve_for_read` and then `BatchPlanCheckService::check`. This puts multi-interactor orchestration in the primary adapter, violating the cli_driver invariant of exactly one interactor per request. Encapsulate track resolution and the gate check behind one use-case application service and inject that single service into the driver.",
+              "severity": "P1",
+              "file": "apps/cli-driver/src/batch_plan.rs",
+              "line": 91,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:26ab5a0c43c771c622f5b9b66022bcd7b2d332f3791727267c40b1451ebfc5f2",
+          "at": "2026-07-29T12:29:45Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1b15bb7484ffc44387b2e5e743b3a5266a31e2565dd0bec1bc485d369ba879ce",
-          "at": "2026-07-29T10:10:49Z"
+          "hash": "rvw1:sha256:73f9b38fb7f974d34801a3f0d3603cdaff37e1b6f331b2e7ef67cea959deb9a3",
+          "at": "2026-07-29T13:10:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `usecase::batch_plan` import path hides a semantic domain-boundary leak: `BatchPlanGateOutcome` and `BatchPlanGateViolation` are re-exports of `domain::batch_plan` types, and the domain catalogue classifies both as `ValueObject`s. The driver consequently destructures the domain verdict and renders nested domain identifiers and line-count objects directly. Re-exporting does not turn them into usecase boundary DTOs; map the domain verdict inside the interactor and return a usecase-owned output DTO to the driver.",
+              "severity": "P1",
+              "file": "apps/cli-driver/src/batch_plan.rs",
+              "line": 13,
+              "category": "boundary_exposure"
+            }
+          ],
+          "hash": "rvw1:sha256:73f9b38fb7f974d34801a3f0d3603cdaff37e1b6f331b2e7ef67cea959deb9a3",
+          "at": "2026-07-29T13:14:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:abae0c69cb43a9dce809614a5ee6c2b68c6326cd6fb6abf33cfa7b7c2e26f9e6",
+          "at": "2026-07-29T13:45:18Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1b15bb7484ffc44387b2e5e743b3a5266a31e2565dd0bec1bc485d369ba879ce",
-          "at": "2026-07-29T10:27:13Z"
+          "hash": "rvw1:sha256:abae0c69cb43a9dce809614a5ee6c2b68c6326cd6fb6abf33cfa7b7c2e26f9e6",
+          "at": "2026-07-29T13:47:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc04f7f6299cdcf6b0caddce550297b00bb9591f3e8a9079533a42ae0df26166",
+          "at": "2026-07-29T14:45:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc04f7f6299cdcf6b0caddce550297b00bb9591f3e8a9079533a42ae0df26166",
+          "at": "2026-07-29T14:46:46Z"
         }
       ]
     },
@@ -593,6 +631,179 @@
           "findings": [],
           "hash": "rvw1:sha256:083171722b6dc6518d0487b37c92532f8fea0c60e245d8fc8ed257913567561a",
           "at": "2026-07-29T08:18:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:09f02c7860f521bd1ccaca16114c34a5830ef0bae433f127a14da06bbf46d640",
+          "at": "2026-07-29T11:31:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::batch_plan::BatchPlanReadError` and `usecase::batch_plan::PlannedTaskReadError` are both newly added with identical `NotFound` and `ReadFailed { message: domain::FreeText }` shapes and no distinct invariants. Consolidate them behind one shared read-error contract to avoid duplicate type declarations and future drift.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+              "line": 640,
+              "category": "DRY: duplicated structural declaration"
+            }
+          ],
+          "hash": "rvw1:sha256:09f02c7860f521bd1ccaca16114c34a5830ef0bae433f127a14da06bbf46d640",
+          "at": "2026-07-29T11:39:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::PlanArtifactReadError` is shared by both ports and documents IN-07/AC-07, but its `spec_refs[]` contains only IN-01 and AC-05; the planned-task error contract lacks a direct trace to the IN-07/AC-07 behavior.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+              "line": 617,
+              "category": "spec_refs missing or off-topic"
+            }
+          ],
+          "hash": "rvw1:sha256:e7719cb07dc2f7d101a1ce8609ca586103884c1e751ce1552cd94f6d084ddcf1",
+          "at": "2026-07-29T12:27:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:35b9397b4da618aac7db28f4648c4149cdc1821a354a4908db990d723b6af8c6",
+          "at": "2026-07-29T13:11:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cli_driver::batch_plan::BatchPlanInput` says omitted-ID resolution and identifier validation happen inside the driver, while `cli_driver::batch_plan::BatchPlanDriver` says it forwards the context unresolved and `usecase::batch_plan::BatchPlanCheckCommand`/`BatchPlanCheckInteractor` claim the usecase owns both operations. Because resolution failure is fail-closed via `TrackResolutionFailed`, the catalogue names contradictory enforcement owners. Assign resolution and validation consistently to the interactor.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/cli_driver-types.json",
+              "line": 92,
+              "category": "Cross-layer contract: enforcement-owner contradiction"
+            },
+            {
+              "message": "`usecase::track_resolution::BranchReaderPort::current_branch` performs repository/git I/O synchronously (`is_async: false`), but the entry docs only explain why the reference is included and give no rationale for its blocking API. The newly declared `infrastructure::branch_reader::LazyBranchReader` makes that external-I/O path concrete; document why synchronous execution is appropriate or change the port color.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+              "line": 222,
+              "category": "API shape: sync/async color mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:35b9397b4da618aac7db28f4648c4149cdc1821a354a4908db990d723b6af8c6",
+          "at": "2026-07-29T13:19:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a454199eb09fe832701d9054649b9c80ac8d76bab915cc4459477902f8d15981",
+          "at": "2026-07-29T13:46:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cli::commands::batch_plan::BatchPlanCheckArgs` still claims that the driver validates the identifier immediately after parsing, while `cli_driver::BatchPlanInput`/`BatchPlanDriver` forward it unresolved and `usecase::BatchPlanCheckCommand`/`BatchPlanCheckInteractor` assign resolution and validation to the interactor. Because resolution failure is fail-closed through `TrackResolutionFailed`, the catalogue still names contradictory enforcement owners.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/cli-types.json",
+              "line": 79,
+              "category": "Cross-layer contract: enforcement-owner contradiction"
+            },
+            {
+              "message": "`usecase::batch_plan::BatchPlanCheckOutput::Blocked.violations` is a plain `Vec`, so the public contract admits `Blocked` with zero violations even though the mirrored domain outcome uses `NonEmptyGateViolations` and this entry asserts non-emptiness. Preserve that invariant with a usecase-owned non-empty boundary type.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+              "line": 778,
+              "category": "API shape: state-shape smell"
+            },
+            {
+              "message": "`usecase::task_ops::AdmissionRejectionOutput::ScopeCeilingWouldBeExceeded.prior_contribution` downgrades the domain's `NonZeroLineCount` to `u32`, making a zero-prior-contribution rejection representable again despite CN-03/AC-12 and contradicting the documented one-to-one mirror. Use a boundary-owned non-zero representation.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+              "line": 552,
+              "category": "API shape: state-shape smell"
+            }
+          ],
+          "hash": "rvw1:sha256:a454199eb09fe832701d9054649b9c80ac8d76bab915cc4459477902f8d15981",
+          "at": "2026-07-29T13:56:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6ffac38032ebc6a5937345416fe5009359e0c1769453cfe1f586ddd7ebf95c7d",
+          "at": "2026-07-29T14:45:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6ffac38032ebc6a5937345416fe5009359e0c1769453cfe1f586ddd7ebf95c7d",
+          "at": "2026-07-29T14:51:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:79f95a5a689e78445e214f2a9315413f53522954e8997bfb4b9a832ad59b9dc9",
+          "at": "2026-07-29T15:17:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::track_resolution::BranchReaderPort` restates the AC-05/CN-09 behavior that the gate targets only the active track and that an omitted identifier is resolved from the branch with fail-closed failure. Keep the local reference/synchronous-port rationale and rely on the anchors for that behavioral contract, as required by `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+              "line": 321,
+              "category": "SoT integrity: upstream restatement"
+            },
+            {
+              "message": "`infrastructure::branch_reader::LazyBranchReader` repeats the same active-track and omitted-ID fail-closed behavior from AC-05/CN-09 in its catalogue docs. Retain only the adapter operation and placement rationale plus the anchors, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/infrastructure-types.json",
+              "line": 547,
+              "category": "SoT integrity: upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:79f95a5a689e78445e214f2a9315413f53522954e8997bfb4b9a832ad59b9dc9",
+          "at": "2026-07-29T15:20:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3379d0ff4d02898ec2d949e1c862812fe07a1d6aa361db499ccc40b2ecc9eb72",
+          "at": "2026-07-29T15:22:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3379d0ff4d02898ec2d949e1c862812fe07a1d6aa361db499ccc40b2ecc9eb72",
+          "at": "2026-07-29T15:24:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bd9fccca0fe37973d105f5f842641a9728084d65643111f3cc422afed14c018e",
+          "at": "2026-07-29T15:32:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bd9fccca0fe37973d105f5f842641a9728084d65643111f3cc422afed14c018e",
+          "at": "2026-07-29T15:37:45Z"
         }
       ]
     },
@@ -825,6 +1036,485 @@
           "findings": [],
           "hash": "rvw1:sha256:0b152f06e515b4c123a63c7aa3d52ece7dacff5b0245e2f0afc4089beae5ecdb",
           "at": "2026-07-29T10:12:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4a2c862d5acac56214ce6c1817be136c230b9cba1cc255b7474d7d133bdf5e45",
+          "at": "2026-07-29T11:31:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4a2c862d5acac56214ce6c1817be136c230b9cba1cc255b7474d7d133bdf5e45",
+          "at": "2026-07-29T11:33:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T005 の description は、許可された target + operation + anchor の範囲を超えて、`error 型は 3 種`、共有される `PlanArtifactReadError` などの設計・挙動契約を本文で再記述している。`.harness/policies/no-upstream-restatement.md` に従い、詳細な契約説明を削除して anchor のみを残すべき。",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/impl-plan.json",
+              "line": 36,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T019 の description は `plan document constructor の検査を更新する` と `BatchPlanDocument` の変更を明示しているが、task-contract.json の T019 attribution には `BatchPlanDocument` がない。該当 catalogue entry を T019 に帰属させる必要がある。",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/task-contract.json",
+              "line": 20,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:6a6da75a8fd9256781beed04d4a8072166cd7c9e80d8beceff4d53c050336713",
+          "at": "2026-07-29T12:26:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8daa97b224f198e45e2160965f158227e20e08813520fcc0383c0c338a369667",
+          "at": "2026-07-29T12:28:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8daa97b224f198e45e2160965f158227e20e08813520fcc0383c0c338a369667",
+          "at": "2026-07-29T12:30:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T011 の description は、許可された target + operation + anchor を超えて、LazyBranchReader の遅延探索・error変換・repositoryなしの配線成立や composition root の責務分離を設計／挙動契約として再記述している。`.harness/policies/no-upstream-restatement.md` に従い、詳細な契約説明を削除すべき。",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/impl-plan.json",
+              "line": 75,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:39ceb7f78aa69896056571d922c42d7f8378e827c089f83449cb4d41eaed946b",
+          "at": "2026-07-29T13:10:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0e2c58f409d586caf92df6c05355958bd6f92630c513d64a3f19c1135a597d3",
+          "at": "2026-07-29T13:11:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0e2c58f409d586caf92df6c05355958bd6f92630c513d64a3f19c1135a597d3",
+          "at": "2026-07-29T13:15:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006 の description は `BatchPlanCheckInteractor` 等のみを実装対象として挙げているが、task-contract.json は未記載の `BatchPlanCheckOutput` を T006 に帰属させている。description に追加するか、帰属を修正すべき。",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/task-contract.json",
+              "line": 55,
+              "category": "task-contract attribution mismatch"
+            },
+            {
+              "message": "T006 の description は `BatchPlanCheckInteractor` 等のみを実装対象として挙げているが、task-contract.json は未記載の `BatchPlanViolationOutput` を T006 に帰属させている。description に追加するか、帰属を修正すべき。",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/task-contract.json",
+              "line": 56,
+              "category": "task-contract attribution mismatch"
+            },
+            {
+              "message": "T018 の description は `TaskTransitionOutcome` 等を更新対象として挙げているが、task-contract.json は未記載の `AdmissionRejectionOutput` を T018 に帰属させている。description に追加するか、帰属を修正すべき。",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/task-contract.json",
+              "line": 93,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:85b96d0f8aeff00591071ab2ac85e815832677517ee418d3cca61b4bdb2a5966",
+          "at": "2026-07-29T13:49:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006 の description は、対象シンボルと操作の列挙を超えて、`interactor が domain verdict を map して driver へ返す`、および `Blocked payload の非空性を境界側でも型で保つ` という設計・挙動契約を再記述している。`.harness/policies/no-upstream-restatement.md` に従い、これらの契約説明を削除すべき。",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/impl-plan.json",
+              "line": 42,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T018 の description は、`refusal を型付きで運ぶ` という挙動契約を本文で再記述している。許可された target + operation + anchor の形式に戻し、契約説明を削除すべき。",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/impl-plan.json",
+              "line": 110,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:0ca08daba1b07affada1b3196ad40068d5a6e1c92d905ff52a1aa8e92c87fa0d",
+          "at": "2026-07-29T14:45:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b3645fe1c8880ed6cf9b5d4780ef123eadd320badc95fc82e74e9c4f4ed1d2bc",
+          "at": "2026-07-29T14:52:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b3645fe1c8880ed6cf9b5d4780ef123eadd320badc95fc82e74e9c4f4ed1d2bc",
+          "at": "2026-07-29T14:53:33Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2ffd5c836fd41b4fe060adcd3b25130d6c9848f453392f1e8de928f7df9ac0a6",
+          "at": "2026-07-29T11:31:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Move active-track resolution behind the batch-plan driver. When `--track-id` is omitted, this handler reads the process CWD, invokes a second composition root, decides the failure path, and emits an application diagnostic before constructing `BatchPlanDriver`. This violates the CLI thin-bin contract (parse → wire driver → `handle` → emit), and `current_dir().ok()?` also collapses an I/O failure into the misleading “no active track” case. Pass unresolved track context through a typed driver input and let the driver/use-case layer resolve it and render failures.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/batch_plan.rs",
+              "line": 62,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:2ffd5c836fd41b4fe060adcd3b25130d6c9848f453392f1e8de928f7df9ac0a6",
+          "at": "2026-07-29T11:35:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9d5b040d7025d5e1142392992ff8f965265734e0e7e266f7d5007ee012fe2acb",
+          "at": "2026-07-29T12:26:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9d5b040d7025d5e1142392992ff8f965265734e0e7e266f7d5007ee012fe2acb",
+          "at": "2026-07-29T12:28:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9d5b040d7025d5e1142392992ff8f965265734e0e7e266f7d5007ee012fe2acb",
+          "at": "2026-07-29T14:45:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9d5b040d7025d5e1142392992ff8f965265734e0e7e266f7d5007ee012fe2acb",
+          "at": "2026-07-29T14:46:36Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d9427b3c62e5f31c24c6912abf9797960c9ac949f209fb3ec4d4d17f5fb11a1f",
+          "at": "2026-07-29T01:36:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d9427b3c62e5f31c24c6912abf9797960c9ac949f209fb3ec4d4d17f5fb11a1f",
+          "at": "2026-07-29T01:38:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9c5cd89f3a5b511f4002e275ee28a9e9c0fed66b775a774641eff2d724c48104",
+          "at": "2026-07-29T07:05:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9c5cd89f3a5b511f4002e275ee28a9e9c0fed66b775a774641eff2d724c48104",
+          "at": "2026-07-29T07:09:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b4ee7d243c2795084448dde546359b6c5cdab1c4869826f6bbd25734024345a",
+          "at": "2026-07-29T07:50:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The file now contains 33 records, not the 29 covered by the briefing. The four newly appended bindings (TrackTask IN-19/AC-21 and ValidationError IN-20/AC-22) do not have verdicts frozen against the current catalogue declarations: `test-obligation check` fails with `DeclChanged` for all four edges. Re-evaluate these bindings against the current declarations before treating the obligation gate as passing.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/test-bindings.json",
+              "line": 658,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:6b4ee7d243c2795084448dde546359b6c5cdab1c4869826f6bbd25734024345a",
+          "at": "2026-07-29T07:57:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b4ee7d243c2795084448dde546359b6c5cdab1c4869826f6bbd25734024345a",
+          "at": "2026-07-29T08:08:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b4ee7d243c2795084448dde546359b6c5cdab1c4869826f6bbd25734024345a",
+          "at": "2026-07-29T08:10:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:15dbb04119a742fd0c2e13938e67b5bb5ef6b3cadb925bd2367b9de5e510666f",
+          "at": "2026-07-29T08:54:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:15dbb04119a742fd0c2e13938e67b5bb5ef6b3cadb925bd2367b9de5e510666f",
+          "at": "2026-07-29T09:02:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The file’s current diff adds 58 records (8 fulfillment, 41 voluntary_binding, and 9 waiver), whereas the briefing defines Batch A as 29 records (24 voluntary_binding and 5 waiver). The extra fulfillment records and four additional waivers make the artifact inconsistent with the stated review scope and gate evidence; reconcile the binding set before acceptance.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/test-bindings.json",
+              "line": 1126,
+              "category": "structural consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:1b15bb7484ffc44387b2e5e743b3a5266a31e2565dd0bec1bc485d369ba879ce",
+          "at": "2026-07-29T10:03:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1b15bb7484ffc44387b2e5e743b3a5266a31e2565dd0bec1bc485d369ba879ce",
+          "at": "2026-07-29T10:10:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1b15bb7484ffc44387b2e5e743b3a5266a31e2565dd0bec1bc485d369ba879ce",
+          "at": "2026-07-29T10:27:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The current file contains 120 records (14 fulfillment, 92 voluntary_binding, 14 waiver), but the briefing explicitly defines the current cumulative state as 101 records (9 fulfillment, 78 voluntary_binding, 14 waiver). The diff adds 19 records, so the artifact does not match the stated current design intent.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/test-bindings.json",
+              "line": 2585,
+              "category": "artifact consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:8729955d3e6137e90f59f52808a167044722cc8b6c5a157f73da8550ec33a677",
+          "at": "2026-07-29T11:31:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:68399c701e2de25faab455756a772ad7327f7de9e09e7e1a6ddc96e2f665863a",
+          "at": "2026-07-29T11:40:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:68399c701e2de25faab455756a772ad7327f7de9e09e7e1a6ddc96e2f665863a",
+          "at": "2026-07-29T11:44:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The current binding file has 118 records (14 fulfillment, 91 voluntary_binding, 13 waiver), while the briefing explicitly requires the current cumulative state to be 101 records (9 fulfillment, 78 voluntary_binding, 14 waiver). The scoped diff adds/rebinds records beyond that declared state, including removing one waiver, so the artifact is inconsistent with the review’s stated design intent.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/test-bindings.json",
+              "line": 1914,
+              "category": "artifact consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:1da1ffd5eb5f012a71832ad311ec8c22d11c995a3c1215952eb644eef7f894df",
+          "at": "2026-07-29T12:26:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1da1ffd5eb5f012a71832ad311ec8c22d11c995a3c1215952eb644eef7f894df",
+          "at": "2026-07-29T12:32:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dc3602bbab917566021e84ffe3bf5313b5a5b46e2fe0de30310f688afe305299",
+          "at": "2026-07-29T13:11:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dc3602bbab917566021e84ffe3bf5313b5a5b46e2fe0de30310f688afe305299",
+          "at": "2026-07-29T13:13:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3728550625bf80d3fea5735818f1b027e6d9a51bdfdd0f42c61ed0950d9da5cc",
+          "at": "2026-07-29T14:45:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3728550625bf80d3fea5735818f1b027e6d9a51bdfdd0f42c61ed0950d9da5cc",
+          "at": "2026-07-29T14:47:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The current briefing explicitly identifies `LazyBranchReader` × `IN-06` as the accepted waiver, but this diff removes that waiver and leaves only `LazyBranchReader` waivers for `AC-05` and `CN-09`. The binding artifact therefore no longer matches the briefing’s documented accepted deviation, despite the machine check passing.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/test-bindings.json",
+              "line": 3203,
+              "category": "artifact consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:07baff258d49407028d4d22522dd927c85f8c0b58ae3154904c6e35fdc8c8ca5",
+          "at": "2026-07-29T15:17:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:07baff258d49407028d4d22522dd927c85f8c0b58ae3154904c6e35fdc8c8ca5",
+          "at": "2026-07-29T15:18:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:07baff258d49407028d4d22522dd927c85f8c0b58ae3154904c6e35fdc8c8ca5",
+          "at": "2026-07-29T15:20:14Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:71e233b0709dacca593095927fd492bf9e843a642e0580c36324248a9a2caa36",
+          "at": "2026-07-29T11:31:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:71e233b0709dacca593095927fd492bf9e843a642e0580c36324248a9a2caa36",
+          "at": "2026-07-29T11:34:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`LazyBranchReader` is a secondary adapter defined in the composition root: it implements the use-case `BranchReaderPort` and performs Git repository discovery/branch reads. Port implementations belong in `infrastructure`; move this adapter there and have the composition root only construct and inject it.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/batch_plan.rs",
+              "line": 28,
+              "category": "adapter defined here"
+            }
+          ],
+          "hash": "rvw1:sha256:937eed6bf825d5efa8b6924ac6279f60ea0b59eda459f2becbaaea6aa2669031",
+          "at": "2026-07-29T12:26:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`LazyBranchReader` is a secondary adapter defined inside the composition layer: it implements the usecase-owned `BranchReaderPort` and performs Git repository discovery plus infrastructure-error translation. This violates the pure-DI boundary; move this lazy branch-reader implementation into `libs/infrastructure` and have `BatchPlanCompositionRoot` only construct and inject it.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/batch_plan.rs",
+              "line": 29,
+              "category": "adapter defined here"
+            }
+          ],
+          "hash": "rvw1:sha256:937eed6bf825d5efa8b6924ac6279f60ea0b59eda459f2becbaaea6aa2669031",
+          "at": "2026-07-29T12:28:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e434b486ef8dd46ab388a5dea8408e7f9ea2deaa232018c487d36dc98c9d2cc2",
+          "at": "2026-07-29T13:10:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e434b486ef8dd46ab388a5dea8408e7f9ea2deaa232018c487d36dc98c9d2cc2",
+          "at": "2026-07-29T13:11:59Z"
         }
       ]
     },
@@ -843,6 +1533,98 @@
           "findings": [],
           "hash": "rvw1:sha256:38934827b6a473810fafbcaba87113622b822cd98c54100b3aaf8f6af34f1f80",
           "at": "2026-07-29T10:14:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:377255798552d17f3cba59db58c49ee5dccd5d69e7948c91681c8782802cc31b",
+          "at": "2026-07-29T11:31:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:377255798552d17f3cba59db58c49ee5dccd5d69e7948c91681c8782802cc31b",
+          "at": "2026-07-29T11:33:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:758383d886d03213b9d20022e3192fad2a6542fe8b5e467cf5e4395ef7be0bed",
+          "at": "2026-07-29T12:26:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:758383d886d03213b9d20022e3192fad2a6542fe8b5e467cf5e4395ef7be0bed",
+          "at": "2026-07-29T12:29:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b4522b60fdb9af9b14b4122006c7e6e83e0a632f355e8956a7da45cf86325b6",
+          "at": "2026-07-29T13:11:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b4522b60fdb9af9b14b4122006c7e6e83e0a632f355e8956a7da45cf86325b6",
+          "at": "2026-07-29T13:13:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2ce7b8c3a1e84beccfd5bf771ebcc31909c2ef5e0080b24c8e1eeb3135689fdc",
+          "at": "2026-07-29T13:45:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2ce7b8c3a1e84beccfd5bf771ebcc31909c2ef5e0080b24c8e1eeb3135689fdc",
+          "at": "2026-07-29T13:47:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e8236044ca6e5dd7dd9380279a0e3cf37e5699c72217de5407f567f6da8cbd2",
+          "at": "2026-07-29T14:45:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`map_outcome` converts a domain `BatchPlanGateOutcome::Blocked` into `Passed` when output wrapping returns `None`. This duplicates the domain-owned verdict decision in the usecase layer and creates a fail-open fallback if the supposedly one-to-one mapping ever loses all findings. Preserve `Blocked` through an infallible conversion from `NonEmptyGateViolations`, or return a mapping error instead.",
+              "severity": "P1",
+              "file": "libs/usecase/src/batch_plan/output.rs",
+              "line": 144,
+              "category": "business_logic_leak"
+            }
+          ],
+          "hash": "rvw1:sha256:5e8236044ca6e5dd7dd9380279a0e3cf37e5699c72217de5407f567f6da8cbd2",
+          "at": "2026-07-29T14:47:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2dcaa21d3b6e5a0650318c8b04d09708a5bea970852d7f753f146ab250ebe356",
+          "at": "2026-07-29T14:52:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2dcaa21d3b6e5a0650318c8b04d09708a5bea970852d7f753f146ab250ebe356",
+          "at": "2026-07-29T14:53:59Z"
         }
       ]
     },
@@ -984,6 +1766,143 @@
           "findings": [],
           "hash": "rvw1:sha256:967376e4c09ef86aef43dc8466f3a7a370ed283c12a5b0f3966a0b1cfd04875d",
           "at": "2026-07-29T05:17:38Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`LineCount::saturating_add` collapses totals above `u32::MAX` to `u32::MAX`, so an actual sum exceeding a maximum ceiling is incorrectly admitted. For example, production `u32::MAX` plus one test line becomes `u32::MAX`, and `ScopeCeiling::resolve(Some(u32::MAX)).admits(...)` returns true. Use checked overflow handling and fail closed.",
+              "severity": "P0",
+              "file": "libs/domain/src/batch_plan/line_count.rs",
+              "line": 33,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:93f226ecde9ebf4753aa13ab06d42cd483c3bc5ba0cd58cdc0abf150006e4729",
+          "at": "2026-07-29T07:05:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:87d19e34f18611acc2f565ec048cdf43a0ac1d1dafaffeeb2507b65e89429b68",
+          "at": "2026-07-29T07:09:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:87d19e34f18611acc2f565ec048cdf43a0ac1d1dafaffeeb2507b65e89429b68",
+          "at": "2026-07-29T07:15:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cc5ad75c51442352bff92aa180e19067024c36684a0de01c4a97a0f79807dd64",
+          "at": "2026-07-29T07:48:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The recursive dependency walk consumes one stack frame per edge in a dependency chain, while task count/depth is unbounded. A valid sufficiently deep acyclic plan can therefore stack-overflow inside `ImplPlanDocument::new`, aborting instead of returning `Result`. Use an iterative DFS with an explicit stack (or enforce a validated depth bound).",
+              "severity": "P0",
+              "file": "libs/domain/src/track.rs",
+              "line": 629,
+              "category": "panic-safety"
+            }
+          ],
+          "hash": "rvw1:sha256:cc5ad75c51442352bff92aa180e19067024c36684a0de01c4a97a0f79807dd64",
+          "at": "2026-07-29T07:54:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The deep-chain regression test never creates a deep DFS traversal: tasks are visited from T1 upward, while each Tn depends on the already-settled T(n-1), so the traversal stack stays at depth one and the previous recursive implementation would also pass. Reverse the task order (or dependency direction) so this test actually protects the prior stack-overflow boundary.",
+              "severity": "P1",
+              "file": "libs/domain/src/track.rs",
+              "line": 899,
+              "category": "test-coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:98a18876d761bf0ee82091c334f8b976bf72cc2560d43fb82661636a66b4b922",
+          "at": "2026-07-29T08:02:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2a578f9a0d2786c4d41dffaf51d3cb604724b8c58f34dfd20efd8b779323af09",
+          "at": "2026-07-29T08:06:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b900e68071494f8a73f8ad76893f115541eae3533e695987254a7a33b048c81f",
+          "at": "2026-07-29T08:55:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b900e68071494f8a73f8ad76893f115541eae3533e695987254a7a33b048c81f",
+          "at": "2026-07-29T09:01:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:22055b4661269f31e5fbcfb5d22b69fb328114130171ec8e42bdef703e499698",
+          "at": "2026-07-29T10:02:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:22055b4661269f31e5fbcfb5d22b69fb328114130171ec8e42bdef703e499698",
+          "at": "2026-07-29T10:17:53Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc6af2cf839f5ed501ac956d02bfb5bee1e3631c5897003bc84fb845b5458eec",
+          "at": "2026-07-29T01:37:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc6af2cf839f5ed501ac956d02bfb5bee1e3631c5897003bc84fb845b5458eec",
+          "at": "2026-07-29T01:42:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:981d6ce819d3be287021d32a6c6882d3d4cd8b9cb8550ae2329c9e7dafc65992",
+          "at": "2026-07-29T05:28:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:981d6ce819d3be287021d32a6c6882d3d4cd8b9cb8550ae2329c9e7dafc65992",
+          "at": "2026-07-29T05:31:01Z"
         }
       ]
     }

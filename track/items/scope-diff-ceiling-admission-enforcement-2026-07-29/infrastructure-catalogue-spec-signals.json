@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "c0337345d380c4769d4f068a62be3837fa3e2358e8fae6cc50265170e870b8c2",
+  "catalogue_declaration_hash": "15acfed3509a6a017d8fa0939d04d4ae753a74bab89b2ddec3ac1dacd4775948",
   "signals": [
     {
       "type_name": "BatchDeclarationDto",
@@ -41,6 +41,11 @@
       "type_name": "ImplPlanTaskDto",
       "signal": "blue",
       "entry_hash": "e92d7c90d514f72a400c3fa0de848bc8f329373855a1bcb146a2279371c21c1d"
+    },
+    {
+      "type_name": "LazyBranchReader",
+      "signal": "blue",
+      "entry_hash": "d1f9b4c923346e33f93342872a90f65676a0da8410f8983a731115a82e5642cd"
     },
     {
       "type_name": "ScopeLineEstimateDto",

@@ -28,52 +28,57 @@
     {
       "id": "T004",
       "description": "`libs/domain/src/batch_plan/` に evaluate_admission、AdmissionDecision、AdmissionRejection、AdmissionEvaluationError、NonZeroLineCount を実装する。IN-09、IN-10、IN-11、AC-10、AC-11、AC-12、AC-13、AC-14、CN-03、CN-04。",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "283f508e"
     },
     {
       "id": "T005",
-      "description": "`libs/usecase/src/batch_plan/` に BatchPlanReaderPort、PlannedTaskReaderPort、ScopeConfigReaderPort、ScopeDiffMeasurePort と各 error 型を定義する。IN-01、AC-01、AC-05、CN-09。",
-      "status": "done"
+      "description": "`libs/usecase/src/batch_plan/` に BatchPlanReaderPort、PlannedTaskReaderPort、ScopeConfigReaderPort、ScopeDiffMeasurePort、PlanArtifactReadError、ScopeConfigReadError、ScopeDiffMeasureError を定義する。IN-01、AC-01、AC-05、CN-09。",
+      "status": "done",
+      "commit_hash": "283f508e"
     },
     {
       "id": "T006",
-      "description": "`libs/usecase/src/batch_plan/` に BatchPlanCheckService、BatchPlanCheckCommand、BatchPlanCheckError、BatchPlanCheckInteractor を実装する。IN-06、IN-07、AC-05、AC-06、AC-07、CN-09。",
-      "status": "done"
+      "description": "`libs/usecase/src/batch_plan/` に BatchPlanCheckService、BatchPlanCheckCommand、BatchPlanCheckError、BatchPlanCheckInteractor、BatchPlanCheckOutput、BatchPlanViolationOutput、NonEmptyViolationOutputs を実装する。IN-06、IN-07、AC-05、AC-06、AC-07、CN-09。",
+      "status": "done",
+      "commit_hash": "283f508e"
     },
     {
       "id": "T007",
       "description": "`libs/infrastructure/src/batch_plan_codec/` に BatchPlanDocumentDto、TaskEstimateDto、ScopeLineEstimateDto、BatchDeclarationDto、BatchPlanCodecError、decode を実装する。IN-01、IN-02、IN-03、IN-04、IN-05、AC-01、AC-02、AC-03、AC-04。",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "283f508e"
     },
     {
       "id": "T020",
       "description": "`libs/infrastructure/` の ImplPlanTaskDto に serde default 付きの depends_on を追加し、impl-plan codec の schema read/write を更新する。IN-19、IN-20、AC-05、AC-21、AC-22。",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "283f508e"
     },
     {
       "id": "T008",
       "description": "T020 の完了後に `libs/infrastructure/` へ FsBatchPlanReader と FsPlannedTaskReader を実装して usecase port へ接続する。IN-01、IN-06、IN-07、AC-01、AC-05、AC-07、CN-09。",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T009",
       "description": "`libs/infrastructure/` に FsReviewScopeConfigReader と GitScopeDiffMeasurer を実装して usecase port へ接続する。IN-14、AC-08、AC-17、CN-05。",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T010",
       "description": "`apps/cli-driver/` に BatchPlanDriver と BatchPlanInput を実装する。IN-06、AC-06、AC-07。",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T011",
-      "description": "`apps/cli-composition/` に BatchPlanCompositionRoot を追加して batch-plan check の依存を配線する。IN-06、AC-06。",
-      "status": "todo"
+      "description": "`libs/infrastructure/` に LazyBranchReader を追加し、`apps/cli-composition/` に BatchPlanCompositionRoot を追加して batch-plan check の依存を配線する。IN-06、AC-06。",
+      "status": "done"
     },
     {
       "id": "T012",
       "description": "`apps/cli/` に BatchPlanCheckArgs、BatchPlanCommand、CliCommand の BatchPlan variant、batch_plan::execute を追加する。IN-06、AC-05、AC-06。",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T013",
@@ -102,7 +107,7 @@
     },
     {
       "id": "T018",
-      "description": "plan order 上で先行する全タスクの完了後、本 track の最終タスクとして `TaskOperationInteractor`、TaskOperationService、TaskTransitionOutcome、task-ops composition root を admission 依存へ更新する。IN-09、IN-10、IN-11、AC-10、AC-11、AC-12、AC-13、AC-14、CN-04、CN-10。",
+      "description": "plan order 上で先行する全タスクの完了後、本 track の最終タスクとして `TaskOperationInteractor`、TaskOperationService、task-ops composition root を admission 依存へ更新し、TaskTransitionOutcome と AdmissionRejectionOutput を実装する。IN-09、IN-10、IN-11、AC-10、AC-11、AC-12、AC-13、AC-14、CN-04、CN-10。",
       "status": "todo"
     }
   ],

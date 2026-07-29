@@ -555,6 +555,30 @@
       }
     },
     {
+      "claim_hash": "d1f9b4c923346e33f93342872a90f65676a0da8410f8983a731115a82e5642cd",
+      "evidence_hash": "814fd50af36666bbcb6af7cfbc049b31721dc7529805489155dac6b732621da9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存成果物との互換が読み取り側で保たれ"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "LazyBranchReader"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "既存成果物との互換が読み取り側で保たれ（schema 1 の `impl-plan.json` が引き続き decode でき、active でない track の registry / views 描画が壊れない）、既存 track 成果物が再検証されない。gate 系の検証対象は active track に限られ、導入後の active track で `batch-plan.json` が欠落している場合は error になる。"
+        }
+      }
+    },
+    {
       "claim_hash": "932270f2d074cdf5093cf9567fa7d19738383c1600f7ceaef64dcc32af83c480",
       "evidence_hash": "85f314b8e1f1ca0a95c337c53191d4789bf1640989bf715f791e7937befdbe42",
       "verdict": {

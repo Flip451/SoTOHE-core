@@ -154,6 +154,11 @@ enum CliCommand {
         #[command(subcommand)]
         cmd: commands::codex_runtime::CodexRuntimeCommand,
     },
+    /// Phase 3 batch-plan gate: check declared batches against ceilings and the plan.
+    BatchPlan {
+        #[command(subcommand)]
+        cmd: commands::batch_plan::BatchPlanCommand,
+    },
     /// Run the example track state machine demo.
     #[cfg(not(doc))]
     Demo,
@@ -202,6 +207,7 @@ fn run_cli_with(
         ),
         Some(CliCommand::Signal { cmd }) => commands::signal::execute(cmd),
         Some(CliCommand::TaskContract { cmd }) => commands::task_contract::execute(cmd),
+        Some(CliCommand::BatchPlan { cmd }) => commands::batch_plan::execute(cmd),
         Some(CliCommand::Catalog { cmd }) => commands::catalog::execute(cmd),
         Some(CliCommand::CatalogueLint { cmd }) => commands::catalogue_lint::execute(cmd),
         Some(CliCommand::Template { cmd }) => commands::template::execute(cmd),
@@ -630,6 +636,25 @@ mod tests {
         assert!(
             matches!(cli.command, Some(CliCommand::Capability { .. })),
             "capability exec must select the Capability variant"
+        );
+    }
+
+    #[test]
+    fn test_cli_command_batch_plan_check_parses_to_batch_plan_variant() {
+        let cli = Cli::try_parse_from([
+            "sotp",
+            "batch-plan",
+            "check",
+            "--track-id",
+            "some-track",
+            "--items-dir",
+            "track/items",
+        ])
+        .expect("batch-plan check must parse at the top-level command boundary");
+
+        assert!(
+            matches!(cli.command, Some(CliCommand::BatchPlan { .. })),
+            "batch-plan check must select the BatchPlan variant"
         );
     }
 

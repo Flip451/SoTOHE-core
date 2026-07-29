@@ -4,5 +4,5 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| BatchPlanCompositionRoot | composition_root | add | — | 🟡 | 🔵 |
+| BatchPlanCompositionRoot | composition_root | add | — | 🔵 | 🔵 |
 
