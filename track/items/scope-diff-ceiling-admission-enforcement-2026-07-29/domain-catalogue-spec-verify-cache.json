@@ -1275,11 +1275,11 @@
       }
     },
     {
-      "claim_hash": "9c9aa4fca7ed1255af8266d88c255875a092e0c1b99beec425c7da9c8f2959a2",
+      "claim_hash": "cc04a4f1dec8be7669bdcac9207c6011ecd4eb25ff0c7c3c3ae1336862f55f19",
       "evidence_hash": "0af85652e4cd8f66223ac126e8ba8a57b2ffa9d932f0173b503174a42007ca1f",
       "verdict": {
         "kind": "pass",
-        "citation": "impl-plan.json を schema 2 へ拡張し、task entry に省略可能な `depends_on`（同一ファイル内の task id の列）を追加する。意味は「そのタスクの実装は列挙されたタスクの完了を前提とする」であり、省略と空列はいずれも未宣言と読む。"
+        "citation": "task entry に省略可能な `depends_on`（同一ファイル内の task id の列）を追加する。意味は「そのタスクの実装は列挙されたタスクの完了を前提とする」であり、省略と空列はいずれも未宣言と読む。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1299,7 +1299,7 @@
       }
     },
     {
-      "claim_hash": "9c9aa4fca7ed1255af8266d88c255875a092e0c1b99beec425c7da9c8f2959a2",
+      "claim_hash": "cc04a4f1dec8be7669bdcac9207c6011ecd4eb25ff0c7c3c3ae1336862f55f19",
       "evidence_hash": "169dc8fb708e978e594047c94fa32ce3ae0b2de770176d3241a294983d6d59eb",
       "verdict": {
         "kind": "pass",
@@ -1323,11 +1323,11 @@
       }
     },
     {
-      "claim_hash": "ca0b3b379e0a4d0bcb1f5cde657365d52cebab4b3cbe8a55783410d826cd4e82",
+      "claim_hash": "d04c79978f024ad947e7e537845b6caebe63b81c8a21598e26d342cce3d4d1d4",
       "evidence_hash": "cfe45c4ac7bfe9c80c6ebd2134ead0e052f5c8ce182ee703194d5fa9015b46fb",
       "verdict": {
         "kind": "pass",
-        "citation": "依存宣言に関する file-internal 不変条件 3 件を fail-closed で追加する: `depends_on` の各 id が同一ファイルの `tasks[]` に実在する（参照の実在）/ 宣言された依存関係が閉路を含まない（自己参照を含む、非循環）/ plan order が宣言された依存グラフの線形拡大である。"
+        "citation": "`depends_on` の各 id が同一ファイルの `tasks[]` に実在する（参照の実在）/ 宣言された依存関係が閉路を含まない（自己参照を含む、非循環）/ plan order が宣言された依存グラフの線形拡大である。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1347,7 +1347,7 @@
       }
     },
     {
-      "claim_hash": "ca0b3b379e0a4d0bcb1f5cde657365d52cebab4b3cbe8a55783410d826cd4e82",
+      "claim_hash": "d04c79978f024ad947e7e537845b6caebe63b81c8a21598e26d342cce3d4d1d4",
       "evidence_hash": "28efa4eeb48f454400d09d715c40c28011e764e17cbb2f551ff3d28f7c606f7b",
       "verdict": {
         "kind": "pass",

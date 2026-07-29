@@ -327,12 +327,21 @@ fn resolve_transition(
 #[allow(clippy::indexing_slicing, clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
     use crate::{
-        DomainError, PlanSection, PlanView, TaskId, TrackTask, ValidationError,
-        impl_plan::ImplPlanDocument,
+        DomainError, NonEmptyString, PlanSection, PlanView, TaskId, TaskStatus, TrackTask,
+        ValidationError, impl_plan::ImplPlanDocument,
     };
 
     fn task(id: &str, desc: &str) -> TrackTask {
         TrackTask::new(TaskId::try_new(id).unwrap(), desc).unwrap()
+    }
+
+    fn dependent_task(id: &str, desc: &str, depends_on: &[&str]) -> TrackTask {
+        TrackTask::with_dependencies(
+            TaskId::try_new(id).unwrap(),
+            NonEmptyString::try_new(desc).unwrap(),
+            TaskStatus::Todo,
+            depends_on.iter().map(|d| TaskId::try_new(*d).unwrap()).collect(),
+        )
     }
 
     fn section(id: &str, title: &str, task_ids: &[&str]) -> PlanSection {
@@ -822,5 +831,95 @@ mod tests {
         let task_ids: Vec<&str> =
             doc.plan().sections()[0].task_ids().iter().map(|id| id.as_ref()).collect();
         assert_eq!(task_ids, vec!["T001", new_id.as_ref(), "T002"]);
+    }
+
+    // --- validation: declared dependencies ---
+
+    #[test]
+    fn test_new_keeps_the_dependencies_each_task_declares() {
+        let tasks = vec![task("T001", "A"), dependent_task("T002", "B", &["T001"])];
+        let doc = ImplPlanDocument::new(tasks, plan(&["T001", "T002"])).unwrap();
+
+        assert_eq!(doc.tasks()[0].depends_on(), &[] as &[TaskId]);
+        assert_eq!(doc.tasks()[1].depends_on(), &[TaskId::try_new("T001").unwrap()]);
+    }
+
+    #[test]
+    fn test_new_rejects_a_dependency_on_a_task_the_plan_does_not_contain() {
+        let tasks = vec![task("T001", "A"), dependent_task("T002", "B", &["T404"])];
+        let err = ImplPlanDocument::new(tasks, plan(&["T001", "T002"])).unwrap_err();
+
+        assert!(
+            matches!(
+                err,
+                DomainError::Validation(ValidationError::UnknownDependencyReference {
+                    ref task_id,
+                    ref dependency,
+                }) if task_id.as_ref() == "T002" && dependency.as_ref() == "T404"
+            ),
+            "unexpected error: {err:?}"
+        );
+    }
+
+    #[test]
+    fn test_new_rejects_a_cycle_in_the_declared_dependencies() {
+        let tasks = vec![
+            dependent_task("T001", "A", &["T003"]),
+            dependent_task("T002", "B", &["T001"]),
+            dependent_task("T003", "C", &["T002"]),
+        ];
+        let err = ImplPlanDocument::new(tasks, plan(&["T001", "T002", "T003"])).unwrap_err();
+
+        let DomainError::Validation(ValidationError::DependencyCycle { task_ids }) = err else {
+            panic!("a dependency cycle must be rejected: {err:?}");
+        };
+        let on_cycle: Vec<&str> = task_ids.iter().map(TaskId::as_ref).collect();
+        assert_eq!(on_cycle, vec!["T001", "T003", "T002"]);
+    }
+
+    #[test]
+    fn test_new_rejects_a_task_that_declares_itself_as_a_dependency() {
+        let tasks = vec![dependent_task("T001", "A", &["T001"])];
+        let err = ImplPlanDocument::new(tasks, plan(&["T001"])).unwrap_err();
+
+        let DomainError::Validation(ValidationError::DependencyCycle { task_ids }) = err else {
+            panic!("a self-reference must be rejected: {err:?}");
+        };
+        assert_eq!(task_ids, vec![TaskId::try_new("T001").unwrap()]);
+    }
+
+    #[test]
+    fn test_new_rejects_a_plan_order_that_places_a_task_before_its_dependency() {
+        let tasks = vec![dependent_task("T001", "A", &["T002"]), task("T002", "B")];
+        // T001 depends on T002 but the plan hands T001 out first.
+        let err = ImplPlanDocument::new(tasks, plan(&["T001", "T002"])).unwrap_err();
+
+        assert!(
+            matches!(
+                err,
+                DomainError::Validation(ValidationError::PlanOrderViolatesDependency {
+                    ref task_id,
+                    ref dependency,
+                }) if task_id.as_ref() == "T001" && dependency.as_ref() == "T002"
+            ),
+            "unexpected error: {err:?}"
+        );
+    }
+
+    #[test]
+    fn test_new_accepts_a_plan_order_that_is_a_linear_extension_of_the_declared_dependencies() {
+        let tasks = vec![
+            task("T001", "A"),
+            dependent_task("T002", "B", &["T001"]),
+            dependent_task("T003", "C", &["T001", "T002"]),
+        ];
+        // Section order continues the plan order, so a dependency may live in an
+        // earlier section.
+        let sections =
+            vec![section("S1", "First", &["T001"]), section("S2", "Rest", &["T002", "T003"])];
+
+        let doc = ImplPlanDocument::new(tasks, PlanView::new(vec![], sections)).unwrap();
+
+        assert_eq!(doc.tasks().len(), 3);
     }
 }

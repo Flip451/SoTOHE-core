@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-29T07:06:22Z",
-  "declaration_hash": "bf4d8a475012f2234673802576ac9714cf8b5f2c625a1404047f50de2458a66c",
-  "implementation_input_hash": "95ee80b8a6555fc3dcca2a9d71a44a945fcf08b39fc45c1a79082cd19d5855a1",
+  "generated_at": "2026-07-29T08:05:02Z",
+  "declaration_hash": "aea7ea7270e640cf83c18fff9de37437185c176a51acfa8b3eb75060c3164e89",
+  "implementation_input_hash": "d8330e90deaa25d321ad5d86d10c0050faf0b8ef25ab5ea03622c255131afeaa",
   "signals": [
     {
       "type_name": "AdmissionDecision",
@@ -228,7 +228,7 @@
     {
       "type_name": "TrackTask",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "Clone",
@@ -240,7 +240,7 @@
     {
       "type_name": "ValidationError",
       "kind_tag": "error_type",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "Clone",

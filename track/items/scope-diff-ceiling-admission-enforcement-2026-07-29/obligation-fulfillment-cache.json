@@ -934,6 +934,190 @@
           "test_name": "test_the_plan_reports_no_lines_for_a_scope_no_member_touches"
         }
       ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TrackTask",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-19"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TrackTask",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-19"
+      },
+      "key": {
+        "bound_tests_set_hash": "80ec293cfed37344f05882e0c16a4d98e3a18796952d502a6b8c9b71ce4da36c",
+        "declaration_hash": "7690132dfc807d958880ecdf47b41c5cd724ef4157fc17cb4d639de7f1452427",
+        "anchor_text_hash": "46c4b0a4ef9e34a5f2f8fc0777b2661ad4f579b9382e9940e3db6b1fdeafdf48"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"assert_eq!(\\n            task.depends_on(),\\n            &[TaskId::try_new(\\\"T002\\\").unwrap(), TaskId::try_new(\\\"T001\\\").unwrap()]\\n        );\"; \"assert!(created.depends_on().is_empty());\"; \"assert!(with_status.depends_on().is_empty());\"; \"assert_eq!(declared_empty, undeclared, \\\"an empty list must not be a distinct state\\\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::track::tests",
+          "test_name": "test_with_dependencies_keeps_the_declared_task_ids_in_order"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::track::tests",
+          "test_name": "test_a_task_built_without_a_dependency_argument_declares_nothing"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::track::tests",
+          "test_name": "test_an_empty_declared_dependency_list_is_the_same_state_as_declaring_none"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_keeps_the_dependencies_each_task_declares"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TrackTask",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-21"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TrackTask",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-21"
+      },
+      "key": {
+        "bound_tests_set_hash": "750c0c09708d824dadb9f9b6e27e0c7bf8b7186a8ce1f356431d833ad7c4ff00",
+        "declaration_hash": "7690132dfc807d958880ecdf47b41c5cd724ef4157fc17cb4d639de7f1452427",
+        "anchor_text_hash": "3be4d8a0dad98f21c741e35f11d4adccffd970ecffe5bb734fcc3dd5f727315f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(created.depends_on().is_empty());\n        assert!(with_status.depends_on().is_empty());\n\n        assert_eq!(declared_empty, undeclared, \"an empty list must not be a distinct state\");\n        assert!(declared_empty.depends_on().is_empty());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::track::tests",
+          "test_name": "test_a_task_built_without_a_dependency_argument_declares_nothing"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::track::tests",
+          "test_name": "test_an_empty_declared_dependency_list_is_the_same_state_as_declaring_none"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::track::tests",
+          "test_name": "test_with_dependencies_keeps_the_declared_task_ids_in_order"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-20"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ValidationError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-20"
+      },
+      "key": {
+        "bound_tests_set_hash": "d0884cfb651fb44414157f2d490044360c2e930bcff7db1ec83ed9cb7a70989c",
+        "declaration_hash": "78d81f1c3192f7cbdb76620f2409eb065fe785fd7df3c3c03fddfd3bdb04ff1e",
+        "anchor_text_hash": "8d64929df77f9750a418f713dadae5b571d0c30c77745637d6fca41e00502ad7"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"ValidationError::UnknownDependencyReference {\\n                    ref task_id,\\n                    ref dependency,\\n                }) if task_id.as_ref() == \\\"T002\\\" && dependency.as_ref() == \\\"T404\\\"\"; \"ValidationError::DependencyCycle { task_ids }\"; \"ValidationError::PlanOrderViolatesDependency {\\n                    ref task_id,\\n                    ref dependency,\\n                }) if task_id.as_ref() == \\\"T001\\\" && dependency.as_ref() == \\\"T002\\\"\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_rejects_a_dependency_on_a_task_the_plan_does_not_contain"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_rejects_a_cycle_in_the_declared_dependencies"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_rejects_a_task_that_declares_itself_as_a_dependency"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_rejects_a_plan_order_that_places_a_task_before_its_dependency"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_accepts_a_plan_order_that_is_a_linear_extension_of_the_declared_dependencies"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-22"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ValidationError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-22"
+      },
+      "key": {
+        "bound_tests_set_hash": "160a609edee422acf16170213530fa2d789d7ec376b81ae503509143c8497064",
+        "declaration_hash": "78d81f1c3192f7cbdb76620f2409eb065fe785fd7df3c3c03fddfd3bdb04ff1e",
+        "anchor_text_hash": "c5a55252c396e665020fdf4382d420b301d189684197549712d1351c09d726f0"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let err = ImplPlanDocument::new(tasks, plan(&[\"T001\", \"T002\"])).unwrap_err(); ... ValidationError::UnknownDependencyReference ... let err = ImplPlanDocument::new(tasks, plan(&[\"T001\", \"T002\", \"T003\"])).unwrap_err(); ... ValidationError::DependencyCycle ... let err = ImplPlanDocument::new(tasks, plan(&[\"T001\", \"T002\"])).unwrap_err(); ... ValidationError::PlanOrderViolatesDependency"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_rejects_a_dependency_on_a_task_the_plan_does_not_contain"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_rejects_a_cycle_in_the_declared_dependencies"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_rejects_a_task_that_declares_itself_as_a_dependency"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_rejects_a_plan_order_that_places_a_task_before_its_dependency"
+        }
+      ]
     }
   ]
 }

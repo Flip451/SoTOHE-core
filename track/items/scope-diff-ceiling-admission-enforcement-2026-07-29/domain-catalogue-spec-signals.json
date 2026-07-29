@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "bf4d8a475012f2234673802576ac9714cf8b5f2c625a1404047f50de2458a66c",
+  "catalogue_declaration_hash": "aea7ea7270e640cf83c18fff9de37437185c176a51acfa8b3eb75060c3164e89",
   "signals": [
     {
       "type_name": "AdmissionDecision",
@@ -100,12 +100,12 @@
     {
       "type_name": "TrackTask",
       "signal": "blue",
-      "entry_hash": "9c9aa4fca7ed1255af8266d88c255875a092e0c1b99beec425c7da9c8f2959a2"
+      "entry_hash": "cc04a4f1dec8be7669bdcac9207c6011ecd4eb25ff0c7c3c3ae1336862f55f19"
     },
     {
       "type_name": "ValidationError",
       "signal": "blue",
-      "entry_hash": "ca0b3b379e0a4d0bcb1f5cde657365d52cebab4b3cbe8a55783410d826cd4e82"
+      "entry_hash": "d04c79978f024ad947e7e537845b6caebe63b81c8a21598e26d342cce3d4d1d4"
     },
     {
       "type_name": "domain::batch_plan::check_batch_plan",

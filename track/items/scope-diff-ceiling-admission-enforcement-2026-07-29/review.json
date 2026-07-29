@@ -1,35 +1,80 @@
 {
   "schema_version": 2,
   "scopes": {
-    "other": {
+    "domain": {
       "rounds": [
         {
           "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d9427b3c62e5f31c24c6912abf9797960c9ac949f209fb3ec4d4d17f5fb11a1f",
-          "at": "2026-07-29T01:36:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d9427b3c62e5f31c24c6912abf9797960c9ac949f209fb3ec4d4d17f5fb11a1f",
-          "at": "2026-07-29T01:38:31Z"
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`LineCount::saturating_add` collapses totals above `u32::MAX` to `u32::MAX`, so an actual sum exceeding a maximum ceiling is incorrectly admitted. For example, production `u32::MAX` plus one test line becomes `u32::MAX`, and `ScopeCeiling::resolve(Some(u32::MAX)).admits(...)` returns true. Use checked overflow handling and fail closed.",
+              "severity": "P0",
+              "file": "libs/domain/src/batch_plan/line_count.rs",
+              "line": 33,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:93f226ecde9ebf4753aa13ab06d42cd483c3bc5ba0cd58cdc0abf150006e4729",
+          "at": "2026-07-29T07:05:31Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:9c5cd89f3a5b511f4002e275ee28a9e9c0fed66b775a774641eff2d724c48104",
-          "at": "2026-07-29T07:05:27Z"
+          "hash": "rvw1:sha256:87d19e34f18611acc2f565ec048cdf43a0ac1d1dafaffeeb2507b65e89429b68",
+          "at": "2026-07-29T07:09:40Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:9c5cd89f3a5b511f4002e275ee28a9e9c0fed66b775a774641eff2d724c48104",
-          "at": "2026-07-29T07:09:12Z"
+          "hash": "rvw1:sha256:87d19e34f18611acc2f565ec048cdf43a0ac1d1dafaffeeb2507b65e89429b68",
+          "at": "2026-07-29T07:15:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cc5ad75c51442352bff92aa180e19067024c36684a0de01c4a97a0f79807dd64",
+          "at": "2026-07-29T07:48:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The recursive dependency walk consumes one stack frame per edge in a dependency chain, while task count/depth is unbounded. A valid sufficiently deep acyclic plan can therefore stack-overflow inside `ImplPlanDocument::new`, aborting instead of returning `Result`. Use an iterative DFS with an explicit stack (or enforce a validated depth bound).",
+              "severity": "P0",
+              "file": "libs/domain/src/track.rs",
+              "line": 629,
+              "category": "panic-safety"
+            }
+          ],
+          "hash": "rvw1:sha256:cc5ad75c51442352bff92aa180e19067024c36684a0de01c4a97a0f79807dd64",
+          "at": "2026-07-29T07:54:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The deep-chain regression test never creates a deep DFS traversal: tasks are visited from T1 upward, while each Tn depends on the already-settled T(n-1), so the traversal stack stays at depth one and the previous recursive implementation would also pass. Reverse the task order (or dependency direction) so this test actually protects the prior stack-overflow boundary.",
+              "severity": "P1",
+              "file": "libs/domain/src/track.rs",
+              "line": 899,
+              "category": "test-coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:98a18876d761bf0ee82091c334f8b976bf72cc2560d43fb82661636a66b4b922",
+          "at": "2026-07-29T08:02:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2a578f9a0d2786c4d41dffaf51d3cb604724b8c58f34dfd20efd8b779323af09",
+          "at": "2026-07-29T08:06:20Z"
         }
       ]
     },
@@ -191,6 +236,42 @@
           "findings": [],
           "hash": "rvw1:sha256:9c99fe15aa91c506959f2e12b15a94c5557f7c6239997772133faab7b7456e24",
           "at": "2026-07-29T07:09:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006 contains upstream behavior restatement: 「planned task を依存宣言を保った TrackTask 値のまま domain 検査へ渡す」. Keep only target + operation + anchor cite; cite .harness/policies/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/impl-plan.json",
+              "line": 38,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T008 contains upstream behavior restatement: 「impl-plan.json のタスクを宣言順に、宣言された depends_on を保った TrackTask として返す」. Keep only target + operation + anchor cite; cite .harness/policies/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/impl-plan.json",
+              "line": 53,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:527727292f37ae9ac4e6243001c4f2171ef74771fa1c52f06f302f963846b707",
+          "at": "2026-07-29T07:48:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:725bc81832e1d192bd90e79321b8b853fe8d754ca405f324d767e2ffa98f234d",
+          "at": "2026-07-29T07:49:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:725bc81832e1d192bd90e79321b8b853fe8d754ca405f324d767e2ffa98f234d",
+          "at": "2026-07-29T07:54:26Z"
         }
       ]
     },
@@ -335,36 +416,71 @@
         }
       ]
     },
-    "domain": {
+    "other": {
       "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`LineCount::saturating_add` collapses totals above `u32::MAX` to `u32::MAX`, so an actual sum exceeding a maximum ceiling is incorrectly admitted. For example, production `u32::MAX` plus one test line becomes `u32::MAX`, and `ScopeCeiling::resolve(Some(u32::MAX)).admits(...)` returns true. Use checked overflow handling and fail closed.",
-              "severity": "P0",
-              "file": "libs/domain/src/batch_plan/line_count.rs",
-              "line": 33,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:93f226ecde9ebf4753aa13ab06d42cd483c3bc5ba0cd58cdc0abf150006e4729",
-          "at": "2026-07-29T07:05:31Z"
-        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:87d19e34f18611acc2f565ec048cdf43a0ac1d1dafaffeeb2507b65e89429b68",
-          "at": "2026-07-29T07:09:40Z"
+          "hash": "rvw1:sha256:d9427b3c62e5f31c24c6912abf9797960c9ac949f209fb3ec4d4d17f5fb11a1f",
+          "at": "2026-07-29T01:36:56Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:87d19e34f18611acc2f565ec048cdf43a0ac1d1dafaffeeb2507b65e89429b68",
-          "at": "2026-07-29T07:15:17Z"
+          "hash": "rvw1:sha256:d9427b3c62e5f31c24c6912abf9797960c9ac949f209fb3ec4d4d17f5fb11a1f",
+          "at": "2026-07-29T01:38:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9c5cd89f3a5b511f4002e275ee28a9e9c0fed66b775a774641eff2d724c48104",
+          "at": "2026-07-29T07:05:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9c5cd89f3a5b511f4002e275ee28a9e9c0fed66b775a774641eff2d724c48104",
+          "at": "2026-07-29T07:09:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b4ee7d243c2795084448dde546359b6c5cdab1c4869826f6bbd25734024345a",
+          "at": "2026-07-29T07:50:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The file now contains 33 records, not the 29 covered by the briefing. The four newly appended bindings (TrackTask IN-19/AC-21 and ValidationError IN-20/AC-22) do not have verdicts frozen against the current catalogue declarations: `test-obligation check` fails with `DeclChanged` for all four edges. Re-evaluate these bindings against the current declarations before treating the obligation gate as passing.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/test-bindings.json",
+              "line": 658,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:6b4ee7d243c2795084448dde546359b6c5cdab1c4869826f6bbd25734024345a",
+          "at": "2026-07-29T07:57:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b4ee7d243c2795084448dde546359b6c5cdab1c4869826f6bbd25734024345a",
+          "at": "2026-07-29T08:08:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b4ee7d243c2795084448dde546359b6c5cdab1c4869826f6bbd25734024345a",
+          "at": "2026-07-29T08:10:16Z"
         }
       ]
     },
@@ -675,6 +791,20 @@
           "findings": [],
           "hash": "rvw1:sha256:bbbfd5199452d48d011927cc33655ddb5f82870eb8694556648074738ba4fa9d",
           "at": "2026-07-29T06:13:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:083171722b6dc6518d0487b37c92532f8fea0c60e245d8fc8ed257913567561a",
+          "at": "2026-07-29T08:09:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:083171722b6dc6518d0487b37c92532f8fea0c60e245d8fc8ed257913567561a",
+          "at": "2026-07-29T08:18:34Z"
         }
       ]
     }

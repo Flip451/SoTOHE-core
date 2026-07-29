@@ -653,6 +653,134 @@
           "test_name": "test_the_plan_reports_no_lines_for_a_scope_no_member_touches"
         }
       ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TrackTask",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-19"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::track::tests",
+          "test_name": "test_with_dependencies_keeps_the_declared_task_ids_in_order"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::track::tests",
+          "test_name": "test_a_task_built_without_a_dependency_argument_declares_nothing"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::track::tests",
+          "test_name": "test_an_empty_declared_dependency_list_is_the_same_state_as_declaring_none"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_keeps_the_dependencies_each_task_declares"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TrackTask",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-21"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::track::tests",
+          "test_name": "test_a_task_built_without_a_dependency_argument_declares_nothing"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::track::tests",
+          "test_name": "test_an_empty_declared_dependency_list_is_the_same_state_as_declaring_none"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::track::tests",
+          "test_name": "test_with_dependencies_keeps_the_declared_task_ids_in_order"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-20"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_rejects_a_dependency_on_a_task_the_plan_does_not_contain"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_rejects_a_cycle_in_the_declared_dependencies"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_rejects_a_task_that_declares_itself_as_a_dependency"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_rejects_a_plan_order_that_places_a_task_before_its_dependency"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_accepts_a_plan_order_that_is_a_linear_extension_of_the_declared_dependencies"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-22"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_rejects_a_dependency_on_a_task_the_plan_does_not_contain"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_rejects_a_cycle_in_the_declared_dependencies"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_rejects_a_task_that_declares_itself_as_a_dependency"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_rejects_a_plan_order_that_places_a_task_before_its_dependency"
+        }
+      ]
     }
   ]
 }

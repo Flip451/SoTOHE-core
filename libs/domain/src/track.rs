@@ -191,15 +191,23 @@ impl StatusOverride {
 }
 
 /// A single task within a track, with its own state machine.
+///
+/// `depends_on` holds the tasks this task's implementation presupposes the
+/// completion of. An empty list and an undeclared list are the same unstated
+/// state, so the field is a plain `Vec` rather than an `Option` (IN-19).
+/// The graph-level invariants over those declarations — reference existence,
+/// acyclicity, and plan order being a linear extension — belong to the plan
+/// document constructor, not to this type.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TrackTask {
     id: TaskId,
     description: NonEmptyString,
     status: TaskStatus,
+    depends_on: Vec<TaskId>,
 }
 
 impl TrackTask {
-    /// Creates a new task in `Todo` status.
+    /// Creates a new task in `Todo` status, declaring no dependency.
     ///
     /// # Errors
     /// Returns `ValidationError::EmptyTaskDescription` if description is empty.
@@ -207,6 +215,10 @@ impl TrackTask {
         Self::with_status(id, description, TaskStatus::Todo)
     }
 
+    /// Creates a task in `status`, declaring no dependency.
+    ///
+    /// # Errors
+    /// Returns `ValidationError::EmptyTaskDescription` if description is empty.
     pub fn with_status(
         id: TaskId,
         description: impl Into<String>,
@@ -214,7 +226,29 @@ impl TrackTask {
     ) -> Result<Self, ValidationError> {
         let description = NonEmptyString::try_new(description)
             .map_err(|_| ValidationError::EmptyTaskDescription)?;
-        Ok(Self { id, description, status })
+        Ok(Self { id, description, status, depends_on: Vec::new() })
+    }
+
+    /// Creates a task that declares dependencies on other tasks.
+    ///
+    /// Total: every parameter is an already-validated value, so there is no
+    /// error channel. An empty `depends_on` declares nothing, which is the same
+    /// state a task built by the other constructors is in.
+    #[must_use]
+    pub fn with_dependencies(
+        id: TaskId,
+        description: NonEmptyString,
+        status: TaskStatus,
+        depends_on: Vec<TaskId>,
+    ) -> Self {
+        Self { id, description, status, depends_on }
+    }
+
+    /// Returns the tasks whose completion this task's implementation
+    /// presupposes, in declaration order. Empty when nothing is declared.
+    #[must_use]
+    pub fn depends_on(&self) -> &[TaskId] {
+        &self.depends_on
     }
 
     #[must_use]
@@ -499,7 +533,107 @@ pub(crate) fn validate_plan_invariants(
         }
     }
 
+    validate_declared_dependencies(tasks, plan, &task_ids)?;
+
     Ok(())
+}
+
+/// Validates the three invariants over the declared dependency graph (IN-20):
+/// every declared dependency exists, the declarations are acyclic (a
+/// self-reference is a cycle), and plan order is a linear extension of the
+/// graph.
+///
+/// Runs after the plan referential-integrity checks, which establish that plan
+/// order is a total order over `tasks`.
+fn validate_declared_dependencies(
+    tasks: &[TrackTask],
+    plan: &PlanView,
+    task_ids: &std::collections::HashSet<TaskId>,
+) -> Result<(), ValidationError> {
+    use std::collections::HashMap;
+
+    for task in tasks {
+        for dependency in task.depends_on() {
+            if !task_ids.contains(dependency) {
+                return Err(ValidationError::UnknownDependencyReference {
+                    task_id: task.id().clone(),
+                    dependency: dependency.clone(),
+                });
+            }
+        }
+    }
+
+    if let Some(task_ids) = detect_dependency_cycle(tasks) {
+        return Err(ValidationError::DependencyCycle { task_ids });
+    }
+
+    let mut plan_order: HashMap<&TaskId, usize> = HashMap::new();
+    for (position, task_id) in
+        plan.sections().iter().flat_map(|section| section.task_ids()).enumerate()
+    {
+        plan_order.insert(task_id, position);
+    }
+    for task in tasks {
+        let Some(task_position) = plan_order.get(task.id()) else { continue };
+        for dependency in task.depends_on() {
+            if plan_order.get(dependency).is_some_and(|position| position > task_position) {
+                return Err(ValidationError::PlanOrderViolatesDependency {
+                    task_id: task.id().clone(),
+                    dependency: dependency.clone(),
+                });
+            }
+        }
+    }
+
+    Ok(())
+}
+
+/// Returns the tasks on the first cycle reachable in the declared dependency
+/// graph, in traversal order, or `None` when the declarations are acyclic.
+fn detect_dependency_cycle(tasks: &[TrackTask]) -> Option<Vec<TaskId>> {
+    use std::collections::{HashMap, HashSet};
+
+    let dependencies_by_task: HashMap<&TaskId, &[TaskId]> =
+        tasks.iter().map(|task| (task.id(), task.depends_on())).collect();
+    let mut settled: HashSet<&TaskId> = HashSet::new();
+    let mut on_path: HashMap<&TaskId, usize> = HashMap::new();
+
+    for task in tasks {
+        if settled.contains(task.id()) {
+            continue;
+        }
+
+        // An explicit stack avoids making plan validity depend on the host call-stack
+        // limit. Its frame order matches recursive DFS, preserving deterministic cycle
+        // reporting in task and declaration order.
+        let mut stack = vec![(task.id(), 0_usize)];
+        on_path.insert(task.id(), 0);
+
+        while let Some((id, next_dependency)) = stack.last_mut() {
+            let dependencies = dependencies_by_task.get(*id).copied().unwrap_or(&[]);
+            if *next_dependency == dependencies.len() {
+                if let Some((completed, _)) = stack.pop() {
+                    on_path.remove(completed);
+                    settled.insert(completed);
+                }
+                continue;
+            }
+
+            let dependency = dependencies.get(*next_dependency)?;
+            *next_dependency += 1;
+            if let Some(cycle_start) = on_path.get(dependency) {
+                let cycle = stack.get(*cycle_start..)?;
+                return Some(cycle.iter().map(|(task_id, _)| (*task_id).clone()).collect());
+            }
+            if settled.contains(dependency) {
+                continue;
+            }
+
+            on_path.insert(dependency, stack.len());
+            stack.push((dependency, 0));
+        }
+    }
+    None
 }
 
 #[cfg(test)]
@@ -750,5 +884,73 @@ mod tests {
     #[test]
     fn test_track_status_archived_is_not_active() {
         assert!(!TrackStatus::Archived.is_active(), "Archived must be frozen (not active)");
+    }
+
+    // --- Declared task dependencies ---
+
+    #[test]
+    fn test_detect_dependency_cycle_with_a_deep_acyclic_chain_returns_none() {
+        const DEPTH: usize = 10_000;
+        let tasks = (1..=DEPTH)
+            .rev()
+            .map(|number| {
+                let dependencies = if number == 1 {
+                    Vec::new()
+                } else {
+                    vec![TaskId::try_new(format!("T{}", number - 1)).unwrap()]
+                };
+                TrackTask::with_dependencies(
+                    TaskId::try_new(format!("T{number}")).unwrap(),
+                    NonEmptyString::try_new(format!("Task {number}")).unwrap(),
+                    TaskStatus::Todo,
+                    dependencies,
+                )
+            })
+            .collect::<Vec<_>>();
+
+        assert_eq!(detect_dependency_cycle(&tasks), None);
+    }
+
+    #[test]
+    fn test_a_task_built_without_a_dependency_argument_declares_nothing() {
+        let created = TrackTask::new(TaskId::try_new("T001").unwrap(), "A").unwrap();
+        let with_status =
+            TrackTask::with_status(TaskId::try_new("T002").unwrap(), "B", TaskStatus::InProgress)
+                .unwrap();
+
+        assert!(created.depends_on().is_empty());
+        assert!(with_status.depends_on().is_empty());
+    }
+
+    #[test]
+    fn test_with_dependencies_keeps_the_declared_task_ids_in_order() {
+        let task = TrackTask::with_dependencies(
+            TaskId::try_new("T003").unwrap(),
+            crate::NonEmptyString::try_new("C").unwrap(),
+            TaskStatus::Todo,
+            vec![TaskId::try_new("T002").unwrap(), TaskId::try_new("T001").unwrap()],
+        );
+
+        assert_eq!(
+            task.depends_on(),
+            &[TaskId::try_new("T002").unwrap(), TaskId::try_new("T001").unwrap()]
+        );
+        assert_eq!(task.id(), &TaskId::try_new("T003").unwrap());
+        assert_eq!(task.description(), "C");
+        assert_eq!(task.status(), &TaskStatus::Todo);
+    }
+
+    #[test]
+    fn test_an_empty_declared_dependency_list_is_the_same_state_as_declaring_none() {
+        let declared_empty = TrackTask::with_dependencies(
+            TaskId::try_new("T001").unwrap(),
+            crate::NonEmptyString::try_new("A").unwrap(),
+            TaskStatus::Todo,
+            Vec::new(),
+        );
+        let undeclared = TrackTask::new(TaskId::try_new("T001").unwrap(), "A").unwrap();
+
+        assert_eq!(declared_empty, undeclared, "an empty list must not be a distinct state");
+        assert!(declared_empty.depends_on().is_empty());
     }
 }

@@ -2061,7 +2061,7 @@
             },
             {
               "name": "description",
-              "ty": "impl Into"
+              "ty": "impl Into<String>"
             }
           ],
           "returns": "Result<Self, ValidationError>"
@@ -2077,7 +2077,7 @@
             },
             {
               "name": "description",
-              "ty": "impl Into"
+              "ty": "impl Into<String>"
             },
             {
               "name": "status",
@@ -2237,21 +2237,36 @@
             "name": "BranchIdMismatch",
             "payload": {
               "fields": [
-                "DiagnosticMessage",
-                "DiagnosticMessage"
+                {
+                  "name": "id",
+                  "ty": "DiagnosticMessage"
+                },
+                {
+                  "name": "branch",
+                  "ty": "DiagnosticMessage"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "StatusOverrideMismatch",
             "payload": {
               "fields": [
-                "DiagnosticMessage",
-                "DiagnosticMessage",
-                "DiagnosticMessage"
+                {
+                  "name": "override_kind",
+                  "ty": "DiagnosticMessage"
+                },
+                {
+                  "name": "required",
+                  "ty": "DiagnosticMessage"
+                },
+                {
+                  "name": "actual",
+                  "ty": "DiagnosticMessage"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
@@ -2336,30 +2351,48 @@
             "name": "TrackActivationRequiresPlanningOnly",
             "payload": {
               "fields": [
-                "DiagnosticMessage",
-                "TrackStatus"
+                {
+                  "name": "track_id",
+                  "ty": "DiagnosticMessage"
+                },
+                {
+                  "name": "status",
+                  "ty": "TrackStatus"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "TrackActivationRequiresSchemaV3",
             "payload": {
               "fields": [
-                "DiagnosticMessage",
-                "u32"
+                {
+                  "name": "track_id",
+                  "ty": "DiagnosticMessage"
+                },
+                {
+                  "name": "schema_version",
+                  "ty": "u32"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "TrackAlreadyMaterialized",
             "payload": {
               "fields": [
-                "DiagnosticMessage",
-                "DiagnosticMessage"
+                {
+                  "name": "track_id",
+                  "ty": "DiagnosticMessage"
+                },
+                {
+                  "name": "branch",
+                  "ty": "DiagnosticMessage"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
@@ -2390,18 +2423,24 @@
             "name": "TaskDescriptionMutated",
             "payload": {
               "fields": [
-                "DiagnosticMessage"
+                {
+                  "name": "task_id",
+                  "ty": "DiagnosticMessage"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "TaskRemoved",
             "payload": {
               "fields": [
-                "DiagnosticMessage"
+                {
+                  "name": "task_id",
+                  "ty": "DiagnosticMessage"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
