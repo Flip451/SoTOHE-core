@@ -7,7 +7,7 @@ GO-01 → T001–T012、T019、T020、T013、T016、T018: 宣言された batch 
 GO-02 → T003、T004、T006、T012、T018: Phase 3 終端と todo → in_progress 遷移の実装開始前 gate を配置する。
 GO-03 → T001、T002、T019、T020、T007、T008、T013、T014、T017: batch と依存宣言を Phase 3 宣言成果物へ移し、impl-plan review と full-cycle consumption の対象にする。
 
-## Tasks (14/20 resolved)
+## Tasks (17/20 resolved)
 
 ### S1 — ドメイン中核 — 見積り・batch 宣言と 2 つの純粋判定
 
@@ -23,20 +23,20 @@ GO-03 → T001、T002、T019、T020、T007、T008、T013、T014、T017: batch �
 - [x] **T006**: `libs/usecase/src/batch_plan/` に BatchPlanCheckService、BatchPlanCheckCommand、BatchPlanCheckError、BatchPlanCheckInteractor、BatchPlanCheckOutput、BatchPlanViolationOutput、NonEmptyViolationOutputs を実装する。IN-06、IN-07、AC-05、AC-06、AC-07、CN-09。 (`283f508e`)
 - [x] **T007**: `libs/infrastructure/src/batch_plan_codec/` に BatchPlanDocumentDto、TaskEstimateDto、ScopeLineEstimateDto、BatchDeclarationDto、BatchPlanCodecError、decode を実装する。IN-01、IN-02、IN-03、IN-04、IN-05、AC-01、AC-02、AC-03、AC-04。 (`283f508e`)
 - [x] **T020**: `libs/infrastructure/` の ImplPlanTaskDto に serde default 付きの depends_on を追加し、impl-plan codec の schema read/write を更新する。IN-19、IN-20、AC-05、AC-21、AC-22。 (`283f508e`)
-- [x] **T008**: T020 の完了後に `libs/infrastructure/` へ FsBatchPlanReader と FsPlannedTaskReader を実装して usecase port へ接続する。IN-01、IN-06、IN-07、AC-01、AC-05、AC-07、CN-09。
-- [x] **T009**: `libs/infrastructure/` に FsReviewScopeConfigReader と GitScopeDiffMeasurer を実装して usecase port へ接続する。IN-14、AC-08、AC-17、CN-05。
+- [x] **T008**: T020 の完了後に `libs/infrastructure/` へ FsBatchPlanReader と FsPlannedTaskReader を実装して usecase port へ接続する。IN-01、IN-06、IN-07、AC-01、AC-05、AC-07、CN-09。 (`89e46b20`)
+- [x] **T009**: `libs/infrastructure/` に FsReviewScopeConfigReader と GitScopeDiffMeasurer を実装して usecase port へ接続する。IN-14、AC-08、AC-17、CN-05。 (`89e46b20`)
 
 ### S3 — 配送面 — driver / composition root / CLI コマンド
 
-- [x] **T010**: `apps/cli-driver/` に BatchPlanDriver と BatchPlanInput を実装する。IN-06、AC-06、AC-07。
-- [x] **T011**: `libs/infrastructure/` に LazyBranchReader を追加し、`apps/cli-composition/` に BatchPlanCompositionRoot を追加して batch-plan check の依存を配線する。IN-06、AC-06。
-- [x] **T012**: `apps/cli/` に BatchPlanCheckArgs、BatchPlanCommand、CliCommand の BatchPlan variant、batch_plan::execute を追加する。IN-06、AC-05、AC-06。
+- [x] **T010**: `apps/cli-driver/` に BatchPlanDriver と BatchPlanInput を実装する。IN-06、AC-06、AC-07。 (`89e46b20`)
+- [x] **T011**: `libs/infrastructure/` に LazyBranchReader を追加し、`apps/cli-composition/` に BatchPlanCompositionRoot を追加して batch-plan check の依存を配線する。IN-06、AC-06。 (`89e46b20`)
+- [x] **T012**: `apps/cli/` に BatchPlanCheckArgs、BatchPlanCommand、CliCommand の BatchPlan variant、batch_plan::execute を追加する。IN-06、AC-05、AC-06。 (`89e46b20`)
 
 ### S4 — 正本伝播 — capability 契約 / review 指示書 / workflow
 
-- [ ] **T013**: `.harness/capabilities/impl-planner.md` の Phase 3 authoring と write ownership を batch-plan.json に対応させて更新する。IN-01、IN-02、IN-03、IN-04、IN-17、AC-01、AC-02、AC-03、AC-18、CN-07、CN-08。
-- [ ] **T014**: `.harness/custom/review-prompts/impl-plan.md` と `.harness/config/review-scope.json` を更新し、batch-plan review checks と artifact pattern を追加する。IN-08、AC-01、AC-09、CN-02。
-- [ ] **T015**: `.harness/capabilities/implementer.md` に task-state pre-work precondition を追加する。IN-13、AC-16、CN-10。
+- [x] **T013**: `.harness/capabilities/impl-planner.md` の Phase 3 authoring と write ownership を batch-plan.json に対応させて更新する。IN-01、IN-02、IN-03、IN-04、IN-17、AC-01、AC-02、AC-03、AC-18、CN-07、CN-08。
+- [x] **T014**: `.harness/custom/review-prompts/impl-plan.md` と `.harness/config/review-scope.json` を更新し、batch-plan review checks と artifact pattern を追加する。IN-08、AC-01、AC-09、CN-02。
+- [x] **T015**: `.harness/capabilities/implementer.md` に task-state pre-work precondition を追加する。IN-13、AC-16、CN-10。
 - [ ] **T016**: `.harness/capabilities/{spec-designer,type-designer,adr-editor,implementer,researcher,review-fix-lead,dry-fix-lead,rollback-diagnoser}.md` の writes-forbidden 列に batch-plan.json を追加して impl-planner 専有を伝播し、`.harness/workflows/track/impl-plan.md`、`.claude/commands/track/impl-plan.md`（impl-planner 専有の forwarding）、`.agents/skills/track-impl-plan/SKILL.md`（同じ forwarding）、Makefile.toml を更新する。IN-01、IN-18、AC-01、AC-19、AC-20、CN-06。
 - [ ] **T017**: plan order 上で先行する全タスクの完了後に `.harness/workflows/track/full-cycle.md` の batch-consumption steps と scope-diff reference を更新する。IN-12、IN-15、IN-16、AC-15、AC-18、AC-19、CN-06、CN-09。
 

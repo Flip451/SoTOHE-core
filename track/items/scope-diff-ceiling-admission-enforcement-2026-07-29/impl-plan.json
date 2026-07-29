@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "tasks": [
     {
       "id": "T001",
@@ -58,42 +58,47 @@
     {
       "id": "T008",
       "description": "T020 の完了後に `libs/infrastructure/` へ FsBatchPlanReader と FsPlannedTaskReader を実装して usecase port へ接続する。IN-01、IN-06、IN-07、AC-01、AC-05、AC-07、CN-09。",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "89e46b20"
     },
     {
       "id": "T009",
       "description": "`libs/infrastructure/` に FsReviewScopeConfigReader と GitScopeDiffMeasurer を実装して usecase port へ接続する。IN-14、AC-08、AC-17、CN-05。",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "89e46b20"
     },
     {
       "id": "T010",
       "description": "`apps/cli-driver/` に BatchPlanDriver と BatchPlanInput を実装する。IN-06、AC-06、AC-07。",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "89e46b20"
     },
     {
       "id": "T011",
       "description": "`libs/infrastructure/` に LazyBranchReader を追加し、`apps/cli-composition/` に BatchPlanCompositionRoot を追加して batch-plan check の依存を配線する。IN-06、AC-06。",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "89e46b20"
     },
     {
       "id": "T012",
       "description": "`apps/cli/` に BatchPlanCheckArgs、BatchPlanCommand、CliCommand の BatchPlan variant、batch_plan::execute を追加する。IN-06、AC-05、AC-06。",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "89e46b20"
     },
     {
       "id": "T013",
       "description": "`.harness/capabilities/impl-planner.md` の Phase 3 authoring と write ownership を batch-plan.json に対応させて更新する。IN-01、IN-02、IN-03、IN-04、IN-17、AC-01、AC-02、AC-03、AC-18、CN-07、CN-08。",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T014",
       "description": "`.harness/custom/review-prompts/impl-plan.md` と `.harness/config/review-scope.json` を更新し、batch-plan review checks と artifact pattern を追加する。IN-08、AC-01、AC-09、CN-02。",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T015",
       "description": "`.harness/capabilities/implementer.md` に task-state pre-work precondition を追加する。IN-13、AC-16、CN-10。",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T016",
