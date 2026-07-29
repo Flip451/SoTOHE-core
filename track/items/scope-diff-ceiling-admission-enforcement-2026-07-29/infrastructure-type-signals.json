@@ -1,0 +1,121 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-29T05:39:18Z",
+  "declaration_hash": "c0337345d380c4769d4f068a62be3837fa3e2358e8fae6cc50265170e870b8c2",
+  "implementation_input_hash": "6abcfdcebd81fabbda1b92b8fda81ba55b546c0a0bfad52f8f449012efae0ed4",
+  "signals": [
+    {
+      "type_name": "BatchDeclarationDto",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "Deserialize<'de>"
+      ]
+    },
+    {
+      "type_name": "BatchPlanCodecError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "BatchPlanDocumentDto",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "Deserialize<'de>"
+      ]
+    },
+    {
+      "type_name": "FsBatchPlanReader",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "Default",
+        "usecase::batch_plan::BatchPlanReaderPort"
+      ]
+    },
+    {
+      "type_name": "FsPlannedTaskReader",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "Default",
+        "usecase::batch_plan::PlannedTaskReaderPort"
+      ]
+    },
+    {
+      "type_name": "FsReviewScopeConfigReader",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "Default",
+        "usecase::batch_plan::ScopeConfigReaderPort"
+      ]
+    },
+    {
+      "type_name": "GitScopeDiffMeasurer",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "Default",
+        "usecase::batch_plan::ScopeDiffMeasurePort"
+      ]
+    },
+    {
+      "type_name": "ImplPlanTaskDto",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Deserialize<'de>",
+        "Serialize"
+      ]
+    },
+    {
+      "type_name": "ScopeLineEstimateDto",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "Deserialize<'de>"
+      ]
+    },
+    {
+      "type_name": "TaskEstimateDto",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "Deserialize<'de>"
+      ]
+    },
+    {
+      "type_name": "infrastructure::batch_plan_codec::decode",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": false
+    }
+  ]
+}

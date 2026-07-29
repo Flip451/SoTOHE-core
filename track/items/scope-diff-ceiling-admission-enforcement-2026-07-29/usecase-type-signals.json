@@ -1,0 +1,138 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-29T05:39:17Z",
+  "declaration_hash": "3de80797f25897dfb766a04cb071f52d1de1370eff180aec5324305456739e82",
+  "implementation_input_hash": "ca87d02065966992020351ea35162bad9ffe676cc5405536dd3f05a3f5957405",
+  "signals": [
+    {
+      "type_name": "BatchPlanCheckCommand",
+      "kind_tag": "command",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "BatchPlanCheckError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "BatchPlanCheckInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "BatchPlanCheckService"
+      ]
+    },
+    {
+      "type_name": "BatchPlanCheckService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "BatchPlanReadError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "BatchPlanReaderPort",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "PlannedTaskReadError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "PlannedTaskReaderPort",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ScopeConfigReadError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "ScopeConfigReaderPort",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ScopeDiffMeasureError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "ScopeDiffMeasurePort",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "TaskOperationInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "TaskOperationService"
+      ]
+    },
+    {
+      "type_name": "TaskOperationService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "TaskTransitionOutcome",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug"
+      ]
+    }
+  ]
+}

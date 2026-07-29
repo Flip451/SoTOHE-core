@@ -1,0 +1,27 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-29T01:53:07Z",
+  "declaration_hash": "aba774a0dc5597034e0f1da024c3c3f28b2e0ecae50e6e22d1f91022e2b77514",
+  "implementation_input_hash": "322aeece6b264c736dc8b3f201bfd90aab1649f6a99a6b729b13738cfabf0dbc",
+  "signals": [
+    {
+      "type_name": "BatchPlanDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug"
+      ]
+    },
+    {
+      "type_name": "BatchPlanInput",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug"
+      ]
+    }
+  ]
+}

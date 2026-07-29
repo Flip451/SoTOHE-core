@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "3de80797f25897dfb766a04cb071f52d1de1370eff180aec5324305456739e82",
+  "signals": [
+    {
+      "type_name": "BatchPlanCheckCommand",
+      "signal": "blue",
+      "entry_hash": "7ec4e1c1a36492dd60bb30993df8faae9f12a6ed0dd6ac01ce4371386685e914"
+    },
+    {
+      "type_name": "BatchPlanCheckError",
+      "signal": "blue",
+      "entry_hash": "e036a801cbcbab1fbdb6492fbb560eee48bdc443b14f2b341d587efb95e8696d"
+    },
+    {
+      "type_name": "BatchPlanCheckInteractor",
+      "signal": "blue",
+      "entry_hash": "2eb42475a3d413957feba41d1a9125a8578c031a8638d44b602f6f8e3af14fb9"
+    },
+    {
+      "type_name": "BatchPlanReadError",
+      "signal": "blue",
+      "entry_hash": "691d60776d210c0e283b0d062a605f4dbf6d783dea5f73e08e910707e07420af"
+    },
+    {
+      "type_name": "PlannedTaskReadError",
+      "signal": "blue",
+      "entry_hash": "24955f44b7ca4a0f49020f980b88f8f4bf92389c1d0d420bb16cecc23ad4906e"
+    },
+    {
+      "type_name": "ScopeConfigReadError",
+      "signal": "blue",
+      "entry_hash": "6bba66f1e1c1ee2306d0037fac668e22859727636d32d5314770393d85429daa"
+    },
+    {
+      "type_name": "ScopeDiffMeasureError",
+      "signal": "blue",
+      "entry_hash": "d3b70d389302c1b157ea46677027e4e05b03d50a802ae0b1667d1533fe1bf02a"
+    },
+    {
+      "type_name": "TaskOperationInteractor",
+      "signal": "blue",
+      "entry_hash": "ab1b44db1c9837f837c8f3cb8380123c941eb527f6f35e0dff7746dc8e8e7fca"
+    },
+    {
+      "type_name": "TaskTransitionOutcome",
+      "signal": "blue",
+      "entry_hash": "62908c6d4423be66e4ddd81cf90704f34be3dc769bdc3b94641ea5db23eec1e2"
+    },
+    {
+      "type_name": "BatchPlanCheckService",
+      "signal": "blue",
+      "entry_hash": "41fe404f0e9c9aa37645c2cac4e1ff564b53810e817a402a372a95a6b03725f7"
+    },
+    {
+      "type_name": "BatchPlanReaderPort",
+      "signal": "blue",
+      "entry_hash": "8185c3cd9a4888c4dfe5af43d2f58dd179f958ab100772239ef097cdf434893a"
+    },
+    {
+      "type_name": "PlannedTaskReaderPort",
+      "signal": "blue",
+      "entry_hash": "2251eabb4194ea4eb4c6f6bba98a3d945defaf70f4f003d72d95a2eb3957950c"
+    },
+    {
+      "type_name": "ScopeConfigReaderPort",
+      "signal": "blue",
+      "entry_hash": "f862a2e68eb8947849d1e05b3889e18a87ec018df7fd23a0c8d42a005bc77def"
+    },
+    {
+      "type_name": "ScopeDiffMeasurePort",
+      "signal": "blue",
+      "entry_hash": "8d5d7431abc35f178b2b1843b15a9489d7f686bcddaf9dc0652f9833634ab249"
+    },
+    {
+      "type_name": "TaskOperationService",
+      "signal": "blue",
+      "entry_hash": "4a6c88e8c1be37ba8b9b467cfcf972f3094f47d8c39d5a007694856d6ead4d8e"
+    }
+  ]
+}

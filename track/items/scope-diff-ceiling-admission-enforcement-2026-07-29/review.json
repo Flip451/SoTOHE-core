@@ -67,6 +67,553 @@
           "findings": [],
           "hash": "rvw1:sha256:aa52287a0add1a09809ebee0335bf747ee0dc5fafe50ad51e1b1559b4ba0b8dc",
           "at": "2026-07-29T00:08:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:538c160fed882ed2e9611ee5986ee9a1bb902723fed1accf31981edeff611cf5",
+          "at": "2026-07-29T04:19:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1 claims `tasks[]` becomes the sole ordering statement, but `plan.sections[].task_ids` remains an independent ordered execution/dependency view: `ImplPlanDocument::next_open_task` and the implementation workflow explicitly follow section order, and no invariant aligns it with `tasks[]`. Reordering only `tasks[]` as the example directs can therefore make batch order disagree with the order consumed by execution, contradicting the ADR's single-order/desync-elimination rationale. Resolving which order is canonical or requiring them to agree is a new decision and is hearing-required.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-29-0358-batch-ordering-check-on-declared-task-order.md",
+              "line": 68,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:538c160fed882ed2e9611ee5986ee9a1bb902723fed1accf31981edeff611cf5",
+          "at": "2026-07-29T04:22:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a3a989f3402bc8125526e1885ce082ab4ee8b8abe77d3c17cd588ef529e5ac5f",
+          "at": "2026-07-29T04:34:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a3a989f3402bc8125526e1885ce082ab4ee8b8abe77d3c17cd588ef529e5ac5f",
+          "at": "2026-07-29T04:36:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6dbb58d84d6a83f2499d18689e2182a826df973fae346034f4e0c1bbc7205907",
+          "at": "2026-07-29T05:04:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The schema-2-only read policy leaks beyond the stated D1/D2 refinement. `collect_track_snapshots`, used by routine view sync/validation and registry rendering, decodes `impl-plan.json` for v5/v6 tracks—including completed tracks—and those artifacts remain schema 1; the current active track also already has a schema-1 plan. Rejecting schema 1 would therefore break repository-wide track rendering/validation rather than leaving historical artifacts untouched as claimed. Preserve a schema-1 read lane or explicitly include and ground the required cross-track migration/rendering change.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-29-0358-task-dependency-declaration-and-batch-order-check.md",
+              "line": 44,
+              "category": "scope leakage into ADR body"
+            }
+          ],
+          "hash": "rvw1:sha256:961a00b0905e79d2f319c4fd673cf3c418c3e4a10e1aab1d218406f2394da5ec",
+          "at": "2026-07-29T05:10:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:967376e4c09ef86aef43dc8466f3a7a370ed283c12a5b0f3966a0b1cfd04875d",
+          "at": "2026-07-29T05:15:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:967376e4c09ef86aef43dc8466f3a7a370ed283c12a5b0f3966a0b1cfd04875d",
+          "at": "2026-07-29T05:17:38Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`domain::batch_plan::evaluate_admission` does not encode CN-03 structurally: its signature permits an implementation to return `ScopeCeilingWouldBeExceeded` even when prior contribution is zero. “First contributor always admits” exists only in `docs`, so the deadlock-freedom invariant is not checkable from the type contract.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/domain-types.json",
+              "line": 4,
+              "category": "API shape"
+            },
+            {
+              "message": "`BatchPlanValidationError` has no variant for an over-ceiling task sharing its scope with another contributor, although the scope checklist assigns this file-internal fail-closed inconsistency to codec/domain validation. The current catalogue places it only in `BatchPlanGateViolation::OversizeScopeHasMultipleContributors`, allowing `batch-plan.json` decoding to accept a structurally invalid document.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/domain-types.json",
+              "line": 1330,
+              "category": "enforcement-owner contradiction"
+            },
+            {
+              "message": "`domain::batch_plan::evaluate_admission` docs restate the complete D3 admission algorithm instead of only identifying the changed symbol and citing upstream anchors, violating `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/domain-types.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`domain::batch_plan::check_batch_plan` docs restate the complete D2 gate behavior and structural rules rather than referencing the upstream contract by anchor, violating `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/domain-types.json",
+              "line": 70,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`BatchPlanDocument` docs restate the complete file-validation, aggregation, and current-batch behavior rather than only describing the catalogue change with anchors, violating `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/domain-types.json",
+              "line": 1118,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`GitScopeDiffMeasurer` docs restate the detailed diff-counting and base-degradation contract owned by the upstream spec, violating `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/infrastructure-types.json",
+              "line": 416,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`TaskOperationInteractor` docs restate the complete CN-10 transition-routing and collaborator contract instead of referring to the upstream behavior by anchors, violating `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+              "line": 742,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`BatchPlanCommand` docs restate the terminal-gate behavior and architectural rationale rather than only identifying the changed command type and upstream anchors, violating `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/cli-types.json",
+              "line": 116,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:9f68c6ee5bf22fa398c0452a022d5e00a2eaedc8e5038a0af09500647a5ec644",
+          "at": "2026-07-29T01:39:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`domain::batch_plan::evaluate_admission` does not encode CN-03 structurally: its signature permits rejection even when prior contribution is zero, so “first contributor always admits” exists only in documentation.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/domain-types.json",
+              "line": 4,
+              "category": "API shape"
+            },
+            {
+              "message": "`BatchPlanValidationError` lacks the required file-internal rejection for an over-ceiling task sharing its scope with another contributor. That rule appears only as `BatchPlanGateViolation::OversizeScopeHasMultipleContributors`, so codec-level validation cannot enforce the required fail-closed contract.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/domain-types.json",
+              "line": 1328,
+              "category": "enforcement-owner contradiction"
+            },
+            {
+              "message": "`domain::batch_plan::evaluate_admission` docs restate the complete upstream D3 behavior instead of only referencing it by anchor, violating `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/domain-types.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`domain::batch_plan::check_batch_plan` docs restate the complete upstream D2 gate behavior instead of only referencing it by anchor, violating `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/domain-types.json",
+              "line": 70,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`BatchPlanDocument` docs restate the complete file-validation, aggregation, and current-batch behavior instead of only identifying the type change with upstream anchors, violating `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/domain-types.json",
+              "line": 1118,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`TaskOperationInteractor` docs restate the complete CN-10 transition-routing and collaborator contract instead of only referencing the upstream behavior by anchor, violating `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+              "line": 742,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:9f68c6ee5bf22fa398c0452a022d5e00a2eaedc8e5038a0af09500647a5ec644",
+          "at": "2026-07-29T01:42:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cli::BatchPlanCommand` directly refers to “the ADR” in its catalogue `docs` text. Catalogue entries must not cite ADRs directly; they should reference the spec anchors only, preserving the SoT chain.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/cli-types.json",
+              "line": 116,
+              "category": "SoT integrity"
+            }
+          ],
+          "hash": "rvw1:sha256:4f498be53f06dcd60b5f9b3f801f4c476d79f9f39778d574c5f185a0ec268140",
+          "at": "2026-07-29T02:00:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`BatchPlanDocument::schema_version` leaks wire-format metadata into the domain aggregate. The catalogue separately defines `BatchPlanDocumentDto.schema_version` as an opaque infrastructure-only field, while the domain boundary must remain independent of JSON/schema concerns; keep schema-version handling in the infrastructure codec/DTO.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/domain-types.json",
+              "line": 455,
+              "category": "Dependency Inversion violation"
+            }
+          ],
+          "hash": "rvw1:sha256:6770ac542264531fcbc5ed38d5a3612d8af75ae4a4480b0b882d9f2c1f2ac860",
+          "at": "2026-07-29T02:04:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56fad36362de7b84a9d955cd32354e2cdfd65f149e8032497dfdb759b5cdbbfd",
+          "at": "2026-07-29T02:08:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`domain::BatchPlanGateViolation::BatchOrderInversion` cannot substantively implement IN-07/AC-07. `check_batch_plan` receives only task IDs in declaration order, while the declared reader returns `TrackTask` values without dependency edges. Treating declaration-order monotonicity as dependency ordering can reject independent tasks and cannot identify the dependency relationship required by the spec. Declare dependency data or revise the upstream contract.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/domain-types.json",
+              "line": 1246,
+              "category": "SoT integrity / spec_refs off-topic"
+            },
+            {
+              "message": "`domain::BatchPlanValidationError` explicitly excludes the over-ceiling sole-contributor violation and assigns it to `check_batch_plan`, while D1 and the briefing classify it as a codec-level file-internal rejection. `BatchPlanDocument::new` also lacks resolved-ceiling input, so the decoder cannot enforce that invariant. Reconcile the enforcement owner and declare a constructible validation path.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/domain-types.json",
+              "line": 1375,
+              "category": "cross-layer contract / enforcement-owner contradiction"
+            },
+            {
+              "message": "`domain::BatchPlanGateOutcome::blocked` returns the workspace-wide `ValidationError`, although this method can only fail for an empty violation list. Callers must handle numerous unrelated track, task, spec, and identifier variants, and the entry does not document a producible subset or justify that breadth. Use a precise error or a non-empty collection type.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/domain-types.json",
+              "line": 547,
+              "category": "API shape / per-method error imprecision"
+            },
+            {
+              "message": "`usecase::TaskOperationInteractor` deliberately converts structured `AdmissionRejection` data into `TaskOperationError::TransitionFailed(String)`. This discards the scope, prior contribution, candidate estimate, ceiling, and batch identifiers, while the sibling Phase 3 check path preserves typed violations through `BatchPlanGateOutcome`. Add a structured companion error variant or typed usecase equivalent.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+              "line": 742,
+              "category": "cross-layer contract / lossy boundary downgrade"
+            },
+            {
+              "message": "The new `usecase::BatchPlanReaderPort`, `PlannedTaskReaderPort`, `ScopeConfigReaderPort`, and `ScopeDiffMeasurePort` all mandate synchronous filesystem or Git I/O, but none of their docs acknowledges or justifies the blocking execution model. This fixes every adapter to synchronous I/O without recording why that color is appropriate.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+              "line": 167,
+              "category": "API shape / sync-async color mismatch"
+            },
+            {
+              "message": "`usecase::BatchPlanReaderPort` repeats the upstream single-writer/read-only rationale in prose; the same rationale is restated by `infrastructure::BatchPlanDocumentDto` and `infrastructure::batch_plan_codec::decode`. Replace these behavioral explanations with concise type operations plus IN-01/AC-01 anchors, as required by `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+              "line": 169,
+              "category": "SoT integrity / upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:56fad36362de7b84a9d955cd32354e2cdfd65f149e8032497dfdb759b5cdbbfd",
+          "at": "2026-07-29T02:23:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`domain::BatchPlanGateViolation::BatchOrderInversion` cannot substantively implement IN-07/AC-07. `check_batch_plan` receives only task IDs in declaration order, while `PlannedTaskReaderPort` supplies `TrackTask` values without dependency edges. Declaration-order monotonicity can reject independent tasks and cannot identify the dependency relationship required by the spec; documenting this as an open question does not make the catalogue contract conformant.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/domain-types.json",
+              "line": 1303,
+              "category": "SoT integrity / spec_refs off-topic"
+            },
+            {
+              "message": "`domain::BatchPlanValidationError` explicitly excludes the over-ceiling sole-contributor violation and assigns it to `check_batch_plan`, while the briefing requires this file-internal fail-closed inconsistency to be covered by codec/domain validation. `BatchPlanDocument::new` has no scope-configuration input, so the current catalogue has no constructible codec-level enforcement path for that required invariant.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/domain-types.json",
+              "line": 1432,
+              "category": "cross-layer contract / enforcement-owner contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f4f5b5b380dc666b1c5355210c9e7fc8a20476ba3897d3accc1253e293ed5fca",
+          "at": "2026-07-29T02:36:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e771cecf81af94ef619b25002f4208d0637c0fa25cca48422c47f33a8f289f90",
+          "at": "2026-07-29T05:51:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TrackTask::with_dependencies` returns the workspace-wide `ValidationError`, although its `TaskId`, `TaskStatus`, and dependency IDs are already validated types and the catalogue assigns graph-level dependency errors to the plan-document constructor. Callers must therefore handle dozens of variants this constructor cannot produce, and the entry neither identifies the producible subset nor justifies the broad error type.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/domain-types.json",
+              "line": 2111,
+              "category": "API shape / per-method error imprecision"
+            }
+          ],
+          "hash": "rvw1:sha256:e771cecf81af94ef619b25002f4208d0637c0fa25cca48422c47f33a8f289f90",
+          "at": "2026-07-29T06:04:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TrackTask::with_dependencies` returns the workspace-wide `ValidationError`, although this constructor can only produce a narrow subset (for example, empty task description); graph-level dependency errors are assigned to the plan-document constructor. Callers must handle many unrelated variants, and the entry neither identifies the producible subset nor justifies the broad shared error type.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/domain-types.json",
+              "line": 2111,
+              "category": "API shape / per-method error imprecision"
+            }
+          ],
+          "hash": "rvw1:sha256:bbbfd5199452d48d011927cc33655ddb5f82870eb8694556648074738ba4fa9d",
+          "at": "2026-07-29T06:07:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bbbfd5199452d48d011927cc33655ddb5f82870eb8694556648074738ba4fa9d",
+          "at": "2026-07-29T06:09:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bbbfd5199452d48d011927cc33655ddb5f82870eb8694556648074738ba4fa9d",
+          "at": "2026-07-29T06:13:55Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d9427b3c62e5f31c24c6912abf9797960c9ac949f209fb3ec4d4d17f5fb11a1f",
+          "at": "2026-07-29T01:36:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d9427b3c62e5f31c24c6912abf9797960c9ac949f209fb3ec4d4d17f5fb11a1f",
+          "at": "2026-07-29T01:38:31Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc6af2cf839f5ed501ac956d02bfb5bee1e3631c5897003bc84fb845b5458eec",
+          "at": "2026-07-29T01:37:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc6af2cf839f5ed501ac956d02bfb5bee1e3631c5897003bc84fb845b5458eec",
+          "at": "2026-07-29T01:42:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:981d6ce819d3be287021d32a6c6882d3d4cd8b9cb8550ae2329c9e7dafc65992",
+          "at": "2026-07-29T05:28:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:981d6ce819d3be287021d32a6c6882d3d4cd8b9cb8550ae2329c9e7dafc65992",
+          "at": "2026-07-29T05:31:01Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Tasks T001–T018 have target and operation text but no permitted anchor cite (`AC-NN`, `IN-NN`, `CN-NN`, or spec-element ID); catalogue-entry names do not satisfy the executable-task anchor requirement.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/impl-plan.json",
+              "line": 6,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T016 leaves the writes-forbidden propagation boundary open with `spec-designer / type-designer / adr-editor / rollback-diagnoser 等`; the executor must invent which peer capability contracts are included.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/impl-plan.json",
+              "line": 96,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T001–T004 append upstream behavioral/design-contract prose such as `Unconstrained ... ceiling 照合を行わない`, `graceful skip は設けない`, and the detailed admission arithmetic. The permitted task form is target + operation + anchor cite only. See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T005–T009 append upstream port, error-handling, codec, and diff-counting contract prose beyond target + operation + anchor cite. See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/impl-plan.json",
+              "line": 30,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T010–T012 append upstream CLI behavior and fail-closed output-contract prose beyond target + operation + anchor cite. See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/impl-plan.json",
+              "line": 60,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T013–T018 append upstream rationale and behavior constraints, including ceiling semantics, gate chaining boundaries, greedy-planner removal, and self-blocking sequencing. See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/impl-plan.json",
+              "line": 78,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`plan.summary` and section descriptions S1–S5 restate the upstream design rationale and behavior contract (for example, fail-closed ceiling enforcement, layer ordering, and the no-retroactive-rollout rationale), rather than serving as concise executable-plan metadata. See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/impl-plan.json",
+              "line": 115,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:cb5ea5c55f86d5f4df85796b8c400ab068214b0f6e87df1214f8d26333bf0be0",
+          "at": "2026-07-29T01:37:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8f6eb90706827dfbfdee612e81f73523a8565ea3d5e9079f75173498879e6655",
+          "at": "2026-07-29T01:42:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan.summary` is empty although the upstream spec declares GO-01 through GO-03. GO elements cannot be mapped in `task-coverage.json`, so this removes all required goal-to-task traceability. Add anchor-only GO-to-task or GO-to-section mappings here.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/impl-plan.json",
+              "line": 114,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "The current domain catalogue contains 51 entries, including the `action: add` entry `NonZeroLineCount` for CN-03/IN-10/AC-11, but `task-contract.json` attributes only the other 50. Attribute `NonZeroLineCount` to its carrier task and name it in that task's description; otherwise refreshed task-contract coverage will report an orphan entry.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/task-contract.json",
+              "line": 26,
+              "category": "task-contract attribution mismatch"
+            },
+            {
+              "message": "T016 names the peer capability contracts but leaves the additional target as only `対応 command / skill adapter`. This does not identify the files the executor must update—at minimum the Claude command and Codex skill adapters—and therefore requires inventing the task boundary. Name each adapter path and its update operation explicitly.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/impl-plan.json",
+              "line": 96,
+              "category": "task description non-executable"
+            }
+          ],
+          "hash": "rvw1:sha256:8f6eb90706827dfbfdee612e81f73523a8565ea3d5e9079f75173498879e6655",
+          "at": "2026-07-29T01:49:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a26090d644bb46ecb10369f702393257424cda81519fcea881f7860d38b64298",
+          "at": "2026-07-29T01:55:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f30ad50a28845e6b213302404a3305a54142316e3ff2a9db967fbf427aed1458",
+          "at": "2026-07-29T05:50:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T019 restates the upstream contract in prose: 「省略と空列はいずれも未宣言」 and the exact three dependency invariants duplicate IN-19/IN-20 and AC-21/AC-22. Per `.harness/policies/no-upstream-restatement.md`, retain the target symbols and operations but rely on the anchors for these semantics.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/impl-plan.json",
+              "line": 18,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T003's second sentence restates IN-07/AC-07's complete dependency-edge predicate, error outcome, and undeclared-pair exclusion. Replace it with a concise operation such as adding declared-dependency batch-order validation and keep the existing anchors, as required by `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/impl-plan.json",
+              "line": 24,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T020 restates upstream behavior through 「schema 1 は未宣言として読む」 and the full inactive-track registry/views compatibility outcome from IN-19, AC-05, and AC-21. Under `.harness/policies/no-upstream-restatement.md`, the description should stop at the codec/DTO schema-read/write operations plus anchor cites.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/impl-plan.json",
+              "line": 54,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:f30ad50a28845e6b213302404a3305a54142316e3ff2a9db967fbf427aed1458",
+          "at": "2026-07-29T05:53:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d07bbfc19fc11e5f4cf8b820131caa5d4c6b0eee1e458d75ee5ea0cf5514ee18",
+          "at": "2026-07-29T05:56:23Z"
         }
       ]
     }

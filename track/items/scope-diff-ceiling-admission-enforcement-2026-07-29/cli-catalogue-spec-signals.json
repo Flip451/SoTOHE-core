@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "02a56198d05fafc1a5c43e0f331bb1402ba09313d8ee9104656a9c90ba557c5b",
+  "signals": [
+    {
+      "type_name": "BatchPlanCheckArgs",
+      "signal": "blue",
+      "entry_hash": "33877b657d70683c853483beb5fbb0710dd52ac7687c4c24d49b91aa19f733a7"
+    },
+    {
+      "type_name": "BatchPlanCommand",
+      "signal": "blue",
+      "entry_hash": "fb66ec9be3c4407453965bf84110e0b7ef4b89386b9f31c98c0474ff3d0799ae"
+    },
+    {
+      "type_name": "CliCommand",
+      "signal": "blue",
+      "entry_hash": "cdc615749b589ee12d44cf11a4737c2a7002f8c291507a0ea4bd4a45ba364007"
+    },
+    {
+      "type_name": "cli::commands::batch_plan::execute",
+      "signal": "blue",
+      "entry_hash": "b45ab980c80f3fab9da6262f7536734dee7afa6fb071f7bef97889f7b80635f0"
+    }
+  ]
+}

@@ -1,0 +1,504 @@
+{
+  "crate_name": "cli",
+  "functions": {
+    "cli::commands::batch_plan::execute": {
+      "action": "add",
+      "docs": "Entry point for the batch-plan command group: resolves the track identifier, builds the wired driver through the composition root and returns its exit code. Type-design: fail-closed when no active track resolves, matching the other track-aware gate commands. IN-06, AC-06.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "cmd",
+          "ty": "BatchPlanCommand"
+        }
+      ],
+      "returns": "std::process::ExitCode",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    }
+  },
+  "layer": "cli",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "BatchPlanCheckArgs",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "BatchPlanCheckArgs",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "BatchPlanCheckArgs",
+      "trait_ref": "clap_builder::derive::Args"
+    },
+    {
+      "for_type": "BatchPlanCheckArgs",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
+    },
+    {
+      "action": "modify",
+      "for_type": "CliCommand",
+      "trait_ref": "clap_builder::derive::Subcommand"
+    },
+    {
+      "action": "modify",
+      "for_type": "CliCommand",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
+    },
+    {
+      "for_type": "BatchPlanCommand",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "BatchPlanCommand",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "BatchPlanCommand",
+      "trait_ref": "clap_builder::derive::Subcommand"
+    },
+    {
+      "for_type": "BatchPlanCommand",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "BatchPlanCheckArgs": {
+      "action": "add",
+      "docs": "clap arguments for the batch-plan check subcommand. Type-design: both fields stay raw transport types because clap owns this surface and the driver validates the identifier immediately afterwards (R9 transport-boundary case, same treatment as the existing gate commands). IN-06, AC-06.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "track_id",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "commands::batch_plan",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "BatchPlanCommand": {
+      "action": "add",
+      "docs": "Subcommand group for the batch plan; Check runs the Phase 3 gate. Type-design: placed as its own command group rather than as another verify subcommand, matching the pre-review task-contract gate, which likewise reads planning artifacts through the full hexagonal path. IN-06, IN-07, AC-06, AC-07.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Check",
+            "payload": {
+              "fields": [
+                "BatchPlanCheckArgs"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "commands::batch_plan",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "CliCommand": {
+      "action": "modify",
+      "docs": "Top-level subcommand enum of the sotp binary; this track adds the BatchPlan variant. The twenty-seven pre-existing variants are listed only because a modify entry must declare the full post-modification set; Demo stays excluded because it is compiled out of the documented surface. IN-06, AC-06.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Arch",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "ArchCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "AdrBaseline",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "AdrBaselineCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Conventions",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "ConventionsCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Domain",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "DomainCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Guard",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "GuardCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Hook",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "HookCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Maintenance",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "MaintenanceCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Track",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "TrackCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Git",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "GitCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Pr",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "PrCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Capability",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "CapabilityCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Review",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "ReviewCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "File",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "FileCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Verify",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "VerifyCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "FindSimilar",
+            "payload": {
+              "fields": [
+                "FindSimilarArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "DupIndex",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "DupIndexCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "DupCheck",
+            "payload": {
+              "fields": [
+                "DupCheckArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Telemetry",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "TelemetryCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Dry",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "DryCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "RefVerify",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "RefVerifyCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "TestObligation",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "TestObligationSubcommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Signal",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "SignalCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "TaskContract",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "TaskContractCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Catalog",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "CatalogCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "CatalogueLint",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "CatalogueLintCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Template",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "TemplateCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "CodexRuntime",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "CodexRuntimeCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "BatchPlan",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "BatchPlanCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    }
+  }
+}

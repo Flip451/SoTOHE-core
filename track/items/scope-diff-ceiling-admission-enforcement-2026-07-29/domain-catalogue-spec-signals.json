@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "bf4d8a475012f2234673802576ac9714cf8b5f2c625a1404047f50de2458a66c",
+  "signals": [
+    {
+      "type_name": "AdmissionDecision",
+      "signal": "blue",
+      "entry_hash": "bd6053234be534cc896924f4c917643ae0e89b5fb2b6cc367f66da4ebad8fe95"
+    },
+    {
+      "type_name": "AdmissionEvaluationError",
+      "signal": "blue",
+      "entry_hash": "675430bd788bfb7613dace83272aa5780a167d2ef14bafbafcf283a579f5cdff"
+    },
+    {
+      "type_name": "AdmissionRejection",
+      "signal": "blue",
+      "entry_hash": "ab4431adb0568c8370679ce7e33d36dfa02884afde730189a4ec39603f565592"
+    },
+    {
+      "type_name": "BatchDeclaration",
+      "signal": "blue",
+      "entry_hash": "c68b1c7efa85382b7b31fa1f39e3beaf30e3bac11df04be4453cf3c8b70a935d"
+    },
+    {
+      "type_name": "BatchId",
+      "signal": "blue",
+      "entry_hash": "9e32edf5f8fb54c36e21d78c62011ea76f108a08af8dbe5c101485ac5ef97250"
+    },
+    {
+      "type_name": "BatchPlanDocument",
+      "signal": "blue",
+      "entry_hash": "4d5045503c610845eab3c548e5cc7bb4b15dc9cf23cfbe76f9f5bbf50919bb5c"
+    },
+    {
+      "type_name": "BatchPlanGateOutcome",
+      "signal": "blue",
+      "entry_hash": "636bfedeeaa91d5be944c75de8eee52d819cc95e142178973dd188993883d19f"
+    },
+    {
+      "type_name": "BatchPlanGateViolation",
+      "signal": "blue",
+      "entry_hash": "df9896d58ab543b370fbbbec432793952d1cd86fb83f24d65df9ed4412933676"
+    },
+    {
+      "type_name": "BatchPlanValidationError",
+      "signal": "blue",
+      "entry_hash": "2dcab97da47e31e31f53ba3afb920fb86cc7f7368e26306058ec0c23c451efcc"
+    },
+    {
+      "type_name": "IndivisibilityJustification",
+      "signal": "blue",
+      "entry_hash": "af259ce0caad105b347e34e0b58c74ca32ffabf25681848a7da554f273b5fc64"
+    },
+    {
+      "type_name": "LineCount",
+      "signal": "blue",
+      "entry_hash": "79aaba102d5cf36a694bec3cbea8ba5a4e3e5d5296c5fa150cc8178cee224a6b"
+    },
+    {
+      "type_name": "MeasuredScopeDiff",
+      "signal": "blue",
+      "entry_hash": "ae642187e4dd614562066730d3333c9087bcdbc07778ce8f866e775af342678c"
+    },
+    {
+      "type_name": "NonEmptyGateViolations",
+      "signal": "blue",
+      "entry_hash": "d0ea2677333bb36104d69a380877bc882030b9fd8c55530e08dd7d8e2e24de20"
+    },
+    {
+      "type_name": "NonZeroLineCount",
+      "signal": "blue",
+      "entry_hash": "aba951bb7b2c0151d32e7e3dd59098ad3f65badee835ede3bc1111cf25a1c8f1"
+    },
+    {
+      "type_name": "ReviewScopeConfig",
+      "signal": "blue",
+      "entry_hash": "0b0529c4b8051737bcdda65d456930015dcc6db59980bdb1bda8a87285545731"
+    },
+    {
+      "type_name": "ScopeCeiling",
+      "signal": "blue",
+      "entry_hash": "55387230f8b94c4abb427cf919985ae0926adb0c47023e61859930f0ede63a54"
+    },
+    {
+      "type_name": "ScopeLineEstimate",
+      "signal": "blue",
+      "entry_hash": "924862c1d18441b24bf8934a1665ef4c5a329592094eaebd0cd4f6d4a75dde89"
+    },
+    {
+      "type_name": "TaskDecomposition",
+      "signal": "blue",
+      "entry_hash": "b3ecde71263acea8fae2caf39fd8080e4f639341ad7fdeede9982adb9430b614"
+    },
+    {
+      "type_name": "TaskEstimate",
+      "signal": "blue",
+      "entry_hash": "c7b4018456e32d9f67bc9269a44e933b0485656ce3fcf11f21678b19ebafacc2"
+    },
+    {
+      "type_name": "TrackTask",
+      "signal": "blue",
+      "entry_hash": "9c9aa4fca7ed1255af8266d88c255875a092e0c1b99beec425c7da9c8f2959a2"
+    },
+    {
+      "type_name": "ValidationError",
+      "signal": "blue",
+      "entry_hash": "ca0b3b379e0a4d0bcb1f5cde657365d52cebab4b3cbe8a55783410d826cd4e82"
+    },
+    {
+      "type_name": "domain::batch_plan::check_batch_plan",
+      "signal": "blue",
+      "entry_hash": "f389cfd7c43923759f4d8664be597fb1c9026d24fa2c01c2d3baafe1b26c708c"
+    },
+    {
+      "type_name": "domain::batch_plan::evaluate_admission",
+      "signal": "blue",
+      "entry_hash": "413de341f9236d4e374e13b571c359bcfb9272ca18754dcd8358bf01d01cc414"
+    }
+  ]
+}

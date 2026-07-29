@@ -1,0 +1,876 @@
+{
+  "crate_name": "usecase",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "batch_plan_reader",
+              "ty": "std::sync::Arc<dyn BatchPlanReaderPort>"
+            },
+            {
+              "name": "planned_task_reader",
+              "ty": "std::sync::Arc<dyn PlannedTaskReaderPort>"
+            },
+            {
+              "name": "scope_config_reader",
+              "ty": "std::sync::Arc<dyn ScopeConfigReaderPort>"
+            }
+          ],
+          "returns": "BatchPlanCheckInteractor"
+        }
+      ],
+      "type_name": "BatchPlanCheckInteractor"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "rejection",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&domain::batch_plan::AdmissionRejection>"
+        }
+      ],
+      "type_name": "TaskTransitionOutcome"
+    }
+  ],
+  "layer": "usecase",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "modify",
+      "for_type": "TaskOperationInteractor",
+      "trait_ref": "TaskOperationService"
+    },
+    {
+      "for_type": "BatchPlanReadError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "BatchPlanReadError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "BatchPlanReadError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "ScopeDiffMeasureError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ScopeDiffMeasureError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "ScopeDiffMeasureError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "BatchPlanCheckCommand",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "BatchPlanCheckCommand",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "BatchPlanCheckCommand",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "BatchPlanCheckCommand",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "BatchPlanCheckError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "BatchPlanCheckError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "BatchPlanCheckError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "BatchPlanCheckInteractor",
+      "trait_ref": "BatchPlanCheckService"
+    },
+    {
+      "for_type": "PlannedTaskReadError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "PlannedTaskReadError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "PlannedTaskReadError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "ScopeConfigReadError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ScopeConfigReadError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "ScopeConfigReadError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "TaskTransitionOutcome",
+      "trait_ref": "core::fmt::Debug"
+    }
+  ],
+  "traits": {
+    "BatchPlanCheckService": {
+      "action": "add",
+      "docs": "Primary port for the Phase 3 gate, driven by the CLI batch-plan check command. Type-design: the verdict is returned as data and the error channel is reserved for failures that prevented the check, so the two stay distinguishable at the adapter boundary. IN-06, IN-07, AC-06, AC-07.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "check",
+          "params": [
+            {
+              "name": "cmd",
+              "ty": "BatchPlanCheckCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<domain::batch_plan::BatchPlanGateOutcome, BatchPlanCheckError>"
+        }
+      ],
+      "module_path": "batch_plan",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
+    "BatchPlanReaderPort": {
+      "action": "add",
+      "docs": "Driven port with a single read operation returning a validated domain document; no write operation. Type-design: decoding stays in the adapter so the domain never sees the wire format. Blocking: the callers are single-shot CLI gates with no concurrency and no async runtime on this path, so is_async is false for every method here — matching the existing driven ports in this crate. IN-01, AC-01, AC-05.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "read",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<domain::batch_plan::BatchPlanDocument, BatchPlanReadError>"
+        }
+      ],
+      "module_path": "batch_plan",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
+    "PlannedTaskReaderPort": {
+      "action": "add",
+      "docs": "Driven port returning the track's tasks with their status and declared dependencies. Type-design: a separate port from the pre-existing plan-status reader, which returns an unordered map and drops both the commit-bearing status and the dependency declarations; returns whole TrackTask values rather than a near-duplicate VO (reuse decision), which is what carries the declared edges the batch-order check reads. Blocking: single-shot CLI callers, no async runtime on this path, so is_async is false. IN-07, IN-19, AC-07.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "read_planned_tasks",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<Vec<domain::TrackTask>, PlannedTaskReadError>"
+        }
+      ],
+      "module_path": "batch_plan",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
+    "ScopeConfigReaderPort": {
+      "action": "add",
+      "docs": "Driven port that loads the review scope configuration, the source of the per-scope ceilings. Type-design: a port rather than a pre-built injected value so composition roots stay zero-argument wiring accessors and the items directory travels per call. Blocking: single-shot CLI callers, no async runtime on this path, so is_async is false. IN-06, AC-08.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "read",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<domain::review_v2::ReviewScopeConfig, ScopeConfigReadError>"
+        }
+      ],
+      "module_path": "batch_plan",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
+    "ScopeDiffMeasurePort": {
+      "action": "add",
+      "docs": "Driven port that measures the actual per-scope diff for a track. Type-design: the port surface exposes only the resulting figures — the counting definition and base resolution are the adapter's responsibility. Blocking: the adapter shells out to git and the caller is a single-shot CLI gate, so is_async is false. IN-10, IN-14, AC-17, CN-05.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "measure_scope_diff",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<Vec<domain::batch_plan::MeasuredScopeDiff>, ScopeDiffMeasureError>"
+        }
+      ],
+      "module_path": "batch_plan",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-10",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-14",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-17",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "CN-05",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
+    "TaskOperationService": {
+      "action": "modify",
+      "docs": "Pre-existing primary port for track task mutations; transition_task's success type becomes TaskTransitionOutcome so an admission refusal travels as typed data. Type-design: no admission-specific method is added — the judgment stays inside transition_task's implementation; the other three operations and the error type are untouched. CN-10.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "transition_task",
+          "params": [
+            {
+              "name": "cmd",
+              "ty": "TaskTransitionCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<TaskTransitionOutcome, TaskOperationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "add_task",
+          "params": [
+            {
+              "name": "cmd",
+              "ty": "AddTaskCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<TaskOperationOutput, TaskOperationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "set_override",
+          "params": [
+            {
+              "name": "cmd",
+              "ty": "SetOverrideCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<TaskOperationOutput, TaskOperationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "clear_override",
+          "params": [
+            {
+              "name": "cmd",
+              "ty": "ClearOverrideCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<TaskOperationOutput, TaskOperationError>"
+        }
+      ],
+      "module_path": "task_ops",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    }
+  },
+  "types": {
+    "BatchPlanCheckCommand": {
+      "action": "add",
+      "docs": "Command object for the Phase 3 gate. Type-design: track_id is the domain identifier so the primary adapter validates once at the CLI boundary (R9); items_dir is a raw path with no domain meaning and travels with the command rather than with construction, which keeps the composition root a zero-argument wiring accessor. IN-06, AC-06.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "track_id",
+              "ty": "domain::TrackId"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "batch_plan",
+      "role": {
+        "Command": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "BatchPlanCheckError": {
+      "action": "add",
+      "docs": "Failures that prevented the Phase 3 gate from running, kept separate from the verdict (structural findings are data inside BatchPlanGateOutcome::Blocked). Type-design: message payloads use FreeText because they are opaque adapter diagnostics with no domain structure (R9 truly-opaque case). Construction owner: BatchPlanCheckInteractor mapping its port errors. IN-06, AC-05, AC-06, CN-09.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "BatchPlanNotFound",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "BatchPlanReadFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "message",
+                  "ty": "domain::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ImplPlanNotFound",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ImplPlanReadFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "message",
+                  "ty": "domain::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ScopeConfigReadFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "message",
+                  "ty": "domain::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "batch_plan",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "BatchPlanCheckInteractor": {
+      "action": "add",
+      "docs": "Implements BatchPlanCheckService: reads the batch plan, the planned tasks and the scope config through its three injected ports and delegates to check_batch_plan. Type-design: holds no ceiling arithmetic of its own, and an absent batch plan is mapped to an error rather than a pass — the opposite of the pre-review task-contract gate's absent-artifact tolerance. IN-06, IN-07, AC-05, AC-06, AC-07, AC-08, CN-09.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "batch_plan",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "BatchPlanReadError": {
+      "action": "add",
+      "docs": "Failure of the batch-plan reading port. Type-design: NotFound is its own variant because both callers act on it distinctly rather than folding it into a generic read failure; the message payload uses FreeText as an opaque adapter diagnostic (R9 truly-opaque case). IN-01, AC-05.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NotFound",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ReadFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "message",
+                  "ty": "domain::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "batch_plan",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "PlannedTaskReadError": {
+      "action": "add",
+      "docs": "Failure of the planned-task reading port. Type-design: NotFound is its own variant so an absent implementation plan is reported rather than treated as an empty task list; the message payload uses FreeText as an opaque adapter diagnostic (R9 truly-opaque case). IN-07, AC-07.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NotFound",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ReadFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "message",
+                  "ty": "domain::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "batch_plan",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "ScopeConfigReadError": {
+      "action": "add",
+      "docs": "Failure of the scope-configuration reading port. Type-design: covers only a configuration that could not be loaded — an unconfigured ceiling is ScopeCeiling::Unconstrained, not an error; the message payload uses FreeText as an opaque adapter diagnostic (R9 truly-opaque case). IN-06, AC-08.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ReadFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "message",
+                  "ty": "domain::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "batch_plan",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "ScopeDiffMeasureError": {
+      "action": "add",
+      "docs": "Failure of the per-scope diff measurement port. Type-design: covers only a measurement that could not be produced — base degradation is not modelled as a failure; the message payload uses FreeText as an opaque adapter diagnostic (R9 truly-opaque case). IN-10, IN-14, AC-17, CN-05.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "MeasureFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "message",
+                  "ty": "domain::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "batch_plan",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-14",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-17",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "TaskOperationInteractor": {
+      "action": "modify",
+      "docs": "Existing task-operation interactor; new() gains the batch-plan reader, scope-diff measurer and scope-config reader, and transition_task delegates the judgment to evaluate_admission. Type-design: the three admission collaborators are required rather than Option so no constructible interactor can transition without judging; the pre-existing branch_reader stays Option because that guard is disabled in repository-less test environments. Port calls are scoped by the items_dir already on TaskTransitionCommand, and planned tasks come from the existing store bound rather than a new port. A refusal is returned as TaskTransitionOutcome::Rejected with its typed payload intact, not flattened into the error channel, so TaskOperationError's declared shape stays baseline-identical. IN-09, IN-10, AC-10, AC-12, AC-13, CN-10.",
+      "generics": [
+        {
+          "bounds": [],
+          "name": "S"
+        }
+      ],
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "store",
+              "ty": "Arc<S>"
+            },
+            {
+              "name": "branch_reader",
+              "ty": "Option<Arc<dyn BranchReaderPort>>"
+            },
+            {
+              "name": "batch_plan_reader",
+              "ty": "Arc<dyn BatchPlanReaderPort>"
+            },
+            {
+              "name": "scope_diff_measurer",
+              "ty": "Arc<dyn ScopeDiffMeasurePort>"
+            },
+            {
+              "name": "scope_config_reader",
+              "ty": "Arc<dyn ScopeConfigReaderPort>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "task_ops",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-10",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "CN-10",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "TaskTransitionOutcome": {
+      "action": "add",
+      "docs": "Result of transition_task: the transition happened, or it was refused with the typed reason. Type-design: an admission refusal is a legitimate result rather than an exceptional condition, so it travels as data and keeps its scope, contribution, ceiling and batch payloads intact — the same outcome-as-data shape the Phase 3 gate uses for BatchPlanGateOutcome, instead of collapsing to a rendered string in the error channel. This also leaves TaskOperationError's declared shape identical to its baseline. Role Dto in usecase (R1 △, justification): it is the output carrier of the pre-existing TaskOperationOutput DTO in this same module, crossing the usecase-to-driver boundary; it is not identified by value equality, so ValueObject would be the wrong classification. IN-09, IN-10, AC-10, AC-12.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Transitioned",
+            "payload": {
+              "fields": [
+                "TaskOperationOutput"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Rejected",
+            "payload": {
+              "fields": [
+                "domain::batch_plan::AdmissionRejection"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "task_ops",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-10",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    }
+  }
+}

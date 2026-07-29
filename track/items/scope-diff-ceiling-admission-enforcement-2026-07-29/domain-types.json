@@ -1,0 +1,2554 @@
+{
+  "crate_name": "domain",
+  "functions": {
+    "domain::batch_plan::check_batch_plan": {
+      "action": "add",
+      "docs": "Pure Phase 3 terminal gate over a declared batch plan. Takes the batch plan, the scope config and the impl-plan tasks; returns the verdict as data. Type-design: the task parameter carries whole TrackTask values rather than ids because the dependency-edge check reads each task's declared depends_on, and no dependency field is required on the batch plan itself. IN-06, IN-07, AC-06, AC-07, AC-08, CN-02.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "plan",
+          "ty": "&BatchPlanDocument"
+        },
+        {
+          "name": "scope_config",
+          "ty": "&ReviewScopeConfig"
+        },
+        {
+          "name": "planned_tasks",
+          "ty": "&[TrackTask]"
+        }
+      ],
+      "returns": "BatchPlanGateOutcome",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "domain::batch_plan::evaluate_admission": {
+      "action": "add",
+      "docs": "Pure admission judgment for a todo -> in_progress transition. Takes the batch plan, the scope config, the candidate task, the committed / in-progress task sets and the measured per-scope diffs; returns the verdict as data. IN-09, IN-10, IN-11, AC-10, AC-11, AC-12, AC-14, CN-02, CN-03.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "plan",
+          "ty": "&BatchPlanDocument"
+        },
+        {
+          "name": "scope_config",
+          "ty": "&ReviewScopeConfig"
+        },
+        {
+          "name": "candidate",
+          "ty": "&TaskId"
+        },
+        {
+          "name": "committed_task_ids",
+          "ty": "&std::collections::BTreeSet<TaskId>"
+        },
+        {
+          "name": "in_progress_task_ids",
+          "ty": "&std::collections::BTreeSet<TaskId>"
+        },
+        {
+          "name": "measured",
+          "ty": "&[MeasuredScopeDiff]"
+        }
+      ],
+      "returns": "Result<AdmissionDecision, AdmissionEvaluationError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-10",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-11",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-11",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    }
+  },
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "u32"
+            }
+          ],
+          "returns": "LineCount"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "value",
+          "params": [],
+          "receiver": "&self",
+          "returns": "u32"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "saturating_add",
+          "params": [
+            {
+              "name": "other",
+              "ty": "&LineCount"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "LineCount"
+        }
+      ],
+      "type_name": "LineCount"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "resolve",
+          "params": [
+            {
+              "name": "configured",
+              "ty": "Option<u32>"
+            }
+          ],
+          "returns": "ScopeCeiling"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "admits",
+          "params": [
+            {
+              "name": "total",
+              "ty": "&LineCount"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "bool"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "limit",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<LineCount>"
+        }
+      ],
+      "type_name": "ScopeCeiling"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "text",
+              "ty": "&str"
+            }
+          ],
+          "returns": "Result<IndivisibilityJustification, BatchPlanValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "type_name": "IndivisibilityJustification"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "justification",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&IndivisibilityJustification>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "is_indivisible",
+          "params": [],
+          "receiver": "&self",
+          "returns": "bool"
+        }
+      ],
+      "type_name": "TaskDecomposition"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "scope",
+              "ty": "ScopeName"
+            },
+            {
+              "name": "production_lines",
+              "ty": "LineCount"
+            },
+            {
+              "name": "test_lines",
+              "ty": "LineCount"
+            }
+          ],
+          "returns": "ScopeLineEstimate"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "scope",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ScopeName"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "production_lines",
+          "params": [],
+          "receiver": "&self",
+          "returns": "LineCount"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "test_lines",
+          "params": [],
+          "receiver": "&self",
+          "returns": "LineCount"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "total",
+          "params": [],
+          "receiver": "&self",
+          "returns": "LineCount"
+        }
+      ],
+      "type_name": "ScopeLineEstimate"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "task_id",
+              "ty": "TaskId"
+            },
+            {
+              "name": "scope_estimates",
+              "ty": "Vec<ScopeLineEstimate>"
+            },
+            {
+              "name": "decomposition",
+              "ty": "TaskDecomposition"
+            }
+          ],
+          "returns": "Result<TaskEstimate, BatchPlanValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "task_id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TaskId"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "scope_estimates",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[ScopeLineEstimate]"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "decomposition",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TaskDecomposition"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "estimate_for",
+          "params": [
+            {
+              "name": "scope",
+              "ty": "&ScopeName"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Option<&ScopeLineEstimate>"
+        }
+      ],
+      "type_name": "TaskEstimate"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "&str"
+            }
+          ],
+          "returns": "Result<BatchId, BatchPlanValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "type_name": "BatchId"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "id",
+              "ty": "BatchId"
+            },
+            {
+              "name": "task_ids",
+              "ty": "Vec<TaskId>"
+            }
+          ],
+          "returns": "Result<BatchDeclaration, BatchPlanValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&BatchId"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "task_ids",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[TaskId]"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "contains",
+          "params": [
+            {
+              "name": "task_id",
+              "ty": "&TaskId"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "bool"
+        }
+      ],
+      "type_name": "BatchDeclaration"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "TrackId"
+            },
+            {
+              "name": "task_estimates",
+              "ty": "Vec<TaskEstimate>"
+            },
+            {
+              "name": "batches",
+              "ty": "Vec<BatchDeclaration>"
+            }
+          ],
+          "returns": "Result<BatchPlanDocument, BatchPlanValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "track_id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TrackId"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "task_estimates",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[TaskEstimate]"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "batches",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[BatchDeclaration]"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "estimate_for",
+          "params": [
+            {
+              "name": "task_id",
+              "ty": "&TaskId"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Option<&TaskEstimate>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "batch_of",
+          "params": [
+            {
+              "name": "task_id",
+              "ty": "&TaskId"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Option<&BatchDeclaration>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "scope_total",
+          "params": [
+            {
+              "name": "batch",
+              "ty": "&BatchDeclaration"
+            },
+            {
+              "name": "scope",
+              "ty": "&ScopeName"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "LineCount"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "current_batch",
+          "params": [
+            {
+              "name": "committed_task_ids",
+              "ty": "&std::collections::BTreeSet<TaskId>"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Option<&BatchDeclaration>"
+        }
+      ],
+      "type_name": "BatchPlanDocument"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "from_violations",
+          "params": [
+            {
+              "name": "violations",
+              "ty": "Vec<BatchPlanGateViolation>"
+            }
+          ],
+          "returns": "BatchPlanGateOutcome"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "violations",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&NonEmptyGateViolations>"
+        }
+      ],
+      "type_name": "BatchPlanGateOutcome"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "scope",
+              "ty": "ScopeName"
+            },
+            {
+              "name": "lines",
+              "ty": "LineCount"
+            }
+          ],
+          "returns": "MeasuredScopeDiff"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "scope",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ScopeName"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "lines",
+          "params": [],
+          "receiver": "&self",
+          "returns": "LineCount"
+        }
+      ],
+      "type_name": "MeasuredScopeDiff"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "is_admitted",
+          "params": [],
+          "receiver": "&self",
+          "returns": "bool"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "rejection",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&AdmissionRejection>"
+        }
+      ],
+      "type_name": "AdmissionDecision"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "LineCount"
+            }
+          ],
+          "returns": "Option<NonZeroLineCount>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "get",
+          "params": [],
+          "receiver": "&self",
+          "returns": "LineCount"
+        }
+      ],
+      "type_name": "NonZeroLineCount"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "violations",
+              "ty": "Vec<BatchPlanGateViolation>"
+            }
+          ],
+          "returns": "Option<NonEmptyGateViolations>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_slice",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[BatchPlanGateViolation]"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "into_vec",
+          "params": [],
+          "receiver": "self",
+          "returns": "Vec<BatchPlanGateViolation>"
+        }
+      ],
+      "type_name": "NonEmptyGateViolations"
+    }
+  ],
+  "layer": "domain",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "ReviewScopeConfig",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "TrackTask",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "TrackTask",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "modify",
+      "for_type": "TrackTask",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "modify",
+      "for_type": "TrackTask",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "modify",
+      "for_type": "ValidationError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "ValidationError",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "modify",
+      "for_type": "ValidationError",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "modify",
+      "for_type": "ValidationError",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "modify",
+      "for_type": "ValidationError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "modify",
+      "for_type": "ValidationError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "reference",
+      "for_type": "DomainError",
+      "trait_ref": "core::convert::From<ValidationError>"
+    },
+    {
+      "for_type": "LineCount",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "LineCount",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "LineCount",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "LineCount",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "LineCount",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "LineCount",
+      "trait_ref": "core::cmp::PartialOrd"
+    },
+    {
+      "for_type": "LineCount",
+      "trait_ref": "core::cmp::Ord"
+    },
+    {
+      "for_type": "ScopeCeiling",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ScopeCeiling",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ScopeCeiling",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ScopeCeiling",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "IndivisibilityJustification",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "IndivisibilityJustification",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "IndivisibilityJustification",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "IndivisibilityJustification",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "TaskDecomposition",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TaskDecomposition",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "TaskDecomposition",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TaskDecomposition",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ScopeLineEstimate",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ScopeLineEstimate",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ScopeLineEstimate",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ScopeLineEstimate",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "TaskEstimate",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TaskEstimate",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "TaskEstimate",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TaskEstimate",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "BatchId",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "BatchId",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "BatchId",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "BatchId",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "BatchDeclaration",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "BatchDeclaration",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "BatchDeclaration",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "BatchDeclaration",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "BatchPlanDocument",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "BatchPlanDocument",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "BatchPlanDocument",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "BatchPlanDocument",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "BatchPlanValidationError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "BatchPlanValidationError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "BatchPlanValidationError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "BatchPlanGateViolation",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "BatchPlanGateViolation",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "BatchPlanGateViolation",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "BatchPlanGateViolation",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "BatchPlanGateOutcome",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "BatchPlanGateOutcome",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "BatchPlanGateOutcome",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "BatchPlanGateOutcome",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "MeasuredScopeDiff",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "MeasuredScopeDiff",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "MeasuredScopeDiff",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "MeasuredScopeDiff",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "AdmissionRejection",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "AdmissionRejection",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "AdmissionRejection",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "AdmissionRejection",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "AdmissionRejection",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "AdmissionDecision",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "AdmissionDecision",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "AdmissionDecision",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "AdmissionDecision",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "AdmissionEvaluationError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "AdmissionEvaluationError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "AdmissionEvaluationError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "NonZeroLineCount",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "NonZeroLineCount",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "NonZeroLineCount",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "NonZeroLineCount",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "NonZeroLineCount",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "NonZeroLineCount",
+      "trait_ref": "core::cmp::PartialOrd"
+    },
+    {
+      "for_type": "NonZeroLineCount",
+      "trait_ref": "core::cmp::Ord"
+    },
+    {
+      "for_type": "NonEmptyGateViolations",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "NonEmptyGateViolations",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "NonEmptyGateViolations",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "NonEmptyGateViolations",
+      "trait_ref": "core::cmp::Eq"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "AdmissionDecision": {
+      "action": "add",
+      "docs": "Admission verdict. Type-design: enum-first — Admitted carries no payload, Rejected always carries the reason, so an admitted transition cannot travel with a rejection attached. Precondition failures are errors, not variants here. IN-09, IN-10, AC-10, AC-11.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Admitted",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Rejected",
+            "payload": {
+              "fields": [
+                "AdmissionRejection"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "batch_plan",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-10",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-11",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "AdmissionEvaluationError": {
+      "action": "add",
+      "docs": "Failure of the admission evaluation, distinct from a rejection. Type-design: single variant — every other malformed-plan shape is already rejected by BatchPlanDocument::new, so no unreachable variant is minted. Construction owner: evaluate_admission. IN-11, AC-13.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "MissingTaskEstimate",
+            "payload": {
+              "fields": [
+                {
+                  "name": "task_id",
+                  "ty": "TaskId"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "batch_plan",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-11",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-13",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "AdmissionRejection": {
+      "action": "add",
+      "docs": "Why a transition was refused. Type-design: carries the arithmetic rather than a rendered sentence (R11), and prior_contribution is NonZeroLineCount so a ceiling rejection is unconstructible at zero prior contribution — that makes CN-03 structural rather than documented. Display renders it at the CLI boundary. Construction owner: evaluate_admission. IN-09, IN-10, AC-10, AC-12, CN-03.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NotCurrentBatchMember",
+            "payload": {
+              "fields": [
+                {
+                  "name": "task_id",
+                  "ty": "TaskId"
+                },
+                {
+                  "name": "task_batch",
+                  "ty": "BatchId"
+                },
+                {
+                  "name": "current_batch",
+                  "ty": "BatchId"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ScopeCeilingWouldBeExceeded",
+            "payload": {
+              "fields": [
+                {
+                  "name": "scope",
+                  "ty": "ScopeName"
+                },
+                {
+                  "name": "prior_contribution",
+                  "ty": "NonZeroLineCount"
+                },
+                {
+                  "name": "candidate_estimate",
+                  "ty": "LineCount"
+                },
+                {
+                  "name": "ceiling",
+                  "ty": "LineCount"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "batch_plan",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-10",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "BatchDeclaration": {
+      "action": "add",
+      "docs": "One declared batch: identifier plus ordered member task ids. Type-design: declares no line figures, so no declared value can desync from the member estimates; the constructor rejects an empty member list. IN-03, AC-03, CN-01.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "batch_plan",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "BatchId": {
+      "action": "add",
+      "docs": "Identifier of one declared batch. Type-design: R9 — non-empty constraint, so not a bare String; private tuple newtype with constructor validation. Reuse check: TrackId / TaskId identify other aggregates and NonEmptyString drops the concept name. IN-03, AC-03.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "batch_plan",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "BatchPlanDocument": {
+      "action": "add",
+      "docs": "Domain model of batch-plan.json. Type-design: the constructor owns every file-internal invariant so the codec re-implements none of them; scope_total derives per-scope figures instead of reading a declared total; current_batch is a pure derivation from the committed-task set. Exposes no schema-version accessor — wire-format metadata stays in the infrastructure DTO and codec, keeping this aggregate independent of the serialised representation. Cross-file agreement with impl-plan.json is not checked here — that owner is check_batch_plan. IN-01, IN-05, AC-01, AC-04, AC-10, CN-01.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "batch_plan",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "BatchPlanGateOutcome": {
+      "action": "add",
+      "docs": "Phase 3 gate verdict. Type-design: Blocked carries NonEmptyGateViolations, so an empty blocked verdict is unrepresentable rather than rejected at runtime, and from_violations is total — the entry declares no error channel and no shared error type. IN-06, AC-06.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Passed",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Blocked",
+            "payload": {
+              "fields": [
+                {
+                  "name": "violations",
+                  "ty": "NonEmptyGateViolations"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "batch_plan",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "BatchPlanGateViolation": {
+      "action": "add",
+      "docs": "One structural finding of the Phase 3 gate. Type-design: modelled as data inside the outcome rather than as an error type; contributor and batch payloads carry ids rather than counts (R11). OversizeScopeHasMultipleContributors is owned here rather than by the codec because deciding it requires the resolved ceiling, and check_batch_plan is the only declared operation that receives the scope configuration. DependencyInLaterBatch names both endpoints of the offending declared edge and both their batches, so the report identifies the relationship rather than an ordering artefact; it is decided on the edges declared in impl-plan, not on plan order, and an undeclared task pair produces no finding. Construction owner: check_batch_plan. IN-06, IN-07, AC-06, AC-07.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "CeilingExceeded",
+            "payload": {
+              "fields": [
+                {
+                  "name": "batch_id",
+                  "ty": "BatchId"
+                },
+                {
+                  "name": "scope",
+                  "ty": "ScopeName"
+                },
+                {
+                  "name": "total",
+                  "ty": "LineCount"
+                },
+                {
+                  "name": "ceiling",
+                  "ty": "LineCount"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "OversizeScopeHasMultipleContributors",
+            "payload": {
+              "fields": [
+                {
+                  "name": "batch_id",
+                  "ty": "BatchId"
+                },
+                {
+                  "name": "scope",
+                  "ty": "ScopeName"
+                },
+                {
+                  "name": "indivisible_task",
+                  "ty": "TaskId"
+                },
+                {
+                  "name": "other_contributors",
+                  "ty": "Vec<TaskId>"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "UnknownTaskRef",
+            "payload": {
+              "fields": [
+                {
+                  "name": "task_id",
+                  "ty": "TaskId"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "UnplannedTask",
+            "payload": {
+              "fields": [
+                {
+                  "name": "task_id",
+                  "ty": "TaskId"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "DependencyInLaterBatch",
+            "payload": {
+              "fields": [
+                {
+                  "name": "task_id",
+                  "ty": "TaskId"
+                },
+                {
+                  "name": "task_batch",
+                  "ty": "BatchId"
+                },
+                {
+                  "name": "dependency",
+                  "ty": "TaskId"
+                },
+                {
+                  "name": "dependency_batch",
+                  "ty": "BatchId"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "batch_plan",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "BatchPlanValidationError": {
+      "action": "add",
+      "docs": "Rejection of a batch plan by BatchPlanDocument::new, covering the invariants decidable from the file alone. Construction owners: EmptyJustification from IndivisibilityJustification::try_new, EmptyBatchId from BatchId::try_new, EmptyBatch from BatchDeclaration::new, DuplicateScopeEstimate from TaskEstimate::new, the rest from BatchPlanDocument::new. Type-design: DuplicateBatchMembership lists the offending batch ids rather than counting them (R11). Invariants that need the resolved ceiling are not decidable here because this constructor takes no scope configuration; their owner is check_batch_plan, which does. IN-05, AC-04.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "EmptyJustification",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "EmptyBatchId",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "EmptyBatch",
+            "payload": {
+              "fields": [
+                {
+                  "name": "batch_id",
+                  "ty": "BatchId"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "DuplicateTaskEstimate",
+            "payload": {
+              "fields": [
+                {
+                  "name": "task_id",
+                  "ty": "TaskId"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "DuplicateScopeEstimate",
+            "payload": {
+              "fields": [
+                {
+                  "name": "task_id",
+                  "ty": "TaskId"
+                },
+                {
+                  "name": "scope",
+                  "ty": "ScopeName"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "DuplicateBatchId",
+            "payload": {
+              "fields": [
+                {
+                  "name": "batch_id",
+                  "ty": "BatchId"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "MissingTaskEstimate",
+            "payload": {
+              "fields": [
+                {
+                  "name": "task_id",
+                  "ty": "TaskId"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "UnassignedTask",
+            "payload": {
+              "fields": [
+                {
+                  "name": "task_id",
+                  "ty": "TaskId"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "DuplicateBatchMembership",
+            "payload": {
+              "fields": [
+                {
+                  "name": "task_id",
+                  "ty": "TaskId"
+                },
+                {
+                  "name": "batch_ids",
+                  "ty": "Vec<BatchId>"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "batch_plan",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "IndivisibilityJustification": {
+      "action": "add",
+      "docs": "The planner's stated indivisibility reason. Type-design: R9 — non-emptiness is a real constraint, so not a bare String; private tuple newtype with constructor validation. Reuse check: FreeText carries no non-empty guarantee and NonEmptyString drops the concept name. IN-04, AC-03, CN-02, OUT-07.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "batch_plan",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "LineCount": {
+      "action": "add",
+      "docs": "Source-line quantity. Type-design: R9 unit-bearing concept, so estimates, measured diffs and ceilings are never bare u32; private tuple newtype with an infallible constructor, Ord for the ceiling comparison and a saturating sum for accumulation. Reuse check: no existing domain quantity newtype covers source lines (NonEmptyString / FreeText are text wrappers). IN-02, AC-02.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "batch_plan",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "MeasuredScopeDiff": {
+      "action": "add",
+      "docs": "Measured diff size for one review scope. Type-design: carries only the resulting figure; the counting rule and base resolution live in the measuring adapter, not here. IN-10, IN-14, AC-17, CN-05.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "batch_plan",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-10",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-14",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-17",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "NonEmptyGateViolations": {
+      "action": "add",
+      "docs": "A violation list proven non-empty. Type-design: carries the Blocked verdict's non-emptiness in the type rather than in a constructor check, so BatchPlanGateOutcome::from_violations is total and no error type is needed for an empty list. Follows the existing NonEmptyReviewerFindings pattern in this crate. IN-06, AC-06, AC-07.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "batch_plan",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "NonZeroLineCount": {
+      "action": "add",
+      "docs": "A LineCount proven non-zero. Type-design: makes CN-03 structural rather than documented — AdmissionRejection::ScopeCeilingWouldBeExceeded carries this type, so a ceiling rejection cannot be constructed unless a non-zero prior contribution was obtained first. try_new returns Option because the zero case is the admit branch, not an error. Private tuple newtype (prefer-type-safe-abstractions: Newtype / Make Illegal States Unrepresentable). CN-03, IN-10, AC-11.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "batch_plan",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-03",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-10",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-11",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "ReviewScopeConfig": {
+      "action": "reference",
+      "docs": "Pre-existing scope-classification and ceiling configuration; unchanged by this track, declared for edge exposure. Its diff_ceiling_for_scope gains its first production callers here (check_batch_plan / evaluate_admission); the Option<u32> return is left as-is because this is a reference entry, and ScopeCeiling::resolve converts it. Role DomainService follows the classification an earlier track recorded for this type (R6: field-holding domain behaviour, no injected dependencies, no state transitions). IN-06, AC-08.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&TrackId"
+            },
+            {
+              "name": "entries",
+              "ty": "Vec<(String, Vec<String>, Option<String>, Option<u32>)>"
+            },
+            {
+              "name": "operational",
+              "ty": "Vec<String>"
+            },
+            {
+              "name": "other_track",
+              "ty": "Vec<String>"
+            },
+            {
+              "name": "default_diff_ceiling",
+              "ty": "Option<u32>"
+            }
+          ],
+          "returns": "Result<ReviewScopeConfig, ScopeConfigError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "diff_ceiling_for_scope",
+          "params": [
+            {
+              "name": "scope",
+              "ty": "&ScopeName"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Option<u32>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "classify",
+          "params": [
+            {
+              "name": "files",
+              "ty": "&[FilePath]"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "HashMap<ScopeName, Vec<FilePath>>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "get_scope_names",
+          "params": [
+            {
+              "name": "files",
+              "ty": "&[FilePath]"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "HashSet<ScopeName>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "contains_scope",
+          "params": [
+            {
+              "name": "scope",
+              "ty": "&ScopeName"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "bool"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "all_scope_names",
+          "params": [],
+          "receiver": "&self",
+          "returns": "HashSet<ScopeName>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "briefing_file_for_scope",
+          "params": [
+            {
+              "name": "scope",
+              "ty": "&ScopeName"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Option<&str>"
+        }
+      ],
+      "module_path": "review_v2::scope_config",
+      "role": {
+        "DomainService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "ScopeCeiling": {
+      "action": "add",
+      "docs": "Resolved per-scope diff ceiling. Type-design: enum-first rendering of the Option<u32> the config accessor returns, so the unconstrained state is a named state rather than a missing number (prefer-type-safe-abstractions: Option-None mapping 1:1 to a state). resolve is the single conversion point from the config boundary into LineCount; admits is the only comparison both callers use. IN-06, AC-08.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Unconstrained",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Limited",
+            "payload": {
+              "fields": [
+                "LineCount"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "batch_plan",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "ScopeLineEstimate": {
+      "action": "add",
+      "docs": "One task's declared estimate for one review scope. Type-design: total() is the only quantity the ceiling comparison consumes, so the production/test split stays informational and creates no second notion of size. IN-02, AC-02.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "batch_plan",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "TaskDecomposition": {
+      "action": "add",
+      "docs": "Decomposable | Indivisible(justification). Type-design: the Phase 1 contract left this representation to type design; Option-None maps 1:1 to a named state, so enum-first per prefer-type-safe-abstractions — a decomposable task cannot carry a justification and an indivisible one cannot lack it. The null-or-string wire form lives on TaskEstimateDto.oversize_justification and converts here on decode (domain stays serde-free). IN-04, AC-03.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Decomposable",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Indivisible",
+            "payload": {
+              "fields": [
+                "IndivisibilityJustification"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "batch_plan",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "TaskEstimate": {
+      "action": "add",
+      "docs": "One task's per-scope estimates plus its decomposition state. Type-design: the constructor rejects a repeated scope so a task cannot declare two competing figures for one scope. IN-02, IN-04, AC-02, AC-03, OUT-10.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "batch_plan",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "TrackTask": {
+      "action": "modify",
+      "docs": "Existing task record; gains an optional declared dependency list and its accessor, plus a constructor that accepts one. Type-design: dependencies are declared on the task SoT and fixed in the same single write as the task list, so no separate artifact holds them; an empty list and an omitted list are the same unstated state, which is why the field is a plain Vec rather than an Option. with_dependencies is total — every parameter is an already-validated type, so it takes NonEmptyString rather than a raw string and returns Self with no error channel; the description's non-emptiness is established once at the boundary that holds the raw value, and the graph-level dependency invariants belong to the plan-document constructor, not here. The two pre-existing constructors keep their baseline fallible signatures. Role Entity with identity accessor id — it is identified by its id and carries a mutating state machine, so ValueObject does not apply. IN-19, AC-21.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "id",
+              "ty": "TaskId"
+            },
+            {
+              "name": "description",
+              "ty": "impl Into"
+            }
+          ],
+          "returns": "Result<Self, ValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "with_status",
+          "params": [
+            {
+              "name": "id",
+              "ty": "TaskId"
+            },
+            {
+              "name": "description",
+              "ty": "impl Into"
+            },
+            {
+              "name": "status",
+              "ty": "TaskStatus"
+            }
+          ],
+          "returns": "Result<Self, ValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "with_dependencies",
+          "params": [
+            {
+              "name": "id",
+              "ty": "TaskId"
+            },
+            {
+              "name": "description",
+              "ty": "NonEmptyString"
+            },
+            {
+              "name": "status",
+              "ty": "TaskStatus"
+            },
+            {
+              "name": "depends_on",
+              "ty": "Vec<TaskId>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "depends_on",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[TaskId]"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TaskId"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "description",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "status",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TaskStatus"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "transition",
+          "params": [
+            {
+              "name": "transition",
+              "ty": "TaskTransition"
+            }
+          ],
+          "receiver": "&mut self",
+          "returns": "Result<(), TransitionError>"
+        }
+      ],
+      "module_path": "track",
+      "role": {
+        "Entity": {
+          "identity": {
+            "method_name": "id"
+          }
+        }
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-19",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-21",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "ValidationError": {
+      "action": "modify",
+      "docs": "Existing domain validation error; gains three variants for the declared dependency invariants. Type-design: they sit here beside the existing plan referential-integrity variants because the checks run at the same position — inside the plan document constructor — rather than in a separate error type. The payloads carry TaskId rather than the DiagnosticMessage the older neighbours use, so the reported endpoints stay typed (R11); the older variants keep their baseline payloads. The thirty-seven pre-existing variants are restated only because a modify entry must declare the full post-modification set. IN-20, AC-22.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "EmptyString",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "InvalidTrackId",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidTaskId",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidCommitHash",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidTimestamp",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidTrackBranch",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "BranchIdMismatch",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage",
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "StatusOverrideMismatch",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage",
+                "DiagnosticMessage",
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "EmptyTrackTitle",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "EmptyTaskDescription",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "EmptyPlanSectionId",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "EmptyPlanSectionTitle",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "DuplicateTaskId",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "DuplicatePlanSectionId",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "UnknownTaskReference",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "DuplicateTaskReference",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "UnreferencedTask",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "OverrideIncompatibleWithResolvedTasks",
+            "payload": {
+              "fields": [
+                "TrackStatus"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "TrackActivationRequiresPlanningOnly",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage",
+                "TrackStatus"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "TrackActivationRequiresSchemaV3",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage",
+                "u32"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "TrackAlreadyMaterialized",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage",
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "UnsupportedTargetStatus",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SectionNotFound",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "NoSectionsAvailable",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "TaskDescriptionMutated",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "TaskRemoved",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "DuplicateElementId",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidLayerId",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidSpecElementId",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "EmptyAdrAnchor",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "EmptyConventionAnchor",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "InvalidContentHash",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "EmptyInformalGroundSummary",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "MultiLineInformalGroundSummary",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "EmptyDecisionGroundRef",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "InvalidObligationMinimum",
+            "payload": {
+              "fields": [
+                "usize"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidDetectionRate",
+            "payload": {
+              "fields": [
+                "u8"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "UnknownDependencyReference",
+            "payload": {
+              "fields": [
+                {
+                  "name": "task_id",
+                  "ty": "TaskId"
+                },
+                {
+                  "name": "dependency",
+                  "ty": "TaskId"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "DependencyCycle",
+            "payload": {
+              "fields": [
+                {
+                  "name": "task_ids",
+                  "ty": "Vec<TaskId>"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "PlanOrderViolatesDependency",
+            "payload": {
+              "fields": [
+                {
+                  "name": "task_id",
+                  "ty": "TaskId"
+                },
+                {
+                  "name": "dependency",
+                  "ty": "TaskId"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "error",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-20",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-22",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    }
+  }
+}

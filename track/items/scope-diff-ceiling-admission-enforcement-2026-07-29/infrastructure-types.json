@@ -1,0 +1,620 @@
+{
+  "crate_name": "infrastructure",
+  "functions": {
+    "infrastructure::batch_plan_codec::decode": {
+      "action": "add",
+      "docs": "Decodes batch-plan.json text into the validated domain document. Type-design: delegates every file-internal invariant to BatchPlanDocument::new instead of re-implementing it here; no encode counterpart is declared. IN-05, AC-04.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "json",
+          "ty": "&str"
+        }
+      ],
+      "returns": "Result<domain::batch_plan::BatchPlanDocument, BatchPlanCodecError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    }
+  },
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "FsBatchPlanReader"
+        }
+      ],
+      "type_name": "FsBatchPlanReader"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "GitScopeDiffMeasurer"
+        }
+      ],
+      "type_name": "GitScopeDiffMeasurer"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "FsPlannedTaskReader"
+        }
+      ],
+      "type_name": "FsPlannedTaskReader"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "FsReviewScopeConfigReader"
+        }
+      ],
+      "type_name": "FsReviewScopeConfigReader"
+    }
+  ],
+  "layer": "infrastructure",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "modify",
+      "for_type": "ImplPlanTaskDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "ImplPlanTaskDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "modify",
+      "for_type": "ImplPlanTaskDto",
+      "trait_ref": "serde_core::ser::Serialize"
+    },
+    {
+      "action": "modify",
+      "for_type": "ImplPlanTaskDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "for_type": "ScopeLineEstimateDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ScopeLineEstimateDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "for_type": "TaskEstimateDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TaskEstimateDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "for_type": "BatchDeclarationDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "BatchDeclarationDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "for_type": "BatchPlanDocumentDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "BatchPlanDocumentDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "for_type": "BatchPlanCodecError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "BatchPlanCodecError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "BatchPlanCodecError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "FsBatchPlanReader",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "FsBatchPlanReader",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "for_type": "GitScopeDiffMeasurer",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "for_type": "FsBatchPlanReader",
+      "trait_ref": "usecase::batch_plan::BatchPlanReaderPort"
+    },
+    {
+      "for_type": "GitScopeDiffMeasurer",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "GitScopeDiffMeasurer",
+      "trait_ref": "usecase::batch_plan::ScopeDiffMeasurePort"
+    },
+    {
+      "for_type": "FsPlannedTaskReader",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "FsPlannedTaskReader",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "for_type": "FsPlannedTaskReader",
+      "trait_ref": "usecase::batch_plan::PlannedTaskReaderPort"
+    },
+    {
+      "for_type": "FsReviewScopeConfigReader",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "FsReviewScopeConfigReader",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "for_type": "FsReviewScopeConfigReader",
+      "trait_ref": "usecase::batch_plan::ScopeConfigReaderPort"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "BatchDeclarationDto": {
+      "action": "add",
+      "docs": "Deserialization mirror of one batches entry. Type-design: no line figures on the wire, and both fields are typed as their domain identifiers through field deserializers rather than raw Strings (R9 serde-boundary rule). IN-03, IN-05, AC-03, CN-01.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "id",
+              "ty": "domain::batch_plan::BatchId"
+            },
+            {
+              "name": "task_ids",
+              "ty": "Vec<domain::TaskId>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "batch_plan_codec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "BatchPlanCodecError": {
+      "action": "add",
+      "docs": "Rejection produced while decoding batch-plan.json. Type-design: InvalidDocument carries the domain validation error unchanged rather than flattening it to text (R11); InvalidJson's message and the observed schema version are opaque values (R9 truly-opaque case). Construction owner: the decode function. IN-05, AC-04.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "InvalidJson",
+            "payload": {
+              "fields": [
+                {
+                  "name": "message",
+                  "ty": "domain::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "UnsupportedSchemaVersion",
+            "payload": {
+              "fields": [
+                {
+                  "name": "found",
+                  "ty": "u32"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "InvalidDocument",
+            "payload": {
+              "fields": [
+                {
+                  "name": "source",
+                  "ty": "domain::batch_plan::BatchPlanValidationError"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "batch_plan_codec",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "BatchPlanDocumentDto": {
+      "action": "add",
+      "docs": "Deserialization mirror of batch-plan.json; derives Deserialize only. Type-design: track_id is the domain identifier via a field deserializer (R9 serde-boundary rule); schema_version stays u32 as an opaque version tag (R9 truly-opaque case), and this field plus the expected-version constant are the sole home of schema-version handling, which the domain document does not carry. IN-01, IN-05, AC-01, AC-04.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "schema_version",
+              "ty": "u32"
+            },
+            {
+              "name": "track_id",
+              "ty": "domain::TrackId"
+            },
+            {
+              "name": "task_estimates",
+              "ty": "Vec<TaskEstimateDto>"
+            },
+            {
+              "name": "batches",
+              "ty": "Vec<BatchDeclarationDto>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "batch_plan_codec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "FsBatchPlanReader": {
+      "action": "add",
+      "docs": "Implements BatchPlanReaderPort over track/items/<id>/batch-plan.json. Type-design: file absence maps to the port's NotFound state rather than an empty plan; unit struct constructed with no arguments so composition roots stay zero-argument wiring accessors. IN-01, AC-05, CN-09.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "batch_plan_reader",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "FsPlannedTaskReader": {
+      "action": "add",
+      "docs": "Implements PlannedTaskReaderPort: reads impl-plan.json and returns its tasks in declaration order with their status. Type-design: read-only, and a unit struct constructed with no arguments so composition roots stay zero-argument wiring accessors. IN-07, AC-07.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "planned_task_reader",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "FsReviewScopeConfigReader": {
+      "action": "add",
+      "docs": "Implements ScopeConfigReaderPort, reusing the existing scope-config loader rather than reparsing the file. Type-design: unit struct constructed with no arguments so composition roots stay zero-argument wiring accessors. IN-06, AC-08, OUT-08.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "review_scope_config_reader",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "GitScopeDiffMeasurer": {
+      "action": "add",
+      "docs": "Implements ScopeDiffMeasurePort over git. Owns the scope line-count definition moved out of workflow prose, and reuses the existing review scope classification rather than reimplementing it. Type-design: unit struct constructed with no arguments so composition roots stay zero-argument wiring accessors; the items directory arrives per call. IN-10, IN-14, IN-15, AC-17, CN-05, OUT-08.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "scope_diff_measure",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-10",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-14",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-17",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "CN-05",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "ImplPlanTaskDto": {
+      "action": "modify",
+      "docs": "Existing impl-plan task wire mirror; gains the optional depends_on field. Type-design: serde default on that field is what keeps a schema-1 document decodable while the writer emits schema 2, so read compatibility is a property of the field rather than of a version branch. The element type is the domain task identifier via a field deserializer rather than a raw String (R9 serde-boundary rule); the pre-existing raw-String fields are inherited baseline shape. deny_unknown_fields still rejects any other unrecognised field. IN-19, AC-05, AC-21.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "id",
+              "ty": "String"
+            },
+            {
+              "name": "description",
+              "ty": "String"
+            },
+            {
+              "name": "status",
+              "ty": "String"
+            },
+            {
+              "name": "commit_hash",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "depends_on",
+              "ty": "Vec<domain::TaskId>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "impl_plan_codec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-19",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-21",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "ScopeLineEstimateDto": {
+      "action": "add",
+      "docs": "Deserialization mirror of one per-scope estimate. Type-design: all three fields are typed as their domain concepts through field deserializers rather than raw String / u32 (R9 serde-boundary rule), so no bare value reaches the arithmetic. IN-02, IN-05, AC-02.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "scope",
+              "ty": "domain::review_v2::ScopeName"
+            },
+            {
+              "name": "production_lines",
+              "ty": "domain::batch_plan::LineCount"
+            },
+            {
+              "name": "test_lines",
+              "ty": "domain::batch_plan::LineCount"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "batch_plan_codec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "TaskEstimateDto": {
+      "action": "add",
+      "docs": "Deserialization mirror of one task_estimates entry. Type-design: task_id is the domain identifier via a field deserializer, not a raw String (R9 serde-boundary rule); oversize_justification keeps the null-or-string wire shape but is typed as Option of the validated domain justification, and decode converts that Option into the domain's two-state enum — the shapes differ deliberately because the domain stays serde-free and must not be able to represent an indivisible task without a reason. IN-02, IN-04, IN-05, AC-02, AC-03.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "task_id",
+              "ty": "domain::TaskId"
+            },
+            {
+              "name": "scope_estimates",
+              "ty": "Vec<ScopeLineEstimateDto>"
+            },
+            {
+              "name": "oversize_justification",
+              "ty": "Option<domain::batch_plan::IndivisibilityJustification>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "batch_plan_codec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    }
+  }
+}

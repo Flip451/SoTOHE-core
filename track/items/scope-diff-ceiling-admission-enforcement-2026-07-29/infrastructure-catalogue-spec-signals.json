@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "c0337345d380c4769d4f068a62be3837fa3e2358e8fae6cc50265170e870b8c2",
+  "signals": [
+    {
+      "type_name": "BatchDeclarationDto",
+      "signal": "blue",
+      "entry_hash": "dc3c1f75cb416656b2b3ac8297065cd39bb04b110db4e780d12cfc369971db5c"
+    },
+    {
+      "type_name": "BatchPlanCodecError",
+      "signal": "blue",
+      "entry_hash": "daee89642e71313d6fc858587e4a212aad64f9a0fc09c5a8035ebf25b0cd9bba"
+    },
+    {
+      "type_name": "BatchPlanDocumentDto",
+      "signal": "blue",
+      "entry_hash": "62e6429ca31fb430f960226136a37adcdcf141e72c6a4e8d2cc5cab063347bce"
+    },
+    {
+      "type_name": "FsBatchPlanReader",
+      "signal": "blue",
+      "entry_hash": "bf79006e8b6b0eecdcb0341e35bbf1b8597c8c3bb62bdfa826a803a01199600a"
+    },
+    {
+      "type_name": "FsPlannedTaskReader",
+      "signal": "blue",
+      "entry_hash": "9c4671ecf78b81139cf015b43f4f8a0a45efb3e5019d174a3de03d73065b1372"
+    },
+    {
+      "type_name": "FsReviewScopeConfigReader",
+      "signal": "blue",
+      "entry_hash": "ce501d4a6b0a950d15653f86e42b324698e8d7521417c540f4c5aa149c3e2994"
+    },
+    {
+      "type_name": "GitScopeDiffMeasurer",
+      "signal": "blue",
+      "entry_hash": "50bf4e59d21d1a288fe265b038a5b5dd7cedfaa14f1dacf678ac11a4df39fb5e"
+    },
+    {
+      "type_name": "ImplPlanTaskDto",
+      "signal": "blue",
+      "entry_hash": "e92d7c90d514f72a400c3fa0de848bc8f329373855a1bcb146a2279371c21c1d"
+    },
+    {
+      "type_name": "ScopeLineEstimateDto",
+      "signal": "blue",
+      "entry_hash": "932270f2d074cdf5093cf9567fa7d19738383c1600f7ceaef64dcc32af83c480"
+    },
+    {
+      "type_name": "TaskEstimateDto",
+      "signal": "blue",
+      "entry_hash": "b3346d553adcedca9c7d53ea8520e81e2f025ea04f40f05b65a90e617e8d86fd"
+    },
+    {
+      "type_name": "infrastructure::batch_plan_codec::decode",
+      "signal": "blue",
+      "entry_hash": "d92858a1d4efe3cfd967a3eb4a43ae700ea45c8e95a9c6302cef7fc4480c2a62"
+    }
+  ]
+}
