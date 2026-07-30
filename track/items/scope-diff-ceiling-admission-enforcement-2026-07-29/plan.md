@@ -42,4 +42,4 @@ GO-03 → T001、T002、T019、T020、T007、T008、T013、T014、T017: batch �
 
 ### S5 — 遷移経路への admission 内蔵（track 終端）
 
-- [x] **T018**: plan order 上で先行する全タスクの完了後、本 track の最終タスクとして `TaskOperationInteractor`、TaskOperationService、task-ops composition root を admission 依存へ更新し、`ImplPlanDocument` に settled_task_ids と in_progress_task_ids を追加し、TaskTransitionOutcome と AdmissionRejectionOutput を実装し、`TransitionTaskUseCase` を公開 API から撤去する。IN-09、IN-10、IN-11、AC-10、AC-11、AC-12、AC-13、AC-14、CN-04、CN-10。
+- [x] **T018**: plan order 上で先行する全タスクの完了後、本 track の最終タスクとして `TaskOperationInteractor`、TaskOperationService、task-ops composition root を admission 依存へ更新し、`ImplPlanDocument` に settled_task_ids と in_progress_task_ids を追加し、TaskTransitionOutcome と AdmissionRejectionOutput を実装し、`TransitionTaskUseCase` を公開 API から撤去する。IN-09、IN-10、IN-11、AC-10、AC-11、AC-12、AC-13、AC-14、CN-04、CN-10。 (`9beee43f`)

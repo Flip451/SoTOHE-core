@@ -118,7 +118,8 @@
     {
       "id": "T018",
       "description": "plan order 上で先行する全タスクの完了後、本 track の最終タスクとして `TaskOperationInteractor`、TaskOperationService、task-ops composition root を admission 依存へ更新し、`ImplPlanDocument` に settled_task_ids と in_progress_task_ids を追加し、TaskTransitionOutcome と AdmissionRejectionOutput を実装し、`TransitionTaskUseCase` を公開 API から撤去する。IN-09、IN-10、IN-11、AC-10、AC-11、AC-12、AC-13、AC-14、CN-04、CN-10。",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "9beee43f"
     }
   ],
   "plan": {
