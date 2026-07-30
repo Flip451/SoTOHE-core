@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "fe72c11aed5a1940722aa148ede04bbade2363fc2df2c4d5a9f37a90e661d22d",
+  "catalogue_declaration_hash": "2bca6e722c4a896360dcf8c5dffbbd9adb5af36b372c8685b4ec3c2401b4480e",
   "signals": [
     {
       "type_name": "AdmissionRejectionOutput",
       "signal": "blue",
-      "entry_hash": "b039626a14c458e0a51e9203da34b3b51cf4217a8d7b74a8d7b20c1a4c43bd64"
+      "entry_hash": "195abe2403df74564da8bae50b12cbd292adb773f841346d5aff7d7d1f55c1a2"
     },
     {
       "type_name": "BatchPlanCheckCommand",
@@ -55,7 +55,7 @@
     {
       "type_name": "TaskOperationInteractor",
       "signal": "blue",
-      "entry_hash": "ab1b44db1c9837f837c8f3cb8380123c941eb527f6f35e0dff7746dc8e8e7fca"
+      "entry_hash": "d46c2fe5fc26a1795c4a6d3fc2c1243aa27f9749d31c7ddb07f6ba5f1fb7543a"
     },
     {
       "type_name": "TaskTransitionOutcome",
@@ -96,6 +96,11 @@
       "type_name": "TaskOperationService",
       "signal": "blue",
       "entry_hash": "4a6c88e8c1be37ba8b9b467cfcf972f3094f47d8c39d5a007694856d6ead4d8e"
+    },
+    {
+      "type_name": "TransitionTaskUseCase",
+      "signal": "blue",
+      "entry_hash": "c2f044043613bad7cd084b8b8735fa47544812557815a87c8bacc07bb18c54ad"
     }
   ]
 }

@@ -3,7 +3,7 @@
   "layer": "usecase",
   "entries": [
     {
-      "claim_hash": "b039626a14c458e0a51e9203da34b3b51cf4217a8d7b74a8d7b20c1a4c43bd64",
+      "claim_hash": "195abe2403df74564da8bae50b12cbd292adb773f841346d5aff7d7d1f55c1a2",
       "evidence_hash": "34131898bc1a30a9365901927c7305441917ccaf99d26615a9107fea270d12f4",
       "verdict": {
         "kind": "pass",
@@ -27,11 +27,11 @@
       }
     },
     {
-      "claim_hash": "b039626a14c458e0a51e9203da34b3b51cf4217a8d7b74a8d7b20c1a4c43bd64",
+      "claim_hash": "195abe2403df74564da8bae50b12cbd292adb773f841346d5aff7d7d1f55c1a2",
       "evidence_hash": "fe21877e227da9e580b0d988448a076149759312fa091267a9ff4d5b84eedf8a",
       "verdict": {
         "kind": "pass",
-        "citation": "先行寄与が 0 の scope では見積りの大小によらず admit し、先行寄与が 0 でない scope で合計が ceiling を超えるなら遷移を拒否して現在 batch をそのタスク境界で早期に閉じる。"
+        "citation": "先行寄与が 0 でない scope で合計が ceiling を超えるなら遷移を拒否して現在 batch をそのタスク境界で早期に閉じる。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -51,11 +51,11 @@
       }
     },
     {
-      "claim_hash": "b039626a14c458e0a51e9203da34b3b51cf4217a8d7b74a8d7b20c1a4c43bd64",
+      "claim_hash": "195abe2403df74564da8bae50b12cbd292adb773f841346d5aff7d7d1f55c1a2",
       "evidence_hash": "66c2f1e0b75dbae5b1f2942d4e0faf979af317f065d8830159c4ccf2b0c14f65",
       "verdict": {
         "kind": "pass",
-        "citation": "現在 batch（宣言順で最先行の、未 commit の member を残す batch）に属さないタスクの todo → in_progress 遷移が拒否され"
+        "citation": "現在 batch（宣言順で最先行の、未 commit の member を残す batch）に属さないタスクの todo → in_progress 遷移が拒否され、後続 batch のタスクは現在 batch の commit 成立後に遷移できる。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -75,7 +75,7 @@
       }
     },
     {
-      "claim_hash": "b039626a14c458e0a51e9203da34b3b51cf4217a8d7b74a8d7b20c1a4c43bd64",
+      "claim_hash": "195abe2403df74564da8bae50b12cbd292adb773f841346d5aff7d7d1f55c1a2",
       "evidence_hash": "7d1d0c87ceb7837599b360b0e7e84b3fdcceb452428f7fe7d724184a4a97f7a0",
       "verdict": {
         "kind": "pass",
@@ -747,7 +747,7 @@
       }
     },
     {
-      "claim_hash": "ab1b44db1c9837f837c8f3cb8380123c941eb527f6f35e0dff7746dc8e8e7fca",
+      "claim_hash": "d46c2fe5fc26a1795c4a6d3fc2c1243aa27f9749d31c7ddb07f6ba5f1fb7543a",
       "evidence_hash": "34131898bc1a30a9365901927c7305441917ccaf99d26615a9107fea270d12f4",
       "verdict": {
         "kind": "pass",
@@ -771,11 +771,11 @@
       }
     },
     {
-      "claim_hash": "ab1b44db1c9837f837c8f3cb8380123c941eb527f6f35e0dff7746dc8e8e7fca",
+      "claim_hash": "d46c2fe5fc26a1795c4a6d3fc2c1243aa27f9749d31c7ddb07f6ba5f1fb7543a",
       "evidence_hash": "fe21877e227da9e580b0d988448a076149759312fa091267a9ff4d5b84eedf8a",
       "verdict": {
         "kind": "pass",
-        "citation": "同遷移に実測ガードを組み込む。候補タスクが見積りを申告する scope ごとに、先行寄与（HEAD 起点の実測 per-scope diff + 現在 in_progress の member の申告見積りの和）に候補タスクの申告見積りを加えた合計を resolved ceiling と比較する。"
+        "citation": "候補タスクが見積りを申告する scope ごとに、先行寄与（HEAD 起点の実測 per-scope diff + 現在 in_progress の member の申告見積りの和）に候補タスクの申告見積りを加えた合計を resolved ceiling と比較する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -795,11 +795,11 @@
       }
     },
     {
-      "claim_hash": "ab1b44db1c9837f837c8f3cb8380123c941eb527f6f35e0dff7746dc8e8e7fca",
+      "claim_hash": "d46c2fe5fc26a1795c4a6d3fc2c1243aa27f9749d31c7ddb07f6ba5f1fb7543a",
       "evidence_hash": "c0188369b660bb2cf7e9f5ff9db301aee3e08825ea3b8d160462c09421b9549f",
       "verdict": {
         "kind": "pass",
-        "citation": "admission 判定はタスク状態遷移の単一経路上に置き、どの workflow / capability から到達しても迂回できない状態を保つ。implementer 側の着手前 precondition が、遷移を経ない実装 dispatch という迂回経路を塞ぐ。"
+        "citation": "admission 判定はタスク状態遷移の単一経路上に置き、どの workflow / capability から到達しても迂回できない状態を保つ。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1367,6 +1367,30 @@
           "section": "acceptance_criteria",
           "element_id": "AC-10",
           "text_label": "現在 batch（宣言順で最先行の、未 commit の member を残す batch）に属さないタスクの todo → in_progress 遷移が拒否され、後続 batch のタスクは現在 batch の commit 成立後に遷移できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c2f044043613bad7cd084b8b8735fa47544812557815a87c8bacc07bb18c54ad",
+      "evidence_hash": "c0188369b660bb2cf7e9f5ff9db301aee3e08825ea3b8d160462c09421b9549f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "admission 判定はタスク状態遷移の単一経路上に置き、どの workflow / capability から到達しても迂回できない状態を保つ。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TransitionTaskUseCase"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-10",
+          "text_label": "admission 判定はタスク状態遷移の単一経路上に置き、どの workflow / capability から到達しても迂回できない状態を保つ。implementer 側の着手前 precondition が、遷移を経ない実装 dispatch という迂回経路を塞ぐ。"
         }
       }
     }

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "aea7ea7270e640cf83c18fff9de37437185c176a51acfa8b3eb75060c3164e89",
+  "catalogue_declaration_hash": "70152195e8500879873d91196db72b90f285f0f8707f6b3638063d63ae9f23f8",
   "signals": [
     {
       "type_name": "AdmissionDecision",
@@ -46,6 +46,11 @@
       "type_name": "BatchPlanValidationError",
       "signal": "blue",
       "entry_hash": "2dcab97da47e31e31f53ba3afb920fb86cc7f7368e26306058ec0c23c451efcc"
+    },
+    {
+      "type_name": "ImplPlanDocument",
+      "signal": "blue",
+      "entry_hash": "7d13047f3a17997fca37ad329473bb003e7f54fc363e98e8bf8de7b503986bb9"
     },
     {
       "type_name": "IndivisibilityJustification",

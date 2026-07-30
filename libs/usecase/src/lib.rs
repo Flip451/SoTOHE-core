@@ -66,6 +66,9 @@ pub mod signal_service;
 pub mod skill_compliance;
 pub mod spec_adr_signal;
 pub mod task_completion;
+// Private: its two public types are re-exported from `task_ops`, whose type
+// contract they belong to.
+mod task_admission;
 pub mod task_ops;
 pub mod tddd_feature_declaration;
 pub mod telemetry;
@@ -90,7 +93,7 @@ use std::sync::Arc;
 
 use domain::{
     CommitHash, ImplPlanReader, ImplPlanWriter, RepositoryError, StatusOverride, TaskId,
-    TaskTransition, TrackMetadata, TrackReadError, TrackReader, TrackWriteError, TrackWriter,
+    TrackMetadata, TrackReadError, TrackReader, TrackWriteError, TrackWriter,
 };
 
 /// Persists a track aggregate.
@@ -143,7 +146,12 @@ impl<R: TrackReader> LoadTrackUseCase<R> {
 /// `impl-plan.json` via `domain::derive_track_status`. This eliminates the
 /// two-file non-atomic write (impl-plan.json + metadata.json) that was flagged
 /// in PR #107.
-pub struct TransitionTaskUseCase<S>
+///
+/// Crate-private on purpose: it writes a task state without judging it, and the
+/// admission guard sits in [`crate::task_ops::TaskOperationInteractor`]. Keeping
+/// this type unreachable from outside the crate makes that guard the only way in
+/// rather than the recommended one (`CN-10`).
+pub(crate) struct TransitionTaskUseCase<S>
 where
     S: TrackReader + ImplPlanReader + ImplPlanWriter,
 {
@@ -155,11 +163,15 @@ where
     S: TrackReader + ImplPlanReader + ImplPlanWriter,
 {
     #[must_use]
-    pub fn new(store: Arc<S>) -> Self {
+    pub(crate) fn new(store: Arc<S>) -> Self {
         Self { store }
     }
 
-    /// Transitions a task by an explicit [`TaskTransition`] and persists the result.
+    /// Resolves a target status string to the correct transition and applies it.
+    ///
+    /// The only write path: an explicit-[`domain::TaskTransition`] variant used
+    /// to sit beside it, and was removed so that starting work has exactly one
+    /// way through, the one the admission guard stands on (`CN-10`).
     ///
     /// Only `impl-plan.json` is written. `metadata.json` is not touched.
     ///
@@ -174,49 +186,9 @@ where
     /// Returns `TrackWriteError::Repository(TrackNotFound)` if the track does not exist.
     /// Returns `TrackWriteError::Repository(Message)` if `impl-plan.json` is missing or
     /// cannot be read/written.
-    /// Returns `TrackWriteError::Domain` if the transition is invalid or the task is not found.
-    pub fn execute(
-        &self,
-        track_id: &TrackId,
-        task_id: &TaskId,
-        transition: TaskTransition,
-    ) -> Result<TrackMetadata, TrackWriteError> {
-        // Verify the track exists.
-        let track = self.store.find(track_id).map_err(TrackWriteError::from)?.ok_or_else(|| {
-            TrackWriteError::Repository(RepositoryError::TrackNotFound(track_id.to_string()))
-        })?;
-
-        // Load impl-plan.json (required for transition).
-        let mut impl_plan =
-            self.store.load_impl_plan(track_id).map_err(TrackWriteError::from)?.ok_or_else(
-                || {
-                    TrackWriteError::Repository(RepositoryError::Message(format!(
-                        "impl-plan.json not found for track '{track_id}'"
-                    )))
-                },
-            )?;
-
-        // Apply transition on the domain aggregate.
-        impl_plan.apply_transition(task_id, transition).map_err(TrackWriteError::from)?;
-
-        // Persist impl-plan.json ONLY (single-file atomic write).
-        self.store.save_impl_plan(track_id, &impl_plan).map_err(TrackWriteError::from)?;
-
-        // Return the (unchanged) metadata — callers derive status on demand.
-        Ok(track)
-    }
-
-    /// Resolves a target status string to the correct transition and applies it.
-    ///
-    /// Only `impl-plan.json` is written. `metadata.json` is not touched.
-    ///
-    /// # Errors
-    /// Returns `TrackWriteError::Repository(TrackNotFound)` if the track does not exist.
-    /// Returns `TrackWriteError::Repository(Message)` if `impl-plan.json` is missing or
-    /// cannot be read/written.
     /// Returns `TrackWriteError::Domain` if the target status is unrecognised, the task
     /// is not found, or the transition is invalid for the current state.
-    pub fn execute_by_status(
+    pub(crate) fn execute_by_status(
         &self,
         track_id: &TrackId,
         task_id: &TaskId,
@@ -280,8 +252,9 @@ where
     /// Only `impl-plan.json` is written. `metadata.json` is not touched.
     ///
     /// # Concurrency note
-    /// This performs a non-serialized read-modify-write on `impl-plan.json`. See
-    /// [`TransitionTaskUseCase::execute`] for the documented single-process assumption.
+    /// This performs a non-serialized read-modify-write on `impl-plan.json`. The
+    /// same single-process assumption the transition path documents applies:
+    /// concurrent callers against one track directory are not supported.
     ///
     /// # Errors
     /// Returns `TrackWriteError::Repository(TrackNotFound)` if the track does not exist.
@@ -379,9 +352,9 @@ mod tests {
 
     use domain::{
         DomainError, ImplPlanDocument, ImplPlanReader, ImplPlanWriter, PlanSection, PlanView,
-        RepositoryError, StatusOverride, TaskId, TaskStatus, TaskTransition, TrackId,
-        TrackMetadata, TrackReadError, TrackReader, TrackStatus, TrackTask, TrackWriteError,
-        TrackWriter, ValidationError, derive_track_status,
+        RepositoryError, StatusOverride, TaskId, TaskStatus, TrackId, TrackMetadata,
+        TrackReadError, TrackReader, TrackStatus, TrackTask, TrackWriteError, TrackWriter,
+        ValidationError, derive_track_status,
     };
 
     use super::{
@@ -496,7 +469,7 @@ mod tests {
         let task_id = TaskId::try_new("T001").unwrap();
 
         save.execute(&track).unwrap();
-        let result = transition.execute(track.id(), &task_id, TaskTransition::Start);
+        let result = transition.execute_by_status(track.id(), &task_id, "in_progress", None);
         assert!(result.is_err());
         assert!(
             matches!(result, Err(TrackWriteError::Repository(_))),
@@ -536,7 +509,7 @@ mod tests {
     }
 
     #[test]
-    fn transition_usecase_execute_with_explicit_transition_updates_impl_plan_only() {
+    fn transition_usecase_start_updates_impl_plan_only() {
         let store = Arc::new(StubTrackStore::default());
         let save = SaveTrackUseCase::new(Arc::clone(&store));
         let transition = TransitionTaskUseCase::new(Arc::clone(&store));
@@ -547,7 +520,7 @@ mod tests {
         save.execute(&track).unwrap();
         store.save_impl_plan(track.id(), &impl_plan).unwrap();
 
-        let result = transition.execute(track.id(), &task_id, TaskTransition::Start);
+        let result = transition.execute_by_status(track.id(), &task_id, "in_progress", None);
         assert!(result.is_ok(), "explicit Start transition must succeed: {result:?}");
 
         // metadata.json is NOT written — derive status from updated impl-plan.
@@ -562,7 +535,7 @@ mod tests {
         let track_id = TrackId::try_new("nonexistent").unwrap();
         let task_id = TaskId::try_new("T001").unwrap();
 
-        let result = transition.execute(&track_id, &task_id, TaskTransition::Start);
+        let result = transition.execute_by_status(&track_id, &task_id, "in_progress", None);
         assert!(matches!(
             result,
             Err(TrackWriteError::Repository(RepositoryError::TrackNotFound(_)))

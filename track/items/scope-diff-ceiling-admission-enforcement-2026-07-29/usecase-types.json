@@ -32,6 +32,45 @@
       "type_name": "BatchPlanCheckInteractor"
     },
     {
+      "impl_generics": [
+        {
+          "bounds": [],
+          "name": "S"
+        }
+      ],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "store",
+              "ty": "Arc<S>"
+            },
+            {
+              "name": "branch_reader",
+              "ty": "Option<Arc<dyn BranchReaderPort>>"
+            },
+            {
+              "name": "batch_plan_reader",
+              "ty": "Arc<dyn BatchPlanReaderPort>"
+            },
+            {
+              "name": "scope_diff_measurer",
+              "ty": "Arc<dyn ScopeDiffMeasurePort>"
+            },
+            {
+              "name": "scope_config_reader",
+              "ty": "Arc<dyn ScopeConfigReaderPort>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "TaskOperationInteractor"
+    },
+    {
       "methods": [
         {
           "has_default_impl": false,
@@ -205,6 +244,10 @@
     {
       "for_type": "AdmissionRejectionOutput",
       "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "AdmissionRejectionOutput",
+      "trait_ref": "core::fmt::Display"
     },
     {
       "for_type": "NonEmptyViolationOutputs",
@@ -564,7 +607,7 @@
   "types": {
     "AdmissionRejectionOutput": {
       "action": "add",
-      "docs": "Usecase-owned mirror of an admission refusal, produced for the driver. Type-design: the transition path is brought into line with the gate path — the interactor maps the domain refusal here so no domain value object reaches the adapter, and the driver renders only this type. Variant names and payload arity mirror the domain refusal one-to-one so the figures survive the crossing (R11), and prior_contribution keeps a non-zero type because that is what makes the refusal well-formed: a ceiling refusal is only reachable once the prior contribution is non-zero, so flattening it to a plain count would drop the very guarantee the domain encodes (CN-03, AC-12). The remaining payloads are display Strings and counts because this is the presentation boundary and the values were validated upstream (R9 boundary justification), matching the existing usecase output DTOs in this crate. IN-09, IN-10, AC-10, AC-12.",
+      "docs": "Usecase-owned mirror of an admission refusal, produced for the driver. Type-design: the transition path is brought into line with the gate path — the interactor maps the domain refusal here so no domain value object reaches the adapter, and the composition root receives and renders only this type. Variant names and payload arity mirror the domain refusal one-to-one so the figures survive the crossing (R11), and prior_contribution keeps a non-zero type because that is what makes the refusal well-formed: a ceiling refusal is only reachable once the prior contribution is non-zero, so flattening it to a plain count would drop the very guarantee the domain encodes (CN-03, AC-12). The remaining payloads are display Strings and counts because this is the presentation boundary and the values were validated upstream (R9 boundary justification), matching the existing usecase output DTOs in this crate. IN-09, IN-10, AC-10, AC-12.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -1136,13 +1179,7 @@
     },
     "TaskOperationInteractor": {
       "action": "modify",
-      "docs": "Existing task-operation interactor; new() gains the batch-plan reader, scope-diff measurer and scope-config reader, and transition_task delegates the judgment to evaluate_admission. Type-design: the three admission collaborators are required rather than Option so no constructible interactor can transition without judging; the pre-existing branch_reader stays Option because that guard is disabled in repository-less test environments. Port calls are scoped by the items_dir already on TaskTransitionCommand, and planned tasks come from the existing store bound rather than a new port. A refusal is returned as TaskTransitionOutcome::Rejected with its typed payload intact, not flattened into the error channel, so TaskOperationError's declared shape stays baseline-identical. IN-09, IN-10, AC-10, AC-12, AC-13, CN-10.",
-      "generics": [
-        {
-          "bounds": [],
-          "name": "S"
-        }
-      ],
+      "docs": "Existing task-operation interactor; new() gains the batch-plan reader, scope-diff measurer and scope-config reader, and transition_task delegates the judgment to evaluate_admission. The constructor is declared in the top-level inherent_impls entry rather than on this type entry, because that is the only place a generic interactor's impl-block type parameter can be expressed; it is declared once there and left empty here so the contract map does not render it twice. Type-design: the three admission collaborators are required rather than Option so no constructible interactor can transition without judging; the pre-existing branch_reader stays Option because that guard is disabled in repository-less test environments. Port calls are scoped by the items_dir already on TaskTransitionCommand, and planned tasks come from the existing store bound rather than a new port. A refusal is returned as TaskTransitionOutcome::Rejected with its typed payload intact, not flattened into the error channel, so TaskOperationError's declared shape stays baseline-identical. IN-09, IN-10, AC-10, AC-12, AC-13, CN-10.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -1152,36 +1189,7 @@
           "kind": "plain"
         }
       },
-      "methods": [
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "new",
-          "params": [
-            {
-              "name": "store",
-              "ty": "Arc<S>"
-            },
-            {
-              "name": "branch_reader",
-              "ty": "Option<Arc<dyn BranchReaderPort>>"
-            },
-            {
-              "name": "batch_plan_reader",
-              "ty": "Arc<dyn BatchPlanReaderPort>"
-            },
-            {
-              "name": "scope_diff_measurer",
-              "ty": "Arc<dyn ScopeDiffMeasurePort>"
-            },
-            {
-              "name": "scope_config_reader",
-              "ty": "Arc<dyn ScopeConfigReaderPort>"
-            }
-          ],
-          "returns": "Self"
-        }
-      ],
+      "methods": [],
       "module_path": "task_ops",
       "role": {
         "Interactor": {}
@@ -1248,6 +1256,16 @@
         },
         {
           "anchor": "AC-12",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "TransitionTaskUseCase": {
+      "action": "delete",
+      "informal_grounds": [],
+      "spec_refs": [
+        {
+          "anchor": "CN-10",
           "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
         }
       ]

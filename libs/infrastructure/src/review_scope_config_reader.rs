@@ -13,7 +13,6 @@ use domain::review_v2::ReviewScopeConfig;
 use domain::{FreeText, TrackId};
 use usecase::batch_plan::{ScopeConfigReadError, ScopeConfigReaderPort};
 
-use crate::git_cli::SystemGitRepo;
 use crate::review_v2::load_v2_scope_config;
 
 /// Repository-relative location of the review scope configuration.
@@ -37,11 +36,15 @@ impl FsReviewScopeConfigReader {
 impl ScopeConfigReaderPort for FsReviewScopeConfigReader {
     fn read(
         &self,
-        _items_dir: &Path,
+        items_dir: &Path,
         track_id: &TrackId,
     ) -> Result<ReviewScopeConfig, ScopeConfigReadError> {
-        let repo = SystemGitRepo::discover().map_err(|error| ScopeConfigReadError::ReadFailed {
-            message: FreeText::new(format!("git repository could not be discovered: {error}")),
+        // Anchored on the items directory, so the ceilings come from the same
+        // repository the track artifacts do.
+        let repo = crate::discover_repo_for_items_dir(items_dir).map_err(|error| {
+            ScopeConfigReadError::ReadFailed {
+                message: FreeText::new(format!("git repository could not be discovered: {error}")),
+            }
         })?;
         let root = repo.root();
 
@@ -62,10 +65,16 @@ mod tests {
 
     use super::*;
 
+    /// This workspace's own items directory: the reader is anchored on it, so
+    /// the configuration it loads is this repository's shipped one.
+    fn workspace_items_dir() -> PathBuf {
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../track/items")
+    }
+
     #[test]
     fn test_the_reader_hands_back_the_configuration_the_ceilings_are_read_from() {
         let config = FsReviewScopeConfigReader::new()
-            .read(&PathBuf::from("track/items"), &TrackId::try_new("some-track").unwrap())
+            .read(&workspace_items_dir(), &TrackId::try_new("some-track").unwrap())
             .unwrap();
 
         let domain = ScopeName::Main(MainScopeName::new("domain").unwrap());
@@ -77,9 +86,91 @@ mod tests {
     }
 
     #[test]
+    fn test_the_reader_follows_the_items_directory_into_its_own_repository() {
+        // A repository of its own, holding a ceiling no other configuration
+        // declares: reading it proves the items directory decides which tree is
+        // read, not the directory this process stands in.
+        let repo = tempfile::Builder::new()
+            .prefix("review-scope-anchor-")
+            .tempdir_in(std::env::current_dir().unwrap())
+            .unwrap();
+        let root = repo.path();
+        std::fs::create_dir_all(root.join(".harness/config")).unwrap();
+        std::fs::write(
+            root.join(".harness/config/review-scope.json"),
+            r#"{"version": 2, "groups": {"domain": {"patterns": ["libs/domain/**"],
+                "diff_ceiling_lines": 42}},
+                "review_operational": [], "other_track": [], "default_diff_ceiling_lines": 500}"#,
+        )
+        .unwrap();
+        std::fs::write(
+            root.join("architecture-rules.json"),
+            r#"{"layers":[{"crate":"domain","path":"libs/domain"}]}"#,
+        )
+        .unwrap();
+        std::fs::create_dir_all(root.join("track/items/some-track")).unwrap();
+        let status = std::process::Command::new("git")
+            .args(["init", "-q"])
+            .current_dir(root)
+            .status()
+            .unwrap();
+        assert!(status.success(), "the fixture needs a repository of its own");
+
+        let config = FsReviewScopeConfigReader::new()
+            .read(&root.join("track/items"), &TrackId::try_new("some-track").unwrap())
+            .unwrap();
+
+        let domain = ScopeName::Main(MainScopeName::new("domain").unwrap());
+        assert_eq!(config.diff_ceiling_for_scope(&domain), Some(42));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_a_symlinked_items_directory_is_refused_rather_than_followed() {
+        // The anchor decides which repository is read, so a symlinked items
+        // directory is refused on the path as supplied instead of being resolved
+        // into whichever tree it points at.
+        let real = tempfile::Builder::new()
+            .prefix("review-scope-symlink-")
+            .tempdir_in(std::env::current_dir().unwrap())
+            .unwrap();
+        std::fs::create_dir_all(real.path().join("track/items/some-track")).unwrap();
+        let linked = real.path().join("items-link");
+        std::os::unix::fs::symlink(real.path().join("track/items"), &linked).unwrap();
+
+        let error = FsReviewScopeConfigReader::new()
+            .read(&linked, &TrackId::try_new("some-track").unwrap())
+            .unwrap_err();
+
+        let ScopeConfigReadError::ReadFailed { message } = error;
+        assert!(message.as_str().contains("refusing to follow symlink"), "unexpected: {message}");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_a_symlinked_ancestor_of_the_items_directory_is_refused_as_well() {
+        // The link sits above the items directory: canonicalising the supplied
+        // path would follow it, so every component is checked first.
+        let real = tempfile::Builder::new()
+            .prefix("review-scope-ancestor-")
+            .tempdir_in(std::env::current_dir().unwrap())
+            .unwrap();
+        std::fs::create_dir_all(real.path().join("repo/track/items/some-track")).unwrap();
+        let linked_root = real.path().join("repo-link");
+        std::os::unix::fs::symlink(real.path().join("repo"), &linked_root).unwrap();
+
+        let error = FsReviewScopeConfigReader::new()
+            .read(&linked_root.join("track/items"), &TrackId::try_new("some-track").unwrap())
+            .unwrap_err();
+
+        let ScopeConfigReadError::ReadFailed { message } = error;
+        assert!(message.as_str().contains("refusing to follow symlink"), "unexpected: {message}");
+    }
+
+    #[test]
     fn test_a_scope_with_no_configured_ceiling_is_unconstrained_rather_than_a_failure() {
         let config = FsReviewScopeConfigReader::new()
-            .read(&PathBuf::from("track/items"), &TrackId::try_new("some-track").unwrap())
+            .read(&workspace_items_dir(), &TrackId::try_new("some-track").unwrap())
             .unwrap();
 
         // `other` is the implicit scope: never configured, never inheriting the

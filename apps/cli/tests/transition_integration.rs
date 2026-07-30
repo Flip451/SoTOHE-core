@@ -10,12 +10,16 @@
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-fn sotp_bin() -> Command {
+/// Runs the CLI from inside `root`, the way it is run in a checkout: the
+/// repository-scoped reads a transition makes resolve against the repository the
+/// process stands in.
+fn sotp_bin_in(root: &Path) -> Command {
     let mut cmd = Command::new(env!("CARGO_BIN_EXE_sotp"));
     // Disable telemetry in spawned binary so integration tests never write to
     // the real track/items/ tree (CN-06 / AC-07).  The #[cfg(test)] guard only
     // applies to in-process code; spawned binaries are full production processes.
     cmd.env("SOTP_TELEMETRY", "0");
+    cmd.current_dir(root);
     cmd
 }
 
@@ -66,6 +70,15 @@ fn init_git_repo_on_track_branch(root: &Path, track_id: &str) {
         .status()
         .expect("git branch -m failed");
     assert!(status.success(), "git branch -m must succeed");
+
+    // Keep the base branch the metadata snapshot names, so the diff the
+    // admission guard measures has a base to start from.
+    let status = Command::new("git")
+        .args(["branch", "main"])
+        .current_dir(root)
+        .status()
+        .expect("git branch main failed");
+    assert!(status.success(), "creating the base branch must succeed");
 }
 
 /// Writes a minimal v6 metadata.json fixture (identity-only, branchless).
@@ -132,15 +145,49 @@ fn write_fixture_impl_plan(items_dir: &Path, track_id: &str) {
 /// Writes a minimal architecture-rules.json fixture so render.rs can iterate
 /// TDDD layers (fail-closed after T045 — synthetic fallback removed).
 fn write_fixture_arch_rules(root: &Path) {
-    let arch_rules = r#"{"layers":[{"crate":"domain","tddd":{"enabled":true,"catalogue_file":"domain-types.json"}}]}"#;
+    let arch_rules = r#"{"layers":[{"crate":"domain","path":"libs/domain","tddd":{"enabled":true,"catalogue_file":"domain-types.json"}}]}"#;
     std::fs::write(root.join("architecture-rules.json"), arch_rules).unwrap();
+}
+
+/// Writes the batch plan the admission guard judges a start of work against:
+/// T001 alone in the first batch, with a small `domain` estimate.
+fn write_fixture_batch_plan(items_dir: &Path, track_id: &str) {
+    let batch_plan = format!(
+        r#"{{
+  "schema_version": 1,
+  "track_id": "{track_id}",
+  "task_estimates": [
+    {{
+      "task_id": "T001",
+      "scope_estimates": [
+        {{ "scope": "domain", "production_lines": 10, "test_lines": 5 }}
+      ],
+      "oversize_justification": null
+    }}
+  ],
+  "batches": [{{ "id": "B1", "task_ids": ["T001"] }}]
+}}
+"#
+    );
+    std::fs::write(items_dir.join(track_id).join("batch-plan.json"), batch_plan).unwrap();
+}
+
+/// Writes the review-scope configuration the ceilings are resolved from.
+fn write_fixture_review_scope(root: &Path) {
+    let config = r#"{"version": 2, "groups": {"domain": {"patterns": ["libs/domain/**"]}},
+      "review_operational": [], "other_track": [], "default_diff_ceiling_lines": 500}"#;
+    let config_dir = root.join(".harness/config");
+    std::fs::create_dir_all(&config_dir).unwrap();
+    std::fs::write(config_dir.join("review-scope.json"), config).unwrap();
 }
 
 fn project_root_with_full_track(root: &Path, track_id: &str) -> PathBuf {
     let items_dir = root.join("track/items");
     write_fixture_metadata(&items_dir, track_id);
     write_fixture_impl_plan(&items_dir, track_id);
+    write_fixture_batch_plan(&items_dir, track_id);
     write_fixture_arch_rules(root);
+    write_fixture_review_scope(root);
     // Bootstrap a git repo on the track branch so `resolve_track_id_for_write`
     // can discover it from the items_dir project root.
     init_git_repo_on_track_branch(root, track_id);
@@ -165,7 +212,7 @@ fn transition_subcommand_success_updates_status_and_persists() {
     let root_dir = tempfile::tempdir().unwrap();
     let items_dir = project_root_with_full_track(root_dir.path(), track_id);
 
-    let output = sotp_bin()
+    let output = sotp_bin_in(root_dir.path())
         .args([
             "track",
             "transition",
@@ -217,7 +264,7 @@ fn transition_subcommand_rejects_invalid_status_transition() {
     let root_dir = tempfile::tempdir().unwrap();
     let items_dir = project_root_with_full_track(root_dir.path(), track_id);
 
-    let output = sotp_bin()
+    let output = sotp_bin_in(root_dir.path())
         .args([
             "track",
             "transition",
@@ -256,7 +303,7 @@ fn transition_subcommand_fails_on_missing_items_dir() {
     // Path does NOT end in `track/items` → resolve_project_root returns Err.
     let bogus = root_dir.path().join("does/not/exist/wrong/path");
 
-    let output = sotp_bin()
+    let output = sotp_bin_in(root_dir.path())
         .args([
             "track",
             "transition",
@@ -286,7 +333,7 @@ fn transition_subcommand_persists_commit_hash_on_done_transition() {
     let items_dir = project_root_with_full_track(root_dir.path(), track_id);
 
     // Step 1: todo -> in_progress
-    let out1 = sotp_bin()
+    let out1 = sotp_bin_in(root_dir.path())
         .args([
             "track",
             "transition",
@@ -303,7 +350,7 @@ fn transition_subcommand_persists_commit_hash_on_done_transition() {
     assert!(out1.status.success(), "step1 transition to in_progress failed:\nstderr: {stderr1}");
 
     // Step 2: in_progress -> done with commit hash
-    let out2 = sotp_bin()
+    let out2 = sotp_bin_in(root_dir.path())
         .args([
             "track",
             "transition",
@@ -342,7 +389,7 @@ fn transition_subcommand_full_round_trip_including_reopen() {
     let items_dir = project_root_with_full_track(root_dir.path(), track_id);
 
     // Step 1: todo -> in_progress
-    let out1 = sotp_bin()
+    let out1 = sotp_bin_in(root_dir.path())
         .args([
             "track",
             "transition",
@@ -359,7 +406,7 @@ fn transition_subcommand_full_round_trip_including_reopen() {
     assert!(out1.status.success(), "step1 (todo->in_progress) failed:\nstderr: {stderr1}");
 
     // Step 2: in_progress -> done
-    let out2 = sotp_bin()
+    let out2 = sotp_bin_in(root_dir.path())
         .args([
             "track",
             "transition",
@@ -381,7 +428,7 @@ fn transition_subcommand_full_round_trip_including_reopen() {
     assert!(content.contains("\"done\""), "impl-plan.json must reflect done status:\n{content}");
 
     // Step 3: done -> in_progress (Reopen)
-    let out3 = sotp_bin()
+    let out3 = sotp_bin_in(root_dir.path())
         .args([
             "track",
             "transition",
@@ -421,7 +468,7 @@ fn transition_subcommand_full_round_trip_with_commit_hash_and_reopen() {
     let impl_plan_path = items_dir.join(format!("{track_id}/impl-plan.json"));
 
     // Step 1: todo -> in_progress
-    let out1 = sotp_bin()
+    let out1 = sotp_bin_in(root_dir.path())
         .args([
             "track",
             "transition",
@@ -438,7 +485,7 @@ fn transition_subcommand_full_round_trip_with_commit_hash_and_reopen() {
     assert!(out1.status.success(), "step1 (todo->in_progress) failed:\nstderr: {stderr1}");
 
     // Step 2: in_progress -> done with commit hash
-    let out2 = sotp_bin()
+    let out2 = sotp_bin_in(root_dir.path())
         .args([
             "track",
             "transition",
@@ -468,7 +515,7 @@ fn transition_subcommand_full_round_trip_with_commit_hash_and_reopen() {
     assert!(content.contains("\"done\""), "impl-plan.json must reflect done status:\n{content}");
 
     // Step 3: done -> in_progress (Reopen)
-    let out3 = sotp_bin()
+    let out3 = sotp_bin_in(root_dir.path())
         .args([
             "track",
             "transition",
@@ -503,7 +550,7 @@ fn views_sync_subcommand_renders_plan_and_registry() {
     let root_dir = tempfile::tempdir().unwrap();
     let _items_dir = project_root_with_full_track(root_dir.path(), "demo");
 
-    let output = sotp_bin()
+    let output = sotp_bin_in(root_dir.path())
         .args([
             "track",
             "views",
@@ -562,9 +609,11 @@ fn transition_subcommand_write_guard_success_with_synthetic_track_branch() {
     let items_dir = root_dir.path().join("track/items");
     write_fixture_metadata(&items_dir, track_id);
     write_fixture_impl_plan(&items_dir, track_id);
+    write_fixture_batch_plan(&items_dir, track_id);
     write_fixture_arch_rules(root_dir.path());
+    write_fixture_review_scope(root_dir.path());
 
-    let output = sotp_bin()
+    let output = sotp_bin_in(root_dir.path())
         .args([
             "track",
             "transition",
@@ -619,7 +668,7 @@ fn transition_subcommand_write_guard_rejects_mismatched_track_id() {
     write_fixture_impl_plan(&items_dir, sentinel_track);
     write_fixture_arch_rules(root_dir.path());
 
-    let output = sotp_bin()
+    let output = sotp_bin_in(root_dir.path())
         .args([
             "track",
             "transition",

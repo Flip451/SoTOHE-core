@@ -679,6 +679,26 @@
   "trait_impls": [
     {
       "action": "reference",
+      "for_type": "ImplPlanDocument",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "ImplPlanDocument",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "ImplPlanDocument",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "ImplPlanDocument",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
       "for_type": "ReviewScopeConfig",
       "trait_ref": "core::fmt::Debug"
     },
@@ -1607,6 +1627,178 @@
         },
         {
           "anchor": "AC-04",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "ImplPlanDocument": {
+      "action": "modify",
+      "docs": "Existing Phase 3 plan document; gains settled_task_ids and in_progress_task_ids, placed on the type that owns the task list beside unresolved_task_ids. Both return owned sets to match the shape their declared consumer takes; a borrowed view would move the same allocation to the caller. Role DomainService: the document is compared by value and carries no identity of its own, and its behaviour is over the task collection it holds -- the task state machine itself belongs to TrackTask. The other signatures are restated from baseline unchanged, legacy raw-primitive slots included (schema_version, target_status, section_id). IN-09, IN-10, AC-10.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "tasks",
+              "ty": "Vec<TrackTask>"
+            },
+            {
+              "name": "plan",
+              "ty": "PlanView"
+            }
+          ],
+          "returns": "Result<Self, DomainError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "schema_version",
+          "params": [],
+          "receiver": "&self",
+          "returns": "u32"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "tasks",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[TrackTask]"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "plan",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&PlanView"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "all_tasks_resolved",
+          "params": [],
+          "receiver": "&self",
+          "returns": "bool"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "unresolved_task_ids",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Vec<&TaskId>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "settled_task_ids",
+          "params": [],
+          "receiver": "&self",
+          "returns": "std::collections::BTreeSet<TaskId>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "in_progress_task_ids",
+          "params": [],
+          "receiver": "&self",
+          "returns": "std::collections::BTreeSet<TaskId>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "next_open_task",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&TrackTask>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "apply_transition",
+          "params": [
+            {
+              "name": "task_id",
+              "ty": "&TaskId"
+            },
+            {
+              "name": "transition",
+              "ty": "TaskTransition"
+            }
+          ],
+          "receiver": "&mut self",
+          "returns": "Result<(), DomainError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "apply_transition_by_status",
+          "params": [
+            {
+              "name": "task_id",
+              "ty": "&TaskId"
+            },
+            {
+              "name": "target_status",
+              "ty": "&str"
+            },
+            {
+              "name": "commit_hash",
+              "ty": "Option<CommitHash>"
+            }
+          ],
+          "receiver": "&mut self",
+          "returns": "Result<(), DomainError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "add_task",
+          "params": [
+            {
+              "name": "description",
+              "ty": "impl Into<String>"
+            },
+            {
+              "name": "section_id",
+              "ty": "Option<&str>"
+            },
+            {
+              "name": "after_task_id",
+              "ty": "Option<&TaskId>"
+            }
+          ],
+          "receiver": "&mut self",
+          "returns": "Result<TaskId, DomainError>"
+        }
+      ],
+      "module_path": "impl_plan",
+      "role": {
+        "DomainService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-10",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-10",
           "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
         }
       ]

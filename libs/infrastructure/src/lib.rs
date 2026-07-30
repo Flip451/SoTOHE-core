@@ -81,6 +81,45 @@ pub use ref_verify::{
 };
 pub use verify_adapter::FsVerifyAdapter;
 
+/// Discovers the repository the items directory belongs to.
+///
+/// Anchoring on the argument rather than on the process working directory keeps
+/// one command reading one tree: a call that names `--items-dir` takes its
+/// track artifacts, its configuration and its measured diff from the repository
+/// that directory sits in, not from wherever the process happens to stand.
+///
+/// Every component of the supplied path — the items directory and each of its
+/// ancestors — is refused if it is a symlink, before the path is canonicalised:
+/// resolving first would follow any of them into whichever tree it points at.
+///
+/// # Errors
+///
+/// Returns an error when a component of the supplied path is a symlink, when the
+/// items directory cannot be resolved on disk, or when no git repository
+/// encloses it.
+pub(crate) fn discover_repo_for_items_dir(
+    items_dir: &std::path::Path,
+) -> Result<crate::git_cli::SystemGitRepo, std::io::Error> {
+    crate::track::symlink_guard::reject_symlinks_up_to_root(items_dir).map_err(|error| {
+        std::io::Error::new(
+            std::io::ErrorKind::InvalidInput,
+            format!("symlink check failed for items_dir {}: {error}", items_dir.display()),
+        )
+    })?;
+    let anchor = items_dir.canonicalize().map_err(|error| {
+        std::io::Error::new(
+            error.kind(),
+            format!("cannot resolve items_dir {}: {error}", items_dir.display()),
+        )
+    })?;
+    crate::git_cli::SystemGitRepo::discover_from(&anchor).map_err(|error| {
+        std::io::Error::new(
+            std::io::ErrorKind::InvalidInput,
+            format!("cannot discover the git repository holding {}: {error}", anchor.display()),
+        )
+    })
+}
+
 pub(crate) fn resolve_items_dir_under_current_repo(
     items_dir: &std::path::Path,
 ) -> Result<std::path::PathBuf, std::io::Error> {

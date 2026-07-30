@@ -5632,13 +5632,13 @@
         "item_identifier": "trait_impl:usecase::batch_plan::ports::ScopeConfigReaderPort"
       },
       "key": {
-        "bound_tests_set_hash": "3ed270e6a89a7cfa48f74be5f85a46832c819044e39188126b1dea83783cb417",
+        "bound_tests_set_hash": "6cd04dca631442d483ac9e5315db6b8640e545695996c901e5e6f5254b1ab762",
         "declaration_hash": "f910c7e27385107d80429b8f19836feaf7f8501a80aa9b9886dd50f25b23fbea",
         "anchor_text_hash": "b55569ed0491a6dd15393ae8f789f1f315e56164fe0fe4ce8a5b7f28f50b1836"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(config.diff_ceiling_for_scope(&domain).is_some(), \"a configured scope resolves a ceiling\")"
+        "citation": "let config = FsReviewScopeConfigReader::new()\n            .read(&workspace_items_dir(), &TrackId::try_new(\"some-track\").unwrap())\n            .unwrap();\n\n        let domain = ScopeName::Main(MainScopeName::new(\"domain\").unwrap());\n        assert!(config.contains_scope(&domain), \"the shipped configuration declares `domain`\");\n        assert!(\n            config.diff_ceiling_for_scope(&domain).is_some(),\n            \"a configured scope resolves a ceiling\"\n        );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -5668,7 +5668,7 @@
         "item_identifier": "trait_impl:usecase::batch_plan::ports::ScopeConfigReaderPort"
       },
       "key": {
-        "bound_tests_set_hash": "3ed270e6a89a7cfa48f74be5f85a46832c819044e39188126b1dea83783cb417",
+        "bound_tests_set_hash": "6cd04dca631442d483ac9e5315db6b8640e545695996c901e5e6f5254b1ab762",
         "declaration_hash": "f910c7e27385107d80429b8f19836feaf7f8501a80aa9b9886dd50f25b23fbea",
         "anchor_text_hash": "c2d1440f1b318188f82fe538fe00e9fc3111a783e04547965c1c10b3437045dc"
       },
@@ -7146,6 +7146,3391 @@
           "layer": "cli_driver",
           "module_path": "cli_driver::batch_plan::tests",
           "test_name": "test_each_cross_file_finding_on_its_own_makes_the_command_fail"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskOperationInteractor",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskOperationInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "2d4783d2beb44d067096cf9469d88689a17b0efac11b92c797fad57f8d482d9c",
+        "declaration_hash": "0a6c58a839bb023799a3148b798c256af6760f5316922ae89f81ccd123b92fdd",
+        "anchor_text_hash": "2b3c24ea936179e964f93c56a5e410861b7a62acf600d103c965bdf9dc5924af"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );\n\n        // With B1's only member committed, B2 becomes the batch being consumed\n        // and the same task starts.\n        let settled = store_with(plan_of(&[\n            (\"T001\", TaskStatus::DoneTraced { commit_hash: commit_hash() }),\n            (\"T002\", TaskStatus::Todo),\n        ]));\n        let outcome = admitting_interactor(settled, batch_plan, Vec::new(), Some(500))\n            .transition_task(start_work_on(\"T002\"))\n            .unwrap();\n\n        assert_eq!(transitioned(outcome).derived_status, \"in_progress\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_candidate_without_an_estimate_makes_the_transition_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_track_without_a_batch_plan_cannot_start_work_but_still_finishes_it"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_finishing_a_task_is_not_judged_by_the_admission_guard"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "task_operation_transition_task_succeeds"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "task_operation_branch_guard_enforced_via_injected_reader"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_adding_a_task_names_the_id_it_created_and_the_status_that_follows"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_an_override_dominates_the_derived_status_until_it_is_cleared"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskOperationInteractor",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskOperationInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "2d4783d2beb44d067096cf9469d88689a17b0efac11b92c797fad57f8d482d9c",
+        "declaration_hash": "0a6c58a839bb023799a3148b798c256af6760f5316922ae89f81ccd123b92fdd",
+        "anchor_text_hash": "95f3aa6927f09837b3f404c8ffe20837feae78d7b9c33b8e60168b0adc31f8e1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::ScopeCeilingWouldBeExceeded {\n                scope: \"domain\".to_owned(),\n                // 100 measured + 300 declared by the member in progress.\n                prior_contribution: std::num::NonZeroU32::new(400).unwrap(),\n                candidate_estimate: 200,\n                ceiling: 500,\n            })\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_candidate_without_an_estimate_makes_the_transition_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_track_without_a_batch_plan_cannot_start_work_but_still_finishes_it"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_finishing_a_task_is_not_judged_by_the_admission_guard"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "task_operation_transition_task_succeeds"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "task_operation_branch_guard_enforced_via_injected_reader"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_adding_a_task_names_the_id_it_created_and_the_status_that_follows"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_an_override_dominates_the_derived_status_until_it_is_cleared"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskOperationInteractor",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "CN-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskOperationInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "2d4783d2beb44d067096cf9469d88689a17b0efac11b92c797fad57f8d482d9c",
+        "declaration_hash": "0a6c58a839bb023799a3148b798c256af6760f5316922ae89f81ccd123b92fdd",
+        "anchor_text_hash": "ee340e885df4efbcde603a11387e84f7d83b3be771b43e2293a100c9ce2902ff"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let error = TaskOperationInteractor::new(\n            store_with(plan_of(&[(\"T001\", TaskStatus::Todo)])),\n            None,\n            Arc::new(StubBatchPlanReader(None)),\n            Arc::new(StubScopeDiffMeasurer(Vec::new())),\n            Arc::new(StubScopeConfigReader(vec![(\"domain\", Some(500))])),\n        )\n        .transition_task(start_work_on(\"T001\"))\n        .unwrap_err();\n\n        assert!(matches!(error, TaskOperationError::TransitionFailed(_)), \"unexpected: {error}\");\n        assert!(error.to_string().contains(\"no batch plan\"), \"unexpected: {error}\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_candidate_without_an_estimate_makes_the_transition_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_track_without_a_batch_plan_cannot_start_work_but_still_finishes_it"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_finishing_a_task_is_not_judged_by_the_admission_guard"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "task_operation_transition_task_succeeds"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "task_operation_branch_guard_enforced_via_injected_reader"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_adding_a_task_names_the_id_it_created_and_the_status_that_follows"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_an_override_dominates_the_derived_status_until_it_is_cleared"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskOperationService",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskOperationService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:transition_task"
+      },
+      "key": {
+        "bound_tests_set_hash": "071b572d9b43b6d9fea5ab58e669cbb24072cf6c9553b22096099d6194c2d5fc",
+        "declaration_hash": "bec63075c9cd95e57769786980fca6c9918f509a466880de622da8343a87a01d",
+        "anchor_text_hash": "2b3c24ea936179e964f93c56a5e410861b7a62acf600d103c965bdf9dc5924af"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );\n\n        // With B1's only member committed, B2 becomes the batch being consumed\n        // and the same task starts.\n        let settled = store_with(plan_of(&[\n            (\"T001\", TaskStatus::DoneTraced { commit_hash: commit_hash() }),\n            (\"T002\", TaskStatus::Todo),\n        ]));\n        let outcome = admitting_interactor(settled, batch_plan, Vec::new(), Some(500))\n            .transition_task(start_work_on(\"T002\"))\n            .unwrap();\n\n        assert_eq!(transitioned(outcome).derived_status, \"in_progress\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_candidate_without_an_estimate_makes_the_transition_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_track_without_a_batch_plan_cannot_start_work_but_still_finishes_it"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_finishing_a_task_is_not_judged_by_the_admission_guard"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskOperationService",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskOperationService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:transition_task"
+      },
+      "key": {
+        "bound_tests_set_hash": "071b572d9b43b6d9fea5ab58e669cbb24072cf6c9553b22096099d6194c2d5fc",
+        "declaration_hash": "bec63075c9cd95e57769786980fca6c9918f509a466880de622da8343a87a01d",
+        "anchor_text_hash": "7669b3f2178d882d0e0caa12e2ca90dacb12def84e7b001e4c49181fa2beb7e5"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );\n\n        // With B1's only member committed, B2 becomes the batch being consumed\n        // and the same task starts.\n        let settled = store_with(plan_of(&[\n            (\"T001\", TaskStatus::DoneTraced { commit_hash: commit_hash() }),\n            (\"T002\", TaskStatus::Todo),\n        ]));\n        let outcome = admitting_interactor(settled, batch_plan, Vec::new(), Some(500))\n            .transition_task(start_work_on(\"T002\"))\n            .unwrap();\n\n        assert_eq!(transitioned(outcome).derived_status, \"in_progress\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_candidate_without_an_estimate_makes_the_transition_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_track_without_a_batch_plan_cannot_start_work_but_still_finishes_it"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_finishing_a_task_is_not_judged_by_the_admission_guard"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskOperationService",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskOperationService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:add_task"
+      },
+      "key": {
+        "bound_tests_set_hash": "b25fa3a74db06b57ee9031a09e40d25c13726336340db3fcd2bbe2221c565b5f",
+        "declaration_hash": "bec63075c9cd95e57769786980fca6c9918f509a466880de622da8343a87a01d",
+        "anchor_text_hash": "2b3c24ea936179e964f93c56a5e410861b7a62acf600d103c965bdf9dc5924af"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );\n\n        // With B1's only member committed, B2 becomes the batch being consumed\n        // and the same task starts.\n        let settled = store_with(plan_of(&[\n            (\"T001\", TaskStatus::DoneTraced { commit_hash: commit_hash() }),\n            (\"T002\", TaskStatus::Todo),\n        ]));\n        let outcome = admitting_interactor(settled, batch_plan, Vec::new(), Some(500))\n            .transition_task(start_work_on(\"T002\"))\n            .unwrap();\n\n        assert_eq!(transitioned(outcome).derived_status, \"in_progress\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_adding_a_task_names_the_id_it_created_and_the_status_that_follows"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_finishing_a_task_is_not_judged_by_the_admission_guard"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskOperationService",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskOperationService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:add_task"
+      },
+      "key": {
+        "bound_tests_set_hash": "b25fa3a74db06b57ee9031a09e40d25c13726336340db3fcd2bbe2221c565b5f",
+        "declaration_hash": "bec63075c9cd95e57769786980fca6c9918f509a466880de622da8343a87a01d",
+        "anchor_text_hash": "7669b3f2178d882d0e0caa12e2ca90dacb12def84e7b001e4c49181fa2beb7e5"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );\n\n        // With B1's only member committed, B2 becomes the batch being consumed\n        // and the same task starts.\n        let settled = store_with(plan_of(&[\n            (\"T001\", TaskStatus::DoneTraced { commit_hash: commit_hash() }),\n            (\"T002\", TaskStatus::Todo),\n        ]));\n        let outcome = admitting_interactor(settled, batch_plan, Vec::new(), Some(500))\n            .transition_task(start_work_on(\"T002\"))\n            .unwrap();\n\n        assert_eq!(transitioned(outcome).derived_status, \"in_progress\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_adding_a_task_names_the_id_it_created_and_the_status_that_follows"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_finishing_a_task_is_not_judged_by_the_admission_guard"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskOperationService",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskOperationService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:set_override"
+      },
+      "key": {
+        "bound_tests_set_hash": "9bcb016418daf9fcc706ab9363195277b7a5a6260b2791d858458d5830aeeaea",
+        "declaration_hash": "bec63075c9cd95e57769786980fca6c9918f509a466880de622da8343a87a01d",
+        "anchor_text_hash": "2b3c24ea936179e964f93c56a5e410861b7a62acf600d103c965bdf9dc5924af"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_an_override_dominates_the_derived_status_until_it_is_cleared"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_finishing_a_task_is_not_judged_by_the_admission_guard"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskOperationService",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskOperationService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:set_override"
+      },
+      "key": {
+        "bound_tests_set_hash": "9bcb016418daf9fcc706ab9363195277b7a5a6260b2791d858458d5830aeeaea",
+        "declaration_hash": "bec63075c9cd95e57769786980fca6c9918f509a466880de622da8343a87a01d",
+        "anchor_text_hash": "7669b3f2178d882d0e0caa12e2ca90dacb12def84e7b001e4c49181fa2beb7e5"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        ); ... assert_eq!(transitioned(outcome).derived_status, \"in_progress\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_an_override_dominates_the_derived_status_until_it_is_cleared"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_finishing_a_task_is_not_judged_by_the_admission_guard"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskOperationService",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskOperationService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:clear_override"
+      },
+      "key": {
+        "bound_tests_set_hash": "9bcb016418daf9fcc706ab9363195277b7a5a6260b2791d858458d5830aeeaea",
+        "declaration_hash": "bec63075c9cd95e57769786980fca6c9918f509a466880de622da8343a87a01d",
+        "anchor_text_hash": "2b3c24ea936179e964f93c56a5e410861b7a62acf600d103c965bdf9dc5924af"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );\n\n        // With B1's only member committed, B2 becomes the batch being consumed\n        // and the same task starts.\n        let settled = store_with(plan_of(&[\n            (\"T001\", TaskStatus::DoneTraced { commit_hash: commit_hash() }),\n            (\"T002\", TaskStatus::Todo),\n        ]));\n        let outcome = admitting_interactor(settled, batch_plan, Vec::new(), Some(500))\n            .transition_task(start_work_on(\"T002\"))\n            .unwrap();\n\n        assert_eq!(transitioned(outcome).derived_status, \"in_progress\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_an_override_dominates_the_derived_status_until_it_is_cleared"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_finishing_a_task_is_not_judged_by_the_admission_guard"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskOperationService",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskOperationService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:clear_override"
+      },
+      "key": {
+        "bound_tests_set_hash": "9bcb016418daf9fcc706ab9363195277b7a5a6260b2791d858458d5830aeeaea",
+        "declaration_hash": "bec63075c9cd95e57769786980fca6c9918f509a466880de622da8343a87a01d",
+        "anchor_text_hash": "7669b3f2178d882d0e0caa12e2ca90dacb12def84e7b001e4c49181fa2beb7e5"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );\n\n        // With B1's only member committed, B2 becomes the batch being consumed\n        // and the same task starts.\n        let settled = store_with(plan_of(&[\n            (\"T001\", TaskStatus::DoneTraced { commit_hash: commit_hash() }),\n            (\"T002\", TaskStatus::Todo),\n        ]));\n        let outcome = admitting_interactor(settled, batch_plan, Vec::new(), Some(500))\n            .transition_task(start_work_on(\"T002\"))\n            .unwrap();\n\n        assert_eq!(transitioned(outcome).derived_status, \"in_progress\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_an_override_dominates_the_derived_status_until_it_is_cleared"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_finishing_a_task_is_not_judged_by_the_admission_guard"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskTransitionOutcome",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskTransitionOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-09"
+      },
+      "key": {
+        "bound_tests_set_hash": "0181d55f9f1446a985c37c2d2884ca741bb6cc5e74cd647798400c9938c8992b",
+        "declaration_hash": "213f4a68483f3b99d03c7b6acfc09a30704f51b1d6de2e6d043de6eec57b8fb9",
+        "anchor_text_hash": "2b3c24ea936179e964f93c56a5e410861b7a62acf600d103c965bdf9dc5924af"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_finishing_a_task_is_not_judged_by_the_admission_guard"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskTransitionOutcome",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskTransitionOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-10"
+      },
+      "key": {
+        "bound_tests_set_hash": "0181d55f9f1446a985c37c2d2884ca741bb6cc5e74cd647798400c9938c8992b",
+        "declaration_hash": "213f4a68483f3b99d03c7b6acfc09a30704f51b1d6de2e6d043de6eec57b8fb9",
+        "anchor_text_hash": "7669b3f2178d882d0e0caa12e2ca90dacb12def84e7b001e4c49181fa2beb7e5"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );\n\n        // With B1's only member committed, B2 becomes the batch being consumed\n        // and the same task starts.\n        let settled = store_with(plan_of(&[\n            (\"T001\", TaskStatus::DoneTraced { commit_hash: commit_hash() }),\n            (\"T002\", TaskStatus::Todo),\n        ]));\n        let outcome = admitting_interactor(settled, batch_plan, Vec::new(), Some(500))\n            .transition_task(start_work_on(\"T002\"))\n            .unwrap();\n\n        assert_eq!(transitioned(outcome).derived_status, \"in_progress\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_finishing_a_task_is_not_judged_by_the_admission_guard"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskTransitionOutcome",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskTransitionOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-10"
+      },
+      "key": {
+        "bound_tests_set_hash": "616b7cd957bde169ef3cf7e204f59e5b71f1ee147ca08426b22fecd369f5d4d8",
+        "declaration_hash": "213f4a68483f3b99d03c7b6acfc09a30704f51b1d6de2e6d043de6eec57b8fb9",
+        "anchor_text_hash": "95f3aa6927f09837b3f404c8ffe20837feae78d7b9c33b8e60168b0adc31f8e1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::ScopeCeilingWouldBeExceeded {\n                scope: \"domain\".to_owned(),\n                // 100 measured + 300 declared by the member in progress.\n                prior_contribution: std::num::NonZeroU32::new(400).unwrap(),\n                candidate_estimate: 200,\n                ceiling: 500,\n            })\n        );\n\n        assert_eq!(transitioned(outcome).derived_status, \"in_progress\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskTransitionOutcome",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-12"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskTransitionOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-12"
+      },
+      "key": {
+        "bound_tests_set_hash": "616b7cd957bde169ef3cf7e204f59e5b71f1ee147ca08426b22fecd369f5d4d8",
+        "declaration_hash": "213f4a68483f3b99d03c7b6acfc09a30704f51b1d6de2e6d043de6eec57b8fb9",
+        "anchor_text_hash": "d9b08a85d66d49d33298ae5cb8b1a9adf29f78988d1086b6c203d164cf23e094"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::ScopeCeilingWouldBeExceeded {\n                scope: \"domain\".to_owned(),\n                prior_contribution: std::num::NonZeroU32::new(400).unwrap(),\n                candidate_estimate: 200,\n                ceiling: 500,\n            })\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdmissionRejectionOutput",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdmissionRejectionOutput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-09"
+      },
+      "key": {
+        "bound_tests_set_hash": "0181d55f9f1446a985c37c2d2884ca741bb6cc5e74cd647798400c9938c8992b",
+        "declaration_hash": "945dacc8048bcbda31179cb8a4025e3501003e5ba8f9df237b411f13bb71ca81",
+        "anchor_text_hash": "2b3c24ea936179e964f93c56a5e410861b7a62acf600d103c965bdf9dc5924af"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_finishing_a_task_is_not_judged_by_the_admission_guard"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdmissionRejectionOutput",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdmissionRejectionOutput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-10"
+      },
+      "key": {
+        "bound_tests_set_hash": "0181d55f9f1446a985c37c2d2884ca741bb6cc5e74cd647798400c9938c8992b",
+        "declaration_hash": "945dacc8048bcbda31179cb8a4025e3501003e5ba8f9df237b411f13bb71ca81",
+        "anchor_text_hash": "7669b3f2178d882d0e0caa12e2ca90dacb12def84e7b001e4c49181fa2beb7e5"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );\n\n        // With B1's only member committed, B2 becomes the batch being consumed\n        // and the same task starts.\n        let settled = store_with(plan_of(&[\n            (\"T001\", TaskStatus::DoneTraced { commit_hash: commit_hash() }),\n            (\"T002\", TaskStatus::Todo),\n        ]));\n        let outcome = admitting_interactor(settled, batch_plan, Vec::new(), Some(500))\n            .transition_task(start_work_on(\"T002\"))\n            .unwrap();\n\n        assert_eq!(transitioned(outcome).derived_status, \"in_progress\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_finishing_a_task_is_not_judged_by_the_admission_guard"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdmissionRejectionOutput",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdmissionRejectionOutput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-10"
+      },
+      "key": {
+        "bound_tests_set_hash": "616b7cd957bde169ef3cf7e204f59e5b71f1ee147ca08426b22fecd369f5d4d8",
+        "declaration_hash": "945dacc8048bcbda31179cb8a4025e3501003e5ba8f9df237b411f13bb71ca81",
+        "anchor_text_hash": "95f3aa6927f09837b3f404c8ffe20837feae78d7b9c33b8e60168b0adc31f8e1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::ScopeCeilingWouldBeExceeded {\n                scope: \"domain\".to_owned(),\n                prior_contribution: std::num::NonZeroU32::new(400).unwrap(),\n                candidate_estimate: 200,\n                ceiling: 500,\n            })\n        );\n\n        assert_eq!(transitioned(outcome).derived_status, \"in_progress\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdmissionRejectionOutput",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-12"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdmissionRejectionOutput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-12"
+      },
+      "key": {
+        "bound_tests_set_hash": "616b7cd957bde169ef3cf7e204f59e5b71f1ee147ca08426b22fecd369f5d4d8",
+        "declaration_hash": "945dacc8048bcbda31179cb8a4025e3501003e5ba8f9df237b411f13bb71ca81",
+        "anchor_text_hash": "d9b08a85d66d49d33298ae5cb8b1a9adf29f78988d1086b6c203d164cf23e094"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::ScopeCeilingWouldBeExceeded {\n                scope: \"domain\".to_owned(),\n                prior_contribution: std::num::NonZeroU32::new(400).unwrap(),\n                candidate_estimate: 200,\n                ceiling: 500,\n            })\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanDocument",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:settled_task_ids"
+      },
+      "key": {
+        "bound_tests_set_hash": "cb5e73df8786b9411c1f7e2880092f09eeb0336b88b8d549dc947b3a518a089c",
+        "declaration_hash": "c74a233c6604bda6135aa2cde60abae1ee729f451e036934dbad2aaf7e011787",
+        "anchor_text_hash": "2b3c24ea936179e964f93c56a5e410861b7a62acf600d103c965bdf9dc5924af"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );\n\n        // With B1's only member committed, B2 becomes the batch being consumed\n        // and the same task starts.\n        let settled = store_with(plan_of(&[\n            (\"T001\", TaskStatus::DoneTraced { commit_hash: commit_hash() }),\n            (\"T002\", TaskStatus::Todo),\n        ]));\n        let outcome = admitting_interactor(settled, batch_plan, Vec::new(), Some(500))\n            .transition_task(start_work_on(\"T002\"))\n            .unwrap();\n\n        assert_eq!(transitioned(outcome).derived_status, \"in_progress\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanDocument",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:settled_task_ids"
+      },
+      "key": {
+        "bound_tests_set_hash": "cb5e73df8786b9411c1f7e2880092f09eeb0336b88b8d549dc947b3a518a089c",
+        "declaration_hash": "c74a233c6604bda6135aa2cde60abae1ee729f451e036934dbad2aaf7e011787",
+        "anchor_text_hash": "95f3aa6927f09837b3f404c8ffe20837feae78d7b9c33b8e60168b0adc31f8e1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            doc.in_progress_task_ids(),\n            [TaskId::try_new(\"T001\").unwrap(), TaskId::try_new(\"T004\").unwrap()]\n                .into_iter()\n                .collect::<std::collections::BTreeSet<TaskId>>()\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanDocument",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:settled_task_ids"
+      },
+      "key": {
+        "bound_tests_set_hash": "cb5e73df8786b9411c1f7e2880092f09eeb0336b88b8d549dc947b3a518a089c",
+        "declaration_hash": "c74a233c6604bda6135aa2cde60abae1ee729f451e036934dbad2aaf7e011787",
+        "anchor_text_hash": "7669b3f2178d882d0e0caa12e2ca90dacb12def84e7b001e4c49181fa2beb7e5"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );\n\n        // With B1's only member committed, B2 becomes the batch being consumed\n        // and the same task starts.\n        let settled = store_with(plan_of(&[\n            (\"T001\", TaskStatus::DoneTraced { commit_hash: commit_hash() }),\n            (\"T002\", TaskStatus::Todo),\n        ]));\n        let outcome = admitting_interactor(settled, batch_plan, Vec::new(), Some(500))\n            .transition_task(start_work_on(\"T002\"))\n            .unwrap();\n\n        assert_eq!(transitioned(outcome).derived_status, \"in_progress\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanDocument",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:in_progress_task_ids"
+      },
+      "key": {
+        "bound_tests_set_hash": "cb5e73df8786b9411c1f7e2880092f09eeb0336b88b8d549dc947b3a518a089c",
+        "declaration_hash": "c74a233c6604bda6135aa2cde60abae1ee729f451e036934dbad2aaf7e011787",
+        "anchor_text_hash": "2b3c24ea936179e964f93c56a5e410861b7a62acf600d103c965bdf9dc5924af"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );\n\n        // With B1's only member committed, B2 becomes the batch being consumed\n        // and the same task starts.\n        let settled = store_with(plan_of(&[\n            (\"T001\", TaskStatus::DoneTraced { commit_hash: commit_hash() }),\n            (\"T002\", TaskStatus::Todo),\n        ]));\n        let outcome = admitting_interactor(settled, batch_plan, Vec::new(), Some(500))\n            .transition_task(start_work_on(\"T002\"))\n            .unwrap();\n\n        assert_eq!(transitioned(outcome).derived_status, \"in_progress\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanDocument",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:in_progress_task_ids"
+      },
+      "key": {
+        "bound_tests_set_hash": "cb5e73df8786b9411c1f7e2880092f09eeb0336b88b8d549dc947b3a518a089c",
+        "declaration_hash": "c74a233c6604bda6135aa2cde60abae1ee729f451e036934dbad2aaf7e011787",
+        "anchor_text_hash": "95f3aa6927f09837b3f404c8ffe20837feae78d7b9c33b8e60168b0adc31f8e1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::ScopeCeilingWouldBeExceeded {\n                scope: \"domain\".to_owned(),\n                // 100 measured + 300 declared by the member in progress.\n                prior_contribution: std::num::NonZeroU32::new(400).unwrap(),\n                candidate_estimate: 200,\n                ceiling: 500,\n            })\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanDocument",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:in_progress_task_ids"
+      },
+      "key": {
+        "bound_tests_set_hash": "cb5e73df8786b9411c1f7e2880092f09eeb0336b88b8d549dc947b3a518a089c",
+        "declaration_hash": "c74a233c6604bda6135aa2cde60abae1ee729f451e036934dbad2aaf7e011787",
+        "anchor_text_hash": "7669b3f2178d882d0e0caa12e2ca90dacb12def84e7b001e4c49181fa2beb7e5"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            doc.settled_task_ids(),\n            [TaskId::try_new(\"T001\").unwrap(), TaskId::try_new(\"T002\").unwrap()]\n                .into_iter()\n                .collect::<std::collections::BTreeSet<TaskId>>()\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanDocument",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:new"
+      },
+      "key": {
+        "bound_tests_set_hash": "99280557fe8c72afe504c3c8e76415002461b603d20344bcfdd1a4f2e6bdf43f",
+        "declaration_hash": "c74a233c6604bda6135aa2cde60abae1ee729f451e036934dbad2aaf7e011787",
+        "anchor_text_hash": "2b3c24ea936179e964f93c56a5e410861b7a62acf600d103c965bdf9dc5924af"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n    outcome.rejection(),\n    Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n        task_id: \"T002\".to_owned(),\n        task_batch: \"B2\".to_owned(),\n        current_batch: \"B1\".to_owned(),\n    })\n)\n\n// With B1's only member committed, B2 becomes the batch being consumed\n// and the same task starts.\n...\nassert_eq!(transitioned(outcome).derived_status, \"in_progress\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_with_valid_tasks_and_plan_succeeds"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_with_duplicate_task_id_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_with_unreferenced_task_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_with_unknown_task_reference_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_keeps_the_dependencies_each_task_declares"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_rejects_a_cycle_in_the_declared_dependencies"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_rejects_a_plan_order_that_places_a_task_before_its_dependency"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanDocument",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:new"
+      },
+      "key": {
+        "bound_tests_set_hash": "99280557fe8c72afe504c3c8e76415002461b603d20344bcfdd1a4f2e6bdf43f",
+        "declaration_hash": "c74a233c6604bda6135aa2cde60abae1ee729f451e036934dbad2aaf7e011787",
+        "anchor_text_hash": "95f3aa6927f09837b3f404c8ffe20837feae78d7b9c33b8e60168b0adc31f8e1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::ScopeCeilingWouldBeExceeded {\n                scope: \"domain\".to_owned(),\n                // 100 measured + 300 declared by the member in progress.\n                prior_contribution: std::num::NonZeroU32::new(400).unwrap(),\n                candidate_estimate: 200,\n                ceiling: 500,\n            })\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_with_valid_tasks_and_plan_succeeds"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_with_duplicate_task_id_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_with_unreferenced_task_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_with_unknown_task_reference_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_keeps_the_dependencies_each_task_declares"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_rejects_a_cycle_in_the_declared_dependencies"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_rejects_a_plan_order_that_places_a_task_before_its_dependency"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanDocument",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:new"
+      },
+      "key": {
+        "bound_tests_set_hash": "99280557fe8c72afe504c3c8e76415002461b603d20344bcfdd1a4f2e6bdf43f",
+        "declaration_hash": "c74a233c6604bda6135aa2cde60abae1ee729f451e036934dbad2aaf7e011787",
+        "anchor_text_hash": "7669b3f2178d882d0e0caa12e2ca90dacb12def84e7b001e4c49181fa2beb7e5"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );\n\n        // With B1's only member committed, B2 becomes the batch being consumed\n        // and the same task starts.\n        let settled = store_with(plan_of(&[\n            (\"T001\", TaskStatus::DoneTraced { commit_hash: commit_hash() }),\n            (\"T002\", TaskStatus::Todo),\n        ]));\n        let outcome = admitting_interactor(settled, batch_plan, Vec::new(), Some(500))\n            .transition_task(start_work_on(\"T002\"))\n            .unwrap();\n\n        assert_eq!(transitioned(outcome).derived_status, \"in_progress\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_with_valid_tasks_and_plan_succeeds"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_with_duplicate_task_id_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_with_unreferenced_task_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_with_unknown_task_reference_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_keeps_the_dependencies_each_task_declares"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_rejects_a_cycle_in_the_declared_dependencies"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_rejects_a_plan_order_that_places_a_task_before_its_dependency"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanDocument",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:schema_version"
+      },
+      "key": {
+        "bound_tests_set_hash": "c6400374b73f4f9f55799a18fac836b94ba3ff22bbbc375bfc2e5519252e01ed",
+        "declaration_hash": "c74a233c6604bda6135aa2cde60abae1ee729f451e036934dbad2aaf7e011787",
+        "anchor_text_hash": "2b3c24ea936179e964f93c56a5e410861b7a62acf600d103c965bdf9dc5924af"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );\n\n        // With B1's only member committed, B2 becomes the batch being consumed\n        // and the same task starts.\n        let settled = store_with(plan_of(&[\n            (\"T001\", TaskStatus::DoneTraced { commit_hash: commit_hash() }),\n            (\"T002\", TaskStatus::Todo),\n        ]));\n        let outcome = admitting_interactor(settled, batch_plan, Vec::new(), Some(500))\n            .transition_task(start_work_on(\"T002\"))\n            .unwrap();\n\n        assert_eq!(transitioned(outcome).derived_status, \"in_progress\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_schema_version_is_1"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanDocument",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:schema_version"
+      },
+      "key": {
+        "bound_tests_set_hash": "c6400374b73f4f9f55799a18fac836b94ba3ff22bbbc375bfc2e5519252e01ed",
+        "declaration_hash": "c74a233c6604bda6135aa2cde60abae1ee729f451e036934dbad2aaf7e011787",
+        "anchor_text_hash": "95f3aa6927f09837b3f404c8ffe20837feae78d7b9c33b8e60168b0adc31f8e1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            doc.in_progress_task_ids(),\n            [TaskId::try_new(\"T001\").unwrap(), TaskId::try_new(\"T004\").unwrap()]\n                .into_iter()\n                .collect::<std::collections::BTreeSet<TaskId>>()\n        );\n\nassert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::ScopeCeilingWouldBeExceeded {\n                scope: \"domain\".to_owned(),\n                // 100 measured + 300 declared by the member in progress.\n                prior_contribution: std::num::NonZeroU32::new(400).unwrap(),\n                candidate_estimate: 200,\n                ceiling: 500,\n            })\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_schema_version_is_1"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanDocument",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:schema_version"
+      },
+      "key": {
+        "bound_tests_set_hash": "c6400374b73f4f9f55799a18fac836b94ba3ff22bbbc375bfc2e5519252e01ed",
+        "declaration_hash": "c74a233c6604bda6135aa2cde60abae1ee729f451e036934dbad2aaf7e011787",
+        "anchor_text_hash": "7669b3f2178d882d0e0caa12e2ca90dacb12def84e7b001e4c49181fa2beb7e5"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );\n\n        // With B1's only member committed, B2 becomes the batch being consumed\n        // and the same task starts.\n        let settled = store_with(plan_of(&[\n            (\"T001\", TaskStatus::DoneTraced { commit_hash: commit_hash() }),\n            (\"T002\", TaskStatus::Todo),\n        ]));\n        let outcome = admitting_interactor(settled, batch_plan, Vec::new(), Some(500))\n            .transition_task(start_work_on(\"T002\"))\n            .unwrap();\n\n        assert_eq!(transitioned(outcome).derived_status, \"in_progress\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_schema_version_is_1"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanDocument",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:tasks"
+      },
+      "key": {
+        "bound_tests_set_hash": "4c25e2a85a6185932ab583a4c1b7262b55de1bc0a7e092c39bc2840b30e08352",
+        "declaration_hash": "c74a233c6604bda6135aa2cde60abae1ee729f451e036934dbad2aaf7e011787",
+        "anchor_text_hash": "2b3c24ea936179e964f93c56a5e410861b7a62acf600d103c965bdf9dc5924af"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );\n\n        // With B1's only member committed, B2 becomes the batch being consumed\n        // and the same task starts.\n        let settled = store_with(plan_of(&[\n            (\"T001\", TaskStatus::DoneTraced { commit_hash: commit_hash() }),\n            (\"T002\", TaskStatus::Todo),\n        ]));\n        let outcome = admitting_interactor(settled, batch_plan, Vec::new(), Some(500))\n            .transition_task(start_work_on(\"T002\"))\n            .unwrap();\n\n        assert_eq!(transitioned(outcome).derived_status, \"in_progress\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_tasks_accessor_returns_correct_count"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanDocument",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:tasks"
+      },
+      "key": {
+        "bound_tests_set_hash": "4c25e2a85a6185932ab583a4c1b7262b55de1bc0a7e092c39bc2840b30e08352",
+        "declaration_hash": "c74a233c6604bda6135aa2cde60abae1ee729f451e036934dbad2aaf7e011787",
+        "anchor_text_hash": "95f3aa6927f09837b3f404c8ffe20837feae78d7b9c33b8e60168b0adc31f8e1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            doc.in_progress_task_ids(),\n            [TaskId::try_new(\"T001\").unwrap(), TaskId::try_new(\"T004\").unwrap()]\n                .into_iter()\n                .collect::<std::collections::BTreeSet<TaskId>>()\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_tasks_accessor_returns_correct_count"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanDocument",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:tasks"
+      },
+      "key": {
+        "bound_tests_set_hash": "4c25e2a85a6185932ab583a4c1b7262b55de1bc0a7e092c39bc2840b30e08352",
+        "declaration_hash": "c74a233c6604bda6135aa2cde60abae1ee729f451e036934dbad2aaf7e011787",
+        "anchor_text_hash": "7669b3f2178d882d0e0caa12e2ca90dacb12def84e7b001e4c49181fa2beb7e5"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n    outcome.rejection(),\n    Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n        task_id: \"T002\".to_owned(),\n        task_batch: \"B2\".to_owned(),\n        current_batch: \"B1\".to_owned(),\n    })\n);\n\n// With B1's only member committed, B2 becomes the batch being consumed\n// and the same task starts.\nlet settled = store_with(plan_of(&[\n    (\"T001\", TaskStatus::DoneTraced { commit_hash: commit_hash() }),\n    (\"T002\", TaskStatus::Todo),\n]));\nlet outcome = admitting_interactor(settled, batch_plan, Vec::new(), Some(500))\n    .transition_task(start_work_on(\"T002\"))\n    .unwrap();\n\nassert_eq!(transitioned(outcome).derived_status, \"in_progress\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_tasks_accessor_returns_correct_count"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanDocument",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:plan"
+      },
+      "key": {
+        "bound_tests_set_hash": "1119473ec187930fa16b8de9677456c3103a21c5a0481413b6b75641b5534c7c",
+        "declaration_hash": "c74a233c6604bda6135aa2cde60abae1ee729f451e036934dbad2aaf7e011787",
+        "anchor_text_hash": "2b3c24ea936179e964f93c56a5e410861b7a62acf600d103c965bdf9dc5924af"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );\n\n        // With B1's only member committed, B2 becomes the batch being consumed\n        // and the same task starts.\n        let settled = store_with(plan_of(&[\n            (\"T001\", TaskStatus::DoneTraced { commit_hash: commit_hash() }),\n            (\"T002\", TaskStatus::Todo),\n        ]));\n        let outcome = admitting_interactor(settled, batch_plan, Vec::new(), Some(500))\n            .transition_task(start_work_on(\"T002\"))\n            .unwrap();\n\n        assert_eq!(transitioned(outcome).derived_status, \"in_progress\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_plan_accessor_returns_sections"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanDocument",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:plan"
+      },
+      "key": {
+        "bound_tests_set_hash": "1119473ec187930fa16b8de9677456c3103a21c5a0481413b6b75641b5534c7c",
+        "declaration_hash": "c74a233c6604bda6135aa2cde60abae1ee729f451e036934dbad2aaf7e011787",
+        "anchor_text_hash": "95f3aa6927f09837b3f404c8ffe20837feae78d7b9c33b8e60168b0adc31f8e1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            doc.in_progress_task_ids(),\n            [TaskId::try_new(\"T001\").unwrap(), TaskId::try_new(\"T004\").unwrap()]\n                .into_iter()\n                .collect::<std::collections::BTreeSet<TaskId>>()\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_plan_accessor_returns_sections"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanDocument",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:plan"
+      },
+      "key": {
+        "bound_tests_set_hash": "1119473ec187930fa16b8de9677456c3103a21c5a0481413b6b75641b5534c7c",
+        "declaration_hash": "c74a233c6604bda6135aa2cde60abae1ee729f451e036934dbad2aaf7e011787",
+        "anchor_text_hash": "7669b3f2178d882d0e0caa12e2ca90dacb12def84e7b001e4c49181fa2beb7e5"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );\n\n        // With B1's only member committed, B2 becomes the batch being consumed\n        // and the same task starts.\n        let settled = store_with(plan_of(&[\n            (\"T001\", TaskStatus::DoneTraced { commit_hash: commit_hash() }),\n            (\"T002\", TaskStatus::Todo),\n        ]));\n        let outcome = admitting_interactor(settled, batch_plan, Vec::new(), Some(500))\n            .transition_task(start_work_on(\"T002\"))\n            .unwrap();\n\n        assert_eq!(transitioned(outcome).derived_status, \"in_progress\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_plan_accessor_returns_sections"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanDocument",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:all_tasks_resolved"
+      },
+      "key": {
+        "bound_tests_set_hash": "eb8a0d07656795a29b3ca7fc2ef2bf524f65e5f258c50a74d1f0e62a56e8c39e",
+        "declaration_hash": "c74a233c6604bda6135aa2cde60abae1ee729f451e036934dbad2aaf7e011787",
+        "anchor_text_hash": "2b3c24ea936179e964f93c56a5e410861b7a62acf600d103c965bdf9dc5924af"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );\n\n        // With B1's only member committed, B2 becomes the batch being consumed\n        // and the same task starts.\n        let settled = store_with(plan_of(&[\n            (\"T001\", TaskStatus::DoneTraced { commit_hash: commit_hash() }),\n            (\"T002\", TaskStatus::Todo),\n        ]));\n        let outcome = admitting_interactor(settled, batch_plan, Vec::new(), Some(500))\n            .transition_task(start_work_on(\"T002\"))\n            .unwrap();\n\n        assert_eq!(transitioned(outcome).derived_status, \"in_progress\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_all_tasks_resolved_with_no_tasks_returns_true"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_all_tasks_resolved_with_todo_task_returns_false"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_all_tasks_resolved_when_all_done_returns_true"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanDocument",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:all_tasks_resolved"
+      },
+      "key": {
+        "bound_tests_set_hash": "eb8a0d07656795a29b3ca7fc2ef2bf524f65e5f258c50a74d1f0e62a56e8c39e",
+        "declaration_hash": "c74a233c6604bda6135aa2cde60abae1ee729f451e036934dbad2aaf7e011787",
+        "anchor_text_hash": "95f3aa6927f09837b3f404c8ffe20837feae78d7b9c33b8e60168b0adc31f8e1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            doc.in_progress_task_ids(),\n            [TaskId::try_new(\"T001\").unwrap(), TaskId::try_new(\"T004\").unwrap()]\n                .into_iter()\n                .collect::<std::collections::BTreeSet<TaskId>>()\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_all_tasks_resolved_with_no_tasks_returns_true"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_all_tasks_resolved_with_todo_task_returns_false"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_all_tasks_resolved_when_all_done_returns_true"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanDocument",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:all_tasks_resolved"
+      },
+      "key": {
+        "bound_tests_set_hash": "eb8a0d07656795a29b3ca7fc2ef2bf524f65e5f258c50a74d1f0e62a56e8c39e",
+        "declaration_hash": "c74a233c6604bda6135aa2cde60abae1ee729f451e036934dbad2aaf7e011787",
+        "anchor_text_hash": "7669b3f2178d882d0e0caa12e2ca90dacb12def84e7b001e4c49181fa2beb7e5"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );\n\n        // With B1's only member committed, B2 becomes the batch being consumed\n        // and the same task starts.\n        let settled = store_with(plan_of(&[\n            (\"T001\", TaskStatus::DoneTraced { commit_hash: commit_hash() }),\n            (\"T002\", TaskStatus::Todo),\n        ]));\n        let outcome = admitting_interactor(settled, batch_plan, Vec::new(), Some(500))\n            .transition_task(start_work_on(\"T002\"))\n            .unwrap();\n\n        assert_eq!(transitioned(outcome).derived_status, \"in_progress\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_all_tasks_resolved_with_no_tasks_returns_true"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_all_tasks_resolved_with_todo_task_returns_false"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_all_tasks_resolved_when_all_done_returns_true"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanDocument",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:unresolved_task_ids"
+      },
+      "key": {
+        "bound_tests_set_hash": "05dcaf421b001a0f969af4b6227e2c631ec0524e260a086c85e9669c02752940",
+        "declaration_hash": "c74a233c6604bda6135aa2cde60abae1ee729f451e036934dbad2aaf7e011787",
+        "anchor_text_hash": "2b3c24ea936179e964f93c56a5e410861b7a62acf600d103c965bdf9dc5924af"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );\n\n        // With B1's only member committed, B2 becomes the batch being consumed\n        // and the same task starts.\n        let settled = store_with(plan_of(&[\n            (\"T001\", TaskStatus::DoneTraced { commit_hash: commit_hash() }),\n            (\"T002\", TaskStatus::Todo),\n        ]));\n        let outcome = admitting_interactor(settled, batch_plan, Vec::new(), Some(500))\n            .transition_task(start_work_on(\"T002\"))\n            .unwrap();\n\n        assert_eq!(transitioned(outcome).derived_status, \"in_progress\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_unresolved_task_ids_returns_unresolved"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanDocument",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:unresolved_task_ids"
+      },
+      "key": {
+        "bound_tests_set_hash": "05dcaf421b001a0f969af4b6227e2c631ec0524e260a086c85e9669c02752940",
+        "declaration_hash": "c74a233c6604bda6135aa2cde60abae1ee729f451e036934dbad2aaf7e011787",
+        "anchor_text_hash": "95f3aa6927f09837b3f404c8ffe20837feae78d7b9c33b8e60168b0adc31f8e1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            doc.in_progress_task_ids(),\n            [TaskId::try_new(\"T001\").unwrap(), TaskId::try_new(\"T004\").unwrap()]\n                .into_iter()\n                .collect::<std::collections::BTreeSet<TaskId>>()\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_unresolved_task_ids_returns_unresolved"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanDocument",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:unresolved_task_ids"
+      },
+      "key": {
+        "bound_tests_set_hash": "05dcaf421b001a0f969af4b6227e2c631ec0524e260a086c85e9669c02752940",
+        "declaration_hash": "c74a233c6604bda6135aa2cde60abae1ee729f451e036934dbad2aaf7e011787",
+        "anchor_text_hash": "7669b3f2178d882d0e0caa12e2ca90dacb12def84e7b001e4c49181fa2beb7e5"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );\n\n        // With B1's only member committed, B2 becomes the batch being consumed\n        // and the same task starts.\n        let settled = store_with(plan_of(&[\n            (\"T001\", TaskStatus::DoneTraced { commit_hash: commit_hash() }),\n            (\"T002\", TaskStatus::Todo),\n        ]));\n        let outcome = admitting_interactor(settled, batch_plan, Vec::new(), Some(500))\n            .transition_task(start_work_on(\"T002\"))\n            .unwrap();\n\n        assert_eq!(transitioned(outcome).derived_status, \"in_progress\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_unresolved_task_ids_returns_unresolved"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanDocument",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:next_open_task"
+      },
+      "key": {
+        "bound_tests_set_hash": "1ab253db5f3aeed6d1b20b7ebbab6d7b6c68491be3d805a8239bdfdd0e21de4d",
+        "declaration_hash": "c74a233c6604bda6135aa2cde60abae1ee729f451e036934dbad2aaf7e011787",
+        "anchor_text_hash": "2b3c24ea936179e964f93c56a5e410861b7a62acf600d103c965bdf9dc5924af"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );\n\n        // With B1's only member committed, B2 becomes the batch being consumed\n        // and the same task starts."
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_next_open_task_returns_first_todo"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_next_open_task_prefers_in_progress_over_todo_in_earlier_section"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_next_open_task_respects_plan_order_for_todo_tasks"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanDocument",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:next_open_task"
+      },
+      "key": {
+        "bound_tests_set_hash": "1ab253db5f3aeed6d1b20b7ebbab6d7b6c68491be3d805a8239bdfdd0e21de4d",
+        "declaration_hash": "c74a233c6604bda6135aa2cde60abae1ee729f451e036934dbad2aaf7e011787",
+        "anchor_text_hash": "95f3aa6927f09837b3f404c8ffe20837feae78d7b9c33b8e60168b0adc31f8e1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            doc.in_progress_task_ids(),\n            [TaskId::try_new(\"T001\").unwrap(), TaskId::try_new(\"T004\").unwrap()]\n                .into_iter()\n                .collect::<std::collections::BTreeSet<TaskId>>()\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_next_open_task_returns_first_todo"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_next_open_task_prefers_in_progress_over_todo_in_earlier_section"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_next_open_task_respects_plan_order_for_todo_tasks"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanDocument",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:next_open_task"
+      },
+      "key": {
+        "bound_tests_set_hash": "1ab253db5f3aeed6d1b20b7ebbab6d7b6c68491be3d805a8239bdfdd0e21de4d",
+        "declaration_hash": "c74a233c6604bda6135aa2cde60abae1ee729f451e036934dbad2aaf7e011787",
+        "anchor_text_hash": "7669b3f2178d882d0e0caa12e2ca90dacb12def84e7b001e4c49181fa2beb7e5"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );\n\n        // With B1's only member committed, B2 becomes the batch being consumed\n        // and the same task starts.\n        let settled = store_with(plan_of(&[\n            (\"T001\", TaskStatus::DoneTraced { commit_hash: commit_hash() }),\n            (\"T002\", TaskStatus::Todo),\n        ]));\n        let outcome = admitting_interactor(settled, batch_plan, Vec::new(), Some(500))\n            .transition_task(start_work_on(\"T002\"))\n            .unwrap();\n\n        assert_eq!(transitioned(outcome).derived_status, \"in_progress\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_next_open_task_returns_first_todo"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_next_open_task_prefers_in_progress_over_todo_in_earlier_section"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_next_open_task_respects_plan_order_for_todo_tasks"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanDocument",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:apply_transition"
+      },
+      "key": {
+        "bound_tests_set_hash": "8bea818aa55abdea6baba23bfee3539c6b36f000e95195cc16887d154346295c",
+        "declaration_hash": "c74a233c6604bda6135aa2cde60abae1ee729f451e036934dbad2aaf7e011787",
+        "anchor_text_hash": "2b3c24ea936179e964f93c56a5e410861b7a62acf600d103c965bdf9dc5924af"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );\n\n        // With B1's only member committed, B2 becomes the batch being consumed\n        // and the same task starts."
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_apply_transition_todo_to_in_progress_succeeds"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_apply_transition_with_unknown_task_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanDocument",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:apply_transition"
+      },
+      "key": {
+        "bound_tests_set_hash": "8bea818aa55abdea6baba23bfee3539c6b36f000e95195cc16887d154346295c",
+        "declaration_hash": "c74a233c6604bda6135aa2cde60abae1ee729f451e036934dbad2aaf7e011787",
+        "anchor_text_hash": "95f3aa6927f09837b3f404c8ffe20837feae78d7b9c33b8e60168b0adc31f8e1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            doc.in_progress_task_ids(),\n            [TaskId::try_new(\"T001\").unwrap(), TaskId::try_new(\"T004\").unwrap()]\n                .into_iter()\n                .collect::<std::collections::BTreeSet<TaskId>>()\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_apply_transition_todo_to_in_progress_succeeds"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_apply_transition_with_unknown_task_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanDocument",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:apply_transition"
+      },
+      "key": {
+        "bound_tests_set_hash": "8bea818aa55abdea6baba23bfee3539c6b36f000e95195cc16887d154346295c",
+        "declaration_hash": "c74a233c6604bda6135aa2cde60abae1ee729f451e036934dbad2aaf7e011787",
+        "anchor_text_hash": "7669b3f2178d882d0e0caa12e2ca90dacb12def84e7b001e4c49181fa2beb7e5"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );\n\n        // With B1's only member committed, B2 becomes the batch being consumed\n        // and the same task starts."
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_apply_transition_todo_to_in_progress_succeeds"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_apply_transition_with_unknown_task_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanDocument",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:apply_transition_by_status"
+      },
+      "key": {
+        "bound_tests_set_hash": "3b5a6aa43207889cfbea2d8524367c8d550bdac194000bd1afa1b8161d97d66b",
+        "declaration_hash": "c74a233c6604bda6135aa2cde60abae1ee729f451e036934dbad2aaf7e011787",
+        "anchor_text_hash": "2b3c24ea936179e964f93c56a5e410861b7a62acf600d103c965bdf9dc5924af"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_apply_transition_by_status_todo_to_in_progress_succeeds"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_apply_transition_by_status_in_progress_to_done_with_hash_succeeds"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_apply_transition_by_status_done_pending_to_done_with_hash_succeeds"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_apply_transition_by_status_unsupported_target_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_apply_transition_by_status_done_traced_to_done_returns_unsupported"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanDocument",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:apply_transition_by_status"
+      },
+      "key": {
+        "bound_tests_set_hash": "3b5a6aa43207889cfbea2d8524367c8d550bdac194000bd1afa1b8161d97d66b",
+        "declaration_hash": "c74a233c6604bda6135aa2cde60abae1ee729f451e036934dbad2aaf7e011787",
+        "anchor_text_hash": "95f3aa6927f09837b3f404c8ffe20837feae78d7b9c33b8e60168b0adc31f8e1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            doc.in_progress_task_ids(),\n            [TaskId::try_new(\"T001\").unwrap(), TaskId::try_new(\"T004\").unwrap()]\n                .into_iter()\n                .collect::<std::collections::BTreeSet<TaskId>>()\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_apply_transition_by_status_todo_to_in_progress_succeeds"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_apply_transition_by_status_in_progress_to_done_with_hash_succeeds"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_apply_transition_by_status_done_pending_to_done_with_hash_succeeds"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_apply_transition_by_status_unsupported_target_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_apply_transition_by_status_done_traced_to_done_returns_unsupported"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanDocument",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:apply_transition_by_status"
+      },
+      "key": {
+        "bound_tests_set_hash": "3b5a6aa43207889cfbea2d8524367c8d550bdac194000bd1afa1b8161d97d66b",
+        "declaration_hash": "c74a233c6604bda6135aa2cde60abae1ee729f451e036934dbad2aaf7e011787",
+        "anchor_text_hash": "7669b3f2178d882d0e0caa12e2ca90dacb12def84e7b001e4c49181fa2beb7e5"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );\n\n        // With B1's only member committed, B2 becomes the batch being consumed\n        // and the same task starts.\n        let settled = store_with(plan_of(&[\n            (\"T001\", TaskStatus::DoneTraced { commit_hash: commit_hash() }),\n            (\"T002\", TaskStatus::Todo),\n        ]));\n        let outcome = admitting_interactor(settled, batch_plan, Vec::new(), Some(500))\n            .transition_task(start_work_on(\"T002\"))\n            .unwrap();\n\n        assert_eq!(transitioned(outcome).derived_status, \"in_progress\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_apply_transition_by_status_todo_to_in_progress_succeeds"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_apply_transition_by_status_in_progress_to_done_with_hash_succeeds"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_apply_transition_by_status_done_pending_to_done_with_hash_succeeds"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_apply_transition_by_status_unsupported_target_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_apply_transition_by_status_done_traced_to_done_returns_unsupported"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanDocument",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:add_task"
+      },
+      "key": {
+        "bound_tests_set_hash": "5e976f03b2a1dd5b89a093b533b1a63336b5f9873b8d68ff002075f9f7452e60",
+        "declaration_hash": "c74a233c6604bda6135aa2cde60abae1ee729f451e036934dbad2aaf7e011787",
+        "anchor_text_hash": "2b3c24ea936179e964f93c56a5e410861b7a62acf600d103c965bdf9dc5924af"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );\n\n        // With B1's only member committed, B2 becomes the batch being consumed\n        // and the same task starts.\n        let settled = store_with(plan_of(&[\n            (\"T001\", TaskStatus::DoneTraced { commit_hash: commit_hash() }),\n            (\"T002\", TaskStatus::Todo),\n        ]));\n        let outcome = admitting_interactor(settled, batch_plan, Vec::new(), Some(500))\n            .transition_task(start_work_on(\"T002\"))\n            .unwrap();\n\n        assert_eq!(transitioned(outcome).derived_status, \"in_progress\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_add_task_appends_to_first_section_when_no_section_specified"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_add_task_inserts_after_specified_task"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_add_task_with_empty_description_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_add_task_invalid_section_does_not_corrupt_document"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanDocument",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:add_task"
+      },
+      "key": {
+        "bound_tests_set_hash": "5e976f03b2a1dd5b89a093b533b1a63336b5f9873b8d68ff002075f9f7452e60",
+        "declaration_hash": "c74a233c6604bda6135aa2cde60abae1ee729f451e036934dbad2aaf7e011787",
+        "anchor_text_hash": "95f3aa6927f09837b3f404c8ffe20837feae78d7b9c33b8e60168b0adc31f8e1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::ScopeCeilingWouldBeExceeded {\n                scope: \"domain\".to_owned(),\n                // 100 measured + 300 declared by the member in progress.\n                prior_contribution: std::num::NonZeroU32::new(400).unwrap(),\n                candidate_estimate: 200,\n                ceiling: 500,\n            })\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_add_task_appends_to_first_section_when_no_section_specified"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_add_task_inserts_after_specified_task"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_add_task_with_empty_description_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_add_task_invalid_section_does_not_corrupt_document"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanDocument",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:add_task"
+      },
+      "key": {
+        "bound_tests_set_hash": "5e976f03b2a1dd5b89a093b533b1a63336b5f9873b8d68ff002075f9f7452e60",
+        "declaration_hash": "c74a233c6604bda6135aa2cde60abae1ee729f451e036934dbad2aaf7e011787",
+        "anchor_text_hash": "7669b3f2178d882d0e0caa12e2ca90dacb12def84e7b001e4c49181fa2beb7e5"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );\n\n        // With B1's only member committed, B2 becomes the batch being consumed\n        // and the same task starts.\n        let settled = store_with(plan_of(&[\n            (\"T001\", TaskStatus::DoneTraced { commit_hash: commit_hash() }),\n            (\"T002\", TaskStatus::Todo),\n        ]));\n        let outcome = admitting_interactor(settled, batch_plan, Vec::new(), Some(500))\n            .transition_task(start_work_on(\"T002\"))\n            .unwrap();\n\n        assert_eq!(transitioned(outcome).derived_status, \"in_progress\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_add_task_appends_to_first_section_when_no_section_specified"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_add_task_inserts_after_specified_task"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_add_task_with_empty_description_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_add_task_invalid_section_does_not_corrupt_document"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
         }
       ]
     }

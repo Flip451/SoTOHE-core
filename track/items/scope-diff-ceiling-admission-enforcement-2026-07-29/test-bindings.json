@@ -3592,6 +3592,1022 @@
         }
       },
       "reason": "CN-09 is the non-retroactivity rule: the new gate applies only to tracks that are active after its introduction, an absent batch-plan.json on such a track is an error, and the artifacts of earlier tracks stay historical records that are never re-checked. LazyBranchReader can neither honour nor break that rule, because it reads no track artifact whatsoever — it discovers the repository at call time and returns the current branch name, or the port's read error when discovery fails. Which tracks are checked is decided by the readers that open a track directory and by the interactor that drives them; whether an earlier track's artifacts are revisited is decided the same way, by nobody visiting them. The error for a missing batch plan belongs to the batch-plan reader path. Even the fact that a branch name refers to the checkout of the moment is a property of what git reports rather than a decision this type makes, so there is nothing here to assert about retroactivity. Its own promise — a discovered repository reports its branch, an undiscoverable one fails at call time rather than at wiring time — is verified where it lives."
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "TaskOperationInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_candidate_without_an_estimate_makes_the_transition_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_track_without_a_batch_plan_cannot_start_work_but_still_finishes_it"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_finishing_a_task_is_not_judged_by_the_admission_guard"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "task_operation_transition_task_succeeds"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "task_operation_branch_guard_enforced_via_injected_reader"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_adding_a_task_names_the_id_it_created_and_the_status_that_follows"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_an_override_dominates_the_derived_status_until_it_is_cleared"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "TaskOperationService",
+        "item_identifier": "trait_method:transition_task",
+        "obligation_kind": "result"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_candidate_without_an_estimate_makes_the_transition_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_track_without_a_batch_plan_cannot_start_work_but_still_finishes_it"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_finishing_a_task_is_not_judged_by_the_admission_guard"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "TaskOperationService",
+        "item_identifier": "trait_method:add_task",
+        "obligation_kind": "result"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_adding_a_task_names_the_id_it_created_and_the_status_that_follows"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_finishing_a_task_is_not_judged_by_the_admission_guard"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "TaskOperationService",
+        "item_identifier": "trait_method:set_override",
+        "obligation_kind": "result"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_an_override_dominates_the_derived_status_until_it_is_cleared"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_finishing_a_task_is_not_judged_by_the_admission_guard"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "TaskOperationService",
+        "item_identifier": "trait_method:clear_override",
+        "obligation_kind": "result"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_an_override_dominates_the_derived_status_until_it_is_cleared"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_finishing_a_task_is_not_judged_by_the_admission_guard"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TaskTransitionOutcome",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_finishing_a_task_is_not_judged_by_the_admission_guard"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TaskTransitionOutcome",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_finishing_a_task_is_not_judged_by_the_admission_guard"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TaskTransitionOutcome",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-10"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TaskTransitionOutcome",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-12"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "AdmissionRejectionOutput",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_finishing_a_task_is_not_judged_by_the_admission_guard"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "AdmissionRejectionOutput",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_finishing_a_task_is_not_judged_by_the_admission_guard"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "AdmissionRejectionOutput",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-10"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "AdmissionRejectionOutput",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-12"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "item_identifier": "method:settled_task_ids",
+        "obligation_kind": "logic_result"
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "item_identifier": "method:in_progress_task_ids",
+        "obligation_kind": "logic_result"
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "item_identifier": "method:new",
+        "obligation_kind": "logic_result"
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_with_valid_tasks_and_plan_succeeds"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_with_duplicate_task_id_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_with_unreferenced_task_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_with_unknown_task_reference_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_keeps_the_dependencies_each_task_declares"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_rejects_a_cycle_in_the_declared_dependencies"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_new_rejects_a_plan_order_that_places_a_task_before_its_dependency"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "item_identifier": "method:schema_version",
+        "obligation_kind": "logic_result"
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_schema_version_is_1"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "item_identifier": "method:tasks",
+        "obligation_kind": "logic_result"
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_tasks_accessor_returns_correct_count"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "item_identifier": "method:plan",
+        "obligation_kind": "logic_result"
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_plan_accessor_returns_sections"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "item_identifier": "method:all_tasks_resolved",
+        "obligation_kind": "logic_result"
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_all_tasks_resolved_with_no_tasks_returns_true"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_all_tasks_resolved_with_todo_task_returns_false"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_all_tasks_resolved_when_all_done_returns_true"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "item_identifier": "method:unresolved_task_ids",
+        "obligation_kind": "logic_result"
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_unresolved_task_ids_returns_unresolved"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "item_identifier": "method:next_open_task",
+        "obligation_kind": "logic_result"
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_next_open_task_returns_first_todo"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_next_open_task_prefers_in_progress_over_todo_in_earlier_section"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_next_open_task_respects_plan_order_for_todo_tasks"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "item_identifier": "method:apply_transition",
+        "obligation_kind": "logic_result"
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_apply_transition_todo_to_in_progress_succeeds"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_apply_transition_with_unknown_task_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "item_identifier": "method:apply_transition_by_status",
+        "obligation_kind": "logic_result"
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_apply_transition_by_status_todo_to_in_progress_succeeds"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_apply_transition_by_status_in_progress_to_done_with_hash_succeeds"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_apply_transition_by_status_done_pending_to_done_with_hash_succeeds"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_apply_transition_by_status_unsupported_target_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_apply_transition_by_status_done_traced_to_done_returns_unsupported"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "item_identifier": "method:add_task",
+        "obligation_kind": "logic_result"
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_add_task_appends_to_first_section_when_no_section_specified"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_add_task_inserts_after_specified_task"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_add_task_with_empty_description_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_add_task_invalid_section_does_not_corrupt_document"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        }
+      ]
     }
   ]
 }

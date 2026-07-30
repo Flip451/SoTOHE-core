@@ -106,17 +106,19 @@
     {
       "id": "T016",
       "description": "`.harness/capabilities/{spec-designer,type-designer,adr-editor,implementer,researcher,review-fix-lead,dry-fix-lead,rollback-diagnoser}.md` の writes-forbidden 列に batch-plan.json を追加して impl-planner 専有を伝播し、`.harness/workflows/track/impl-plan.md`、`.claude/commands/track/impl-plan.md`（impl-planner 専有の forwarding）、`.agents/skills/track-impl-plan/SKILL.md`（同じ forwarding）、Makefile.toml を更新する。IN-01、IN-18、AC-01、AC-19、AC-20、CN-06。",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "a81ed7d1"
     },
     {
       "id": "T017",
       "description": "plan order 上で先行する全タスクの完了後に `.harness/workflows/track/full-cycle.md` の batch-consumption steps と scope-diff reference を更新する。IN-12、IN-15、IN-16、AC-15、AC-18、AC-19、CN-06、CN-09。",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "a81ed7d1"
     },
     {
       "id": "T018",
-      "description": "plan order 上で先行する全タスクの完了後、本 track の最終タスクとして `TaskOperationInteractor`、TaskOperationService、task-ops composition root を admission 依存へ更新し、TaskTransitionOutcome と AdmissionRejectionOutput を実装する。IN-09、IN-10、IN-11、AC-10、AC-11、AC-12、AC-13、AC-14、CN-04、CN-10。",
-      "status": "todo"
+      "description": "plan order 上で先行する全タスクの完了後、本 track の最終タスクとして `TaskOperationInteractor`、TaskOperationService、task-ops composition root を admission 依存へ更新し、`ImplPlanDocument` に settled_task_ids と in_progress_task_ids を追加し、TaskTransitionOutcome と AdmissionRejectionOutput を実装し、`TransitionTaskUseCase` を公開 API から撤去する。IN-09、IN-10、IN-11、AC-10、AC-11、AC-12、AC-13、AC-14、CN-04、CN-10。",
+      "status": "done"
     }
   ],
   "plan": {

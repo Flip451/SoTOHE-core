@@ -1,17 +1,18 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-29T15:21:50Z",
-  "declaration_hash": "fe72c11aed5a1940722aa148ede04bbade2363fc2df2c4d5a9f37a90e661d22d",
-  "implementation_input_hash": "998b95a1c4263050b9380ef888f9eae5075b3346bb233d9ce0c53c2c61701eab",
+  "generated_at": "2026-07-29T23:40:16Z",
+  "declaration_hash": "2bca6e722c4a896360dcf8c5dffbbd9adb5af36b372c8685b4ec3c2401b4480e",
+  "implementation_input_hash": "ecd006f73277544abb3d89c69433614502ab2a54484962cb40b8c8b83658213a",
   "signals": [
     {
       "type_name": "AdmissionRejectionOutput",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
+        "Display",
         "Eq",
         "PartialEq"
       ]
@@ -150,7 +151,7 @@
     {
       "type_name": "TaskOperationInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "TaskOperationService"
@@ -159,17 +160,23 @@
     {
       "type_name": "TaskOperationService",
       "kind_tag": "application_service",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
       "type_name": "TaskTransitionOutcome",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Debug"
       ]
+    },
+    {
+      "type_name": "TransitionTaskUseCase",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
     },
     {
       "type_name": "BranchReaderPort",

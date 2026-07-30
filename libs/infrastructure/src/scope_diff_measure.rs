@@ -28,7 +28,6 @@ use usecase::fixpoint_resolve::DiffBaseResolverPort;
 
 use crate::dry_check::FsDiffBaseResolverAdapter;
 use crate::git_cli::{SystemGitRepo, guarded_git_command};
-use crate::resolve_items_dir_under_current_repo;
 use crate::review_scope_config_reader::REVIEW_SCOPE_CONFIG;
 use crate::review_v2::load_v2_scope_config;
 use crate::track::symlink_guard::reject_symlinks_below;
@@ -64,11 +63,12 @@ impl ScopeDiffMeasurePort for GitScopeDiffMeasurer {
         items_dir: &Path,
         track_id: &TrackId,
     ) -> Result<Vec<MeasuredScopeDiff>, ScopeDiffMeasureError> {
-        let repo = SystemGitRepo::discover()
+        // Anchored on the items directory, so the diff measured is the one of
+        // the repository the track artifacts live in.
+        let repo = crate::discover_repo_for_items_dir(items_dir)
             .map_err(|error| measure_failed(format!("git repository not discovered: {error}")))?;
         let root = repo.root().to_path_buf();
-        let items_dir = resolve_items_dir_under_current_repo(items_dir)
-            .map_err(|error| measure_failed(format!("items_dir rejected: {error}")))?;
+        let items_dir = resolve_items_dir_under(items_dir, &root)?;
         let track_dir = items_dir.join(track_id.as_ref());
 
         let base = resolve_base(&root, &items_dir, track_id, &track_dir)?;
@@ -89,6 +89,29 @@ impl ScopeDiffMeasurePort for GitScopeDiffMeasurer {
 
         Ok(accumulate_by_scope(&scope_config, &coalesce_by_path(changed)))
     }
+}
+
+/// Resolves the items directory against the repository it was discovered from,
+/// refusing one that resolves outside it: a measurement only means something
+/// for a track inside the repository being measured.
+fn resolve_items_dir_under(
+    items_dir: &Path,
+    root: &Path,
+) -> Result<std::path::PathBuf, ScopeDiffMeasureError> {
+    let canonical = items_dir
+        .canonicalize()
+        .map_err(|error| measure_failed(format!("items_dir rejected: {error}")))?;
+    let canonical_root = root
+        .canonicalize()
+        .map_err(|error| measure_failed(format!("canonicalize repository root: {error}")))?;
+    if !canonical.starts_with(&canonical_root) {
+        return Err(measure_failed(format!(
+            "items_dir {} resolves outside the repository {}",
+            canonical.display(),
+            canonical_root.display()
+        )));
+    }
+    Ok(canonical)
 }
 
 /// Resolves the batch base: the track's recorded commit hash, or the base branch
@@ -510,6 +533,24 @@ mod tests {
             3 + 2 + 4,
             "all three change kinds are summed against the base"
         );
+    }
+
+    #[test]
+    fn test_the_measurement_follows_the_items_directory_rather_than_the_working_directory() {
+        use usecase::batch_plan::ScopeDiffMeasurePort;
+
+        let repo = fixture_repo();
+        let root = repo.path().to_path_buf();
+        // unstaged: +4 lines (5 -> 9), on top of the committed +3.
+        write(&root, "libs/domain/src/unstaged.rs", &"line\n".repeat(9));
+
+        // The working directory is left alone: the items directory names the
+        // repository, so that is the tree measured.
+        let measured = super::GitScopeDiffMeasurer::new()
+            .measure_scope_diff(&root.join("track/items"), &TrackId::try_new("some-track").unwrap())
+            .unwrap();
+
+        assert_eq!(domain_lines(&measured), 3 + 4, "the fixture repository's own diff is measured");
     }
 
     #[test]

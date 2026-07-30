@@ -17,7 +17,11 @@ use domain::{
     derive_track_status,
 };
 
+use crate::batch_plan::{BatchPlanReaderPort, ScopeConfigReaderPort, ScopeDiffMeasurePort};
+use crate::task_admission::{AdmissionPorts, judge_admission};
 use crate::track_resolution::{BranchReadError, BranchReaderPort};
+
+pub use crate::task_admission::{AdmissionRejectionOutput, TaskTransitionOutcome};
 
 // ── DTOs ──────────────────────────────────────────────────────────────────────
 
@@ -166,6 +170,10 @@ pub struct ClearOverrideCommand {
 pub trait TaskOperationService: Send + Sync {
     /// Transitions a task to the target status.
     ///
+    /// A `todo -> in_progress` transition is judged first: a refusal comes back
+    /// as [`TaskTransitionOutcome::Rejected`] with its figures intact, and no
+    /// state is written.
+    ///
     /// # Errors
     ///
     /// Returns [`TaskOperationError`] on ID validation, not-found, or transition
@@ -173,7 +181,7 @@ pub trait TaskOperationService: Send + Sync {
     fn transition_task(
         &self,
         cmd: TaskTransitionCommand,
-    ) -> Result<TaskOperationOutput, TaskOperationError>;
+    ) -> Result<TaskTransitionOutcome, TaskOperationError>;
 
     /// Adds a new task to the track's impl-plan.
     ///
@@ -236,6 +244,9 @@ where
 {
     store: Arc<S>,
     branch_reader: Option<Arc<dyn BranchReaderPort>>,
+    batch_plan_reader: Arc<dyn BatchPlanReaderPort>,
+    scope_diff_measurer: Arc<dyn ScopeDiffMeasurePort>,
+    scope_config_reader: Arc<dyn ScopeConfigReaderPort>,
 }
 
 impl<S> TaskOperationInteractor<S>
@@ -263,22 +274,52 @@ where
     /// The branch reader port should return `Err(BranchReadError)` when the
     /// branch cannot be determined; the error is surfaced as
     /// [`TaskOperationError::BranchGuardFailed`].
+    /// The three admission collaborators are required rather than optional, so
+    /// no constructible interactor can transition a task without judging it
+    /// first (`CN-10`).
     #[must_use]
-    pub fn new(store: Arc<S>, branch_reader: Option<Arc<dyn BranchReaderPort>>) -> Self {
-        Self { store, branch_reader }
-    }
-
-    /// Test-only constructor with an injected `Option<Arc<dyn BranchReaderPort>>`.
-    ///
-    /// Intra-crate test helpers use this to share a pre-built `Arc` branch reader;
-    /// external callers should use [`Self::new`] instead.
-    #[cfg(test)]
-    #[must_use]
-    pub(crate) fn with_branch_reader(
+    pub fn new(
         store: Arc<S>,
         branch_reader: Option<Arc<dyn BranchReaderPort>>,
+        batch_plan_reader: Arc<dyn BatchPlanReaderPort>,
+        scope_diff_measurer: Arc<dyn ScopeDiffMeasurePort>,
+        scope_config_reader: Arc<dyn ScopeConfigReaderPort>,
     ) -> Self {
-        Self { store, branch_reader }
+        Self { store, branch_reader, batch_plan_reader, scope_diff_measurer, scope_config_reader }
+    }
+
+    /// The ports the admission judgement reads its inputs through.
+    fn admission_ports(&self) -> AdmissionPorts<'_> {
+        AdmissionPorts {
+            batch_plan_reader: &self.batch_plan_reader,
+            scope_diff_measurer: &self.scope_diff_measurer,
+            scope_config_reader: &self.scope_config_reader,
+        }
+    }
+
+    /// Judges a `todo -> in_progress` transition, returning the refusal when
+    /// there is one.
+    ///
+    /// Every other transition passes through untouched: the guard is about
+    /// starting work, not about finishing or skipping it.
+    fn judge_start_of_work(
+        &self,
+        cmd: &TaskTransitionCommand,
+        track_id: &TrackId,
+        task_id: &TaskId,
+    ) -> Result<Option<AdmissionRejectionOutput>, TaskOperationError> {
+        if cmd.target_status != "in_progress" {
+            return Ok(None);
+        }
+        let plan = self
+            .store
+            .load_impl_plan(track_id)
+            .map_err(|e| TaskOperationError::StoreFailed(e.to_string()))?;
+        let Some(plan) = plan else { return Ok(None) };
+        if !crate::task_admission::starts_from_todo(&plan, task_id) {
+            return Ok(None);
+        }
+        judge_admission(&self.admission_ports(), &cmd.items_dir, track_id, task_id, &plan)
     }
 }
 
@@ -362,7 +403,7 @@ where
     fn transition_task(
         &self,
         cmd: TaskTransitionCommand,
-    ) -> Result<TaskOperationOutput, TaskOperationError> {
+    ) -> Result<TaskTransitionOutcome, TaskOperationError> {
         let track_id = TrackId::try_new(&cmd.track_id)
             .map_err(|e| TaskOperationError::InvalidTrackId(e.to_string()))?;
         let task_id = TaskId::try_new(&cmd.task_id)
@@ -377,6 +418,13 @@ where
         // Enforce branch guard before mutating state.
         enforce_branch_guard(&*self.store, &track_id, &cmd.items_dir, self.branch_reader.as_ref())?;
 
+        // Judge the start of work before anything is written: the guard sits on
+        // the one transition path, so no workflow reaches `in_progress` around
+        // it (CN-10).
+        if let Some(rejection) = self.judge_start_of_work(&cmd, &track_id, &task_id)? {
+            return Ok(TaskTransitionOutcome::Rejected(rejection));
+        }
+
         let uc = crate::TransitionTaskUseCase::new(Arc::clone(&self.store));
         let track = uc
             .execute_by_status(&track_id, &task_id, &cmd.target_status, commit_hash)
@@ -389,11 +437,11 @@ where
             .map_err(|e| TaskOperationError::StoreFailed(e.to_string()))?;
         let status = derive_track_status(impl_plan.as_ref(), track.status_override()).to_string();
 
-        Ok(TaskOperationOutput {
+        Ok(TaskTransitionOutcome::Transitioned(TaskOperationOutput {
             track_id: track.id().as_ref().to_owned(),
             task_id: None,
             derived_status: status,
-        })
+        }))
     }
 
     fn add_task(&self, cmd: AddTaskCommand) -> Result<TaskOperationOutput, TaskOperationError> {
@@ -669,6 +717,101 @@ mod tests {
         }
     }
 
+    /// Batch plan stub: `None` is the shape of a track authored before the gate
+    /// existed, which the reader reports as `NotFound`.
+    struct StubBatchPlanReader(Option<domain::batch_plan::BatchPlanDocument>);
+
+    impl BatchPlanReaderPort for StubBatchPlanReader {
+        fn read(
+            &self,
+            _items_dir: &std::path::Path,
+            _track_id: &TrackId,
+        ) -> Result<domain::batch_plan::BatchPlanDocument, crate::batch_plan::PlanArtifactReadError>
+        {
+            self.0.clone().ok_or(crate::batch_plan::PlanArtifactReadError::NotFound)
+        }
+    }
+
+    struct StubScopeDiffMeasurer(Vec<domain::batch_plan::MeasuredScopeDiff>);
+
+    impl ScopeDiffMeasurePort for StubScopeDiffMeasurer {
+        fn measure_scope_diff(
+            &self,
+            _items_dir: &std::path::Path,
+            _track_id: &TrackId,
+        ) -> Result<
+            Vec<domain::batch_plan::MeasuredScopeDiff>,
+            crate::batch_plan::ScopeDiffMeasureError,
+        > {
+            Ok(self.0.clone())
+        }
+    }
+
+    /// Scope configuration stub carrying one ceiling per named scope.
+    struct StubScopeConfigReader(Vec<(&'static str, Option<u32>)>);
+
+    impl ScopeConfigReaderPort for StubScopeConfigReader {
+        fn read(
+            &self,
+            _items_dir: &std::path::Path,
+            track_id: &TrackId,
+        ) -> Result<domain::review_v2::ReviewScopeConfig, crate::batch_plan::ScopeConfigReadError>
+        {
+            let groups = self
+                .0
+                .iter()
+                .map(|(scope, ceiling)| {
+                    ((*scope).to_owned(), vec![format!("libs/{scope}/**")], None, *ceiling)
+                })
+                .collect();
+            domain::review_v2::ReviewScopeConfig::new(
+                track_id,
+                groups,
+                Vec::new(),
+                Vec::new(),
+                None,
+            )
+            .map_err(|error| crate::batch_plan::ScopeConfigReadError::ReadFailed {
+                message: domain::FreeText::new(error.to_string()),
+            })
+        }
+    }
+
+    /// The interactor the guard-focused tests use: a batch plan that admits
+    /// `T001`, so those tests observe the branch guard rather than admission.
+    fn task_ops_interactor(
+        store: Arc<StubStore>,
+        branch_reader: Option<Arc<dyn BranchReaderPort>>,
+    ) -> TaskOperationInteractor<StubStore> {
+        let batch_plan = domain::batch_plan::BatchPlanDocument::new(
+            TrackId::try_new("my-track-2026").unwrap(),
+            vec![estimate("T001", 10, 5)],
+            vec![batch("B1", &["T001"])],
+        )
+        .unwrap();
+        TaskOperationInteractor::new(
+            store,
+            branch_reader,
+            Arc::new(StubBatchPlanReader(Some(batch_plan))),
+            Arc::new(StubScopeDiffMeasurer(Vec::new())),
+            Arc::new(StubScopeConfigReader(vec![("domain", Some(500))])),
+        )
+    }
+
+    /// The output of a transition that must have happened. A refusal is carried
+    /// into the derived status instead, so the assertion that follows fails with
+    /// the reason in its message.
+    fn transitioned(outcome: TaskTransitionOutcome) -> TaskOperationOutput {
+        match outcome {
+            TaskTransitionOutcome::Transitioned(output) => output,
+            TaskTransitionOutcome::Rejected(rejection) => TaskOperationOutput {
+                track_id: format!("<refused: {rejection}>"),
+                task_id: None,
+                derived_status: format!("<refused: {rejection}>"),
+            },
+        }
+    }
+
     #[derive(Default)]
     struct StubStore {
         tracks: Mutex<HashMap<TrackId, TrackMetadata>>,
@@ -837,10 +980,8 @@ mod tests {
         store.impl_plans.lock().unwrap().insert(track.id().clone(), plan);
 
         // Inject a stub that returns the expected branch — guard passes.
-        let interactor = TaskOperationInteractor::new(
-            Arc::clone(&store),
-            StubBranchReader::ok("track/my-track-2026"),
-        );
+        let interactor =
+            task_ops_interactor(Arc::clone(&store), StubBranchReader::ok("track/my-track-2026"));
         let cmd = TaskTransitionCommand {
             items_dir: PathBuf::new(),
             track_id: "my-track-2026".to_owned(),
@@ -848,7 +989,7 @@ mod tests {
             target_status: "in_progress".to_owned(),
             commit_hash: None,
         };
-        let out = interactor.transition_task(cmd).unwrap();
+        let out = transitioned(interactor.transition_task(cmd).unwrap());
         assert_eq!(out.track_id, "my-track-2026");
         assert!(out.task_id.is_none());
         assert_eq!(out.derived_status, "in_progress");
@@ -871,8 +1012,7 @@ mod tests {
         // No impl-plan: branch guard fires before the domain call.
 
         // Inject a reader that returns a mismatched branch.
-        let interactor =
-            TaskOperationInteractor::new(Arc::clone(&store), StubBranchReader::ok("main"));
+        let interactor = task_ops_interactor(Arc::clone(&store), StubBranchReader::ok("main"));
         let cmd = TaskTransitionCommand {
             items_dir: PathBuf::new(),
             track_id: "my-track-2026".to_owned(),
@@ -904,8 +1044,7 @@ mod tests {
         store.tracks.lock().unwrap().insert(track.id().clone(), track.clone());
         // No impl-plan: branch guard fires before the domain call.
 
-        let interactor =
-            TaskOperationInteractor::new(Arc::clone(&store), StubBranchReader::ok("HEAD"));
+        let interactor = task_ops_interactor(Arc::clone(&store), StubBranchReader::ok("HEAD"));
         let cmd = TaskTransitionCommand {
             items_dir: PathBuf::new(),
             track_id: "my-track-2026".to_owned(),
@@ -924,8 +1063,7 @@ mod tests {
     fn task_operation_error_invalid_track_id_returns_error() {
         let store = Arc::new(StubStore::default());
         // Branch reader is never called: track_id validation fires first.
-        let interactor =
-            TaskOperationInteractor::new(Arc::clone(&store), StubBranchReader::ok("any"));
+        let interactor = task_ops_interactor(Arc::clone(&store), StubBranchReader::ok("any"));
         let cmd = TaskTransitionCommand {
             items_dir: PathBuf::new(),
             track_id: String::new(),
@@ -956,7 +1094,7 @@ mod tests {
         store.impl_plans.lock().unwrap().insert(track.id().clone(), plan);
 
         // No branch reader — guard is a no-op regardless of the track's branch.
-        let interactor = TaskOperationInteractor::new(Arc::clone(&store), None);
+        let interactor = task_ops_interactor(Arc::clone(&store), None);
         let cmd = TaskTransitionCommand {
             items_dir: PathBuf::new(),
             track_id: "my-track-2026".to_owned(),
@@ -964,7 +1102,7 @@ mod tests {
             target_status: "in_progress".to_owned(),
             commit_hash: None,
         };
-        let out = interactor.transition_task(cmd).unwrap();
+        let out = transitioned(interactor.transition_task(cmd).unwrap());
         assert_eq!(out.track_id, "my-track-2026");
     }
 
@@ -981,8 +1119,7 @@ mod tests {
         // branchless tracks.
         let branch_reader =
             StubBranchReader::err("branch reader must not be called for branchless tracks");
-        let interactor =
-            TaskOperationInteractor::with_branch_reader(Arc::clone(&store), branch_reader);
+        let interactor = task_ops_interactor(Arc::clone(&store), branch_reader);
         let cmd = TaskTransitionCommand {
             items_dir: PathBuf::new(),
             track_id: "my-track-2026".to_owned(),
@@ -990,7 +1127,7 @@ mod tests {
             target_status: "in_progress".to_owned(),
             commit_hash: None,
         };
-        let out = interactor.transition_task(cmd).unwrap();
+        let out = transitioned(interactor.transition_task(cmd).unwrap());
         assert_eq!(out.track_id, "my-track-2026");
     }
 
@@ -1012,8 +1149,7 @@ mod tests {
 
         // Inject a reader that returns "main" — mismatches "track/my-track-2026".
         let branch_reader = StubBranchReader::ok("main");
-        let interactor =
-            TaskOperationInteractor::with_branch_reader(Arc::clone(&store), branch_reader);
+        let interactor = task_ops_interactor(Arc::clone(&store), branch_reader);
         let cmd = TaskTransitionCommand {
             items_dir: PathBuf::new(),
             track_id: "my-track-2026".to_owned(),
@@ -1044,8 +1180,7 @@ mod tests {
         store.tracks.lock().unwrap().insert(track.id().clone(), track.clone());
 
         let branch_reader = StubBranchReader::ok("HEAD");
-        let interactor =
-            TaskOperationInteractor::with_branch_reader(Arc::clone(&store), branch_reader);
+        let interactor = task_ops_interactor(Arc::clone(&store), branch_reader);
         let cmd = TaskTransitionCommand {
             items_dir: PathBuf::new(),
             track_id: "my-track-2026".to_owned(),
@@ -1058,5 +1193,406 @@ mod tests {
             matches!(err, TaskOperationError::BranchlessGuardFailed(_)),
             "expected BranchlessGuardFailed, got: {err}"
         );
+    }
+
+    // ── admission on todo -> in_progress ──────────────────────────────────────
+
+    /// An implementation plan holding the named tasks in the given states.
+    fn plan_of(tasks: &[(&str, domain::TaskStatus)]) -> ImplPlanDocument {
+        use domain::{NonEmptyString, TrackTask};
+        let ids: Vec<TaskId> = tasks.iter().map(|(id, _)| TaskId::try_new(*id).unwrap()).collect();
+        let tasks: Vec<TrackTask> = tasks
+            .iter()
+            .map(|(id, status)| {
+                TrackTask::with_dependencies(
+                    TaskId::try_new(*id).unwrap(),
+                    NonEmptyString::try_new(format!("task {id}")).unwrap(),
+                    status.clone(),
+                    Vec::new(),
+                )
+            })
+            .collect();
+        let section = PlanSection::new("S1", "Section", vec![], ids).unwrap();
+        ImplPlanDocument::new(tasks, PlanView::new(vec![], vec![section])).unwrap()
+    }
+
+    /// One task's estimate for the `domain` scope, split as production + test.
+    fn estimate(id: &str, production: u32, test: u32) -> domain::batch_plan::TaskEstimate {
+        use domain::batch_plan::{LineCount, ScopeLineEstimate, TaskDecomposition, TaskEstimate};
+        use domain::review_v2::{MainScopeName, ScopeName};
+        TaskEstimate::new(
+            TaskId::try_new(id).unwrap(),
+            vec![ScopeLineEstimate::new(
+                ScopeName::Main(MainScopeName::new("domain").unwrap()),
+                LineCount::new(production),
+                LineCount::new(test),
+            )],
+            TaskDecomposition::Decomposable,
+        )
+        .unwrap()
+    }
+
+    fn batch(id: &str, members: &[&str]) -> domain::batch_plan::BatchDeclaration {
+        use domain::batch_plan::{BatchDeclaration, BatchId};
+        BatchDeclaration::new(
+            BatchId::try_new(id).unwrap(),
+            members.iter().map(|member| TaskId::try_new(*member).unwrap()).collect(),
+        )
+        .unwrap()
+    }
+
+    /// The interactor with a declared batch plan, a measured diff and one
+    /// ceiling for the `domain` scope.
+    fn admitting_interactor(
+        store: Arc<StubStore>,
+        batch_plan: domain::batch_plan::BatchPlanDocument,
+        measured: Vec<domain::batch_plan::MeasuredScopeDiff>,
+        ceiling: Option<u32>,
+    ) -> TaskOperationInteractor<StubStore> {
+        TaskOperationInteractor::new(
+            store,
+            None,
+            Arc::new(StubBatchPlanReader(Some(batch_plan))),
+            Arc::new(StubScopeDiffMeasurer(measured)),
+            Arc::new(StubScopeConfigReader(vec![("domain", ceiling)])),
+        )
+    }
+
+    fn start_work_on(task_id: &str) -> TaskTransitionCommand {
+        TaskTransitionCommand {
+            items_dir: PathBuf::new(),
+            track_id: "my-track-2026".to_owned(),
+            task_id: task_id.to_owned(),
+            target_status: "in_progress".to_owned(),
+            commit_hash: None,
+        }
+    }
+
+    fn commit_hash() -> CommitHash {
+        CommitHash::try_new("a1b2c3d4e5f60718293a4b5c6d7e8f9012345678").unwrap()
+    }
+
+    fn store_with(plan: ImplPlanDocument) -> Arc<StubStore> {
+        let store = Arc::new(StubStore::default());
+        let track = sample_track();
+        store.tracks.lock().unwrap().insert(track.id().clone(), track);
+        store.impl_plans.lock().unwrap().insert(TrackId::try_new("my-track-2026").unwrap(), plan);
+        store
+    }
+
+    #[test]
+    fn test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled() {
+        use domain::TaskStatus;
+        use domain::batch_plan::BatchPlanDocument;
+
+        // B1 = T001, B2 = T002, and nothing is settled yet, so B1 is the batch
+        // being consumed.
+        let batch_plan = BatchPlanDocument::new(
+            TrackId::try_new("my-track-2026").unwrap(),
+            vec![estimate("T001", 10, 5), estimate("T002", 10, 5)],
+            vec![batch("B1", &["T001"]), batch("B2", &["T002"])],
+        )
+        .unwrap();
+
+        let waiting =
+            store_with(plan_of(&[("T001", TaskStatus::Todo), ("T002", TaskStatus::Todo)]));
+        let outcome = admitting_interactor(waiting, batch_plan.clone(), Vec::new(), Some(500))
+            .transition_task(start_work_on("T002"))
+            .unwrap();
+
+        assert_eq!(
+            outcome.rejection(),
+            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {
+                task_id: "T002".to_owned(),
+                task_batch: "B2".to_owned(),
+                current_batch: "B1".to_owned(),
+            })
+        );
+
+        // With B1's only member committed, B2 becomes the batch being consumed
+        // and the same task starts.
+        let settled = store_with(plan_of(&[
+            ("T001", TaskStatus::DoneTraced { commit_hash: commit_hash() }),
+            ("T002", TaskStatus::Todo),
+        ]));
+        let outcome = admitting_interactor(settled, batch_plan, Vec::new(), Some(500))
+            .transition_task(start_work_on("T002"))
+            .unwrap();
+
+        assert_eq!(transitioned(outcome).derived_status, "in_progress");
+    }
+
+    #[test]
+    fn test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone() {
+        use domain::TaskStatus;
+        use domain::batch_plan::BatchPlanDocument;
+
+        // B1 = T001, B2 = T002 again.
+        let batch_plan = BatchPlanDocument::new(
+            TrackId::try_new("my-track-2026").unwrap(),
+            vec![estimate("T001", 10, 5), estimate("T002", 10, 5)],
+            vec![batch("B1", &["T001"]), batch("B2", &["T002"])],
+        )
+        .unwrap();
+
+        // T001 is marked done with no commit recorded: its work is not on the
+        // branch yet, so B1 is still the batch being consumed.
+        let done_without_commit =
+            store_with(plan_of(&[("T001", TaskStatus::DonePending), ("T002", TaskStatus::Todo)]));
+        let outcome =
+            admitting_interactor(done_without_commit, batch_plan.clone(), Vec::new(), Some(500))
+                .transition_task(start_work_on("T002"))
+                .unwrap();
+
+        assert_eq!(
+            outcome.rejection(),
+            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {
+                task_id: "T002".to_owned(),
+                task_batch: "B2".to_owned(),
+                current_batch: "B1".to_owned(),
+            })
+        );
+
+        // A member that will never be committed does not hold the batch open.
+        let skipped =
+            store_with(plan_of(&[("T001", TaskStatus::Skipped), ("T002", TaskStatus::Todo)]));
+        let outcome = admitting_interactor(skipped, batch_plan, Vec::new(), Some(500))
+            .transition_task(start_work_on("T002"))
+            .unwrap();
+
+        assert!(matches!(outcome, TaskTransitionOutcome::Transitioned(_)));
+    }
+
+    #[test]
+    fn test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is() {
+        use domain::TaskStatus;
+        use domain::batch_plan::BatchPlanDocument;
+
+        // 1000 declared domain lines against a ceiling of 500, with nothing
+        // measured and no member in progress: the scope carries nothing yet.
+        let batch_plan = BatchPlanDocument::new(
+            TrackId::try_new("my-track-2026").unwrap(),
+            vec![estimate("T001", 700, 300)],
+            vec![batch("B1", &["T001"])],
+        )
+        .unwrap();
+
+        let outcome = admitting_interactor(
+            store_with(plan_of(&[("T001", TaskStatus::Todo)])),
+            batch_plan,
+            Vec::new(),
+            Some(500),
+        )
+        .transition_task(start_work_on("T001"))
+        .unwrap();
+
+        assert_eq!(transitioned(outcome).derived_status, "in_progress");
+    }
+
+    #[test]
+    fn test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling() {
+        use domain::TaskStatus;
+        use domain::batch_plan::{BatchPlanDocument, LineCount, MeasuredScopeDiff};
+        use domain::review_v2::{MainScopeName, ScopeName};
+
+        // B1 holds both tasks; T001 is already in progress with 300 declared
+        // domain lines, and 100 more are measured on disk. The candidate's own
+        // 200 would take the scope to 600 against a ceiling of 500.
+        let batch_plan = BatchPlanDocument::new(
+            TrackId::try_new("my-track-2026").unwrap(),
+            vec![estimate("T001", 200, 100), estimate("T002", 150, 50)],
+            vec![batch("B1", &["T001", "T002"])],
+        )
+        .unwrap();
+
+        let outcome = admitting_interactor(
+            store_with(plan_of(&[("T001", TaskStatus::InProgress), ("T002", TaskStatus::Todo)])),
+            batch_plan,
+            vec![MeasuredScopeDiff::new(
+                ScopeName::Main(MainScopeName::new("domain").unwrap()),
+                LineCount::new(100),
+            )],
+            Some(500),
+        )
+        .transition_task(start_work_on("T002"))
+        .unwrap();
+
+        assert_eq!(
+            outcome.rejection(),
+            Some(&AdmissionRejectionOutput::ScopeCeilingWouldBeExceeded {
+                scope: "domain".to_owned(),
+                // 100 measured + 300 declared by the member in progress.
+                prior_contribution: std::num::NonZeroU32::new(400).unwrap(),
+                candidate_estimate: 200,
+                ceiling: 500,
+            })
+        );
+    }
+
+    #[test]
+    fn test_a_candidate_without_an_estimate_makes_the_transition_an_error() {
+        use domain::TaskStatus;
+        use domain::batch_plan::BatchPlanDocument;
+
+        // The batch plan knows T001 only; T002 is planned work the plan never
+        // estimated, so there is nothing to compare and the start is refused as
+        // an error rather than passing silently.
+        let batch_plan = BatchPlanDocument::new(
+            TrackId::try_new("my-track-2026").unwrap(),
+            vec![estimate("T001", 10, 5)],
+            vec![batch("B1", &["T001"])],
+        )
+        .unwrap();
+
+        let error = admitting_interactor(
+            store_with(plan_of(&[("T001", TaskStatus::DonePending), ("T002", TaskStatus::Todo)])),
+            batch_plan,
+            Vec::new(),
+            Some(500),
+        )
+        .transition_task(start_work_on("T002"))
+        .unwrap_err();
+
+        assert!(matches!(error, TaskOperationError::TransitionFailed(_)), "unexpected: {error}");
+        assert!(error.to_string().contains("T002"), "the failure names the task: {error}");
+        assert!(error.to_string().contains("no estimate"), "unexpected: {error}");
+    }
+
+    #[test]
+    fn test_a_track_without_a_batch_plan_cannot_start_work_but_still_finishes_it() {
+        use domain::TaskStatus;
+
+        // Starting work is judged against the batch plan, so its absence is an
+        // error: the start never passes unjudged.
+        let error = TaskOperationInteractor::new(
+            store_with(plan_of(&[("T001", TaskStatus::Todo)])),
+            None,
+            Arc::new(StubBatchPlanReader(None)),
+            Arc::new(StubScopeDiffMeasurer(Vec::new())),
+            Arc::new(StubScopeConfigReader(vec![("domain", Some(500))])),
+        )
+        .transition_task(start_work_on("T001"))
+        .unwrap_err();
+
+        assert!(matches!(error, TaskOperationError::TransitionFailed(_)), "unexpected: {error}");
+        assert!(error.to_string().contains("no batch plan"), "unexpected: {error}");
+
+        // Finishing work already under way is a different transition and is not
+        // judged, so a track without the artifact still closes its tasks.
+        let outcome = TaskOperationInteractor::new(
+            store_with(plan_of(&[("T001", TaskStatus::InProgress)])),
+            None,
+            Arc::new(StubBatchPlanReader(None)),
+            Arc::new(StubScopeDiffMeasurer(Vec::new())),
+            Arc::new(StubScopeConfigReader(vec![("domain", Some(500))])),
+        )
+        .transition_task(TaskTransitionCommand {
+            items_dir: PathBuf::new(),
+            track_id: "my-track-2026".to_owned(),
+            task_id: "T001".to_owned(),
+            target_status: "done".to_owned(),
+            commit_hash: None,
+        })
+        .unwrap();
+
+        assert!(matches!(outcome, TaskTransitionOutcome::Transitioned(_)));
+    }
+
+    #[test]
+    fn test_adding_a_task_names_the_id_it_created_and_the_status_that_follows() {
+        use domain::TaskStatus;
+
+        let store = store_with(plan_of(&[("T001", TaskStatus::Todo)]));
+        let output = task_ops_interactor(Arc::clone(&store), None)
+            .add_task(AddTaskCommand {
+                items_dir: PathBuf::new(),
+                track_id: "my-track-2026".to_owned(),
+                description: "second task".to_owned(),
+                section: None,
+                after_task_id: None,
+            })
+            .unwrap();
+
+        assert_eq!(output.track_id, "my-track-2026");
+        assert_eq!(output.task_id.as_deref(), Some("T002"));
+        // Two tasks, neither started: the track is still planned.
+        assert_eq!(output.derived_status, "planned");
+
+        let stored = store.impl_plans.lock().unwrap();
+        let plan = stored.get(&TrackId::try_new("my-track-2026").unwrap()).unwrap();
+        assert_eq!(plan.tasks().len(), 2);
+        assert_eq!(plan.tasks()[1].id().as_ref(), "T002");
+    }
+
+    #[test]
+    fn test_an_override_dominates_the_derived_status_until_it_is_cleared() {
+        use domain::TaskStatus;
+
+        let store = store_with(plan_of(&[("T001", TaskStatus::Todo)]));
+        let interactor = task_ops_interactor(Arc::clone(&store), None);
+
+        let blocked = interactor
+            .set_override(SetOverrideCommand {
+                items_dir: PathBuf::new(),
+                track_id: "my-track-2026".to_owned(),
+                status: "blocked".to_owned(),
+                reason: "waiting on a decision".to_owned(),
+            })
+            .unwrap();
+        assert_eq!(blocked.derived_status, "blocked");
+
+        // Cleared, the status is derived from the plan again.
+        let cleared = interactor
+            .clear_override(ClearOverrideCommand {
+                items_dir: PathBuf::new(),
+                track_id: "my-track-2026".to_owned(),
+            })
+            .unwrap();
+        assert_eq!(cleared.derived_status, "planned");
+
+        // An override kind the domain does not define is refused rather than
+        // written.
+        let error = interactor
+            .set_override(SetOverrideCommand {
+                items_dir: PathBuf::new(),
+                track_id: "my-track-2026".to_owned(),
+                status: "paused".to_owned(),
+                reason: "no such kind".to_owned(),
+            })
+            .unwrap_err();
+        assert!(matches!(error, TaskOperationError::TransitionFailed(_)), "unexpected: {error}");
+    }
+
+    #[test]
+    fn test_finishing_a_task_is_not_judged_by_the_admission_guard() {
+        use domain::TaskStatus;
+        use domain::batch_plan::BatchPlanDocument;
+
+        // A plan whose membership rule would refuse T002 if it were starting:
+        // B1 still has an unsettled member. Finishing work already in progress
+        // is a different transition and goes through.
+        let batch_plan = BatchPlanDocument::new(
+            TrackId::try_new("my-track-2026").unwrap(),
+            vec![estimate("T001", 10, 5), estimate("T002", 10, 5)],
+            vec![batch("B1", &["T001"]), batch("B2", &["T002"])],
+        )
+        .unwrap();
+
+        let outcome = admitting_interactor(
+            store_with(plan_of(&[("T001", TaskStatus::Todo), ("T002", TaskStatus::InProgress)])),
+            batch_plan,
+            Vec::new(),
+            Some(500),
+        )
+        .transition_task(TaskTransitionCommand {
+            items_dir: PathBuf::new(),
+            track_id: "my-track-2026".to_owned(),
+            task_id: "T002".to_owned(),
+            target_status: "done".to_owned(),
+            commit_hash: None,
+        })
+        .unwrap();
+
+        assert!(matches!(outcome, TaskTransitionOutcome::Transitioned(_)));
     }
 }

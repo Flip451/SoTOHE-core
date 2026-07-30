@@ -121,6 +121,20 @@ fn build_branch_reader(
         Err(_) => None,
     }
 }
+/// Wires the task-operation interactor together with the admission
+/// collaborators every transition is judged through.
+fn build_task_operation_interactor(
+    store: Arc<infrastructure::track::fs_store::FsTrackStore>,
+    branch_reader: Option<Arc<dyn usecase::track_resolution::BranchReaderPort>>,
+) -> usecase::task_ops::TaskOperationInteractor<infrastructure::track::fs_store::FsTrackStore> {
+    usecase::task_ops::TaskOperationInteractor::new(
+        store,
+        branch_reader,
+        Arc::new(infrastructure::batch_plan_reader::FsBatchPlanReader::new()),
+        Arc::new(infrastructure::scope_diff_measure::GitScopeDiffMeasurer::new()),
+        Arc::new(infrastructure::review_scope_config_reader::FsReviewScopeConfigReader::new()),
+    )
+}
 fn sync_views_to_stdout(project_root: &Path, track_id: &str) -> Vec<String> {
     match infrastructure::track::render::sync_rendered_views(project_root, Some(track_id)) {
         Ok(changed) => changed
@@ -198,8 +212,7 @@ impl TrackCompositionRoot {
         let project_root = resolve_project_root(&repo_dir)?;
         let store = Arc::new(FsTrackStore::new(items_dir.clone()));
         let branch_reader = build_branch_reader(&project_root);
-        let service =
-            usecase::task_ops::TaskOperationInteractor::new(Arc::clone(&store), branch_reader);
+        let service = build_task_operation_interactor(Arc::clone(&store), branch_reader);
         let cmd = usecase::task_ops::TaskTransitionCommand {
             items_dir,
             track_id: effective_track_id.clone(),
@@ -207,9 +220,19 @@ impl TrackCompositionRoot {
             target_status: target_status.clone(),
             commit_hash,
         };
-        let output = service
+        let outcome = service
             .transition_task(cmd)
             .map_err(|err| CompositionError::Usecase(format!("transition failed: {err}")))?;
+        let output = match outcome {
+            usecase::task_ops::TaskTransitionOutcome::Transitioned(output) => output,
+            // A refused start of work is a verdict, not a failure of the
+            // command: the task stays where it was and the reason is reported.
+            usecase::task_ops::TaskTransitionOutcome::Rejected(rejection) => {
+                return Ok(CommandOutcome::failure(Some(format!(
+                    "[BLOCKED] {task_id}: {rejection}"
+                ))));
+            }
+        };
         let mut lines = vec![format!(
             "[OK] {}: transitioned to {} (track status: {})",
             task_id, target_status, output.derived_status,
@@ -337,8 +360,7 @@ impl TrackCompositionRoot {
         let project_root = resolve_project_root(&repo_dir)?;
         let store = Arc::new(FsTrackStore::new(items_dir.clone()));
         let branch_reader = build_branch_reader(&project_root);
-        let service =
-            usecase::task_ops::TaskOperationInteractor::new(Arc::clone(&store), branch_reader);
+        let service = build_task_operation_interactor(Arc::clone(&store), branch_reader);
         let after_task_id = match after {
             Some(ref a)
                 if a.strip_prefix('T').is_some_and(|digits| {
@@ -392,8 +414,7 @@ impl TrackCompositionRoot {
         let project_root = resolve_project_root(&repo_dir)?;
         let store = Arc::new(FsTrackStore::new(items_dir.clone()));
         let branch_reader = build_branch_reader(&project_root);
-        let service =
-            usecase::task_ops::TaskOperationInteractor::new(Arc::clone(&store), branch_reader);
+        let service = build_task_operation_interactor(Arc::clone(&store), branch_reader);
         let cmd = usecase::task_ops::SetOverrideCommand {
             items_dir,
             track_id: effective_track_id.clone(),
@@ -426,8 +447,7 @@ impl TrackCompositionRoot {
         let project_root = resolve_project_root(&repo_dir)?;
         let store = Arc::new(FsTrackStore::new(items_dir.clone()));
         let branch_reader = build_branch_reader(&project_root);
-        let service =
-            usecase::task_ops::TaskOperationInteractor::new(Arc::clone(&store), branch_reader);
+        let service = build_task_operation_interactor(Arc::clone(&store), branch_reader);
         let cmd = usecase::task_ops::ClearOverrideCommand {
             items_dir,
             track_id: effective_track_id.clone(),

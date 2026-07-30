@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-29T10:00:37Z",
-  "declaration_hash": "aea7ea7270e640cf83c18fff9de37437185c176a51acfa8b3eb75060c3164e89",
-  "implementation_input_hash": "8d4afbfa5c9a50ee6a3edd08826d6f28a2b62dcec6d8d4647cb5aa82f0385000",
+  "generated_at": "2026-07-29T23:53:37Z",
+  "declaration_hash": "70152195e8500879873d91196db72b90f285f0f8707f6b3638063d63ae9f23f8",
+  "implementation_input_hash": "91398c19284c6adf83215b6a218b00740df4fa367081d0e754bd0d61f00016ad",
   "signals": [
     {
       "type_name": "AdmissionDecision",
@@ -110,6 +110,12 @@
         "Display",
         "Error"
       ]
+    },
+    {
+      "type_name": "ImplPlanDocument",
+      "kind_tag": "domain_service",
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "IndivisibilityJustification",

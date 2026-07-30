@@ -88,10 +88,12 @@
       { "layer": "cli", "entry_key": "cli::commands::batch_plan::execute" }
     ],
     "T018": [
+      { "layer": "domain", "entry_key": "ImplPlanDocument" },
       { "layer": "usecase", "entry_key": "TaskOperationInteractor" },
       { "layer": "usecase", "entry_key": "TaskOperationService" },
       { "layer": "usecase", "entry_key": "TaskTransitionOutcome" },
-      { "layer": "usecase", "entry_key": "AdmissionRejectionOutput" }
+      { "layer": "usecase", "entry_key": "AdmissionRejectionOutput" },
+      { "layer": "usecase", "entry_key": "TransitionTaskUseCase" }
     ]
   }
 }

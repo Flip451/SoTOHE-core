@@ -82,6 +82,34 @@ impl ImplPlanDocument {
         self.tasks.iter().filter(|t| !t.status().is_resolved()).map(|t| t.id()).collect()
     }
 
+    /// Returns the IDs of tasks whose work is settled: committed, which is the
+    /// traced status carrying the commit hash, or skipped and therefore never to
+    /// be committed at all.
+    ///
+    /// A task marked done with no commit recorded is deliberately excluded: work
+    /// that is not on the branch has not been delivered, so a batch waiting on
+    /// it is still waiting.
+    #[must_use]
+    pub fn settled_task_ids(&self) -> std::collections::BTreeSet<TaskId> {
+        self.tasks
+            .iter()
+            .filter(|task| {
+                matches!(task.status(), TaskStatus::DoneTraced { .. } | TaskStatus::Skipped)
+            })
+            .map(|task| task.id().clone())
+            .collect()
+    }
+
+    /// Returns the IDs of tasks currently in progress.
+    #[must_use]
+    pub fn in_progress_task_ids(&self) -> std::collections::BTreeSet<TaskId> {
+        self.tasks
+            .iter()
+            .filter(|task| *task.status() == TaskStatus::InProgress)
+            .map(|task| task.id().clone())
+            .collect()
+    }
+
     /// Returns the first task that is in `Todo` or `InProgress` status, if any.
     ///
     /// Tasks are considered in plan order (section order, then task order within each section).
@@ -921,5 +949,62 @@ mod tests {
         let doc = ImplPlanDocument::new(tasks, PlanView::new(vec![], sections)).unwrap();
 
         assert_eq!(doc.tasks().len(), 3);
+    }
+
+    // --- settled / in-progress classification ---
+
+    fn task_with_status(id: &str, status: TaskStatus) -> TrackTask {
+        TrackTask::with_dependencies(
+            TaskId::try_new(id).unwrap(),
+            NonEmptyString::try_new(format!("task {id}")).unwrap(),
+            status,
+            Vec::new(),
+        )
+    }
+
+    fn commit_hash() -> crate::CommitHash {
+        crate::CommitHash::try_new("a1b2c3d4e5f60718293a4b5c6d7e8f9012345678").unwrap()
+    }
+
+    #[test]
+    fn test_only_committed_or_skipped_work_counts_as_settled() {
+        let tasks = vec![
+            task_with_status("T001", TaskStatus::DoneTraced { commit_hash: commit_hash() }),
+            task_with_status("T002", TaskStatus::Skipped),
+            // Marked done with no commit recorded: the work is not on the branch,
+            // so it has not been delivered.
+            task_with_status("T003", TaskStatus::DonePending),
+            task_with_status("T004", TaskStatus::InProgress),
+            task_with_status("T005", TaskStatus::Todo),
+        ];
+        let doc =
+            ImplPlanDocument::new(tasks, plan(&["T001", "T002", "T003", "T004", "T005"])).unwrap();
+
+        assert_eq!(
+            doc.settled_task_ids(),
+            [TaskId::try_new("T001").unwrap(), TaskId::try_new("T002").unwrap()]
+                .into_iter()
+                .collect::<std::collections::BTreeSet<TaskId>>()
+        );
+    }
+
+    #[test]
+    fn test_in_progress_ids_name_the_tasks_currently_under_way() {
+        let tasks = vec![
+            task_with_status("T001", TaskStatus::InProgress),
+            task_with_status("T002", TaskStatus::Todo),
+            task_with_status("T003", TaskStatus::DonePending),
+            task_with_status("T004", TaskStatus::InProgress),
+        ];
+        let doc = ImplPlanDocument::new(tasks, plan(&["T001", "T002", "T003", "T004"])).unwrap();
+
+        assert_eq!(
+            doc.in_progress_task_ids(),
+            [TaskId::try_new("T001").unwrap(), TaskId::try_new("T004").unwrap()]
+                .into_iter()
+                .collect::<std::collections::BTreeSet<TaskId>>()
+        );
+        // The two classifications never overlap: a task under way is not settled.
+        assert!(doc.settled_task_ids().is_empty());
     }
 }

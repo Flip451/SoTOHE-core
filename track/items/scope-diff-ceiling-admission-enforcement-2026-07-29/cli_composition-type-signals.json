@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-29T12:54:17Z",
+  "generated_at": "2026-07-29T17:20:49Z",
   "declaration_hash": "2ac352f0a27b2ce270e8afdff5bcee59f21e5aeaf78702a4ae5756cedfc6a39a",
-  "implementation_input_hash": "41945fc904bc6d524ff07f86807a3cbefb2bf1aefaeab22586f00d8673e18199",
+  "implementation_input_hash": "d62271f121828503be0c3894b38cbef84fe4d7e9e26804fc9f373642ac9ca511",
   "signals": [
     {
       "type_name": "BatchPlanCompositionRoot",

@@ -229,6 +229,25 @@ subgraph domain["domain"]
     T29_domain_domain_ValidationError_PlanOrderViolatesDependency[PlanOrderViolatesDependency]
   end
   end
+  subgraph domain_domain_module_impl_plan["domain::impl_plan"]
+    direction TB
+  subgraph T30_domain_domain_ImplPlanDocument["impl_plan::ImplPlanDocument"]
+    direction TB
+    T30_domain_domain_ImplPlanDocument__self[ImplPlanDocument]
+    T30_domain_domain_ImplPlanDocument_new([new])
+    T30_domain_domain_ImplPlanDocument_schema_version([schema_version])
+    T30_domain_domain_ImplPlanDocument_tasks([tasks])
+    T30_domain_domain_ImplPlanDocument_plan([plan])
+    T30_domain_domain_ImplPlanDocument_all_tasks_resolved([all_tasks_resolved])
+    T30_domain_domain_ImplPlanDocument_unresolved_task_ids([unresolved_task_ids])
+    T30_domain_domain_ImplPlanDocument_settled_task_ids([settled_task_ids])
+    T30_domain_domain_ImplPlanDocument_in_progress_task_ids([in_progress_task_ids])
+    T30_domain_domain_ImplPlanDocument_next_open_task([next_open_task])
+    T30_domain_domain_ImplPlanDocument_apply_transition([apply_transition])
+    T30_domain_domain_ImplPlanDocument_apply_transition_by_status([apply_transition_by_status])
+    T30_domain_domain_ImplPlanDocument_add_task([add_task])
+  end
+  end
   subgraph domain_domain_module_review_v2["domain::review_v2"]
     direction TB
   subgraph T31_domain_domain_ReviewScopeConfig["review_v2::scope_config::ReviewScopeConfig"]
@@ -618,6 +637,10 @@ F52_domain_domain_domain__batch_plan__evaluate_admission --o T31_domain_domain_R
 F52_domain_domain_domain__batch_plan__evaluate_admission --o T31_domain_domain_MeasuredScopeDiff__self
 F52_domain_domain_domain__batch_plan__evaluate_admission --> T31_domain_domain_AdmissionDecision__self
 F52_domain_domain_domain__batch_plan__evaluate_admission --> T38_domain_domain_AdmissionEvaluationError__self
+T30_domain_domain_ImplPlanDocument_new --o T23_domain_domain_TrackTask__self
+T30_domain_domain_ImplPlanDocument_new --> T30_domain_domain_ImplPlanDocument__self
+T30_domain_domain_ImplPlanDocument_tasks --> T23_domain_domain_TrackTask__self
+T30_domain_domain_ImplPlanDocument_next_open_task --> T23_domain_domain_TrackTask__self
 T31_domain_domain_ReviewScopeConfig_new --> T31_domain_domain_ReviewScopeConfig__self
 T23_domain_domain_TrackTask_new --> T23_domain_domain_TrackTask__self
 T23_domain_domain_TrackTask_new --> T29_domain_domain_ValidationError__self
@@ -816,6 +839,19 @@ class T29_domain_domain_ValidationError_UnknownDependencyReference variant_node
 class T29_domain_domain_ValidationError_DependencyCycle variant_node
 class T29_domain_domain_ValidationError_PlanOrderViolatesDependency variant_node
 class T29_domain_domain_ValidationError__self error_type
+class T30_domain_domain_ImplPlanDocument_new method_node
+class T30_domain_domain_ImplPlanDocument_schema_version method_node
+class T30_domain_domain_ImplPlanDocument_tasks method_node
+class T30_domain_domain_ImplPlanDocument_plan method_node
+class T30_domain_domain_ImplPlanDocument_all_tasks_resolved method_node
+class T30_domain_domain_ImplPlanDocument_unresolved_task_ids method_node
+class T30_domain_domain_ImplPlanDocument_settled_task_ids method_node
+class T30_domain_domain_ImplPlanDocument_in_progress_task_ids method_node
+class T30_domain_domain_ImplPlanDocument_next_open_task method_node
+class T30_domain_domain_ImplPlanDocument_apply_transition method_node
+class T30_domain_domain_ImplPlanDocument_apply_transition_by_status method_node
+class T30_domain_domain_ImplPlanDocument_add_task method_node
+class T30_domain_domain_ImplPlanDocument__self domain_service
 class T31_domain_domain_ReviewScopeConfig_new method_node
 class T31_domain_domain_ReviewScopeConfig_diff_ceiling_for_scope method_node
 class T31_domain_domain_ReviewScopeConfig_classify method_node

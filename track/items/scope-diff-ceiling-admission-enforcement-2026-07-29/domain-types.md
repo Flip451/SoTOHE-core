@@ -38,6 +38,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
+| ImplPlanDocument | domain_service | modify | — | 🔵 | 🔵 |
 | ReviewScopeConfig | domain_service | reference | — | 🔵 | 🔵 |
 
 ## Free Functions

@@ -4,10 +4,10 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| AdmissionRejectionOutput | enum | add | NotCurrentBatchMember, ScopeCeilingWouldBeExceeded | 🟡 | 🔵 |
+| AdmissionRejectionOutput | enum | add | NotCurrentBatchMember, ScopeCeilingWouldBeExceeded | 🔵 | 🔵 |
 | BatchPlanCheckOutput | enum | add | Passed, Blocked | 🔵 | 🔵 |
 | BatchPlanViolationOutput | enum | add | CeilingExceeded, OversizeScopeHasMultipleContributors, UnknownTaskRef, UnplannedTask, DependencyInLaterBatch | 🔵 | 🔵 |
-| TaskTransitionOutcome | enum | add | Transitioned, Rejected | 🟡 | 🔵 |
+| TaskTransitionOutcome | enum | add | Transitioned, Rejected | 🔵 | 🔵 |
 
 ## Error Types
 
@@ -33,14 +33,14 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | BatchPlanCheckService | application_service | add | fn check(&self, cmd: BatchPlanCheckCommand) -> Result<BatchPlanCheckOutput, BatchPlanCheckError> | 🔵 | 🔵 |
-| TaskOperationService | application_service | modify | fn transition_task(&self, cmd: TaskTransitionCommand) -> Result<TaskTransitionOutcome, TaskOperationError>, fn add_task(&self, cmd: AddTaskCommand) -> Result<TaskOperationOutput, TaskOperationError>, fn set_override(&self, cmd: SetOverrideCommand) -> Result<TaskOperationOutput, TaskOperationError>, fn clear_override(&self, cmd: ClearOverrideCommand) -> Result<TaskOperationOutput, TaskOperationError> | 🟡 | 🔵 |
+| TaskOperationService | application_service | modify | fn transition_task(&self, cmd: TaskTransitionCommand) -> Result<TaskTransitionOutcome, TaskOperationError>, fn add_task(&self, cmd: AddTaskCommand) -> Result<TaskOperationOutput, TaskOperationError>, fn set_override(&self, cmd: SetOverrideCommand) -> Result<TaskOperationOutput, TaskOperationError>, fn clear_override(&self, cmd: ClearOverrideCommand) -> Result<TaskOperationOutput, TaskOperationError> | 🔵 | 🔵 |
 
 ## Interactors
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | BatchPlanCheckInteractor | interactor | add | — | 🔵 | 🔵 |
-| TaskOperationInteractor | interactor | modify | — | 🟡 | 🔵 |
+| TaskOperationInteractor | interactor | modify | — | 🔵 | 🔵 |
 
 ## DTOs
 
