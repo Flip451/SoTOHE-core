@@ -151,20 +151,21 @@
     {
       "id": "T025",
       "description": "`libs/infrastructure/src/scope_diff_measure.rs`: untracked_additions の guard 失敗分岐と count_file_lines の全分岐で message の絶対パス埋め込みを repo-relative FilePath 報告 + sanitized reason に差し替え、count_file_lines のシグネチャを調整する（IN-14、`knowledge/conventions/security.md` §Error Messages）。同ファイルの symlink 拒絶テストに message 内容の assertion を追加する（IN-14）。",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "1d5dfd04094d9e05c123f2e7175c29401828ecc1"
     },
     {
       "id": "T026",
       "description": "`libs/usecase/src/task_ops/` の ports module: CommitRecordVerifierPort と CommitRecordVerifyError を定義する（IN-22、AC-28）。`libs/usecase/src/task_ops.rs`: port 照合と TaskOperationError への mapping を行う usecase 内部 helper を追加する（呼び出し側への挿入と署名変更は含まない）（IN-22、AC-28）。同ファイルの試験: stub port で mapping の 3 failure lane を function 段で試験する（AC-28）。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T027",
       "description": "`libs/infrastructure/src/commit_record_verifier.rs`: T026 が定義した CommitRecordVerifierPort を実装する GitCommitRecordVerifier を追加し、実 git fixture で ancestry / not-found / unreadable の各分岐を試験する（IN-22、AC-29）。`libs/usecase/src/task_ops.rs`: TaskOperationInteractor::new を 6 collaborator 化し、T026 の helper を hash 書き込み遷移 2 経路（Complete-with-hash / BackfillHash）の apply 前に挿入する（IN-22、AC-28、AC-29）。同ファイルの試験: transition 段で 3 failure mode × 同 2 経路 × 永続化された impl-plan.json の byte 不変性、および success 経路（受理された hash の永続化）と bypass 経路（hash なし完了）を試験する（AC-28、AC-29）。`apps/cli-composition/src/track/mod.rs`: task-ops composition root の build 関数に 6 番目の collaborator として同 adapter を配線する（IN-22）。`apps/cli/tests/transition_integration.rs`: 配線後に影響する fixture を確認し必要なら更新する（AC-28）。",
       "status": "todo",
-      "commit_hash": null,
-      "depends_on": ["T026"]
+      "depends_on": [
+        "T026"
+      ]
     }
   ],
   "plan": {
