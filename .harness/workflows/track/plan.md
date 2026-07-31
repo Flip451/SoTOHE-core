@@ -52,7 +52,7 @@ stays visible across phases and back-and-forth loops:
 2. Phase 1 loop — invoke `spec-design` workflow, evaluate spec → ADR signal, escalate on 🔴
    (delta-candidate lane — the input box is frozen after the boundary)
 3. Phase 2 loop — invoke `type-design` workflow, evaluate type → spec signal per layer, escalate on 🔴
-4. Phase 3 loop — invoke `impl-plan` workflow, evaluate task-coverage gate, re-invoke on ERROR
+4. Phase 3 loop — invoke `impl-plan` workflow, evaluate the task-coverage gate AND the batch-plan structural gate, re-invoke while either is ERROR
 5. Termination — unexpected-divergence triage only; admitted delta drafts stay 🟡 for the
    merge-stage adjudication
 
@@ -87,7 +87,7 @@ Reverse references and layer skipping are forbidden: `spec → type catalogue`,
 | 0 | `init` → `review` → `commit` | orchestrator (direct) | the governing convention's Phase 0 gates, then ADR-baseline commit |
 | 1 | `spec-design` | spec-designer | spec → ADR signal (🔵🟡🔴) |
 | 2 | `type-design` | type-designer | type → spec signal, per layer (🔵🟡🔴) |
-| 3 | `impl-plan` | impl-planner | task-coverage binary gate (OK / ERROR) |
+| 3 | `impl-plan` | impl-planner | task-coverage binary gate AND batch-plan structural gate (each OK / ERROR) |
 
 ### Phase 0: init workflow
 
@@ -151,11 +151,14 @@ Reverse references and layer skipping are forbidden: `spec → type catalogue`,
 ### Phase 3 loop: impl-plan workflow
 
 1. Invoke the `impl-plan` workflow (`.harness/workflows/track/impl-plan.md`).
-2. Read the binary gate verdict (OK / ERROR).
+2. Read BOTH binary gate verdicts (each OK / ERROR): the task-coverage gate
+   (`bin/sotp verify plan-artifact-refs`) and the batch-plan structural gate
+   (`bin/sotp batch-plan check`).
 3. Apply the loop rule:
-   - **OK**: mark Phase 3 `completed` and proceed to Termination.
-   - **ERROR**: re-invoke `impl-plan`. Count against `max_retry`; on overflow, stop and
-     present the latest error to the user.
+   - **Both OK**: mark Phase 3 `completed` and proceed to Termination.
+   - **Either ERROR**: re-invoke `impl-plan` with the failing gate's output. Count against
+     `max_retry`; on overflow, stop and present the latest error to the user. Coverage OK
+     with batch-plan ERROR does NOT complete Phase 3.
 
 ### Termination
 
@@ -177,11 +180,11 @@ After Phase 3 OK:
 | 0 | `track/items/<id>/metadata.json` | orchestrator (direct via `init` workflow) |
 | 1 | `track/items/<id>/spec.json` + `spec.md` | `spec-designer` capability |
 | 2 | `track/items/<id>/<layer>-types.json` + baselines + views | `type-designer` capability |
-| 3 | `track/items/<id>/impl-plan.json` + `task-coverage.json` + `task-contract.json` | `impl-planner` capability |
+| 3 | `track/items/<id>/impl-plan.json` + `task-coverage.json` + `task-contract.json` + `batch-plan.json` | `impl-planner` capability |
 
 The orchestrator does not directly write `knowledge/adr/*.md`, `spec.json`,
-`<layer>-types.json`, `impl-plan.json`, `task-coverage.json`, or `task-contract.json`. Each artifact's writer
-capability owns its file end-to-end.
+`<layer>-types.json`, `impl-plan.json`, `task-coverage.json`, `task-contract.json`, or
+`batch-plan.json`. Each artifact's writer capability owns its file end-to-end.
 
 ### Sub-workflow briefing rules (no design prescription)
 
@@ -226,7 +229,7 @@ operations, environment-breaking changes. Artifact generation uses post-hoc revi
 - `track/items/<id>/metadata.json` (Phase 0)
 - `track/items/<id>/spec.json` + `spec.md` (Phase 1)
 - `track/items/<id>/<layer>-types.json` + views (Phase 2, per TDDD-enabled layer)
-- `track/items/<id>/impl-plan.json` + `task-coverage.json` + `task-contract.json` (Phase 3)
+- `track/items/<id>/impl-plan.json` + `task-coverage.json` + `task-contract.json` + `batch-plan.json` (Phase 3)
 - Per-phase gate results (🔵🟡🔴 / OK / ERROR) and final `max_retry` counters
 - Back-and-forth edits that occurred (target artifact and its writer)
 - Unexpected ADR working-tree divergence triage (if any), and admitted delta drafts left 🟡 for
