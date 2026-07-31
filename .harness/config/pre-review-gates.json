@@ -1,0 +1,17 @@
+{
+  "$schema_version": 1,
+  "entries": [
+    { "scope": "domain", "gates": ["task_contract_liveness"] },
+    { "scope": "usecase", "gates": ["task_contract_liveness"] },
+    { "scope": "infrastructure", "gates": ["task_contract_liveness"] },
+    { "scope": "cli", "gates": ["task_contract_liveness"] },
+    { "scope": "cli_composition", "gates": ["task_contract_liveness"] },
+    { "scope": "cli_driver", "gates": ["task_contract_liveness"] },
+    { "scope": "adr", "gates": [] },
+    { "scope": "spec", "gates": [] },
+    { "scope": "types", "gates": [] },
+    { "scope": "impl-plan", "gates": [] },
+    { "scope": "harness-policy", "gates": [] },
+    { "scope": "other", "gates": [] }
+  ]
+}

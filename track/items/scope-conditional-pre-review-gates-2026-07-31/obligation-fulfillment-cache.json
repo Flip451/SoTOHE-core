@@ -139,13 +139,13 @@
         "item_identifier": "trait_impl:usecase::pre_review_gate_dispatch::PreReviewGateConfigLoaderPort"
       },
       "key": {
-        "bound_tests_set_hash": "a6e59e070d34082e74836e3e11c5d2416c47dcddb8eb9f6707dcd4c5b4bc6119",
+        "bound_tests_set_hash": "4453ec023d05a6c7ba74d3b2dde4d68c2042edf42ef11f2f9ed1d071843d8e36",
         "declaration_hash": "f64745ae1bedeef8b2c3e6163dd6120f6089f24bcce06bf86b0ebdabb2185756",
         "anchor_text_hash": "ed51b1e4d8a2c891a8218b5cca23ae256e1d15fc3879dc89bae023c5215d130a"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(matrix.gates_for(&scope(\"spec\")).unwrap(), []);\n        assert_eq!(matrix.gates_for(&scope(\"planning\")).unwrap(), []);\n        assert_eq!(\n            matrix.gates_for(&scope(\"implementation\")).unwrap(),\n            [PreReviewGateKind::TaskContractLiveness]\n        );\n        assert_eq!(matrix.gates_for(&ScopeName::Other).unwrap(), []);"
+        "citation": "assert_eq!(matrix.gates_for(&scope(\"spec\")).unwrap(), []); assert_eq!(matrix.gates_for(&scope(\"planning\")).unwrap(), []); assert_eq!(matrix.gates_for(&scope(\"implementation\")).unwrap(), [PreReviewGateKind::TaskContractLiveness]);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -153,6 +153,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::pre_review_gate_config::tests",
           "test_name": "test_pre_review_gate_config_loader_port_complete_matrix_returns_declared_gates"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::pre_review_gate_config::tests",
+          "test_name": "test_pre_review_gate_config_loader_repository_declaration_validates_total_scope_policy"
         }
       ]
     },
@@ -170,7 +175,7 @@
         "item_identifier": "trait_impl:usecase::pre_review_gate_dispatch::PreReviewGateConfigLoaderPort"
       },
       "key": {
-        "bound_tests_set_hash": "a6e59e070d34082e74836e3e11c5d2416c47dcddb8eb9f6707dcd4c5b4bc6119",
+        "bound_tests_set_hash": "4453ec023d05a6c7ba74d3b2dde4d68c2042edf42ef11f2f9ed1d071843d8e36",
         "declaration_hash": "f64745ae1bedeef8b2c3e6163dd6120f6089f24bcce06bf86b0ebdabb2185756",
         "anchor_text_hash": "b2e87d16f47a3cbbe6eca3d1607dbd1712e23c89b912f6ed09dd133c64a720a1"
       },
@@ -184,6 +189,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::pre_review_gate_config::tests",
           "test_name": "test_pre_review_gate_config_loader_port_complete_matrix_returns_declared_gates"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::pre_review_gate_config::tests",
+          "test_name": "test_pre_review_gate_config_loader_repository_declaration_validates_total_scope_policy"
         }
       ]
     },
@@ -201,7 +211,7 @@
         "item_identifier": "trait_impl:usecase::pre_review_gate_dispatch::PreReviewGateConfigLoaderPort"
       },
       "key": {
-        "bound_tests_set_hash": "a6e59e070d34082e74836e3e11c5d2416c47dcddb8eb9f6707dcd4c5b4bc6119",
+        "bound_tests_set_hash": "4453ec023d05a6c7ba74d3b2dde4d68c2042edf42ef11f2f9ed1d071843d8e36",
         "declaration_hash": "f64745ae1bedeef8b2c3e6163dd6120f6089f24bcce06bf86b0ebdabb2185756",
         "anchor_text_hash": "fa6eaf331bec952677daee86b5e97d724023a85d6456a22e9a752bd0d643207d"
       },
@@ -215,6 +225,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::pre_review_gate_config::tests",
           "test_name": "test_pre_review_gate_config_loader_port_complete_matrix_returns_declared_gates"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::pre_review_gate_config::tests",
+          "test_name": "test_pre_review_gate_config_loader_repository_declaration_validates_total_scope_policy"
         }
       ]
     },
@@ -232,13 +247,13 @@
         "item_identifier": "trait_impl:usecase::pre_review_gate_dispatch::PreReviewGateConfigLoaderPort"
       },
       "key": {
-        "bound_tests_set_hash": "a6e59e070d34082e74836e3e11c5d2416c47dcddb8eb9f6707dcd4c5b4bc6119",
+        "bound_tests_set_hash": "4453ec023d05a6c7ba74d3b2dde4d68c2042edf42ef11f2f9ed1d071843d8e36",
         "declaration_hash": "f64745ae1bedeef8b2c3e6163dd6120f6089f24bcce06bf86b0ebdabb2185756",
         "anchor_text_hash": "08f3ac81524ea5cd2aa6d19f2264026803386f963aba31f5a619918fb64dfb93"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let matrix = loader.load(&repo.path().join(\"track/items\"), &track_id()).unwrap();\n\n        assert_eq!(matrix.gates_for(&scope(\"spec\")).unwrap(), []);\n        assert_eq!(matrix.gates_for(&scope(\"planning\")).unwrap(), []);\n        assert_eq!(\n            matrix.gates_for(&scope(\"implementation\")).unwrap(),\n            [PreReviewGateKind::TaskContractLiveness]\n        );\n        assert_eq!(matrix.gates_for(&ScopeName::Other).unwrap(), []);"
+        "citation": "assert_eq!(matrix.gates_for(&scope(\"implementation\")).unwrap(),\n            [PreReviewGateKind::TaskContractLiveness]\n        );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -246,6 +261,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::pre_review_gate_config::tests",
           "test_name": "test_pre_review_gate_config_loader_port_complete_matrix_returns_declared_gates"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::pre_review_gate_config::tests",
+          "test_name": "test_pre_review_gate_config_loader_repository_declaration_validates_total_scope_policy"
         }
       ]
     },

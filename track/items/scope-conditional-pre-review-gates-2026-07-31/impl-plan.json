@@ -11,6 +11,7 @@
       "id": "T002",
       "description": "`libs/infrastructure/src/pre_review_gate_config.rs` に `FsPreReviewGateConfigLoader` を実装し、infrastructure module に登録する。loader port の conformance / decode tests を追加する。IN-01、CN-01、AC-01。",
       "status": "done",
+      "commit_hash": "35a4fd6ff771e6aaf5f179d7d24a1866e192a511",
       "depends_on": [
         "T001"
       ]
@@ -18,7 +19,7 @@
     {
       "id": "T003",
       "description": "`.harness/config/pre-review-gates.json` に scope × gate declaration を追加し、`libs/infrastructure/src/pre_review_gate_config.rs` に declaration fixture validation を追加する。IN-01、OS-03、CN-01、AC-01。",
-      "status": "todo",
+      "status": "done",
       "depends_on": [
         "T002"
       ]

@@ -28,6 +28,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::pre_review_gate_config::tests",
           "test_name": "test_pre_review_gate_config_loader_port_complete_matrix_returns_declared_gates"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::pre_review_gate_config::tests",
+          "test_name": "test_pre_review_gate_config_loader_repository_declaration_validates_total_scope_policy"
         }
       ]
     },

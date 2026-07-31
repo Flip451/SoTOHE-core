@@ -198,7 +198,7 @@ fn decode_scope(value: &str) -> Result<ScopeName, PreReviewGateConfigLoadError> 
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
     use std::fs;
-    use std::path::Path;
+    use std::path::{Path, PathBuf};
     use std::process::Command;
 
     use super::*;
@@ -228,6 +228,10 @@ mod tests {
 
     fn track_id() -> TrackId {
         TrackId::try_new("scope-policy-test").unwrap()
+    }
+
+    fn repository_items_dir() -> PathBuf {
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..").join("track/items")
     }
 
     fn fixture_repo() -> tempfile::TempDir {
@@ -262,6 +266,27 @@ mod tests {
             matrix.gates_for(&scope("implementation")).unwrap(),
             [PreReviewGateKind::TaskContractLiveness]
         );
+        assert_eq!(matrix.gates_for(&ScopeName::Other).unwrap(), []);
+    }
+
+    #[test]
+    fn test_pre_review_gate_config_loader_repository_declaration_validates_total_scope_policy() {
+        let matrix =
+            FsPreReviewGateConfigLoader::new().load(&repository_items_dir(), &track_id()).unwrap();
+
+        for scope_name in ["adr", "spec", "types", "impl-plan", "harness-policy"] {
+            assert_eq!(matrix.gates_for(&scope(scope_name)).unwrap(), []);
+        }
+
+        for scope_name in
+            ["domain", "usecase", "infrastructure", "cli", "cli_composition", "cli_driver"]
+        {
+            assert_eq!(
+                matrix.gates_for(&scope(scope_name)).unwrap(),
+                [PreReviewGateKind::TaskContractLiveness]
+            );
+        }
+
         assert_eq!(matrix.gates_for(&ScopeName::Other).unwrap(), []);
     }
 
