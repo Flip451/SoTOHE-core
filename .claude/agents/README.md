@@ -16,7 +16,7 @@ One file per `provider: claude` capability. `orchestrator` has no file — it is
 |---|---|---|---|---|
 | `spec-designer.md` | spec-designer | `claude-opus-5` | `high` | `/track:spec-design` (Phase 1) — authors `spec.json` |
 | `type-designer.md` | type-designer | `claude-opus-5` | `high` | `/track:type-design` (Phase 2) — authors `<layer>-types.json` |
-| `impl-planner.md` | impl-planner | `claude-opus-5` | `medium` | `/track:impl-plan` (Phase 3) — authors `impl-plan.json` + `task-coverage.json` + `task-contract.json` |
+| `impl-planner.md` | impl-planner | `claude-opus-5` | `medium` | `/track:impl-plan` (Phase 3) — authors `impl-plan.json` + `task-coverage.json` + `task-contract.json` + `batch-plan.json` |
 | `adr-editor.md` | adr-editor | `claude-opus-5` | `high` | the sole in-track writer for `knowledge/adr/*.md` |
 | `adr-diagnoser.md` | adr-diagnoser | `claude-opus-5` | `xhigh` | guardian for recorded ADR decisions; read-only verdicts, no `Edit`/`Write` |
 | `rollback-diagnoser.md` | rollback-diagnoser | `claude-opus-5` | `xhigh` | `/track:diagnose` — routes a finding back to the phase owning its root cause |
