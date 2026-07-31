@@ -4,7 +4,8 @@
     {
       "id": "T001",
       "description": "`.github/workflows/ci.yml` の `check` job にある `Recreate local track branch on PR merge ref` と `Run CI suite (track-aware gates)` を更新し、同 job に CI run evidence matrix と remote strict-gate regression cases を追加する。IN-01、OUT-01、OUT-02、CN-01、AC-01、AC-02。",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "cea074b9797139d6f1bb804058f0e323ce03d4c3"
     },
     {
       "id": "T002",
@@ -17,7 +18,7 @@
     {
       "id": "T004",
       "description": "`Makefile.toml` の `[tasks.ci-track]` / `[tasks.ci-track-local]` と `apps/cli/tests/consumer_scaffold_host_first.rs` の `test_exported_ci_track_*` regression cases を更新し、local early-detection path の検証を追加する。IN-03、AC-04。",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T003",

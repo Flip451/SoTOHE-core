@@ -6,19 +6,19 @@
 GO-01 → T001, T002, T004.
 GO-02 → T003.
 
-## Tasks (1/4 resolved)
+## Tasks (2/4 resolved)
 
 ### S1 — Remote strict merge gate
 
 > `.github/workflows/ci.yml` `check` job: `Recreate local track branch on PR merge ref`; `Run CI suite (track-aware gates)`. IN-01、CN-01、AC-01、AC-02。
 
-- [x] **T001**: `.github/workflows/ci.yml` の `check` job にある `Recreate local track branch on PR merge ref` と `Run CI suite (track-aware gates)` を更新し、同 job に CI run evidence matrix と remote strict-gate regression cases を追加する。IN-01、OUT-01、OUT-02、CN-01、AC-01、AC-02。
+- [x] **T001**: `.github/workflows/ci.yml` の `check` job にある `Recreate local track branch on PR merge ref` と `Run CI suite (track-aware gates)` を更新し、同 job に CI run evidence matrix と remote strict-gate regression cases を追加する。IN-01、OUT-01、OUT-02、CN-01、AC-01、AC-02。 (`cea074b9797139d6f1bb804058f0e323ce03d4c3`)
 
 ### S2 — Local early-detection path
 
 > `Makefile.toml` `[tasks.ci-track]` / `[tasks.ci-track-local]`; `apps/cli/tests/consumer_scaffold_host_first.rs` `test_exported_ci_track_*`. IN-03、AC-04。
 
-- [ ] **T004**: `Makefile.toml` の `[tasks.ci-track]` / `[tasks.ci-track-local]` と `apps/cli/tests/consumer_scaffold_host_first.rs` の `test_exported_ci_track_*` regression cases を更新し、local early-detection path の検証を追加する。IN-03、AC-04。
+- [x] **T004**: `Makefile.toml` の `[tasks.ci-track]` / `[tasks.ci-track-local]` と `apps/cli/tests/consumer_scaffold_host_first.rs` の `test_exported_ci_track_*` regression cases を更新し、local early-detection path の検証を追加する。IN-03、AC-04。
 
 ### S3 — Branch protection enforcement
 

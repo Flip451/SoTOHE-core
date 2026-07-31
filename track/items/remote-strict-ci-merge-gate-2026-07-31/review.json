@@ -1,6 +1,38 @@
 {
   "schema_version": 2,
   "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:164c45e98880fe829393dd71d970d655f386c3371d2c7f12f4932ca76a2ea44b",
+          "at": "2026-07-31T11:20:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:164c45e98880fe829393dd71d970d655f386c3371d2c7f12f4932ca76a2ea44b",
+          "at": "2026-07-31T11:22:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7444b2430f355932f82ff469acaacdd5c4d0d83b4b23c2ceb49bcc6dbe0aa58b",
+          "at": "2026-07-31T12:01:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7444b2430f355932f82ff469acaacdd5c4d0d83b4b23c2ceb49bcc6dbe0aa58b",
+          "at": "2026-07-31T12:04:29Z"
+        }
+      ]
+    },
     "impl-plan": {
       "rounds": [
         {
@@ -153,6 +185,129 @@
           "findings": [],
           "hash": "rvw1:sha256:d46a3949f1de78a7dbb953be0217fc19fe8f124044131f0e9ce83e8658a6ad97",
           "at": "2026-07-31T13:21:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d795d44d4218f9a8e35e3e0f0021d361badd896ede9cdaffa9b271553a2cbb8d",
+          "at": "2026-07-31T13:37:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d795d44d4218f9a8e35e3e0f0021d361badd896ede9cdaffa9b271553a2cbb8d",
+          "at": "2026-07-31T13:43:18Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `preserves_track_gates` test only inspects dependency names and never validates the `ci-track` task's `script`. Therefore it would still pass if the ADR-baseline gate (`bin/sotp adr-baseline check-commit`) were removed or replaced with a no-op, so it does not fully prove that the exported local early-detection route preserves its gates.",
+              "severity": "P1",
+              "file": "apps/cli/tests/consumer_scaffold_host_first.rs",
+              "line": 615,
+              "category": "missing regression coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:affae12a4982c183f2524c8d4c208467f7aec1444a899543b32a976b072ee9a0",
+          "at": "2026-07-31T13:37:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aa36e2cb6a9bd18b4f1085fb22b3afb64616509284a54c3ee841642e11806943",
+          "at": "2026-07-31T13:40:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The regression does not prove that the exported `ci-track` task remains publicly invocable. Adding `private = true` or disabling the task would leave every assertion here passing, while `cargo make ci-track` would reject the route unless explicitly overridden. This permits AC-04 to regress despite a green test; assert that the task is public/enabled or verify non-executing task resolution.",
+              "severity": "P1",
+              "file": "apps/cli/tests/consumer_scaffold_host_first.rs",
+              "line": 615,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:aa36e2cb6a9bd18b4f1085fb22b3afb64616509284a54c3ee841642e11806943",
+          "at": "2026-07-31T13:44:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`task_toml_optional_value` does not parse TOML semantics: it only recognizes the exact spelling `key = ` and returns an unparsed value. Valid declarations such as `private=true` are therefore treated as absent, while `private = true # reason` compares unequal to `Some(\"true\")`. In either case both availability assertions pass even though cargo-make treats `ci-track` as private/disabled, so AC-04 can still regress. Parse these flags as TOML booleans or validate task resolution through cargo-make.",
+              "severity": "P1",
+              "file": "apps/cli/tests/consumer_scaffold_host_first.rs",
+              "line": 103,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:56d37f09a5ee90af7f2b0f494ed9bb6320346622f04123a3fc945c1f4a535142",
+          "at": "2026-07-31T13:48:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2f3a0aab9c91ee791b49d52b857b5ffedb61bce15061ffd0a52ff2aba93e5459",
+          "at": "2026-07-31T13:51:13Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:168f21efca7ef2d05af430cfaa40fd9bec6da32637f0e8cd968d56ae5ebd09a7",
+          "at": "2026-07-31T12:28:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:168f21efca7ef2d05af430cfaa40fd9bec6da32637f0e8cd968d56ae5ebd09a7",
+          "at": "2026-07-31T12:31:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d2ca9d1feca60816ec658cb49808ced5103bcca8a8dcc74261c200dff0ed3820",
+          "at": "2026-07-31T13:16:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d2ca9d1feca60816ec658cb49808ced5103bcca8a8dcc74261c200dff0ed3820",
+          "at": "2026-07-31T13:22:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1394996deca4b4de296dde90a1b59e83ba55938a553b5feb0a481f6ba8c97f63",
+          "at": "2026-07-31T13:37:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1394996deca4b4de296dde90a1b59e83ba55938a553b5feb0a481f6ba8c97f63",
+          "at": "2026-07-31T13:42:58Z"
         }
       ]
     },
@@ -189,67 +344,35 @@
         }
       ]
     },
-    "adr": {
+    "harness-policy": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:164c45e98880fe829393dd71d970d655f386c3371d2c7f12f4932ca76a2ea44b",
-          "at": "2026-07-31T11:20:21Z"
+          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
+          "at": "2026-07-31T11:44:08Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:164c45e98880fe829393dd71d970d655f386c3371d2c7f12f4932ca76a2ea44b",
-          "at": "2026-07-31T11:22:40Z"
+          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
+          "at": "2026-07-31T11:47:56Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7444b2430f355932f82ff469acaacdd5c4d0d83b4b23c2ceb49bcc6dbe0aa58b",
-          "at": "2026-07-31T12:01:24Z"
+          "hash": "rvw1:sha256:452d51231cfa0b228ff165c52e8110a2d2c95dccf04f90ded89896b0475283ec",
+          "at": "2026-07-31T13:36:52Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7444b2430f355932f82ff469acaacdd5c4d0d83b4b23c2ceb49bcc6dbe0aa58b",
-          "at": "2026-07-31T12:04:29Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:168f21efca7ef2d05af430cfaa40fd9bec6da32637f0e8cd968d56ae5ebd09a7",
-          "at": "2026-07-31T12:28:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:168f21efca7ef2d05af430cfaa40fd9bec6da32637f0e8cd968d56ae5ebd09a7",
-          "at": "2026-07-31T12:31:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d2ca9d1feca60816ec658cb49808ced5103bcca8a8dcc74261c200dff0ed3820",
-          "at": "2026-07-31T13:16:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d2ca9d1feca60816ec658cb49808ced5103bcca8a8dcc74261c200dff0ed3820",
-          "at": "2026-07-31T13:22:51Z"
+          "hash": "rvw1:sha256:452d51231cfa0b228ff165c52e8110a2d2c95dccf04f90ded89896b0475283ec",
+          "at": "2026-07-31T13:43:53Z"
         }
       ]
     },
@@ -268,24 +391,6 @@
           "findings": [],
           "hash": "rvw1:sha256:2b9c01989185915d5b01537a0c897a37b0cda578e88f7cd38d1c8f61a3464615",
           "at": "2026-07-31T12:32:30Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
-          "at": "2026-07-31T11:44:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
-          "at": "2026-07-31T11:47:56Z"
         }
       ]
     }
