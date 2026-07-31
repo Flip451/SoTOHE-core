@@ -9,7 +9,7 @@
     },
     {
       "id": "T002",
-      "description": "After T001, implement the catalogue-defined infrastructure `SystemSignalReportSourceAdapter` in `libs/infrastructure/src/signal_report/`, with independently verifiable artifact-read, chain ⓪/① derivation, and non-persistence conformance tests. IN-04, CN-01, AC-04.",
+      "description": "After T001, implement and independently verify the catalogue-defined `SystemSignalReportSourceAdapter` in `libs/infrastructure/src/signal_report/`. IN-04, CN-01, AC-01, AC-04.",
       "status": "done",
       "commit_hash": "43e23a96",
       "depends_on": [
@@ -20,6 +20,7 @@
       "id": "T003",
       "description": "After T001, implement filter-to-query conversion in `apps/cli-driver/src/signal_report/`. IN-03, AC-03.",
       "status": "done",
+      "commit_hash": "c2a77f82",
       "depends_on": [
         "T001"
       ]
@@ -27,7 +28,7 @@
     {
       "id": "T004",
       "description": "After T001 and T003, implement occurrence rendering in `apps/cli-driver/src/signal_report/`. IN-02, CN-02, AC-02.",
-      "status": "todo",
+      "status": "done",
       "depends_on": [
         "T001",
         "T003"
@@ -86,7 +87,7 @@
         "id": "S2",
         "title": "Infrastructure — report source adapter",
         "description": [
-          "Implement `SystemSignalReportSourceAdapter` in `libs/infrastructure/src/signal_report/`, with artifact-read, chain ⓪/① derivation, and non-persistence conformance tests. IN-04, CN-01, AC-04."
+          "Implement and independently verify `SystemSignalReportSourceAdapter` in `libs/infrastructure/src/signal_report/`. IN-04, CN-01, AC-01, AC-04."
         ],
         "task_ids": [
           "T002"

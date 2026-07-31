@@ -752,6 +752,104 @@
           "test_name": "test_signal_report_input_each_level_filter_converts_to_expected_selection"
         }
       ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportDriver",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "GO-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportDriver",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:GO-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "2b80c4e00fc78b2891b83a8c7e9a19b6c22cf85a9ca35fdcc24ae839f55cd114",
+        "declaration_hash": "ee1acf0f143bbc5d8ba6a8e31a6d75c37ff324218441552016240903017e02ba",
+        "anchor_text_hash": "58738475f1f701537f0cde2212eefb1637eaafa6f10e261cf5b6a97653478a15"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let outcome = driver.handle(SignalReportInput {\n            chain: SignalReportChainFilter::All,\n            levels: SignalReportLevelFilter::YellowAndRed,\n        });\n\n        assert_eq!(outcome.exit_code, 0);\n        assert_eq!(outcome.stderr, None);\n        assert_eq!(\n            outcome.stdout.as_deref(),\n            Some(\n                \"signal report: 4 occurrence(s)\\n\\\n                 chain=catalog_spec level=red entry_id=CatalogEntry reference=spec.json#IN-02 reason=missing reference location=track/items/example/cli_driver-types.json\\n\\\n                 chain=adr_user level=yellow entry_id=ADR-01 reference=adr.md#D1 reason=needs evidence location=knowledge/adr/example.md\\n\\\n                 chain=spec_adr level=red entry_id=IN-02 reference=adr.md#D1 reason=unresolved ADR reference location=track/items/example/spec.json\\n\\\n                 chain=impl_catalog level=yellow entry_id=SignalReportDriver reference=cli_driver-types.json#AC-02 reason=implementation reference pending review location=apps/cli-driver/src/signal_report.rs\"\n            )\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::signal_report::tests",
+          "test_name": "test_signal_report_driver_renders_complete_occurrences_in_service_order"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportDriver",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportDriver",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "df44eb3a4d6121ad1c8830d24c8d7dc2e19a91ec65f81c6420b89bb229a4df25",
+        "declaration_hash": "ee1acf0f143bbc5d8ba6a8e31a6d75c37ff324218441552016240903017e02ba",
+        "anchor_text_hash": "2699a99dc0e6aa19d5e25cb6808bfa86e9d8718ec9ddefa2891028db6a3b62b8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome.stdout.as_deref(), Some(\n                \"signal report: 4 occurrence(s)\\n\\\n                 chain=catalog_spec level=red entry_id=CatalogEntry reference=spec.json#IN-02 reason=missing reference location=track/items/example/cli_driver-types.json\\n\\\n                 chain=adr_user level=yellow entry_id=ADR-01 reference=adr.md#D1 reason=needs evidence location=knowledge/adr/example.md\\n\\\n                 chain=spec_adr level=red entry_id=IN-02 reference=adr.md#D1 reason=unresolved ADR reference location=track/items/example/spec.json\\n\\\n                 chain=impl_catalog level=yellow entry_id=SignalReportDriver reference=cli_driver-types.json#AC-02 reason=implementation reference pending review location=apps/cli-driver/src/signal_report.rs\"\n            ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::signal_report::tests",
+          "test_name": "test_signal_report_driver_renders_complete_occurrences_in_service_order"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::signal_report::tests",
+          "test_name": "test_signal_report_driver_renders_empty_success_output"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportDriver",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportDriver",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "2b80c4e00fc78b2891b83a8c7e9a19b6c22cf85a9ca35fdcc24ae839f55cd114",
+        "declaration_hash": "ee1acf0f143bbc5d8ba6a8e31a6d75c37ff324218441552016240903017e02ba",
+        "anchor_text_hash": "4be465a5a98f6d97a4f29c3ae254fec040c63d259333d40200bca7a3acd48a94"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"chain=catalog_spec level=red entry_id=CatalogEntry reference=spec.json#IN-02 reason=missing reference location=track/items/example/cli_driver-types.json\\n                 chain=adr_user level=yellow entry_id=ADR-01 reference=adr.md#D1 reason=needs evidence location=knowledge/adr/example.md\\n                 chain=spec_adr level=red entry_id=IN-02 reference=adr.md#D1 reason=unresolved ADR reference location=track/items/example/spec.json\\n                 chain=impl_catalog level=yellow entry_id=SignalReportDriver reference=cli_driver-types.json#AC-02 reason=implementation reference pending review location=apps/cli-driver/src/signal_report.rs\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::signal_report::tests",
+          "test_name": "test_signal_report_driver_renders_complete_occurrences_in_service_order"
+        }
+      ]
     }
   ]
 }

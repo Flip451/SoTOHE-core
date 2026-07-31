@@ -1,99 +1,50 @@
 {
   "schema_version": 2,
   "scopes": {
-    "cli_composition": {
+    "cli_driver": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b6ef392c142af817f0e614fbb49672d0e56dd2526ef8c02e3238a5804df8bf4d",
-          "at": "2026-07-31T18:59:59Z"
+          "hash": "rvw1:sha256:65568efaf17d359f05157e201dccc53a82e0bb528a8bc7056207cd5c29bef9c3",
+          "at": "2026-07-31T21:02:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:65568efaf17d359f05157e201dccc53a82e0bb528a8bc7056207cd5c29bef9c3",
+          "at": "2026-07-31T21:05:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dfdf14fcec1535e720044508f2a3a360b526d1c13485128e02c853a0b77cce73",
+          "at": "2026-07-31T21:39:28Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`ref_verify_run`, `ref_verify_check_approved`, and `ref_verify_results` execute application flow by calling `RefVerifyDriver::handle` and returning its `CommandOutcome`. Composition must stop at `ref_verify_driver`; the CLI layer should invoke the returned driver.",
+              "message": "The public `handle` error path is tested only with `SourceUnavailable`; `InvalidOccurrence` has distinct user-visible rendering but no test. A regression in that match arm would pass this scope. Add a test asserting exit code 1, empty stdout, and bounded stderr for `SignalReportError::InvalidOccurrence`.",
               "severity": "P1",
-              "file": "apps/cli-composition/src/ref_verify.rs",
-              "line": 98,
-              "category": "invoke leak"
-            },
-            {
-              "message": "`track_type_signals` invokes `TypeSignalsInteractor::run` and converts its result into a command outcome. Move request execution to `cli_driver`; this root should only construct and return the wired primary adapter.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/tddd.rs",
-              "line": 72,
-              "category": "invoke leak"
-            },
-            {
-              "message": "`track_type_graph` constructs a user-facing command-removal message inside the composition root. Deprecation rendering belongs in `cli_driver`, with composition limited to wiring.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/tddd.rs",
-              "line": 100,
-              "category": "render leak"
-            },
-            {
-              "message": "`track_baseline_graph` invokes `RenderBaselineGraph::execute` and then formats the user-facing success message. Both execution and rendering must be handled by a wired primary adapter in `cli_driver`.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/tddd.rs",
-              "line": 150,
-              "category": "invoke leak / render leak"
-            },
-            {
-              "message": "`track_contract_map` calls `ContractMapDriver::handle` from the composition entry point. Return the fully wired driver instead and let `apps/cli` invoke it.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/tddd.rs",
-              "line": 207,
-              "category": "invoke leak"
-            },
-            {
-              "message": "`track_catalogue_spec_signals` implements the application workflow in composition: it validates filesystem state, selects layers, deletes stale artifacts, and invokes `refresh_one_layer`. Move this orchestration behind a use-case/driver boundary and retain only collaborator construction here.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/tddd.rs",
-              "line": 216,
-              "category": "application-logic leak"
-            },
-            {
-              "message": "`track_spec_element_hash` directly invokes the infrastructure hash operation and serializes its result for display. Execution and JSON rendering belong behind a `cli_driver` primary adapter.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/tddd.rs",
-              "line": 378,
-              "category": "invoke leak / render leak"
-            },
-            {
-              "message": "`track_baseline_capture` invokes `BaselineCaptureInteractor::run` from the composition root. Expose a wired driver and perform the request invocation in `apps/cli`.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/tddd.rs",
-              "line": 441,
-              "category": "invoke leak"
-            },
-            {
-              "message": "`track_lint` invokes `RunCatalogueLint::execute` and formats violations, counts, and user-facing errors locally. Move execution and presentation into `cli_driver`, leaving this method as pure wiring.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/tddd.rs",
-              "line": 488,
-              "category": "invoke leak / render leak"
-            },
-            {
-              "message": "`track_catalogue_impl_signals` invokes `CatalogueImplSignalsInteractor::run` and maps its report into CLI output. The composition root must instead return a wired primary adapter without executing it.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/tddd.rs",
-              "line": 571,
-              "category": "invoke leak"
+              "file": "apps/cli-driver/src/signal_report.rs",
+              "line": 339,
+              "category": "test_coverage"
             }
           ],
-          "hash": "rvw1:sha256:b6ef392c142af817f0e614fbb49672d0e56dd2526ef8c02e3238a5804df8bf4d",
-          "at": "2026-07-31T19:22:01Z"
+          "hash": "rvw1:sha256:dfdf14fcec1535e720044508f2a3a360b526d1c13485128e02c853a0b77cce73",
+          "at": "2026-07-31T21:49:32Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b6ef392c142af817f0e614fbb49672d0e56dd2526ef8c02e3238a5804df8bf4d",
-          "at": "2026-07-31T20:29:58Z"
+          "hash": "rvw1:sha256:e43ef7b32e93c170d057f892897cb51278f5c7942e15f92f85390c5230e1c33d",
+          "at": "2026-07-31T21:53:28Z"
         }
       ]
     },
@@ -466,24 +417,60 @@
           "findings": [],
           "hash": "rvw1:sha256:4ac29d6cb074b6773ae29a39635885299901c5f9c0986d4cdb178041ad02a5ee",
           "at": "2026-07-31T21:18:07Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 restates upstream behavior in prose (`artifact-read`, chain ⓪/① derivation, and non-persistence). Keep only the target, operation, and anchor cite per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/signal-report-command-2026-07-31/impl-plan.json",
+              "line": 12,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S2 repeats the upstream behavior contract (`artifact-read`, chain ⓪/① derivation, and non-persistence) instead of only naming the target, operation, and anchor cite. Remove the restatement per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/signal-report-command-2026-07-31/impl-plan.json",
+              "line": 90,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:6eb3b6cd558f1fd55ebf2103e3be80ad6e037e5b4b1a8e03bc78e5b79d89cee8",
+          "at": "2026-07-31T21:40:42Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:5a83f3b5a812e150ac96f6d9a2cec69d7322c78d4260fd8e6927329d8624f4f5",
-          "at": "2026-07-31T16:59:07Z"
+          "hash": "rvw1:sha256:bf50c395fd677d27f6a34f1062584f2071a79b575f7c0016af3969281b7f5974",
+          "at": "2026-07-31T21:45:32Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:5a83f3b5a812e150ac96f6d9a2cec69d7322c78d4260fd8e6927329d8624f4f5",
-          "at": "2026-07-31T17:28:19Z"
+          "hash": "rvw1:sha256:bf50c395fd677d27f6a34f1062584f2071a79b575f7c0016af3969281b7f5974",
+          "at": "2026-07-31T21:57:59Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0e6438fbe7b445d29dfe318ee778afd871c063eed23d7876227e3cb0d6d11749",
+          "at": "2026-07-31T18:59:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0e6438fbe7b445d29dfe318ee778afd871c063eed23d7876227e3cb0d6d11749",
+          "at": "2026-07-31T19:19:02Z"
         }
       ]
     },
@@ -724,6 +711,24 @@
         }
       ]
     },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4f7c4098aaaaf40e9be2bd227012f39cfc11039a57d6e9e673888c4a842a53ba",
+          "at": "2026-07-31T12:48:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4f7c4098aaaaf40e9be2bd227012f39cfc11039a57d6e9e673888c4a842a53ba",
+          "at": "2026-07-31T12:51:56Z"
+        }
+      ]
+    },
     "types": {
       "rounds": [
         {
@@ -823,118 +828,21 @@
         }
       ]
     },
-    "cli_driver": {
+    "usecase": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:65568efaf17d359f05157e201dccc53a82e0bb528a8bc7056207cd5c29bef9c3",
-          "at": "2026-07-31T21:02:02Z"
+          "hash": "rvw1:sha256:5a83f3b5a812e150ac96f6d9a2cec69d7322c78d4260fd8e6927329d8624f4f5",
+          "at": "2026-07-31T16:59:07Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:65568efaf17d359f05157e201dccc53a82e0bb528a8bc7056207cd5c29bef9c3",
-          "at": "2026-07-31T21:05:53Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f3300d882f7f8e7a3746dc1556723c5d61465e4921ce03560f01e7a3df39cf48",
-          "at": "2026-07-31T11:29:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D1 requires `adr_user` to be included while forbidding signal recalculation and limiting the view to persisted `calc-*` artifacts. Chain ⓪'s `calc-adr-user` performs a live scan and persists no signal document, so the command cannot enumerate all four chains under the recorded boundary. This incompatibility must be resolved before downstream behavior can be derived.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-29-0839-signal-report-command.md",
-              "line": 18,
-              "category": "inconsistent decisions within the same ADR"
-            }
-          ],
-          "hash": "rvw1:sha256:f3300d882f7f8e7a3746dc1556723c5d61465e4921ce03560f01e7a3df39cf48",
-          "at": "2026-07-31T11:32:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f3300d882f7f8e7a3746dc1556723c5d61465e4921ce03560f01e7a3df39cf48",
-          "at": "2026-07-31T11:42:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6ba9a8c8b276d76b47425d2580babc14a1dbc6add90e9cdb70c2b909a2fbfd01",
-          "at": "2026-07-31T12:40:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6ba9a8c8b276d76b47425d2580babc14a1dbc6add90e9cdb70c2b909a2fbfd01",
-          "at": "2026-07-31T12:42:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:18e287538db3e7cbc650bde69b36adcbd84d3905aa0e4abaf1f5e9d137c0fcc0",
-          "at": "2026-07-31T19:13:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:18e287538db3e7cbc650bde69b36adcbd84d3905aa0e4abaf1f5e9d137c0fcc0",
-          "at": "2026-07-31T19:17:12Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0e6438fbe7b445d29dfe318ee778afd871c063eed23d7876227e3cb0d6d11749",
-          "at": "2026-07-31T18:59:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0e6438fbe7b445d29dfe318ee778afd871c063eed23d7876227e3cb0d6d11749",
-          "at": "2026-07-31T19:19:02Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
-          "at": "2026-07-31T11:44:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
-          "at": "2026-07-31T11:49:20Z"
+          "hash": "rvw1:sha256:5a83f3b5a812e150ac96f6d9a2cec69d7322c78d4260fd8e6927329d8624f4f5",
+          "at": "2026-07-31T17:28:19Z"
         }
       ]
     },
@@ -1002,24 +910,195 @@
           "findings": [],
           "hash": "rvw1:sha256:d01f366dd26bb96539672e8a6a9b22b76e36fcc263a80a68b42d220eee69e3e6",
           "at": "2026-07-31T21:21:01Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4f7c4098aaaaf40e9be2bd227012f39cfc11039a57d6e9e673888c4a842a53ba",
-          "at": "2026-07-31T12:48:56Z"
+          "hash": "rvw1:sha256:54393ff227807208d0bc6f2cde4ae897d0990fd6849533085009cecb72e03ee7",
+          "at": "2026-07-31T21:46:38Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4f7c4098aaaaf40e9be2bd227012f39cfc11039a57d6e9e673888c4a842a53ba",
-          "at": "2026-07-31T12:51:56Z"
+          "hash": "rvw1:sha256:54393ff227807208d0bc6f2cde4ae897d0990fd6849533085009cecb72e03ee7",
+          "at": "2026-07-31T22:00:26Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
+          "at": "2026-07-31T11:44:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
+          "at": "2026-07-31T11:49:20Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f3300d882f7f8e7a3746dc1556723c5d61465e4921ce03560f01e7a3df39cf48",
+          "at": "2026-07-31T11:29:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1 requires `adr_user` to be included while forbidding signal recalculation and limiting the view to persisted `calc-*` artifacts. Chain ⓪'s `calc-adr-user` performs a live scan and persists no signal document, so the command cannot enumerate all four chains under the recorded boundary. This incompatibility must be resolved before downstream behavior can be derived.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-29-0839-signal-report-command.md",
+              "line": 18,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:f3300d882f7f8e7a3746dc1556723c5d61465e4921ce03560f01e7a3df39cf48",
+          "at": "2026-07-31T11:32:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f3300d882f7f8e7a3746dc1556723c5d61465e4921ce03560f01e7a3df39cf48",
+          "at": "2026-07-31T11:42:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6ba9a8c8b276d76b47425d2580babc14a1dbc6add90e9cdb70c2b909a2fbfd01",
+          "at": "2026-07-31T12:40:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6ba9a8c8b276d76b47425d2580babc14a1dbc6add90e9cdb70c2b909a2fbfd01",
+          "at": "2026-07-31T12:42:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:18e287538db3e7cbc650bde69b36adcbd84d3905aa0e4abaf1f5e9d137c0fcc0",
+          "at": "2026-07-31T19:13:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:18e287538db3e7cbc650bde69b36adcbd84d3905aa0e4abaf1f5e9d137c0fcc0",
+          "at": "2026-07-31T19:17:12Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b6ef392c142af817f0e614fbb49672d0e56dd2526ef8c02e3238a5804df8bf4d",
+          "at": "2026-07-31T18:59:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ref_verify_run`, `ref_verify_check_approved`, and `ref_verify_results` execute application flow by calling `RefVerifyDriver::handle` and returning its `CommandOutcome`. Composition must stop at `ref_verify_driver`; the CLI layer should invoke the returned driver.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/ref_verify.rs",
+              "line": 98,
+              "category": "invoke leak"
+            },
+            {
+              "message": "`track_type_signals` invokes `TypeSignalsInteractor::run` and converts its result into a command outcome. Move request execution to `cli_driver`; this root should only construct and return the wired primary adapter.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 72,
+              "category": "invoke leak"
+            },
+            {
+              "message": "`track_type_graph` constructs a user-facing command-removal message inside the composition root. Deprecation rendering belongs in `cli_driver`, with composition limited to wiring.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 100,
+              "category": "render leak"
+            },
+            {
+              "message": "`track_baseline_graph` invokes `RenderBaselineGraph::execute` and then formats the user-facing success message. Both execution and rendering must be handled by a wired primary adapter in `cli_driver`.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 150,
+              "category": "invoke leak / render leak"
+            },
+            {
+              "message": "`track_contract_map` calls `ContractMapDriver::handle` from the composition entry point. Return the fully wired driver instead and let `apps/cli` invoke it.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 207,
+              "category": "invoke leak"
+            },
+            {
+              "message": "`track_catalogue_spec_signals` implements the application workflow in composition: it validates filesystem state, selects layers, deletes stale artifacts, and invokes `refresh_one_layer`. Move this orchestration behind a use-case/driver boundary and retain only collaborator construction here.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 216,
+              "category": "application-logic leak"
+            },
+            {
+              "message": "`track_spec_element_hash` directly invokes the infrastructure hash operation and serializes its result for display. Execution and JSON rendering belong behind a `cli_driver` primary adapter.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 378,
+              "category": "invoke leak / render leak"
+            },
+            {
+              "message": "`track_baseline_capture` invokes `BaselineCaptureInteractor::run` from the composition root. Expose a wired driver and perform the request invocation in `apps/cli`.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 441,
+              "category": "invoke leak"
+            },
+            {
+              "message": "`track_lint` invokes `RunCatalogueLint::execute` and formats violations, counts, and user-facing errors locally. Move execution and presentation into `cli_driver`, leaving this method as pure wiring.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 488,
+              "category": "invoke leak / render leak"
+            },
+            {
+              "message": "`track_catalogue_impl_signals` invokes `CatalogueImplSignalsInteractor::run` and maps its report into CLI output. The composition root must instead return a wired primary adapter without executing it.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 571,
+              "category": "invoke leak"
+            }
+          ],
+          "hash": "rvw1:sha256:b6ef392c142af817f0e614fbb49672d0e56dd2526ef8c02e3238a5804df8bf4d",
+          "at": "2026-07-31T19:22:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b6ef392c142af817f0e614fbb49672d0e56dd2526ef8c02e3238a5804df8bf4d",
+          "at": "2026-07-31T20:29:58Z"
         }
       ]
     }

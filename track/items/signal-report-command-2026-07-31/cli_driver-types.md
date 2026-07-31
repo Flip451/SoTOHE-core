@@ -18,5 +18,5 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | SignalDriver | primary_adapter | reference | — | 🔵 | 🔵 |
-| SignalReportDriver | primary_adapter | add | — | 🟡 | 🔵 |
+| SignalReportDriver | primary_adapter | add | — | 🔵 | 🔵 |
 

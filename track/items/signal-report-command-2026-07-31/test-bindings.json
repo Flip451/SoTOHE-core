@@ -317,6 +317,44 @@
           "test_name": "test_signal_report_input_each_level_filter_converts_to_expected_selection"
         }
       ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "SignalReportDriver", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "GO-01"}},
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::signal_report::tests",
+          "test_name": "test_signal_report_driver_renders_complete_occurrences_in_service_order"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "SignalReportDriver", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "AC-01"}},
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::signal_report::tests",
+          "test_name": "test_signal_report_driver_renders_complete_occurrences_in_service_order"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::signal_report::tests",
+          "test_name": "test_signal_report_driver_renders_empty_success_output"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "SignalReportDriver", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "AC-02"}},
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::signal_report::tests",
+          "test_name": "test_signal_report_driver_renders_complete_occurrences_in_service_order"
+        }
+      ]
     }
   ]
 }

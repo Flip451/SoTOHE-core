@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-31T20:55:07Z",
+  "generated_at": "2026-07-31T21:52:30Z",
   "declaration_hash": "f686024f7a77eacc159ba7297bfec4f546b67b8f30ae498df3648597e5147295",
-  "implementation_input_hash": "bb0e9ef8f03f3348e6f9c75e1a723aa117a78f28cfca48755556148e49c7c351",
+  "implementation_input_hash": "d3e581a4e82cfa9f60bdb56a3f0800099eb6e1416a0503475087c5ac09111c14",
   "signals": [
     {
       "type_name": "SignalReportChainFilter",
@@ -20,8 +20,8 @@
     {
       "type_name": "SignalReportDriver",
       "kind_tag": "primary_adapter",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "SignalReportInput",
