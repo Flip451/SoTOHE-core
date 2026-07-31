@@ -1,0 +1,216 @@
+{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "pre-review gate の scope 条件付き適用と CLI dispatch",
+  "goal": [
+    {
+      "id": "GO-01",
+      "text": "pre-review gate の適用可否を review scope × pre-review gate の宣言的な設定マトリクスとして管理し、各 review scope が自身の上流 SoT chain に関係しない下流整合検査によって妨げられない review 経路を提供する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "GO-02",
+      "text": "scope を解決できる `sotp review local` が必要な pre-review gate を dispatch し、Makefile wrapper が scope-blind な gate dependency を持たない review 経路を提供する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md",
+          "anchor": "D2"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IN-01",
+        "text": "review scope × pre-review gate の適用有無を config で宣言する。これは types scope の一回限りの例外ではなく、planning scope と implementation scope を含む一般的な適用範囲の SoT とする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-02",
+        "text": "spec および types を含む planning scope の local review は、下流 chain ③ に由来する liveness state または task-contract 成果物の存在・整合を前提としない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-03",
+        "text": "implementation scope の local review には、既存どおり chain ③ に由来する pre-review liveness gate を適用する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-04",
+        "text": "`sotp review local` が review scope を解決し、適用マトリクスに従って必要な pre-review gate だけを内部で実行する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-05",
+        "text": "Makefile review wrapper は CLI への薄い委譲に限定し、scope を認識しない dependency chain で pre-review gate を無条件に前置しない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md",
+            "anchor": "D2"
+          }
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "id": "OS-01",
+        "text": "task-contract gate が NonBlueSignal を判定する既存の decision rules、Red / Yellow の意味論、または implementation scope における liveness gate の判定内容を変更しない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-02",
+        "text": "todo-lane または declaration-ahead の帰属意味論を補強・変更する第二段の対応は含まない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-03",
+        "text": "scope × gate の設定を既存の signal-gates.json と統合することは含まない。統合の妥当性は設定宣言の増加時に別途再評価する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md",
+            "anchor": "D1"
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "id": "CN-01",
+      "text": "pre-review gate applicability は review scope × gate の config マトリクスとして表現し、特定 scope 向けの ad-hoc な例外分岐で表現しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-02",
+      "text": "scope-aware な gate dispatch の所有権は `sotp review local` に置き、Makefile に scope 条件分岐または review policy を実装しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "CN-03",
+      "text": "本変更は gate の適用範囲だけを変更し、NonBlueSignal の既存判定規則を変更しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md",
+          "anchor": "D1"
+        }
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "text": "review scope × pre-review gate の適用有無を表す設定マトリクスが存在し、planning scope と implementation scope の適用差を宣言として確認できる。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-02",
+      "text": "spec または types の local review は、下流 chain ③ liveness state または task-contract 成果物がまだ存在しない通常の planning 段階でも、当該 scope の上流 prerequisite を満たす限り開始できる。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-03",
+      "text": "implementation scope の local review は既存の chain ③ liveness gate を実行し、NonBlueSignal の既存判定規則に従って結果を返す。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-04",
+      "text": "`sotp review local` は scope を解決して設定マトリクスを参照し、適用対象の pre-review gate を内部で dispatch する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-05",
+      "text": "Makefile review wrapper は scope-blind な pre-review liveness gate dependency を持たず、review policy を CLI に委譲する薄い wrapper である。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md",
+          "anchor": "D2"
+        }
+      ]
+    }
+  ],
+  "related_conventions": [
+    {
+      "file": "knowledge/conventions/coding-principles.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/prefer-type-safe-abstractions.md",
+      "anchor": "Rule"
+    }
+  ],
+  "signals": {
+    "blue": 18,
+    "yellow": 0,
+    "red": 0
+  }
+}

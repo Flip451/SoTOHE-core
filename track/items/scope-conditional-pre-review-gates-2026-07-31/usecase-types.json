@@ -1,0 +1,847 @@
+{
+  "crate_name": "usecase",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "known_scopes",
+              "ty": "std::collections::HashSet<domain::review_v2::ScopeName>"
+            },
+            {
+              "name": "entries",
+              "ty": "Vec<(domain::review_v2::ScopeName, Vec<PreReviewGateKind>)>"
+            }
+          ],
+          "returns": "Result<Self, PreReviewGateMatrixError>"
+        },
+        {
+          "docs": "Returns the gates for a configured scope; the only failure is PreReviewGateLookupError::UnknownScope.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "gates_for",
+          "params": [
+            {
+              "name": "scope",
+              "ty": "&domain::review_v2::ScopeName"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<&[PreReviewGateKind], PreReviewGateLookupError>"
+        }
+      ],
+      "type_name": "PreReviewGateMatrix"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "config_loader",
+              "ty": "std::sync::Arc<dyn PreReviewGateConfigLoaderPort>"
+            },
+            {
+              "name": "task_contract_gate",
+              "ty": "std::sync::Arc<dyn PreReviewGateService>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "PreReviewGateDispatchInteractor"
+    }
+  ],
+  "layer": "usecase",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "PreReviewGateKind",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "PreReviewGateKind",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "PreReviewGateKind",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "PreReviewGateKind",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "PreReviewGateKind",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "PreReviewGateKind",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "for_type": "PreReviewGateMatrix",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "PreReviewGateMatrix",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "PreReviewGateMatrix",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "PreReviewGateMatrix",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "PreReviewGateMatrixError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "PreReviewGateMatrixError",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "PreReviewGateMatrixError",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "PreReviewGateMatrixError",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "PreReviewGateMatrixError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "PreReviewGateMatrixError",
+      "trait_ref": "std::error::Error"
+    },
+    {
+      "for_type": "PreReviewGateConfigLoadError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "PreReviewGateConfigLoadError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "PreReviewGateConfigLoadError",
+      "trait_ref": "std::error::Error"
+    },
+    {
+      "for_type": "PreReviewGateDispatchCommand",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "PreReviewGateDispatchCommand",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "PreReviewGateDispatchOutcome",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "PreReviewGateDispatchOutcome",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "PreReviewGateDispatchOutcome",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "PreReviewGateDispatchOutcome",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "PreReviewGateDispatchError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "PreReviewGateDispatchError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "PreReviewGateDispatchError",
+      "trait_ref": "std::error::Error"
+    },
+    {
+      "for_type": "PreReviewGateDispatchError",
+      "trait_ref": "core::convert::From<PreReviewGateConfigLoadError>"
+    },
+    {
+      "for_type": "PreReviewGateDispatchError",
+      "trait_ref": "core::convert::From<PreReviewGateError>"
+    },
+    {
+      "for_type": "PreReviewGateDispatchError",
+      "trait_ref": "core::convert::From<PreReviewGateLookupError>"
+    },
+    {
+      "for_type": "PreReviewGateDispatchInteractor",
+      "trait_ref": "PreReviewGateDispatchService"
+    },
+    {
+      "for_type": "PreReviewGateDispatchInteractor",
+      "trait_ref": "core::marker::Send"
+    },
+    {
+      "for_type": "PreReviewGateDispatchInteractor",
+      "trait_ref": "core::marker::Sync"
+    },
+    {
+      "for_type": "PreReviewGateLookupError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "PreReviewGateLookupError",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "PreReviewGateLookupError",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "PreReviewGateLookupError",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "PreReviewGateLookupError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "PreReviewGateLookupError",
+      "trait_ref": "std::error::Error"
+    }
+  ],
+  "traits": {
+    "PreReviewGateConfigLoaderPort": {
+      "action": "add",
+      "docs": "Synchronous secondary port that loads and validates the declared review-scope to pre-review-gate applicability matrix before local-review dispatch; sync I/O is deliberate because the owning CLI workflow is synchronous and reads one small local config file.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "docs": "Synchronous by design: local review performs this single small configuration read before gate dispatch and does not require an async runtime.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "load",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<PreReviewGateMatrix, PreReviewGateConfigLoadError>"
+        }
+      ],
+      "module_path": "pre_review_gate_dispatch",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "GO-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
+    "PreReviewGateDispatchService": {
+      "action": "add",
+      "docs": "Application service that resolves scope applicability and dispatches only the configured pre-review gates.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "dispatch",
+          "params": [
+            {
+              "name": "cmd",
+              "ty": "PreReviewGateDispatchCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<PreReviewGateDispatchOutcome, PreReviewGateDispatchError>"
+        }
+      ],
+      "module_path": "pre_review_gate_dispatch",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "GO-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    }
+  },
+  "types": {
+    "PreReviewGateConfigLoadError": {
+      "action": "add",
+      "docs": "Failure to read or validate the declarative pre-review-gate applicability matrix.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ReadFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "message",
+                  "ty": "domain::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "InvalidMatrix",
+            "payload": {
+              "fields": [
+                "PreReviewGateMatrixError"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "pre_review_gate_dispatch",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "GO-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PreReviewGateDispatchCommand": {
+      "action": "add",
+      "docs": "Command carrying the resolved review scope and track location for pre-review-gate dispatch.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "track_id",
+              "ty": "domain::TrackId"
+            },
+            {
+              "name": "scope",
+              "ty": "domain::review_v2::ScopeName"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "pre_review_gate_dispatch",
+      "role": {
+        "Command": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "GO-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PreReviewGateDispatchError": {
+      "action": "add",
+      "docs": "Failure while loading applicability policy, resolving a configured scope, or executing an applicable pre-review gate.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Config",
+            "payload": {
+              "fields": [
+                "PreReviewGateConfigLoadError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "TaskContract",
+            "payload": {
+              "fields": [
+                "PreReviewGateError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Lookup",
+            "payload": {
+              "fields": [
+                "PreReviewGateLookupError"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "pre_review_gate_dispatch",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "GO-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PreReviewGateDispatchInteractor": {
+      "action": "add",
+      "docs": "Interactor that combines matrix loading with the existing task-contract liveness gate.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "pre_review_gate_dispatch",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "GO-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PreReviewGateDispatchOutcome": {
+      "action": "add",
+      "docs": "Dispatch result that distinguishes a non-applicable gate from an executed task-contract gate outcome.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NotApplicable",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "TaskContract",
+            "payload": {
+              "fields": [
+                "domain::task_contract::PreReviewGateOutcome"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "pre_review_gate_dispatch",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "GO-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PreReviewGateKind": {
+      "action": "add",
+      "docs": "Application-workflow vocabulary of pre-review gates that may be assigned to a resolved review scope.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "TaskContractLiveness",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "pre_review_gate_dispatch",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "GO-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PreReviewGateLookupError": {
+      "action": "add",
+      "docs": "Lookup failure when a requested review scope is absent from the validated applicability matrix.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "UnknownScope",
+            "payload": {
+              "fields": [
+                "domain::review_v2::ScopeName"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "pre_review_gate_dispatch",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "GO-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PreReviewGateMatrix": {
+      "action": "add",
+      "docs": "Application-workflow value that validates a total mapping from every configured review scope to its applicable pre-review gates.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "pre_review_gate_dispatch",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "GO-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PreReviewGateMatrixError": {
+      "action": "add",
+      "docs": "Construction failure while validating a total, duplicate-free review-scope applicability matrix.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "MissingScope",
+            "payload": {
+              "fields": [
+                "domain::review_v2::ScopeName"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "UnknownScope",
+            "payload": {
+              "fields": [
+                "domain::review_v2::ScopeName"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "DuplicateScope",
+            "payload": {
+              "fields": [
+                "domain::review_v2::ScopeName"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "DuplicateGate",
+            "payload": {
+              "fields": [
+                {
+                  "name": "scope",
+                  "ty": "domain::review_v2::ScopeName"
+                },
+                {
+                  "name": "gate",
+                  "ty": "PreReviewGateKind"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "pre_review_gate_dispatch",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "GO-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    }
+  }
+}

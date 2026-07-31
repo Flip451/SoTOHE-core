@@ -1,0 +1,79 @@
+{
+  "crate_name": "infrastructure",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "FsPreReviewGateConfigLoader"
+    }
+  ],
+  "layer": "infrastructure",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "FsPreReviewGateConfigLoader",
+      "trait_ref": "usecase::pre_review_gate_dispatch::PreReviewGateConfigLoaderPort"
+    },
+    {
+      "for_type": "FsPreReviewGateConfigLoader",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "FsPreReviewGateConfigLoader",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "for_type": "FsPreReviewGateConfigLoader",
+      "trait_ref": "core::marker::Send"
+    },
+    {
+      "for_type": "FsPreReviewGateConfigLoader",
+      "trait_ref": "core::marker::Sync"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "FsPreReviewGateConfigLoader": {
+      "action": "add",
+      "docs": "Synchronous filesystem adapter that performs one small local config read before review dispatch, using typed deserialization into ScopeName and PreReviewGateKind values; sync I/O intentionally matches the synchronous CLI workflow.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "pre_review_gate_config",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "GO-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    }
+  }
+}

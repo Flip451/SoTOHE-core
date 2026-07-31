@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "track_id": "scope-conditional-pre-review-gates-2026-07-31",
+  "entries": {
+    "T001": [
+      { "layer": "usecase", "entry_key": "PreReviewGateConfigLoaderPort" },
+      { "layer": "usecase", "entry_key": "PreReviewGateKind" },
+      { "layer": "usecase", "entry_key": "PreReviewGateMatrix" },
+      { "layer": "usecase", "entry_key": "PreReviewGateMatrixError" },
+      { "layer": "usecase", "entry_key": "PreReviewGateLookupError" },
+      { "layer": "usecase", "entry_key": "PreReviewGateConfigLoadError" }
+    ],
+    "T002": [
+      { "layer": "infrastructure", "entry_key": "FsPreReviewGateConfigLoader" }
+    ],
+    "T004": [
+      { "layer": "usecase", "entry_key": "PreReviewGateDispatchService" },
+      { "layer": "usecase", "entry_key": "PreReviewGateDispatchCommand" },
+      { "layer": "usecase", "entry_key": "PreReviewGateDispatchError" },
+      { "layer": "usecase", "entry_key": "PreReviewGateDispatchInteractor" },
+      { "layer": "usecase", "entry_key": "PreReviewGateDispatchOutcome" }
+    ]
+  }
+}

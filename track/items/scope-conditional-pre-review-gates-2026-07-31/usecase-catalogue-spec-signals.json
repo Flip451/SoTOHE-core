@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "be395d1a4375b30449b235b82d3c1ba1adb7b6fd50cf1313687d771aed4ed62e",
+  "signals": [
+    {
+      "type_name": "PreReviewGateConfigLoadError",
+      "signal": "blue",
+      "entry_hash": "9e843f9cf7eb93a709c6a35576bfd329bb1151f858acc52436fe51b875eeecc4"
+    },
+    {
+      "type_name": "PreReviewGateDispatchCommand",
+      "signal": "blue",
+      "entry_hash": "4259a89948be4337f422f640f0a9cf6280c9e175a3da09a822e6303ec99861b4"
+    },
+    {
+      "type_name": "PreReviewGateDispatchError",
+      "signal": "blue",
+      "entry_hash": "693f2044045b2bfe2f1b47d6b39e077002ed31630a51af05179699312c081838"
+    },
+    {
+      "type_name": "PreReviewGateDispatchInteractor",
+      "signal": "blue",
+      "entry_hash": "f7e078c02ce1976292d080f318eac42f6606f64179a478e08c761e64e8eed87e"
+    },
+    {
+      "type_name": "PreReviewGateDispatchOutcome",
+      "signal": "blue",
+      "entry_hash": "d8ffbea9908b05f83346b3ff9ffc9fe5e0ee2cbe3ca8ab5ea24625d74f1b4526"
+    },
+    {
+      "type_name": "PreReviewGateKind",
+      "signal": "blue",
+      "entry_hash": "918b2599779d3844ecf3dbe0d98f6589f376cd4b8dfcb938ff79bf4636e00f7c"
+    },
+    {
+      "type_name": "PreReviewGateLookupError",
+      "signal": "blue",
+      "entry_hash": "6954361eabec5c4c0de3f199fcc5bf017fdf35747c83280573db3d5644d2413f"
+    },
+    {
+      "type_name": "PreReviewGateMatrix",
+      "signal": "blue",
+      "entry_hash": "05e33e9e4b8dd0bcbd8e208be7e815e72519f77fa4388858126b25c21cf96924"
+    },
+    {
+      "type_name": "PreReviewGateMatrixError",
+      "signal": "blue",
+      "entry_hash": "d823b18cdf87fdeb6fa727206ba6b8e7ae667afd74caf790a07b1fb49ceb0e70"
+    },
+    {
+      "type_name": "PreReviewGateConfigLoaderPort",
+      "signal": "blue",
+      "entry_hash": "58a8156c07ba19fb9932ca1483038fcd5c965f78444c243d8a818e11d9a8d9fd"
+    },
+    {
+      "type_name": "PreReviewGateDispatchService",
+      "signal": "blue",
+      "entry_hash": "a8dad723afbc36e43085b43dca0e2c54d3a15a2d67e7879c744516386e316cf6"
+    }
+  ]
+}

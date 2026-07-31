@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "layer": "infrastructure",
+  "entries": [
+    {
+      "claim_hash": "117f10f60732797b5fb472d02313cfc7e607befdd2478ca538cccdce1f4f9614",
+      "evidence_hash": "7c9d26803a2354e59dd8ae1085eafde4e8d7d2be390ad877827dad33ae1dec80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "pre-review gate の適用可否を review scope × pre-review gate の宣言的な設定マトリクスとして管理し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsPreReviewGateConfigLoader"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "pre-review gate の適用可否を review scope × pre-review gate の宣言的な設定マトリクスとして管理し、各 review scope が自身の上流 SoT chain に関係しない下流整合検査によって妨げられない review 経路を提供する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "117f10f60732797b5fb472d02313cfc7e607befdd2478ca538cccdce1f4f9614",
+      "evidence_hash": "2d3b8146d3fb0ab8adeeddc61df151a67328f49c8f3a7702d2ea829ca3e44c1b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "review scope × pre-review gate の適用有無を config で宣言する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsPreReviewGateConfigLoader"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "review scope × pre-review gate の適用有無を config で宣言する。これは types scope の一回限りの例外ではなく、planning scope と implementation scope を含む一般的な適用範囲の SoT とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "117f10f60732797b5fb472d02313cfc7e607befdd2478ca538cccdce1f4f9614",
+      "evidence_hash": "ae4a7d1f7783f0b9386f2a7fdc3b20fa7bc4157f4a8f7d10e9d2ec03145182e1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "review scope × pre-review gate の適用有無を表す設定マトリクスが存在し、planning scope と implementation scope の適用差を宣言として確認できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsPreReviewGateConfigLoader"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "review scope × pre-review gate の適用有無を表す設定マトリクスが存在し、planning scope と implementation scope の適用差を宣言として確認できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "117f10f60732797b5fb472d02313cfc7e607befdd2478ca538cccdce1f4f9614",
+      "evidence_hash": "510c6d05129810db704f499745624782281a738366a655b62c660f9418e0bab0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp review local` は scope を解決して設定マトリクスを参照し、適用対象の pre-review gate を内部で dispatch する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsPreReviewGateConfigLoader"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "`sotp review local` は scope を解決して設定マトリクスを参照し、適用対象の pre-review gate を内部で dispatch する。"
+        }
+      }
+    }
+  ]
+}

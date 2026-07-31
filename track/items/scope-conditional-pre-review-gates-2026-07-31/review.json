@@ -1,6 +1,288 @@
 {
   "schema_version": 2,
   "scopes": {
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-04 は `sotp review local` による scope 解決・matrix 参照・gate dispatch の受入条件です。T001/T002 は設定型と loader の実装であり dispatch を検証しないため、この mapping は不 plausibly load-bearing です。T003/T004 のみに割り当ててください。",
+              "severity": "P1",
+              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/task-coverage.json",
+              "line": 24,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "T001 の説明は対象を `libs/usecase/` というディレクトリに留め、実装対象の具体的なファイルまたはシンボルを指定していません。executor が境界を発明する必要があります。",
+              "severity": "P1",
+              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/impl-plan.json",
+              "line": 6,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T002 の説明は filesystem adapter の具体的な対象ファイルまたはシンボルを指定していません。`T001 の contract` だけでは実装境界を決められません。",
+              "severity": "P1",
+              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/impl-plan.json",
+              "line": 12,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T004 の説明は `CLI / composition 経路` という広い対象しか示さず、具体的な対象ファイルまたはシンボルを指定していません。",
+              "severity": "P1",
+              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/impl-plan.json",
+              "line": 26,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T003 は target + operation + anchors を超えて、「planning scope では下流 gate を実行せず」「implementation scope の既存判定意味論を保持」と upstream spec/ADR の契約を prose で再記述しています。許容形式に合わせて削除してください（`.harness/policies/no-upstream-restatement.md`）。",
+              "severity": "P1",
+              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/impl-plan.json",
+              "line": 19,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T004 は「対象外 gate は skip」「適用 gate の結果を既存経路へ伝播」と upstream の振る舞い契約を prose で再記述しています。target + operation + anchors のみにしてください（`.harness/policies/no-upstream-restatement.md`）。",
+              "severity": "P1",
+              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/impl-plan.json",
+              "line": 26,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T005 は「薄い委譲」「scope-blind dependency の除去」という upstream constraint/acceptance behavior を prose で再記述しています。target + operation + anchors のみにしてください（`.harness/policies/no-upstream-restatement.md`）。",
+              "severity": "P1",
+              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/impl-plan.json",
+              "line": 33,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S2 の section description は matrix に応じて適用 gate のみを実行するという upstream の behavior contract を再記述しています。section description は実装順序・境界に限定してください（`.harness/policies/no-upstream-restatement.md`）。",
+              "severity": "P1",
+              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/impl-plan.json",
+              "line": 53,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S3 の section description は review policy を CLI に集約し scope-blind dependency を除去するという upstream constraint を再記述しています。section description は実装順序・境界に限定してください（`.harness/policies/no-upstream-restatement.md`）。",
+              "severity": "P1",
+              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/impl-plan.json",
+              "line": 61,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:f543792a5746a30b0acd7d031a7412f47d094d173d8916ef2f4e72e749b0229f",
+          "at": "2026-07-31T12:46:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eb36c0fa7ec7371ca0dcf664c84c80d9c69bc1a425f7eab05f38a3a265be6722",
+          "at": "2026-07-31T12:49:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`IN-01`/`AC-01` and the `OS-03` preservation mapping are assigned to T001/T002, but those tasks only add use-case types and a filesystem loader. No task targets the configuration schema or data that declares the scope × gate matrix, so the plan can complete without creating the required declarative policy. Add an executable configuration-artifact task and map these anchors to it.",
+              "severity": "P1",
+              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/task-coverage.json",
+              "line": 4,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "`AC-01` through `AC-05` are mapped only to T001–T005, but none of those task descriptions contains a validation or test operation. The test-line estimates in `batch-plan.json` do not define executable validation work. Add explicit validation-bearing steps or dedicated validation tasks for every AC.",
+              "severity": "P1",
+              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/task-coverage.json",
+              "line": 21,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "The `plan` omits `summary`, leaving GO-01 and GO-02 without goal-to-task traceability. Goals cannot be represented in `task-coverage.json` by design; add concise anchor-only mappings in `plan.summary`.",
+              "severity": "P1",
+              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/impl-plan.json",
+              "line": 39,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "T002 is attributed to `infrastructure/FsPreReviewGateConfigLoader`, whose catalogue entry declares `module_path: pre_review_gate_config`, while T002 targets `review_v2/pre_review_gate_config_loader.rs` and registration under `review_v2`. Completing T002 as written would not implement the attributed entry at its contracted module path. Align the task target with the catalogue or re-enter type design.",
+              "severity": "P1",
+              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/task-contract.json",
+              "line": 14,
+              "category": "task-contract attribution mismatch"
+            },
+            {
+              "message": "S1's text, `宣言的な matrix と、その typed loading / validation 境界を先に完成させる。`, restates the declarative-matrix and validation contract from GO-01/IN-01/AC-01 instead of citing it. Rewrite the section as target + operation + anchor cites, as required by `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/impl-plan.json",
+              "line": 45,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T003 bundles independently verifiable behavior units while still `todo`: (1) matrix/scope resolution and the non-applicable planning-scope path (IN-02, IN-04, AC-02, AC-04), and (2) execution of the existing task-contract gate for implementation scopes without changing its semantics (IN-03, OS-01, CN-03, AC-03). Split these into dependent tasks before implementation.",
+              "severity": "P1",
+              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/impl-plan.json",
+              "line": 19,
+              "category": "pre-implementation split proposal"
+            },
+            {
+              "message": "T005's stated operation is already satisfied: the current `track-local-review` script already invokes `bin/sotp review local`. The required change is removal of its scope-blind pre-review dependencies, but the task never names that operation, forcing the executor to invent the change boundary. State the exact dependency removal or wrapper edit.",
+              "severity": "P1",
+              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/impl-plan.json",
+              "line": 33,
+              "category": "task description non-executable"
+            }
+          ],
+          "hash": "rvw1:sha256:15e3d05c8526cd5668a8c740736f49f4fe1e560fef476091d7f258b83a3508b1",
+          "at": "2026-07-31T13:33:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AC-04` は `sotp review local` が scope を解決し、設定 matrix を参照して適用 gate を dispatch することです。T005 の記述は `TaskContractLiveness` の実行と既存 service の結果検証だけで、scope 解決・matrix 参照・dispatch を担いません。`task-coverage.json` の AC-04 から T005 を除外し、impl-plan の T005 からも AC-04 を外してください。",
+              "severity": "P1",
+              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/task-coverage.json",
+              "line": 24,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:c404d8c7fb13d71e9c4c2c8b8f6df53f63b0758d0a22ad2fed09c2ab30f0d43e",
+          "at": "2026-07-31T13:39:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006 の local-review integration tests は T003 が追加する `.harness/config/pre-review-gates.json` の declaration を検証対象にしますが、T006 の `depends_on` は `T002` と `T005` のみで T003 を欠いています。そのため T006 が設定 declaration の作成前に完了し得ます。T006 に `T003` を依存として追加してください。",
+              "severity": "P1",
+              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/impl-plan.json",
+              "line": 29,
+              "category": "dependency cycle or wrong ordering"
+            }
+          ],
+          "hash": "rvw1:sha256:86a7c03224a17967f520ddd14766254c4b872e3500b875b6f85b668792dcec43",
+          "at": "2026-07-31T13:41:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1efdbfaa9725395cbb36157f509310a30f72a3451c6cd2d7ccc3a5eeb05d6610",
+          "at": "2026-07-31T13:43:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T005 explicitly modifies `PreReviewGateDispatchInteractor`, but `task-contract.json` has no T005 entry and attributes that catalogue entry only to T004. Consequently T005's later in-progress/done work is not bound to the entry it changes. Attribute the entry to T005 as well, or realign task ownership.",
+              "severity": "P1",
+              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/task-contract.json",
+              "line": 16,
+              "category": "task-contract attribution mismatch"
+            },
+            {
+              "message": "T005 is implicitly required to complete T004: T004 owns `PreReviewGateDispatchInteractor` and its `PreReviewGateDispatchService` implementation but plans only the `NotApplicable` path. Because the only applicable gate kind is `TaskContractLiveness` and the service has no valid pending/placeholder outcome, T004 cannot finish an exhaustive, correct dispatch implementation without performing the execution deferred to T005. T005 nevertheless depends on T004, creating a semantic dependency cycle. Merge these units or move interactor/service ownership to a task covering both paths.",
+              "severity": "P1",
+              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/impl-plan.json",
+              "line": 36,
+              "category": "dependency cycle or wrong ordering"
+            }
+          ],
+          "hash": "rvw1:sha256:1efdbfaa9725395cbb36157f509310a30f72a3451c6cd2d7ccc3a5eeb05d6610",
+          "at": "2026-07-31T13:47:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7f4a533a6d5f14dce64cfdd545ee51c8a4af9582c2faa5b09ec2aad11f2fa68b",
+          "at": "2026-07-31T13:54:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7f4a533a6d5f14dce64cfdd545ee51c8a4af9582c2faa5b09ec2aad11f2fa68b",
+          "at": "2026-07-31T13:57:56Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`PreReviewGateConfigLoaderPort::load` performs filesystem-backed configuration loading, and its `FsPreReviewGateConfigLoader` adapter confirms that responsibility, but both are declared synchronous without documenting the deliberate sync-I/O choice. This leaves the port's execution color underspecified and can force an adapter/API redesign when integrated with the review-local path.",
+              "severity": "P1",
+              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+              "line": 205,
+              "category": "sync/async color mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:62c3516bb35858155e2a63dc824204dddf3c31896602db10de1cfda1c60e1c84",
+          "at": "2026-07-31T12:47:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fcaa6e387c06708552c971c89edef6c2334913f3d83b3f45a6d3df76a2ae0caf",
+          "at": "2026-07-31T12:56:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::PreReviewGateMatrix::gates_for` returns the construction-wide `PreReviewGateMatrixError`. After `try_new` has produced a total, duplicate-free matrix, `DuplicateScope` and `DuplicateGate` cannot occur during lookup, yet the method documents no producible subset. Use an infallible lookup for resolved scopes or a lookup-specific error type.",
+              "severity": "P1",
+              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+              "line": 34,
+              "category": "API shape / per-method error imprecision"
+            }
+          ],
+          "hash": "rvw1:sha256:fcaa6e387c06708552c971c89edef6c2334913f3d83b3f45a6d3df76a2ae0caf",
+          "at": "2026-07-31T13:01:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`PreReviewGateMatrix::gates_for` now returns `PreReviewGateLookupError`, whose `UnknownScope` variant represents a possible lookup failure, but `PreReviewGateDispatchService::dispatch` still returns `PreReviewGateDispatchError`, which has no lookup-error variant or conversion. The dispatcher therefore has no declared error path for a command whose scope is absent from the validated matrix; add that propagation or make the resolved-scope invariant explicit in the API.",
+              "severity": "P1",
+              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+              "line": 290,
+              "category": "API shape / per-method error imprecision"
+            }
+          ],
+          "hash": "rvw1:sha256:0477b36ffbc7a6aeaeff694f017a9eac1294b2b07940b05330a13cff321981fa",
+          "at": "2026-07-31T13:16:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a58cb03f29ef6cb692f9a918ed5acfa1bc55b0bddced3c79dcfddea7d0b7eb55",
+          "at": "2026-07-31T13:27:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a58cb03f29ef6cb692f9a918ed5acfa1bc55b0bddced3c79dcfddea7d0b7eb55",
+          "at": "2026-07-31T13:30:25Z"
+        }
+      ]
+    },
     "adr": {
       "rounds": [
         {
@@ -30,6 +312,42 @@
           "findings": [],
           "hash": "rvw1:sha256:0fdb687eae29921dcb294481fdc12d29f8cd6fe47f3a2f1f77a76930f863c89f",
           "at": "2026-07-31T11:33:40Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:431479782a2ad8acf702b7b9f350ef9a2a25fa43fe204d1cc0aa669a8b054f56",
+          "at": "2026-07-31T12:46:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:431479782a2ad8acf702b7b9f350ef9a2a25fa43fe204d1cc0aa669a8b054f56",
+          "at": "2026-07-31T13:29:46Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19fa4083746a7a3c8c77efdb0de7532c9365cf4fc4cdb74be1a52d946d7466f7",
+          "at": "2026-07-31T12:46:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19fa4083746a7a3c8c77efdb0de7532c9365cf4fc4cdb74be1a52d946d7466f7",
+          "at": "2026-07-31T13:29:45Z"
         }
       ]
     },

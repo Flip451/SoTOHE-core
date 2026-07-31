@@ -1,0 +1,1542 @@
+{
+  "schema_version": 1,
+  "layer": "usecase",
+  "entries": [
+    {
+      "claim_hash": "9e843f9cf7eb93a709c6a35576bfd329bb1151f858acc52436fe51b875eeecc4",
+      "evidence_hash": "7c9d26803a2354e59dd8ae1085eafde4e8d7d2be390ad877827dad33ae1dec80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "pre-review gate の適用可否を review scope × pre-review gate の宣言的な設定マトリクスとして管理し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateConfigLoadError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "pre-review gate の適用可否を review scope × pre-review gate の宣言的な設定マトリクスとして管理し、各 review scope が自身の上流 SoT chain に関係しない下流整合検査によって妨げられない review 経路を提供する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "9e843f9cf7eb93a709c6a35576bfd329bb1151f858acc52436fe51b875eeecc4",
+      "evidence_hash": "2d3b8146d3fb0ab8adeeddc61df151a67328f49c8f3a7702d2ea829ca3e44c1b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "review scope × pre-review gate の適用有無を config で宣言する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateConfigLoadError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "review scope × pre-review gate の適用有無を config で宣言する。これは types scope の一回限りの例外ではなく、planning scope と implementation scope を含む一般的な適用範囲の SoT とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "9e843f9cf7eb93a709c6a35576bfd329bb1151f858acc52436fe51b875eeecc4",
+      "evidence_hash": "ae4a7d1f7783f0b9386f2a7fdc3b20fa7bc4157f4a8f7d10e9d2ec03145182e1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "レビュー scope × pre-review gate の適用有無を表す設定マトリクスが存在し、planning scope と implementation scope の適用差を宣言として確認できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateConfigLoadError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "review scope × pre-review gate の適用有無を表す設定マトリクスが存在し、planning scope と implementation scope の適用差を宣言として確認できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "4259a89948be4337f422f640f0a9cf6280c9e175a3da09a822e6303ec99861b4",
+      "evidence_hash": "b68ca96e81f8aedeafeb7b0196bac29c860fee8ea9e977e47b6d0457418de6c3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "scope を解決できる `sotp review local` が必要な pre-review gate を dispatch し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateDispatchCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "scope を解決できる `sotp review local` が必要な pre-review gate を dispatch し、Makefile wrapper が scope-blind な gate dependency を持たない review 経路を提供する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "4259a89948be4337f422f640f0a9cf6280c9e175a3da09a822e6303ec99861b4",
+      "evidence_hash": "0030c718fccc7892e840b1238ab3bc0aa149c06ddc1bdf35dc4d8dd5ce22a7e7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp review local` が review scope を解決し、適用マトリクスに従って必要な pre-review gate だけを内部で実行する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateDispatchCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "`sotp review local` が review scope を解決し、適用マトリクスに従って必要な pre-review gate だけを内部で実行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "4259a89948be4337f422f640f0a9cf6280c9e175a3da09a822e6303ec99861b4",
+      "evidence_hash": "510c6d05129810db704f499745624782281a738366a655b62c660f9418e0bab0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp review local` は scope を解決して設定マトリクスを参照し、適用対象の pre-review gate を内部で dispatch する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateDispatchCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "`sotp review local` は scope を解決して設定マトリクスを参照し、適用対象の pre-review gate を内部で dispatch する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "693f2044045b2bfe2f1b47d6b39e077002ed31630a51af05179699312c081838",
+      "evidence_hash": "b68ca96e81f8aedeafeb7b0196bac29c860fee8ea9e977e47b6d0457418de6c3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "scope を解決できる `sotp review local` が必要な pre-review gate を dispatch し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateDispatchError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "scope を解決できる `sotp review local` が必要な pre-review gate を dispatch し、Makefile wrapper が scope-blind な gate dependency を持たない review 経路を提供する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "693f2044045b2bfe2f1b47d6b39e077002ed31630a51af05179699312c081838",
+      "evidence_hash": "d42e42afb353d1eda6093e0cdd1a14fa98510a58621d2f92fa4d10dabc74a19d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "spec および types を含む planning scope の local review は、下流 chain ③ に由来する liveness state または task-contract 成果物の存在・整合を前提としない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateDispatchError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "spec および types を含む planning scope の local review は、下流 chain ③ に由来する liveness state または task-contract 成果物の存在・整合を前提としない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "693f2044045b2bfe2f1b47d6b39e077002ed31630a51af05179699312c081838",
+      "evidence_hash": "dca561b8bc2d42da0ffc85e527dead916037dd52ba7d3264fd9a5b31c7844806",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存どおり chain ③ に由来する pre-review liveness gate を適用する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateDispatchError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "implementation scope の local review には、既存どおり chain ③ に由来する pre-review liveness gate を適用する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "693f2044045b2bfe2f1b47d6b39e077002ed31630a51af05179699312c081838",
+      "evidence_hash": "0030c718fccc7892e840b1238ab3bc0aa149c06ddc1bdf35dc4d8dd5ce22a7e7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp review local` が review scope を解決し、適用マトリクスに従って必要な pre-review gate だけを内部で実行する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateDispatchError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "`sotp review local` が review scope を解決し、適用マトリクスに従って必要な pre-review gate だけを内部で実行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "693f2044045b2bfe2f1b47d6b39e077002ed31630a51af05179699312c081838",
+      "evidence_hash": "69f2b537156e6e8c9a6b65c5b54650cb3bbe062023e8f23f9d45a780361739a6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "spec または types の local review は、下流 chain ③ liveness state または task-contract 成果物がまだ存在しない通常の planning 段階でも、当該 scope の上流 prerequisite を満たす限り開始できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateDispatchError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "spec または types の local review は、下流 chain ③ liveness state または task-contract 成果物がまだ存在しない通常の planning 段階でも、当該 scope の上流 prerequisite を満たす限り開始できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "693f2044045b2bfe2f1b47d6b39e077002ed31630a51af05179699312c081838",
+      "evidence_hash": "12b178469f87ee66bd7ddef8f3adcda8532a3f31f473502d3877586829858265",
+      "verdict": {
+        "kind": "pass",
+        "citation": "implementation scope の local review は既存の chain ③ liveness gate を実行し、NonBlueSignal の既存判定規則に従って結果を返す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateDispatchError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "implementation scope の local review は既存の chain ③ liveness gate を実行し、NonBlueSignal の既存判定規則に従って結果を返す。"
+        }
+      }
+    },
+    {
+      "claim_hash": "693f2044045b2bfe2f1b47d6b39e077002ed31630a51af05179699312c081838",
+      "evidence_hash": "510c6d05129810db704f499745624782281a738366a655b62c660f9418e0bab0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp review local` は scope を解決して設定マトリクスを参照し、適用対象の pre-review gate を内部で dispatch する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateDispatchError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "`sotp review local` は scope を解決して設定マトリクスを参照し、適用対象の pre-review gate を内部で dispatch する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f7e078c02ce1976292d080f318eac42f6606f64179a478e08c761e64e8eed87e",
+      "evidence_hash": "b68ca96e81f8aedeafeb7b0196bac29c860fee8ea9e977e47b6d0457418de6c3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "scope を解決できる `sotp review local` が必要な pre-review gate を dispatch し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateDispatchInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "scope を解決できる `sotp review local` が必要な pre-review gate を dispatch し、Makefile wrapper が scope-blind な gate dependency を持たない review 経路を提供する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f7e078c02ce1976292d080f318eac42f6606f64179a478e08c761e64e8eed87e",
+      "evidence_hash": "d42e42afb353d1eda6093e0cdd1a14fa98510a58621d2f92fa4d10dabc74a19d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "spec および types を含む planning scope の local review は、下流 chain ③ に由来する liveness state または task-contract 成果物の存在・整合を前提としない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateDispatchInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "spec および types を含む planning scope の local review は、下流 chain ③ に由来する liveness state または task-contract 成果物の存在・整合を前提としない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f7e078c02ce1976292d080f318eac42f6606f64179a478e08c761e64e8eed87e",
+      "evidence_hash": "dca561b8bc2d42da0ffc85e527dead916037dd52ba7d3264fd9a5b31c7844806",
+      "verdict": {
+        "kind": "pass",
+        "citation": "implementation scope の local review には、既存どおり chain ③ に由来する pre-review liveness gate を適用する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateDispatchInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "implementation scope の local review には、既存どおり chain ③ に由来する pre-review liveness gate を適用する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f7e078c02ce1976292d080f318eac42f6606f64179a478e08c761e64e8eed87e",
+      "evidence_hash": "0030c718fccc7892e840b1238ab3bc0aa149c06ddc1bdf35dc4d8dd5ce22a7e7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp review local` が review scope を解決し、適用マトリクスに従って必要な pre-review gate だけを内部で実行する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateDispatchInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "`sotp review local` が review scope を解決し、適用マトリクスに従って必要な pre-review gate だけを内部で実行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f7e078c02ce1976292d080f318eac42f6606f64179a478e08c761e64e8eed87e",
+      "evidence_hash": "507a8f42be597dacc379f073747d428d04a96b4b8be42ada9e9bb9e8fdd9682c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "pre-review gate applicability は review scope × gate の config マトリクスとして表現し、特定 scope 向けの ad-hoc な例外分岐で表現しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateDispatchInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "pre-review gate applicability は review scope × gate の config マトリクスとして表現し、特定 scope 向けの ad-hoc な例外分岐で表現しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f7e078c02ce1976292d080f318eac42f6606f64179a478e08c761e64e8eed87e",
+      "evidence_hash": "ed969a87c213ff1b70e22d67d34f289cb4ccd74296c6b2d1567a9b38c30884c9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "scope-aware な gate dispatch の所有権は `sotp review local` に置き"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateDispatchInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "scope-aware な gate dispatch の所有権は `sotp review local` に置き、Makefile に scope 条件分岐または review policy を実装しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f7e078c02ce1976292d080f318eac42f6606f64179a478e08c761e64e8eed87e",
+      "evidence_hash": "69f2b537156e6e8c9a6b65c5b54650cb3bbe062023e8f23f9d45a780361739a6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "spec または types の local review は、下流 chain ③ liveness state または task-contract 成果物がまだ存在しない通常の planning 段階でも、当該 scope の上流 prerequisite を満たす限り開始できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateDispatchInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "spec または types の local review は、下流 chain ③ liveness state または task-contract 成果物がまだ存在しない通常の planning 段階でも、当該 scope の上流 prerequisite を満たす限り開始できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f7e078c02ce1976292d080f318eac42f6606f64179a478e08c761e64e8eed87e",
+      "evidence_hash": "12b178469f87ee66bd7ddef8f3adcda8532a3f31f473502d3877586829858265",
+      "verdict": {
+        "kind": "pass",
+        "citation": "implementation scope の local review は既存の chain ③ liveness gate を実行し、NonBlueSignal の既存判定規則に従って結果を返す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateDispatchInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "implementation scope の local review は既存の chain ③ liveness gate を実行し、NonBlueSignal の既存判定規則に従って結果を返す。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f7e078c02ce1976292d080f318eac42f6606f64179a478e08c761e64e8eed87e",
+      "evidence_hash": "510c6d05129810db704f499745624782281a738366a655b62c660f9418e0bab0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp review local` は scope を解決して設定マトリクスを参照し、適用対象の pre-review gate を内部で dispatch する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateDispatchInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "`sotp review local` は scope を解決して設定マトリクスを参照し、適用対象の pre-review gate を内部で dispatch する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d8ffbea9908b05f83346b3ff9ffc9fe5e0ee2cbe3ca8ab5ea24625d74f1b4526",
+      "evidence_hash": "b68ca96e81f8aedeafeb7b0196bac29c860fee8ea9e977e47b6d0457418de6c3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "scope を解決できる `sotp review local` が必要な pre-review gate を dispatch し、Makefile wrapper が scope-blind な gate dependency を持たない review 経路を提供する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateDispatchOutcome"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "scope を解決できる `sotp review local` が必要な pre-review gate を dispatch し、Makefile wrapper が scope-blind な gate dependency を持たない review 経路を提供する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d8ffbea9908b05f83346b3ff9ffc9fe5e0ee2cbe3ca8ab5ea24625d74f1b4526",
+      "evidence_hash": "d42e42afb353d1eda6093e0cdd1a14fa98510a58621d2f92fa4d10dabc74a19d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "spec および types を含む planning scope の local review は、下流 chain ③ に由来する liveness state または task-contract 成果物の存在・整合を前提としない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateDispatchOutcome"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "spec および types を含む planning scope の local review は、下流 chain ③ に由来する liveness state または task-contract 成果物の存在・整合を前提としない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d8ffbea9908b05f83346b3ff9ffc9fe5e0ee2cbe3ca8ab5ea24625d74f1b4526",
+      "evidence_hash": "dca561b8bc2d42da0ffc85e527dead916037dd52ba7d3264fd9a5b31c7844806",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実装 scope の local review には、既存どおり chain ③ に由来する pre-review liveness gate を適用する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateDispatchOutcome"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "implementation scope の local review には、既存どおり chain ③ に由来する pre-review liveness gate を適用する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d8ffbea9908b05f83346b3ff9ffc9fe5e0ee2cbe3ca8ab5ea24625d74f1b4526",
+      "evidence_hash": "69f2b537156e6e8c9a6b65c5b54650cb3bbe062023e8f23f9d45a780361739a6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "spec または types の local review は、下流 chain ③ liveness state または task-contract 成果物がまだ存在しない通常の planning 段階でも、当該 scope の上流 prerequisite を満たす限り開始できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateDispatchOutcome"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "spec または types の local review は、下流 chain ③ liveness state または task-contract 成果物がまだ存在しない通常の planning 段階でも、当該 scope の上流 prerequisite を満たす限り開始できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d8ffbea9908b05f83346b3ff9ffc9fe5e0ee2cbe3ca8ab5ea24625d74f1b4526",
+      "evidence_hash": "12b178469f87ee66bd7ddef8f3adcda8532a3f31f473502d3877586829858265",
+      "verdict": {
+        "kind": "pass",
+        "citation": "implementation scope の local review は既存の chain ③ liveness gate を実行し、NonBlueSignal の既存判定規則に従って結果を返す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateDispatchOutcome"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "implementation scope の local review は既存の chain ③ liveness gate を実行し、NonBlueSignal の既存判定規則に従って結果を返す。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d8ffbea9908b05f83346b3ff9ffc9fe5e0ee2cbe3ca8ab5ea24625d74f1b4526",
+      "evidence_hash": "510c6d05129810db704f499745624782281a738366a655b62c660f9418e0bab0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp review local` は scope を解決して設定マトリクスを参照し、適用対象の pre-review gate を内部で dispatch する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateDispatchOutcome"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "`sotp review local` は scope を解決して設定マトリクスを参照し、適用対象の pre-review gate を内部で dispatch する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "918b2599779d3844ecf3dbe0d98f6589f376cd4b8dfcb938ff79bf4636e00f7c",
+      "evidence_hash": "7c9d26803a2354e59dd8ae1085eafde4e8d7d2be390ad877827dad33ae1dec80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "pre-review gate の適用可否を review scope × pre-review gate の宣言的な設定マトリクスとして管理し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateKind"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "pre-review gate の適用可否を review scope × pre-review gate の宣言的な設定マトリクスとして管理し、各 review scope が自身の上流 SoT chain に関係しない下流整合検査によって妨げられない review 経路を提供する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "918b2599779d3844ecf3dbe0d98f6589f376cd4b8dfcb938ff79bf4636e00f7c",
+      "evidence_hash": "2d3b8146d3fb0ab8adeeddc61df151a67328f49c8f3a7702d2ea829ca3e44c1b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "review scope × pre-review gate の適用有無を config で宣言する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateKind"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "review scope × pre-review gate の適用有無を config で宣言する。これは types scope の一回限りの例外ではなく、planning scope と implementation scope を含む一般的な適用範囲の SoT とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "918b2599779d3844ecf3dbe0d98f6589f376cd4b8dfcb938ff79bf4636e00f7c",
+      "evidence_hash": "d42e42afb353d1eda6093e0cdd1a14fa98510a58621d2f92fa4d10dabc74a19d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "spec および types を含む planning scope の local review は、下流 chain ③ に由来する liveness state または task-contract 成果物の存在・整合を前提としない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateKind"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "spec および types を含む planning scope の local review は、下流 chain ③ に由来する liveness state または task-contract 成果物の存在・整合を前提としない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "918b2599779d3844ecf3dbe0d98f6589f376cd4b8dfcb938ff79bf4636e00f7c",
+      "evidence_hash": "dca561b8bc2d42da0ffc85e527dead916037dd52ba7d3264fd9a5b31c7844806",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実装 scope の local review には、既存どおり chain ③ に由来する pre-review liveness gate を適用する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateKind"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "implementation scope の local review には、既存どおり chain ③ に由来する pre-review liveness gate を適用する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "918b2599779d3844ecf3dbe0d98f6589f376cd4b8dfcb938ff79bf4636e00f7c",
+      "evidence_hash": "507a8f42be597dacc379f073747d428d04a96b4b8be42ada9e9bb9e8fdd9682c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "pre-review gate applicability は review scope × gate の config マトリクスとして表現し、特定 scope 向けの ad-hoc な例外分岐で表現しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateKind"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "pre-review gate applicability は review scope × gate の config マトリクスとして表現し、特定 scope 向けの ad-hoc な例外分岐で表現しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "918b2599779d3844ecf3dbe0d98f6589f376cd4b8dfcb938ff79bf4636e00f7c",
+      "evidence_hash": "ae4a7d1f7783f0b9386f2a7fdc3b20fa7bc4157f4a8f7d10e9d2ec03145182e1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "review scope × pre-review gate の適用有無を表す設定マトリクスが存在し、planning scope と implementation scope の適用差を宣言として確認できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateKind"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "review scope × pre-review gate の適用有無を表す設定マトリクスが存在し、planning scope と implementation scope の適用差を宣言として確認できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "918b2599779d3844ecf3dbe0d98f6589f376cd4b8dfcb938ff79bf4636e00f7c",
+      "evidence_hash": "69f2b537156e6e8c9a6b65c5b54650cb3bbe062023e8f23f9d45a780361739a6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "spec または types の local review は、下流 chain ③ liveness state または task-contract 成果物がまだ存在しない通常の planning 段階でも、当該 scope の上流 prerequisite を満たす限り開始できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateKind"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "spec または types の local review は、下流 chain ③ liveness state または task-contract 成果物がまだ存在しない通常の planning 段階でも、当該 scope の上流 prerequisite を満たす限り開始できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "918b2599779d3844ecf3dbe0d98f6589f376cd4b8dfcb938ff79bf4636e00f7c",
+      "evidence_hash": "12b178469f87ee66bd7ddef8f3adcda8532a3f31f473502d3877586829858265",
+      "verdict": {
+        "kind": "pass",
+        "citation": "implementation scope の local review は既存の chain ③ liveness gate を実行し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateKind"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "implementation scope の local review は既存の chain ③ liveness gate を実行し、NonBlueSignal の既存判定規則に従って結果を返す。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6954361eabec5c4c0de3f199fcc5bf017fdf35747c83280573db3d5644d2413f",
+      "evidence_hash": "7c9d26803a2354e59dd8ae1085eafde4e8d7d2be390ad877827dad33ae1dec80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "pre-review gate の適用可否を review scope × pre-review gate の宣言的な設定マトリクスとして管理し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateLookupError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "pre-review gate の適用可否を review scope × pre-review gate の宣言的な設定マトリクスとして管理し、各 review scope が自身の上流 SoT chain に関係しない下流整合検査によって妨げられない review 経路を提供する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6954361eabec5c4c0de3f199fcc5bf017fdf35747c83280573db3d5644d2413f",
+      "evidence_hash": "2d3b8146d3fb0ab8adeeddc61df151a67328f49c8f3a7702d2ea829ca3e44c1b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "review scope × pre-review gate の適用有無を config で宣言する。これは types scope の一回限りの例外ではなく、planning scope と implementation scope を含む一般的な適用範囲の SoT とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateLookupError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "review scope × pre-review gate の適用有無を config で宣言する。これは types scope の一回限りの例外ではなく、planning scope と implementation scope を含む一般的な適用範囲の SoT とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6954361eabec5c4c0de3f199fcc5bf017fdf35747c83280573db3d5644d2413f",
+      "evidence_hash": "507a8f42be597dacc379f073747d428d04a96b4b8be42ada9e9bb9e8fdd9682c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "pre-review gate applicability は review scope × gate の config マトリクスとして表現し、特定 scope 向けの ad-hoc な例外分岐で表現しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateLookupError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "pre-review gate applicability は review scope × gate の config マトリクスとして表現し、特定 scope 向けの ad-hoc な例外分岐で表現しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6954361eabec5c4c0de3f199fcc5bf017fdf35747c83280573db3d5644d2413f",
+      "evidence_hash": "ae4a7d1f7783f0b9386f2a7fdc3b20fa7bc4157f4a8f7d10e9d2ec03145182e1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "review scope × pre-review gate の適用有無を表す設定マトリクスが存在し、planning scope と implementation scope の適用差を宣言として確認できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateLookupError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "review scope × pre-review gate の適用有無を表す設定マトリクスが存在し、planning scope と implementation scope の適用差を宣言として確認できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "05e33e9e4b8dd0bcbd8e208be7e815e72519f77fa4388858126b25c21cf96924",
+      "evidence_hash": "7c9d26803a2354e59dd8ae1085eafde4e8d7d2be390ad877827dad33ae1dec80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "pre-review gate の適用可否を review scope × pre-review gate の宣言的な設定マトリクスとして管理し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateMatrix"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "pre-review gate の適用可否を review scope × pre-review gate の宣言的な設定マトリクスとして管理し、各 review scope が自身の上流 SoT chain に関係しない下流整合検査によって妨げられない review 経路を提供する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "05e33e9e4b8dd0bcbd8e208be7e815e72519f77fa4388858126b25c21cf96924",
+      "evidence_hash": "2d3b8146d3fb0ab8adeeddc61df151a67328f49c8f3a7702d2ea829ca3e44c1b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "review scope × pre-review gate の適用有無を config で宣言する。これは types scope の一回限りの例外ではなく、planning scope と implementation scope を含む一般的な適用範囲の SoT とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateMatrix"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "review scope × pre-review gate の適用有無を config で宣言する。これは types scope の一回限りの例外ではなく、planning scope と implementation scope を含む一般的な適用範囲の SoT とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "05e33e9e4b8dd0bcbd8e208be7e815e72519f77fa4388858126b25c21cf96924",
+      "evidence_hash": "d42e42afb353d1eda6093e0cdd1a14fa98510a58621d2f92fa4d10dabc74a19d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "spec および types を含む planning scope の local review は、下流 chain ③ に由来する liveness state または task-contract 成果物の存在・整合を前提としない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateMatrix"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "spec および types を含む planning scope の local review は、下流 chain ③ に由来する liveness state または task-contract 成果物の存在・整合を前提としない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "05e33e9e4b8dd0bcbd8e208be7e815e72519f77fa4388858126b25c21cf96924",
+      "evidence_hash": "dca561b8bc2d42da0ffc85e527dead916037dd52ba7d3264fd9a5b31c7844806",
+      "verdict": {
+        "kind": "pass",
+        "citation": "implementation scope の local review には、既存どおり chain ③ に由来する pre-review liveness gate を適用する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateMatrix"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "implementation scope の local review には、既存どおり chain ③ に由来する pre-review liveness gate を適用する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "05e33e9e4b8dd0bcbd8e208be7e815e72519f77fa4388858126b25c21cf96924",
+      "evidence_hash": "507a8f42be597dacc379f073747d428d04a96b4b8be42ada9e9bb9e8fdd9682c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "pre-review gate applicability は review scope × gate の config マトリクスとして表現し、特定 scope 向けの ad-hoc な例外分岐で表現しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateMatrix"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "pre-review gate applicability は review scope × gate の config マトリクスとして表現し、特定 scope 向けの ad-hoc な例外分岐で表現しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "05e33e9e4b8dd0bcbd8e208be7e815e72519f77fa4388858126b25c21cf96924",
+      "evidence_hash": "ae4a7d1f7783f0b9386f2a7fdc3b20fa7bc4157f4a8f7d10e9d2ec03145182e1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "review scope × pre-review gate の適用有無を表す設定マトリクスが存在し、planning scope と implementation scope の適用差を宣言として確認できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateMatrix"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "review scope × pre-review gate の適用有無を表す設定マトリクスが存在し、planning scope と implementation scope の適用差を宣言として確認できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "05e33e9e4b8dd0bcbd8e208be7e815e72519f77fa4388858126b25c21cf96924",
+      "evidence_hash": "69f2b537156e6e8c9a6b65c5b54650cb3bbe062023e8f23f9d45a780361739a6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "spec または types の local review は、下流 chain ③ liveness state または task-contract 成果物がまだ存在しない通常の planning 段階でも、当該 scope の上流 prerequisite を満たす限り開始できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateMatrix"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "spec または types の local review は、下流 chain ③ liveness state または task-contract 成果物がまだ存在しない通常の planning 段階でも、当該 scope の上流 prerequisite を満たす限り開始できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "05e33e9e4b8dd0bcbd8e208be7e815e72519f77fa4388858126b25c21cf96924",
+      "evidence_hash": "12b178469f87ee66bd7ddef8f3adcda8532a3f31f473502d3877586829858265",
+      "verdict": {
+        "kind": "pass",
+        "citation": "implementation scope の local review は既存の chain ③ liveness gate を実行し、NonBlueSignal の既存判定規則に従って結果を返す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateMatrix"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "implementation scope の local review は既存の chain ③ liveness gate を実行し、NonBlueSignal の既存判定規則に従って結果を返す。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d823b18cdf87fdeb6fa727206ba6b8e7ae667afd74caf790a07b1fb49ceb0e70",
+      "evidence_hash": "7c9d26803a2354e59dd8ae1085eafde4e8d7d2be390ad877827dad33ae1dec80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "pre-review gate の適用可否を review scope × pre-review gate の宣言的な設定マトリクスとして管理し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateMatrixError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "pre-review gate の適用可否を review scope × pre-review gate の宣言的な設定マトリクスとして管理し、各 review scope が自身の上流 SoT chain に関係しない下流整合検査によって妨げられない review 経路を提供する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d823b18cdf87fdeb6fa727206ba6b8e7ae667afd74caf790a07b1fb49ceb0e70",
+      "evidence_hash": "2d3b8146d3fb0ab8adeeddc61df151a67328f49c8f3a7702d2ea829ca3e44c1b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "review scope × pre-review gate の適用有無を config で宣言する。これは types scope の一回限りの例外ではなく、planning scope と implementation scope を含む一般的な適用範囲の SoT とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateMatrixError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "review scope × pre-review gate の適用有無を config で宣言する。これは types scope の一回限りの例外ではなく、planning scope と implementation scope を含む一般的な適用範囲の SoT とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d823b18cdf87fdeb6fa727206ba6b8e7ae667afd74caf790a07b1fb49ceb0e70",
+      "evidence_hash": "507a8f42be597dacc379f073747d428d04a96b4b8be42ada9e9bb9e8fdd9682c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "pre-review gate applicability は review scope × gate の config マトリクスとして表現し、特定 scope 向けの ad-hoc な例外分岐で表現しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateMatrixError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "pre-review gate applicability は review scope × gate の config マトリクスとして表現し、特定 scope 向けの ad-hoc な例外分岐で表現しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d823b18cdf87fdeb6fa727206ba6b8e7ae667afd74caf790a07b1fb49ceb0e70",
+      "evidence_hash": "ae4a7d1f7783f0b9386f2a7fdc3b20fa7bc4157f4a8f7d10e9d2ec03145182e1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "review scope × pre-review gate の適用有無を表す設定マトリクスが存在し、planning scope と implementation scope の適用差を宣言として確認できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateMatrixError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "review scope × pre-review gate の適用有無を表す設定マトリクスが存在し、planning scope と implementation scope の適用差を宣言として確認できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "58a8156c07ba19fb9932ca1483038fcd5c965f78444c243d8a818e11d9a8d9fd",
+      "evidence_hash": "7c9d26803a2354e59dd8ae1085eafde4e8d7d2be390ad877827dad33ae1dec80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "pre-review gate の適用可否を review scope × pre-review gate の宣言的な設定マトリクスとして管理し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "PreReviewGateConfigLoaderPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "pre-review gate の適用可否を review scope × pre-review gate の宣言的な設定マトリクスとして管理し、各 review scope が自身の上流 SoT chain に関係しない下流整合検査によって妨げられない review 経路を提供する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "58a8156c07ba19fb9932ca1483038fcd5c965f78444c243d8a818e11d9a8d9fd",
+      "evidence_hash": "2d3b8146d3fb0ab8adeeddc61df151a67328f49c8f3a7702d2ea829ca3e44c1b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "review scope × pre-review gate の適用有無を config で宣言する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "PreReviewGateConfigLoaderPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "review scope × pre-review gate の適用有無を config で宣言する。これは types scope の一回限りの例外ではなく、planning scope と implementation scope を含む一般的な適用範囲の SoT とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "58a8156c07ba19fb9932ca1483038fcd5c965f78444c243d8a818e11d9a8d9fd",
+      "evidence_hash": "ae4a7d1f7783f0b9386f2a7fdc3b20fa7bc4157f4a8f7d10e9d2ec03145182e1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "review scope × pre-review gate の適用有無を表す設定マトリクスが存在し、planning scope と implementation scope の適用差を宣言として確認できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "PreReviewGateConfigLoaderPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "review scope × pre-review gate の適用有無を表す設定マトリクスが存在し、planning scope と implementation scope の適用差を宣言として確認できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "58a8156c07ba19fb9932ca1483038fcd5c965f78444c243d8a818e11d9a8d9fd",
+      "evidence_hash": "510c6d05129810db704f499745624782281a738366a655b62c660f9418e0bab0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp review local` は scope を解決して設定マトリクスを参照し、適用対象の pre-review gate を内部で dispatch する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "PreReviewGateConfigLoaderPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "`sotp review local` は scope を解決して設定マトリクスを参照し、適用対象の pre-review gate を内部で dispatch する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a8dad723afbc36e43085b43dca0e2c54d3a15a2d67e7879c744516386e316cf6",
+      "evidence_hash": "b68ca96e81f8aedeafeb7b0196bac29c860fee8ea9e977e47b6d0457418de6c3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "scope を解決できる `sotp review local` が必要な pre-review gate を dispatch し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "PreReviewGateDispatchService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "scope を解決できる `sotp review local` が必要な pre-review gate を dispatch し、Makefile wrapper が scope-blind な gate dependency を持たない review 経路を提供する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a8dad723afbc36e43085b43dca0e2c54d3a15a2d67e7879c744516386e316cf6",
+      "evidence_hash": "d42e42afb353d1eda6093e0cdd1a14fa98510a58621d2f92fa4d10dabc74a19d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "spec および types を含む planning scope の local review は、下流 chain ③ に由来する liveness state または task-contract 成果物の存在・整合を前提としない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "PreReviewGateDispatchService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "spec および types を含む planning scope の local review は、下流 chain ③ に由来する liveness state または task-contract 成果物の存在・整合を前提としない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a8dad723afbc36e43085b43dca0e2c54d3a15a2d67e7879c744516386e316cf6",
+      "evidence_hash": "dca561b8bc2d42da0ffc85e527dead916037dd52ba7d3264fd9a5b31c7844806",
+      "verdict": {
+        "kind": "pass",
+        "citation": "implementation scope の local review には、既存どおり chain ③ に由来する pre-review liveness gate を適用する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "PreReviewGateDispatchService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "implementation scope の local review には、既存どおり chain ③ に由来する pre-review liveness gate を適用する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a8dad723afbc36e43085b43dca0e2c54d3a15a2d67e7879c744516386e316cf6",
+      "evidence_hash": "0030c718fccc7892e840b1238ab3bc0aa149c06ddc1bdf35dc4d8dd5ce22a7e7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp review local` が review scope を解決し、適用マトリクスに従って必要な pre-review gate だけを内部で実行する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "PreReviewGateDispatchService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "`sotp review local` が review scope を解決し、適用マトリクスに従って必要な pre-review gate だけを内部で実行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a8dad723afbc36e43085b43dca0e2c54d3a15a2d67e7879c744516386e316cf6",
+      "evidence_hash": "ed969a87c213ff1b70e22d67d34f289cb4ccd74296c6b2d1567a9b38c30884c9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "scope-aware な gate dispatch の所有権は `sotp review local` に置き、Makefile に scope 条件分岐または review policy を実装しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "PreReviewGateDispatchService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "scope-aware な gate dispatch の所有権は `sotp review local` に置き、Makefile に scope 条件分岐または review policy を実装しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a8dad723afbc36e43085b43dca0e2c54d3a15a2d67e7879c744516386e316cf6",
+      "evidence_hash": "69f2b537156e6e8c9a6b65c5b54650cb3bbe062023e8f23f9d45a780361739a6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "spec または types の local review は、下流 chain ③ liveness state または task-contract 成果物がまだ存在しない通常の planning 段階でも、当該 scope の上流 prerequisite を満たす限り開始できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "PreReviewGateDispatchService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "spec または types の local review は、下流 chain ③ liveness state または task-contract 成果物がまだ存在しない通常の planning 段階でも、当該 scope の上流 prerequisite を満たす限り開始できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a8dad723afbc36e43085b43dca0e2c54d3a15a2d67e7879c744516386e316cf6",
+      "evidence_hash": "12b178469f87ee66bd7ddef8f3adcda8532a3f31f473502d3877586829858265",
+      "verdict": {
+        "kind": "pass",
+        "citation": "implementation scope の local review は既存の chain ③ liveness gate を実行し、NonBlueSignal の既存判定規則に従って結果を返す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "PreReviewGateDispatchService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "implementation scope の local review は既存の chain ③ liveness gate を実行し、NonBlueSignal の既存判定規則に従って結果を返す。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a8dad723afbc36e43085b43dca0e2c54d3a15a2d67e7879c744516386e316cf6",
+      "evidence_hash": "510c6d05129810db704f499745624782281a738366a655b62c660f9418e0bab0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp review local` は scope を解決して設定マトリクスを参照し、適用対象の pre-review gate を内部で dispatch する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "PreReviewGateDispatchService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "`sotp review local` は scope を解決して設定マトリクスを参照し、適用対象の pre-review gate を内部で dispatch する。"
+        }
+      }
+    }
+  ]
+}

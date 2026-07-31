@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "ee37661a9368b8a939c37a1e1fa5fa619e25a43f3f8ca1d8692c3566be4a260f",
+  "signals": [
+    {
+      "type_name": "FsPreReviewGateConfigLoader",
+      "signal": "blue",
+      "entry_hash": "117f10f60732797b5fb472d02313cfc7e607befdd2478ca538cccdce1f4f9614"
+    }
+  ]
+}
