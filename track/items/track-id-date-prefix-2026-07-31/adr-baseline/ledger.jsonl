@@ -1,0 +1,2 @@
+{"source":"2026-07-29-0839-track-id-date-prefix.md","hash":"e68d03ae93cb0a858c2f1d70c254eb011c426135f82f7ef4b592aededb1f00a4","kind":"init","timestamp":"2026-07-31T11:25:35Z"}
+{"source":"2026-07-29-0839-track-id-date-prefix.md","hash":"88b8f80e0f8268e1fd581e2748c66c2319f6d147e5187fc99205004b7ac71c4a","kind":"escalation","reason":"review-refinement 記録（経過措置）: Phase 0 review は ADR 本文を変更せず zero_findings に収束した。user が収束全文を承認し、adr-editor が D1 の user_decision_ref に境界承認を追記した。adr-diagnoser はこの concrete diff を decision-preserved と判定した。","timestamp":"2026-07-31T12:24:59Z"}

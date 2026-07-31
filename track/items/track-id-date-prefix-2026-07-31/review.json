@@ -1,0 +1,70 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
+          "at": "2026-07-31T12:01:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`capabilities.orchestrator.reasoning_effort` declares `medium`, but Codex root orchestration is configured by `.codex/config.toml`, which still pins `model_reasoning_effort = \"low\"`; the generic capability dispatcher does not execute this typed-pipeline row. The routing SSoT therefore disagrees with actual orchestrator execution. Align the profile with `low` or update the provider-native Codex configuration in the same change.",
+              "severity": "P1",
+              "file": ".harness/config/agent-profiles.json",
+              "line": 18,
+              "category": "capability_routing_mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
+          "at": "2026-07-31T12:06:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b20d7607c725320a347f91c3a940f85ae9a48868208f94bf9c40c7f05621ce0d",
+          "at": "2026-07-31T12:09:44Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f59d66bc491c4a186b33f9521f050f2866cfae38d621838448514f8ecf03a6cd",
+          "at": "2026-07-31T11:29:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f59d66bc491c4a186b33f9521f050f2866cfae38d621838448514f8ecf03a6cd",
+          "at": "2026-07-31T11:32:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c4a3e3b3d4192d829f03502ad2ff540435b099415e300b110fd5cad6629f17f",
+          "at": "2026-07-31T12:21:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c4a3e3b3d4192d829f03502ad2ff540435b099415e300b110fd5cad6629f17f",
+          "at": "2026-07-31T12:24:17Z"
+        }
+      ]
+    }
+  }
+}
