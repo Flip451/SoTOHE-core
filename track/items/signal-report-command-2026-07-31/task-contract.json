@@ -22,9 +22,12 @@
     ],
     "T004": [{"layer": "cli_driver", "entry_key": "SignalReportDriver"}],
     "T005": [
-      {"layer": "cli_driver", "entry_key": "SignalDriver"}, {"layer": "cli", "entry_key": "SignalCommand"},
+      {"layer": "cli", "entry_key": "SignalCommand"},
       {"layer": "cli", "entry_key": "SignalReportArgs"}, {"layer": "cli", "entry_key": "SignalReportChainArg"},
-      {"layer": "cli", "entry_key": "SignalReportOnlyArg"}, {"layer": "cli", "entry_key": "cli::commands::signal::execute"}
+      {"layer": "cli", "entry_key": "SignalReportOnlyArg"}
+    ],
+    "T008": [
+      {"layer": "cli_driver", "entry_key": "SignalDriver"}, {"layer": "cli", "entry_key": "cli::commands::signal::execute"}
     ],
     "T006": [{"layer": "cli_composition", "entry_key": "SignalCompositionRoot"}],
     "T007": []

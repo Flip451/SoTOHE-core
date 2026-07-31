@@ -355,6 +355,33 @@
           "test_name": "test_signal_report_driver_renders_complete_occurrences_in_service_order"
         }
       ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "SignalCompositionRoot", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "GO-01"}},
+      "tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::signal::tests",
+          "test_name": "test_signal_composition_root_constructs_signal_report_driver_without_dispatch"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::signal::tests",
+          "test_name": "test_signal_composition_root_signal_report_driver_renders_yellow_and_red_block_causes"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "SignalCompositionRoot", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "CN-01"}},
+      "tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::signal::tests",
+          "test_name": "test_signal_report_driver_factory_is_wiring_only"
+        }
+      ]
     }
   ]
 }

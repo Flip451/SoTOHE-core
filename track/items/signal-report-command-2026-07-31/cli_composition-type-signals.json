@@ -1,13 +1,13 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-31T18:58:20Z",
+  "generated_at": "2026-07-31T22:31:57Z",
   "declaration_hash": "55ede06c029beea9b0cba2c24959a52be9e83c08652fc94bbb804189290ead8f",
-  "implementation_input_hash": "81587dd5bdf6229a1a7054302b8d58f2f1df557acfe1b2c8ffab5f72c12e722c",
+  "implementation_input_hash": "0cde7045ef38eb151b13a5b3914f5bcb4301f495f532c9f6811f5dd0641e5d4f",
   "signals": [
     {
       "type_name": "SignalCompositionRoot",
       "kind_tag": "composition_root",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     }
   ]

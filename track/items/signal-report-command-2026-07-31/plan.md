@@ -3,14 +3,14 @@
 
 ## Summary
 
-GO-01 → T001–T007.
+GO-01 → T001–T008.
 IN-02 / CN-02 / AC-02 → T001, T004.
 IN-03 / AC-03 → T001, T003, T005.
 IN-04 / CN-01 / AC-04 → T001, T002, T006.
-AC-01 → T001, T002, T005, T006.
+AC-01 → T001, T002, T004, T006, T008.
 OUT-01 / AC-05 → T007.
 
-## Tasks (4/7 resolved)
+## Tasks (5/8 resolved)
 
 ### S1 — Usecase boundary — typed report query
 
@@ -26,15 +26,16 @@ OUT-01 / AC-05 → T007.
 
 ### S3 — CLI driver — query conversion and rendering
 
-> Implement filter conversion and rendering in `apps/cli-driver/src/signal_report/`. IN-02, IN-03, CN-02, AC-02, AC-03.
+> Implement filter conversion and rendering in `apps/cli-driver/src/signal_report/`. IN-02, IN-03, CN-02, AC-01–AC-03.
 
 - [x] **T003**: After T001, implement filter-to-query conversion in `apps/cli-driver/src/signal_report/`. IN-03, AC-03. (`c2a77f82`)
-- [x] **T004**: After T001 and T003, implement occurrence rendering in `apps/cli-driver/src/signal_report/`. IN-02, CN-02, AC-02.
+- [x] **T004**: After T001 and T003, implement the `SignalReportDriver` occurrence-rendering contribution in `apps/cli-driver/src/signal_report/`. IN-02, CN-02, AC-01, AC-02. (`6eda10b1`)
 
 ### S4 — CLI transport and composition root
 
-> Wire the signal-report CLI through the composition-root report driver, then add `apps/cli/src/commands/track/resolve.rs` regression validation. IN-01, IN-03, OUT-01, CN-01, AC-01, AC-03–AC-05.
+> Add signal-report CLI parsing, then dispatch through the composition-root report driver, and finally add `apps/cli/src/commands/track/resolve.rs` regression validation. IN-01, IN-03, OUT-01, CN-01, AC-01, AC-03–AC-05.
 
-- [ ] **T006**: After T001, T002, and T004, implement and independently verify `SignalCompositionRoot::signal_report_driver` wiring in `apps/cli-composition/`, before CLI report dispatch consumes it. CN-01, AC-01, AC-04.
-- [ ] **T005**: After T003, T004, and T006, add signal-report CLI parsing and dispatch through the composition-root report driver in `apps/cli/`. IN-01, IN-03, AC-01, AC-03.
-- [ ] **T007**: After T005, add `sotp track resolve` regression tests in `apps/cli/src/commands/track/resolve.rs`. OUT-01, AC-05.
+- [x] **T006**: After T001, T002, and T004, implement and independently verify `SignalCompositionRoot::signal_report_driver` wiring in `apps/cli-composition/`, before CLI report dispatch consumes it. CN-01, AC-01, AC-04.
+- [ ] **T005**: After T003, T004, and T006, add the parsing and command shape that makes `sotp signal report` parseable in `apps/cli/src/commands/signal/mod.rs`: `SignalReportChainArg`, `SignalReportOnlyArg`, `SignalReportArgs`, and `SignalCommand::Report`; add same-module parsing tests. IN-01, IN-03, AC-03.
+- [ ] **T008**: After T005, T004, and T006, add the signal-report branch of `execute` in `apps/cli/src/commands/signal/mod.rs`, constructing and using the composition-root report driver while propagating output and exit status; add focused dispatch tests. IN-01, AC-01.
+- [ ] **T007**: After T008, add `sotp track resolve` regression tests in `apps/cli/src/commands/track/resolve.rs`. OUT-01, AC-05.

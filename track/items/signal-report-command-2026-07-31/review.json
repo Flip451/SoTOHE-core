@@ -1,6 +1,371 @@
 {
   "schema_version": 2,
   "scopes": {
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5a83f3b5a812e150ac96f6d9a2cec69d7322c78d4260fd8e6927329d8624f4f5",
+          "at": "2026-07-31T16:59:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5a83f3b5a812e150ac96f6d9a2cec69d7322c78d4260fd8e6927329d8624f4f5",
+          "at": "2026-07-31T17:28:19Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b6ef392c142af817f0e614fbb49672d0e56dd2526ef8c02e3238a5804df8bf4d",
+          "at": "2026-07-31T18:59:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ref_verify_run`, `ref_verify_check_approved`, and `ref_verify_results` execute application flow by calling `RefVerifyDriver::handle` and returning its `CommandOutcome`. Composition must stop at `ref_verify_driver`; the CLI layer should invoke the returned driver.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/ref_verify.rs",
+              "line": 98,
+              "category": "invoke leak"
+            },
+            {
+              "message": "`track_type_signals` invokes `TypeSignalsInteractor::run` and converts its result into a command outcome. Move request execution to `cli_driver`; this root should only construct and return the wired primary adapter.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 72,
+              "category": "invoke leak"
+            },
+            {
+              "message": "`track_type_graph` constructs a user-facing command-removal message inside the composition root. Deprecation rendering belongs in `cli_driver`, with composition limited to wiring.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 100,
+              "category": "render leak"
+            },
+            {
+              "message": "`track_baseline_graph` invokes `RenderBaselineGraph::execute` and then formats the user-facing success message. Both execution and rendering must be handled by a wired primary adapter in `cli_driver`.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 150,
+              "category": "invoke leak / render leak"
+            },
+            {
+              "message": "`track_contract_map` calls `ContractMapDriver::handle` from the composition entry point. Return the fully wired driver instead and let `apps/cli` invoke it.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 207,
+              "category": "invoke leak"
+            },
+            {
+              "message": "`track_catalogue_spec_signals` implements the application workflow in composition: it validates filesystem state, selects layers, deletes stale artifacts, and invokes `refresh_one_layer`. Move this orchestration behind a use-case/driver boundary and retain only collaborator construction here.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 216,
+              "category": "application-logic leak"
+            },
+            {
+              "message": "`track_spec_element_hash` directly invokes the infrastructure hash operation and serializes its result for display. Execution and JSON rendering belong behind a `cli_driver` primary adapter.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 378,
+              "category": "invoke leak / render leak"
+            },
+            {
+              "message": "`track_baseline_capture` invokes `BaselineCaptureInteractor::run` from the composition root. Expose a wired driver and perform the request invocation in `apps/cli`.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 441,
+              "category": "invoke leak"
+            },
+            {
+              "message": "`track_lint` invokes `RunCatalogueLint::execute` and formats violations, counts, and user-facing errors locally. Move execution and presentation into `cli_driver`, leaving this method as pure wiring.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 488,
+              "category": "invoke leak / render leak"
+            },
+            {
+              "message": "`track_catalogue_impl_signals` invokes `CatalogueImplSignalsInteractor::run` and maps its report into CLI output. The composition root must instead return a wired primary adapter without executing it.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 571,
+              "category": "invoke leak"
+            }
+          ],
+          "hash": "rvw1:sha256:b6ef392c142af817f0e614fbb49672d0e56dd2526ef8c02e3238a5804df8bf4d",
+          "at": "2026-07-31T19:22:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b6ef392c142af817f0e614fbb49672d0e56dd2526ef8c02e3238a5804df8bf4d",
+          "at": "2026-07-31T20:29:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a7a3d3f3da673f93c92941488f56ab4f72a3380ccc1241bf3ed70775bcf40210",
+          "at": "2026-07-31T22:35:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a7a3d3f3da673f93c92941488f56ab4f72a3380ccc1241bf3ed70775bcf40210",
+          "at": "2026-07-31T22:39:19Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`context()` uses ambient `SystemGitRepo::discover()`, so `GIT_DIR`/related Git environment variables can redirect the report to a different repository than the current working tree. The adapter should use isolated repository discovery and verify the resulting root before reading artifacts.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/signal_report/mod.rs",
+              "line": 35,
+              "category": "I/O boundary / repository isolation"
+            },
+            {
+              "message": "The adapter performs unbounded filesystem reads via `read_to_string` (and delegates ADR reads to an also-unbounded filesystem adapter) for user-controlled repository artifacts. A very large artifact can exhaust memory; enforce the repository's bounded-read policy before decoding.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/signal_report/mod.rs",
+              "line": 326,
+              "category": "I/O boundary / resource exhaustion"
+            }
+          ],
+          "hash": "rvw1:sha256:6bc22adc229b6dc9c3cfcf7fbb48a2deee4cef3759ddbf8e28ae90f6ba7401a4",
+          "at": "2026-07-31T17:00:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`context()` uses ambient `SystemGitRepo::discover()`, so `GIT_DIR` and related Git environment variables can redirect the report to a different repository than the current working tree. Use isolated repository discovery and verify the resulting root before reading artifacts.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/signal_report/mod.rs",
+              "line": 35,
+              "category": "I/O boundary / repository isolation"
+            },
+            {
+              "message": "`read_text()` uses unbounded `std::fs::read_to_string` for repository-controlled artifacts, and ADR loading delegates to another unbounded filesystem read. A very large artifact can exhaust memory; enforce a bounded-read limit before decoding.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/signal_report/mod.rs",
+              "line": 326,
+              "category": "I/O boundary / resource exhaustion"
+            }
+          ],
+          "hash": "rvw1:sha256:6bc22adc229b6dc9c3cfcf7fbb48a2deee4cef3759ddbf8e28ae90f6ba7401a4",
+          "at": "2026-07-31T17:01:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The catalog-spec and impl-catalog paths call `tddd_layers::load_tddd_layers`, whose architecture-rules loader still uses unbounded `read_to_string`. A repository-controlled oversized `architecture-rules.json` can exhaust memory before the adapter returns its typed error; apply the bounded-read policy to this input path.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/signal_report/mod.rs",
+              "line": 180,
+              "category": "I/O boundary / resource exhaustion"
+            }
+          ],
+          "hash": "rvw1:sha256:d0e824eba9d8b0e80e2322cd5a21cc31274a92647d69f30b55b684cd3ce4c3e3",
+          "at": "2026-07-31T17:07:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`context()` isolates repository discovery, but `repo.current_branch()` is not isolated: `SystemGitRepo::current_branch()` invokes the ambient Git environment through `output()`. `GIT_DIR`/related variables can therefore supply a branch from another repository, causing this adapter to read the wrong track artifacts from the discovered workspace. Branch resolution must use the same repository-selection isolation.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/signal_report/mod.rs",
+              "line": 45,
+              "category": "I/O boundary / repository isolation"
+            }
+          ],
+          "hash": "rvw1:sha256:b764b71726e8722aeb33b4df8ee4a36c412bff3a7828c9472c71f001e2879149",
+          "at": "2026-07-31T17:19:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4f44e120535cd7bc80dfbff808b4680bee9dea7b7c2f1e54e021b1dd0633a243",
+          "at": "2026-07-31T17:24:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`reject_symlinks_below` does not verify that `path` is beneath `trusted_root`; when the two paths are unrelated it simply walks to the filesystem root and accepts a regular file. Consequently both public loaders can read an attacker-selected `architecture-rules.json` outside the trusted workspace. Apply the fail-closed containment validation used by the `is_safe_briefing_path`/guarded-reader patterns before opening the file, including canonical containment after resolution.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/verify/tddd_layers.rs",
+              "line": 422,
+              "category": "security"
+            },
+            {
+              "message": "A missing `architecture-rules.json` is converted to an empty workspace-crate set, and the parser also defaults a missing `layers` field to empty. This silently disables the gate-relevant IN-10 reverse checks. Fail closed as `load_tddd_layers` does instead of treating absent configuration as a valid default.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/tddd_layers.rs",
+              "line": 429,
+              "category": "configuration"
+            },
+            {
+              "message": "The catalogue-spec report iterates every TDDD-enabled binding without checking `catalogue_spec_signal_enabled()`. A legitimate configuration with this signal disabled for one layer has no corresponding artifact, so that layer makes the entire `CatalogSpec` report fail even when other enabled layers are reportable. Filter bindings using the same activation check as the canonical signal calculation/check paths.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/signal_report/mod.rs",
+              "line": 181,
+              "category": "correctness"
+            },
+            {
+              "message": "A missing impl-catalog signal artifact is silently skipped because `None` continues the loop. This makes an unavailable layer indistinguishable from an all-blue layer and returns a successful but incomplete report. Missing artifacts for expected TDDD-enabled layers must fail closed with `SourceUnavailable(ImplCatalog)`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/signal_report/mod.rs",
+              "line": 253,
+              "category": "error_handling"
+            },
+            {
+              "message": "`context()` maps every discovery, branch, and track-id failure to `SourceUnavailable(AdrUser)`, and `load()` propagates that unchanged for all requested chains. Thus a `CatalogSpec`, `SpecAdr`, or `ImplCatalog` query reports the wrong failed chain, violating the port's selected-chain error contract. Map context failures to the chain passed to `load`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/signal_report/mod.rs",
+              "line": 285,
+              "category": "error_handling"
+            },
+            {
+              "message": "The ADR report path enumerates and accumulates every ADR without a file-count or aggregate-byte bound. Per-file bounded reads do not prevent a repository containing an unbounded number of ADR files from exhausting memory or runtime. Enforce a total input/count ceiling and return a typed source error when exceeded.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/signal_report/mod.rs",
+              "line": 94,
+              "category": "resource_exhaustion"
+            }
+          ],
+          "hash": "rvw1:sha256:4f44e120535cd7bc80dfbff808b4680bee9dea7b7c2f1e54e021b1dd0633a243",
+          "at": "2026-07-31T17:30:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`confined_rules_path` canonicalizes `trusted_root` before checking whether it or an ancestor is a symlink. That erases the symlink evidence: supplying a symlinked root together with a target-resolved rules path makes containment and the later guard pass, because `reject_symlinks_below` excludes the canonical root itself. Reject symlinked root components before canonicalization, following the real-root policy used by `scope_config_loader`/`ensure_not_symlink_root`.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/verify/tddd_layers.rs",
+              "line": 502,
+              "category": "security"
+            },
+            {
+              "message": "The architecture-rules DTOs omit the top-level `version` and lack `deny_unknown_fields`, so unsupported versions and misspelled TDDD fields are silently accepted and interpreted with defaults. For example, a typo in `catalogue_spec_signal.enabled` disables that gate without a parse error. Parse and reject unsupported versions first, then strictly deserialize the consumed configuration blocks as in the `agent_profiles` codec pattern.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/tddd_layers.rs",
+              "line": 259,
+              "category": "serde_codec"
+            },
+            {
+              "message": "`parse_workspace_crate_names` still accepts `{\"layers\":[]}` and returns an empty set. Because this set enables the gate-relevant IN-10 reverse checks, an empty configuration silently disables those checks. Reject an empty array consistently with `parse_tddd_layers` rather than treating it as valid configuration.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/tddd_layers.rs",
+              "line": 399,
+              "category": "configuration"
+            },
+            {
+              "message": "The new count ceiling is applied only after `FsAdrFileAdapter::list_adr_paths()` has already read the entire directory into an unbounded `Vec`. A repository with an excessive number of ADR entries can therefore exhaust time or memory before `MAX_ADR_FILES` is checked. Enforce the ceiling while enumerating entries and fail immediately when it is exceeded.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/signal_report/mod.rs",
+              "line": 92,
+              "category": "resource_exhaustion"
+            },
+            {
+              "message": "`read_impl_catalog` uses `FsImplCatalogSignalReader`, which hardcodes `<layer>-type-signals.json`, while the canonical calculator writes `binding.signal_file()` derived from the configured `catalogue_file`. With a supported custom catalogue filename, the report rejects an existing signal artifact and also constructs the wrong catalogue reference at line 281. Resolve the artifact with `binding.signal_file()` and reference `binding.catalogue_file()`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/signal_report/mod.rs",
+              "line": 255,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:81fc3d32c644f9deb4588bdab62ae45c31f2189232808e907449376aa8691cc4",
+          "at": "2026-07-31T17:45:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`read_impl_catalog()` now treats every configured layer's implementation-signal file as mandatory. The previous port path used `read_optional_signals()` and skipped absent artifacts; with a normal track whose signals have not yet been generated, `SignalReportSourcePort::load(ImplCatalog)` now fails the entire report instead of returning the available occurrences. Preserve optional-file semantics while still rejecting malformed or unsafe files.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/signal_report/mod.rs",
+              "line": 244,
+              "category": "adapter correctness / fail-closed I/O"
+            }
+          ],
+          "hash": "rvw1:sha256:8eeee2ef5229317d4c074cf38308fa78fd04b041375c996e15e625d282d9a231",
+          "at": "2026-07-31T19:06:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`read_impl_catalog()` still treats every configured layer's implementation-signal file as mandatory. The previous adapter path used `read_optional_signals()` and skipped absent artifacts; on a normal track before signals are generated, `SignalReportSourcePort::load(ImplCatalog)` now fails the whole report instead of returning available occurrences. Preserve optional-file semantics while continuing to reject malformed or unsafe existing files.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/signal_report/mod.rs",
+              "line": 244,
+              "category": "adapter correctness / fail-closed I/O"
+            }
+          ],
+          "hash": "rvw1:sha256:8eeee2ef5229317d4c074cf38308fa78fd04b041375c996e15e625d282d9a231",
+          "at": "2026-07-31T19:14:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8eeee2ef5229317d4c074cf38308fa78fd04b041375c996e15e625d282d9a231",
+          "at": "2026-07-31T19:15:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`MAX_ADR_FILES` only limits matching Markdown files after filtering, so `bounded_adr_paths` still performs an unbounded `read_dir` walk over non-Markdown files, directories, and other entries. A repository with many junk entries can therefore force unbounded I/O despite the advertised enumeration ceiling. Count every directory entry examined and fail once the ceiling is exceeded.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/signal_report/mod.rs",
+              "line": 292,
+              "category": "unbounded_io"
+            }
+          ],
+          "hash": "rvw1:sha256:8eeee2ef5229317d4c074cf38308fa78fd04b041375c996e15e625d282d9a231",
+          "at": "2026-07-31T20:36:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8a76a8aaa9d0a47baee7a3483e9e2dc36d154745bd994ba4cd5d34fcb65ed682",
+          "at": "2026-07-31T20:42:39Z"
+        }
+      ]
+    },
     "cli_driver": {
       "rounds": [
         {
@@ -45,6 +410,198 @@
           "findings": [],
           "hash": "rvw1:sha256:e43ef7b32e93c170d057f892897cb51278f5c7942e15f92f85390c5230e1c33d",
           "at": "2026-07-31T21:53:28Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
+          "at": "2026-07-31T11:44:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
+          "at": "2026-07-31T11:49:20Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0e6438fbe7b445d29dfe318ee778afd871c063eed23d7876227e3cb0d6d11749",
+          "at": "2026-07-31T18:59:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0e6438fbe7b445d29dfe318ee778afd871c063eed23d7876227e3cb0d6d11749",
+          "at": "2026-07-31T19:19:02Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f3300d882f7f8e7a3746dc1556723c5d61465e4921ce03560f01e7a3df39cf48",
+          "at": "2026-07-31T11:29:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1 requires `adr_user` to be included while forbidding signal recalculation and limiting the view to persisted `calc-*` artifacts. Chain ⓪'s `calc-adr-user` performs a live scan and persists no signal document, so the command cannot enumerate all four chains under the recorded boundary. This incompatibility must be resolved before downstream behavior can be derived.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-29-0839-signal-report-command.md",
+              "line": 18,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:f3300d882f7f8e7a3746dc1556723c5d61465e4921ce03560f01e7a3df39cf48",
+          "at": "2026-07-31T11:32:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f3300d882f7f8e7a3746dc1556723c5d61465e4921ce03560f01e7a3df39cf48",
+          "at": "2026-07-31T11:42:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6ba9a8c8b276d76b47425d2580babc14a1dbc6add90e9cdb70c2b909a2fbfd01",
+          "at": "2026-07-31T12:40:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6ba9a8c8b276d76b47425d2580babc14a1dbc6add90e9cdb70c2b909a2fbfd01",
+          "at": "2026-07-31T12:42:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:18e287538db3e7cbc650bde69b36adcbd84d3905aa0e4abaf1f5e9d137c0fcc0",
+          "at": "2026-07-31T19:13:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:18e287538db3e7cbc650bde69b36adcbd84d3905aa0e4abaf1f5e9d137c0fcc0",
+          "at": "2026-07-31T19:17:12Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ebb6b1a74f3f76a0e993151410d1e37d9f97e3ec9efa20c637548086c536c469",
+          "at": "2026-07-31T13:26:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ebb6b1a74f3f76a0e993151410d1e37d9f97e3ec9efa20c637548086c536c469",
+          "at": "2026-07-31T14:41:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ebb6b1a74f3f76a0e993151410d1e37d9f97e3ec9efa20c637548086c536c469",
+          "at": "2026-07-31T15:16:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ebb6b1a74f3f76a0e993151410d1e37d9f97e3ec9efa20c637548086c536c469",
+          "at": "2026-07-31T15:17:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8611b31187c795fdce80aa23d57ffeadd45989b890dbd5e962a33a7c2c8d0ce2",
+          "at": "2026-07-31T16:59:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8611b31187c795fdce80aa23d57ffeadd45989b890dbd5e962a33a7c2c8d0ce2",
+          "at": "2026-07-31T17:25:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8611b31187c795fdce80aa23d57ffeadd45989b890dbd5e962a33a7c2c8d0ce2",
+          "at": "2026-07-31T17:28:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d01f366dd26bb96539672e8a6a9b22b76e36fcc263a80a68b42d220eee69e3e6",
+          "at": "2026-07-31T21:04:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d01f366dd26bb96539672e8a6a9b22b76e36fcc263a80a68b42d220eee69e3e6",
+          "at": "2026-07-31T21:21:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:54393ff227807208d0bc6f2cde4ae897d0990fd6849533085009cecb72e03ee7",
+          "at": "2026-07-31T21:46:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:54393ff227807208d0bc6f2cde4ae897d0990fd6849533085009cecb72e03ee7",
+          "at": "2026-07-31T22:00:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2623d28cc4f0d91ccaeced9ddec2e403c4f63b592da5913b2957570205fd0ca",
+          "at": "2026-07-31T22:37:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2623d28cc4f0d91ccaeced9ddec2e403c4f63b592da5913b2957570205fd0ca",
+          "at": "2026-07-31T23:17:26Z"
         }
       ]
     },
@@ -453,261 +1010,101 @@
           "findings": [],
           "hash": "rvw1:sha256:bf50c395fd677d27f6a34f1062584f2071a79b575f7c0016af3969281b7f5974",
           "at": "2026-07-31T21:57:59Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0e6438fbe7b445d29dfe318ee778afd871c063eed23d7876227e3cb0d6d11749",
-          "at": "2026-07-31T18:59:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0e6438fbe7b445d29dfe318ee778afd871c063eed23d7876227e3cb0d6d11749",
-          "at": "2026-07-31T19:19:02Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`context()` uses ambient `SystemGitRepo::discover()`, so `GIT_DIR`/related Git environment variables can redirect the report to a different repository than the current working tree. The adapter should use isolated repository discovery and verify the resulting root before reading artifacts.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/signal_report/mod.rs",
-              "line": 35,
-              "category": "I/O boundary / repository isolation"
-            },
-            {
-              "message": "The adapter performs unbounded filesystem reads via `read_to_string` (and delegates ADR reads to an also-unbounded filesystem adapter) for user-controlled repository artifacts. A very large artifact can exhaust memory; enforce the repository's bounded-read policy before decoding.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/signal_report/mod.rs",
-              "line": 326,
-              "category": "I/O boundary / resource exhaustion"
-            }
-          ],
-          "hash": "rvw1:sha256:6bc22adc229b6dc9c3cfcf7fbb48a2deee4cef3759ddbf8e28ae90f6ba7401a4",
-          "at": "2026-07-31T17:00:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`context()` uses ambient `SystemGitRepo::discover()`, so `GIT_DIR` and related Git environment variables can redirect the report to a different repository than the current working tree. Use isolated repository discovery and verify the resulting root before reading artifacts.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/signal_report/mod.rs",
-              "line": 35,
-              "category": "I/O boundary / repository isolation"
-            },
-            {
-              "message": "`read_text()` uses unbounded `std::fs::read_to_string` for repository-controlled artifacts, and ADR loading delegates to another unbounded filesystem read. A very large artifact can exhaust memory; enforce a bounded-read limit before decoding.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/signal_report/mod.rs",
-              "line": 326,
-              "category": "I/O boundary / resource exhaustion"
-            }
-          ],
-          "hash": "rvw1:sha256:6bc22adc229b6dc9c3cfcf7fbb48a2deee4cef3759ddbf8e28ae90f6ba7401a4",
-          "at": "2026-07-31T17:01:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The catalog-spec and impl-catalog paths call `tddd_layers::load_tddd_layers`, whose architecture-rules loader still uses unbounded `read_to_string`. A repository-controlled oversized `architecture-rules.json` can exhaust memory before the adapter returns its typed error; apply the bounded-read policy to this input path.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/signal_report/mod.rs",
-              "line": 180,
-              "category": "I/O boundary / resource exhaustion"
-            }
-          ],
-          "hash": "rvw1:sha256:d0e824eba9d8b0e80e2322cd5a21cc31274a92647d69f30b55b684cd3ce4c3e3",
-          "at": "2026-07-31T17:07:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`context()` isolates repository discovery, but `repo.current_branch()` is not isolated: `SystemGitRepo::current_branch()` invokes the ambient Git environment through `output()`. `GIT_DIR`/related variables can therefore supply a branch from another repository, causing this adapter to read the wrong track artifacts from the discovered workspace. Branch resolution must use the same repository-selection isolation.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/signal_report/mod.rs",
-              "line": 45,
-              "category": "I/O boundary / repository isolation"
-            }
-          ],
-          "hash": "rvw1:sha256:b764b71726e8722aeb33b4df8ee4a36c412bff3a7828c9472c71f001e2879149",
-          "at": "2026-07-31T17:19:24Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4f44e120535cd7bc80dfbff808b4680bee9dea7b7c2f1e54e021b1dd0633a243",
-          "at": "2026-07-31T17:24:46Z"
+          "hash": "rvw1:sha256:a090d5a08889aba61b9ac7382d7b016dc42363846643da495574208dd43505c9",
+          "at": "2026-07-31T22:36:17Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`reject_symlinks_below` does not verify that `path` is beneath `trusted_root`; when the two paths are unrelated it simply walks to the filesystem root and accepts a regular file. Consequently both public loaders can read an attacker-selected `architecture-rules.json` outside the trusted workspace. Apply the fail-closed containment validation used by the `is_safe_briefing_path`/guarded-reader patterns before opening the file, including canonical containment after resolution.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/verify/tddd_layers.rs",
-              "line": 422,
-              "category": "security"
-            },
-            {
-              "message": "A missing `architecture-rules.json` is converted to an empty workspace-crate set, and the parser also defaults a missing `layers` field to empty. This silently disables the gate-relevant IN-10 reverse checks. Fail closed as `load_tddd_layers` does instead of treating absent configuration as a valid default.",
+              "message": "T005 names only the entire `apps/cli/` crate as its target, so the executor must infer which file or symbols own the parsing and dispatch changes. Name the concrete target (for example `apps/cli/src/commands/signal/mod.rs` and its affected command/execute symbols) while retaining the existing anchor cites.",
               "severity": "P1",
-              "file": "libs/infrastructure/src/verify/tddd_layers.rs",
-              "line": 429,
-              "category": "configuration"
-            },
-            {
-              "message": "The catalogue-spec report iterates every TDDD-enabled binding without checking `catalogue_spec_signal_enabled()`. A legitimate configuration with this signal disabled for one layer has no corresponding artifact, so that layer makes the entire `CatalogSpec` report fail even when other enabled layers are reportable. Filter bindings using the same activation check as the canonical signal calculation/check paths.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/signal_report/mod.rs",
-              "line": 181,
-              "category": "correctness"
-            },
-            {
-              "message": "A missing impl-catalog signal artifact is silently skipped because `None` continues the loop. This makes an unavailable layer indistinguishable from an all-blue layer and returns a successful but incomplete report. Missing artifacts for expected TDDD-enabled layers must fail closed with `SourceUnavailable(ImplCatalog)`.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/signal_report/mod.rs",
-              "line": 253,
-              "category": "error_handling"
-            },
-            {
-              "message": "`context()` maps every discovery, branch, and track-id failure to `SourceUnavailable(AdrUser)`, and `load()` propagates that unchanged for all requested chains. Thus a `CatalogSpec`, `SpecAdr`, or `ImplCatalog` query reports the wrong failed chain, violating the port's selected-chain error contract. Map context failures to the chain passed to `load`.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/signal_report/mod.rs",
-              "line": 285,
-              "category": "error_handling"
-            },
-            {
-              "message": "The ADR report path enumerates and accumulates every ADR without a file-count or aggregate-byte bound. Per-file bounded reads do not prevent a repository containing an unbounded number of ADR files from exhausting memory or runtime. Enforce a total input/count ceiling and return a typed source error when exceeded.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/signal_report/mod.rs",
-              "line": 94,
-              "category": "resource_exhaustion"
+              "file": "track/items/signal-report-command-2026-07-31/impl-plan.json",
+              "line": 50,
+              "category": "task description non-executable"
             }
           ],
-          "hash": "rvw1:sha256:4f44e120535cd7bc80dfbff808b4680bee9dea7b7c2f1e54e021b1dd0633a243",
-          "at": "2026-07-31T17:30:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`confined_rules_path` canonicalizes `trusted_root` before checking whether it or an ancestor is a symlink. That erases the symlink evidence: supplying a symlinked root together with a target-resolved rules path makes containment and the later guard pass, because `reject_symlinks_below` excludes the canonical root itself. Reject symlinked root components before canonicalization, following the real-root policy used by `scope_config_loader`/`ensure_not_symlink_root`.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/verify/tddd_layers.rs",
-              "line": 502,
-              "category": "security"
-            },
-            {
-              "message": "The architecture-rules DTOs omit the top-level `version` and lack `deny_unknown_fields`, so unsupported versions and misspelled TDDD fields are silently accepted and interpreted with defaults. For example, a typo in `catalogue_spec_signal.enabled` disables that gate without a parse error. Parse and reject unsupported versions first, then strictly deserialize the consumed configuration blocks as in the `agent_profiles` codec pattern.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/tddd_layers.rs",
-              "line": 259,
-              "category": "serde_codec"
-            },
-            {
-              "message": "`parse_workspace_crate_names` still accepts `{\"layers\":[]}` and returns an empty set. Because this set enables the gate-relevant IN-10 reverse checks, an empty configuration silently disables those checks. Reject an empty array consistently with `parse_tddd_layers` rather than treating it as valid configuration.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/tddd_layers.rs",
-              "line": 399,
-              "category": "configuration"
-            },
-            {
-              "message": "The new count ceiling is applied only after `FsAdrFileAdapter::list_adr_paths()` has already read the entire directory into an unbounded `Vec`. A repository with an excessive number of ADR entries can therefore exhaust time or memory before `MAX_ADR_FILES` is checked. Enforce the ceiling while enumerating entries and fail immediately when it is exceeded.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/signal_report/mod.rs",
-              "line": 92,
-              "category": "resource_exhaustion"
-            },
-            {
-              "message": "`read_impl_catalog` uses `FsImplCatalogSignalReader`, which hardcodes `<layer>-type-signals.json`, while the canonical calculator writes `binding.signal_file()` derived from the configured `catalogue_file`. With a supported custom catalogue filename, the report rejects an existing signal artifact and also constructs the wrong catalogue reference at line 281. Resolve the artifact with `binding.signal_file()` and reference `binding.catalogue_file()`.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/signal_report/mod.rs",
-              "line": 255,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:81fc3d32c644f9deb4588bdab62ae45c31f2189232808e907449376aa8691cc4",
-          "at": "2026-07-31T17:45:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`read_impl_catalog()` now treats every configured layer's implementation-signal file as mandatory. The previous port path used `read_optional_signals()` and skipped absent artifacts; with a normal track whose signals have not yet been generated, `SignalReportSourcePort::load(ImplCatalog)` now fails the entire report instead of returning the available occurrences. Preserve optional-file semantics while still rejecting malformed or unsafe files.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/signal_report/mod.rs",
-              "line": 244,
-              "category": "adapter correctness / fail-closed I/O"
-            }
-          ],
-          "hash": "rvw1:sha256:8eeee2ef5229317d4c074cf38308fa78fd04b041375c996e15e625d282d9a231",
-          "at": "2026-07-31T19:06:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`read_impl_catalog()` still treats every configured layer's implementation-signal file as mandatory. The previous adapter path used `read_optional_signals()` and skipped absent artifacts; on a normal track before signals are generated, `SignalReportSourcePort::load(ImplCatalog)` now fails the whole report instead of returning available occurrences. Preserve optional-file semantics while continuing to reject malformed or unsafe existing files.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/signal_report/mod.rs",
-              "line": 244,
-              "category": "adapter correctness / fail-closed I/O"
-            }
-          ],
-          "hash": "rvw1:sha256:8eeee2ef5229317d4c074cf38308fa78fd04b041375c996e15e625d282d9a231",
-          "at": "2026-07-31T19:14:28Z"
+          "hash": "rvw1:sha256:a090d5a08889aba61b9ac7382d7b016dc42363846643da495574208dd43505c9",
+          "at": "2026-07-31T22:43:12Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8eeee2ef5229317d4c074cf38308fa78fd04b041375c996e15e625d282d9a231",
-          "at": "2026-07-31T19:15:35Z"
+          "hash": "rvw1:sha256:a16cfcc0de7e7c8b0d6d801246c195d16de7f7ef6ee372c3e7520da03215d0e4",
+          "at": "2026-07-31T22:48:19Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`MAX_ADR_FILES` only limits matching Markdown files after filtering, so `bounded_adr_paths` still performs an unbounded `read_dir` walk over non-Markdown files, directories, and other entries. A repository with many junk entries can therefore force unbounded I/O despite the advertised enumeration ceiling. Count every directory entry examined and fail once the ceiling is exceeded.",
+              "message": "T005 is still `todo` but bundles two independently verifiable behavior units: CLI argument/command parsing (`SignalReport*Arg` and `SignalCommand::Report`), covered by IN-01/IN-03/AC-03, and the `execute` report-dispatch branch, covered by IN-01/AC-01. Each has separate tests and can be committed independently, so split T005 into a parsing task and a dependent dispatch task before implementation.",
               "severity": "P1",
-              "file": "libs/infrastructure/src/signal_report/mod.rs",
-              "line": 292,
-              "category": "unbounded_io"
+              "file": "track/items/signal-report-command-2026-07-31/impl-plan.json",
+              "line": 50,
+              "category": "pre-implementation split proposal"
             }
           ],
-          "hash": "rvw1:sha256:8eeee2ef5229317d4c074cf38308fa78fd04b041375c996e15e625d282d9a231",
-          "at": "2026-07-31T20:36:08Z"
+          "hash": "rvw1:sha256:a16cfcc0de7e7c8b0d6d801246c195d16de7f7ef6ee372c3e7520da03215d0e4",
+          "at": "2026-07-31T22:49:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7f9e4dbbab19a475a306b793d9ec7e1303311ef16e32f725c3f0fc50b753861c",
+          "at": "2026-07-31T22:58:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The AC-01 mapping omits two load-bearing tasks: T004 owns `SignalReportDriver`, whose catalogue entry cites AC-01 and renders the reported occurrences, while T005 owns `SignalCommand::Report`, whose catalogue entry also cites AC-01 and makes `sotp signal report` parseable. Add T004 and T005 to AC-01 coverage and align their impl-plan anchor cites/AC-01 summary.",
+              "severity": "P1",
+              "file": "track/items/signal-report-command-2026-07-31/task-coverage.json",
+              "line": 18,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:7f9e4dbbab19a475a306b793d9ec7e1303311ef16e32f725c3f0fc50b753861c",
+          "at": "2026-07-31T23:01:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T005` is mapped to `AC-01`, but its description limits the task to CLI parsing/command-shape changes and same-module parsing tests. `AC-01` requires executing `sotp signal report` and reporting occurrences; that validation/behavior is owned by `T008`, so the `T005` mapping is not semantically load-bearing. Remove `T005` from the `AC-01` mapping and from the corresponding plan summary.",
+              "severity": "P1",
+              "file": "track/items/signal-report-command-2026-07-31/task-coverage.json",
+              "line": 18,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:dccff30785107420fca553e808e2c689d2e1978ef7f2faf866a4e9190e93e465",
+          "at": "2026-07-31T23:07:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5135790eb90f8a8a40aea8c6f3797e45605c75d515e50ca2acdc7de8b61390c4",
+          "at": "2026-07-31T23:14:33Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8a76a8aaa9d0a47baee7a3483e9e2dc36d154745bd994ba4cd5d34fcb65ed682",
-          "at": "2026-07-31T20:42:39Z"
+          "hash": "rvw1:sha256:5135790eb90f8a8a40aea8c6f3797e45605c75d515e50ca2acdc7de8b61390c4",
+          "at": "2026-07-31T23:15:26Z"
         }
       ]
     },
@@ -825,280 +1222,6 @@
           "findings": [],
           "hash": "rvw1:sha256:69f2e13004da8127e6a2ec66cef0792c70f175ca11ead39caf4b2fbddff51746",
           "at": "2026-07-31T14:35:47Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5a83f3b5a812e150ac96f6d9a2cec69d7322c78d4260fd8e6927329d8624f4f5",
-          "at": "2026-07-31T16:59:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5a83f3b5a812e150ac96f6d9a2cec69d7322c78d4260fd8e6927329d8624f4f5",
-          "at": "2026-07-31T17:28:19Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ebb6b1a74f3f76a0e993151410d1e37d9f97e3ec9efa20c637548086c536c469",
-          "at": "2026-07-31T13:26:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ebb6b1a74f3f76a0e993151410d1e37d9f97e3ec9efa20c637548086c536c469",
-          "at": "2026-07-31T14:41:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ebb6b1a74f3f76a0e993151410d1e37d9f97e3ec9efa20c637548086c536c469",
-          "at": "2026-07-31T15:16:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ebb6b1a74f3f76a0e993151410d1e37d9f97e3ec9efa20c637548086c536c469",
-          "at": "2026-07-31T15:17:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8611b31187c795fdce80aa23d57ffeadd45989b890dbd5e962a33a7c2c8d0ce2",
-          "at": "2026-07-31T16:59:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8611b31187c795fdce80aa23d57ffeadd45989b890dbd5e962a33a7c2c8d0ce2",
-          "at": "2026-07-31T17:25:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8611b31187c795fdce80aa23d57ffeadd45989b890dbd5e962a33a7c2c8d0ce2",
-          "at": "2026-07-31T17:28:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d01f366dd26bb96539672e8a6a9b22b76e36fcc263a80a68b42d220eee69e3e6",
-          "at": "2026-07-31T21:04:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d01f366dd26bb96539672e8a6a9b22b76e36fcc263a80a68b42d220eee69e3e6",
-          "at": "2026-07-31T21:21:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:54393ff227807208d0bc6f2cde4ae897d0990fd6849533085009cecb72e03ee7",
-          "at": "2026-07-31T21:46:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:54393ff227807208d0bc6f2cde4ae897d0990fd6849533085009cecb72e03ee7",
-          "at": "2026-07-31T22:00:26Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
-          "at": "2026-07-31T11:44:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
-          "at": "2026-07-31T11:49:20Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f3300d882f7f8e7a3746dc1556723c5d61465e4921ce03560f01e7a3df39cf48",
-          "at": "2026-07-31T11:29:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D1 requires `adr_user` to be included while forbidding signal recalculation and limiting the view to persisted `calc-*` artifacts. Chain ⓪'s `calc-adr-user` performs a live scan and persists no signal document, so the command cannot enumerate all four chains under the recorded boundary. This incompatibility must be resolved before downstream behavior can be derived.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-29-0839-signal-report-command.md",
-              "line": 18,
-              "category": "inconsistent decisions within the same ADR"
-            }
-          ],
-          "hash": "rvw1:sha256:f3300d882f7f8e7a3746dc1556723c5d61465e4921ce03560f01e7a3df39cf48",
-          "at": "2026-07-31T11:32:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f3300d882f7f8e7a3746dc1556723c5d61465e4921ce03560f01e7a3df39cf48",
-          "at": "2026-07-31T11:42:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6ba9a8c8b276d76b47425d2580babc14a1dbc6add90e9cdb70c2b909a2fbfd01",
-          "at": "2026-07-31T12:40:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6ba9a8c8b276d76b47425d2580babc14a1dbc6add90e9cdb70c2b909a2fbfd01",
-          "at": "2026-07-31T12:42:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:18e287538db3e7cbc650bde69b36adcbd84d3905aa0e4abaf1f5e9d137c0fcc0",
-          "at": "2026-07-31T19:13:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:18e287538db3e7cbc650bde69b36adcbd84d3905aa0e4abaf1f5e9d137c0fcc0",
-          "at": "2026-07-31T19:17:12Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b6ef392c142af817f0e614fbb49672d0e56dd2526ef8c02e3238a5804df8bf4d",
-          "at": "2026-07-31T18:59:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`ref_verify_run`, `ref_verify_check_approved`, and `ref_verify_results` execute application flow by calling `RefVerifyDriver::handle` and returning its `CommandOutcome`. Composition must stop at `ref_verify_driver`; the CLI layer should invoke the returned driver.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/ref_verify.rs",
-              "line": 98,
-              "category": "invoke leak"
-            },
-            {
-              "message": "`track_type_signals` invokes `TypeSignalsInteractor::run` and converts its result into a command outcome. Move request execution to `cli_driver`; this root should only construct and return the wired primary adapter.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/tddd.rs",
-              "line": 72,
-              "category": "invoke leak"
-            },
-            {
-              "message": "`track_type_graph` constructs a user-facing command-removal message inside the composition root. Deprecation rendering belongs in `cli_driver`, with composition limited to wiring.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/tddd.rs",
-              "line": 100,
-              "category": "render leak"
-            },
-            {
-              "message": "`track_baseline_graph` invokes `RenderBaselineGraph::execute` and then formats the user-facing success message. Both execution and rendering must be handled by a wired primary adapter in `cli_driver`.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/tddd.rs",
-              "line": 150,
-              "category": "invoke leak / render leak"
-            },
-            {
-              "message": "`track_contract_map` calls `ContractMapDriver::handle` from the composition entry point. Return the fully wired driver instead and let `apps/cli` invoke it.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/tddd.rs",
-              "line": 207,
-              "category": "invoke leak"
-            },
-            {
-              "message": "`track_catalogue_spec_signals` implements the application workflow in composition: it validates filesystem state, selects layers, deletes stale artifacts, and invokes `refresh_one_layer`. Move this orchestration behind a use-case/driver boundary and retain only collaborator construction here.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/tddd.rs",
-              "line": 216,
-              "category": "application-logic leak"
-            },
-            {
-              "message": "`track_spec_element_hash` directly invokes the infrastructure hash operation and serializes its result for display. Execution and JSON rendering belong behind a `cli_driver` primary adapter.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/tddd.rs",
-              "line": 378,
-              "category": "invoke leak / render leak"
-            },
-            {
-              "message": "`track_baseline_capture` invokes `BaselineCaptureInteractor::run` from the composition root. Expose a wired driver and perform the request invocation in `apps/cli`.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/tddd.rs",
-              "line": 441,
-              "category": "invoke leak"
-            },
-            {
-              "message": "`track_lint` invokes `RunCatalogueLint::execute` and formats violations, counts, and user-facing errors locally. Move execution and presentation into `cli_driver`, leaving this method as pure wiring.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/tddd.rs",
-              "line": 488,
-              "category": "invoke leak / render leak"
-            },
-            {
-              "message": "`track_catalogue_impl_signals` invokes `CatalogueImplSignalsInteractor::run` and maps its report into CLI output. The composition root must instead return a wired primary adapter without executing it.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/tddd.rs",
-              "line": 571,
-              "category": "invoke leak"
-            }
-          ],
-          "hash": "rvw1:sha256:b6ef392c142af817f0e614fbb49672d0e56dd2526ef8c02e3238a5804df8bf4d",
-          "at": "2026-07-31T19:22:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b6ef392c142af817f0e614fbb49672d0e56dd2526ef8c02e3238a5804df8bf4d",
-          "at": "2026-07-31T20:29:58Z"
         }
       ]
     }

@@ -850,6 +850,73 @@
           "test_name": "test_signal_report_driver_renders_complete_occurrences_in_service_order"
         }
       ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "GO-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:GO-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "ad64e05eccc92509fabecd9f5d5fb488b7ef6d60e3c759f123d633a63e335d96",
+        "declaration_hash": "82d8dee0c1b513b6aabdeb9f1ef07e25236dbbf025b8cb343e5a5a5ede3d88c8",
+        "anchor_text_hash": "58738475f1f701537f0cde2212eefb1637eaafa6f10e261cf5b6a97653478a15"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let _driver = root.signal_report_driver();"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::signal::tests",
+          "test_name": "test_signal_composition_root_constructs_signal_report_driver_without_dispatch"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::signal::tests",
+          "test_name": "test_signal_composition_root_signal_report_driver_renders_yellow_and_red_block_causes"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "b47413925eb7f3532a9c7dfa2fd65605f94f774ff0f77ad92e112e4a20594842",
+        "declaration_hash": "82d8dee0c1b513b6aabdeb9f1ef07e25236dbbf025b8cb343e5a5a5ede3d88c8",
+        "anchor_text_hash": "f597b4515c60e8b8a68d66fbdd45ec775b0e4962442225ed266047ffd4dfe0c4"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(!source.contains(\".handle(\"), \"signal composition must not dispatch a driver\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::signal::tests",
+          "test_name": "test_signal_report_driver_factory_is_wiring_only"
+        }
+      ]
     }
   ]
 }

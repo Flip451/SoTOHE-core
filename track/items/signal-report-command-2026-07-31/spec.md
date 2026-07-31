@@ -13,7 +13,7 @@ signals: { blue: 14, yellow: 0, red: 0 }
 ## Scope
 
 ### In Scope
-- [IN-01] `sotp signal report` を追加し、`adr_user`、`spec_adr`、`catalog_spec`、`impl_catalog` の 4 chain における Yellow / Red 信号の発生箇所を報告する。 [adr: knowledge/adr/2026-07-29-0839-signal-report-command.md#D1] [tasks: T001, T005]
+- [IN-01] `sotp signal report` を追加し、`adr_user`、`spec_adr`、`catalog_spec`、`impl_catalog` の 4 chain における Yellow / Red 信号の発生箇所を報告する。 [adr: knowledge/adr/2026-07-29-0839-signal-report-command.md#D1] [tasks: T001, T005, T008]
 - [IN-02] 報告する各 signal occurrence に、entry id、参照文字列、判定理由、および対象ファイル位置を含める。 [adr: knowledge/adr/2026-07-29-0839-signal-report-command.md#D1] [tasks: T001, T004]
 - [IN-03] `--chain <id>` による chain 選択と、Yellow / Red の選択による結果の絞り込みを提供する。 [adr: knowledge/adr/2026-07-29-0839-signal-report-command.md#D1] [tasks: T001, T003, T005]
 - [IN-04] 発生単位 signal 成果物がある chain はその成果物を読み、存在しない chain ⓪・①は正規の入力成果物から既存の評価規則で発生単位データをメモリ上に導出する。report は導出した signal または集計値を永続化しない読み取り専用 view とする。 [adr: knowledge/adr/2026-07-29-0839-signal-report-command.md#D1, knowledge/adr/2026-07-31-2134-signal-report-occurrence-source.md#D1] [tasks: T001, T002]
@@ -27,7 +27,7 @@ signals: { blue: 14, yellow: 0, red: 0 }
 - [CN-02] 選択条件に一致する occurrence を、診断に必要な entry id、参照文字列、判定理由、対象ファイル位置とともに欠落なく報告する。 [adr: knowledge/adr/2026-07-29-0839-signal-report-command.md#D1] [tasks: T001, T004]
 
 ## Acceptance Criteria
-- [ ] [AC-01] `sotp signal report` を実行すると、発生単位 signal 成果物がある chain ではその成果物を用い、chain ⓪・①では正規の入力成果物からメモリ上で導出して、4 chain の Yellow / Red occurrence が報告される。 [adr: knowledge/adr/2026-07-29-0839-signal-report-command.md#D1, knowledge/adr/2026-07-31-2134-signal-report-occurrence-source.md#D1] [tasks: T001, T002, T006, T005]
+- [ ] [AC-01] `sotp signal report` を実行すると、発生単位 signal 成果物がある chain ではその成果物を用い、chain ⓪・①では正規の入力成果物からメモリ上で導出して、4 chain の Yellow / Red occurrence が報告される。 [adr: knowledge/adr/2026-07-29-0839-signal-report-command.md#D1, knowledge/adr/2026-07-31-2134-signal-report-occurrence-source.md#D1] [tasks: T001, T002, T004, T006, T008]
 - [ ] [AC-02] report の各 occurrence には entry id、参照文字列、判定理由、および対象ファイル位置が表示される。 [adr: knowledge/adr/2026-07-29-0839-signal-report-command.md#D1] [tasks: T001, T004]
 - [ ] [AC-03] `sotp signal report --chain <id>` は指定した chain の occurrence のみを報告し、Yellow / Red 選択を指定した実行は選択した色の occurrence のみを報告する。 [adr: knowledge/adr/2026-07-29-0839-signal-report-command.md#D1] [tasks: T001, T003, T005]
 - [ ] [AC-04] report の実行は既存の calculation artifacts を読み取り専用で扱い、chain ⓪・①で導出した発生単位データを含め、signal または集計値を persist しない。 [adr: knowledge/adr/2026-07-29-0839-signal-report-command.md#D1, knowledge/adr/2026-07-31-2134-signal-report-occurrence-source.md#D1] [tasks: T001, T002, T006]
