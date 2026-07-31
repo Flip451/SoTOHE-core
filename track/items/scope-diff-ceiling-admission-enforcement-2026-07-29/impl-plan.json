@@ -131,6 +131,7 @@
       "id": "T022",
       "description": "`libs/domain/src/batch_plan/mod.rs`: membership_rejection の current_batch 不在経路を AdmissionRejection::NoCurrentBatch として報告し、同経路の doc comment を更新（IN-09、AC-27）。`libs/usecase/src/task_admission.rs`: map_rejection と Display 写像に AdmissionRejectionOutput の対応 variant を追加（AC-27）。`libs/domain/src/batch_plan/tests.rs`: 全 batch settle 済みの plan に対する Reopen 候補の NoCurrentBatch 拒否と、現在 batch が残る場合との対比を試験する（IN-09、AC-27）。`libs/usecase/src/task_ops.rs`: interactor 段で、全 member settle 済みの宣言に対する reopen の拒否・鏡像 variant 経由の描画・状態非書き込みを試験する（IN-09、AC-27）。`apps/cli/tests/transition_integration.rs`: 新しい拒否経路に合わせて round-trip fixture を修復する（AC-27）。",
       "status": "done",
+      "commit_hash": "87f40f2c",
       "depends_on": [
         "T021"
       ]
@@ -138,7 +139,8 @@
     {
       "id": "T023",
       "description": "`libs/infrastructure/src/dry_check/commit_hash_store.rs`: ancestry 検査の repo 解決を SystemGitRepo::discover() から discover_from(self.trusted_root) へ差し替え、CWD が別 repo のときの一貫性試験を追加する（CN-05、IN-14）。",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "87f40f2c"
     }
   ],
   "plan": {
