@@ -5,11 +5,11 @@
 
 GO-01 → T001–T003; D1。
 
-## Tasks (0/3 resolved)
+## Tasks (1/3 resolved)
 
 ### S1 — Init Workflow
 
-- [ ] **T001**: `.harness/workflows/track/init.md` Step 2 の track-id 導出を date-then-slug 順へ更新し、`apps/cli/tests/operational_reference_cutover.rs` に init-workflow derivation regression を追加する。D1; IN-01; CN-01; AC-01。
+- [x] **T001**: `.harness/workflows/track/init.md` Step 2 の track-id 導出を date-then-slug 順へ更新し、`apps/cli/tests/operational_reference_cutover.rs` に init-workflow derivation regression を追加する。D1; IN-01; CN-01; AC-01。
 
 ### S2 — Date-prefixed fixtures
 

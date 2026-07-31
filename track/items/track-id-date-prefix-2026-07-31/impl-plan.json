@@ -4,14 +4,12 @@
     {
       "id": "T001",
       "description": "`.harness/workflows/track/init.md` Step 2 の track-id 導出を date-then-slug 順へ更新し、`apps/cli/tests/operational_reference_cutover.rs` に init-workflow derivation regression を追加する。D1; IN-01; CN-01; AC-01。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     },
     {
       "id": "T002",
       "description": "`apps/cli-composition/src/track/mod.rs` test module、`apps/cli-composition/src/track/branch_strategy.rs`、`apps/cli-composition/src/track/resolution.rs` に `TrackCompositionRoot::{track_init, track_branch_create, track_resolve_id}` の date-prefixed fixture 回帰試験を追加する。D1; IN-02、IN-03; CN-02; AC-02、AC-04。",
       "status": "todo",
-      "commit_hash": null,
       "depends_on": [
         "T001"
       ]
@@ -20,7 +18,6 @@
       "id": "T003",
       "description": "`apps/cli-composition/src/track/mod.rs` test module、`apps/cli-composition/src/track/branch_strategy.rs`、`apps/cli-composition/src/track/resolution.rs` に `TrackCompositionRoot::{track_init, track_branch_create, track_resolve_id}` の suffix-form fixture 回帰試験を追加する。D1; OUT-01; CN-01、CN-02; AC-03。",
       "status": "todo",
-      "commit_hash": null,
       "depends_on": [
         "T002"
       ]
