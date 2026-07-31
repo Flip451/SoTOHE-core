@@ -100,7 +100,7 @@
     },
     {
       "claim_hash": "c4709afd73518138459b9867f477691a2d9ae814c68d3d2312b8b36319a5c68d",
-      "evidence_hash": "30aeb8012ce61fbc6b374f730ecb9d4987a91cf37860cd7f264df0b058d9d991",
+      "evidence_hash": "14657f8f3ca8ac8949ef9e3888d7f55a4432c178ed972249a3fb9f19bd393991",
       "verdict": {
         "kind": "pass",
         "citation": "見積り欠落タスクの遷移を error とする（graceful skip なし）。候補タスクの見積りが設定済み scope 集合に存在しない main scope 名を宣言している場合も、ceiling 未解決として全 admit に落とさず、見積り欠落と同格の error とする。"
@@ -1396,7 +1396,7 @@
     },
     {
       "claim_hash": "f760fa8264e3757e42c975c382e71075c4e1474e3b752cb182aa169f85ce0659",
-      "evidence_hash": "30aeb8012ce61fbc6b374f730ecb9d4987a91cf37860cd7f264df0b058d9d991",
+      "evidence_hash": "14657f8f3ca8ac8949ef9e3888d7f55a4432c178ed972249a3fb9f19bd393991",
       "verdict": {
         "kind": "pass",
         "citation": "admission 判定を算術と membership 照合のみで行い、見積り欠落タスクの遷移を error とする（graceful skip なし）。候補タスクの見積りが設定済み scope 集合に存在しない main scope 名を宣言している場合も、ceiling 未解決として全 admit に落とさず、見積り欠落と同格の error とする。runtime に許すのは宣言 batch の分割のみで、合併は許さない。"
@@ -2164,10 +2164,10 @@
     },
     {
       "claim_hash": "6918b9d6d5dd5ca33e28359a758bb7f741fa077710fe4c5689a25adae0938c5b",
-      "evidence_hash": "30aeb8012ce61fbc6b374f730ecb9d4987a91cf37860cd7f264df0b058d9d991",
+      "evidence_hash": "14657f8f3ca8ac8949ef9e3888d7f55a4432c178ed972249a3fb9f19bd393991",
       "verdict": {
         "kind": "pass",
-        "citation": "admission 判定を算術と membership 照合のみで行い、見積り欠落タスクの遷移を error とする（graceful skip なし）。候補タスクの見積りが設定済み scope 集合に存在しない main scope 名を宣言している場合も、ceiling 未解決として全 admit に落とさず、見積り欠落と同格の error とする。"
+        "citation": "admission 判定を算術と membership 照合のみで行い、見積り欠落タスクの遷移を error とする（graceful skip なし）。候補タスクの見積りが設定済み scope 集合に存在しない main scope 名を宣言している場合も、ceiling 未解決として全 admit に落とさず、見積り欠落と同格の error とする。runtime に許すのは宣言 batch の分割のみで、合併は許さない。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",

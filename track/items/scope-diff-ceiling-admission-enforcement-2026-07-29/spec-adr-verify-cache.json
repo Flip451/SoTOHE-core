@@ -256,7 +256,7 @@
     },
     {
       "claim_hash": "c13ad5190a1c073a041823c2bc56ba467b4a9a7c6f6d27570ae8c23903988ecd",
-      "evidence_hash": "2d25e6db7d6acd8a75a9df20082ae54c89d19e0b9eee5be70b054da08cc341b1",
+      "evidence_hash": "60062da7220e738efc9369e984c4614edd5c0f4cbb4a1c10f5def1d3aa24f20e",
       "verdict": {
         "kind": "pass",
         "citation": "`batch-plan.json` が宣言を要求されるのは未 settle のタスク（todo / in_progress）に限る。"
@@ -348,10 +348,10 @@
     },
     {
       "claim_hash": "ad044a24bd9e64f1446a89b3482e2ea5aa0363d48eb18993c2ba48f1f0c50637",
-      "evidence_hash": "4a16c20e23a9bc04927165e6ccea836211cec94ed7ad88b081fcc51edd4f509d",
+      "evidence_hash": "622e8395414c453eea3be8e3ec16d0b35c3c0fd1210a70c1b4458ce9f0c092ec",
       "verdict": {
         "kind": "pass",
-        "citation": "宣言されたすべての依存辺について、依存先タスクの所属 batch が依存元タスクの所属 batch と同一であるか、`batches[]` の宣言順でそれより先行することを検査する。"
+        "citation": "宣言されたすべての依存辺について、依存先タスクの所属 batch が依存元タスクの所属 batch と同一であるか、`batches[]` の宣言順でそれより先行することを検査する。満たさない辺が一つでもあれば fail-closed とする。入力は `impl-plan.json` の依存宣言と `batches[]` のみで、`batch-plan.json` 側に新しい宣言フィールドを要求しない。依存を宣言していないタスク対は対象外である。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -371,10 +371,10 @@
     },
     {
       "claim_hash": "ad044a24bd9e64f1446a89b3482e2ea5aa0363d48eb18993c2ba48f1f0c50637",
-      "evidence_hash": "b272e7ecd93640a3d61500a4797551abea82b748dca17bb7474a66da0cd4fd9a",
+      "evidence_hash": "958a59c83d784cb0118a4502131b51764fed87804e1dd670ee3d8e743be360e0",
       "verdict": {
         "kind": "pass",
-        "citation": "`batch-plan.json` の見積りが宣言する `ScopeName::Main` は、`ReviewScopeConfig` の設定済み scope 集合に実在しなければならない。実在しない名前を宣言した `batch-plan.json` は fail-closed で拒否する。`ScopeName::Other` は暗黙 scope であり常に有効。graceful skip は設けない。\n\n**検査レーンは `batch-plan.json` の cross-file 構造検査**（Phase 3 の終端 gate）とする。"
+        "citation": "`batch-plan.json` の見積りが宣言する `ScopeName::Main` は、`ReviewScopeConfig` の設定済み scope 集合に\n実在しなければならない。実在しない名前を宣言した `batch-plan.json` は fail-closed で拒否する。\n`ScopeName::Other` は暗黙 scope であり常に有効。graceful skip は設けない。\n\n**検査レーンは `batch-plan.json` の cross-file 構造検査**（Phase 3 の終端 gate）とする。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -394,10 +394,10 @@
     },
     {
       "claim_hash": "ad044a24bd9e64f1446a89b3482e2ea5aa0363d48eb18993c2ba48f1f0c50637",
-      "evidence_hash": "2d25e6db7d6acd8a75a9df20082ae54c89d19e0b9eee5be70b054da08cc341b1",
+      "evidence_hash": "60062da7220e738efc9369e984c4614edd5c0f4cbb4a1c10f5def1d3aa24f20e",
       "verdict": {
         "kind": "pass",
-        "citation": "- 「planned task がどの batch にも属さない」違反は、未 settle タスクについてのみ報告する。\n- 「宣言された task id が実在のタスクを指す」検査は、settle 済みタスクへの言及を含むすべての宣言に従来どおり適用する。存在しない id の宣言は依然として違反である。\n- 「タスクの依存先が同一または先行の batch にある」依存順序検査は、依存元と依存先の双方が宣言されている辺についてのみ適用する。宣言されていない端は D1 により settle 済みタスクに限られ、その batch を解決する手段がない。検査対象外の辺は違反ではなく、無検査で通す。"
+        "citation": "「planned task がどの batch にも属さない」違反は、未 settle タスクについてのみ報告する。」「宣言された task id が実在のタスクを指す」検査は、settle 済みタスクへの言及を含むすべての宣言に従来どおり適用する。」「タスクの依存先が同一または先行の batch にある」依存順序検査は、依存元と依存先の双方が宣言されている辺についてのみ適用する。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -463,7 +463,7 @@
     },
     {
       "claim_hash": "a36553b773468155e8afd40fabadf2c2f47ccd898e53f349ef403942e7068b65",
-      "evidence_hash": "2d25e6db7d6acd8a75a9df20082ae54c89d19e0b9eee5be70b054da08cc341b1",
+      "evidence_hash": "60062da7220e738efc9369e984c4614edd5c0f4cbb4a1c10f5def1d3aa24f20e",
       "verdict": {
         "kind": "pass",
         "citation": "admission 判定（membership 検査 + 実測ガード）が働く遷移集合を、todo → in_progress に加えて done → in_progress（reopen）へ広げる。"
@@ -508,11 +508,11 @@
       }
     },
     {
-      "claim_hash": "30aeb8012ce61fbc6b374f730ecb9d4987a91cf37860cd7f264df0b058d9d991",
+      "claim_hash": "14657f8f3ca8ac8949ef9e3888d7f55a4432c178ed972249a3fb9f19bd393991",
       "evidence_hash": "9dd39c3547389fbd3e162db099d7ece2913854838e2f50ce5ab02d4f3690bc91",
       "verdict": {
         "kind": "pass",
-        "citation": "「判定は算術と membership 照合のみで行い、gate 経路に LLM 判定を挟まない。見積り欠落タスクの遷移は error とする（graceful skip なし）。」"
+        "citation": "- 判定は算術と membership 照合のみで行い、gate 経路に LLM 判定を挟まない。見積り欠落タスクの遷移は error とする（graceful skip なし）。\n- **runtime に許されるのは宣言 batch の分割のみで、合併は許されない**"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -531,11 +531,11 @@
       }
     },
     {
-      "claim_hash": "30aeb8012ce61fbc6b374f730ecb9d4987a91cf37860cd7f264df0b058d9d991",
-      "evidence_hash": "b272e7ecd93640a3d61500a4797551abea82b748dca17bb7474a66da0cd4fd9a",
+      "claim_hash": "14657f8f3ca8ac8949ef9e3888d7f55a4432c178ed972249a3fb9f19bd393991",
+      "evidence_hash": "958a59c83d784cb0118a4502131b51764fed87804e1dd670ee3d8e743be360e0",
       "verdict": {
         "kind": "pass",
-        "citation": "`遷移時の admission 判定も独立に ceiling を解決するため、そこでも未知名は `Unconstrained` に落とさず見積り欠落と同格の error とする。gate 通過と遷移は別時点の判定であり、片側だけの検査では、gate 後に書き換えられた宣言が照合なしで admit される。`"
+        "citation": "`遷移時の admission 判定も独立に ceiling を解決するため、そこでも未知名は `Unconstrained` に落とさず見積り欠落と同格の error とする。」「`ScopeName::Other` は暗黙 scope であり常に有効。graceful skip は設けない。」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -550,29 +550,6 @@
         "data": {
           "file_path": "knowledge/adr/2026-07-30-0951-batch-plan-scope-name-config-validation.md",
           "decision_id": "D1"
-        }
-      }
-    },
-    {
-      "claim_hash": "30aeb8012ce61fbc6b374f730ecb9d4987a91cf37860cd7f264df0b058d9d991",
-      "evidence_hash": "b272e7ecd93640a3d61500a4797551abea82b748dca17bb7474a66da0cd4fd9a",
-      "verdict": {
-        "kind": "pass",
-        "citation": "未知名から `Unconstrained` に至る第 3 の経路は存在してはならない。「ceiling が解決されなければ照合しない」という規則は、名前が設定に実在することを前提として初めて意味を持つ。"
-      },
-      "claim_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "in_scope",
-          "element_id": "IN-11",
-          "text_label": "admission 判定を算術と membership 照合のみで行い、見積り欠落タスクの遷移を error とする（graceful skip なし）。候補タスクの見積りが設定済み scope 集合に存在しない main scope 名を宣言している場合も、ceiling 未解決として全 admit に落とさず、見積り欠落と同格の error とする。runtime に許すのは宣言 batch の分割のみで、合併は許さない。"
-        }
-      },
-      "evidence_origin": {
-        "kind": "adr_decision",
-        "data": {
-          "file_path": "knowledge/adr/2026-07-30-0951-batch-plan-scope-name-config-validation.md",
-          "decision_id": "D2"
         }
       }
     },
@@ -762,10 +739,10 @@
     },
     {
       "claim_hash": "0af85652e4cd8f66223ac126e8ba8a57b2ffa9d932f0173b503174a42007ca1f",
-      "evidence_hash": "4a16c20e23a9bc04927165e6ccea836211cec94ed7ad88b081fcc51edd4f509d",
+      "evidence_hash": "622e8395414c453eea3be8e3ec16d0b35c3c0fd1210a70c1b4458ce9f0c092ec",
       "verdict": {
         "kind": "pass",
-        "citation": "`impl-plan.json` を schema 2 へ拡張し、タスクが依存関係を宣言できるようにする\n\ntask entry に省略可能な `depends_on`（同一ファイル内の task id の列）を追加する。意味は「そのタスクの実装は列挙されたタスクの完了を前提とする」。省略と空列は未宣言と読む。\n\n読み取りは schema 1 / 2 の双方を受理し、書き出しは 2 とする。"
+        "citation": "### D1: `impl-plan.json` を schema 2 へ拡張し、タスクが依存関係を宣言できるようにする\n\ntask entry に省略可能な `depends_on`（同一ファイル内の task id の列）を追加する。意味は「そのタスクの実装は列挙されたタスクの完了を前提とする」。省略と空列は未宣言と読む。\n\n読み取りは schema 1 / 2 の双方を受理し、書き出しは 2 とする。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -785,10 +762,10 @@
     },
     {
       "claim_hash": "cfe45c4ac7bfe9c80c6ebd2134ead0e052f5c8ce182ee703194d5fa9015b46fb",
-      "evidence_hash": "4a16c20e23a9bc04927165e6ccea836211cec94ed7ad88b081fcc51edd4f509d",
+      "evidence_hash": "622e8395414c453eea3be8e3ec16d0b35c3c0fd1210a70c1b4458ce9f0c092ec",
       "verdict": {
         "kind": "pass",
-        "citation": "codec が fail-closed で拒否する file-internal 不変条件（`plan.sections[]` の参照整合性検査と同型）:\n\n- **参照の実在**: `depends_on` の各 id が同一ファイルの `tasks[]` に存在する。\n- **非循環**: 宣言された依存関係が閉路を含まない（自己参照を含む）。\n- **線形拡大**: plan order が宣言された依存グラフの線形拡大である。\n\n三つ目は宣言と実行順の食い違いを構造的に排除する — plan order は次タスク解決がたどる順序であるため、これが依存グラフに反すれば、前提未完了のタスクを先に配る計画を表現できてしまう。"
+        "citation": "codec が fail-closed で拒否する file-internal 不変条件:\n\n- **参照の実在**: `depends_on` の各 id が同一ファイルの `tasks[]` に存在する。\n- **非循環**: 宣言された依存関係が閉路を含まない（自己参照を含む）。\n- **線形拡大**: plan order が宣言された依存グラフの線形拡大である。\n\n三つ目は宣言と実行順の食い違いを構造的に排除する — plan order は次タスク解決がたどる順序であるため、これが依存グラフに反すれば、前提未完了のタスクを先に配る計画を表現できてしまう。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -808,10 +785,10 @@
     },
     {
       "claim_hash": "97351d2ef276ebeb29381626a8ca3cd53d267ea8d3acfccb63bdf24b7cbb5232",
-      "evidence_hash": "2d25e6db7d6acd8a75a9df20082ae54c89d19e0b9eee5be70b054da08cc341b1",
+      "evidence_hash": "60062da7220e738efc9369e984c4614edd5c0f4cbb4a1c10f5def1d3aa24f20e",
       "verdict": {
         "kind": "pass",
-        "citation": "`batch-plan.json` が宣言を要求されるのは未 settle のタスク（todo / in_progress）に限る。settle 済みのタスクは宣言を要求されない。settle の判定は遷移時の admission が用いる既存の定義をそのまま使う（commit 記録を伴う done、または skipped）— commit 記録のない done は未 settle であり、宣言対象に含まれる。新しい状態概念は導入しない。"
+        "citation": "任意は免除ではない。宣言された settle 済みタスクは従来どおり見積り Σ と ceiling 照合の対象である。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -831,7 +808,7 @@
     },
     {
       "claim_hash": "032b684617147b7908220c571b6c30548caea06250737a91e80a685d7ac260a1",
-      "evidence_hash": "35fdeca0caefa8acf0ece13c1c5cea8359a8b1c5d015968735cb9623144dd9d6",
+      "evidence_hash": "21dd1fd355e50ca35a33290bb6ae32e37d2e607b510d49d6e97dd32ad97c1050",
       "verdict": {
         "kind": "pass",
         "citation": "commit hash を伴うタスク状態遷移は、与えられた hash が当該 repository に commit object として実在し、かつ HEAD の祖先であることを要求する。対象は hash を書く 2 つの遷移の双方 — hash を伴う完了記録（`Complete`）と後からの埋め戻し（`BackfillHash`）— であり、記録経路による例外は設けない。"
@@ -877,10 +854,10 @@
     },
     {
       "claim_hash": "920107069854cf1952e3bce02a480d139a9d2a568c3900a5931bc672589a86d2",
-      "evidence_hash": "4a16c20e23a9bc04927165e6ccea836211cec94ed7ad88b081fcc51edd4f509d",
+      "evidence_hash": "622e8395414c453eea3be8e3ec16d0b35c3c0fd1210a70c1b4458ce9f0c092ec",
       "verdict": {
         "kind": "pass",
-        "citation": "candidate_selection: from:[impl-plan-schema-2-dependency-declaration,batch-plan-dependency-declaration,no-dependency-declaration,mandatory-dependency-declaration] chose:impl-plan-schema-2-dependency-declaration\n\n### D1: `impl-plan.json` を schema 2 へ拡張し、タスクが依存関係を宣言できるようにする"
+        "citation": "読み取りは schema 1 / 2 の双方を受理し、書き出しは 2 とする。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1084,7 +1061,7 @@
     },
     {
       "claim_hash": "b9819ce02b51cc3f351e86ba40405b1c287ed7fa50cf24bb82e7878fde70c643",
-      "evidence_hash": "4a16c20e23a9bc04927165e6ccea836211cec94ed7ad88b081fcc51edd4f509d",
+      "evidence_hash": "622e8395414c453eea3be8e3ec16d0b35c3c0fd1210a70c1b4458ce9f0c092ec",
       "verdict": {
         "kind": "pass",
         "citation": "依存を宣言していないタスク対は対象外である。宣言の網羅性は機械では検査できず、impl-plan scope の review が担う（gate は構造適合のみ）。"
@@ -1613,7 +1590,7 @@
     },
     {
       "claim_hash": "814fd50af36666bbcb6af7cfbc049b31721dc7529805489155dac6b732621da9",
-      "evidence_hash": "4a16c20e23a9bc04927165e6ccea836211cec94ed7ad88b081fcc51edd4f509d",
+      "evidence_hash": "622e8395414c453eea3be8e3ec16d0b35c3c0fd1210a70c1b4458ce9f0c092ec",
       "verdict": {
         "kind": "pass",
         "citation": "読み取りは schema 1 / 2 の双方を受理し、書き出しは 2 とする。registry / views の描画は active でない track の `impl-plan.json` も decode するため、読み取り互換が必要である。schema 1 は未宣言として読む。gate 系の検証対象は active track に限り、既存成果物へ遡及しない。"
@@ -1659,10 +1636,10 @@
     },
     {
       "claim_hash": "066ac434f24eeed8fec277e7f1ba298088024a7eed5fe45b3a7bdbac54505a4f",
-      "evidence_hash": "4a16c20e23a9bc04927165e6ccea836211cec94ed7ad88b081fcc51edd4f509d",
+      "evidence_hash": "622e8395414c453eea3be8e3ec16d0b35c3c0fd1210a70c1b4458ce9f0c092ec",
       "verdict": {
         "kind": "pass",
-        "citation": "宣言されたすべての依存辺について、依存先タスクの所属 batch が依存元タスクの所属 batch と同一であるか、`batches[]` の宣言順でそれより先行することを検査する。満たさない辺が一つでもあれば fail-closed とする。入力は `impl-plan.json` の依存宣言と `batches[]` のみで、`batch-plan.json` 側に新しい宣言フィールドを要求しない。依存を宣言していないタスク対は対象外である。"
+        "citation": "宣言されたすべての依存辺について、依存先タスクの所属 batch が依存元タスクの所属 batch と同一であるか、`batches[]` の宣言順でそれより先行することを検査する。満たさない辺が一つでもあれば fail-closed とする。…依存を宣言していないタスク対は対象外である。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1682,10 +1659,10 @@
     },
     {
       "claim_hash": "066ac434f24eeed8fec277e7f1ba298088024a7eed5fe45b3a7bdbac54505a4f",
-      "evidence_hash": "b272e7ecd93640a3d61500a4797551abea82b748dca17bb7474a66da0cd4fd9a",
+      "evidence_hash": "958a59c83d784cb0118a4502131b51764fed87804e1dd670ee3d8e743be360e0",
       "verdict": {
         "kind": "pass",
-        "citation": "`batch-plan.json` の見積りが宣言する `ScopeName::Main` は、`ReviewScopeConfig` の設定済み scope 集合に\n実在しなければならない。実在しない名前を宣言した `batch-plan.json` は fail-closed で拒否する。\n`ScopeName::Other` は暗黙 scope であり常に有効。graceful skip は設けない。\n\n**検査レーンは `batch-plan.json` の cross-file 構造検査**（Phase 3 の終端 gate）とする。"
+        "citation": "`batch-plan.json` の見積りが宣言する `ScopeName::Main` は、`ReviewScopeConfig` の設定済み scope 集合に実在しなければならない。実在しない名前を宣言した `batch-plan.json` は fail-closed で拒否する。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1705,10 +1682,10 @@
     },
     {
       "claim_hash": "066ac434f24eeed8fec277e7f1ba298088024a7eed5fe45b3a7bdbac54505a4f",
-      "evidence_hash": "2d25e6db7d6acd8a75a9df20082ae54c89d19e0b9eee5be70b054da08cc341b1",
+      "evidence_hash": "60062da7220e738efc9369e984c4614edd5c0f4cbb4a1c10f5def1d3aa24f20e",
       "verdict": {
         "kind": "pass",
-        "citation": "「planned task がどの batch にも属さない」違反は、未 settle タスクについてのみ報告する。」「宣言された task id が実在のタスクを指す」検査は、settle 済みタスクへの言及を含むすべての宣言に従来どおり適用する。存在しない id の宣言は依然として違反である。」「依存元と依存先の双方が宣言されている辺についてのみ適用する。宣言されていない端は…検査対象外の辺は違反ではなく、無検査で通す。」"
+        "citation": "- 「planned task がどの batch にも属さない」違反は、未 settle タスクについてのみ報告する。\n- 「宣言された task id が実在のタスクを指す」検査は、settle 済みタスクへの言及を含むすべての宣言に\n  従来どおり適用する。存在しない id の宣言は依然として違反である。\n- 「タスクの依存先が同一または先行の batch にある」依存順序検査は、依存元と依存先の双方が宣言\n  されている辺についてのみ適用する。宣言されていない端は D1 により settle 済みタスクに限られ、\n  その batch を解決する手段がない。検査対象外の辺は違反ではなく、無検査で通す。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1751,10 +1728,10 @@
     },
     {
       "claim_hash": "aee51e5b7039a93c2ee15154052d037c426db95ca2dacd9edbd04507b10804ab",
-      "evidence_hash": "b272e7ecd93640a3d61500a4797551abea82b748dca17bb7474a66da0cd4fd9a",
+      "evidence_hash": "958a59c83d784cb0118a4502131b51764fed87804e1dd670ee3d8e743be360e0",
       "verdict": {
         "kind": "pass",
-        "citation": "ceiling 未解決（= 照合せず全 admit）が正当なのは次の 2 通りに限る:"
+        "citation": "ceiling 未解決（= 照合せず全 admit）が正当なのは次の 2 通りに限る:\n\n1. 設定済み scope で、per-scope 上限も global 既定も設定されていない。\n2. `other` — named scope のいずれにも一致しなかった残り物を表す予約名で、per-scope 上限を持たず\nglobal 既定も継承しない。\n\n未知名から `Unconstrained` に至る第 3 の経路は存在してはならない。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -2142,10 +2119,10 @@
     },
     {
       "claim_hash": "169dc8fb708e978e594047c94fa32ce3ae0b2de770176d3241a294983d6d59eb",
-      "evidence_hash": "4a16c20e23a9bc04927165e6ccea836211cec94ed7ad88b081fcc51edd4f509d",
+      "evidence_hash": "622e8395414c453eea3be8e3ec16d0b35c3c0fd1210a70c1b4458ce9f0c092ec",
       "verdict": {
         "kind": "pass",
-        "citation": "task entry に省略可能な `depends_on`（同一ファイル内の task id の列）を追加する。意味は「そのタスクの実装は列挙されたタスクの完了を前提とする」。省略と空列は未宣言と読む。\n\n読み取りは schema 1 / 2 の双方を受理し、書き出しは 2 とする。"
+        "citation": "task entry に省略可能な `depends_on`（同一ファイル内の task id の列）を追加する。意味は「そのタスクの実装は列挙されたタスクの完了を前提とする」。省略と空列は未宣言と読む。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -2165,7 +2142,7 @@
     },
     {
       "claim_hash": "28efa4eeb48f454400d09d715c40c28011e764e17cbb2f551ff3d28f7c606f7b",
-      "evidence_hash": "4a16c20e23a9bc04927165e6ccea836211cec94ed7ad88b081fcc51edd4f509d",
+      "evidence_hash": "622e8395414c453eea3be8e3ec16d0b35c3c0fd1210a70c1b4458ce9f0c092ec",
       "verdict": {
         "kind": "pass",
         "citation": "codec が fail-closed で拒否する file-internal 不変条件（`plan.sections[]` の参照整合性検査と同型）:\n\n- **参照の実在**: `depends_on` の各 id が同一ファイルの `tasks[]` に存在する。\n- **非循環**: 宣言された依存関係が閉路を含まない（自己参照を含む）。\n- **線形拡大**: plan order が宣言された依存グラフの線形拡大である。"
@@ -2211,10 +2188,10 @@
     },
     {
       "claim_hash": "ce7db4290c3c3597e07a0360c3e428b7063eb0d072e11cb8056628eb9b8b6736",
-      "evidence_hash": "2d25e6db7d6acd8a75a9df20082ae54c89d19e0b9eee5be70b054da08cc341b1",
+      "evidence_hash": "60062da7220e738efc9369e984c4614edd5c0f4cbb4a1c10f5def1d3aa24f20e",
       "verdict": {
         "kind": "pass",
-        "citation": "admission 判定（membership 検査 + 実測ガード）が働く遷移集合を、todo → in_progress に加えて done → in_progress（reopen）へ広げる。判定式は変更しない — 広げるのは適用対象の遷移だけである。"
+        "citation": "「未宣言の todo タスクは Start の admission が見積りを引けず error となって着手できず（見積りの照合は membership より前に行われるため、batch 帰属を問う前に fail-closed になる）」また、「reopen の候補にも、現在 batch の member であることと見積りの申告を要求する。満たさなければ遷移を拒否する。」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -2234,10 +2211,10 @@
     },
     {
       "claim_hash": "ce7db4290c3c3597e07a0360c3e428b7063eb0d072e11cb8056628eb9b8b6736",
-      "evidence_hash": "b272e7ecd93640a3d61500a4797551abea82b748dca17bb7474a66da0cd4fd9a",
+      "evidence_hash": "958a59c83d784cb0118a4502131b51764fed87804e1dd670ee3d8e743be360e0",
       "verdict": {
         "kind": "pass",
-        "citation": "加えて、遷移時の admission 判定も独立に ceiling を解決するため、そこでも未知名は `Unconstrained` に落とさず見積り欠落と同格の error とする。… `ScopeName::Other` は暗黙 scope であり常に有効。graceful skip は設けない。"
+        "citation": "遷移時の admission 判定も独立に ceiling を解決するため、そこでも未知名は `Unconstrained` に落とさず見積り欠落と同格の error とする。」「`ScopeName::Other` は暗黙 scope であり常に有効。graceful skip は設けない。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -2257,10 +2234,10 @@
     },
     {
       "claim_hash": "ce7db4290c3c3597e07a0360c3e428b7063eb0d072e11cb8056628eb9b8b6736",
-      "evidence_hash": "b272e7ecd93640a3d61500a4797551abea82b748dca17bb7474a66da0cd4fd9a",
+      "evidence_hash": "958a59c83d784cb0118a4502131b51764fed87804e1dd670ee3d8e743be360e0",
       "verdict": {
         "kind": "pass",
-        "citation": "「ceiling 未解決（= 照合せず全 admit）が正当なのは次の 2 通りに限る」および「未知名から `Unconstrained` に至る第 3 の経路は存在してはならない。」"
+        "citation": "「未知名から `Unconstrained` に至る第 3 の経路は存在してはならない。」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -2280,7 +2257,7 @@
     },
     {
       "claim_hash": "7c66cb5b1e78e59af558336640b0e7b07f5e3fcb411c984363b1bd3d1d972f52",
-      "evidence_hash": "2d25e6db7d6acd8a75a9df20082ae54c89d19e0b9eee5be70b054da08cc341b1",
+      "evidence_hash": "60062da7220e738efc9369e984c4614edd5c0f4cbb4a1c10f5def1d3aa24f20e",
       "verdict": {
         "kind": "pass",
         "citation": "`batch-plan.json` が宣言を要求されるのは未 settle のタスク（todo / in_progress）に限る。settle 済みのタスクは宣言を要求されない。"
@@ -2303,7 +2280,7 @@
     },
     {
       "claim_hash": "7c66cb5b1e78e59af558336640b0e7b07f5e3fcb411c984363b1bd3d1d972f52",
-      "evidence_hash": "2d25e6db7d6acd8a75a9df20082ae54c89d19e0b9eee5be70b054da08cc341b1",
+      "evidence_hash": "60062da7220e738efc9369e984c4614edd5c0f4cbb4a1c10f5def1d3aa24f20e",
       "verdict": {
         "kind": "pass",
         "citation": "「planned task がどの batch にも属さない」違反は、未 settle タスクについてのみ報告する。"
@@ -2349,7 +2326,7 @@
     },
     {
       "claim_hash": "5c65bd4504dab5b53ef7fabe3819e42bb635ee64f0af3d3d90910badf0611f1a",
-      "evidence_hash": "2d25e6db7d6acd8a75a9df20082ae54c89d19e0b9eee5be70b054da08cc341b1",
+      "evidence_hash": "60062da7220e738efc9369e984c4614edd5c0f4cbb4a1c10f5def1d3aa24f20e",
       "verdict": {
         "kind": "pass",
         "citation": "任意は免除ではない。宣言された settle 済みタスクは従来どおり見積り Σ と ceiling 照合の対象である。"
@@ -2372,10 +2349,10 @@
     },
     {
       "claim_hash": "7e491e8cd12b3b65cfbe171bfee36beecbcf2de2f3aeb6f200b005ed06ee5362",
-      "evidence_hash": "2d25e6db7d6acd8a75a9df20082ae54c89d19e0b9eee5be70b054da08cc341b1",
+      "evidence_hash": "60062da7220e738efc9369e984c4614edd5c0f4cbb4a1c10f5def1d3aa24f20e",
       "verdict": {
         "kind": "pass",
-        "citation": "「batch-plan.json」が宣言を要求されるのは未 settle のタスク（todo / in_progress）に限る。settle 済みのタスクは宣言を要求されない。"
+        "citation": "`batch-plan.json` が宣言を要求されるのは未 settle のタスク（todo / in_progress）に限る。settle 済みのタスクは宣言を要求されない。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -2395,10 +2372,10 @@
     },
     {
       "claim_hash": "7e491e8cd12b3b65cfbe171bfee36beecbcf2de2f3aeb6f200b005ed06ee5362",
-      "evidence_hash": "2d25e6db7d6acd8a75a9df20082ae54c89d19e0b9eee5be70b054da08cc341b1",
+      "evidence_hash": "60062da7220e738efc9369e984c4614edd5c0f4cbb4a1c10f5def1d3aa24f20e",
       "verdict": {
         "kind": "pass",
-        "citation": "D1 により宣言されていない settle 済みタスクは member ではないため、その reopen は拒否される。再開には impl-planner が当該タスクを現在 batch の member として宣言し直すことが必要である"
+        "citation": "D1 により宣言されていない settle 済みタスクは member ではないため、その reopen は拒否される。再開には impl-planner が当該タスクを現在 batch の member として宣言し直すことが必要である（宣言の更新が先、遷移が後）。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -2418,7 +2395,7 @@
     },
     {
       "claim_hash": "961f2dbce1da968ef17ae6f95edffe20e0ffad14f2779a842038595cf31e4bb0",
-      "evidence_hash": "2d25e6db7d6acd8a75a9df20082ae54c89d19e0b9eee5be70b054da08cc341b1",
+      "evidence_hash": "60062da7220e738efc9369e984c4614edd5c0f4cbb4a1c10f5def1d3aa24f20e",
       "verdict": {
         "kind": "pass",
         "citation": "admission 判定（membership 検査 + 実測ガード）が働く遷移集合を、todo → in_progress に加えて done → in_progress（reopen）へ広げる。判定式は変更しない — 広げるのは適用対象の遷移だけである。"
@@ -2464,10 +2441,10 @@
     },
     {
       "claim_hash": "f758bd115cf20e6ed6e85f6f99be77ec8da4ecc823727b29df105cb16a2827a4",
-      "evidence_hash": "35fdeca0caefa8acf0ece13c1c5cea8359a8b1c5d015968735cb9623144dd9d6",
+      "evidence_hash": "21dd1fd355e50ca35a33290bb6ae32e37d2e607b510d49d6e97dd32ad97c1050",
       "verdict": {
         "kind": "pass",
-        "citation": "満たさない記録は error として拒否し、**状態を一切書き換えない**。`impl-plan.json` は遷移前のまま残り、部分適用も graceful skip も生じない。検証を実行できない場合（repository の読み取り自体の失敗）も同様に error とする。検証せずに記録することはしない。"
+        "citation": "満たさない記録は error として拒否し、状態を一切書き換えない。`impl-plan.json` は遷移前のまま残り、部分適用も graceful skip も生じない。検証を実行できない場合（repository の読み取り自体の失敗）も同様に error とする。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -2487,7 +2464,7 @@
     },
     {
       "claim_hash": "96f42364bc8042784632f7b7deb790c79b96f5ce627d9319d125a49770752b75",
-      "evidence_hash": "35fdeca0caefa8acf0ece13c1c5cea8359a8b1c5d015968735cb9623144dd9d6",
+      "evidence_hash": "21dd1fd355e50ca35a33290bb6ae32e37d2e607b510d49d6e97dd32ad97c1050",
       "verdict": {
         "kind": "pass",
         "citation": "対象は hash を書く 2 つの遷移の双方 — hash を伴う完了記録（`Complete`）と後からの埋め戻し（`BackfillHash`）— であり、記録経路による例外は設けない。hash を伴わない完了記録は検査対象ではない（記録すべき値が存在せず、その done は従来どおり未 settle である）。"

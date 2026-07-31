@@ -183,10 +183,6 @@
           {
             "file": "knowledge/adr/2026-07-30-0951-batch-plan-scope-name-config-validation.md",
             "anchor": "D1"
-          },
-          {
-            "file": "knowledge/adr/2026-07-30-0951-batch-plan-scope-name-config-validation.md",
-            "anchor": "D2"
           }
         ]
       },
