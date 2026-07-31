@@ -5,28 +5,28 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | PreReviewGateDispatchOutcome | enum | add | NotApplicable, TaskContract | 🟡 | 🔵 |
-| PreReviewGateKind | enum | add | TaskContractLiveness | 🟡 | 🔵 |
+| PreReviewGateKind | enum | add | TaskContractLiveness | 🔵 | 🔵 |
 
 ## Value Objects
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| PreReviewGateMatrix | value_object | add | — | 🟡 | 🔵 |
+| PreReviewGateMatrix | value_object | add | — | 🔵 | 🔵 |
 
 ## Error Types
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| PreReviewGateConfigLoadError | error_type | add | ReadFailed, InvalidMatrix | 🟡 | 🔵 |
+| PreReviewGateConfigLoadError | error_type | add | ReadFailed, InvalidMatrix | 🔵 | 🔵 |
 | PreReviewGateDispatchError | error_type | add | Config, TaskContract, Lookup | 🟡 | 🔵 |
-| PreReviewGateLookupError | error_type | add | UnknownScope | 🟡 | 🔵 |
-| PreReviewGateMatrixError | error_type | add | MissingScope, UnknownScope, DuplicateScope, DuplicateGate | 🟡 | 🔵 |
+| PreReviewGateLookupError | error_type | add | UnknownScope | 🔵 | 🔵 |
+| PreReviewGateMatrixError | error_type | add | MissingScope, UnknownScope, DuplicateScope, DuplicateGate | 🔵 | 🔵 |
 
 ## Secondary Ports
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| PreReviewGateConfigLoaderPort | secondary_port | add | fn load(&self, items_dir: &std::path::Path, track_id: &domain::TrackId) -> Result<PreReviewGateMatrix, PreReviewGateConfigLoadError> | 🟡 | 🔵 |
+| PreReviewGateConfigLoaderPort | secondary_port | add | fn load(&self, items_dir: &std::path::Path, track_id: &domain::TrackId) -> Result<PreReviewGateMatrix, PreReviewGateConfigLoadError> | 🔵 | 🔵 |
 
 ## Application Services
 

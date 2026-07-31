@@ -1,15 +1,15 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-31T13:21:10Z",
+  "generated_at": "2026-07-31T21:17:57Z",
   "declaration_hash": "be395d1a4375b30449b235b82d3c1ba1adb7b6fd50cf1313687d771aed4ed62e",
-  "implementation_input_hash": "944480e64a282c30d32e03d9cef6134638a05e92db8964dc2392ae654ede9ff7",
+  "implementation_input_hash": "48ae71478e48fce2afa8a85cb87f4efd02734300e3a35cafe4aee4a50c200159",
   "signals": [
     {
       "type_name": "PreReviewGateConfigLoadError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Debug",
         "Display",
         "Error"
@@ -18,8 +18,8 @@
     {
       "type_name": "PreReviewGateConfigLoaderPort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "PreReviewGateDispatchCommand",
@@ -77,9 +77,9 @@
     {
       "type_name": "PreReviewGateKind",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Copy",
         "Debug",
@@ -91,9 +91,9 @@
     {
       "type_name": "PreReviewGateLookupError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Display",
@@ -105,9 +105,9 @@
     {
       "type_name": "PreReviewGateMatrix",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -117,9 +117,9 @@
     {
       "type_name": "PreReviewGateMatrixError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Display",

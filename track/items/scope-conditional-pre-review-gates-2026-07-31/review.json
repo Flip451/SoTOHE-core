@@ -1,6 +1,162 @@
 {
   "schema_version": 2,
   "scopes": {
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:431479782a2ad8acf702b7b9f350ef9a2a25fa43fe204d1cc0aa669a8b054f56",
+          "at": "2026-07-31T12:46:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:431479782a2ad8acf702b7b9f350ef9a2a25fa43fe204d1cc0aa669a8b054f56",
+          "at": "2026-07-31T13:29:46Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:65ac2d868da539610204036536ba64a00f17a742ef6e521c488d50fa1dc2a9b7",
+          "at": "2026-07-31T21:19:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:65ac2d868da539610204036536ba64a00f17a742ef6e521c488d50fa1dc2a9b7",
+          "at": "2026-07-31T21:30:55Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`PreReviewGateConfigLoaderPort::load` performs filesystem-backed configuration loading, and its `FsPreReviewGateConfigLoader` adapter confirms that responsibility, but both are declared synchronous without documenting the deliberate sync-I/O choice. This leaves the port's execution color underspecified and can force an adapter/API redesign when integrated with the review-local path.",
+              "severity": "P1",
+              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+              "line": 205,
+              "category": "sync/async color mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:62c3516bb35858155e2a63dc824204dddf3c31896602db10de1cfda1c60e1c84",
+          "at": "2026-07-31T12:47:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fcaa6e387c06708552c971c89edef6c2334913f3d83b3f45a6d3df76a2ae0caf",
+          "at": "2026-07-31T12:56:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::PreReviewGateMatrix::gates_for` returns the construction-wide `PreReviewGateMatrixError`. After `try_new` has produced a total, duplicate-free matrix, `DuplicateScope` and `DuplicateGate` cannot occur during lookup, yet the method documents no producible subset. Use an infallible lookup for resolved scopes or a lookup-specific error type.",
+              "severity": "P1",
+              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+              "line": 34,
+              "category": "API shape / per-method error imprecision"
+            }
+          ],
+          "hash": "rvw1:sha256:fcaa6e387c06708552c971c89edef6c2334913f3d83b3f45a6d3df76a2ae0caf",
+          "at": "2026-07-31T13:01:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`PreReviewGateMatrix::gates_for` now returns `PreReviewGateLookupError`, whose `UnknownScope` variant represents a possible lookup failure, but `PreReviewGateDispatchService::dispatch` still returns `PreReviewGateDispatchError`, which has no lookup-error variant or conversion. The dispatcher therefore has no declared error path for a command whose scope is absent from the validated matrix; add that propagation or make the resolved-scope invariant explicit in the API.",
+              "severity": "P1",
+              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+              "line": 290,
+              "category": "API shape / per-method error imprecision"
+            }
+          ],
+          "hash": "rvw1:sha256:0477b36ffbc7a6aeaeff694f017a9eac1294b2b07940b05330a13cff321981fa",
+          "at": "2026-07-31T13:16:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a58cb03f29ef6cb692f9a918ed5acfa1bc55b0bddced3c79dcfddea7d0b7eb55",
+          "at": "2026-07-31T13:27:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a58cb03f29ef6cb692f9a918ed5acfa1bc55b0bddced3c79dcfddea7d0b7eb55",
+          "at": "2026-07-31T13:30:25Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:324adbdf67c8e139f034ccf08288be93375905e70134d9c011061bea4a075bf2",
+          "at": "2026-07-31T11:21:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:324adbdf67c8e139f034ccf08288be93375905e70134d9c011061bea4a075bf2",
+          "at": "2026-07-31T11:24:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0fdb687eae29921dcb294481fdc12d29f8cd6fe47f3a2f1f77a76930f863c89f",
+          "at": "2026-07-31T11:31:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0fdb687eae29921dcb294481fdc12d29f8cd6fe47f3a2f1f77a76930f863c89f",
+          "at": "2026-07-31T11:33:40Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
+          "at": "2026-07-31T12:02:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
+          "at": "2026-07-31T12:07:24Z"
+        }
+      ]
+    },
     "impl-plan": {
       "rounds": [
         {
@@ -210,126 +366,42 @@
           "findings": [],
           "hash": "rvw1:sha256:7f4a533a6d5f14dce64cfdd545ee51c8a4af9582c2faa5b09ec2aad11f2fa68b",
           "at": "2026-07-31T13:57:56Z"
-        }
-      ]
-    },
-    "types": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`PreReviewGateConfigLoaderPort::load` performs filesystem-backed configuration loading, and its `FsPreReviewGateConfigLoader` adapter confirms that responsibility, but both are declared synchronous without documenting the deliberate sync-I/O choice. This leaves the port's execution color underspecified and can force an adapter/API redesign when integrated with the review-local path.",
-              "severity": "P1",
-              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
-              "line": 205,
-              "category": "sync/async color mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:62c3516bb35858155e2a63dc824204dddf3c31896602db10de1cfda1c60e1c84",
-          "at": "2026-07-31T12:47:24Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:fcaa6e387c06708552c971c89edef6c2334913f3d83b3f45a6d3df76a2ae0caf",
-          "at": "2026-07-31T12:56:05Z"
+          "hash": "rvw1:sha256:1f69b227857ddabc04e2f7b447f84979d22889c82a3e1fa549fc0d82f4342db8",
+          "at": "2026-07-31T21:19:26Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`usecase::PreReviewGateMatrix::gates_for` returns the construction-wide `PreReviewGateMatrixError`. After `try_new` has produced a total, duplicate-free matrix, `DuplicateScope` and `DuplicateGate` cannot occur during lookup, yet the method documents no producible subset. Use an infallible lookup for resolved scopes or a lookup-specific error type.",
+              "message": "T001 is marked `done`, but its required completion evidence is currently invalid: `bin/sotp test-obligation check` exits 1 with `ReasonChanged` drifts for the T001-owned `PreReviewGateConfigLoadError` edges at GO-01, IN-01, and AC-01. Refresh/evaluate the waiver evidence (or restore matching bindings) and keep T001 incomplete until the obligation gate passes.",
               "severity": "P1",
-              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
-              "line": 34,
-              "category": "API shape / per-method error imprecision"
+              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/impl-plan.json",
+              "line": 7,
+              "category": "task-coverage gap"
             }
           ],
-          "hash": "rvw1:sha256:fcaa6e387c06708552c971c89edef6c2334913f3d83b3f45a6d3df76a2ae0caf",
-          "at": "2026-07-31T13:01:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`PreReviewGateMatrix::gates_for` now returns `PreReviewGateLookupError`, whose `UnknownScope` variant represents a possible lookup failure, but `PreReviewGateDispatchService::dispatch` still returns `PreReviewGateDispatchError`, which has no lookup-error variant or conversion. The dispatcher therefore has no declared error path for a command whose scope is absent from the validated matrix; add that propagation or make the resolved-scope invariant explicit in the API.",
-              "severity": "P1",
-              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
-              "line": 290,
-              "category": "API shape / per-method error imprecision"
-            }
-          ],
-          "hash": "rvw1:sha256:0477b36ffbc7a6aeaeff694f017a9eac1294b2b07940b05330a13cff321981fa",
-          "at": "2026-07-31T13:16:53Z"
+          "hash": "rvw1:sha256:1f69b227857ddabc04e2f7b447f84979d22889c82a3e1fa549fc0d82f4342db8",
+          "at": "2026-07-31T21:31:40Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a58cb03f29ef6cb692f9a918ed5acfa1bc55b0bddced3c79dcfddea7d0b7eb55",
-          "at": "2026-07-31T13:27:14Z"
+          "hash": "rvw1:sha256:1f69b227857ddabc04e2f7b447f84979d22889c82a3e1fa549fc0d82f4342db8",
+          "at": "2026-07-31T21:34:57Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a58cb03f29ef6cb692f9a918ed5acfa1bc55b0bddced3c79dcfddea7d0b7eb55",
-          "at": "2026-07-31T13:30:25Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:324adbdf67c8e139f034ccf08288be93375905e70134d9c011061bea4a075bf2",
-          "at": "2026-07-31T11:21:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:324adbdf67c8e139f034ccf08288be93375905e70134d9c011061bea4a075bf2",
-          "at": "2026-07-31T11:24:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0fdb687eae29921dcb294481fdc12d29f8cd6fe47f3a2f1f77a76930f863c89f",
-          "at": "2026-07-31T11:31:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0fdb687eae29921dcb294481fdc12d29f8cd6fe47f3a2f1f77a76930f863c89f",
-          "at": "2026-07-31T11:33:40Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:431479782a2ad8acf702b7b9f350ef9a2a25fa43fe204d1cc0aa669a8b054f56",
-          "at": "2026-07-31T12:46:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:431479782a2ad8acf702b7b9f350ef9a2a25fa43fe204d1cc0aa669a8b054f56",
-          "at": "2026-07-31T13:29:46Z"
+          "hash": "rvw1:sha256:1f69b227857ddabc04e2f7b447f84979d22889c82a3e1fa549fc0d82f4342db8",
+          "at": "2026-07-31T21:36:33Z"
         }
       ]
     },
@@ -348,24 +420,35 @@
           "findings": [],
           "hash": "rvw1:sha256:19fa4083746a7a3c8c77efdb0de7532c9365cf4fc4cdb74be1a52d946d7466f7",
           "at": "2026-07-31T13:29:45Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The three PreReviewGateConfigLoadError waivers justify omission by deferring behavior to T002, contrary to the scope requirement that waivers not defer responsibility to later tasks. Replace with an edge-local rationale explaining why this passive error vocabulary has no independently testable behavior, or bind an in-scope test.",
+              "severity": "P1",
+              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/test-bindings.json",
+              "line": 22,
+              "category": "test-obligation"
+            }
+          ],
+          "hash": "rvw1:sha256:4780367d4905cb7f16cef2b9075058f80286aecd1edb8f7c6662ef7db4b00dd0",
+          "at": "2026-07-31T21:20:21Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
-          "at": "2026-07-31T12:02:40Z"
+          "hash": "rvw1:sha256:a3aa66d2708d95c7712a9adf07ea29a04506c408dcb1872eb248dc8233f64df9",
+          "at": "2026-07-31T21:25:26Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
-          "at": "2026-07-31T12:07:24Z"
+          "hash": "rvw1:sha256:3bbf70f6347dab8af1e403411bb4ce3ccacc03204abfa4c0a860f7d86b818cbf",
+          "at": "2026-07-31T21:31:59Z"
         }
       ]
     }

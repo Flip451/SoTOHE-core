@@ -1,4 +1,155 @@
 {
   "track_id": "scope-conditional-pre-review-gates-2026-07-31",
-  "records": []
+  "records": [
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "PreReviewGateConfigLoaderPort",
+        "item_identifier": "trait_method:load",
+        "obligation_kind": "contract"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_config_loader_port_validated_matrix_returns_scope_policy"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "PreReviewGateConfigLoadError", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "GO-01"}},
+      "reason": "PreReviewGateConfigLoadError is passive error vocabulary that declares representation/conversion shape but has no independently executable behavior for GO-01. Concrete loader behavior is a separate catalogue entry, not deferred fulfillment of this error-type edge."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "PreReviewGateConfigLoadError", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "IN-01"}},
+      "reason": "PreReviewGateConfigLoadError is passive error vocabulary that declares representation/conversion shape but has no independently executable behavior for IN-01. Concrete loader behavior is a separate catalogue entry, not deferred fulfillment of this error-type edge."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "PreReviewGateConfigLoadError", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "AC-01"}},
+      "reason": "PreReviewGateConfigLoadError is passive error vocabulary that declares representation/conversion shape but has no independently executable behavior for AC-01. Concrete loader behavior is a separate catalogue entry, not deferred fulfillment of this error-type edge."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "PreReviewGateKind", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "GO-01"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::pre_review_gate_dispatch::tests", "test_name": "test_pre_review_gate_matrix_valid_entries_returns_configured_gates"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "PreReviewGateKind", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "IN-01"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::pre_review_gate_dispatch::tests", "test_name": "test_pre_review_gate_matrix_valid_entries_returns_configured_gates"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "PreReviewGateKind", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "IN-02"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::pre_review_gate_dispatch::tests", "test_name": "test_pre_review_gate_matrix_planning_scopes_return_no_liveness_gate"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "PreReviewGateKind", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "IN-03"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::pre_review_gate_dispatch::tests", "test_name": "test_pre_review_gate_matrix_valid_entries_returns_configured_gates"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "PreReviewGateKind", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "CN-01"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::pre_review_gate_dispatch::tests", "test_name": "test_pre_review_gate_matrix_valid_entries_returns_configured_gates"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "PreReviewGateKind", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "AC-01"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::pre_review_gate_dispatch::tests", "test_name": "test_pre_review_gate_matrix_valid_entries_returns_configured_gates"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "PreReviewGateKind", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "AC-02"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::pre_review_gate_dispatch::tests", "test_name": "test_pre_review_gate_matrix_planning_scopes_return_no_liveness_gate"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "PreReviewGateKind", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "AC-03"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::pre_review_gate_dispatch::tests", "test_name": "test_pre_review_gate_matrix_valid_entries_returns_configured_gates"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "PreReviewGateLookupError", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "GO-01"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::pre_review_gate_dispatch::tests", "test_name": "test_pre_review_gate_matrix_unconfigured_scope_returns_lookup_error"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "PreReviewGateLookupError", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "IN-01"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::pre_review_gate_dispatch::tests", "test_name": "test_pre_review_gate_matrix_unconfigured_scope_returns_lookup_error"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "PreReviewGateLookupError", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "CN-01"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::pre_review_gate_dispatch::tests", "test_name": "test_pre_review_gate_matrix_unconfigured_scope_returns_lookup_error"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "PreReviewGateLookupError", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "AC-01"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::pre_review_gate_dispatch::tests", "test_name": "test_pre_review_gate_matrix_unconfigured_scope_returns_lookup_error"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "PreReviewGateMatrix", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "GO-01"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::pre_review_gate_dispatch::tests", "test_name": "test_pre_review_gate_matrix_valid_entries_returns_configured_gates"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "PreReviewGateMatrix", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "IN-01"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::pre_review_gate_dispatch::tests", "test_name": "test_pre_review_gate_matrix_valid_entries_returns_configured_gates"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "PreReviewGateMatrix", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "IN-02"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::pre_review_gate_dispatch::tests", "test_name": "test_pre_review_gate_matrix_planning_scopes_return_no_liveness_gate"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "PreReviewGateMatrix", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "IN-03"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::pre_review_gate_dispatch::tests", "test_name": "test_pre_review_gate_matrix_valid_entries_returns_configured_gates"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "PreReviewGateMatrix", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "CN-01"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::pre_review_gate_dispatch::tests", "test_name": "test_pre_review_gate_matrix_arbitrary_scopes_returns_declared_gate_vectors"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "PreReviewGateMatrix", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "AC-01"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::pre_review_gate_dispatch::tests", "test_name": "test_pre_review_gate_matrix_valid_entries_returns_configured_gates"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "PreReviewGateMatrix", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "AC-02"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::pre_review_gate_dispatch::tests", "test_name": "test_pre_review_gate_matrix_valid_entries_returns_configured_gates"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "PreReviewGateMatrix", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "AC-03"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::pre_review_gate_dispatch::tests", "test_name": "test_pre_review_gate_matrix_valid_entries_returns_configured_gates"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "PreReviewGateMatrixError", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "GO-01"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::pre_review_gate_dispatch::tests", "test_name": "test_pre_review_gate_matrix_unknown_scope_returns_unknown_scope_error"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "PreReviewGateMatrixError", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "IN-01"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::pre_review_gate_dispatch::tests", "test_name": "test_pre_review_gate_matrix_missing_scope_returns_missing_scope_error"}]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "PreReviewGateMatrixError", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "CN-01"}},
+      "reason": "PreReviewGateMatrixError reports validation failures after a representation has been selected; its error variants neither declare the scope×gate matrix nor can an error-enum test establish CN-01's positive no-ad-hoc-branching constraint."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "PreReviewGateMatrixError", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "AC-01"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::pre_review_gate_dispatch::tests", "test_name": "test_pre_review_gate_matrix_missing_types_scope_rejects_incomplete_declaration"}]
+    }
+  ]
 }
