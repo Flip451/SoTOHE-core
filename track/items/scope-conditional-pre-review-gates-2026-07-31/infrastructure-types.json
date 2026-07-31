@@ -29,14 +29,6 @@
     {
       "for_type": "FsPreReviewGateConfigLoader",
       "trait_ref": "core::default::Default"
-    },
-    {
-      "for_type": "FsPreReviewGateConfigLoader",
-      "trait_ref": "core::marker::Send"
-    },
-    {
-      "for_type": "FsPreReviewGateConfigLoader",
-      "trait_ref": "core::marker::Sync"
     }
   ],
   "traits": {},

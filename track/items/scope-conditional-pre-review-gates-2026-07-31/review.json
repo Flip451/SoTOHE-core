@@ -1,6 +1,56 @@
 {
   "schema_version": 2,
   "scopes": {
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:65ac2d868da539610204036536ba64a00f17a742ef6e521c488d50fa1dc2a9b7",
+          "at": "2026-07-31T21:19:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:65ac2d868da539610204036536ba64a00f17a742ef6e521c488d50fa1dc2a9b7",
+          "at": "2026-07-31T21:30:55Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:324adbdf67c8e139f034ccf08288be93375905e70134d9c011061bea4a075bf2",
+          "at": "2026-07-31T11:21:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:324adbdf67c8e139f034ccf08288be93375905e70134d9c011061bea4a075bf2",
+          "at": "2026-07-31T11:24:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0fdb687eae29921dcb294481fdc12d29f8cd6fe47f3a2f1f77a76930f863c89f",
+          "at": "2026-07-31T11:31:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0fdb687eae29921dcb294481fdc12d29f8cd6fe47f3a2f1f77a76930f863c89f",
+          "at": "2026-07-31T11:33:40Z"
+        }
+      ]
+    },
     "spec": {
       "rounds": [
         {
@@ -19,21 +69,21 @@
         }
       ]
     },
-    "usecase": {
+    "harness-policy": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:65ac2d868da539610204036536ba64a00f17a742ef6e521c488d50fa1dc2a9b7",
-          "at": "2026-07-31T21:19:29Z"
+          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
+          "at": "2026-07-31T12:02:40Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:65ac2d868da539610204036536ba64a00f17a742ef6e521c488d50fa1dc2a9b7",
-          "at": "2026-07-31T21:30:55Z"
+          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
+          "at": "2026-07-31T12:07:24Z"
         }
       ]
     },
@@ -104,56 +154,20 @@
           "findings": [],
           "hash": "rvw1:sha256:a58cb03f29ef6cb692f9a918ed5acfa1bc55b0bddced3c79dcfddea7d0b7eb55",
           "at": "2026-07-31T13:30:25Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:324adbdf67c8e139f034ccf08288be93375905e70134d9c011061bea4a075bf2",
-          "at": "2026-07-31T11:21:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:324adbdf67c8e139f034ccf08288be93375905e70134d9c011061bea4a075bf2",
-          "at": "2026-07-31T11:24:39Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0fdb687eae29921dcb294481fdc12d29f8cd6fe47f3a2f1f77a76930f863c89f",
-          "at": "2026-07-31T11:31:41Z"
+          "hash": "rvw1:sha256:5324c6ed26a3b1e2abaedce8a49fe4b97f7100b49346532cc6f0fa9c65d90f80",
+          "at": "2026-07-31T22:32:03Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0fdb687eae29921dcb294481fdc12d29f8cd6fe47f3a2f1f77a76930f863c89f",
-          "at": "2026-07-31T11:33:40Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
-          "at": "2026-07-31T12:02:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
-          "at": "2026-07-31T12:07:24Z"
+          "hash": "rvw1:sha256:5324c6ed26a3b1e2abaedce8a49fe4b97f7100b49346532cc6f0fa9c65d90f80",
+          "at": "2026-07-31T22:36:44Z"
         }
       ]
     },
@@ -402,6 +416,68 @@
           "findings": [],
           "hash": "rvw1:sha256:1f69b227857ddabc04e2f7b447f84979d22889c82a3e1fa549fc0d82f4342db8",
           "at": "2026-07-31T21:36:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7b9341da39d3f1b30a53c4e2016ddc0d01507195785aa3ac2203af11fff8f0d1",
+          "at": "2026-07-31T22:40:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7b9341da39d3f1b30a53c4e2016ddc0d01507195785aa3ac2203af11fff8f0d1",
+          "at": "2026-07-31T22:44:14Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The gate configuration is loaded with unbounded `std::fs::read_to_string`, so a repository-authored file can cause an unbounded allocation before JSON decoding. Use the crate’s bounded-read pattern (metadata check plus capped read) and return `ReadFailed` when the size limit is exceeded.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/pre_review_gate_config.rs",
+              "line": 73,
+              "category": "unbounded read"
+            }
+          ],
+          "hash": "rvw1:sha256:ea1f1d4d246bf47ee3e072e0a7fc9f08f0526a8f507b9d2da8c7318d072f27c2",
+          "at": "2026-07-31T22:47:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:055f5f93bd85205d9d6640d7976eabb56a1d809da1449c9fa9b39aacfa8c8522",
+          "at": "2026-07-31T22:51:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`discover_isolated_repo_for_items_dir` returns the canonical items-directory anchor specifically so callers can verify that the discovered repository root encloses it, but this loader discards that anchor. Repository configuration such as `core.worktree` can make Git report a different root, after which both review-scope and pre-review-gate configs are loaded from that unrelated tree, potentially bypassing required gates. Preserve the anchor and fail closed unless the canonical repository root encloses it, following the existing `FsReviewScopeConfigReader::ensure_encloses` pattern.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/pre_review_gate_config.rs",
+              "line": 50,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:055f5f93bd85205d9d6640d7976eabb56a1d809da1449c9fa9b39aacfa8c8522",
+          "at": "2026-07-31T22:57:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7bb50ea8f4fdae29b3e981b4ae63412c8e6bf51bebd96244a800bad80bbe7dda",
+          "at": "2026-07-31T23:05:52Z"
         }
       ]
     },
@@ -449,6 +525,20 @@
           "findings": [],
           "hash": "rvw1:sha256:3bbf70f6347dab8af1e403411bb4ce3ccacc03204abfa4c0a860f7d86b818cbf",
           "at": "2026-07-31T21:31:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:928016fc95de04b9eae89663de3b8a2a1e71f195f87e12d9d1186aa2a0766f04",
+          "at": "2026-07-31T22:46:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:928016fc95de04b9eae89663de3b8a2a1e71f195f87e12d9d1186aa2a0766f04",
+          "at": "2026-07-31T22:54:42Z"
         }
       ]
     }

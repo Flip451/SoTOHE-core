@@ -4,12 +4,13 @@
     {
       "id": "T001",
       "description": "`libs/usecase/src/pre_review_gate_dispatch.rs` に `PreReviewGateKind`、`PreReviewGateMatrix`、matrix / lookup / load error、`PreReviewGateConfigLoaderPort` を追加し、`libs/usecase/src/lib.rs` から公開する。matrix validation と lookup の unit tests を追加する。IN-01、CN-01、AC-01。",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "94600fc2fb39340e10fbffad046570612bd458cb"
     },
     {
       "id": "T002",
       "description": "`libs/infrastructure/src/pre_review_gate_config.rs` に `FsPreReviewGateConfigLoader` を実装し、infrastructure module に登録する。loader port の conformance / decode tests を追加する。IN-01、CN-01、AC-01。",
-      "status": "todo",
+      "status": "done",
       "depends_on": [
         "T001"
       ]

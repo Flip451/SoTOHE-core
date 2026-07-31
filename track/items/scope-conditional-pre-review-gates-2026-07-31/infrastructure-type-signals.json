@@ -1,19 +1,17 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-31T12:50:10Z",
-  "declaration_hash": "ee37661a9368b8a939c37a1e1fa5fa619e25a43f3f8ca1d8692c3566be4a260f",
-  "implementation_input_hash": "a64622563158087d7d16ee6e0095f45cd7068061a517232564ccc5b374e766d0",
+  "generated_at": "2026-07-31T23:04:07Z",
+  "declaration_hash": "a742cfb157fcbe8ef816b66a3f46ca534a7eed53a07d8c3dd5b85cee55002eef",
+  "implementation_input_hash": "1357543ae46771503c8691d75783051fca7559bd692e528f3a7f9adf73217815",
   "signals": [
     {
       "type_name": "FsPreReviewGateConfigLoader",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Debug",
         "Default",
-        "Send",
-        "Sync",
         "usecase::pre_review_gate_dispatch::PreReviewGateConfigLoaderPort"
       ]
     }

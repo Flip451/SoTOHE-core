@@ -34,6 +34,7 @@ mod lexical_path;
 pub mod planned_task_reader;
 pub mod pr;
 pub mod pr_review;
+pub mod pre_review_gate_config;
 pub mod provider_session;
 pub mod ref_verify;
 pub mod review_scope_config_reader;

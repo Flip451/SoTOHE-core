@@ -17,6 +17,21 @@
       ]
     },
     {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "FsPreReviewGateConfigLoader",
+        "item_identifier": "trait_impl:usecase::pre_review_gate_dispatch::PreReviewGateConfigLoaderPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::pre_review_gate_config::tests",
+          "test_name": "test_pre_review_gate_config_loader_port_complete_matrix_returns_declared_gates"
+        }
+      ]
+    },
+    {
       "kind": "waiver",
       "edge_id": {"entry_key": "PreReviewGateConfigLoadError", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "GO-01"}},
       "reason": "PreReviewGateConfigLoadError is passive error vocabulary that declares representation/conversion shape but has no independently executable behavior for GO-01. Concrete loader behavior is a separate catalogue entry, not deferred fulfillment of this error-type edge."

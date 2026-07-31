@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "ee37661a9368b8a939c37a1e1fa5fa619e25a43f3f8ca1d8692c3566be4a260f",
+  "catalogue_declaration_hash": "a742cfb157fcbe8ef816b66a3f46ca534a7eed53a07d8c3dd5b85cee55002eef",
   "signals": [
     {
       "type_name": "FsPreReviewGateConfigLoader",
