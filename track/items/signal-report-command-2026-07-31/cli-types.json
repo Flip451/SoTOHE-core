@@ -1,0 +1,365 @@
+{
+  "crate_name": "cli",
+  "functions": {
+    "cli::commands::signal::execute": {
+      "action": "modify",
+      "docs": "Add the Report branch to cli::commands::signal::execute. IN-01, AC-01.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "cmd",
+          "ty": "SignalCommand"
+        }
+      ],
+      "returns": "std::process::ExitCode",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        }
+      ]
+    }
+  },
+  "layer": "cli",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "SignalReportChainArg",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "SignalReportChainArg",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "SignalReportChainArg",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "SignalReportChainArg",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "SignalReportChainArg",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "SignalReportChainArg",
+      "trait_ref": "clap_builder::derive::ValueEnum"
+    },
+    {
+      "for_type": "SignalReportOnlyArg",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "SignalReportOnlyArg",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "SignalReportOnlyArg",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "SignalReportOnlyArg",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "SignalReportOnlyArg",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "SignalReportOnlyArg",
+      "trait_ref": "clap_builder::derive::ValueEnum"
+    },
+    {
+      "for_type": "SignalReportArgs",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "SignalReportArgs",
+      "trait_ref": "clap_builder::derive::Args"
+    },
+    {
+      "for_type": "SignalReportArgs",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
+    },
+    {
+      "action": "modify",
+      "for_type": "SignalCommand",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "SignalCommand",
+      "trait_ref": "clap_builder::derive::Subcommand"
+    },
+    {
+      "action": "modify",
+      "for_type": "SignalCommand",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "SignalCommand": {
+      "action": "modify",
+      "docs": "Add Report(SignalReportArgs) to the existing SignalCommand. IN-01, AC-01, AC-03.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "CalcAdrUser",
+            "payload": {
+              "fields": [
+                "CalcAdrUserArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "CheckAdrUser",
+            "payload": {
+              "fields": [
+                "CheckAdrUserArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "CalcSpecAdr",
+            "payload": {
+              "fields": [
+                "CalcSpecAdrArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "CheckSpecAdr",
+            "payload": {
+              "fields": [
+                "CheckSpecAdrArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "CalcCatalogSpec",
+            "payload": {
+              "fields": [
+                "CalcCatalogSpecArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "CheckCatalogSpec",
+            "payload": {
+              "fields": [
+                "CheckCatalogSpecArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "CalcImplCatalog",
+            "payload": {
+              "fields": [
+                "CalcImplCatalogArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "CheckImplCatalog",
+            "payload": {
+              "fields": [
+                "CheckImplCatalogArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Check",
+            "payload": {
+              "fields": [
+                "SignalCheckArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Report",
+            "payload": {
+              "fields": [
+                "SignalReportArgs"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "commands::signal",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "SignalReportArgs": {
+      "action": "add",
+      "docs": "Add the clap argument Dto for signal report. The internal `levels` field mirrors cli_driver::SignalReportInput and usecase::SignalReportQuery; clap metadata owns the external `--only` spelling. IN-03, AC-03.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "chain",
+              "ty": "SignalReportChainArg"
+            },
+            {
+              "name": "levels",
+              "ty": "SignalReportOnlyArg"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "commands::signal",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "SignalReportChainArg": {
+      "action": "add",
+      "docs": "CLI value enum structurally mirroring cli_driver::SignalReportChainFilter. IN-03, AC-03.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "All",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "AdrUser",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "SpecAdr",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "CatalogSpec",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ImplCatalog",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "commands::signal",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "SignalReportOnlyArg": {
+      "action": "add",
+      "docs": "CLI value enum structurally mirroring cli_driver::SignalReportLevelFilter; clap attributes own external spellings. IN-03, AC-03.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "YellowOnly",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "RedOnly",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "YellowAndRed",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "commands::signal",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        }
+      ]
+    }
+  }
+}

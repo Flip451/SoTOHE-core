@@ -1,0 +1,183 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-31T14:25:10Z",
+  "declaration_hash": "493b24f1e7e6a72d125a1c95b8f60585595b3104bd7014c3f75f27066e3e7ff8",
+  "implementation_input_hash": "944480e64a282c30d32e03d9cef6134638a05e92db8964dc2392ae654ede9ff7",
+  "signals": [
+    {
+      "type_name": "SignalReportChain",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Copy",
+        "Debug",
+        "Eq",
+        "Hash",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "SignalReportChainSelection",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Copy",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "SignalReportEntryId",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Display",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "SignalReportError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "SignalReportInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "SignalReportService"
+      ]
+    },
+    {
+      "type_name": "SignalReportLevel",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Copy",
+        "Debug",
+        "Eq",
+        "Hash",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "SignalReportLevelSelection",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Copy",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "SignalReportLocation",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Display",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "SignalReportOccurrence",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "SignalReportOutput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "SignalReportQuery",
+      "kind_tag": "query",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Copy",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "SignalReportReason",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Display",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "SignalReportReference",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Display",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "SignalReportService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "SignalReportSourcePort",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": false
+    }
+  ]
+}

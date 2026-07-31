@@ -1,0 +1,465 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "3efd2b6e00a051c796f0c0505fa40221d21936fe08b9e4dfab9aba9ee502e34e",
+      "evidence_hash": "c41cf8fb3d6954e95461e929f7a667be7ccec9123c5afc4e42149ac77678434c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "4 chain（adr_user / spec_adr / catalog_spec / impl_catalog）を横断して Yellow / Red 信号の発生箇所を列挙する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "4 chain の Yellow / Red の発生箇所を 1 コマンドで横断列挙し、発生単位データが永続化されない chain も含めて、gate が block した原因を手動の JSON 読解なしに診断できるようにする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-signal-report-command.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "3efd2b6e00a051c796f0c0505fa40221d21936fe08b9e4dfab9aba9ee502e34e",
+      "evidence_hash": "baaf1a23b7fe5326f0f9fd5564d6f01a98499268e8c7eebc09b813b3b4b9cc79",
+      "verdict": {
+        "kind": "pass",
+        "citation": "4 chain を横断すること、Yellow / Red の発生箇所を所定の粒度で列挙すること、および絞り込みの契約は変更しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "4 chain の Yellow / Red の発生箇所を 1 コマンドで横断列挙し、発生単位データが永続化されない chain も含めて、gate が block した原因を手動の JSON 読解なしに診断できるようにする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-31-2134-signal-report-occurrence-source.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "4a9aabc45eb2e4eb545a5469ad85106162bd6d824a37a5fe9d2fc14528d9188d",
+      "evidence_hash": "c41cf8fb3d6954e95461e929f7a667be7ccec9123c5afc4e42149ac77678434c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "4 chain（adr_user / spec_adr / catalog_spec / impl_catalog）を横断して Yellow / Red 信号の発生箇所を列挙する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "`sotp signal report` を追加し、`adr_user`、`spec_adr`、`catalog_spec`、`impl_catalog` の 4 chain における Yellow / Red 信号の発生箇所を報告する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-signal-report-command.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "076a6ae15a47d5d61b27fcaf68febe9944608ae7d5e33d9dc897f7d5b988513c",
+      "evidence_hash": "c41cf8fb3d6954e95461e929f7a667be7ccec9123c5afc4e42149ac77678434c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "出力粒度は entry id・参照文字列・判定理由・対象ファイル位置。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "報告する各 signal occurrence に、entry id、参照文字列、判定理由、および対象ファイル位置を含める。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-signal-report-command.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "1017bb3ec4bdf6d512d78a0d89a3aaf95ad6537953759ad31978d52125f27456",
+      "evidence_hash": "c41cf8fb3d6954e95461e929f7a667be7ccec9123c5afc4e42149ac77678434c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`--chain <id>` / `--only yellow,red` などの絞り込みを備える。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "`--chain <id>` による chain 選択と、Yellow / Red の選択による結果の絞り込みを提供する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-signal-report-command.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "850053170a621fdedb58205dc6fe8ff8ffba366394bc5bdc22f6a5f26b28a1f2",
+      "evidence_hash": "c41cf8fb3d6954e95461e929f7a667be7ccec9123c5afc4e42149ac77678434c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "signals の再計算や persist は行わない（既存 `calc-*` の成果物を読むだけの view）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "発生単位 signal 成果物がある chain はその成果物を読み、存在しない chain ⓪・①は正規の入力成果物から既存の評価規則で発生単位データをメモリ上に導出する。report は導出した signal または集計値を永続化しない読み取り専用 view とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-signal-report-command.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "850053170a621fdedb58205dc6fe8ff8ffba366394bc5bdc22f6a5f26b28a1f2",
+      "evidence_hash": "baaf1a23b7fe5326f0f9fd5564d6f01a98499268e8c7eebc09b813b3b4b9cc79",
+      "verdict": {
+        "kind": "pass",
+        "citation": "発生単位の signal 成果物が存在する chain はその成果物を読み、存在しない chain ⓪・①は正規の入力成果物から既存の評価規則で発生単位データをメモリ上に導出する。この導出は report の表示を構成するためだけに行い、signal や集計値を永続化しない。したがって `sotp signal report` は読み取り専用の view であり続ける。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "発生単位 signal 成果物がある chain はその成果物を読み、存在しない chain ⓪・①は正規の入力成果物から既存の評価規則で発生単位データをメモリ上に導出する。report は導出した signal または集計値を永続化しない読み取り専用 view とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-31-2134-signal-report-occurrence-source.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "d6921963fd4fba1c4ec90dc684c0610058b153a5b792d1303e7a05b8a63496da",
+      "evidence_hash": "c41cf8fb3d6954e95461e929f7a667be7ccec9123c5afc4e42149ac77678434c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "読み取り専用の `sotp signal report` コマンドを追加する"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-01",
+          "text_label": "`sotp track resolve` の blocker 表示へ signal occurrence の要約を統合することは対象外とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-signal-report-command.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "f98203997fc78108bde3b066e508663664baa7ee4ffbf8ffb654b64f7077abfb",
+      "evidence_hash": "c41cf8fb3d6954e95461e929f7a667be7ccec9123c5afc4e42149ac77678434c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "signals の再計算や persist は行わない（既存 `calc-*` の成果物を読むだけの view）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-02",
+          "text_label": "通常の signal 評価規則、signal または集計値の永続化、ならびに gate 合否と strictness の判定規則を変更することは対象外とする。chain ⓪・①で report 表示用に既存の評価規則から発生単位データをメモリ上に導出することは、この除外に含まれない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-signal-report-command.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "f98203997fc78108bde3b066e508663664baa7ee4ffbf8ffb654b64f7077abfb",
+      "evidence_hash": "baaf1a23b7fe5326f0f9fd5564d6f01a98499268e8c7eebc09b813b3b4b9cc79",
+      "verdict": {
+        "kind": "pass",
+        "citation": "この導出は report の表示を構成するためだけに行い、signal や集計値を永続化しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-02",
+          "text_label": "通常の signal 評価規則、signal または集計値の永続化、ならびに gate 合否と strictness の判定規則を変更することは対象外とする。chain ⓪・①で report 表示用に既存の評価規則から発生単位データをメモリ上に導出することは、この除外に含まれない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-31-2134-signal-report-occurrence-source.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "25075c3d63c3af9dcac74d85c23f1b23a11d735f74e8c491d609cf1a55f4372b",
+      "evidence_hash": "c41cf8fb3d6954e95461e929f7a667be7ccec9123c5afc4e42149ac77678434c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "signals の再計算や persist は行わない（既存 `calc-*` の成果物を読むだけの view）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "report は診断用の読み取り専用 view であり、実行前後で既存の signal calculation artifacts を変更せず、chain ⓪・①で導出した発生単位データも永続化しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-signal-report-command.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "25075c3d63c3af9dcac74d85c23f1b23a11d735f74e8c491d609cf1a55f4372b",
+      "evidence_hash": "baaf1a23b7fe5326f0f9fd5564d6f01a98499268e8c7eebc09b813b3b4b9cc79",
+      "verdict": {
+        "kind": "pass",
+        "citation": "この導出は report の表示を構成するためだけに行い、signal や集計値を永続化しない。したがって `sotp signal report` は読み取り専用の view であり続ける。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "report は診断用の読み取り専用 view であり、実行前後で既存の signal calculation artifacts を変更せず、chain ⓪・①で導出した発生単位データも永続化しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-31-2134-signal-report-occurrence-source.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "3ee1a40d72809a038c87c493395dd541b16427f8d063d233fd1a9ce9f0906107",
+      "evidence_hash": "c41cf8fb3d6954e95461e929f7a667be7ccec9123c5afc4e42149ac77678434c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "4 chain（adr_user / spec_adr / catalog_spec / impl_catalog）を横断して Yellow / Red 信号の発生箇所を列挙する。出力粒度は entry id・参照文字列・判定理由・対象ファイル位置。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "選択条件に一致する occurrence を、診断に必要な entry id、参照文字列、判定理由、対象ファイル位置とともに欠落なく報告する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-signal-report-command.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "55e8e58e0763db0818a133ccf47c4e86cad123b896bc61d5354388b88527cdb1",
+      "evidence_hash": "c41cf8fb3d6954e95461e929f7a667be7ccec9123c5afc4e42149ac77678434c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "4 chain（adr_user / spec_adr / catalog_spec / impl_catalog）を横断して Yellow / Red 信号の発生箇所を列挙する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`sotp signal report` を実行すると、発生単位 signal 成果物がある chain ではその成果物を用い、chain ⓪・①では正規の入力成果物からメモリ上で導出して、4 chain の Yellow / Red occurrence が報告される。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-signal-report-command.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "55e8e58e0763db0818a133ccf47c4e86cad123b896bc61d5354388b88527cdb1",
+      "evidence_hash": "baaf1a23b7fe5326f0f9fd5564d6f01a98499268e8c7eebc09b813b3b4b9cc79",
+      "verdict": {
+        "kind": "pass",
+        "citation": "発生単位の signal 成果物が存在する chain はその成果物を読み、存在しない chain ⓪・①は正規の入力成果物から既存の評価規則で発生単位データをメモリ上に導出する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`sotp signal report` を実行すると、発生単位 signal 成果物がある chain ではその成果物を用い、chain ⓪・①では正規の入力成果物からメモリ上で導出して、4 chain の Yellow / Red occurrence が報告される。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-31-2134-signal-report-occurrence-source.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "37220e32224f27fcfba0166b9b2d6ae2b6e22b93024535aba6751916d0517c30",
+      "evidence_hash": "c41cf8fb3d6954e95461e929f7a667be7ccec9123c5afc4e42149ac77678434c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "出力粒度は entry id・参照文字列・判定理由・対象ファイル位置。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "report の各 occurrence には entry id、参照文字列、判定理由、および対象ファイル位置が表示される。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-signal-report-command.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "e6dce33c355f043c9b2e0a0089e61df36d731f48ddabe7d3eb022bd9e3495af8",
+      "evidence_hash": "c41cf8fb3d6954e95461e929f7a667be7ccec9123c5afc4e42149ac77678434c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`--chain <id>` / `--only yellow,red` などの絞り込みを備える。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "`sotp signal report --chain <id>` は指定した chain の occurrence のみを報告し、Yellow / Red 選択を指定した実行は選択した色の occurrence のみを報告する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-signal-report-command.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "ce4548c77f72b43a14eb8be6511c43ac05196f65fb7e7cb33592ee393592c024",
+      "evidence_hash": "c41cf8fb3d6954e95461e929f7a667be7ccec9123c5afc4e42149ac77678434c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "signals の再計算や persist は行わない（既存 `calc-*` の成果物を読むだけの view）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "report の実行は既存の calculation artifacts を読み取り専用で扱い、chain ⓪・①で導出した発生単位データを含め、signal または集計値を persist しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-signal-report-command.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "ce4548c77f72b43a14eb8be6511c43ac05196f65fb7e7cb33592ee393592c024",
+      "evidence_hash": "baaf1a23b7fe5326f0f9fd5564d6f01a98499268e8c7eebc09b813b3b4b9cc79",
+      "verdict": {
+        "kind": "pass",
+        "citation": "この導出は report の表示を構成するためだけに行い、signal や集計値を永続化しない。したがって `sotp signal report` は読み取り専用の view であり続ける。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "report の実行は既存の calculation artifacts を読み取り専用で扱い、chain ⓪・①で導出した発生単位データを含め、signal または集計値を persist しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-31-2134-signal-report-occurrence-source.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "b0e2f63b3127e05ffa5ad2368af7fef999ac817a710889b47fa2d51075a99798",
+      "evidence_hash": "c41cf8fb3d6954e95461e929f7a667be7ccec9123c5afc4e42149ac77678434c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "signals の再計算や persist は行わない（既存 `calc-*` の成果物を読むだけの view）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "`sotp track resolve` の表示は、この report command によって新たな signal occurrence の要約を追加されず従来どおりである。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-signal-report-command.md",
+          "decision_id": "D1"
+        }
+      }
+    }
+  ]
+}

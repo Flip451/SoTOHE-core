@@ -1,6 +1,173 @@
 {
   "schema_version": 2,
   "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ebb6b1a74f3f76a0e993151410d1e37d9f97e3ec9efa20c637548086c536c469",
+          "at": "2026-07-31T13:26:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ebb6b1a74f3f76a0e993151410d1e37d9f97e3ec9efa20c637548086c536c469",
+          "at": "2026-07-31T14:41:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ebb6b1a74f3f76a0e993151410d1e37d9f97e3ec9efa20c637548086c536c469",
+          "at": "2026-07-31T15:16:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ebb6b1a74f3f76a0e993151410d1e37d9f97e3ec9efa20c637548086c536c469",
+          "at": "2026-07-31T15:17:21Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4f7c4098aaaaf40e9be2bd227012f39cfc11039a57d6e9e673888c4a842a53ba",
+          "at": "2026-07-31T12:48:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4f7c4098aaaaf40e9be2bd227012f39cfc11039a57d6e9e673888c4a842a53ba",
+          "at": "2026-07-31T12:51:56Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Mirror-chain divergence: cli_driver::SignalReportLevelFilter is documented as mapping exhaustively into usecase::SignalReportLevelSelection, but its variants are Yellow/Red/YellowAndRed while the usecase selection uses YellowOnly/RedOnly/YellowAndRed. No documented language-level reason explains the renamed variants, so the conversion mirror is not structurally aligned.",
+              "severity": "P1",
+              "file": "track/items/signal-report-command-2026-07-31/cli_driver-types.json",
+              "line": 278,
+              "category": "mirror chain divergence"
+            },
+            {
+              "message": "The docs for infrastructure::SystemSignalReportSourceAdapter and usecase::SignalReportSourcePort restate the upstream derivation, persistence, filtering, and read-only behavior contracts in prose instead of only naming the changed surface and citing IN-04/CN-01/AC-04. This violates the no-upstream-restatement policy.",
+              "severity": "P1",
+              "file": "track/items/signal-report-command-2026-07-31/infrastructure-types.json",
+              "line": 30,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Multiple CLI, composition, driver, and usecase entries restate upstream command behavior, defaults, conversion, rendering, CQRS, and validation contracts in their docs rather than using anchor-only references. Affected entries include cli::SignalReportArgs, cli::SignalReportChainArg, cli::SignalReportOnlyArg, cli_composition::SignalCompositionRoot, cli_driver::SignalReportChainFilter, cli_driver::SignalReportDriver, cli_driver::SignalReportInput, cli_driver::SignalReportLevelFilter, usecase::SignalReportService, usecase::SignalReportInteractor, and the SignalReport* value-object/report DTO entries.",
+              "severity": "P1",
+              "file": "track/items/signal-report-command-2026-07-31/usecase-types.json",
+              "line": 334,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:d5324b1c7a0adaedc507e046a7051cf59b21637dc3d07a369d2b8232c7301961",
+          "at": "2026-07-31T13:28:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Mirror-chain field divergence: cli::SignalReportArgs declares the level selector as `only`, cli_driver::SignalReportInput declares it as `level`, and usecase::SignalReportQuery declares it as `levels`. These are parallel conversion payloads, but the catalogues provide no documented language-level constraint or explicit mapping rationale for the inconsistent field names.",
+              "severity": "P1",
+              "file": "track/items/signal-report-command-2026-07-31/cli-types.json",
+              "line": 242,
+              "category": "mirror chain divergence"
+            }
+          ],
+          "hash": "rvw1:sha256:e091e1e24f8cf61cfa9c6037655cac7611a6bae33a59b6feb4dc3d131f3f09c7",
+          "at": "2026-07-31T13:50:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:96a44f0049de2d32b38c8aedb58045270119c02a44eccdae9ecf7c7d1083ed62",
+          "at": "2026-07-31T14:01:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::SignalReportSourcePort::load` is synchronous despite loading persisted signal artifacts and canonical input files, but the entry docs do not acknowledge the blocking execution choice. Document the intentional synchronous CLI boundary or make the port asynchronous.",
+              "severity": "P1",
+              "file": "track/items/signal-report-command-2026-07-31/usecase-types.json",
+              "line": 370,
+              "category": "API shape / sync-async color mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:96a44f0049de2d32b38c8aedb58045270119c02a44eccdae9ecf7c7d1083ed62",
+          "at": "2026-07-31T14:09:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Upstream-restatement remains in usecase::SignalReportService, usecase::SignalReportInteractor, and usecase::SignalReportQuery: their docs repeat the CQRS rationale that the collaborator/read model/error surface differs from the existing command path and that no consistency boundary is shared. Per `.harness/policies/no-upstream-restatement.md`, these entries should cite GO-01/AC-01/IN-03/AC-03 without restating the upstream design rationale.",
+              "severity": "P1",
+              "file": "track/items/signal-report-command-2026-07-31/usecase-types.json",
+              "line": 334,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:a2a60b818d916e6eaf977a05349275cd96dc6c4964a36a01d76fd25e2afa242f",
+          "at": "2026-07-31T14:21:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69f2e13004da8127e6a2ec66cef0792c70f175ca11ead39caf4b2fbddff51746",
+          "at": "2026-07-31T14:31:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69f2e13004da8127e6a2ec66cef0792c70f175ca11ead39caf4b2fbddff51746",
+          "at": "2026-07-31T14:35:47Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
+          "at": "2026-07-31T11:44:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
+          "at": "2026-07-31T11:49:20Z"
+        }
+      ]
+    },
     "adr": {
       "rounds": [
         {
@@ -31,24 +198,233 @@
           "findings": [],
           "hash": "rvw1:sha256:f3300d882f7f8e7a3746dc1556723c5d61465e4921ce03560f01e7a3df39cf48",
           "at": "2026-07-31T11:42:44Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
-          "at": "2026-07-31T11:44:52Z"
+          "hash": "rvw1:sha256:6ba9a8c8b276d76b47425d2580babc14a1dbc6add90e9cdb70c2b909a2fbfd01",
+          "at": "2026-07-31T12:40:26Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
-          "at": "2026-07-31T11:49:20Z"
+          "hash": "rvw1:sha256:6ba9a8c8b276d76b47425d2580babc14a1dbc6add90e9cdb70c2b909a2fbfd01",
+          "at": "2026-07-31T12:42:54Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 description restates upstream behavior (ordering, filtering, persistence, gate judgment, and rendering) instead of limiting the plan text to target + operation + anchors. See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/signal-report-command-2026-07-31/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T002 description restates the source derivation, artifact-reading, validation, and non-persistence contract in prose. Keep those requirements in the cited spec elements and retain only target + operation + anchors here. See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/signal-report-command-2026-07-31/impl-plan.json",
+              "line": 12,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T003 description restates the output completeness and failure-rendering behavior in prose beyond the executable target/operation/anchor form. See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/signal-report-command-2026-07-31/impl-plan.json",
+              "line": 21,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T004 description restates the unchanged-command/routes behavior contract (`sotp track resolve` and existing Signal routes) instead of relying on its anchors. See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/signal-report-command-2026-07-31/impl-plan.json",
+              "line": 30,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:ade40d0e5c1ca1229c193a207b9a17573d5b576290aff5b58284ca3583db35f3",
+          "at": "2026-07-31T13:27:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Section S2 restates upstream behavior by requiring persisted artifacts/evaluators to be connected and derived results not to be saved. Keep the section as target + operation + anchor cite; cite `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/signal-report-command-2026-07-31/impl-plan.json",
+              "line": 61,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S4 restates the upstream non-target-command behavior contract by requiring existing Signal dispatch behavior to be preserved. Keep the section as target + operation + anchor cite; cite `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/signal-report-command-2026-07-31/impl-plan.json",
+              "line": 81,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:57f562e9a1c2be770eb336030524e8ff3e33eaf5d64d479dd60c722b2e07c0ec",
+          "at": "2026-07-31T13:29:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:178a2d5dd5cb5801dd8ea8f5baccd2a58007b0d56477812207dc150f7e71bea7",
+          "at": "2026-07-31T13:31:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 includes upstream behavior prose: “The usecase selects and returns occurrences without runtime I/O.” Retain only target, operation, and anchor cites; see `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/signal-report-command-2026-07-31/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T002 restates the upstream source-selection, derivation, evaluation-rule, and persistence contract in prose. See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/signal-report-command-2026-07-31/impl-plan.json",
+              "line": 12,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T003 restates the upstream occurrence-output contract by listing every rendered field. See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/signal-report-command-2026-07-31/impl-plan.json",
+              "line": 18,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T004 restates the upstream `track resolve` behavior-preservation contract. See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/signal-report-command-2026-07-31/impl-plan.json",
+              "line": 24,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S2 restates the upstream in-memory derivation behavior for chains without persisted artifacts. See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/signal-report-command-2026-07-31/impl-plan.json",
+              "line": 51,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S4 restates the upstream requirement that `track resolve` remain unchanged. See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/signal-report-command-2026-07-31/impl-plan.json",
+              "line": 71,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:95ff9cbdf32edbb8bc4efcdfd63c632769485306b4dae4d619f795598a828787",
+          "at": "2026-07-31T14:40:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4169a7e9d875510e74a4d418b6c20be70cb395a261b666365521ce7e2a652408",
+          "at": "2026-07-31T14:42:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-05 and OUT-01 are mapped only to T004, but T004 neither targets `sotp track resolve` nor specifies a regression-validation step. Adding the separate report command and its wiring cannot itself verify that resolve output remains unchanged. Add an explicit regression test operation to T004 or a dedicated validation task.",
+              "severity": "P1",
+              "file": "track/items/signal-report-command-2026-07-31/task-coverage.json",
+              "line": 22,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "T003 bundles two independently verifiable behavior units: filter-to-query conversion (IN-03/AC-03) and occurrence rendering (IN-02/AC-02). Its contract entries already separate the filter/input DTOs from `SignalReportDriver`; split these units into ordered tasks and update their coverage, attribution, estimates, and batches.",
+              "severity": "P1",
+              "file": "track/items/signal-report-command-2026-07-31/impl-plan.json",
+              "line": 18,
+              "category": "pre-implementation split proposal"
+            },
+            {
+              "message": "T004 bundles independently verifiable work across two scopes: CLI parsing/dispatch (IN-01, IN-03, AC-01, AC-03) and composition-root wiring (CN-01, AC-04). Split composition wiring from the CLI transport task, with an explicit dependency, and place AC-05 regression validation in the appropriate CLI/validation task.",
+              "severity": "P1",
+              "file": "track/items/signal-report-command-2026-07-31/impl-plan.json",
+              "line": 24,
+              "category": "pre-implementation split proposal"
+            }
+          ],
+          "hash": "rvw1:sha256:4169a7e9d875510e74a4d418b6c20be70cb395a261b666365521ce7e2a652408",
+          "at": "2026-07-31T14:49:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 implements `SignalReportDriver`, but its `depends_on` lists only T001 even though T003 creates the `SignalReportInput` and filter DTOs consumed by that driver. Add T003 as a dependency or reorder/split the tasks so T004 does not refer to artifacts not yet created.",
+              "severity": "P1",
+              "file": "track/items/signal-report-command-2026-07-31/impl-plan.json",
+              "line": 18,
+              "category": "dependency cycle or wrong ordering"
+            },
+            {
+              "message": "T005 adds CLI dispatch before T006 creates `SignalCompositionRoot::signal_report_driver`, which the dispatch must obtain to invoke the report path. The declared order B3 (T005) → B4 (T006) is therefore not independently implementable; composition-root wiring must precede the dispatch task or the dependency direction must be redesigned.",
+              "severity": "P1",
+              "file": "track/items/signal-report-command-2026-07-31/impl-plan.json",
+              "line": 24,
+              "category": "dependency cycle or wrong ordering"
+            }
+          ],
+          "hash": "rvw1:sha256:ed19249e3526daf986e94ccb6028ddd874084e7a6d98a18f0ebc34754984db9c",
+          "at": "2026-07-31T14:55:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6501b948bbcade5167ca9e63aa7dfcbf5a060140ae85845b0588fc842d5bbc98",
+          "at": "2026-07-31T15:01:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "B2 contains both producer T003 and consumer T004 even though T004 explicitly declares `depends_on: [\"T001\", \"T003\"]`. This allows occurrence-rendering work to begin before T003’s filter/input types are verifiably complete. Move T004 to a later batch and keep T006/T005 after it.",
+              "severity": "P1",
+              "file": "track/items/signal-report-command-2026-07-31/batch-plan.json",
+              "line": 14,
+              "category": "unsound batch composition"
+            }
+          ],
+          "hash": "rvw1:sha256:6501b948bbcade5167ca9e63aa7dfcbf5a060140ae85845b0588fc842d5bbc98",
+          "at": "2026-07-31T15:04:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6ab39914bacea4e12f3e698cb5cb7561b54fe5bd1f8d91e3d7fe97ecbe722a9d",
+          "at": "2026-07-31T15:06:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6ab39914bacea4e12f3e698cb5cb7561b54fe5bd1f8d91e3d7fe97ecbe722a9d",
+          "at": "2026-07-31T15:08:15Z"
         }
       ]
     }

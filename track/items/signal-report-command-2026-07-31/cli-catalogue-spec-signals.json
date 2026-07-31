@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "5e52dd353b2ec567a7652b6d050734da05faa39c4b187488b341a84170f79084",
+  "signals": [
+    {
+      "type_name": "SignalCommand",
+      "signal": "blue",
+      "entry_hash": "a740518dec1ddd5aebe89e42e959008e40906961da8588df046f9f9151031e33"
+    },
+    {
+      "type_name": "SignalReportArgs",
+      "signal": "blue",
+      "entry_hash": "c3aae65efb7f4720f1908e5110147fa4f148fc31728f8ed904e0a692a79f9f92"
+    },
+    {
+      "type_name": "SignalReportChainArg",
+      "signal": "blue",
+      "entry_hash": "63525f000fda0320d0ef82e60ac65d8d6590f07e4cd7f4cd79cf72b089d56319"
+    },
+    {
+      "type_name": "SignalReportOnlyArg",
+      "signal": "blue",
+      "entry_hash": "6449d2938628f0759e3a52ad6280eafc9e0c0267b5bbf1a42cbbbe7e8204999f"
+    },
+    {
+      "type_name": "cli::commands::signal::execute",
+      "signal": "blue",
+      "entry_hash": "26be632a93d593fc2ef742c1f34587cb433f5eb6d7c7ef6620152a67c7062926"
+    }
+  ]
+}
