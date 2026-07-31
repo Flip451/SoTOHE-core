@@ -90,6 +90,7 @@
     "T018": [
       { "layer": "domain", "entry_key": "ImplPlanDocument" },
       { "layer": "usecase", "entry_key": "TaskOperationService" },
+      { "layer": "usecase", "entry_key": "TaskOperationInteractor" },
       { "layer": "usecase", "entry_key": "TaskTransitionOutcome" },
       { "layer": "usecase", "entry_key": "AdmissionRejectionOutput" },
       { "layer": "usecase", "entry_key": "TransitionTaskUseCase" }
@@ -99,7 +100,6 @@
       { "layer": "domain", "entry_key": "AdmissionEvaluationError" },
       { "layer": "domain", "entry_key": "ImplPlanDocument" },
       { "layer": "domain", "entry_key": "TaskStatusKind" },
-      { "layer": "domain", "entry_key": "TaskTransition" },
       { "layer": "domain", "entry_key": "domain::batch_plan::check_batch_plan" },
       { "layer": "domain", "entry_key": "domain::batch_plan::evaluate_admission" },
       { "layer": "usecase", "entry_key": "BatchPlanViolationOutput" }
@@ -117,6 +117,7 @@
       { "layer": "usecase", "entry_key": "CommitRecordVerifyError" }
     ],
     "T027": [
+      { "layer": "domain", "entry_key": "TaskTransition" },
       { "layer": "usecase", "entry_key": "TaskOperationInteractor" },
       { "layer": "infrastructure", "entry_key": "GitCommitRecordVerifier" }
     ]

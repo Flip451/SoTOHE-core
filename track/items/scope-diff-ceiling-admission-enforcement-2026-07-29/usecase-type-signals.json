@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-30T16:00:32Z",
+  "generated_at": "2026-07-30T21:49:56Z",
   "declaration_hash": "03c29801682d16bdab42649ca2a11e107904f3b82568dd6a8f5c36e88583f03f",
-  "implementation_input_hash": "31c8ea9f90367a3830d5836aadd818c66d20253d4c1b8c95d8b08ac0fc0c43b3",
+  "implementation_input_hash": "944480e64a282c30d32e03d9cef6134638a05e92db8964dc2392ae654ede9ff7",
   "signals": [
     {
       "type_name": "AdmissionRejectionOutput",
@@ -88,15 +88,15 @@
     {
       "type_name": "CommitRecordVerifierPort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "CommitRecordVerifyError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Debug",
         "Display",
         "Error"
@@ -168,7 +168,7 @@
     {
       "type_name": "TaskOperationInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "TaskOperationService"

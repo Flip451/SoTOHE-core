@@ -6,6 +6,10 @@
 //! `domain::CommitHash`, `domain::StatusOverride`, `domain::DomainError`,
 //! `domain::TrackReadError`, or `domain::TrackWriteError` directly (CN-01 / D1).
 
+mod branch_guard;
+mod commit_record;
+mod ports;
+
 use std::path::PathBuf;
 use std::sync::Arc;
 
@@ -19,9 +23,13 @@ use domain::{
 
 use crate::batch_plan::{BatchPlanReaderPort, ScopeConfigReaderPort, ScopeDiffMeasurePort};
 use crate::task_admission::{AdmissionPorts, judge_admission};
-use crate::track_resolution::{BranchReadError, BranchReaderPort};
+use crate::track_resolution::BranchReaderPort;
+use branch_guard::enforce_branch_guard;
 
 pub use crate::task_admission::{AdmissionRejectionOutput, TaskTransitionOutcome};
+// The record-time verification contract is part of this module's type
+// contract; it lives in its own file only for module-size reasons.
+pub use ports::{CommitRecordVerifierPort, CommitRecordVerifyError};
 
 // ── DTOs ──────────────────────────────────────────────────────────────────────
 
@@ -247,6 +255,7 @@ where
     batch_plan_reader: Arc<dyn BatchPlanReaderPort>,
     scope_diff_measurer: Arc<dyn ScopeDiffMeasurePort>,
     scope_config_reader: Arc<dyn ScopeConfigReaderPort>,
+    commit_record_verifier: Arc<dyn CommitRecordVerifierPort>,
 }
 
 impl<S> TaskOperationInteractor<S>
@@ -276,7 +285,9 @@ where
     /// [`TaskOperationError::BranchGuardFailed`].
     /// The three admission collaborators are required rather than optional, so
     /// no constructible interactor can transition a task without judging it
-    /// first (`CN-10`).
+    /// first (`CN-10`). The commit-record verifier is required for the same
+    /// reason: no constructible interactor can record a hash unverified
+    /// (`IN-22`).
     #[must_use]
     pub fn new(
         store: Arc<S>,
@@ -284,8 +295,16 @@ where
         batch_plan_reader: Arc<dyn BatchPlanReaderPort>,
         scope_diff_measurer: Arc<dyn ScopeDiffMeasurePort>,
         scope_config_reader: Arc<dyn ScopeConfigReaderPort>,
+        commit_record_verifier: Arc<dyn CommitRecordVerifierPort>,
     ) -> Self {
-        Self { store, branch_reader, batch_plan_reader, scope_diff_measurer, scope_config_reader }
+        Self {
+            store,
+            branch_reader,
+            batch_plan_reader,
+            scope_diff_measurer,
+            scope_config_reader,
+            commit_record_verifier,
+        }
     }
 
     /// The ports the admission judgement reads its inputs through.
@@ -331,79 +350,6 @@ where
     }
 }
 
-// ── Branch guard logic ────────────────────────────────────────────────────────
-
-/// Enforces the branch guard for track mutation operations.
-///
-/// When a `branch_reader` port is provided:
-/// - Branchless tracks (`branch = None` in metadata) pass the guard unconditionally.
-/// - Tracks with a branch require the current git branch (returned by
-///   [`BranchReaderPort::current_branch`]) to match the expected branch;
-///   detached HEAD state is rejected.
-/// - When the current branch does not match, returns
-///   [`TaskOperationError::BranchGuardFailed`].
-/// - When the HEAD is detached (reader returns `Some("HEAD")`), returns
-///   [`TaskOperationError::BranchlessGuardFailed`].
-///
-/// When no `branch_reader` is provided, the guard is a no-op.
-///
-/// # Errors
-///
-/// Returns [`TaskOperationError::BranchGuardFailed`] when the branch does not match.
-/// Returns [`TaskOperationError::BranchlessGuardFailed`] for detached HEAD state.
-fn enforce_branch_guard<R: TrackReader>(
-    store: &R,
-    track_id: &TrackId,
-    _items_dir: &std::path::Path,
-    branch_reader: Option<&Arc<dyn BranchReaderPort>>,
-) -> Result<(), TaskOperationError> {
-    let Some(reader) = branch_reader else {
-        return Ok(()); // no reader injected — skip guard
-    };
-
-    // Read track metadata to determine expected branch.
-    let track = store
-        .find(track_id)
-        .map_err(TaskOperationError::from)?
-        .ok_or_else(|| TaskOperationError::TrackNotFound(track_id.to_string()))?;
-
-    let expected_branch = match track.branch() {
-        None => return Ok(()), // branchless track — skip guard
-        Some(b) => b.as_ref().to_owned(),
-    };
-
-    // Delegate branch reading to the injected port.
-    let actual_branch_opt =
-        reader.current_branch().map_err(|BranchReadError::ReadFailed(msg)| {
-            TaskOperationError::BranchGuardFailed(format!("branch read failed: {msg}"))
-        })?;
-
-    let actual_branch = match actual_branch_opt {
-        Some(b) => b,
-        None => {
-            return Err(TaskOperationError::BranchGuardFailed(
-                "branch read returned no branch name".to_owned(),
-            ));
-        }
-    };
-
-    // Detached HEAD → ambiguous branch state.
-    if actual_branch == "HEAD" {
-        return Err(TaskOperationError::BranchlessGuardFailed(format!(
-            "detached HEAD — expected branch '{expected_branch}', cannot verify"
-        )));
-    }
-
-    // Branch mismatch → guard fails.
-    if actual_branch != expected_branch {
-        return Err(TaskOperationError::BranchGuardFailed(format!(
-            "current branch '{actual_branch}' does not match expected '{expected_branch}'"
-        )));
-    }
-
-    Ok(())
-}
-
 impl<S> TaskOperationService for TaskOperationInteractor<S>
 where
     S: TrackReader + TrackWriter + ImplPlanReader + ImplPlanWriter + Send + Sync,
@@ -434,6 +380,18 @@ where
         {
             return Ok(TaskTransitionOutcome::Rejected(rejection));
         }
+
+        // A hash is checked against the repository before the transition that
+        // would record it is applied, so a refused hash leaves the plan exactly
+        // as it was (IN-22, AC-28).
+        commit_record::verify_recorded_hash(
+            &*self.commit_record_verifier,
+            &*self.store,
+            &cmd,
+            &track_id,
+            &task_id,
+            commit_hash.as_ref(),
+        )?;
 
         let uc = crate::TransitionTaskUseCase::new(Arc::clone(&self.store));
         let track = uc
@@ -787,6 +745,38 @@ mod tests {
         }
     }
 
+    /// Commit-record verifier stub yielding one fixed verdict.
+    ///
+    /// [`StubVerifier::accepting`] is what every test that is not about record
+    /// verification wires: those tests are about another guard, and an accepted
+    /// hash leaves the transition they observe unchanged.
+    struct StubVerifier(Option<Box<dyn Fn() -> CommitRecordVerifyError + Send + Sync>>);
+
+    impl StubVerifier {
+        fn accepting() -> Arc<dyn CommitRecordVerifierPort> {
+            Arc::new(Self(None))
+        }
+
+        fn refusing(
+            error: impl Fn() -> CommitRecordVerifyError + Send + Sync + 'static,
+        ) -> Arc<dyn CommitRecordVerifierPort> {
+            Arc::new(Self(Some(Box::new(error))))
+        }
+    }
+
+    impl CommitRecordVerifierPort for StubVerifier {
+        fn verify_commit_record(
+            &self,
+            _items_dir: &std::path::Path,
+            _commit_hash: &CommitHash,
+        ) -> Result<(), CommitRecordVerifyError> {
+            match &self.0 {
+                None => Ok(()),
+                Some(error) => Err(error()),
+            }
+        }
+    }
+
     /// The interactor the guard-focused tests use: a batch plan that admits
     /// `T001`, so those tests observe the branch guard rather than admission.
     fn task_ops_interactor(
@@ -805,6 +795,7 @@ mod tests {
             Arc::new(StubBatchPlanReader(Some(batch_plan))),
             Arc::new(StubScopeDiffMeasurer(Vec::new())),
             Arc::new(StubScopeConfigReader(vec![("domain", Some(500))])),
+            StubVerifier::accepting(),
         )
     }
 
@@ -1281,6 +1272,7 @@ mod tests {
             Arc::new(StubBatchPlanReader(Some(batch_plan))),
             Arc::new(StubScopeDiffMeasurer(measured)),
             Arc::new(StubScopeConfigReader(vec![("domain", ceiling)])),
+            StubVerifier::accepting(),
         )
     }
 
@@ -1912,6 +1904,7 @@ mod tests {
             Arc::new(StubBatchPlanReader(None)),
             Arc::new(StubScopeDiffMeasurer(Vec::new())),
             Arc::new(StubScopeConfigReader(vec![("domain", Some(500))])),
+            StubVerifier::accepting(),
         )
         .transition_task(start_work_on("T001"))
         .unwrap_err();
@@ -1927,6 +1920,7 @@ mod tests {
             Arc::new(StubBatchPlanReader(None)),
             Arc::new(StubScopeDiffMeasurer(Vec::new())),
             Arc::new(StubScopeConfigReader(vec![("domain", Some(500))])),
+            StubVerifier::accepting(),
         )
         .transition_task(TaskTransitionCommand {
             items_dir: PathBuf::new(),
@@ -2036,5 +2030,180 @@ mod tests {
         .unwrap();
 
         assert!(matches!(outcome, TaskTransitionOutcome::Transitioned(_)));
+    }
+
+    // ── record-time verification of a commit hash ─────────────────────────────
+
+    /// The two recording lanes side by side: `T001` is in progress, so
+    /// completing it records the hash, and `T002` is done without one, so the
+    /// same request against it is a backfill.
+    fn recording_plan() -> ImplPlanDocument {
+        use domain::TaskStatus;
+        plan_of(&[("T001", TaskStatus::InProgress), ("T002", TaskStatus::DonePending)])
+    }
+
+    /// A request to record `commit_hash()` against `task_id`.
+    fn record_hash(task_id: &str) -> TaskTransitionCommand {
+        TaskTransitionCommand {
+            items_dir: PathBuf::new(),
+            track_id: "my-track-2026".to_owned(),
+            task_id: task_id.to_owned(),
+            target_status: "done".to_owned(),
+            commit_hash: Some(commit_hash().as_ref().to_owned()),
+        }
+    }
+
+    /// The interactor with the given verifier. The batch plan is absent because
+    /// no recording transition is judged against one: what these tests observe
+    /// is the verification, and a reader that is never consulted cannot supply
+    /// the outcome.
+    fn recording_interactor(
+        store: Arc<StubStore>,
+        verifier: Arc<dyn CommitRecordVerifierPort>,
+    ) -> TaskOperationInteractor<StubStore> {
+        TaskOperationInteractor::new(
+            store,
+            None,
+            Arc::new(StubBatchPlanReader(None)),
+            Arc::new(StubScopeDiffMeasurer(Vec::new())),
+            Arc::new(StubScopeConfigReader(vec![("domain", Some(500))])),
+            verifier,
+        )
+    }
+
+    /// The persisted plan as a byte string.
+    ///
+    /// The stub store holds the very document `impl-plan.json` would be written
+    /// from, so comparing this rendering across an attempt is the byte
+    /// comparison of the file AC-28 requires: a partial application to any task
+    /// or any field outside the task list changes it.
+    fn persisted(store: &StubStore) -> String {
+        let plans = store.impl_plans.lock().unwrap();
+        format!("{:?}", plans.get(&TrackId::try_new("my-track-2026").unwrap()).unwrap())
+    }
+
+    /// Attempts to record a refused hash against `task_id`, returning the error
+    /// and whether the persisted plan survived the attempt unchanged.
+    fn refused_recording(
+        task_id: &str,
+        verifier: Arc<dyn CommitRecordVerifierPort>,
+    ) -> (TaskOperationError, bool) {
+        let store = store_with(recording_plan());
+        let before = persisted(&store);
+        let error = recording_interactor(Arc::clone(&store), verifier)
+            .transition_task(record_hash(task_id))
+            .unwrap_err();
+        let unchanged = persisted(&store) == before;
+        (error, unchanged)
+    }
+
+    /// `T001` is the completion lane and `T002` the backfill lane: the same
+    /// request reaches a different transition on each, and neither is exempt.
+    const RECORDING_LANES: [(&str, &str); 2] =
+        [("T001", "the completion lane"), ("T002", "the backfill lane")];
+
+    #[test]
+    fn test_a_hash_the_repository_does_not_hold_is_recorded_on_neither_lane() {
+        for (task_id, lane) in RECORDING_LANES {
+            let (error, unchanged) = refused_recording(
+                task_id,
+                StubVerifier::refusing(|| CommitRecordVerifyError::CommitNotFound {
+                    commit_hash: commit_hash(),
+                }),
+            );
+
+            assert!(
+                matches!(error, TaskOperationError::TransitionFailed(_)),
+                "{lane} must refuse a hash naming no commit: {error}"
+            );
+            assert!(unchanged, "{lane} must leave the persisted plan byte-identical");
+        }
+    }
+
+    #[test]
+    fn test_a_hash_that_is_not_an_ancestor_of_head_is_recorded_on_neither_lane() {
+        for (task_id, lane) in RECORDING_LANES {
+            let (error, unchanged) = refused_recording(
+                task_id,
+                StubVerifier::refusing(|| CommitRecordVerifyError::NotAncestorOfHead {
+                    commit_hash: commit_hash(),
+                }),
+            );
+
+            assert!(
+                matches!(error, TaskOperationError::TransitionFailed(_)),
+                "{lane} must refuse a commit unreachable from HEAD: {error}"
+            );
+            assert!(unchanged, "{lane} must leave the persisted plan byte-identical");
+        }
+    }
+
+    #[test]
+    fn test_a_repository_that_cannot_be_read_records_on_neither_lane() {
+        // No verdict was produced, and the absence of a refusal is not an
+        // acceptance: there is no graceful skip that records the hash unchecked.
+        for (task_id, lane) in RECORDING_LANES {
+            let (error, unchanged) = refused_recording(
+                task_id,
+                StubVerifier::refusing(|| CommitRecordVerifyError::RepositoryUnreadable {
+                    message: domain::FreeText::new("not a git repository"),
+                }),
+            );
+
+            assert!(
+                matches!(error, TaskOperationError::StoreFailed(_)),
+                "{lane} must report an unperformed check as a store failure: {error}"
+            );
+            assert!(unchanged, "{lane} must leave the persisted plan byte-identical");
+        }
+    }
+
+    #[test]
+    fn test_a_hash_the_repository_accepts_is_recorded_on_both_lanes() {
+        use domain::TaskStatus;
+
+        for (task_id, lane) in RECORDING_LANES {
+            let store = store_with(recording_plan());
+            let outcome = recording_interactor(Arc::clone(&store), StubVerifier::accepting())
+                .transition_task(record_hash(task_id))
+                .unwrap();
+
+            assert!(
+                matches!(outcome, TaskTransitionOutcome::Transitioned(_)),
+                "{lane} must record an accepted hash"
+            );
+            assert_eq!(
+                stored_status(&store, task_id),
+                TaskStatus::DoneTraced { commit_hash: commit_hash() },
+                "{lane} must persist the accepted hash"
+            );
+        }
+    }
+
+    #[test]
+    fn test_a_completion_carrying_no_hash_is_recorded_without_being_verified() {
+        use domain::TaskStatus;
+
+        // Nothing would be written, so there is nothing to verify: the verifier
+        // refuses everything it is asked about, and the completion still goes
+        // through — as an unsettled `done`, exactly as before (AC-29).
+        let store = store_with(recording_plan());
+        let outcome = recording_interactor(
+            Arc::clone(&store),
+            StubVerifier::refusing(|| CommitRecordVerifyError::CommitNotFound {
+                commit_hash: commit_hash(),
+            }),
+        )
+        .transition_task(TaskTransitionCommand {
+            items_dir: PathBuf::new(),
+            track_id: "my-track-2026".to_owned(),
+            task_id: "T001".to_owned(),
+            target_status: "done".to_owned(),
+            commit_hash: None,
+        })
+        .unwrap();
+
+        assert!(matches!(outcome, TaskTransitionOutcome::Transitioned(_)));
+        assert_eq!(stored_status(&store, "T001"), TaskStatus::DonePending);
     }
 }

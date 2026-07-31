@@ -18,6 +18,7 @@ pub mod capability_exec;
 pub mod code_profile_builder;
 pub mod codex_common;
 pub mod codex_runtime;
+pub mod commit_record_verifier;
 pub mod conventions;
 pub mod conventions_resolve;
 pub mod demo;
@@ -102,6 +103,32 @@ pub use verify_adapter::FsVerifyAdapter;
 pub(crate) fn discover_repo_for_items_dir(
     items_dir: &std::path::Path,
 ) -> Result<crate::git_cli::SystemGitRepo, std::io::Error> {
+    Ok(discover_repo_and_anchor(items_dir, crate::git_cli::SystemGitRepo::discover_from)?.0)
+}
+
+/// Discovers that repository without letting the ambient Git environment name a
+/// different one, and returns the canonical anchor it was discovered from.
+///
+/// For a caller whose verdict decides what is written into the tree under
+/// `items_dir`, inheriting `GIT_DIR` would let one repository answer for
+/// another. The anchor comes back with the repository so such a caller can also
+/// check that what git found actually encloses the directory it asked about.
+///
+/// # Errors
+///
+/// The same failures as [`discover_repo_for_items_dir`].
+pub(crate) fn discover_isolated_repo_for_items_dir(
+    items_dir: &std::path::Path,
+) -> Result<(crate::git_cli::SystemGitRepo, std::path::PathBuf), std::io::Error> {
+    discover_repo_and_anchor(items_dir, crate::git_cli::SystemGitRepo::discover_from_isolated)
+}
+
+fn discover_repo_and_anchor(
+    items_dir: &std::path::Path,
+    discover: fn(
+        &std::path::Path,
+    ) -> Result<crate::git_cli::SystemGitRepo, crate::git_cli::GitError>,
+) -> Result<(crate::git_cli::SystemGitRepo, std::path::PathBuf), std::io::Error> {
     // Each failure is returned with its cause intact and no path written into it.
     // Callers report these to an operator, and a rendered path would both leak the
     // checkout location and bury the distinction between the three causes: the
@@ -109,7 +136,7 @@ pub(crate) fn discover_repo_for_items_dir(
     // and an absent repository is its own type.
     crate::track::symlink_guard::reject_symlinks_up_to_root(items_dir)?;
     let anchor = items_dir.canonicalize()?;
-    crate::git_cli::SystemGitRepo::discover_from(&anchor).map_err(|error| {
+    let repo = discover(&anchor).map_err(|error| {
         crate::sanitized_failure::sanitized_io_error(match error {
             // `rev-parse --show-toplevel` exiting nonzero is how git reports that
             // nothing encloses the directory. Only this command gives that outcome
@@ -119,7 +146,8 @@ pub(crate) fn discover_repo_for_items_dir(
             crate::git_cli::GitError::CommandFailed { .. } => "no enclosing git repository",
             other => crate::sanitized_failure::git_classification(&other),
         })
-    })
+    })?;
+    Ok((repo, anchor))
 }
 
 pub(crate) fn resolve_items_dir_under_current_repo(

@@ -157,12 +157,12 @@
     {
       "id": "T026",
       "description": "`libs/usecase/src/task_ops/` の ports module: CommitRecordVerifierPort と CommitRecordVerifyError を定義する（IN-22、AC-28）。`libs/usecase/src/task_ops.rs`: port 照合と TaskOperationError への mapping を行う usecase 内部 helper を追加する（呼び出し側への挿入と署名変更は含まない）（IN-22、AC-28）。同ファイルの試験: stub port で mapping の 3 failure lane を function 段で試験する（AC-28）。",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T027",
-      "description": "`libs/infrastructure/src/commit_record_verifier.rs`: T026 が定義した CommitRecordVerifierPort を実装する GitCommitRecordVerifier を追加し、実 git fixture で ancestry / not-found / unreadable の各分岐を試験する（IN-22、AC-29）。`libs/usecase/src/task_ops.rs`: TaskOperationInteractor::new を 6 collaborator 化し、T026 の helper を hash 書き込み遷移 2 経路（Complete-with-hash / BackfillHash）の apply 前に挿入する（IN-22、AC-28、AC-29）。同ファイルの試験: transition 段で 3 failure mode × 同 2 経路 × 永続化された impl-plan.json の byte 不変性、および success 経路（受理された hash の永続化）と bypass 経路（hash なし完了）を試験する（AC-28、AC-29）。`apps/cli-composition/src/track/mod.rs`: task-ops composition root の build 関数に 6 番目の collaborator として同 adapter を配線する（IN-22）。`apps/cli/tests/transition_integration.rs`: 配線後に影響する fixture を確認し必要なら更新する（AC-28）。",
-      "status": "todo",
+      "description": "`libs/domain/src/track.rs`: TaskTransition に recorded_commit_hash accessor を追加し、hash 記録を伴う遷移の判定を単一定義に集約する（IN-22）— usecase の検証レーンはこの accessor を経由して対象遷移を識別する。`libs/infrastructure/src/commit_record_verifier.rs`: T026 が定義した CommitRecordVerifierPort を実装する GitCommitRecordVerifier を追加し、実 git fixture で ancestry / not-found / unreadable の各分岐を試験する（IN-22、AC-29）。`libs/usecase/src/task_ops.rs`: TaskOperationInteractor::new を 6 collaborator 化し、T026 の helper を hash 書き込み遷移 2 経路（Complete-with-hash / BackfillHash）の apply 前に挿入する（IN-22、AC-28、AC-29）。同ファイルの試験: transition 段で 3 failure mode × 同 2 経路 × 永続化された impl-plan.json の byte 不変性、および success 経路（受理された hash の永続化）と bypass 経路（hash なし完了）を試験する（AC-28、AC-29）。`apps/cli-composition/src/track/mod.rs`: task-ops composition root の build 関数に 6 番目の collaborator として同 adapter を配線する（IN-22）。`apps/cli/tests/transition_integration.rs`: 配線後に影響する fixture を確認し必要なら更新する（AC-28）。",
+      "status": "in_progress",
       "depends_on": [
         "T026"
       ]

@@ -1731,11 +1731,11 @@
       }
     },
     {
-      "claim_hash": "92d8f70316e40df271d3e9745c05a70118f2a6a685890ea08d797873f6d6a453",
+      "claim_hash": "8ab834bc990bd1f341d48e74aa5ed55af7826e97c9e711e113dfa7a8165999f0",
       "evidence_hash": "a36553b773468155e8afd40fabadf2c2f47ccd898e53f349ef403942e7068b65",
       "verdict": {
         "kind": "pass",
-        "citation": "対象は todo からの着手（Start）と done からの再開（Reopen）の双方であり"
+        "citation": "skipped からの再開は ResetToTodo → Start を経るため既存の判定対象であり、追加の判定点を要しない。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1755,11 +1755,11 @@
       }
     },
     {
-      "claim_hash": "92d8f70316e40df271d3e9745c05a70118f2a6a685890ea08d797873f6d6a453",
-      "evidence_hash": "c0188369b660bb2cf7e9f5ff9db301aee3e08825ea3b8d160462c09421b9549f",
+      "claim_hash": "8ab834bc990bd1f341d48e74aa5ed55af7826e97c9e711e113dfa7a8165999f0",
+      "evidence_hash": "032b684617147b7908220c571b6c30548caea06250737a91e80a685d7ac260a1",
       "verdict": {
         "kind": "pass",
-        "citation": "admission 判定はタスク状態遷移の単一経路上に置き、どの workflow / capability から到達しても迂回できない状態を保つ。implementer 側の着手前 precondition が、遷移を経ない実装 dispatch という迂回経路を塞ぐ。"
+        "citation": "対象は hash を伴う完了記録（`Complete`）と後からの埋め戻し（`BackfillHash`）の双方であり、記録経路による例外は設けない。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1772,9 +1772,9 @@
       "evidence_origin": {
         "kind": "spec_element",
         "data": {
-          "section": "constraint",
-          "element_id": "CN-10",
-          "text_label": "admission 判定はタスク状態遷移の単一経路上に置き、どの workflow / capability から到達しても迂回できない状態を保つ。implementer 側の着手前 precondition が、遷移を経ない実装 dispatch という迂回経路を塞ぐ。"
+          "section": "in_scope",
+          "element_id": "IN-22",
+          "text_label": "commit hash を書くタスク状態遷移に記録時の repository 照合を組み込む。対象は hash を伴う完了記録（`Complete`）と後からの埋め戻し（`BackfillHash`）の双方であり、記録経路による例外は設けない。与えられた hash が当該 repository に commit object として実在し、かつ HEAD の祖先であることを要求する。満たさない記録は error として拒否し状態を一切書き換えない — `impl-plan.json` は遷移前のまま残り、部分適用も graceful skip も生じない。repository の読み取り自体が失敗して検証を実行できない場合も同じく error とし、検証せずに記録する経路を設けない。hash を伴わない完了記録は照合の対象外である（記録すべき値が存在せず、その done は従来どおり未 settle である）。照合は repository の読み取りを要するため usecase の port と、track 成果物が置かれた repository を items_dir 起点で解決する infrastructure adapter が担い、domain は I/O を持たず検証結果を入力として受け取る。"
         }
       }
     },

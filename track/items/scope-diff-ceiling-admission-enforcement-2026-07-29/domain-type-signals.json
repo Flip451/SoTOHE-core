@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-30T10:49:00Z",
-  "declaration_hash": "ee8d263206dc3823481b5c9300fddf21c03587aefc1b1772d97972df62e59df5",
-  "implementation_input_hash": "5fa60a459bbff1c5202c962d3fac3fc3c3d411fd060632da8b049669bdd2407b",
+  "generated_at": "2026-07-30T22:33:55Z",
+  "declaration_hash": "190a7d7afc7a8c9790c9c883f0223ad343e97babed38193152774dc6be502017",
+  "implementation_input_hash": "b990bf1d185062cdbc12da4a16696230ff6a08fbab97b5647bf5d42f6a9bf245",
   "signals": [
     {
       "type_name": "AdmissionDecision",
@@ -232,6 +232,12 @@
       ]
     },
     {
+      "type_name": "TaskTransition",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
       "type_name": "TrackTask",
       "kind_tag": "value_object",
       "signal": "blue",
@@ -277,12 +283,6 @@
     },
     {
       "type_name": "TaskStatusKind",
-      "kind_tag": "enum",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "TaskTransition",
       "kind_tag": "enum",
       "signal": "blue",
       "found_type": true

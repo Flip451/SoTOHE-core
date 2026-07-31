@@ -81,6 +81,16 @@ fn init_git_repo_on_track_branch(root: &Path, track_id: &str) {
     assert!(status.success(), "creating the base branch must succeed");
 }
 
+/// The fixture repository's `HEAD` commit: the one hash a recording transition
+/// can use, since a recorded hash must exist in the repository the track lives
+/// in and be an ancestor of its `HEAD`.
+fn head_hash(root: &Path) -> String {
+    let output =
+        Command::new("git").args(["rev-parse", "HEAD"]).current_dir(root).output().unwrap();
+    assert!(output.status.success(), "the fixture repository must have a resolvable HEAD");
+    String::from_utf8(output.stdout).unwrap().trim().to_owned()
+}
+
 /// Writes a minimal v6 metadata.json fixture (identity-only, branchless).
 ///
 /// Uses `"branch": null` so the in-usecase branch guard is a no-op: the guard
@@ -364,7 +374,10 @@ fn transition_subcommand_persists_commit_hash_on_done_transition() {
     let stderr1 = String::from_utf8_lossy(&out1.stderr);
     assert!(out1.status.success(), "step1 transition to in_progress failed:\nstderr: {stderr1}");
 
-    // Step 2: in_progress -> done with commit hash
+    // Step 2: in_progress -> done with commit hash. The hash is the fixture
+    // repository's own HEAD: a recorded hash is verified against that repository
+    // before it is written, so an invented one would be refused.
+    let head = head_hash(root_dir.path());
     let out2 = sotp_bin_in(root_dir.path())
         .args([
             "track",
@@ -372,7 +385,7 @@ fn transition_subcommand_persists_commit_hash_on_done_transition() {
             "--items-dir",
             items_dir.to_str().unwrap(),
             "--commit-hash",
-            "abc1234",
+            &head,
             "--track-id",
             track_id,
             "T001",
@@ -386,7 +399,7 @@ fn transition_subcommand_persists_commit_hash_on_done_transition() {
     // Verify commit hash is persisted in impl-plan.json.
     let impl_plan_path = items_dir.join(format!("{track_id}/impl-plan.json"));
     let content = std::fs::read_to_string(&impl_plan_path).unwrap();
-    assert!(content.contains("abc1234"), "impl-plan.json must contain commit hash:\n{content}");
+    assert!(content.contains(&head), "impl-plan.json must contain commit hash:\n{content}");
     assert!(content.contains("\"done\""), "impl-plan.json must reflect done status:\n{content}");
 }
 
@@ -499,7 +512,9 @@ fn transition_subcommand_full_round_trip_with_commit_hash_and_reopen() {
     let stderr1 = String::from_utf8_lossy(&out1.stderr);
     assert!(out1.status.success(), "step1 (todo->in_progress) failed:\nstderr: {stderr1}");
 
-    // Step 2: in_progress -> done with commit hash
+    // Step 2: in_progress -> done with the fixture repository's own HEAD, the
+    // hash a recording transition accepts.
+    let head = head_hash(root_dir.path());
     let out2 = sotp_bin_in(root_dir.path())
         .args([
             "track",
@@ -507,7 +522,7 @@ fn transition_subcommand_full_round_trip_with_commit_hash_and_reopen() {
             "--items-dir",
             items_dir.to_str().unwrap(),
             "--commit-hash",
-            "def5678",
+            &head,
             "--track-id",
             track_id,
             "T001",
@@ -524,7 +539,7 @@ fn transition_subcommand_full_round_trip_with_commit_hash_and_reopen() {
     // Verify commit hash is persisted after done transition.
     let content = std::fs::read_to_string(&impl_plan_path).unwrap();
     assert!(
-        content.contains("def5678"),
+        content.contains(&head),
         "impl-plan.json must contain commit hash after done:\n{content}"
     );
     assert!(content.contains("\"done\""), "impl-plan.json must reflect done status:\n{content}");
@@ -555,8 +570,64 @@ fn transition_subcommand_full_round_trip_with_commit_hash_and_reopen() {
         "impl-plan.json must reflect reopened in_progress status:\n{content}"
     );
     assert!(
-        !content.contains("def5678"),
+        !content.contains(&head),
         "impl-plan.json must NOT contain commit hash after DoneTraced->InProgress reopen:\n{content}"
+    );
+}
+
+#[test]
+fn transition_subcommand_refuses_a_hash_the_repository_does_not_hold() {
+    // The end-to-end refusal: a well-formed hash the fixture repository holds no
+    // commit for is checked before the completion is applied, so impl-plan.json
+    // survives the attempt byte for byte (AC-28).
+    let track_id = "synthetic-2026";
+
+    let root_dir = tempfile::tempdir().unwrap();
+    let items_dir = project_root_with_full_track(root_dir.path(), track_id);
+    let impl_plan_path = items_dir.join(format!("{track_id}/impl-plan.json"));
+
+    let out1 = sotp_bin_in(root_dir.path())
+        .args([
+            "track",
+            "transition",
+            "--items-dir",
+            items_dir.to_str().unwrap(),
+            "--track-id",
+            track_id,
+            "T001",
+            "in_progress",
+        ])
+        .output()
+        .unwrap();
+    assert!(out1.status.success(), "step1 (todo->in_progress) failed");
+
+    let before = std::fs::read(&impl_plan_path).unwrap();
+    let output = sotp_bin_in(root_dir.path())
+        .args([
+            "track",
+            "transition",
+            "--items-dir",
+            items_dir.to_str().unwrap(),
+            "--commit-hash",
+            "0123456789abcdef0123456789abcdef01234567",
+            "--track-id",
+            track_id,
+            "T001",
+            "done",
+        ])
+        .output()
+        .unwrap();
+
+    assert!(
+        !output.status.success(),
+        "expected non-zero exit for a hash the repository does not hold"
+    );
+    let after = std::fs::read(&impl_plan_path).unwrap();
+    assert_eq!(
+        after,
+        before,
+        "a refused hash must leave impl-plan.json untouched; after:\n{}",
+        String::from_utf8_lossy(&after)
     );
 }
 

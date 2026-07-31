@@ -731,6 +731,26 @@
       "trait_ref": "core::fmt::Debug"
     },
     {
+      "action": "reference",
+      "for_type": "TaskTransition",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "TaskTransition",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "TaskTransition",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "TaskTransition",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
       "action": "modify",
       "for_type": "TrackTask",
       "trait_ref": "core::fmt::Debug"
@@ -2444,8 +2464,8 @@
       ]
     },
     "TaskTransition": {
-      "action": "reference",
-      "docs": "Baseline transition command enum; action reference — byte-identical to baseline, declared for edge exposure (ImplPlanDocument::transition_for return, apply_transition / TrackTask::transition param). 6 variants and target_kind restated from baseline; target_kind derives TaskStatusKind from the value (R3 side-effect-free derivation). Role ValueObject (R1 △: finite value set identified by value, no dependency, no state of its own). IN-09, CN-10.",
+      "action": "modify",
+      "docs": "Baseline transition command enum; gains recorded_commit_hash, the single definition of the hash-recording transitions and the recorded value (IN-22). Type-design: returning the value rather than a bool predicate keeps both in one definition, so no consumer re-derives either; maintained as a pair with the TrackTask::transition state table. Action reference -> modify because this track adds a method; Complete / BackfillHash payloads restated as struct shapes with the named field commit_hash to match baseline and post-modification source (the earlier tuple spelling was inert under reference). Remaining variants and target_kind restated from baseline. Role ValueObject (R3: side-effect-free derivation from the value's own payload, no dependency or I/O). IN-09, IN-22.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -2460,18 +2480,24 @@
             "name": "Complete",
             "payload": {
               "fields": [
-                "Option<CommitHash>"
+                {
+                  "name": "commit_hash",
+                  "ty": "Option<CommitHash>"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "BackfillHash",
             "payload": {
               "fields": [
-                "CommitHash"
+                {
+                  "name": "commit_hash",
+                  "ty": "CommitHash"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
@@ -2502,6 +2528,14 @@
           "params": [],
           "receiver": "&self",
           "returns": "TaskStatusKind"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "recorded_commit_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&CommitHash>"
         }
       ],
       "module_path": "track",
@@ -2514,7 +2548,7 @@
           "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
         },
         {
-          "anchor": "CN-10",
+          "anchor": "IN-22",
           "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
         }
       ]

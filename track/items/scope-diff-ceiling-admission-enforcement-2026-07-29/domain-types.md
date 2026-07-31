@@ -11,7 +11,7 @@
 | ScopeCeiling | enum | add | Unconstrained, Limited | 🔵 | 🔵 |
 | TaskDecomposition | enum | add | Decomposable, Indivisible | 🔵 | 🔵 |
 | TaskStatusKind | enum | reference | Todo, InProgress, Done, Skipped | 🔵 | 🔵 |
-| TaskTransition | enum | reference | Start, Complete, BackfillHash, ResetToTodo, Skip, Reopen | 🔵 | 🔵 |
+| TaskTransition | enum | modify | Start, Complete, BackfillHash, ResetToTodo, Skip, Reopen | 🔵 | 🔵 |
 
 ## Value Objects
 

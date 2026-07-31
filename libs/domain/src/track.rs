@@ -134,6 +134,33 @@ impl TaskTransition {
             Self::Reopen => TaskStatusKind::InProgress,
         }
     }
+
+    /// Returns the commit hash this transition would record into the plan, if
+    /// it records one at all (`IN-22`).
+    ///
+    /// This is the single definition of which transitions record a hash and of
+    /// what they record: a completion that carries one, and a backfill. A
+    /// completion without a hash records nothing — that `done` stays unsettled
+    /// — and every other transition writes none however the request was
+    /// phrased. Consumers that need the hash to be recorded read it here rather
+    /// than re-matching variants and separately assuming the hash they hold is
+    /// the recorded one.
+    ///
+    /// Maintained as a pair with the [`TrackTask::transition`] state table: the
+    /// match is exhaustive without a wildcard arm, so a new hash-bearing
+    /// variant fails to compile until it is classified here.
+    #[must_use]
+    pub fn recorded_commit_hash(&self) -> Option<&CommitHash> {
+        match self {
+            Self::Complete { commit_hash: Some(commit_hash) }
+            | Self::BackfillHash { commit_hash } => Some(commit_hash),
+            Self::Complete { commit_hash: None }
+            | Self::Start
+            | Self::ResetToTodo
+            | Self::Skip
+            | Self::Reopen => None,
+        }
+    }
 }
 
 /// The kind of status override (discriminant only).
@@ -844,6 +871,78 @@ mod tests {
         let hash = CommitHash::try_new("abc1234").unwrap();
         let t = TaskTransition::BackfillHash { commit_hash: hash };
         assert_eq!(t.target_kind(), TaskStatusKind::Done);
+    }
+
+    #[test]
+    fn test_every_transition_names_the_status_kind_it_targets() {
+        let hash = CommitHash::try_new("abc1234").unwrap();
+        let cases = [
+            (TaskTransition::Start, TaskStatusKind::InProgress),
+            (TaskTransition::Reopen, TaskStatusKind::InProgress),
+            (TaskTransition::Complete { commit_hash: Some(hash.clone()) }, TaskStatusKind::Done),
+            (TaskTransition::Complete { commit_hash: None }, TaskStatusKind::Done),
+            (TaskTransition::BackfillHash { commit_hash: hash }, TaskStatusKind::Done),
+            (TaskTransition::ResetToTodo, TaskStatusKind::Todo),
+            (TaskTransition::Skip, TaskStatusKind::Skipped),
+        ];
+
+        for (transition, expected) in cases {
+            assert_eq!(
+                transition.target_kind(),
+                expected,
+                "the transition must name the status kind it targets: {transition:?}"
+            );
+        }
+    }
+
+    // --- TaskTransition::recorded_commit_hash tests ---
+
+    #[test]
+    fn test_complete_with_a_hash_records_that_hash() {
+        let hash = CommitHash::try_new("abc1234").unwrap();
+        let t = TaskTransition::Complete { commit_hash: Some(hash.clone()) };
+        assert_eq!(
+            t.recorded_commit_hash(),
+            Some(&hash),
+            "a completion carrying a hash records exactly that hash"
+        );
+    }
+
+    #[test]
+    fn test_backfill_hash_records_its_hash() {
+        let hash = CommitHash::try_new("abc1234").unwrap();
+        let t = TaskTransition::BackfillHash { commit_hash: hash.clone() };
+        assert_eq!(
+            t.recorded_commit_hash(),
+            Some(&hash),
+            "a backfill records exactly the hash it carries"
+        );
+    }
+
+    #[test]
+    fn test_complete_without_a_hash_records_nothing() {
+        let t = TaskTransition::Complete { commit_hash: None };
+        assert_eq!(
+            t.recorded_commit_hash(),
+            None,
+            "a completion with no hash records nothing and stays unsettled"
+        );
+    }
+
+    #[test]
+    fn test_non_recording_transitions_record_nothing() {
+        for t in [
+            TaskTransition::Start,
+            TaskTransition::ResetToTodo,
+            TaskTransition::Skip,
+            TaskTransition::Reopen,
+        ] {
+            assert_eq!(
+                t.recorded_commit_hash(),
+                None,
+                "no transition other than Complete-with-hash and BackfillHash records a hash: {t:?}"
+            );
+        }
     }
 
     // --- TrackStatus display ---

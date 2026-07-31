@@ -287,6 +287,7 @@ subgraph domain["domain"]
     T28_domain_domain_TaskTransition_Skip[Skip]
     T28_domain_domain_TaskTransition_Reopen[Reopen]
     T28_domain_domain_TaskTransition_target_kind([target_kind])
+    T28_domain_domain_TaskTransition_recorded_commit_hash([recorded_commit_hash])
   end
   subgraph T23_domain_domain_TrackTask["track::TrackTask"]
     direction TB
@@ -932,6 +933,7 @@ class T28_domain_domain_TaskTransition_ResetToTodo variant_node
 class T28_domain_domain_TaskTransition_Skip variant_node
 class T28_domain_domain_TaskTransition_Reopen variant_node
 class T28_domain_domain_TaskTransition_target_kind method_node
+class T28_domain_domain_TaskTransition_recorded_commit_hash method_node
 class T28_domain_domain_TaskTransition__self value_object
 class T23_domain_domain_TrackTask_new method_node
 class T23_domain_domain_TrackTask_with_status method_node

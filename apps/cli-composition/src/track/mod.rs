@@ -122,7 +122,8 @@ fn build_branch_reader(
     }
 }
 /// Wires the task-operation interactor together with the admission
-/// collaborators every transition is judged through.
+/// collaborators every transition is judged through and the verifier every
+/// recorded commit hash is checked by.
 fn build_task_operation_interactor(
     store: Arc<infrastructure::track::fs_store::FsTrackStore>,
     branch_reader: Option<Arc<dyn usecase::track_resolution::BranchReaderPort>>,
@@ -133,6 +134,7 @@ fn build_task_operation_interactor(
         Arc::new(infrastructure::batch_plan_reader::FsBatchPlanReader::new()),
         Arc::new(infrastructure::scope_diff_measure::GitScopeDiffMeasurer::new()),
         Arc::new(infrastructure::review_scope_config_reader::FsReviewScopeConfigReader::new()),
+        Arc::new(infrastructure::commit_record_verifier::GitCommitRecordVerifier::new()),
     )
 }
 fn sync_views_to_stdout(project_root: &Path, track_id: &str) -> Vec<String> {

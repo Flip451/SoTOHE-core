@@ -3959,6 +3959,31 @@
         {
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_hash_the_repository_does_not_hold_is_recorded_on_neither_lane"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_hash_that_is_not_an_ancestor_of_head_is_recorded_on_neither_lane"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_repository_that_cannot_be_read_records_on_neither_lane"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_hash_the_repository_accepts_is_recorded_on_both_lanes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_completion_carrying_no_hash_is_recorded_without_being_verified"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
           "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
         },
         {
@@ -6401,6 +6426,264 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::batch_plan_codec::tests",
           "test_name": "test_decode_rejects_an_estimate_that_names_no_scope"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "CommitRecordVerifierPort",
+        "item_identifier": "trait_method:verify_commit_record",
+        "obligation_kind": "contract"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::commit_record::tests",
+          "test_name": "test_accepted_commit_record_passes_verification"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::commit_record::tests",
+          "test_name": "test_absent_commit_is_reported_as_a_transition_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::commit_record::tests",
+          "test_name": "test_non_ancestor_commit_is_reported_as_a_transition_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::commit_record::tests",
+          "test_name": "test_unreadable_repository_is_reported_as_a_store_failure"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "GitCommitRecordVerifier",
+        "item_identifier": "trait_impl:usecase::task_ops::ports::CommitRecordVerifierPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_a_commit_reachable_from_head_may_be_recorded"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_a_well_formed_hash_the_repository_does_not_hold_is_not_found"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_a_commit_from_another_repository_is_refused_as_a_non_ancestor"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_a_directory_no_repository_encloses_is_reported_as_unreadable"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_a_repository_that_does_not_enclose_the_items_directory_is_unreadable"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_verification_discovers_the_repository_the_items_directory_sits_in"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::tests",
+          "test_name": "test_a_repository_selecting_environment_cannot_redirect_the_isolated_discovery"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::tests",
+          "test_name": "test_the_isolated_discovery_clears_every_repository_selecting_variable"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_an_annotated_tag_to_head_is_not_accepted_as_a_commit"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_verification_commands_disable_lazy_fetching"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_verification_ignores_grafts_that_would_make_a_foreign_commit_an_ancestor"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_verification_stays_with_the_git_directory_discovered_from_the_anchor"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_batch_protocol_requires_full_framing_and_accepts_a_full_id_for_an_abbreviation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_a_corrupt_object_is_unreadable_not_an_absent_commit"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_an_unresolved_abbreviation_is_reported_as_a_missing_commit"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::tests",
+          "test_name": "system_git_repo_discover_from_accepts_a_root_longer_than_the_verifier_limit"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::bounded::tests",
+          "test_name": "test_an_over_limit_reader_does_not_wait_on_a_pipe_a_descendant_holds"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::bounded::tests",
+          "test_name": "test_the_bounded_git_runner_times_out_and_reaps_a_sleeping_child"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CommitRecordVerifyError",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-22"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::commit_record::tests",
+          "test_name": "test_absent_commit_is_reported_as_a_transition_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::commit_record::tests",
+          "test_name": "test_non_ancestor_commit_is_reported_as_a_transition_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::commit_record::tests",
+          "test_name": "test_unreadable_repository_is_reported_as_a_store_failure"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TaskTransition",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-22"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::track::tests",
+          "test_name": "test_complete_with_a_hash_records_that_hash"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::track::tests",
+          "test_name": "test_backfill_hash_records_its_hash"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::track::tests",
+          "test_name": "test_complete_without_a_hash_records_nothing"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::track::tests",
+          "test_name": "test_non_recording_transitions_record_nothing"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TaskTransition",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_resolution::tests",
+          "test_name": "test_resolve_transition_todo_to_in_progress_returns_start"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_resolution::tests",
+          "test_name": "test_resolve_transition_done_to_in_progress_returns_reopen"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CommitRecordVerifyError",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-28"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::commit_record::tests",
+          "test_name": "test_absent_commit_is_reported_as_a_transition_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::commit_record::tests",
+          "test_name": "test_non_ancestor_commit_is_reported_as_a_transition_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::commit_record::tests",
+          "test_name": "test_unreadable_repository_is_reported_as_a_store_failure"
         }
       ]
     }

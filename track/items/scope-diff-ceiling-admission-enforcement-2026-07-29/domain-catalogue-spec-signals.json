@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "ee8d263206dc3823481b5c9300fddf21c03587aefc1b1772d97972df62e59df5",
+  "catalogue_declaration_hash": "190a7d7afc7a8c9790c9c883f0223ad343e97babed38193152774dc6be502017",
   "signals": [
     {
       "type_name": "AdmissionDecision",
@@ -110,7 +110,7 @@
     {
       "type_name": "TaskTransition",
       "signal": "blue",
-      "entry_hash": "92d8f70316e40df271d3e9745c05a70118f2a6a685890ea08d797873f6d6a453"
+      "entry_hash": "8ab834bc990bd1f341d48e74aa5ed55af7826e97c9e711e113dfa7a8165999f0"
     },
     {
       "type_name": "TrackTask",

@@ -9084,16 +9084,41 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "78736dc02156f6bcd5d0e9ec35e089e5095fe541c97aaa32cafb48de6126f8d4",
+        "bound_tests_set_hash": "8d8b7389ab06f9d8e2eec869e77a8269a758cb615a533e4069da5b4afb1579d5",
         "declaration_hash": "01df50096fc37e48db538f4838be67cb6c98deaf83535831a7272feac47ed17f",
         "anchor_text_hash": "cd8cbbbe4d4110b8e002d053a1d4e701fa2b8334f907fbf9dc5711abd8c1b15d"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(\n    outcome.rejection(),\n    Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n        task_id: \"T002\".to_owned(),\n        task_batch: \"B2\".to_owned(),\n        current_batch: \"B1\".to_owned(),\n    })\n); ... assert_eq!(\n    outcome.rejection(),\n    Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n        task_id: \"T001\".to_owned(),\n        task_batch: \"B1\".to_owned(),\n        current_batch: \"B2\".to_owned(),\n    })\n); ... assert_eq!(\n    outcome.rejection(),\n    Some(&AdmissionRejectionOutput::NoCurrentBatch {\n        task_id: \"T001\".to_owned(),\n        task_batch: \"B1\".to_owned(),\n    })\n);"
+        "citation": "\"Some B1 member is unsettled...\" ... outcome.rejection() == Some(&AdmissionRejectionOutput::NotCurrentBatchMember { task_id: \"T002\"... }) ... \"With B1's only member committed, B2 becomes the batch being consumed and the same task starts.\"; \"The plan declares only the remaining work... Reopening it...\" ... transition_task(reopen(\"T001\")).unwrap_err(); \"B1 is fully committed, so B2 is the batch being consumed...\" ... outcome.rejection() == Some(&AdmissionRejectionOutput::NotCurrentBatchMember { task_id: \"T001\"... }); \"B1 holds the settled T001 and the todo T002... the same formula that admits a start admits its reopen\" ... derived_status, \"in_progress\""
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_hash_the_repository_does_not_hold_is_recorded_on_neither_lane"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_hash_that_is_not_an_ancestor_of_head_is_recorded_on_neither_lane"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_repository_that_cannot_be_read_records_on_neither_lane"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_hash_the_repository_accepts_is_recorded_on_both_lanes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_completion_carrying_no_hash_is_recorded_without_being_verified"
+        },
         {
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
@@ -9225,16 +9250,41 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "78736dc02156f6bcd5d0e9ec35e089e5095fe541c97aaa32cafb48de6126f8d4",
+        "bound_tests_set_hash": "8d8b7389ab06f9d8e2eec869e77a8269a758cb615a533e4069da5b4afb1579d5",
         "declaration_hash": "01df50096fc37e48db538f4838be67cb6c98deaf83535831a7272feac47ed17f",
         "anchor_text_hash": "95f3aa6927f09837b3f404c8ffe20837feae78d7b9c33b8e60168b0adc31f8e1"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "\"100 measured + 300 declared by the member in progress.\" ... \"ScopeCeilingWouldBeExceeded {\" ... \"prior_contribution: std::num::NonZeroU32::new(400).unwrap(),\" ... \"candidate_estimate: 200,\" ... \"ceiling: 500,\" ... \"let outcome = admitting_interactor(\\n            store_with(plan_of(&[(\\\"T001\\\", TaskStatus::Todo)])),\\n            batch_plan,\\n            Vec::new(),\\n            Some(500),\\n        )\\n        .transition_task(start_work_on(\\\"T001\\\"))\\n        .unwrap();\\n\\n        assert_eq!(transitioned(outcome).derived_status, \\\"in_progress\\\");\""
+        "citation": "\"1000 declared domain lines against a ceiling of 500, with nothing measured and no member in progress: the scope carries nothing yet.\" ... \"assert_eq!(transitioned(outcome).derived_status, \\\"in_progress\\\");\"; \"100 more are measured on disk. The candidate's own 200 would take the scope to 600 against a ceiling of 500.\" ... \"Some(&AdmissionRejectionOutput::ScopeCeilingWouldBeExceeded {\"; \"`other` resolves no ceiling, so its total is never compared\""
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_hash_the_repository_does_not_hold_is_recorded_on_neither_lane"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_hash_that_is_not_an_ancestor_of_head_is_recorded_on_neither_lane"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_repository_that_cannot_be_read_records_on_neither_lane"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_hash_the_repository_accepts_is_recorded_on_both_lanes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_completion_carrying_no_hash_is_recorded_without_being_verified"
+        },
         {
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
@@ -9366,16 +9416,41 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "78736dc02156f6bcd5d0e9ec35e089e5095fe541c97aaa32cafb48de6126f8d4",
+        "bound_tests_set_hash": "8d8b7389ab06f9d8e2eec869e77a8269a758cb615a533e4069da5b4afb1579d5",
         "declaration_hash": "01df50096fc37e48db538f4838be67cb6c98deaf83535831a7272feac47ed17f",
         "anchor_text_hash": "ee340e885df4efbcde603a11387e84f7d83b3be771b43e2293a100c9ce2902ff"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "// Starting work is judged against the batch plan, so its absence is an\n// error: the start never passes unjudged.\nlet error = TaskOperationInteractor::new(\n    store_with(plan_of(&[(\"T001\", TaskStatus::Todo)])),\n    None,\n    Arc::new(StubBatchPlanReader(None)),\n    Arc::new(StubScopeDiffMeasurer(Vec::new())),\n    Arc::new(StubScopeConfigReader(vec![(\"domain\", Some(500))])),\n)\n.transition_task(start_work_on(\"T001\"))\n.unwrap_err();\n\nassert!(matches!(error, TaskOperationError::TransitionFailed(_)), \"unexpected: {error}\");\nassert!(error.to_string().contains(\"no batch plan\"), \"unexpected: {error}\");"
+        "citation": "// Starting work is judged against the batch plan, so its absence is an\n        // error: the start never passes unjudged.\n        let error = TaskOperationInteractor::new(\n            store_with(plan_of(&[(\"T001\", TaskStatus::Todo)])),\n            None,\n            Arc::new(StubBatchPlanReader(None)),\n            Arc::new(StubScopeDiffMeasurer(Vec::new())),\n            Arc::new(StubScopeConfigReader(vec![(\"domain\", Some(500))])),\n            StubVerifier::accepting(),\n        )\n        .transition_task(start_work_on(\"T001\"))\n        .unwrap_err();\n\n        assert!(matches!(error, TaskOperationError::TransitionFailed(_)), \"unexpected: {error}\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_hash_the_repository_does_not_hold_is_recorded_on_neither_lane"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_hash_that_is_not_an_ancestor_of_head_is_recorded_on_neither_lane"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_repository_that_cannot_be_read_records_on_neither_lane"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_hash_the_repository_accepts_is_recorded_on_both_lanes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_completion_carrying_no_hash_is_recorded_without_being_verified"
+        },
         {
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
@@ -9507,16 +9582,41 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "78736dc02156f6bcd5d0e9ec35e089e5095fe541c97aaa32cafb48de6126f8d4",
+        "bound_tests_set_hash": "8d8b7389ab06f9d8e2eec869e77a8269a758cb615a533e4069da5b4afb1579d5",
         "declaration_hash": "01df50096fc37e48db538f4838be67cb6c98deaf83535831a7272feac47ed17f",
         "anchor_text_hash": "cf41c1df28aa3a5011c3eb94a9bbe7ddd8fea711f5988a984027e8f867776cc4"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let error = admitting_interactor(\n            store_with(plan_of(&[(\"T001\", TaskStatus::Todo)])),\n            batch_plan,\n            Vec::new(),\n            Some(500),\n        )\n        .transition_task(start_work_on(\"T001\"))\n        .unwrap_err();\n\n        assert!(matches!(error, TaskOperationError::TransitionFailed(_)), \"unexpected: {error}\");\n        assert!(error.to_string().contains(\"domian\"), \"the failure names the scope: {error}\");\n\n        let error = admitting_interactor(store, batch_plan, Vec::new(), Some(500))\n            .transition_task(reopen(\"T001\"))\n            .unwrap_err();\n\n        assert!(matches!(error, TaskOperationError::TransitionFailed(_)), \"unexpected: {error}\");\n        assert!(error.to_string().contains(\"domian\"), \"the failure names the scope: {error}\");\n\n        let outcome = admitting_interactor(Arc::clone(&store), batch_plan, Vec::new(), Some(500))\n            .transition_task(reopen(\"T001\"))\n            .unwrap();\n\n        assert!(matches!(outcome, TaskTransitionOutcome::Transitioned(_)));\n\n        let outcome = admitting_interactor(\n            store_with(plan_of(&[(\"T001\", TaskStatus::InProgress), (\"T002\", TaskStatus::Todo)])),\n            batch_plan,\n            vec![MeasuredScopeDiff::new(ScopeName::Other, LineCount::new(100))],\n            Some(500),\n        )\n        .transition_task(start_work_on(\"T002\"))\n        .unwrap();\n\n        assert!(matches!(outcome, TaskTransitionOutcome::Transitioned(_)));"
+        "citation": "\"the start is refused as an error rather than passing silently\" ... \"transition_task(start_work_on(\\\"T002\\\"))\" ... \"matches!(error, TaskOperationError::TransitionFailed(_))\"; \"The same fail-closed error a start gets\" ... \"transition_task(reopen(\\\"T001\\\"))\" ... \"matches!(error, TaskOperationError::TransitionFailed(_))\"; \"`other` resolves no ceiling\" ... \"transition_task(reopen(\\\"T001\\\"))\" ... \"TaskTransitionOutcome::Transitioned(_)\""
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_hash_the_repository_does_not_hold_is_recorded_on_neither_lane"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_hash_that_is_not_an_ancestor_of_head_is_recorded_on_neither_lane"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_repository_that_cannot_be_read_records_on_neither_lane"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_hash_the_repository_accepts_is_recorded_on_both_lanes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_completion_carrying_no_hash_is_recorded_without_being_verified"
+        },
         {
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
@@ -9648,16 +9748,41 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "78736dc02156f6bcd5d0e9ec35e089e5095fe541c97aaa32cafb48de6126f8d4",
+        "bound_tests_set_hash": "8d8b7389ab06f9d8e2eec869e77a8269a758cb615a533e4069da5b4afb1579d5",
         "declaration_hash": "01df50096fc37e48db538f4838be67cb6c98deaf83535831a7272feac47ed17f",
         "anchor_text_hash": "628a2564d1e567d81f887dcb074f45632d87652f77b3be921da52c5f4f9ebf7a"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(error, TaskOperationError::TransitionFailed(_)), \"unexpected: {error}\");\nassert!(error.to_string().contains(\"T001\"), \"the failure names the task: {error}\");\nassert!(matches!(stored_status(&store, \"T001\"), TaskStatus::DoneTraced { .. }));\n\nassert_eq!(transitioned(outcome).derived_status, \"in_progress\");\nassert_eq!(stored_status(&store, \"T001\"), TaskStatus::InProgress);"
+        "citation": "\"let error = admitting_interactor(Arc::clone(&store), batch_plan, Vec::new(), Some(500))\\n            .transition_task(reopen(\\\"T001\\\"))\\n            .unwrap_err();\\n\\n        assert!(matches!(error, TaskOperationError::TransitionFailed(_)), \\\"unexpected: {error}\\\");\\n        assert!(error.to_string().contains(\\\"T001\\\"), \\\"the failure names the task: {error}\\\");\\n        // Fail-closed and before any write: the task is still settled.\\n        assert!(matches!(stored_status(&store, \\\"T001\\\"), TaskStatus::DoneTraced { .. }));\"; \"let outcome = admitting_interactor(Arc::clone(&store), batch_plan, Vec::new(), Some(500))\\n            .transition_task(reopen(\\\"T001\\\"))\\n            .unwrap();\\n\\n        assert_eq!(transitioned(outcome).derived_status, \\\"in_progress\\\");\\n        assert_eq!(stored_status(&store, \\\"T001\\\"), TaskStatus::InProgress);\"; \"Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\\n                task_id: \\\"T001\\\".to_owned(),\\n                task_batch: \\\"B1\\\".to_owned(),\\n                current_batch: \\\"B2\\\".to_owned(),\\n            })\""
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_hash_the_repository_does_not_hold_is_recorded_on_neither_lane"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_hash_that_is_not_an_ancestor_of_head_is_recorded_on_neither_lane"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_repository_that_cannot_be_read_records_on_neither_lane"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_hash_the_repository_accepts_is_recorded_on_both_lanes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_completion_carrying_no_hash_is_recorded_without_being_verified"
+        },
         {
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
@@ -9789,16 +9914,41 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "78736dc02156f6bcd5d0e9ec35e089e5095fe541c97aaa32cafb48de6126f8d4",
+        "bound_tests_set_hash": "8d8b7389ab06f9d8e2eec869e77a8269a758cb615a533e4069da5b4afb1579d5",
         "declaration_hash": "01df50096fc37e48db538f4838be67cb6c98deaf83535831a7272feac47ed17f",
         "anchor_text_hash": "b2c7413977b1f386a58b3255d6390e1019bdfb8252b2192ac0be4e84f7e7cdbb"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "\"the cumulative rejection applies to a\\n        // reopen exactly as it does to a start.\" ... \"the first contribution gets in on a reopen too\" ... \"The same fail-closed error a start gets: an unresolvable ceiling must not\\n        // admit the reopen\" ... \"The reopen is refused rather than admitted\""
+        "citation": "\"the same formula that admits a start admits its reopen (AC-27).\" ... \"outcome.rejection(), Some(&AdmissionRejectionOutput::NotCurrentBatchMember\" ... \"the cumulative rejection applies to a reopen exactly as it does to a start.\" ... \"the first contribution gets in on a reopen too\" ... \"The reopen is refused rather than admitted\""
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_hash_the_repository_does_not_hold_is_recorded_on_neither_lane"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_hash_that_is_not_an_ancestor_of_head_is_recorded_on_neither_lane"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_repository_that_cannot_be_read_records_on_neither_lane"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_hash_the_repository_accepts_is_recorded_on_both_lanes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_completion_carrying_no_hash_is_recorded_without_being_verified"
+        },
         {
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
@@ -9930,13 +10080,13 @@
         "item_identifier": "trait_method:transition_task"
       },
       "key": {
-        "bound_tests_set_hash": "e28d58f5dbb06f1466e301df3e175798f1e30d13c0b7e925fb42aab075a36aa1",
+        "bound_tests_set_hash": "cc187752c86dbe95dec656b44b21f96c9577a5cfcaad6d447718b95ca9dd5f5e",
         "declaration_hash": "1dffdcb2f96dc19adce3240c85b1df4fbf5122f3e5b99b4e8e5bcc5c4fa2394e",
         "anchor_text_hash": "cd8cbbbe4d4110b8e002d053a1d4e701fa2b8334f907fbf9dc5711abd8c1b15d"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(\n    outcome.rejection(),\n    Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n        task_id: \"T002\".to_owned(),\n        task_batch: \"B2\".to_owned(),\n        current_batch: \"B1\".to_owned(),\n    })\n); ... assert_eq!(\n    outcome.rejection(),\n    Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n        task_id: \"T001\".to_owned(),\n        task_batch: \"B1\".to_owned(),\n        current_batch: \"B2\".to_owned(),\n    })\n); ... assert_eq!(transitioned(outcome).derived_status, \"in_progress\");"
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        ); ... assert_eq!(transitioned(outcome).derived_status, \"in_progress\"); ... assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T001\".to_owned(),\n                task_batch: \"B1\".to_owned(),\n                current_batch: \"B2\".to_owned(),\n            })\n        );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -10051,7 +10201,7 @@
         "item_identifier": "trait_method:transition_task"
       },
       "key": {
-        "bound_tests_set_hash": "e28d58f5dbb06f1466e301df3e175798f1e30d13c0b7e925fb42aab075a36aa1",
+        "bound_tests_set_hash": "cc187752c86dbe95dec656b44b21f96c9577a5cfcaad6d447718b95ca9dd5f5e",
         "declaration_hash": "1dffdcb2f96dc19adce3240c85b1df4fbf5122f3e5b99b4e8e5bcc5c4fa2394e",
         "anchor_text_hash": "7669b3f2178d882d0e0caa12e2ca90dacb12def84e7b001e4c49181fa2beb7e5"
       },
@@ -10172,13 +10322,13 @@
         "item_identifier": "trait_method:transition_task"
       },
       "key": {
-        "bound_tests_set_hash": "e28d58f5dbb06f1466e301df3e175798f1e30d13c0b7e925fb42aab075a36aa1",
+        "bound_tests_set_hash": "cc187752c86dbe95dec656b44b21f96c9577a5cfcaad6d447718b95ca9dd5f5e",
         "declaration_hash": "1dffdcb2f96dc19adce3240c85b1df4fbf5122f3e5b99b4e8e5bcc5c4fa2394e",
         "anchor_text_hash": "cf41c1df28aa3a5011c3eb94a9bbe7ddd8fea711f5988a984027e8f867776cc4"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let error = admitting_interactor(\n            store_with(plan_of(&[(\"T001\", TaskStatus::DonePending), (\"T002\", TaskStatus::Todo)])),\n            batch_plan,\n            Vec::new(),\n            Some(500),\n        )\n        .transition_task(start_work_on(\"T002\"))\n        .unwrap_err();\n\n        assert!(matches!(error, TaskOperationError::TransitionFailed(_)), \"unexpected: {error}\");\n        assert!(error.to_string().contains(\"no estimate\"), \"unexpected: {error}\");"
+        "citation": "\"// The estimate names a misspelled scope, so no ceiling can be resolved\\n        // for it: the start fails rather than degrading into an unconstrained\\n        // comparison that admits any figure.\" ... \"assert!(error.to_string().contains(\\\"domian\\\"), \\\"the failure names the scope: {error}\\\");\"; \"// The same fail-closed error a start gets: an unresolvable ceiling must not\\n        // admit the reopen on the grounds that nothing constrains it.\" ... \"assert!(error.to_string().contains(\\\"domian\\\"), \\\"the failure names the scope: {error}\\\");\"; \"// `other` resolves no ceiling, so its total is never compared — on a reopen\\n        // as on a start\" ... \"assert!(matches!(outcome, TaskTransitionOutcome::Transitioned(_)));\""
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -10293,13 +10443,13 @@
         "item_identifier": "trait_method:transition_task"
       },
       "key": {
-        "bound_tests_set_hash": "e28d58f5dbb06f1466e301df3e175798f1e30d13c0b7e925fb42aab075a36aa1",
+        "bound_tests_set_hash": "cc187752c86dbe95dec656b44b21f96c9577a5cfcaad6d447718b95ca9dd5f5e",
         "declaration_hash": "1dffdcb2f96dc19adce3240c85b1df4fbf5122f3e5b99b4e8e5bcc5c4fa2394e",
         "anchor_text_hash": "628a2564d1e567d81f887dcb074f45632d87652f77b3be921da52c5f4f9ebf7a"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let error = admitting_interactor(Arc::clone(&store), batch_plan, Vec::new(), Some(500))\n            .transition_task(reopen(\"T001\"))\n            .unwrap_err();\n\n        assert!(matches!(error, TaskOperationError::TransitionFailed(_)), \"unexpected: {error}\");\n        assert!(error.to_string().contains(\"T001\"), \"the failure names the task: {error}\");\n        // Fail-closed and before any write: the task is still settled.\n        assert!(matches!(stored_status(&store, \"T001\"), TaskStatus::DoneTraced { .. }));"
+        "citation": "let error = admitting_interactor(Arc::clone(&store), batch_plan, Vec::new(), Some(500))\n            .transition_task(reopen(\"T001\"))\n            .unwrap_err();\n\n        assert!(matches!(error, TaskOperationError::TransitionFailed(_)), \"unexpected: {error}\");\n        assert!(error.to_string().contains(\"T001\"), \"the failure names the task: {error}\");\n        // Fail-closed and before any write: the task is still settled.\n        assert!(matches!(stored_status(&store, \"T001\"), TaskStatus::DoneTraced { .. }));\n\n        assert_eq!(transitioned(outcome).derived_status, \"in_progress\");\n        assert_eq!(stored_status(&store, \"T001\"), TaskStatus::InProgress);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -10414,13 +10564,13 @@
         "item_identifier": "trait_method:transition_task"
       },
       "key": {
-        "bound_tests_set_hash": "e28d58f5dbb06f1466e301df3e175798f1e30d13c0b7e925fb42aab075a36aa1",
+        "bound_tests_set_hash": "cc187752c86dbe95dec656b44b21f96c9577a5cfcaad6d447718b95ca9dd5f5e",
         "declaration_hash": "1dffdcb2f96dc19adce3240c85b1df4fbf5122f3e5b99b4e8e5bcc5c4fa2394e",
         "anchor_text_hash": "b2c7413977b1f386a58b3255d6390e1019bdfb8252b2192ac0be4e84f7e7cdbb"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "\"the cumulative rejection applies to a reopen exactly as it does to a start\"; \"the first contribution gets in on a reopen too\"; \"The missing-estimate failure on a reopen\"; \"The reopen is refused rather than admitted\""
+        "citation": "// 400 measured domain lines plus the reopened task's declared 200 would\n// reach 600 against a ceiling of 500: the cumulative rejection applies to a\n// reopen exactly as it does to a start.\n...\n// Nothing measured and no member in progress, so the scope carries nothing:\n// the first contribution gets in on a reopen too\n...\n// The missing-estimate failure on a reopen\n...\n// The declaration has to be updated before the work can be picked up again."
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -18893,6 +19043,676 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::batch_plan_codec::tests",
           "test_name": "test_decode_rejects_an_estimate_that_names_no_scope"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommitRecordVerifierPort",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-22"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommitRecordVerifierPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:verify_commit_record"
+      },
+      "key": {
+        "bound_tests_set_hash": "76e897997de088ac2031f3e5f6bfbcb0536792f85aeee2628ac03f59a210166d",
+        "declaration_hash": "0472fdfd3aca2adb5fa9aac163b46f7e8fcbc9abb5d5d9aedd0c60add60dd5fa",
+        "anchor_text_hash": "f7369751c3deb714fc58fca50945cd8dabf1d69ad6f439189b8f001e92c0e7f8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let error = verify(&verifier, items_dir(), &hash()).unwrap_err();\n\nmatch error {\n    TaskOperationError::TransitionFailed(message) => {\n        assert!(\n            message.contains(\"abc1234\") && message.contains(\"not an ancestor\"),\n            \"the refusal must name the rejected hash and its reason: {message}\"\n        );\n    }\n    other => panic!(\"a non-ancestor commit must fail the transition lane, got {other:?}\"),\n}"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::commit_record::tests",
+          "test_name": "test_accepted_commit_record_passes_verification"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::commit_record::tests",
+          "test_name": "test_absent_commit_is_reported_as_a_transition_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::commit_record::tests",
+          "test_name": "test_non_ancestor_commit_is_reported_as_a_transition_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::commit_record::tests",
+          "test_name": "test_unreadable_repository_is_reported_as_a_store_failure"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommitRecordVerifierPort",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-28"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommitRecordVerifierPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:verify_commit_record"
+      },
+      "key": {
+        "bound_tests_set_hash": "76e897997de088ac2031f3e5f6bfbcb0536792f85aeee2628ac03f59a210166d",
+        "declaration_hash": "0472fdfd3aca2adb5fa9aac163b46f7e8fcbc9abb5d5d9aedd0c60add60dd5fa",
+        "anchor_text_hash": "d8b332c58fbd45f1349ea09d09f7ad1743429b941c4e4dbef98959862cb74f31"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let error = verify(&verifier, items_dir(), &hash()).unwrap_err(); ... TaskOperationError::TransitionFailed(message) ... message.contains(\"abc1234\") && message.contains(\"does not exist\") ... let error = verify(&verifier, items_dir(), &hash()).unwrap_err(); ... message.contains(\"abc1234\") && message.contains(\"not an ancestor\") ... let error = verify(&verifier, items_dir(), &hash()).unwrap_err(); ... TaskOperationError::StoreFailed(message) ... message.contains(\"not a git repository\")"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::commit_record::tests",
+          "test_name": "test_accepted_commit_record_passes_verification"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::commit_record::tests",
+          "test_name": "test_absent_commit_is_reported_as_a_transition_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::commit_record::tests",
+          "test_name": "test_non_ancestor_commit_is_reported_as_a_transition_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::commit_record::tests",
+          "test_name": "test_unreadable_repository_is_reported_as_a_store_failure"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommitRecordVerifierPort",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-29"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommitRecordVerifierPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:verify_commit_record"
+      },
+      "key": {
+        "bound_tests_set_hash": "76e897997de088ac2031f3e5f6bfbcb0536792f85aeee2628ac03f59a210166d",
+        "declaration_hash": "0472fdfd3aca2adb5fa9aac163b46f7e8fcbc9abb5d5d9aedd0c60add60dd5fa",
+        "anchor_text_hash": "cd627e26c8e8cbed92c9f5369a0eebfb12942de0e57273cdcd816e945d18e70c"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let result = verify(&StubVerifier::accepting(), items_dir(), &hash());\n\n        assert!(result.is_ok(), \"an accepted hash must not produce an error: {result:?}\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::commit_record::tests",
+          "test_name": "test_accepted_commit_record_passes_verification"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::commit_record::tests",
+          "test_name": "test_absent_commit_is_reported_as_a_transition_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::commit_record::tests",
+          "test_name": "test_non_ancestor_commit_is_reported_as_a_transition_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::commit_record::tests",
+          "test_name": "test_unreadable_repository_is_reported_as_a_store_failure"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "GitCommitRecordVerifier",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-22"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "GitCommitRecordVerifier",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::task_ops::ports::CommitRecordVerifierPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "8f35cdeec6c9bdf003d051ad5f7aa68753d2ccff76e7f17b9adb68e24e454bda",
+        "declaration_hash": "82cba986bfb65b4d784beedecc8a338eda238bab783de329eca466ec45f6c247",
+        "anchor_text_hash": "f7369751c3deb714fc58fca50945cd8dabf1d69ad6f439189b8f001e92c0e7f8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "GitCommitRecordVerifier::new()\n            .verify_commit_record(&items_dir(&repo), &head)\n            .expect(\"a commit that is HEAD itself is reachable from HEAD\");\n\nlet error = GitCommitRecordVerifier::new()\n            .verify_commit_record(&items_dir(&repo), &foreign_head)\n            .expect_err(\"a commit unreachable from HEAD cannot be recorded\");\n\nlet error = GitCommitRecordVerifier::new()\n            .verify_commit_record(outside.path(), &hash)\n            .expect_err(\"a directory outside any repository cannot yield a verdict\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_a_commit_reachable_from_head_may_be_recorded"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_a_well_formed_hash_the_repository_does_not_hold_is_not_found"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_a_commit_from_another_repository_is_refused_as_a_non_ancestor"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_a_directory_no_repository_encloses_is_reported_as_unreadable"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_a_repository_that_does_not_enclose_the_items_directory_is_unreadable"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_verification_discovers_the_repository_the_items_directory_sits_in"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::tests",
+          "test_name": "test_a_repository_selecting_environment_cannot_redirect_the_isolated_discovery"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::tests",
+          "test_name": "test_the_isolated_discovery_clears_every_repository_selecting_variable"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_an_annotated_tag_to_head_is_not_accepted_as_a_commit"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_verification_commands_disable_lazy_fetching"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_verification_ignores_grafts_that_would_make_a_foreign_commit_an_ancestor"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_verification_stays_with_the_git_directory_discovered_from_the_anchor"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_batch_protocol_requires_full_framing_and_accepts_a_full_id_for_an_abbreviation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_a_corrupt_object_is_unreadable_not_an_absent_commit"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_an_unresolved_abbreviation_is_reported_as_a_missing_commit"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::tests",
+          "test_name": "system_git_repo_discover_from_accepts_a_root_longer_than_the_verifier_limit"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::bounded::tests",
+          "test_name": "test_an_over_limit_reader_does_not_wait_on_a_pipe_a_descendant_holds"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::bounded::tests",
+          "test_name": "test_the_bounded_git_runner_times_out_and_reaps_a_sleeping_child"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "GitCommitRecordVerifier",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-28"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "GitCommitRecordVerifier",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::task_ops::ports::CommitRecordVerifierPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "8f35cdeec6c9bdf003d051ad5f7aa68753d2ccff76e7f17b9adb68e24e454bda",
+        "declaration_hash": "82cba986bfb65b4d784beedecc8a338eda238bab783de329eca466ec45f6c247",
+        "anchor_text_hash": "d8b332c58fbd45f1349ea09d09f7ad1743429b941c4e4dbef98959862cb74f31"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "`.expect_err(\"a hash naming no commit object cannot be recorded\");` ... `CommitRecordVerifyError::CommitNotFound { commit_hash }` ... `.expect_err(\"a commit unreachable from HEAD cannot be recorded\");` ... `CommitRecordVerifyError::NotAncestorOfHead { commit_hash }` ... `.expect_err(\"a directory outside any repository cannot yield a verdict\");` ... `CommitRecordVerifyError::RepositoryUnreadable { message }`"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_a_commit_reachable_from_head_may_be_recorded"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_a_well_formed_hash_the_repository_does_not_hold_is_not_found"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_a_commit_from_another_repository_is_refused_as_a_non_ancestor"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_a_directory_no_repository_encloses_is_reported_as_unreadable"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_a_repository_that_does_not_enclose_the_items_directory_is_unreadable"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_verification_discovers_the_repository_the_items_directory_sits_in"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::tests",
+          "test_name": "test_a_repository_selecting_environment_cannot_redirect_the_isolated_discovery"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::tests",
+          "test_name": "test_the_isolated_discovery_clears_every_repository_selecting_variable"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_an_annotated_tag_to_head_is_not_accepted_as_a_commit"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_verification_commands_disable_lazy_fetching"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_verification_ignores_grafts_that_would_make_a_foreign_commit_an_ancestor"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_verification_stays_with_the_git_directory_discovered_from_the_anchor"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_batch_protocol_requires_full_framing_and_accepts_a_full_id_for_an_abbreviation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_a_corrupt_object_is_unreadable_not_an_absent_commit"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_an_unresolved_abbreviation_is_reported_as_a_missing_commit"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::tests",
+          "test_name": "system_git_repo_discover_from_accepts_a_root_longer_than_the_verifier_limit"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::bounded::tests",
+          "test_name": "test_an_over_limit_reader_does_not_wait_on_a_pipe_a_descendant_holds"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::bounded::tests",
+          "test_name": "test_the_bounded_git_runner_times_out_and_reaps_a_sleeping_child"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "GitCommitRecordVerifier",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-29"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "GitCommitRecordVerifier",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::task_ops::ports::CommitRecordVerifierPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "8f35cdeec6c9bdf003d051ad5f7aa68753d2ccff76e7f17b9adb68e24e454bda",
+        "declaration_hash": "82cba986bfb65b4d784beedecc8a338eda238bab783de329eca466ec45f6c247",
+        "anchor_text_hash": "cd627e26c8e8cbed92c9f5369a0eebfb12942de0e57273cdcd816e945d18e70c"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "GitCommitRecordVerifier::new()\n            .verify_commit_record(&items_dir(&repo), &head)\n            .expect(\"a commit that is HEAD itself is reachable from HEAD\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_a_commit_reachable_from_head_may_be_recorded"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_a_well_formed_hash_the_repository_does_not_hold_is_not_found"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_a_commit_from_another_repository_is_refused_as_a_non_ancestor"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_a_directory_no_repository_encloses_is_reported_as_unreadable"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_a_repository_that_does_not_enclose_the_items_directory_is_unreadable"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_verification_discovers_the_repository_the_items_directory_sits_in"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::tests",
+          "test_name": "test_a_repository_selecting_environment_cannot_redirect_the_isolated_discovery"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::tests",
+          "test_name": "test_the_isolated_discovery_clears_every_repository_selecting_variable"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_an_annotated_tag_to_head_is_not_accepted_as_a_commit"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_verification_commands_disable_lazy_fetching"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_verification_ignores_grafts_that_would_make_a_foreign_commit_an_ancestor"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_verification_stays_with_the_git_directory_discovered_from_the_anchor"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_batch_protocol_requires_full_framing_and_accepts_a_full_id_for_an_abbreviation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_a_corrupt_object_is_unreadable_not_an_absent_commit"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::commit_record_verifier::tests",
+          "test_name": "test_an_unresolved_abbreviation_is_reported_as_a_missing_commit"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::tests",
+          "test_name": "system_git_repo_discover_from_accepts_a_root_longer_than_the_verifier_limit"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::bounded::tests",
+          "test_name": "test_an_over_limit_reader_does_not_wait_on_a_pipe_a_descendant_holds"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::bounded::tests",
+          "test_name": "test_the_bounded_git_runner_times_out_and_reaps_a_sleeping_child"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommitRecordVerifyError",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-22"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommitRecordVerifyError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-22"
+      },
+      "key": {
+        "bound_tests_set_hash": "c7d4e60d6a00ae5f4fa32eed39ee174b334dc4ce4bf34f3db46ba9b27dcf67c0",
+        "declaration_hash": "2b9c5596d9143bf807efd34fcac862616953dd7da32d3a9f3403537bd517b3bb",
+        "anchor_text_hash": "f7369751c3deb714fc58fca50945cd8dabf1d69ad6f439189b8f001e92c0e7f8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "match error {\n            TaskOperationError::TransitionFailed(message) => {\n                assert!(\n                    message.contains(\"abc1234\") && message.contains(\"does not exist\"),\n                    \"the refusal must name the rejected hash and its reason: {message}\"\n                );\n            }\n            other => panic!(\"an absent commit must fail the transition lane, got {other:?}\"),\n        }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::commit_record::tests",
+          "test_name": "test_absent_commit_is_reported_as_a_transition_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::commit_record::tests",
+          "test_name": "test_non_ancestor_commit_is_reported_as_a_transition_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::commit_record::tests",
+          "test_name": "test_unreadable_repository_is_reported_as_a_store_failure"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskTransition",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-22"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskTransition",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-22"
+      },
+      "key": {
+        "bound_tests_set_hash": "feaba122d7a3e015a3ef2b33e8f550b212690d44d4e972993ba1782ae9ef1cd4",
+        "declaration_hash": "df57cbc044f747f29fa7bf3bdb4b5c8452e98193f3203077b0ea053b455e1c90",
+        "anchor_text_hash": "f7369751c3deb714fc58fca50945cd8dabf1d69ad6f439189b8f001e92c0e7f8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            t.recorded_commit_hash(),\n            Some(&hash),\n            \"a completion carrying a hash records exactly that hash\"\n        );\n\nassert_eq!(\n            t.recorded_commit_hash(),\n            Some(&hash),\n            \"a backfill records exactly the hash it carries\"\n        );\n\nassert_eq!(\n            t.recorded_commit_hash(),\n            None,\n            \"a completion with no hash records nothing and stays unsettled\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::track::tests",
+          "test_name": "test_complete_with_a_hash_records_that_hash"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::track::tests",
+          "test_name": "test_backfill_hash_records_its_hash"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::track::tests",
+          "test_name": "test_complete_without_a_hash_records_nothing"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::track::tests",
+          "test_name": "test_non_recording_transitions_record_nothing"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskTransition",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskTransition",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-09"
+      },
+      "key": {
+        "bound_tests_set_hash": "0efd8369d1fc215c39163d542494d1b6d2614b8de48cf898c0ace11fada723fd",
+        "declaration_hash": "df57cbc044f747f29fa7bf3bdb4b5c8452e98193f3203077b0ea053b455e1c90",
+        "anchor_text_hash": "cd8cbbbe4d4110b8e002d053a1d4e701fa2b8334f907fbf9dc5711abd8c1b15d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"assert_eq!(\\n            outcome.rejection(),\\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\\n                task_id: \\\"T002\\\".to_owned(),\\n                task_batch: \\\"B2\\\".to_owned(),\\n                current_batch: \\\"B1\\\".to_owned(),\\n            })\\n        );\"; \"assert_eq!(\\n            outcome.rejection(),\\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\\n                task_id: \\\"T001\\\".to_owned(),\\n                task_batch: \\\"B1\\\".to_owned(),\\n                current_batch: \\\"B2\\\".to_owned(),\\n            })\\n        );\"; \"assert!(matches!(error, TaskOperationError::TransitionFailed(_)), \\\"unexpected: {error}\\\");\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_resolution::tests",
+          "test_name": "test_resolve_transition_todo_to_in_progress_returns_start"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_resolution::tests",
+          "test_name": "test_resolve_transition_done_to_in_progress_returns_reopen"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommitRecordVerifyError",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-28"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommitRecordVerifyError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-28"
+      },
+      "key": {
+        "bound_tests_set_hash": "c7d4e60d6a00ae5f4fa32eed39ee174b334dc4ce4bf34f3db46ba9b27dcf67c0",
+        "declaration_hash": "2b9c5596d9143bf807efd34fcac862616953dd7da32d3a9f3403537bd517b3bb",
+        "anchor_text_hash": "d8b332c58fbd45f1349ea09d09f7ad1743429b941c4e4dbef98959862cb74f31"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "match error {\n            TaskOperationError::TransitionFailed(message) => {\n                assert!(\n                    message.contains(\"abc1234\") && message.contains(\"does not exist\"),\n                    \"the refusal must name the rejected hash and its reason: {message}\"\n                );\n            }\n            other => panic!(\"an absent commit must fail the transition lane, got {other:?}\"),\n        }\n    }\n{\n        let verifier = StubVerifier::refusing(|| CommitRecordVerifyError::NotAncestorOfHead {\n            commit_hash: hash(),\n        });\n\n        let error = verify(&verifier, items_dir(), &hash()).unwrap_err();\n\n        match error {\n            TaskOperationError::TransitionFailed(message) => {\n                assert!(\n                    message.contains(\"abc1234\") && message.contains(\"not an ancestor\"),\n                    \"the refusal must name the rejected hash and its reason: {message}\"\n                );\n            }\n            other => panic!(\"a non-ancestor commit must fail the transition lane, got {other:?}\"),\n        }\n    }\n{\n        let verifier = StubVerifier::refusing(|| CommitRecordVerifyError::RepositoryUnreadable {\n            message: FreeText::new(\"not a git repository\"),\n        });\n\n        let error = verify(&verifier, items_dir(), &hash()).unwrap_err();\n\n        match error {\n            TaskOperationError::StoreFailed(message) => {\n                assert!(\n                    message.contains(\"not a git repository\"),\n                    \"an unperformed check must carry the adapter diagnostic: {message}\"\n                );\n            }\n            other => panic!(\"an unreadable repository must fail the store lane, got {other:?}\"),\n        }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::commit_record::tests",
+          "test_name": "test_absent_commit_is_reported_as_a_transition_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::commit_record::tests",
+          "test_name": "test_non_ancestor_commit_is_reported_as_a_transition_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::commit_record::tests",
+          "test_name": "test_unreadable_repository_is_reported_as_a_store_failure"
         }
       ]
     }
