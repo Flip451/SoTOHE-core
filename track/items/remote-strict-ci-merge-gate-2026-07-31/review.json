@@ -1,125 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4a2bba2e80ee6b93efcac6413d61433e0e7a6290075d59accbed48ec16809cba",
-          "at": "2026-07-31T12:27:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "GO-02 and CN-02 require eliminating duplicate confirmation prompts from both the workflow and the adapter, but AC-05 only verifies the workflow. An implementation that leaves an adapter confirmation prompt would satisfy every acceptance criterion while violating the stated goal and ADR D2, so GO-02 lacks complete deterministic acceptance coverage.",
-              "severity": "P1",
-              "file": "track/items/remote-strict-ci-merge-gate-2026-07-31/spec.json",
-              "line": 168,
-              "category": "missing AC coverage for a stated goal"
-            }
-          ],
-          "hash": "rvw1:sha256:4a2bba2e80ee6b93efcac6413d61433e0e7a6290075d59accbed48ec16809cba",
-          "at": "2026-07-31T12:31:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fe735f85ab3d40ff6310fe655b11c0a44f7db0bca4f861ef4bd509f504f2fdce",
-          "at": "2026-07-31T12:33:00Z"
-        }
-      ]
-    },
-    "types": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2b9c01989185915d5b01537a0c897a37b0cda578e88f7cd38d1c8f61a3464615",
-          "at": "2026-07-31T12:28:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2b9c01989185915d5b01537a0c897a37b0cda578e88f7cd38d1c8f61a3464615",
-          "at": "2026-07-31T12:32:30Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
-          "at": "2026-07-31T11:44:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
-          "at": "2026-07-31T11:47:56Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:168f21efca7ef2d05af430cfaa40fd9bec6da32637f0e8cd968d56ae5ebd09a7",
-          "at": "2026-07-31T12:28:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:168f21efca7ef2d05af430cfaa40fd9bec6da32637f0e8cd968d56ae5ebd09a7",
-          "at": "2026-07-31T12:31:01Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:164c45e98880fe829393dd71d970d655f386c3371d2c7f12f4932ca76a2ea44b",
-          "at": "2026-07-31T11:20:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:164c45e98880fe829393dd71d970d655f386c3371d2c7f12f4932ca76a2ea44b",
-          "at": "2026-07-31T11:22:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7444b2430f355932f82ff469acaacdd5c4d0d83b4b23c2ceb49bcc6dbe0aa58b",
-          "at": "2026-07-31T12:01:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7444b2430f355932f82ff469acaacdd5c4d0d83b4b23c2ceb49bcc6dbe0aa58b",
-          "at": "2026-07-31T12:04:29Z"
-        }
-      ]
-    },
     "impl-plan": {
       "rounds": [
         {
@@ -251,6 +132,160 @@
           "findings": [],
           "hash": "rvw1:sha256:3e381481814c7755eeb2593abd9a89546a0114049e04d6518f3b4fcc9b89ffab",
           "at": "2026-07-31T12:56:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d46a3949f1de78a7dbb953be0217fc19fe8f124044131f0e9ce83e8658a6ad97",
+          "at": "2026-07-31T13:16:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d46a3949f1de78a7dbb953be0217fc19fe8f124044131f0e9ce83e8658a6ad97",
+          "at": "2026-07-31T13:18:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d46a3949f1de78a7dbb953be0217fc19fe8f124044131f0e9ce83e8658a6ad97",
+          "at": "2026-07-31T13:21:24Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4a2bba2e80ee6b93efcac6413d61433e0e7a6290075d59accbed48ec16809cba",
+          "at": "2026-07-31T12:27:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-02 and CN-02 require eliminating duplicate confirmation prompts from both the workflow and the adapter, but AC-05 only verifies the workflow. An implementation that leaves an adapter confirmation prompt would satisfy every acceptance criterion while violating the stated goal and ADR D2, so GO-02 lacks complete deterministic acceptance coverage.",
+              "severity": "P1",
+              "file": "track/items/remote-strict-ci-merge-gate-2026-07-31/spec.json",
+              "line": 168,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:4a2bba2e80ee6b93efcac6413d61433e0e7a6290075d59accbed48ec16809cba",
+          "at": "2026-07-31T12:31:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe735f85ab3d40ff6310fe655b11c0a44f7db0bca4f861ef4bd509f504f2fdce",
+          "at": "2026-07-31T12:33:00Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:164c45e98880fe829393dd71d970d655f386c3371d2c7f12f4932ca76a2ea44b",
+          "at": "2026-07-31T11:20:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:164c45e98880fe829393dd71d970d655f386c3371d2c7f12f4932ca76a2ea44b",
+          "at": "2026-07-31T11:22:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7444b2430f355932f82ff469acaacdd5c4d0d83b4b23c2ceb49bcc6dbe0aa58b",
+          "at": "2026-07-31T12:01:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7444b2430f355932f82ff469acaacdd5c4d0d83b4b23c2ceb49bcc6dbe0aa58b",
+          "at": "2026-07-31T12:04:29Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:168f21efca7ef2d05af430cfaa40fd9bec6da32637f0e8cd968d56ae5ebd09a7",
+          "at": "2026-07-31T12:28:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:168f21efca7ef2d05af430cfaa40fd9bec6da32637f0e8cd968d56ae5ebd09a7",
+          "at": "2026-07-31T12:31:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d2ca9d1feca60816ec658cb49808ced5103bcca8a8dcc74261c200dff0ed3820",
+          "at": "2026-07-31T13:16:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d2ca9d1feca60816ec658cb49808ced5103bcca8a8dcc74261c200dff0ed3820",
+          "at": "2026-07-31T13:22:51Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2b9c01989185915d5b01537a0c897a37b0cda578e88f7cd38d1c8f61a3464615",
+          "at": "2026-07-31T12:28:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2b9c01989185915d5b01537a0c897a37b0cda578e88f7cd38d1c8f61a3464615",
+          "at": "2026-07-31T12:32:30Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
+          "at": "2026-07-31T11:44:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
+          "at": "2026-07-31T11:47:56Z"
         }
       ]
     }
