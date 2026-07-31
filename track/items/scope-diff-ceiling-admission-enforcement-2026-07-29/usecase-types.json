@@ -627,7 +627,7 @@
   "types": {
     "AdmissionRejectionOutput": {
       "action": "add",
-      "docs": "Usecase-owned mirror of an admission refusal, produced for the driver. Type-design: the transition path is brought into line with the gate path — the interactor maps the domain refusal here so no domain value object reaches the adapter, and the composition root receives and renders only this type. Variant names and payload arity mirror the domain refusal one-to-one so the figures survive the crossing (R11), and prior_contribution keeps a non-zero type because that is what makes the refusal well-formed: a ceiling refusal is only reachable once the prior contribution is non-zero, so flattening it to a plain count would drop the very guarantee the domain encodes (CN-03, AC-12). The remaining payloads are display Strings and counts because this is the presentation boundary and the values were validated upstream (R9 boundary justification), matching the existing usecase output DTOs in this crate. IN-09, IN-10, AC-10, AC-12.",
+      "docs": "Usecase-owned mirror of AdmissionRejection; enum, 3 variants (NotCurrentBatchMember, NoCurrentBatch, ScopeCeilingWouldBeExceeded), names and payload arity 1:1 with the domain refusal (R11). Payloads: String / u32 / core::num::NonZeroU32 (R9 presentation boundary: validated upstream, rendered by the driver; matches this crate's existing output DTOs). Declared so no domain value object reaches the adapter. IN-09, IN-10, AC-10, AC-12, AC-27.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -646,6 +646,22 @@
                 },
                 {
                   "name": "current_batch",
+                  "ty": "String"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "NoCurrentBatch",
+            "payload": {
+              "fields": [
+                {
+                  "name": "task_id",
+                  "ty": "String"
+                },
+                {
+                  "name": "task_batch",
                   "ty": "String"
                 }
               ],

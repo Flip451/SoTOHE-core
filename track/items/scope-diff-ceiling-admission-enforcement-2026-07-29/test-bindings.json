@@ -1277,6 +1277,16 @@
           "layer": "domain",
           "module_path": "domain::batch_plan::tests",
           "test_name": "test_the_gate_ignores_a_dependency_edge_whose_settled_endpoint_the_plan_does_not_declare"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_refuses_a_candidate_when_every_declared_batch_is_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_no_current_batch_rejection_renders_the_task_and_its_settled_batch"
         }
       ]
     },
@@ -1602,6 +1612,11 @@
           "layer": "usecase",
           "module_path": "usecase::batch_plan::tests",
           "test_name": "test_the_scope_diff_measure_port_returns_one_measured_figure_per_scope"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::scope_diff_measure::tests",
+          "test_name": "test_a_valid_commit_record_is_honoured_from_another_repositorys_working_directory"
         }
       ]
     },
@@ -1802,6 +1817,16 @@
           "layer": "domain",
           "module_path": "domain::batch_plan::tests",
           "test_name": "test_a_rejection_renders_the_arithmetic_it_carries"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_refuses_a_candidate_when_every_declared_batch_is_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_no_current_batch_rejection_renders_the_task_and_its_settled_batch"
         }
       ]
     },
@@ -1846,6 +1871,16 @@
           "layer": "domain",
           "module_path": "domain::batch_plan::tests",
           "test_name": "test_a_rejection_renders_the_arithmetic_it_carries"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_refuses_a_candidate_when_every_declared_batch_is_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_no_current_batch_rejection_renders_the_task_and_its_settled_batch"
         }
       ]
     },
@@ -2955,6 +2990,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::scope_diff_measure::tests",
           "test_name": "test_the_measurer_uses_the_track_snapshot_not_live_branch_strategy_config"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::scope_diff_measure::tests",
+          "test_name": "test_a_valid_commit_record_is_honoured_from_another_repositorys_working_directory"
         }
       ]
     },
@@ -3945,6 +3985,11 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
         }
       ]
     },
@@ -4040,6 +4085,11 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
         }
       ]
     },
@@ -4120,6 +4170,11 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
         }
       ]
     },
@@ -4200,6 +4255,11 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
         }
       ]
     },
@@ -4280,6 +4340,11 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
         }
       ]
     },
@@ -4327,6 +4392,11 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
         }
       ]
     },
@@ -4354,6 +4424,11 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
         }
       ]
     },
@@ -4445,6 +4520,11 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
         }
       ]
     },
@@ -4472,6 +4552,11 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
         }
       ]
     },
@@ -5983,6 +6068,11 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
         }
       ]
     },
@@ -6035,6 +6125,11 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_reopening_a_candidate_that_declares_only_the_reserved_other_scope_is_admitted"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
         }
       ]
     },
@@ -6120,6 +6215,33 @@
           "layer": "domain",
           "module_path": "domain::impl_plan::tests",
           "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "AdmissionRejection",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-27"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_refuses_a_candidate_when_every_declared_batch_is_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_no_current_batch_rejection_renders_the_task_and_its_settled_batch"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
         }
       ]
     }

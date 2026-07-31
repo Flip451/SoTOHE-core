@@ -4,7 +4,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| AdmissionRejectionOutput | enum | add | NotCurrentBatchMember, ScopeCeilingWouldBeExceeded | 🔵 | 🔵 |
+| AdmissionRejectionOutput | enum | add | NotCurrentBatchMember, NoCurrentBatch, ScopeCeilingWouldBeExceeded | 🔵 | 🔵 |
 | BatchPlanCheckOutput | enum | add | Passed, Blocked | 🔵 | 🔵 |
 | BatchPlanViolationOutput | enum | add | CeilingExceeded, OversizeScopeHasMultipleContributors, UnknownTaskRef, UnplannedTask, DependencyInLaterBatch, UnknownMainScopeName | 🔵 | 🔵 |
 | TaskTransitionOutcome | enum | add | Transitioned, Rejected | 🔵 | 🔵 |

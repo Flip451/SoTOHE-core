@@ -171,7 +171,7 @@
       }
     },
     {
-      "claim_hash": "ab4431adb0568c8370679ce7e33d36dfa02884afde730189a4ec39603f565592",
+      "claim_hash": "9940ce2782f29227c5d55ba90398107209550c9753ff3d8be522e8deae4bd6a2",
       "evidence_hash": "a36553b773468155e8afd40fabadf2c2f47ccd898e53f349ef403942e7068b65",
       "verdict": {
         "kind": "pass",
@@ -195,7 +195,7 @@
       }
     },
     {
-      "claim_hash": "ab4431adb0568c8370679ce7e33d36dfa02884afde730189a4ec39603f565592",
+      "claim_hash": "9940ce2782f29227c5d55ba90398107209550c9753ff3d8be522e8deae4bd6a2",
       "evidence_hash": "fe21877e227da9e580b0d988448a076149759312fa091267a9ff4d5b84eedf8a",
       "verdict": {
         "kind": "pass",
@@ -219,7 +219,7 @@
       }
     },
     {
-      "claim_hash": "ab4431adb0568c8370679ce7e33d36dfa02884afde730189a4ec39603f565592",
+      "claim_hash": "9940ce2782f29227c5d55ba90398107209550c9753ff3d8be522e8deae4bd6a2",
       "evidence_hash": "66c2f1e0b75dbae5b1f2942d4e0faf979af317f065d8830159c4ccf2b0c14f65",
       "verdict": {
         "kind": "pass",
@@ -243,7 +243,7 @@
       }
     },
     {
-      "claim_hash": "ab4431adb0568c8370679ce7e33d36dfa02884afde730189a4ec39603f565592",
+      "claim_hash": "9940ce2782f29227c5d55ba90398107209550c9753ff3d8be522e8deae4bd6a2",
       "evidence_hash": "7d1d0c87ceb7837599b360b0e7e84b3fdcceb452428f7fe7d724184a4a97f7a0",
       "verdict": {
         "kind": "pass",
@@ -263,6 +263,30 @@
           "section": "acceptance_criteria",
           "element_id": "AC-12",
           "text_label": "先行寄与が 0 でない scope で「先行寄与 + 候補タスクの申告見積り」が resolved ceiling を超える場合に遷移が拒否される。候補タスクが見積りを申告しない scope は照合対象外であり、その scope の既超過は遷移を妨げない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "9940ce2782f29227c5d55ba90398107209550c9753ff3d8be522e8deae4bd6a2",
+      "evidence_hash": "961f2dbce1da968ef17ae6f95edffe20e0ffad14f2779a842038595cf31e4bb0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "AC-10（現在 batch 非 member の拒否）、AC-11（先行寄与 0 の scope の admit）、AC-12（先行寄与ありの合計超過による拒否）、AC-13（見積り欠落の error）、AC-23（未実在 scope 名の error）の各判定が Reopen 候補に対しても同じ結果で適用される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/domain-types.json",
+          "section_key": "types",
+          "entry_key": "AdmissionRejection"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-27",
+          "text_label": "宣言済みタスクの Reopen が Start と同一の判定式で判定される: AC-10（現在 batch 非 member の拒否）、AC-11（先行寄与 0 の scope の admit）、AC-12（先行寄与ありの合計超過による拒否）、AC-13（見積り欠落の error）、AC-23（未実在 scope 名の error）の各判定が Reopen 候補に対しても同じ結果で適用される。したがって宣言済み settle 済みタスクの Reopen は、その所属 batch が現在 batch である場合に限り通り、すでに閉じた batch の member であれば拒否される。判定式は変わらず、広がるのは判定対象の遷移集合のみである。"
         }
       }
     },

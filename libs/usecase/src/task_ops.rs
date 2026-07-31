@@ -1412,6 +1412,41 @@ mod tests {
     }
 
     #[test]
+    fn test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch() {
+        use domain::TaskStatus;
+        use domain::batch_plan::BatchPlanDocument;
+
+        // The declaration holds one batch and its only member is delivered, so no
+        // batch is being consumed. The reopen is refused rather than admitted: the
+        // declaration has to be updated before the work can be picked up again.
+        let batch_plan = BatchPlanDocument::new(
+            TrackId::try_new("my-track-2026").unwrap(),
+            vec![estimate("T001", 10, 5)],
+            vec![batch("B1", &["T001"])],
+        )
+        .unwrap();
+        let store =
+            store_with(plan_of(&[("T001", TaskStatus::DoneTraced { commit_hash: commit_hash() })]));
+
+        let outcome = admitting_interactor(Arc::clone(&store), batch_plan, Vec::new(), Some(500))
+            .transition_task(reopen("T001"))
+            .unwrap();
+
+        assert_eq!(
+            outcome.rejection(),
+            Some(&AdmissionRejectionOutput::NoCurrentBatch {
+                task_id: "T001".to_owned(),
+                task_batch: "B1".to_owned(),
+            })
+        );
+        let rendered = outcome.rejection().unwrap().to_string();
+        assert!(rendered.contains("T001") && rendered.contains("B1"), "rendered as: {rendered}");
+        assert!(rendered.contains("settled"), "rendered as: {rendered}");
+        // Refused before any write: the task is still delivered.
+        assert!(matches!(stored_status(&store, "T001"), TaskStatus::DoneTraced { .. }));
+    }
+
+    #[test]
     fn test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error() {
         use domain::TaskStatus;
         use domain::batch_plan::BatchPlanDocument;

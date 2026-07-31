@@ -58,6 +58,19 @@ pub enum AdmissionRejection {
         /// The batch currently being consumed.
         current_batch: BatchId,
     },
+    /// Every declared batch is settled, so there is no batch being consumed for
+    /// the candidate to belong to.
+    ///
+    /// Its own variant rather than an absent `current_batch` on
+    /// [`AdmissionRejection::NotCurrentBatchMember`]: the two refusals name
+    /// different states, and a `None` standing for one of them would have to be
+    /// read rather than matched.
+    NoCurrentBatch {
+        /// The candidate task.
+        task_id: TaskId,
+        /// The batch the candidate belongs to, all of whose work is delivered.
+        task_batch: BatchId,
+    },
     /// Admitting the candidate would take a scope past its resolved ceiling.
     ScopeCeilingWouldBeExceeded {
         /// The scope the comparison was made for.
@@ -83,6 +96,12 @@ impl fmt::Display for AdmissionRejection {
                     current_batch.as_str()
                 )
             }
+            AdmissionRejection::NoCurrentBatch { task_id, task_batch } => write!(
+                f,
+                "task '{task_id}' belongs to batch '{}', and every declared batch is settled, so \
+                 there is no batch being consumed",
+                task_batch.as_str()
+            ),
             AdmissionRejection::ScopeCeilingWouldBeExceeded {
                 scope,
                 prior_contribution,

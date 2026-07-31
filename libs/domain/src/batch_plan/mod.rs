@@ -351,16 +351,31 @@ pub fn evaluate_admission(
     Ok(AdmissionDecision::Admitted)
 }
 
-/// Refuses a candidate that belongs to a batch other than the one being
-/// consumed. With every batch committed there is no batch left to consume, and
-/// membership cannot be violated.
+/// Refuses a candidate that does not belong to the batch being consumed.
+///
+/// Two ways that happens. The candidate's batch may be a different one, which is
+/// [`AdmissionRejection::NotCurrentBatchMember`]. Or every declared batch may be
+/// settled, leaving no batch to consume at all: a reopen is the transition that
+/// reaches this state, and it is refused rather than admitted, because a task
+/// whose whole declaration is delivered has no current batch to join
+/// ([`AdmissionRejection::NoCurrentBatch`]). Reopening it needs the declaration
+/// updated first.
+///
+/// A candidate the plan places in no batch cannot be reached here: this runs
+/// after the estimate lookup, and `BatchPlanDocument::new` refuses a plan holding
+/// an estimate no batch claims, so an estimate-holding candidate always has one.
 fn membership_rejection(
     plan: &BatchPlanDocument,
     candidate: &TaskId,
     committed_task_ids: &std::collections::BTreeSet<TaskId>,
 ) -> Option<AdmissionRejection> {
     let task_batch = plan.batch_of(candidate)?;
-    let current_batch = plan.current_batch(committed_task_ids)?;
+    let Some(current_batch) = plan.current_batch(committed_task_ids) else {
+        return Some(AdmissionRejection::NoCurrentBatch {
+            task_id: candidate.clone(),
+            task_batch: task_batch.id().clone(),
+        });
+    };
     if task_batch.id() == current_batch.id() {
         return None;
     }

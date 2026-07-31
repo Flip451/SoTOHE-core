@@ -1203,7 +1203,7 @@
     },
     "AdmissionRejection": {
       "action": "add",
-      "docs": "Why a transition was refused. Type-design: carries the arithmetic rather than a rendered sentence (R11), and prior_contribution is NonZeroLineCount so a ceiling rejection is unconstructible at zero prior contribution — that makes CN-03 structural rather than documented. Display renders it at the CLI boundary. Construction owner: evaluate_admission. IN-09, IN-10, AC-10, AC-12, CN-03.",
+      "docs": "Refusal carried in AdmissionDecision::Rejected; enum, 3 variants (NotCurrentBatchMember, NoCurrentBatch { task_id, task_batch }, ScopeCeilingWouldBeExceeded). Payloads: TaskId / BatchId / ScopeName / NonZeroLineCount / LineCount — typed ids and figures, no rendered text (R11). NoCurrentBatch is its own variant, not Option<BatchId> on NotCurrentBatchMember (prefer-type-safe-abstractions: Option-None 1:1 with a named state). Display declared for the CLI boundary. Construction owner: evaluate_admission. IN-09, IN-10, AC-10, AC-12, AC-27, CN-03.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -1222,6 +1222,22 @@
                 },
                 {
                   "name": "current_batch",
+                  "ty": "BatchId"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "NoCurrentBatch",
+            "payload": {
+              "fields": [
+                {
+                  "name": "task_id",
+                  "ty": "TaskId"
+                },
+                {
+                  "name": "task_batch",
                   "ty": "BatchId"
                 }
               ],
@@ -1274,6 +1290,10 @@
         },
         {
           "anchor": "AC-12",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-27",
           "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
         }
       ]

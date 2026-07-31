@@ -749,6 +749,77 @@ mod tests {
     }
 
     #[test]
+    fn test_a_valid_commit_record_is_honoured_from_another_repositorys_working_directory() {
+        use usecase::batch_plan::ScopeDiffMeasurePort;
+
+        // The measured repository, holding a record that names its own track-branch
+        // tip: an ancestor of its HEAD, so the base is that commit and only the
+        // uncommitted work is in range.
+        let measured_repo = fixture_repo();
+        let measured_root = measured_repo.path().to_path_buf();
+        write(&measured_root, "libs/domain/src/unstaged.rs", &"line\n".repeat(9));
+        let head = String::from_utf8(
+            std::process::Command::new("git")
+                .args(["rev-parse", "HEAD"])
+                .current_dir(&measured_root)
+                .output()
+                .unwrap()
+                .stdout,
+        )
+        .unwrap();
+        write(&measured_root, "track/items/some-track/.commit_hash", head.trim());
+
+        // A second repository, unrelated to the first, is where the process stands.
+        // The record's ancestry must be asked of the repository the record was read
+        // from; asking this one would find no such commit and degrade the base.
+        //
+        // Its history is built from content of its own rather than from the shared
+        // fixture: two fixture repositories assembled from identical trees in the
+        // same second produce identical commit ids, which would make the stored hash
+        // resolvable here and leave the anchoring untested.
+        let elsewhere = tempfile::Builder::new()
+            .prefix("scope-diff-measure-elsewhere-")
+            .tempdir_in(std::env::current_dir().unwrap())
+            .unwrap();
+        write(elsewhere.path(), "unrelated.txt", "a history of its own\n");
+        git(elsewhere.path(), &["init", "-b", "main"]);
+        git(elsewhere.path(), &["config", "user.email", "elsewhere@example.com"]);
+        git(elsewhere.path(), &["config", "user.name", "elsewhere"]);
+        git(elsewhere.path(), &["add", "-A"]);
+        git(elsewhere.path(), &["commit", "-m", "unrelated history"]);
+        assert!(
+            !std::process::Command::new("git")
+                .args(["cat-file", "-e", &format!("{}^{{commit}}", head.trim())])
+                .current_dir(elsewhere.path())
+                .output()
+                .unwrap()
+                .status
+                .success(),
+            "the stored commit must not exist in the working-directory repository, or the \
+             anchoring is untested"
+        );
+
+        let measured = {
+            let _guard = CWD_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+            let original = std::env::current_dir().unwrap();
+            std::env::set_current_dir(elsewhere.path()).unwrap();
+            let measured = super::GitScopeDiffMeasurer::new().measure_scope_diff(
+                &measured_root.join("track/items"),
+                &TrackId::try_new("some-track").unwrap(),
+            );
+            std::env::set_current_dir(original).unwrap();
+            measured.unwrap()
+        };
+
+        assert_eq!(
+            domain_lines(&measured),
+            4,
+            "the record is honoured, so the committed +3 sits behind the base and only the \
+             unstaged +4 is measured"
+        );
+    }
+
+    #[test]
     fn test_a_scope_figure_is_additions_plus_deletions() {
         let changed = parse_numstat(
             b"12\t5\tlibs/domain/src/a.rs\0\

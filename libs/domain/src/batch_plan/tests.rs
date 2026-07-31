@@ -1643,6 +1643,56 @@ fn test_admission_refuses_a_later_batch_task_until_the_current_batch_is_committe
 }
 
 #[test]
+fn test_admission_refuses_a_candidate_when_every_declared_batch_is_settled() {
+    let plan = admission_plan();
+    let config = admission_config();
+
+    // Every declared batch delivered: there is no batch being consumed, so a
+    // reopen candidate has none to belong to and is refused rather than admitted.
+    let refused = evaluate_admission(
+        &plan,
+        &config,
+        &task("T003"),
+        &committed(&["T001", "T002", "T003"]),
+        &in_progress(&[]),
+        &measured(&[]),
+    )
+    .unwrap();
+    assert_eq!(
+        refused,
+        AdmissionDecision::Rejected(AdmissionRejection::NoCurrentBatch {
+            task_id: task("T003"),
+            task_batch: batch_id("B2"),
+        })
+    );
+
+    // The contrast: with B2 still holding uncommitted work, the same candidate in
+    // the same batch is admitted, so the refusal follows the absence of a current
+    // batch and not the candidate.
+    let admitted = evaluate_admission(
+        &plan,
+        &config,
+        &task("T003"),
+        &committed(&["T001", "T002"]),
+        &in_progress(&[]),
+        &measured(&[]),
+    )
+    .unwrap();
+    assert_eq!(admitted, AdmissionDecision::Admitted);
+}
+
+#[test]
+fn test_a_no_current_batch_rejection_renders_the_task_and_its_settled_batch() {
+    let rejection =
+        AdmissionRejection::NoCurrentBatch { task_id: task("T003"), task_batch: batch_id("B2") };
+
+    let rendered = rejection.to_string();
+    assert!(rendered.contains("T003"), "rendered as: {rendered}");
+    assert!(rendered.contains("B2"), "rendered as: {rendered}");
+    assert!(rendered.contains("settled"), "rendered as: {rendered}");
+}
+
+#[test]
 fn test_admission_admits_any_estimate_when_the_scope_carries_nothing_yet() {
     let plan = planned_plan(
         vec![estimate(

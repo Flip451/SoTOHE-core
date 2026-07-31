@@ -3,11 +3,11 @@
   "layer": "usecase",
   "entries": [
     {
-      "claim_hash": "3fbf36c9a091f68f525f8cabaa00c9b2a9ddeaf7c25345a81e0970c359eccf56",
+      "claim_hash": "79c60059fd1e1d015b7881177c225cc4daae69ab13596c14e37c55e43af4040a",
       "evidence_hash": "a36553b773468155e8afd40fabadf2c2f47ccd898e53f349ef403942e7068b65",
       "verdict": {
         "kind": "pass",
-        "citation": "候補タスクが現在 batch（`batch-plan.json` の宣言順で最先行の、未 commit の member を残す batch）の member であることを要求し、後続 batch のタスクは現在 batch の commit 成立まで遷移を拒否する。"
+        "citation": "候補タスクが現在 batch（`batch-plan.json` の宣言順で最先行の、未 commit の member を残す batch）の member であることを要求し、後続 batch のタスクは現在 batch の commit 成立まで遷移を拒否する。宣言に不在の settle 済みタスクは member ではないため Reopen も拒否され、再開には impl-planner が当該タスクを現在 batch の member として宣言し直すこと（宣言の更新が先、遷移が後）が必要である。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -27,7 +27,7 @@
       }
     },
     {
-      "claim_hash": "3fbf36c9a091f68f525f8cabaa00c9b2a9ddeaf7c25345a81e0970c359eccf56",
+      "claim_hash": "79c60059fd1e1d015b7881177c225cc4daae69ab13596c14e37c55e43af4040a",
       "evidence_hash": "fe21877e227da9e580b0d988448a076149759312fa091267a9ff4d5b84eedf8a",
       "verdict": {
         "kind": "pass",
@@ -51,11 +51,11 @@
       }
     },
     {
-      "claim_hash": "3fbf36c9a091f68f525f8cabaa00c9b2a9ddeaf7c25345a81e0970c359eccf56",
+      "claim_hash": "79c60059fd1e1d015b7881177c225cc4daae69ab13596c14e37c55e43af4040a",
       "evidence_hash": "66c2f1e0b75dbae5b1f2942d4e0faf979af317f065d8830159c4ccf2b0c14f65",
       "verdict": {
         "kind": "pass",
-        "citation": "現在 batch（宣言順で最先行の、未 commit の member を残す batch）に属さないタスクの todo → in_progress 遷移が拒否され、後続 batch のタスクは現在 batch の commit 成立後に遷移できる。"
+        "citation": "現在 batch（宣言順で最先行の、未 commit の member を残す batch）に属さないタスクの todo → in_progress 遷移が拒否され"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -75,7 +75,7 @@
       }
     },
     {
-      "claim_hash": "3fbf36c9a091f68f525f8cabaa00c9b2a9ddeaf7c25345a81e0970c359eccf56",
+      "claim_hash": "79c60059fd1e1d015b7881177c225cc4daae69ab13596c14e37c55e43af4040a",
       "evidence_hash": "7d1d0c87ceb7837599b360b0e7e84b3fdcceb452428f7fe7d724184a4a97f7a0",
       "verdict": {
         "kind": "pass",
@@ -99,7 +99,7 @@
       }
     },
     {
-      "claim_hash": "3fbf36c9a091f68f525f8cabaa00c9b2a9ddeaf7c25345a81e0970c359eccf56",
+      "claim_hash": "79c60059fd1e1d015b7881177c225cc4daae69ab13596c14e37c55e43af4040a",
       "evidence_hash": "961f2dbce1da968ef17ae6f95edffe20e0ffad14f2779a842038595cf31e4bb0",
       "verdict": {
         "kind": "pass",

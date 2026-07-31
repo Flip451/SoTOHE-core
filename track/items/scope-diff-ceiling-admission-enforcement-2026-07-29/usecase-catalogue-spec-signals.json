@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "6ebd4ef75dd4b15ba0c776c43f53454e4f7908610577a4e33a7009d42b60b5d6",
+  "catalogue_declaration_hash": "82fbe98c92bb272afb3c82728cbc1c2ae19445b8ff6a7f1d11b2d26890fadab2",
   "signals": [
     {
       "type_name": "AdmissionRejectionOutput",
       "signal": "blue",
-      "entry_hash": "3fbf36c9a091f68f525f8cabaa00c9b2a9ddeaf7c25345a81e0970c359eccf56"
+      "entry_hash": "79c60059fd1e1d015b7881177c225cc4daae69ab13596c14e37c55e43af4040a"
     },
     {
       "type_name": "BatchPlanCheckCommand",

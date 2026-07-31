@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-30T05:45:45Z",
-  "declaration_hash": "6ebd4ef75dd4b15ba0c776c43f53454e4f7908610577a4e33a7009d42b60b5d6",
-  "implementation_input_hash": "64a326f00bc9190b06054e4dab8b45ea82932c14fa50f35dbbda36bbde497632",
+  "generated_at": "2026-07-30T09:02:34Z",
+  "declaration_hash": "82fbe98c92bb272afb3c82728cbc1c2ae19445b8ff6a7f1d11b2d26890fadab2",
+  "implementation_input_hash": "a390b0f4122676701ac8e0030996ace8bb4af4b24557f253882cc12e714985bc",
   "signals": [
     {
       "type_name": "AdmissionRejectionOutput",

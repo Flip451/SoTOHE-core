@@ -56,6 +56,13 @@ pub enum AdmissionRejectionOutput {
         /// The batch currently being consumed.
         current_batch: String,
     },
+    /// Every declared batch is settled, so no batch is being consumed.
+    NoCurrentBatch {
+        /// The candidate task.
+        task_id: String,
+        /// The batch the candidate belongs to, all of whose work is delivered.
+        task_batch: String,
+    },
     /// Admitting the candidate would take a scope past its resolved ceiling.
     ScopeCeilingWouldBeExceeded {
         /// The scope the comparison was made for.
@@ -81,6 +88,11 @@ impl std::fmt::Display for AdmissionRejectionOutput {
                 f,
                 "task '{task_id}' belongs to batch '{task_batch}', but batch '{current_batch}' \
                  is the one being consumed"
+            ),
+            AdmissionRejectionOutput::NoCurrentBatch { task_id, task_batch } => write!(
+                f,
+                "task '{task_id}' belongs to batch '{task_batch}', and every declared batch is \
+                 settled, so there is no batch being consumed"
             ),
             AdmissionRejectionOutput::ScopeCeilingWouldBeExceeded {
                 scope,
@@ -238,6 +250,12 @@ fn map_rejection(rejection: AdmissionRejection) -> AdmissionRejectionOutput {
                 task_id: task_id.to_string(),
                 task_batch: task_batch.as_str().to_owned(),
                 current_batch: current_batch.as_str().to_owned(),
+            }
+        }
+        AdmissionRejection::NoCurrentBatch { task_id, task_batch } => {
+            AdmissionRejectionOutput::NoCurrentBatch {
+                task_id: task_id.to_string(),
+                task_batch: task_batch.as_str().to_owned(),
             }
         }
         AdmissionRejection::ScopeCeilingWouldBeExceeded {

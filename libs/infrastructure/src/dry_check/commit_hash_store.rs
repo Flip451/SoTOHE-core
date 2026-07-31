@@ -114,8 +114,11 @@ impl FsDryCheckCommitHashStore {
             ))
         })?;
 
-        // Ancestry check: is the stored hash an ancestor of HEAD?
-        match SystemGitRepo::discover() {
+        // Ancestry check: is the stored hash an ancestor of HEAD? Anchored on the
+        // trusted root the record was read from, not on the process working
+        // directory, so the answer describes the repository holding the record
+        // rather than whichever repository the process happens to stand in.
+        match SystemGitRepo::discover_from(&self.trusted_root) {
             Ok(git) => {
                 let output = git.output(&["merge-base", "--is-ancestor", trimmed, "HEAD"]);
                 match output {

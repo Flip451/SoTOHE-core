@@ -126,15 +126,20 @@ fn write_fixture_metadata(items_dir: &Path, track_id: &str) -> PathBuf {
 /// Writes an impl-plan.json with a single todo task T001.
 fn write_fixture_impl_plan(items_dir: &Path, track_id: &str) {
     let track_dir = items_dir.join(track_id);
+    // T002 is remaining work nothing in these tests transitions. It keeps the
+    // batch it shares with T001 open, so committing T001 does not settle the whole
+    // declaration and leave no batch being consumed — the state a reopen is
+    // refused in.
     let impl_plan = r#"{
   "schema_version": 1,
   "tasks": [
-    { "id": "T001", "description": "First task", "status": "todo" }
+    { "id": "T001", "description": "First task", "status": "todo" },
+    { "id": "T002", "description": "Remaining work", "status": "todo" }
   ],
   "plan": {
     "summary": [],
     "sections": [
-      { "id": "S1", "title": "Phase 1", "description": [], "task_ids": ["T001"] }
+      { "id": "S1", "title": "Phase 1", "description": [], "task_ids": ["T001", "T002"] }
     ]
   }
 }
@@ -149,8 +154,10 @@ fn write_fixture_arch_rules(root: &Path) {
     std::fs::write(root.join("architecture-rules.json"), arch_rules).unwrap();
 }
 
-/// Writes the batch plan the admission guard judges a start of work against:
-/// T001 alone in the first batch, with a small `domain` estimate.
+/// Writes the batch plan the admission guard judges an entry into work against:
+/// T001 and the untouched T002 in the first batch, each with a small `domain`
+/// estimate. T002 is what keeps the batch open once T001 is committed, so a
+/// reopen of T001 still has a batch being consumed to belong to.
 fn write_fixture_batch_plan(items_dir: &Path, track_id: &str) {
     let batch_plan = format!(
         r#"{{
@@ -163,9 +170,16 @@ fn write_fixture_batch_plan(items_dir: &Path, track_id: &str) {
         {{ "scope": "domain", "production_lines": 10, "test_lines": 5 }}
       ],
       "oversize_justification": null
+    }},
+    {{
+      "task_id": "T002",
+      "scope_estimates": [
+        {{ "scope": "domain", "production_lines": 10, "test_lines": 5 }}
+      ],
+      "oversize_justification": null
     }}
   ],
-  "batches": [{{ "id": "B1", "task_ids": ["T001"] }}]
+  "batches": [{{ "id": "B1", "task_ids": ["T001", "T002"] }}]
 }}
 "#
     );
@@ -254,8 +268,8 @@ fn transition_subcommand_success_updates_status_and_persists() {
 #[test]
 fn transition_subcommand_rejects_invalid_status_transition() {
     // todo -> done is invalid (must go todo -> in_progress -> done).
-    // Also verifies that impl-plan.json is NOT partially written on a failed
-    // transition — the task state must remain "todo" after rejection.
+    // Also verifies that impl-plan.json is not written at all on a failed
+    // transition: the whole document must survive byte for byte.
     //
     // Uses a fixed synthetic track id and an isolated git repo so the test runs
     // unconditionally on any CI/dev checkout branch (D7 / AC-18).
@@ -263,6 +277,8 @@ fn transition_subcommand_rejects_invalid_status_transition() {
 
     let root_dir = tempfile::tempdir().unwrap();
     let items_dir = project_root_with_full_track(root_dir.path(), track_id);
+    let impl_plan_path = items_dir.join(format!("{track_id}/impl-plan.json"));
+    let before = std::fs::read(&impl_plan_path).unwrap();
 
     let output = sotp_bin_in(root_dir.path())
         .args([
@@ -280,16 +296,15 @@ fn transition_subcommand_rejects_invalid_status_transition() {
 
     assert!(!output.status.success(), "expected non-zero exit for invalid transition todo->done");
 
-    // impl-plan.json must not have been partially written — T001 stays "todo".
-    let impl_plan_path = items_dir.join(format!("{track_id}/impl-plan.json"));
-    let content = std::fs::read_to_string(&impl_plan_path).unwrap();
-    assert!(
-        content.contains("\"todo\""),
-        "impl-plan.json must still contain \"todo\" status after rejected transition:\n{content}"
-    );
-    assert!(
-        !content.contains("\"done\""),
-        "impl-plan.json must NOT contain \"done\" status after rejected transition:\n{content}"
+    // The whole document, not one task's status: a rejected transition writes
+    // nothing, so any partial write — to the candidate, to another task, or to a
+    // field outside the task list — fails this comparison.
+    let after = std::fs::read(&impl_plan_path).unwrap();
+    assert_eq!(
+        after,
+        before,
+        "a rejected transition must leave impl-plan.json untouched; after:\n{}",
+        String::from_utf8_lossy(&after)
     );
 }
 

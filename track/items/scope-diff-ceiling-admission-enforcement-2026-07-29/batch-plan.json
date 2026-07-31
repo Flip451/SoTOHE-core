@@ -27,12 +27,48 @@
         }
       ],
       "oversize_justification": "3 つの操作は単一の契約族の拡張である: 同じ enum 群（BatchPlanGateViolation、AdmissionEvaluationError、BatchPlanViolationOutput）と同じ関数群（check_batch_plan、evaluate_admission、単一の guarded transition 経路）に、各操作が同時に手を入れる。分割して配送すると、後続 batch は先行 batch の review が直前に確定させた宣言面そのものを書き換えることになり、ceiling が守ろうとする batch 単位の review 隔離は分割によって得られない — 各分割は先行 batch の既 review 面を再び開く。加えて obligation 機構は 3 レーンにまたがる per-entry 記録に単一の試験束を束ねており、判定は各 entry について 3 レーン全体に及ぶ証跡を要求するため、試験の帰属を挙動境界で分割できない。実装状態としても hunk が交錯し、どの境界で切っても片側がコンパイルせず、相互参照した 1 個の変更集合を commit 時に複数 batch へ割り当てることは宣言 batch の合併に当たる（CN-04）。"
+    },
+    {
+      "task_id": "T022",
+      "scope_estimates": [
+        {
+          "scope": "domain",
+          "production_lines": 38,
+          "test_lines": 50
+        },
+        {
+          "scope": "usecase",
+          "production_lines": 18,
+          "test_lines": 35
+        },
+        {
+          "scope": "cli",
+          "production_lines": 0,
+          "test_lines": 42
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T023",
+      "scope_estimates": [
+        {
+          "scope": "infrastructure",
+          "production_lines": 5,
+          "test_lines": 71
+        }
+      ],
+      "oversize_justification": null
     }
   ],
   "batches": [
     {
       "id": "B1",
       "task_ids": ["T021"]
+    },
+    {
+      "id": "B2",
+      "task_ids": ["T022", "T023"]
     }
   ]
 }

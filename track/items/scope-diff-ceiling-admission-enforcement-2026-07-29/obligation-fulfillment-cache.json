@@ -2711,13 +2711,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "de0d86bbacb2129197c63c1e3291f216ed3c50a9b405b56171fbe87d91223764",
+        "bound_tests_set_hash": "53a285f79f5a62cc38e3dde89618412b100024cbb6fa3e85874b576ede9663cb",
         "declaration_hash": "5dffabcd1f13ff0788589aecc94319a2456a405ca421a4a8ac68dc3d587b5141",
         "anchor_text_hash": "cd8cbbbe4d4110b8e002d053a1d4e701fa2b8334f907fbf9dc5711abd8c1b15d"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let refused = evaluate_admission(\n        &plan,\n        &config,\n        &task(\"T003\"),\n        &committed(&[]),\n        &in_progress(&[]),\n        &measured(&[]),\n    )\n    .unwrap();\n    assert_eq!(\n        refused,\n        AdmissionDecision::Rejected(AdmissionRejection::NotCurrentBatchMember {\n            task_id: task(\"T003\"),\n            task_batch: batch_id(\"B2\"),\n            current_batch: batch_id(\"B1\"),\n        })\n    );\n\n    let admitted = evaluate_admission(\n        &plan,\n        &config,\n        &task(\"T003\"),\n        &committed(&[\"T001\", \"T002\"]),\n        &in_progress(&[]),\n        &measured(&[]),\n    )\n    .unwrap();\n    assert_eq!(admitted, AdmissionDecision::Admitted, \"B2 opens once B1 is committed\");"
+        "citation": "assert_eq!(\n        refused,\n        AdmissionDecision::Rejected(AdmissionRejection::NotCurrentBatchMember {\n            task_id: task(\"T003\"),\n            task_batch: batch_id(\"B2\"),\n            current_batch: batch_id(\"B1\"),\n        })\n    );\n\n    let admitted = evaluate_admission(\n        &plan,\n        &config,\n        &task(\"T003\"),\n        &committed(&[\"T001\", \"T002\"]),\n        &in_progress(&[]),\n        &measured(&[]),\n    )\n    .unwrap();\n    assert_eq!(admitted, AdmissionDecision::Admitted, \"B2 opens once B1 is committed\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -2780,6 +2780,16 @@
           "layer": "domain",
           "module_path": "domain::batch_plan::tests",
           "test_name": "test_the_gate_ignores_a_dependency_edge_whose_settled_endpoint_the_plan_does_not_declare"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_refuses_a_candidate_when_every_declared_batch_is_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_no_current_batch_rejection_renders_the_task_and_its_settled_batch"
         }
       ]
     },
@@ -2797,13 +2807,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "de0d86bbacb2129197c63c1e3291f216ed3c50a9b405b56171fbe87d91223764",
+        "bound_tests_set_hash": "53a285f79f5a62cc38e3dde89618412b100024cbb6fa3e85874b576ede9663cb",
         "declaration_hash": "5dffabcd1f13ff0788589aecc94319a2456a405ca421a4a8ac68dc3d587b5141",
         "anchor_text_hash": "95f3aa6927f09837b3f404c8ffe20837feae78d7b9c33b8e60168b0adc31f8e1"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(decision, AdmissionDecision::Admitted); ... assert_eq!(decision, AdmissionDecision::Admitted, \"1100 declared lines against a 500 ceiling still get in as the first contribution\"); ... assert_eq!(decision, AdmissionDecision::Rejected(AdmissionRejection::ScopeCeilingWouldBeExceeded { ... })); ... assert_eq!(prior_contribution.get(), LineCount::new(250)); ... assert_eq!(decision, AdmissionDecision::Admitted);"
+        "citation": "assert_eq!(decision, AdmissionDecision::Admitted, \"1100 declared lines against a 500 ceiling still get in as the first contribution\");\n\nassert_eq!(\n    decision,\n    AdmissionDecision::Rejected(AdmissionRejection::ScopeCeilingWouldBeExceeded {\n        scope: scope(\"domain\"),\n        prior_contribution: NonZeroLineCount::try_new(LineCount::new(250)).unwrap(),\n        candidate_estimate: LineCount::new(300),\n        ceiling: LineCount::new(500),\n    })\n);\n\nassert_eq!(decision, AdmissionDecision::Admitted);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -2866,6 +2876,16 @@
           "layer": "domain",
           "module_path": "domain::batch_plan::tests",
           "test_name": "test_the_gate_ignores_a_dependency_edge_whose_settled_endpoint_the_plan_does_not_declare"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_refuses_a_candidate_when_every_declared_batch_is_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_no_current_batch_rejection_renders_the_task_and_its_settled_batch"
         }
       ]
     },
@@ -2883,7 +2903,7 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "de0d86bbacb2129197c63c1e3291f216ed3c50a9b405b56171fbe87d91223764",
+        "bound_tests_set_hash": "53a285f79f5a62cc38e3dde89618412b100024cbb6fa3e85874b576ede9663cb",
         "declaration_hash": "5dffabcd1f13ff0788589aecc94319a2456a405ca421a4a8ac68dc3d587b5141",
         "anchor_text_hash": "6f947960e65a3683b885b439e41df9158b4d3cb076fba3c0db15c33bcca0f043"
       },
@@ -2952,6 +2972,16 @@
           "layer": "domain",
           "module_path": "domain::batch_plan::tests",
           "test_name": "test_the_gate_ignores_a_dependency_edge_whose_settled_endpoint_the_plan_does_not_declare"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_refuses_a_candidate_when_every_declared_batch_is_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_no_current_batch_rejection_renders_the_task_and_its_settled_batch"
         }
       ]
     },
@@ -2969,13 +2999,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "de0d86bbacb2129197c63c1e3291f216ed3c50a9b405b56171fbe87d91223764",
+        "bound_tests_set_hash": "53a285f79f5a62cc38e3dde89618412b100024cbb6fa3e85874b576ede9663cb",
         "declaration_hash": "5dffabcd1f13ff0788589aecc94319a2456a405ca421a4a8ac68dc3d587b5141",
         "anchor_text_hash": "7669b3f2178d882d0e0caa12e2ca90dacb12def84e7b001e4c49181fa2beb7e5"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let refused = evaluate_admission(\n        &plan,\n        &config,\n        &task(\"T003\"),\n        &committed(&[]),\n        &in_progress(&[]),\n        &measured(&[]),\n    )\n    .unwrap();\n    assert_eq!(\n        refused,\n        AdmissionDecision::Rejected(AdmissionRejection::NotCurrentBatchMember {\n            task_id: task(\"T003\"),\n            task_batch: batch_id(\"B2\"),\n            current_batch: batch_id(\"B1\"),\n        })\n    );\n\n    let admitted = evaluate_admission(\n        &plan,\n        &config,\n        &task(\"T003\"),\n        &committed(&[\"T001\", \"T002\"]),\n        &in_progress(&[]),\n        &measured(&[]),\n    )\n    .unwrap();\n    assert_eq!(admitted, AdmissionDecision::Admitted, \"B2 opens once B1 is committed\");"
+        "citation": "assert_eq!(\n        refused,\n        AdmissionDecision::Rejected(AdmissionRejection::NotCurrentBatchMember {\n            task_id: task(\"T003\"),\n            task_batch: batch_id(\"B2\"),\n            current_batch: batch_id(\"B1\"),\n        })\n    );\n\n    let admitted = evaluate_admission(\n        &plan,\n        &config,\n        &task(\"T003\"),\n        &committed(&[\"T001\", \"T002\"]),\n        &in_progress(&[]),\n        &measured(&[]),\n    )\n    .unwrap();\n    assert_eq!(admitted, AdmissionDecision::Admitted, \"B2 opens once B1 is committed\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -3038,6 +3068,16 @@
           "layer": "domain",
           "module_path": "domain::batch_plan::tests",
           "test_name": "test_the_gate_ignores_a_dependency_edge_whose_settled_endpoint_the_plan_does_not_declare"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_refuses_a_candidate_when_every_declared_batch_is_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_no_current_batch_rejection_renders_the_task_and_its_settled_batch"
         }
       ]
     },
@@ -3055,13 +3095,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "de0d86bbacb2129197c63c1e3291f216ed3c50a9b405b56171fbe87d91223764",
+        "bound_tests_set_hash": "53a285f79f5a62cc38e3dde89618412b100024cbb6fa3e85874b576ede9663cb",
         "declaration_hash": "5dffabcd1f13ff0788589aecc94319a2456a405ca421a4a8ac68dc3d587b5141",
         "anchor_text_hash": "cd6dba41e9744a8b9c420f05a6ed4c430ae8e451896c2b15e05780901a2525ad"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "\"1100 declared lines against a 500 ceiling still get in as the first contribution\""
+        "citation": "assert_eq!(\n        decision,\n        AdmissionDecision::Admitted,\n        \"1100 declared lines against a 500 ceiling still get in as the first contribution\"\n    );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -3124,6 +3164,16 @@
           "layer": "domain",
           "module_path": "domain::batch_plan::tests",
           "test_name": "test_the_gate_ignores_a_dependency_edge_whose_settled_endpoint_the_plan_does_not_declare"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_refuses_a_candidate_when_every_declared_batch_is_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_no_current_batch_rejection_renders_the_task_and_its_settled_batch"
         }
       ]
     },
@@ -3141,7 +3191,7 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "de0d86bbacb2129197c63c1e3291f216ed3c50a9b405b56171fbe87d91223764",
+        "bound_tests_set_hash": "53a285f79f5a62cc38e3dde89618412b100024cbb6fa3e85874b576ede9663cb",
         "declaration_hash": "5dffabcd1f13ff0788589aecc94319a2456a405ca421a4a8ac68dc3d587b5141",
         "anchor_text_hash": "d9b08a85d66d49d33298ae5cb8b1a9adf29f78988d1086b6c203d164cf23e094"
       },
@@ -3210,6 +3260,16 @@
           "layer": "domain",
           "module_path": "domain::batch_plan::tests",
           "test_name": "test_the_gate_ignores_a_dependency_edge_whose_settled_endpoint_the_plan_does_not_declare"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_refuses_a_candidate_when_every_declared_batch_is_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_no_current_batch_rejection_renders_the_task_and_its_settled_batch"
         }
       ]
     },
@@ -3227,7 +3287,7 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "de0d86bbacb2129197c63c1e3291f216ed3c50a9b405b56171fbe87d91223764",
+        "bound_tests_set_hash": "53a285f79f5a62cc38e3dde89618412b100024cbb6fa3e85874b576ede9663cb",
         "declaration_hash": "5dffabcd1f13ff0788589aecc94319a2456a405ca421a4a8ac68dc3d587b5141",
         "anchor_text_hash": "debd8e5c6de40d604edc5f2398b882e836ba46f04e27cce0d3793b4c0a7c3337"
       },
@@ -3296,6 +3356,16 @@
           "layer": "domain",
           "module_path": "domain::batch_plan::tests",
           "test_name": "test_the_gate_ignores_a_dependency_edge_whose_settled_endpoint_the_plan_does_not_declare"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_refuses_a_candidate_when_every_declared_batch_is_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_no_current_batch_rejection_renders_the_task_and_its_settled_batch"
         }
       ]
     },
@@ -3313,13 +3383,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "de0d86bbacb2129197c63c1e3291f216ed3c50a9b405b56171fbe87d91223764",
+        "bound_tests_set_hash": "53a285f79f5a62cc38e3dde89618412b100024cbb6fa3e85874b576ede9663cb",
         "declaration_hash": "5dffabcd1f13ff0788589aecc94319a2456a405ca421a4a8ac68dc3d587b5141",
         "anchor_text_hash": "cf41c1df28aa3a5011c3eb94a9bbe7ddd8fea711f5988a984027e8f867776cc4"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let error = result.expect_err(\"an unrecognised name must not admit on an unresolved ceiling\");\nassert!(\n    matches!(\n        &error,\n        AdmissionEvaluationError::UnknownMainScopeName { task_id, scope }\n            if task_id == &task(\"T001\") && scope == &main_scope(\"domian\")\n    ),\n    \"unexpected: {error:?}\"\n);"
+        "citation": "let error = result.expect_err(\"an unrecognised name must not admit on an unresolved ceiling\");\n    assert!(\n        matches!(\n            &error,\n            AdmissionEvaluationError::UnknownMainScopeName { task_id, scope }\n                if task_id == &task(\"T001\") && scope == &main_scope(\"domian\")\n        ),\n        \"unexpected: {error:?}\"\n    );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -3382,6 +3452,16 @@
           "layer": "domain",
           "module_path": "domain::batch_plan::tests",
           "test_name": "test_the_gate_ignores_a_dependency_edge_whose_settled_endpoint_the_plan_does_not_declare"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_refuses_a_candidate_when_every_declared_batch_is_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_no_current_batch_rejection_renders_the_task_and_its_settled_batch"
         }
       ]
     },
@@ -3399,13 +3479,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "de0d86bbacb2129197c63c1e3291f216ed3c50a9b405b56171fbe87d91223764",
+        "bound_tests_set_hash": "53a285f79f5a62cc38e3dde89618412b100024cbb6fa3e85874b576ede9663cb",
         "declaration_hash": "5dffabcd1f13ff0788589aecc94319a2456a405ca421a4a8ac68dc3d587b5141",
         "anchor_text_hash": "6f9b59674e60454bb5ed38b8e579da944bce665d03d33f9d23fb4dce20f54c40"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "// T001 is done with a commit recorded and T002 is skipped, so a plan holding\n// only T003 declares everything it is required to.\n...\nassert_eq!(check_batch_plan(&plan, &config, &planned_tasks), BatchPlanGateOutcome::Passed);"
+        "citation": "assert_eq!(check_batch_plan(&plan, &config, &planned_tasks), BatchPlanGateOutcome::Passed);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -3468,6 +3548,16 @@
           "layer": "domain",
           "module_path": "domain::batch_plan::tests",
           "test_name": "test_the_gate_ignores_a_dependency_edge_whose_settled_endpoint_the_plan_does_not_declare"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_refuses_a_candidate_when_every_declared_batch_is_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_no_current_batch_rejection_renders_the_task_and_its_settled_batch"
         }
       ]
     },
@@ -3485,13 +3575,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "de0d86bbacb2129197c63c1e3291f216ed3c50a9b405b56171fbe87d91223764",
+        "bound_tests_set_hash": "53a285f79f5a62cc38e3dde89618412b100024cbb6fa3e85874b576ede9663cb",
         "declaration_hash": "5dffabcd1f13ff0788589aecc94319a2456a405ca421a4a8ac68dc3d587b5141",
         "anchor_text_hash": "21219f3e18c825c395a02a15ddf2d3b97af13ae4ea4780be63aded2091c4b1f0"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(check_batch_plan(&plan, &config, &planned_tasks), BatchPlanGateOutcome::Passed); ... assert_eq!(decision, AdmissionDecision::Admitted);"
+        "citation": "assert_eq!(check_batch_plan(&plan, &config, &planned_tasks), BatchPlanGateOutcome::Passed);\n\n// With the settled tasks undeclared, the one declared batch is the current\n// one, so its todo member is not refused for membership either.\nlet decision = evaluate_admission(\n    &plan,\n    &config,\n    &task(\"T003\"),\n    &committed(&[\"T001\", \"T002\"]),\n    &in_progress(&[]),\n    &measured(&[]),\n)\n.unwrap();\nassert_eq!(decision, AdmissionDecision::Admitted);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -3554,6 +3644,16 @@
           "layer": "domain",
           "module_path": "domain::batch_plan::tests",
           "test_name": "test_the_gate_ignores_a_dependency_edge_whose_settled_endpoint_the_plan_does_not_declare"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_refuses_a_candidate_when_every_declared_batch_is_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_no_current_batch_rejection_renders_the_task_and_its_settled_batch"
         }
       ]
     },
@@ -5118,13 +5218,13 @@
         "item_identifier": "trait_method:measure_scope_diff"
       },
       "key": {
-        "bound_tests_set_hash": "aab135417e71ce160d1a842c08513d225046c1c4182d875c6c418f1155579eab",
+        "bound_tests_set_hash": "e0ae5a4de1e8500d0ec2c39c8dc3099fc13b1d710c3814d3f52f54eb61aaa2bf",
         "declaration_hash": "2011fd1565081b3218f735c7de89ee31f7b7a849490088eeaa3acad00c6914d3",
         "anchor_text_hash": "95f3aa6927f09837b3f404c8ffe20837feae78d7b9c33b8e60168b0adc31f8e1"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(measured.len(), 1);\n    assert_eq!(measured[0].scope(), &scope(\"domain\"));\n    assert_eq!(measured[0].lines(), LineCount::new(412));"
+        "citation": "assert_eq!(domain_lines(&measured),\n            4,\n            \"the record is honoured, so the committed +3 sits behind the base and only the \\\n             unstaged +4 is measured\""
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -5132,6 +5232,11 @@
           "layer": "usecase",
           "module_path": "usecase::batch_plan::tests",
           "test_name": "test_the_scope_diff_measure_port_returns_one_measured_figure_per_scope"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::scope_diff_measure::tests",
+          "test_name": "test_a_valid_commit_record_is_honoured_from_another_repositorys_working_directory"
         }
       ]
     },
@@ -5500,8 +5605,8 @@
         "item_identifier": "voluntary:IN-09"
       },
       "key": {
-        "bound_tests_set_hash": "7787dbd2cf9a34661c9ae3eca385e94562b801c26e193bfd14538cfbdca81533",
-        "declaration_hash": "12d17992a46009567302f4787692e7ef0f28822eb2c73d739ebf593e6ff8e8ac",
+        "bound_tests_set_hash": "43667c888d36faf17886e4ca4446a09dd662baba41537507d56ce1c4d5f876b0",
+        "declaration_hash": "deca0d04368e7e7a08997a9becfabda53cb424bdbee3ec49a69f85628db713bc",
         "anchor_text_hash": "cd8cbbbe4d4110b8e002d053a1d4e701fa2b8334f907fbf9dc5711abd8c1b15d"
       },
       "verdict": {
@@ -5519,6 +5624,16 @@
           "layer": "domain",
           "module_path": "domain::batch_plan::tests",
           "test_name": "test_a_rejection_renders_the_arithmetic_it_carries"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_refuses_a_candidate_when_every_declared_batch_is_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_no_current_batch_rejection_renders_the_task_and_its_settled_batch"
         }
       ]
     },
@@ -5537,12 +5652,12 @@
       },
       "key": {
         "bound_tests_set_hash": "ae907388211d1760459b739a3de702a57d4df1e6ad25331ef00d60991bcc2cdd",
-        "declaration_hash": "12d17992a46009567302f4787692e7ef0f28822eb2c73d739ebf593e6ff8e8ac",
+        "declaration_hash": "deca0d04368e7e7a08997a9becfabda53cb424bdbee3ec49a69f85628db713bc",
         "anchor_text_hash": "95f3aa6927f09837b3f404c8ffe20837feae78d7b9c33b8e60168b0adc31f8e1"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "decision,\n        AdmissionDecision::Rejected(AdmissionRejection::ScopeCeilingWouldBeExceeded {\n            scope: scope(\"domain\"),\n            prior_contribution: NonZeroLineCount::try_new(LineCount::new(250)).unwrap(),\n            candidate_estimate: LineCount::new(300),\n            ceiling: LineCount::new(500),\n        })"
+        "citation": "assert_eq!(\n        decision,\n        AdmissionDecision::Rejected(AdmissionRejection::ScopeCeilingWouldBeExceeded {\n            scope: scope(\"domain\"),\n            prior_contribution: NonZeroLineCount::try_new(LineCount::new(250)).unwrap(),\n            candidate_estimate: LineCount::new(300),\n            ceiling: LineCount::new(500),\n        })\n    );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -5572,13 +5687,13 @@
         "item_identifier": "voluntary:AC-10"
       },
       "key": {
-        "bound_tests_set_hash": "7787dbd2cf9a34661c9ae3eca385e94562b801c26e193bfd14538cfbdca81533",
-        "declaration_hash": "12d17992a46009567302f4787692e7ef0f28822eb2c73d739ebf593e6ff8e8ac",
+        "bound_tests_set_hash": "43667c888d36faf17886e4ca4446a09dd662baba41537507d56ce1c4d5f876b0",
+        "declaration_hash": "deca0d04368e7e7a08997a9becfabda53cb424bdbee3ec49a69f85628db713bc",
         "anchor_text_hash": "7669b3f2178d882d0e0caa12e2ca90dacb12def84e7b001e4c49181fa2beb7e5"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let refused = evaluate_admission(\n        &plan,\n        &config,\n        &task(\"T003\"),\n        &committed(&[]),\n        &in_progress(&[]),\n        &measured(&[]),\n    )\n    .unwrap();\n    assert_eq!(\n        refused,\n        AdmissionDecision::Rejected(AdmissionRejection::NotCurrentBatchMember {\n            task_id: task(\"T003\"),\n            task_batch: batch_id(\"B2\"),\n            current_batch: batch_id(\"B1\"),\n        })\n    );\n\n    let admitted = evaluate_admission(\n        &plan,\n        &config,\n        &task(\"T003\"),\n        &committed(&[\"T001\", \"T002\"]),\n        &in_progress(&[]),\n        &measured(&[]),\n    )\n    .unwrap();\n    assert_eq!(admitted, AdmissionDecision::Admitted, \"B2 opens once B1 is committed\");"
+        "citation": "assert_eq!(\n        refused,\n        AdmissionDecision::Rejected(AdmissionRejection::NotCurrentBatchMember {\n            task_id: task(\"T003\"),\n            task_batch: batch_id(\"B2\"),\n            current_batch: batch_id(\"B1\"),\n        })\n    );\n\n    let admitted = evaluate_admission(\n        &plan,\n        &config,\n        &task(\"T003\"),\n        &committed(&[\"T001\", \"T002\"]),\n        &in_progress(&[]),\n        &measured(&[]),\n    )\n    .unwrap();\n    assert_eq!(admitted, AdmissionDecision::Admitted, \"B2 opens once B1 is committed\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -5591,6 +5706,16 @@
           "layer": "domain",
           "module_path": "domain::batch_plan::tests",
           "test_name": "test_a_rejection_renders_the_arithmetic_it_carries"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_refuses_a_candidate_when_every_declared_batch_is_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_no_current_batch_rejection_renders_the_task_and_its_settled_batch"
         }
       ]
     },
@@ -5609,12 +5734,12 @@
       },
       "key": {
         "bound_tests_set_hash": "9170fea983461b37a026a634c54ea6fb509644da27b65979daafdad97667613e",
-        "declaration_hash": "12d17992a46009567302f4787692e7ef0f28822eb2c73d739ebf593e6ff8e8ac",
+        "declaration_hash": "deca0d04368e7e7a08997a9becfabda53cb424bdbee3ec49a69f85628db713bc",
         "anchor_text_hash": "d9b08a85d66d49d33298ae5cb8b1a9adf29f78988d1086b6c203d164cf23e094"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(\n        decision,\n        AdmissionDecision::Rejected(AdmissionRejection::ScopeCeilingWouldBeExceeded {\n            scope: scope(\"domain\"),\n            prior_contribution: NonZeroLineCount::try_new(LineCount::new(250)).unwrap(),\n            candidate_estimate: LineCount::new(300),\n            ceiling: LineCount::new(500),\n        })\n    );\n\n// T003 declares usecase only; domain is far over its ceiling already.\nassert_eq!(decision, AdmissionDecision::Admitted);"
+        "citation": "assert_eq!(\n        decision,\n        AdmissionDecision::Rejected(AdmissionRejection::ScopeCeilingWouldBeExceeded {\n            scope: scope(\"domain\"),\n            prior_contribution: NonZeroLineCount::try_new(LineCount::new(250)).unwrap(),\n            candidate_estimate: LineCount::new(300),\n            ceiling: LineCount::new(500),\n        })\n    );\n\nassert_eq!(decision, AdmissionDecision::Admitted);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -7360,13 +7485,13 @@
         "item_identifier": "trait_impl:usecase::batch_plan::ports::ScopeDiffMeasurePort"
       },
       "key": {
-        "bound_tests_set_hash": "e0c5a8e8839dd5cbb6b8f7f5ae338712b45c97a8ac4fa8e81906cdd59c6de191",
+        "bound_tests_set_hash": "be41a6666f10c9276913172dc4cd0bcaf35965e424cf3924c20bcbbe3e7f5f62",
         "declaration_hash": "61109d5cb0f522559552e8238cbd76bf82bf8a7b612e5a6ca0622b30b03eedbd",
         "anchor_text_hash": "95f3aa6927f09837b3f404c8ffe20837feae78d7b9c33b8e60168b0adc31f8e1"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "\"all three change kinds are summed against the base\""
+        "citation": "assert_eq!(domain_lines(&measured), 3 + 2 + 4, \"all three change kinds are summed against the base\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -7419,6 +7544,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::scope_diff_measure::tests",
           "test_name": "test_the_measurer_uses_the_track_snapshot_not_live_branch_strategy_config"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::scope_diff_measure::tests",
+          "test_name": "test_a_valid_commit_record_is_honoured_from_another_repositorys_working_directory"
         }
       ]
     },
@@ -7436,13 +7566,13 @@
         "item_identifier": "trait_impl:usecase::batch_plan::ports::ScopeDiffMeasurePort"
       },
       "key": {
-        "bound_tests_set_hash": "e0c5a8e8839dd5cbb6b8f7f5ae338712b45c97a8ac4fa8e81906cdd59c6de191",
+        "bound_tests_set_hash": "be41a6666f10c9276913172dc4cd0bcaf35965e424cf3924c20bcbbe3e7f5f62",
         "declaration_hash": "61109d5cb0f522559552e8238cbd76bf82bf8a7b612e5a6ca0622b30b03eedbd",
         "anchor_text_hash": "ffdc22721890fd01dada6c95d08bcde7973a523171d5a1657e8f7ab3596e20e2"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(changed[0].1, 17, \"12 additions + 5 deletions\");\nassert_eq!(domain.lines(), LineCount::new(20));\nassert_eq!(domain_lines(&measure_in(&root)), 3 + 2 + 4, \"all three change kinds are summed against the base\");\nassert_eq!(domain_lines(&measure_in(&root)), 3 + 7, \"an untracked file adds its whole length, with no deletions\");\nassert_eq!(domain_lines(&measure_in(&root)), 3 + 4 + 2, \"both awkward names are counted under `domain`\");"
+        "citation": "assert_eq!(domain.lines(), LineCount::new(20));\n\n\"all three change kinds are summed against the base\"\n\n\"an untracked file adds its whole length, with no deletions\"\n\n\"both awkward names are counted under `domain`\""
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -7495,6 +7625,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::scope_diff_measure::tests",
           "test_name": "test_the_measurer_uses_the_track_snapshot_not_live_branch_strategy_config"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::scope_diff_measure::tests",
+          "test_name": "test_a_valid_commit_record_is_honoured_from_another_repositorys_working_directory"
         }
       ]
     },
@@ -7512,13 +7647,13 @@
         "item_identifier": "trait_impl:usecase::batch_plan::ports::ScopeDiffMeasurePort"
       },
       "key": {
-        "bound_tests_set_hash": "e0c5a8e8839dd5cbb6b8f7f5ae338712b45c97a8ac4fa8e81906cdd59c6de191",
+        "bound_tests_set_hash": "be41a6666f10c9276913172dc4cd0bcaf35965e424cf3924c20bcbbe3e7f5f62",
         "declaration_hash": "61109d5cb0f522559552e8238cbd76bf82bf8a7b612e5a6ca0622b30b03eedbd",
         "anchor_text_hash": "88b0b5d03fd4d86a87adeccb80ba003f2c27cb47ea187dfb176beb5f14792fb8"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(changed[0].1, 17, \"12 additions + 5 deletions\");\nassert_eq!(domain.lines(), LineCount::new(20));\nassert_eq!(domain_lines(&measure_in(&root)), 3 + 7, \"an untracked file adds its whole length, with no deletions\");\nlet measured = accumulate_by_scope(&config(), &changed);"
+        "citation": "assert_eq!(changed[0].1, 17, \"12 additions + 5 deletions\");\n\nassert_eq!(\n    domain_lines(&measure_in(&root)),\n    3 + 7,\n    \"an untracked file adds its whole length, with no deletions\"\n);\n\nlet measured = accumulate_by_scope(&config(), &changed);\nlet domain = measured.iter().find(|diff| diff.scope().to_string() == \"domain\").unwrap();\nassert_eq!(domain.lines(), LineCount::new(20));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -7571,6 +7706,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::scope_diff_measure::tests",
           "test_name": "test_the_measurer_uses_the_track_snapshot_not_live_branch_strategy_config"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::scope_diff_measure::tests",
+          "test_name": "test_a_valid_commit_record_is_honoured_from_another_repositorys_working_directory"
         }
       ]
     },
@@ -7588,7 +7728,7 @@
         "item_identifier": "trait_impl:usecase::batch_plan::ports::ScopeDiffMeasurePort"
       },
       "key": {
-        "bound_tests_set_hash": "e0c5a8e8839dd5cbb6b8f7f5ae338712b45c97a8ac4fa8e81906cdd59c6de191",
+        "bound_tests_set_hash": "be41a6666f10c9276913172dc4cd0bcaf35965e424cf3924c20bcbbe3e7f5f62",
         "declaration_hash": "61109d5cb0f522559552e8238cbd76bf82bf8a7b612e5a6ca0622b30b03eedbd",
         "anchor_text_hash": "6f39c6a6690cc059399beb1b142b4869ea15ad8ee0648aa396dfba14c22d4fb2"
       },
@@ -7647,6 +7787,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::scope_diff_measure::tests",
           "test_name": "test_the_measurer_uses_the_track_snapshot_not_live_branch_strategy_config"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::scope_diff_measure::tests",
+          "test_name": "test_a_valid_commit_record_is_honoured_from_another_repositorys_working_directory"
         }
       ]
     },
@@ -8859,13 +9004,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "2de28abaa00da27012bac014f999952ed7b5c0cc5d6b4045bd9408df00dc8d4f",
+        "bound_tests_set_hash": "fe085eb106b0b2cc89dbfd9463354f395f7c9aa9396c173010aa7b6b04e53759",
         "declaration_hash": "e86ba9cefaa376e16d7574f8ab05bf7ce16a0313adf3f60fe5de605d4697de31",
         "anchor_text_hash": "cd8cbbbe4d4110b8e002d053a1d4e701fa2b8334f907fbf9dc5711abd8c1b15d"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );"
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );\n\n        assert_eq!(transitioned(outcome).derived_status, \"in_progress\");\n\n        assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T001\".to_owned(),\n                task_batch: \"B1\".to_owned(),\n                current_batch: \"B2\".to_owned(),\n            })\n        );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -8973,6 +9118,11 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
         }
       ]
     },
@@ -8990,7 +9140,7 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "2de28abaa00da27012bac014f999952ed7b5c0cc5d6b4045bd9408df00dc8d4f",
+        "bound_tests_set_hash": "fe085eb106b0b2cc89dbfd9463354f395f7c9aa9396c173010aa7b6b04e53759",
         "declaration_hash": "e86ba9cefaa376e16d7574f8ab05bf7ce16a0313adf3f60fe5de605d4697de31",
         "anchor_text_hash": "95f3aa6927f09837b3f404c8ffe20837feae78d7b9c33b8e60168b0adc31f8e1"
       },
@@ -9104,6 +9254,11 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
         }
       ]
     },
@@ -9121,13 +9276,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "2de28abaa00da27012bac014f999952ed7b5c0cc5d6b4045bd9408df00dc8d4f",
+        "bound_tests_set_hash": "fe085eb106b0b2cc89dbfd9463354f395f7c9aa9396c173010aa7b6b04e53759",
         "declaration_hash": "e86ba9cefaa376e16d7574f8ab05bf7ce16a0313adf3f60fe5de605d4697de31",
         "anchor_text_hash": "ee340e885df4efbcde603a11387e84f7d83b3be771b43e2293a100c9ce2902ff"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let outcome = admitting_interactor(\n            store_with(plan_of(&[(\"T001\", TaskStatus::InProgress), (\"T002\", TaskStatus::Todo)])),\n            batch_plan,\n            vec![MeasuredScopeDiff::new(\n                ScopeName::Main(MainScopeName::new(\"domain\").unwrap()),\n                LineCount::new(100),\n            )],\n            Some(500),\n        )\n        .transition_task(start_work_on(\"T002\"))\n        .unwrap();\n\n        assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::ScopeCeilingWouldBeExceeded {\n                scope: \"domain\".to_owned(),\n                // 100 measured + 300 declared by the member in progress.\n                prior_contribution: std::num::NonZeroU32::new(400).unwrap(),\n                candidate_estimate: 200,\n                ceiling: 500,\n            })\n        );"
+        "citation": "// Starting work is judged against the batch plan, so its absence is an\n        // error: the start never passes unjudged.\n        let error = TaskOperationInteractor::new(\n            store_with(plan_of(&[(\"T001\", TaskStatus::Todo)])),\n            None,\n            Arc::new(StubBatchPlanReader(None)),\n            Arc::new(StubScopeDiffMeasurer(Vec::new())),\n            Arc::new(StubScopeConfigReader(vec![(\"domain\", Some(500))])),\n        )\n        .transition_task(start_work_on(\"T001\"))\n        .unwrap_err();"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -9235,6 +9390,11 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
         }
       ]
     },
@@ -9252,13 +9412,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "2de28abaa00da27012bac014f999952ed7b5c0cc5d6b4045bd9408df00dc8d4f",
+        "bound_tests_set_hash": "fe085eb106b0b2cc89dbfd9463354f395f7c9aa9396c173010aa7b6b04e53759",
         "declaration_hash": "e86ba9cefaa376e16d7574f8ab05bf7ce16a0313adf3f60fe5de605d4697de31",
         "anchor_text_hash": "cf41c1df28aa3a5011c3eb94a9bbe7ddd8fea711f5988a984027e8f867776cc4"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "\"The estimate names a misspelled scope, so no ceiling can be resolved for it: the start fails rather than degrading into an unconstrained comparison that admits any figure.\" ... \"assert!(matches!(error, TaskOperationError::TransitionFailed(_)), \\\"unexpected: {error}\\\");\" ... \"`other` resolves no ceiling, so its total is never compared\""
+        "citation": "let error = admitting_interactor(\n            store_with(plan_of(&[(\"T001\", TaskStatus::Todo)])),\n            batch_plan,\n            Vec::new(),\n            Some(500),\n        )\n        .transition_task(start_work_on(\"T001\"))\n        .unwrap_err();\n\n        assert!(matches!(error, TaskOperationError::TransitionFailed(_)), \"unexpected: {error}\");\n        assert!(error.to_string().contains(\"T001\"), \"the failure names the task: {error}\");\n        assert!(error.to_string().contains(\"domian\"), \"the failure names the scope: {error}\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -9366,6 +9526,11 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
         }
       ]
     },
@@ -9383,8 +9548,628 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "2de28abaa00da27012bac014f999952ed7b5c0cc5d6b4045bd9408df00dc8d4f",
+        "bound_tests_set_hash": "fe085eb106b0b2cc89dbfd9463354f395f7c9aa9396c173010aa7b6b04e53759",
         "declaration_hash": "e86ba9cefaa376e16d7574f8ab05bf7ce16a0313adf3f60fe5de605d4697de31",
+        "anchor_text_hash": "628a2564d1e567d81f887dcb074f45632d87652f77b3be921da52c5f4f9ebf7a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(error, TaskOperationError::TransitionFailed(_)), \"unexpected: {error}\");\nassert!(error.to_string().contains(\"T001\"), \"the failure names the task: {error}\");\n// Fail-closed and before any write: the task is still settled.\nassert!(matches!(stored_status(&store, \"T001\"), TaskStatus::DoneTraced { .. }));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_candidate_without_an_estimate_makes_the_transition_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_track_without_a_batch_plan_cannot_start_work_but_still_finishes_it"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_finishing_a_task_is_not_judged_by_the_admission_guard"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "task_operation_transition_task_succeeds"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "task_operation_branch_guard_enforced_via_injected_reader"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_adding_a_task_names_the_id_it_created_and_the_status_that_follows"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_an_override_dominates_the_derived_status_until_it_is_cleared"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_the_current_batch_is_judged_like_a_start"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_an_estimate_naming_an_unconfigured_scope_makes_the_transition_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_whose_estimate_would_pass_the_ceiling_is_refused"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_whose_estimate_names_an_unconfigured_scope_is_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_the_first_contributor_to_a_scope_is_admitted_however_large_its_estimate"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_that_declares_only_the_reserved_other_scope_is_admitted"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskOperationInteractor",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-27"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskOperationInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "fe085eb106b0b2cc89dbfd9463354f395f7c9aa9396c173010aa7b6b04e53759",
+        "declaration_hash": "e86ba9cefaa376e16d7574f8ab05bf7ce16a0313adf3f60fe5de605d4697de31",
+        "anchor_text_hash": "b2c7413977b1f386a58b3255d6390e1019bdfb8252b2192ac0be4e84f7e7cdbb"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"the cumulative rejection applies to a\\n        // reopen exactly as it does to a start.\" ... \"the first contribution gets in on a reopen too\" ... \"The missing-estimate failure on a reopen\" ... \"The reopen is refused rather than admitted\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_candidate_without_an_estimate_makes_the_transition_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_track_without_a_batch_plan_cannot_start_work_but_still_finishes_it"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_finishing_a_task_is_not_judged_by_the_admission_guard"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "task_operation_transition_task_succeeds"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "task_operation_branch_guard_enforced_via_injected_reader"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_adding_a_task_names_the_id_it_created_and_the_status_that_follows"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_an_override_dominates_the_derived_status_until_it_is_cleared"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_the_current_batch_is_judged_like_a_start"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_an_estimate_naming_an_unconfigured_scope_makes_the_transition_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_whose_estimate_would_pass_the_ceiling_is_refused"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_whose_estimate_names_an_unconfigured_scope_is_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_the_first_contributor_to_a_scope_is_admitted_however_large_its_estimate"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_that_declares_only_the_reserved_other_scope_is_admitted"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskOperationService",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskOperationService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:transition_task"
+      },
+      "key": {
+        "bound_tests_set_hash": "98f21380fbe2c39907f40fcae25405feeb67531f45d5697564eeafb6b29cbda1",
+        "declaration_hash": "0df93e0eecc60dfa3e8bbdc13845bd12a97a6e2cb424b1e27c7f25809645c12e",
+        "anchor_text_hash": "cd8cbbbe4d4110b8e002d053a1d4e701fa2b8334f907fbf9dc5711abd8c1b15d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"outcome.rejection(),\\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\\n                task_id: \\\"T002\\\".to_owned(),\\n                task_batch: \\\"B2\\\".to_owned(),\\n                current_batch: \\\"B1\\\".to_owned(),\\n            })\"; \"assert_eq!(transitioned(outcome).derived_status, \\\"in_progress\\\");\"; \"outcome.rejection(),\\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\\n                task_id: \\\"T001\\\".to_owned(),\\n                task_batch: \\\"B1\\\".to_owned(),\\n                current_batch: \\\"B2\\\".to_owned(),\\n            })\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_candidate_without_an_estimate_makes_the_transition_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_track_without_a_batch_plan_cannot_start_work_but_still_finishes_it"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_finishing_a_task_is_not_judged_by_the_admission_guard"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_the_current_batch_is_judged_like_a_start"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_an_estimate_naming_an_unconfigured_scope_makes_the_transition_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_whose_estimate_would_pass_the_ceiling_is_refused"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_whose_estimate_names_an_unconfigured_scope_is_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_the_first_contributor_to_a_scope_is_admitted_however_large_its_estimate"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_that_declares_only_the_reserved_other_scope_is_admitted"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskOperationService",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskOperationService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:transition_task"
+      },
+      "key": {
+        "bound_tests_set_hash": "98f21380fbe2c39907f40fcae25405feeb67531f45d5697564eeafb6b29cbda1",
+        "declaration_hash": "0df93e0eecc60dfa3e8bbdc13845bd12a97a6e2cb424b1e27c7f25809645c12e",
+        "anchor_text_hash": "7669b3f2178d882d0e0caa12e2ca90dacb12def84e7b001e4c49181fa2beb7e5"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );\n\n        // With B1's only member committed, B2 becomes the batch being consumed\n        // and the same task starts.\n        let settled = store_with(plan_of(&[\n            (\"T001\", TaskStatus::DoneTraced { commit_hash: commit_hash() }),\n            (\"T002\", TaskStatus::Todo),\n        ]));\n        let outcome = admitting_interactor(settled, batch_plan, Vec::new(), Some(500))\n            .transition_task(start_work_on(\"T002\"))\n            .unwrap();\n\n        assert_eq!(transitioned(outcome).derived_status, \"in_progress\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_candidate_without_an_estimate_makes_the_transition_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_track_without_a_batch_plan_cannot_start_work_but_still_finishes_it"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_finishing_a_task_is_not_judged_by_the_admission_guard"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_the_current_batch_is_judged_like_a_start"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_an_estimate_naming_an_unconfigured_scope_makes_the_transition_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_whose_estimate_would_pass_the_ceiling_is_refused"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_whose_estimate_names_an_unconfigured_scope_is_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_the_first_contributor_to_a_scope_is_admitted_however_large_its_estimate"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_that_declares_only_the_reserved_other_scope_is_admitted"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskOperationService",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-23"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskOperationService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:transition_task"
+      },
+      "key": {
+        "bound_tests_set_hash": "98f21380fbe2c39907f40fcae25405feeb67531f45d5697564eeafb6b29cbda1",
+        "declaration_hash": "0df93e0eecc60dfa3e8bbdc13845bd12a97a6e2cb424b1e27c7f25809645c12e",
+        "anchor_text_hash": "cf41c1df28aa3a5011c3eb94a9bbe7ddd8fea711f5988a984027e8f867776cc4"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"The estimate names a misspelled scope, so no ceiling can be resolved\\n        // for it: the start fails rather than degrading into an unconstrained\\n        // comparison that admits any figure.\" ... \"The same fail-closed error a start gets: an unresolvable ceiling must not\\n        // admit the reopen\" ... \"`other` resolves no ceiling, so its total is never compared\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_candidate_without_an_estimate_makes_the_transition_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_track_without_a_batch_plan_cannot_start_work_but_still_finishes_it"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_finishing_a_task_is_not_judged_by_the_admission_guard"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_the_current_batch_is_judged_like_a_start"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_an_estimate_naming_an_unconfigured_scope_makes_the_transition_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_whose_estimate_would_pass_the_ceiling_is_refused"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_whose_estimate_names_an_unconfigured_scope_is_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_the_first_contributor_to_a_scope_is_admitted_however_large_its_estimate"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_that_declares_only_the_reserved_other_scope_is_admitted"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskOperationService",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-26"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskOperationService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:transition_task"
+      },
+      "key": {
+        "bound_tests_set_hash": "98f21380fbe2c39907f40fcae25405feeb67531f45d5697564eeafb6b29cbda1",
+        "declaration_hash": "0df93e0eecc60dfa3e8bbdc13845bd12a97a6e2cb424b1e27c7f25809645c12e",
         "anchor_text_hash": "628a2564d1e567d81f887dcb074f45632d87652f77b3be921da52c5f4f9ebf7a"
       },
       "verdict": {
@@ -9426,26 +10211,6 @@
         {
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
-          "test_name": "task_operation_transition_task_succeeds"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "task_operation_branch_guard_enforced_via_injected_reader"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_adding_a_task_names_the_id_it_created_and_the_status_that_follows"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_an_override_dominates_the_derived_status_until_it_is_cleared"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
           "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
         },
         {
@@ -9497,581 +10262,11 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
-        }
-      ]
-    },
-    {
-      "edge_id": {
-        "entry_key": "TaskOperationInteractor",
-        "anchor_id": {
-          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
-          "element_id": "AC-27"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "TaskOperationInteractor",
-        "obligation_kind": "result",
-        "item_identifier": "entry"
-      },
-      "key": {
-        "bound_tests_set_hash": "2de28abaa00da27012bac014f999952ed7b5c0cc5d6b4045bd9408df00dc8d4f",
-        "declaration_hash": "e86ba9cefaa376e16d7574f8ab05bf7ce16a0313adf3f60fe5de605d4697de31",
-        "anchor_text_hash": "b2c7413977b1f386a58b3255d6390e1019bdfb8252b2192ac0be4e84f7e7cdbb"
-      },
-      "verdict": {
-        "kind": "fulfilled",
-        "citation": "\"the cumulative rejection applies to a\\n        // reopen exactly as it does to a start.\" ... \"the same fail-closed error a start gets\" ... \"the first contribution gets in on a reopen too\" ... \"The missing-estimate failure on a reopen\" ... \"transition_task(reopen(\\\"T001\\\"))\" ... \"Some(&AdmissionRejectionOutput::NotCurrentBatchMember\""
-      },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
-      "bound_tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_a_candidate_without_an_estimate_makes_the_transition_an_error"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_a_track_without_a_batch_plan_cannot_start_work_but_still_finishes_it"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_finishing_a_task_is_not_judged_by_the_admission_guard"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "task_operation_transition_task_succeeds"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "task_operation_branch_guard_enforced_via_injected_reader"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_adding_a_task_names_the_id_it_created_and_the_status_that_follows"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_an_override_dominates_the_derived_status_until_it_is_cleared"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_declared_member_of_the_current_batch_is_judged_like_a_start"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_an_estimate_naming_an_unconfigured_scope_makes_the_transition_an_error"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_candidate_whose_estimate_would_pass_the_ceiling_is_refused"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_candidate_whose_estimate_names_an_unconfigured_scope_is_an_error"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_the_first_contributor_to_a_scope_is_admitted_however_large_its_estimate"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_candidate_that_declares_only_the_reserved_other_scope_is_admitted"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
-        }
-      ]
-    },
-    {
-      "edge_id": {
-        "entry_key": "TaskOperationService",
-        "anchor_id": {
-          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
-          "element_id": "IN-09"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "TaskOperationService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:transition_task"
-      },
-      "key": {
-        "bound_tests_set_hash": "e7bb4756f9f798772b9ac6180ceb7bcbbbe87c91bce1a8a2ab94678464c66e49",
-        "declaration_hash": "0df93e0eecc60dfa3e8bbdc13845bd12a97a6e2cb424b1e27c7f25809645c12e",
-        "anchor_text_hash": "cd8cbbbe4d4110b8e002d053a1d4e701fa2b8334f907fbf9dc5711abd8c1b15d"
-      },
-      "verdict": {
-        "kind": "fulfilled",
-        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );"
-      },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
-      "bound_tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_a_candidate_without_an_estimate_makes_the_transition_an_error"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_a_track_without_a_batch_plan_cannot_start_work_but_still_finishes_it"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_finishing_a_task_is_not_judged_by_the_admission_guard"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_declared_member_of_the_current_batch_is_judged_like_a_start"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_an_estimate_naming_an_unconfigured_scope_makes_the_transition_an_error"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_candidate_whose_estimate_would_pass_the_ceiling_is_refused"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_candidate_whose_estimate_names_an_unconfigured_scope_is_an_error"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_the_first_contributor_to_a_scope_is_admitted_however_large_its_estimate"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_candidate_that_declares_only_the_reserved_other_scope_is_admitted"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
-        }
-      ]
-    },
-    {
-      "edge_id": {
-        "entry_key": "TaskOperationService",
-        "anchor_id": {
-          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
-          "element_id": "AC-10"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "TaskOperationService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:transition_task"
-      },
-      "key": {
-        "bound_tests_set_hash": "e7bb4756f9f798772b9ac6180ceb7bcbbbe87c91bce1a8a2ab94678464c66e49",
-        "declaration_hash": "0df93e0eecc60dfa3e8bbdc13845bd12a97a6e2cb424b1e27c7f25809645c12e",
-        "anchor_text_hash": "7669b3f2178d882d0e0caa12e2ca90dacb12def84e7b001e4c49181fa2beb7e5"
-      },
-      "verdict": {
-        "kind": "fulfilled",
-        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );\n\n        // With B1's only member committed, B2 becomes the batch being consumed\n        // and the same task starts.\n        let settled = store_with(plan_of(&[\n            (\"T001\", TaskStatus::DoneTraced { commit_hash: commit_hash() }),\n            (\"T002\", TaskStatus::Todo),\n        ]));\n        let outcome = admitting_interactor(settled, batch_plan, Vec::new(), Some(500))\n            .transition_task(start_work_on(\"T002\"))\n            .unwrap();\n\n        assert_eq!(transitioned(outcome).derived_status, \"in_progress\");"
-      },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
-      "bound_tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_a_candidate_without_an_estimate_makes_the_transition_an_error"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_a_track_without_a_batch_plan_cannot_start_work_but_still_finishes_it"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_finishing_a_task_is_not_judged_by_the_admission_guard"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_declared_member_of_the_current_batch_is_judged_like_a_start"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_an_estimate_naming_an_unconfigured_scope_makes_the_transition_an_error"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_candidate_whose_estimate_would_pass_the_ceiling_is_refused"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_candidate_whose_estimate_names_an_unconfigured_scope_is_an_error"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_the_first_contributor_to_a_scope_is_admitted_however_large_its_estimate"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_candidate_that_declares_only_the_reserved_other_scope_is_admitted"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
-        }
-      ]
-    },
-    {
-      "edge_id": {
-        "entry_key": "TaskOperationService",
-        "anchor_id": {
-          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
-          "element_id": "AC-23"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "TaskOperationService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:transition_task"
-      },
-      "key": {
-        "bound_tests_set_hash": "e7bb4756f9f798772b9ac6180ceb7bcbbbe87c91bce1a8a2ab94678464c66e49",
-        "declaration_hash": "0df93e0eecc60dfa3e8bbdc13845bd12a97a6e2cb424b1e27c7f25809645c12e",
-        "anchor_text_hash": "cf41c1df28aa3a5011c3eb94a9bbe7ddd8fea711f5988a984027e8f867776cc4"
-      },
-      "verdict": {
-        "kind": "fulfilled",
-        "citation": "let error = admitting_interactor(\n            store_with(plan_of(&[(\"T001\", TaskStatus::Todo)])),\n            batch_plan,\n            Vec::new(),\n            Some(500),\n        )\n        .transition_task(start_work_on(\"T001\"))\n        .unwrap_err();\n\n        assert!(matches!(error, TaskOperationError::TransitionFailed(_)), \"unexpected: {error}\");\n        assert!(error.to_string().contains(\"domian\"), \"the failure names the scope: {error}\");\n\nlet error = admitting_interactor(store, batch_plan, Vec::new(), Some(500))\n            .transition_task(reopen(\"T001\"))\n            .unwrap_err();\n\n        assert!(matches!(error, TaskOperationError::TransitionFailed(_)), \"unexpected: {error}\");\n        assert!(error.to_string().contains(\"domian\"), \"the failure names the scope: {error}\");\n\nlet outcome = admitting_interactor(Arc::clone(&store), batch_plan, Vec::new(), Some(500))\n            .transition_task(reopen(\"T001\"))\n            .unwrap();\n\n        assert!(matches!(outcome, TaskTransitionOutcome::Transitioned(_)));"
-      },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
-      "bound_tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_a_candidate_without_an_estimate_makes_the_transition_an_error"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_a_track_without_a_batch_plan_cannot_start_work_but_still_finishes_it"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_finishing_a_task_is_not_judged_by_the_admission_guard"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_declared_member_of_the_current_batch_is_judged_like_a_start"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_an_estimate_naming_an_unconfigured_scope_makes_the_transition_an_error"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_candidate_whose_estimate_would_pass_the_ceiling_is_refused"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_candidate_whose_estimate_names_an_unconfigured_scope_is_an_error"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_the_first_contributor_to_a_scope_is_admitted_however_large_its_estimate"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_candidate_that_declares_only_the_reserved_other_scope_is_admitted"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
-        }
-      ]
-    },
-    {
-      "edge_id": {
-        "entry_key": "TaskOperationService",
-        "anchor_id": {
-          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
-          "element_id": "AC-26"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "TaskOperationService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:transition_task"
-      },
-      "key": {
-        "bound_tests_set_hash": "e7bb4756f9f798772b9ac6180ceb7bcbbbe87c91bce1a8a2ab94678464c66e49",
-        "declaration_hash": "0df93e0eecc60dfa3e8bbdc13845bd12a97a6e2cb424b1e27c7f25809645c12e",
-        "anchor_text_hash": "628a2564d1e567d81f887dcb074f45632d87652f77b3be921da52c5f4f9ebf7a"
-      },
-      "verdict": {
-        "kind": "fulfilled",
-        "citation": "let error = admitting_interactor(Arc::clone(&store), batch_plan, Vec::new(), Some(500))\n            .transition_task(reopen(\"T001\"))\n            .unwrap_err();\n\n        assert!(matches!(error, TaskOperationError::TransitionFailed(_)), \"unexpected: {error}\");\n        assert!(error.to_string().contains(\"T001\"), \"the failure names the task: {error}\");\n        // Fail-closed and before any write: the task is still settled.\n        assert!(matches!(stored_status(&store, \"T001\"), TaskStatus::DoneTraced { .. }));"
-      },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
-      "bound_tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_a_candidate_without_an_estimate_makes_the_transition_an_error"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_a_track_without_a_batch_plan_cannot_start_work_but_still_finishes_it"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_finishing_a_task_is_not_judged_by_the_admission_guard"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_declared_member_of_the_current_batch_is_judged_like_a_start"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_an_estimate_naming_an_unconfigured_scope_makes_the_transition_an_error"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_candidate_whose_estimate_would_pass_the_ceiling_is_refused"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_candidate_whose_estimate_names_an_unconfigured_scope_is_an_error"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_the_first_contributor_to_a_scope_is_admitted_however_large_its_estimate"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_candidate_that_declares_only_the_reserved_other_scope_is_admitted"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
         }
       ]
     },
@@ -10089,13 +10284,13 @@
         "item_identifier": "trait_method:transition_task"
       },
       "key": {
-        "bound_tests_set_hash": "e7bb4756f9f798772b9ac6180ceb7bcbbbe87c91bce1a8a2ab94678464c66e49",
+        "bound_tests_set_hash": "98f21380fbe2c39907f40fcae25405feeb67531f45d5697564eeafb6b29cbda1",
         "declaration_hash": "0df93e0eecc60dfa3e8bbdc13845bd12a97a6e2cb424b1e27c7f25809645c12e",
         "anchor_text_hash": "b2c7413977b1f386a58b3255d6390e1019bdfb8252b2192ac0be4e84f7e7cdbb"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "\"the cumulative rejection applies to a reopen exactly as it does to a start\" ... \"the first contribution gets in on a reopen too\" ... \"The missing-estimate failure on a reopen\" ... \"the reopen needs the declaration updated first\" ... \"the same formula that admits a start admits its reopen\""
+        "citation": "\"the cumulative rejection applies to a reopen exactly as it does to a start\" ... assert_eq!(outcome.rejection(), Some(&AdmissionRejectionOutput::ScopeCeilingWouldBeExceeded { ... })) ... \"the first contribution gets in on a reopen too\" ... assert!(matches!(outcome, TaskTransitionOutcome::Transitioned(_))) ... \"The missing-estimate failure on a reopen\" ... assert!(rendered.contains(\"no estimate in the batch plan\")) ... assert_eq!(outcome.rejection(), Some(&AdmissionRejectionOutput::NotCurrentBatchMember { ... }))"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -10183,6 +10378,11 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
         }
       ]
     },
@@ -10200,13 +10400,13 @@
         "item_identifier": "trait_method:add_task"
       },
       "key": {
-        "bound_tests_set_hash": "5d20e34387ba6ec061d49a985837b0f612fde43a245b0f038440ef01cdbf5c32",
+        "bound_tests_set_hash": "56425f26e685e7fcfcbb422203a3141c757a7eca672e5d3e76b5a1301d13ce12",
         "declaration_hash": "0df93e0eecc60dfa3e8bbdc13845bd12a97a6e2cb424b1e27c7f25809645c12e",
         "anchor_text_hash": "cd8cbbbe4d4110b8e002d053a1d4e701fa2b8334f907fbf9dc5711abd8c1b15d"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );\n\n        // With B1's only member committed, B2 becomes the batch being consumed\n        // and the same task starts.\n        let settled = store_with(plan_of(&[\n            (\"T001\", TaskStatus::DoneTraced { commit_hash: commit_hash() }),\n            (\"T002\", TaskStatus::Todo),\n        ]));\n        let outcome = admitting_interactor(settled, batch_plan, Vec::new(), Some(500))\n            .transition_task(start_work_on(\"T002\"))\n            .unwrap();\n\n        assert_eq!(transitioned(outcome).derived_status, \"in_progress\");\n\n        let error = admitting_interactor(Arc::clone(&store), batch_plan, Vec::new(), Some(500))\n            .transition_task(reopen(\"T001\"))\n            .unwrap_err();\n\n        assert!(matches!(error, TaskOperationError::TransitionFailed(_)), \"unexpected: {error}\");\n        assert!(error.to_string().contains(\"T001\"), \"the failure names the task: {error}\");\n        // Fail-closed and before any write: the task is still settled.\n        assert!(matches!(stored_status(&store, \"T001\"), TaskStatus::DoneTraced { .. }));\n\n        assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T001\".to_owned(),\n                task_batch: \"B1\".to_owned(),\n                current_batch: \"B2\".to_owned(),\n            })\n        );\n        assert!(matches!(stored_status(&store, \"T001\"), TaskStatus::DoneTraced { .. }));"
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );\n\n        assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T001\".to_owned(),\n                task_batch: \"B1\".to_owned(),\n                current_batch: \"B2\".to_owned(),\n            })\n        );\n        assert!(matches!(stored_status(&store, \"T001\"), TaskStatus::DoneTraced { .. }));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -10279,6 +10479,11 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
         }
       ]
     },
@@ -10296,7 +10501,7 @@
         "item_identifier": "trait_method:add_task"
       },
       "key": {
-        "bound_tests_set_hash": "5d20e34387ba6ec061d49a985837b0f612fde43a245b0f038440ef01cdbf5c32",
+        "bound_tests_set_hash": "56425f26e685e7fcfcbb422203a3141c757a7eca672e5d3e76b5a1301d13ce12",
         "declaration_hash": "0df93e0eecc60dfa3e8bbdc13845bd12a97a6e2cb424b1e27c7f25809645c12e",
         "anchor_text_hash": "7669b3f2178d882d0e0caa12e2ca90dacb12def84e7b001e4c49181fa2beb7e5"
       },
@@ -10375,6 +10580,11 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
         }
       ]
     },
@@ -10392,13 +10602,13 @@
         "item_identifier": "trait_method:add_task"
       },
       "key": {
-        "bound_tests_set_hash": "5d20e34387ba6ec061d49a985837b0f612fde43a245b0f038440ef01cdbf5c32",
+        "bound_tests_set_hash": "56425f26e685e7fcfcbb422203a3141c757a7eca672e5d3e76b5a1301d13ce12",
         "declaration_hash": "0df93e0eecc60dfa3e8bbdc13845bd12a97a6e2cb424b1e27c7f25809645c12e",
         "anchor_text_hash": "cf41c1df28aa3a5011c3eb94a9bbe7ddd8fea711f5988a984027e8f867776cc4"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(error, TaskOperationError::TransitionFailed(_)), \"unexpected: {error}\"); ... assert!(matches!(error, TaskOperationError::TransitionFailed(_)), \"unexpected: {error}\"); ... assert!(matches!(outcome, TaskTransitionOutcome::Transitioned(_)));"
+        "citation": "\"let scope = ScopeName::Main(MainScopeName::new(\\\"domian\\\").unwrap());\" ... \"let error = admitting_interactor(\\n            store_with(plan_of(&[(\\\"T001\\\", TaskStatus::Todo)])),\\n            batch_plan,\\n            Vec::new(),\\n            Some(500),\\n        )\\n        .transition_task(start_work_on(\\\"T001\\\"))\\n        .unwrap_err();\" ... \"assert!(matches!(error, TaskOperationError::TransitionFailed(_)), \\\"unexpected: {error}\\\");\" ... \"let (store, batch_plan) = reopen_fixture(estimate_in(main_scope(\\\"domian\\\"), \\\"T001\\\", 10, 5));\" ... \"let error = admitting_interactor(store, batch_plan, Vec::new(), Some(500))\\n            .transition_task(reopen(\\\"T001\\\"))\\n            .unwrap_err();\" ... \"let (store, batch_plan) =\\n            reopen_fixture(estimate_in(domain::review_v2::ScopeName::Other, \\\"T001\\\", 900, 200));\" ... \"assert!(matches!(outcome, TaskTransitionOutcome::Transitioned(_)));\""
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -10471,6 +10681,11 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
         }
       ]
     },
@@ -10488,7 +10703,7 @@
         "item_identifier": "trait_method:add_task"
       },
       "key": {
-        "bound_tests_set_hash": "5d20e34387ba6ec061d49a985837b0f612fde43a245b0f038440ef01cdbf5c32",
+        "bound_tests_set_hash": "56425f26e685e7fcfcbb422203a3141c757a7eca672e5d3e76b5a1301d13ce12",
         "declaration_hash": "0df93e0eecc60dfa3e8bbdc13845bd12a97a6e2cb424b1e27c7f25809645c12e",
         "anchor_text_hash": "628a2564d1e567d81f887dcb074f45632d87652f77b3be921da52c5f4f9ebf7a"
       },
@@ -10567,6 +10782,11 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
         }
       ]
     },
@@ -10584,13 +10804,13 @@
         "item_identifier": "trait_method:add_task"
       },
       "key": {
-        "bound_tests_set_hash": "5d20e34387ba6ec061d49a985837b0f612fde43a245b0f038440ef01cdbf5c32",
+        "bound_tests_set_hash": "56425f26e685e7fcfcbb422203a3141c757a7eca672e5d3e76b5a1301d13ce12",
         "declaration_hash": "0df93e0eecc60dfa3e8bbdc13845bd12a97a6e2cb424b1e27c7f25809645c12e",
         "anchor_text_hash": "b2c7413977b1f386a58b3255d6390e1019bdfb8252b2192ac0be4e84f7e7cdbb"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::ScopeCeilingWouldBeExceeded {\n                scope: \"domain\".to_owned(),\n                prior_contribution: std::num::NonZeroU32::new(400).unwrap(),\n                candidate_estimate: 200,\n                ceiling: 500,\n            })\n        );"
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T001\".to_owned(),\n                task_batch: \"B1\".to_owned(),\n                current_batch: \"B2\".to_owned(),\n            })\n        );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -10663,6 +10883,11 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
         }
       ]
     },
@@ -10680,13 +10905,13 @@
         "item_identifier": "trait_method:set_override"
       },
       "key": {
-        "bound_tests_set_hash": "c356a9a087e217dd9d00aa48d101bd42dcec3a7d3502a3c67467756f617bb392",
+        "bound_tests_set_hash": "2ab88af3499699a9afd5880a4ebaf1d2a72c5ed60107de251d1a3359cc5fb88c",
         "declaration_hash": "0df93e0eecc60dfa3e8bbdc13845bd12a97a6e2cb424b1e27c7f25809645c12e",
         "anchor_text_hash": "cd8cbbbe4d4110b8e002d053a1d4e701fa2b8334f907fbf9dc5711abd8c1b15d"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );"
+        "citation": "\"outcome.rejection(),\\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\\n                task_id: \\\"T002\\\".to_owned(),\\n                task_batch: \\\"B2\\\".to_owned(),\\n                current_batch: \\\"B1\\\".to_owned(),\\n            })\"; \"assert_eq!(transitioned(outcome).derived_status, \\\"in_progress\\\");\"; \"assert!(matches!(error, TaskOperationError::TransitionFailed(_)), \\\"unexpected: {error}\\\");\"; \"outcome.rejection(),\\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\\n                task_id: \\\"T001\\\".to_owned(),\\n                task_batch: \\\"B1\\\".to_owned(),\\n                current_batch: \\\"B2\\\".to_owned(),\\n            })\""
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -10759,6 +10984,11 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
         }
       ]
     },
@@ -10776,7 +11006,7 @@
         "item_identifier": "trait_method:set_override"
       },
       "key": {
-        "bound_tests_set_hash": "c356a9a087e217dd9d00aa48d101bd42dcec3a7d3502a3c67467756f617bb392",
+        "bound_tests_set_hash": "2ab88af3499699a9afd5880a4ebaf1d2a72c5ed60107de251d1a3359cc5fb88c",
         "declaration_hash": "0df93e0eecc60dfa3e8bbdc13845bd12a97a6e2cb424b1e27c7f25809645c12e",
         "anchor_text_hash": "7669b3f2178d882d0e0caa12e2ca90dacb12def84e7b001e4c49181fa2beb7e5"
       },
@@ -10855,6 +11085,11 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
         }
       ]
     },
@@ -10872,487 +11107,7 @@
         "item_identifier": "trait_method:set_override"
       },
       "key": {
-        "bound_tests_set_hash": "c356a9a087e217dd9d00aa48d101bd42dcec3a7d3502a3c67467756f617bb392",
-        "declaration_hash": "0df93e0eecc60dfa3e8bbdc13845bd12a97a6e2cb424b1e27c7f25809645c12e",
-        "anchor_text_hash": "cf41c1df28aa3a5011c3eb94a9bbe7ddd8fea711f5988a984027e8f867776cc4"
-      },
-      "verdict": {
-        "kind": "fulfilled",
-        "citation": "\"let error = admitting_interactor(\\n            store_with(plan_of(&[(\\\"T001\\\", TaskStatus::Todo)])),\\n            batch_plan,\\n            Vec::new(),\\n            Some(500),\\n        )\\n        .transition_task(start_work_on(\\\"T001\\\"))\\n        .unwrap_err();\\n\\n        assert!(matches!(error, TaskOperationError::TransitionFailed(_)), \\\"unexpected: {error}\\\");\" and \"let error = admitting_interactor(store, batch_plan, Vec::new(), Some(500))\\n            .transition_task(reopen(\\\"T001\\\"))\\n            .unwrap_err();\\n\\n        assert!(matches!(error, TaskOperationError::TransitionFailed(_)), \\\"unexpected: {error}\\\");\" and \"let outcome = admitting_interactor(store, batch_plan, Vec::new(), Some(500))\\n            .transition_task(reopen(\\\"T001\\\"))\\n            .unwrap();\\n\\n        assert!(matches!(outcome, TaskTransitionOutcome::Transitioned(_)));\\n        assert_eq!(stored_status(&store, \\\"T001\\\"), domain::TaskStatus::InProgress);\",\"reason\":null,"
-      },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
-      "bound_tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_an_override_dominates_the_derived_status_until_it_is_cleared"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_finishing_a_task_is_not_judged_by_the_admission_guard"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_declared_member_of_the_current_batch_is_judged_like_a_start"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_an_estimate_naming_an_unconfigured_scope_makes_the_transition_an_error"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_candidate_whose_estimate_would_pass_the_ceiling_is_refused"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_candidate_whose_estimate_names_an_unconfigured_scope_is_an_error"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_the_first_contributor_to_a_scope_is_admitted_however_large_its_estimate"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_candidate_that_declares_only_the_reserved_other_scope_is_admitted"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
-        }
-      ]
-    },
-    {
-      "edge_id": {
-        "entry_key": "TaskOperationService",
-        "anchor_id": {
-          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
-          "element_id": "AC-26"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "TaskOperationService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:set_override"
-      },
-      "key": {
-        "bound_tests_set_hash": "c356a9a087e217dd9d00aa48d101bd42dcec3a7d3502a3c67467756f617bb392",
-        "declaration_hash": "0df93e0eecc60dfa3e8bbdc13845bd12a97a6e2cb424b1e27c7f25809645c12e",
-        "anchor_text_hash": "628a2564d1e567d81f887dcb074f45632d87652f77b3be921da52c5f4f9ebf7a"
-      },
-      "verdict": {
-        "kind": "fulfilled",
-        "citation": "        let error = admitting_interactor(Arc::clone(&store), batch_plan, Vec::new(), Some(500))\n            .transition_task(reopen(\"T001\"))\n            .unwrap_err();\n\n        assert!(matches!(error, TaskOperationError::TransitionFailed(_)), \"unexpected: {error}\");\n        assert!(error.to_string().contains(\"T001\"), \"the failure names the task: {error}\");\n        // Fail-closed and before any write: the task is still settled.\n        assert!(matches!(stored_status(&store, \"T001\"), TaskStatus::DoneTraced { .. }));"
-      },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
-      "bound_tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_an_override_dominates_the_derived_status_until_it_is_cleared"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_finishing_a_task_is_not_judged_by_the_admission_guard"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_declared_member_of_the_current_batch_is_judged_like_a_start"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_an_estimate_naming_an_unconfigured_scope_makes_the_transition_an_error"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_candidate_whose_estimate_would_pass_the_ceiling_is_refused"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_candidate_whose_estimate_names_an_unconfigured_scope_is_an_error"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_the_first_contributor_to_a_scope_is_admitted_however_large_its_estimate"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_candidate_that_declares_only_the_reserved_other_scope_is_admitted"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
-        }
-      ]
-    },
-    {
-      "edge_id": {
-        "entry_key": "TaskOperationService",
-        "anchor_id": {
-          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
-          "element_id": "AC-27"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "TaskOperationService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:set_override"
-      },
-      "key": {
-        "bound_tests_set_hash": "c356a9a087e217dd9d00aa48d101bd42dcec3a7d3502a3c67467756f617bb392",
-        "declaration_hash": "0df93e0eecc60dfa3e8bbdc13845bd12a97a6e2cb424b1e27c7f25809645c12e",
-        "anchor_text_hash": "b2c7413977b1f386a58b3255d6390e1019bdfb8252b2192ac0be4e84f7e7cdbb"
-      },
-      "verdict": {
-        "kind": "fulfilled",
-        "citation": "assert_eq!(outcome.rejection(),\n    Some(&AdmissionRejectionOutput::ScopeCeilingWouldBeExceeded {\n        scope: \"domain\".to_owned(),\n        prior_contribution: std::num::NonZeroU32::new(400).unwrap(),\n        candidate_estimate: 200,\n        ceiling: 500,\n    })\n);"
-      },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
-      "bound_tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_an_override_dominates_the_derived_status_until_it_is_cleared"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_finishing_a_task_is_not_judged_by_the_admission_guard"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_declared_member_of_the_current_batch_is_judged_like_a_start"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_an_estimate_naming_an_unconfigured_scope_makes_the_transition_an_error"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_candidate_whose_estimate_would_pass_the_ceiling_is_refused"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_candidate_whose_estimate_names_an_unconfigured_scope_is_an_error"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_the_first_contributor_to_a_scope_is_admitted_however_large_its_estimate"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_candidate_that_declares_only_the_reserved_other_scope_is_admitted"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
-        }
-      ]
-    },
-    {
-      "edge_id": {
-        "entry_key": "TaskOperationService",
-        "anchor_id": {
-          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
-          "element_id": "IN-09"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "TaskOperationService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:clear_override"
-      },
-      "key": {
-        "bound_tests_set_hash": "c356a9a087e217dd9d00aa48d101bd42dcec3a7d3502a3c67467756f617bb392",
-        "declaration_hash": "0df93e0eecc60dfa3e8bbdc13845bd12a97a6e2cb424b1e27c7f25809645c12e",
-        "anchor_text_hash": "cd8cbbbe4d4110b8e002d053a1d4e701fa2b8334f907fbf9dc5711abd8c1b15d"
-      },
-      "verdict": {
-        "kind": "fulfilled",
-        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );"
-      },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
-      "bound_tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_an_override_dominates_the_derived_status_until_it_is_cleared"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_finishing_a_task_is_not_judged_by_the_admission_guard"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_declared_member_of_the_current_batch_is_judged_like_a_start"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_an_estimate_naming_an_unconfigured_scope_makes_the_transition_an_error"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_candidate_whose_estimate_would_pass_the_ceiling_is_refused"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_candidate_whose_estimate_names_an_unconfigured_scope_is_an_error"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_the_first_contributor_to_a_scope_is_admitted_however_large_its_estimate"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_candidate_that_declares_only_the_reserved_other_scope_is_admitted"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
-        }
-      ]
-    },
-    {
-      "edge_id": {
-        "entry_key": "TaskOperationService",
-        "anchor_id": {
-          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
-          "element_id": "AC-10"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "TaskOperationService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:clear_override"
-      },
-      "key": {
-        "bound_tests_set_hash": "c356a9a087e217dd9d00aa48d101bd42dcec3a7d3502a3c67467756f617bb392",
-        "declaration_hash": "0df93e0eecc60dfa3e8bbdc13845bd12a97a6e2cb424b1e27c7f25809645c12e",
-        "anchor_text_hash": "7669b3f2178d882d0e0caa12e2ca90dacb12def84e7b001e4c49181fa2beb7e5"
-      },
-      "verdict": {
-        "kind": "fulfilled",
-        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );\n\n        // With B1's only member committed, B2 becomes the batch being consumed\n        // and the same task starts.\n        let settled = store_with(plan_of(&[\n            (\"T001\", TaskStatus::DoneTraced { commit_hash: commit_hash() }),\n            (\"T002\", TaskStatus::Todo),\n        ]));\n        let outcome = admitting_interactor(settled, batch_plan, Vec::new(), Some(500))\n            .transition_task(start_work_on(\"T002\"))\n            .unwrap();\n\n        assert_eq!(transitioned(outcome).derived_status, \"in_progress\");"
-      },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
-      "bound_tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_an_override_dominates_the_derived_status_until_it_is_cleared"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_finishing_a_task_is_not_judged_by_the_admission_guard"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_declared_member_of_the_current_batch_is_judged_like_a_start"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_an_estimate_naming_an_unconfigured_scope_makes_the_transition_an_error"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_candidate_whose_estimate_would_pass_the_ceiling_is_refused"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_candidate_whose_estimate_names_an_unconfigured_scope_is_an_error"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_the_first_contributor_to_a_scope_is_admitted_however_large_its_estimate"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_candidate_that_declares_only_the_reserved_other_scope_is_admitted"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::task_ops::tests",
-          "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
-        }
-      ]
-    },
-    {
-      "edge_id": {
-        "entry_key": "TaskOperationService",
-        "anchor_id": {
-          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
-          "element_id": "AC-23"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "TaskOperationService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:clear_override"
-      },
-      "key": {
-        "bound_tests_set_hash": "c356a9a087e217dd9d00aa48d101bd42dcec3a7d3502a3c67467756f617bb392",
+        "bound_tests_set_hash": "2ab88af3499699a9afd5880a4ebaf1d2a72c5ed60107de251d1a3359cc5fb88c",
         "declaration_hash": "0df93e0eecc60dfa3e8bbdc13845bd12a97a6e2cb424b1e27c7f25809645c12e",
         "anchor_text_hash": "cf41c1df28aa3a5011c3eb94a9bbe7ddd8fea711f5988a984027e8f867776cc4"
       },
@@ -11431,6 +11186,11 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
         }
       ]
     },
@@ -11445,10 +11205,10 @@
       "obligation_id": {
         "entry_key": "TaskOperationService",
         "obligation_kind": "result",
-        "item_identifier": "trait_method:clear_override"
+        "item_identifier": "trait_method:set_override"
       },
       "key": {
-        "bound_tests_set_hash": "c356a9a087e217dd9d00aa48d101bd42dcec3a7d3502a3c67467756f617bb392",
+        "bound_tests_set_hash": "2ab88af3499699a9afd5880a4ebaf1d2a72c5ed60107de251d1a3359cc5fb88c",
         "declaration_hash": "0df93e0eecc60dfa3e8bbdc13845bd12a97a6e2cb424b1e27c7f25809645c12e",
         "anchor_text_hash": "628a2564d1e567d81f887dcb074f45632d87652f77b3be921da52c5f4f9ebf7a"
       },
@@ -11527,6 +11287,11 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
         }
       ]
     },
@@ -11541,16 +11306,16 @@
       "obligation_id": {
         "entry_key": "TaskOperationService",
         "obligation_kind": "result",
-        "item_identifier": "trait_method:clear_override"
+        "item_identifier": "trait_method:set_override"
       },
       "key": {
-        "bound_tests_set_hash": "c356a9a087e217dd9d00aa48d101bd42dcec3a7d3502a3c67467756f617bb392",
+        "bound_tests_set_hash": "2ab88af3499699a9afd5880a4ebaf1d2a72c5ed60107de251d1a3359cc5fb88c",
         "declaration_hash": "0df93e0eecc60dfa3e8bbdc13845bd12a97a6e2cb424b1e27c7f25809645c12e",
         "anchor_text_hash": "b2c7413977b1f386a58b3255d6390e1019bdfb8252b2192ac0be4e84f7e7cdbb"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T001\".to_owned(),\n                task_batch: \"B1\".to_owned(),\n                current_batch: \"B2\".to_owned(),\n            })\n        );\n        assert!(matches!(stored_status(&store, \"T001\"), TaskStatus::DoneTraced { .. }));\n\nassert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::ScopeCeilingWouldBeExceeded {\n                scope: \"domain\".to_owned(),\n                prior_contribution: std::num::NonZeroU32::new(400).unwrap(),\n                candidate_estimate: 200,\n                ceiling: 500,\n            })\n        );\n\nassert!(matches!(outcome, TaskTransitionOutcome::Transitioned(_)));\n        assert_eq!(stored_status(&store, \"T001\"), domain::TaskStatus::InProgress);\n\nassert!(rendered.contains(\"no estimate in the batch plan\"), \"unexpected: {rendered}\");\n        assert!(rendered.contains(\"T001\"), \"the failure names the candidate: {rendered}\");\n        assert!(matches!(stored_status(&store, \"T001\"), TaskStatus::DoneTraced { .. }));"
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T001\".to_owned(),\n                task_batch: \"B1\".to_owned(),\n                current_batch: \"B2\".to_owned(),\n            })\n        );\n\n        assert_eq!(transitioned(outcome).derived_status, \"in_progress\");\n\n        assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::ScopeCeilingWouldBeExceeded {\n                scope: \"domain\".to_owned(),\n                prior_contribution: std::num::NonZeroU32::new(400).unwrap(),\n                candidate_estimate: 200,\n                ceiling: 500,\n            })\n        );\n\n        assert!(rendered.contains(\"no estimate in the batch plan\"), \"unexpected: {rendered}\");\n\n        assert!(matches!(error, TaskOperationError::TransitionFailed(_)), \"unexpected: {error}\");\n        assert!(error.to_string().contains(\"domian\"), \"the failure names the scope: {error}\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -11623,6 +11388,516 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskOperationService",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskOperationService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:clear_override"
+      },
+      "key": {
+        "bound_tests_set_hash": "2ab88af3499699a9afd5880a4ebaf1d2a72c5ed60107de251d1a3359cc5fb88c",
+        "declaration_hash": "0df93e0eecc60dfa3e8bbdc13845bd12a97a6e2cb424b1e27c7f25809645c12e",
+        "anchor_text_hash": "cd8cbbbe4d4110b8e002d053a1d4e701fa2b8334f907fbf9dc5711abd8c1b15d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );\n\n        assert_eq!(transitioned(outcome).derived_status, \"in_progress\");\n\n        assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T001\".to_owned(),\n                task_batch: \"B1\".to_owned(),\n                current_batch: \"B2\".to_owned(),\n            })\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_an_override_dominates_the_derived_status_until_it_is_cleared"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_finishing_a_task_is_not_judged_by_the_admission_guard"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_the_current_batch_is_judged_like_a_start"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_an_estimate_naming_an_unconfigured_scope_makes_the_transition_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_whose_estimate_would_pass_the_ceiling_is_refused"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_whose_estimate_names_an_unconfigured_scope_is_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_the_first_contributor_to_a_scope_is_admitted_however_large_its_estimate"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_that_declares_only_the_reserved_other_scope_is_admitted"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskOperationService",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskOperationService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:clear_override"
+      },
+      "key": {
+        "bound_tests_set_hash": "2ab88af3499699a9afd5880a4ebaf1d2a72c5ed60107de251d1a3359cc5fb88c",
+        "declaration_hash": "0df93e0eecc60dfa3e8bbdc13845bd12a97a6e2cb424b1e27c7f25809645c12e",
+        "anchor_text_hash": "7669b3f2178d882d0e0caa12e2ca90dacb12def84e7b001e4c49181fa2beb7e5"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );\n\n        // With B1's only member committed, B2 becomes the batch being consumed\n        // and the same task starts.\n        let settled = store_with(plan_of(&[\n            (\"T001\", TaskStatus::DoneTraced { commit_hash: commit_hash() }),\n            (\"T002\", TaskStatus::Todo),\n        ]));\n        let outcome = admitting_interactor(settled, batch_plan, Vec::new(), Some(500))\n            .transition_task(start_work_on(\"T002\"))\n            .unwrap();\n\n        assert_eq!(transitioned(outcome).derived_status, \"in_progress\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_an_override_dominates_the_derived_status_until_it_is_cleared"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_finishing_a_task_is_not_judged_by_the_admission_guard"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_the_current_batch_is_judged_like_a_start"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_an_estimate_naming_an_unconfigured_scope_makes_the_transition_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_whose_estimate_would_pass_the_ceiling_is_refused"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_whose_estimate_names_an_unconfigured_scope_is_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_the_first_contributor_to_a_scope_is_admitted_however_large_its_estimate"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_that_declares_only_the_reserved_other_scope_is_admitted"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskOperationService",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-23"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskOperationService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:clear_override"
+      },
+      "key": {
+        "bound_tests_set_hash": "2ab88af3499699a9afd5880a4ebaf1d2a72c5ed60107de251d1a3359cc5fb88c",
+        "declaration_hash": "0df93e0eecc60dfa3e8bbdc13845bd12a97a6e2cb424b1e27c7f25809645c12e",
+        "anchor_text_hash": "cf41c1df28aa3a5011c3eb94a9bbe7ddd8fea711f5988a984027e8f867776cc4"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let scope = ScopeName::Main(MainScopeName::new(\"domian\").unwrap()); ... let error = admitting_interactor( ... ).transition_task(start_work_on(\"T001\")).unwrap_err(); ... assert!(matches!(error, TaskOperationError::TransitionFailed(_)), \"unexpected: {error}\"); ... let error = admitting_interactor(store, batch_plan, Vec::new(), Some(500))\n            .transition_task(reopen(\"T001\"))\n            .unwrap_err(); ... assert!(matches!(error, TaskOperationError::TransitionFailed(_)), \"unexpected: {error}\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_an_override_dominates_the_derived_status_until_it_is_cleared"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_finishing_a_task_is_not_judged_by_the_admission_guard"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_the_current_batch_is_judged_like_a_start"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_an_estimate_naming_an_unconfigured_scope_makes_the_transition_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_whose_estimate_would_pass_the_ceiling_is_refused"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_whose_estimate_names_an_unconfigured_scope_is_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_the_first_contributor_to_a_scope_is_admitted_however_large_its_estimate"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_that_declares_only_the_reserved_other_scope_is_admitted"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskOperationService",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-26"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskOperationService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:clear_override"
+      },
+      "key": {
+        "bound_tests_set_hash": "2ab88af3499699a9afd5880a4ebaf1d2a72c5ed60107de251d1a3359cc5fb88c",
+        "declaration_hash": "0df93e0eecc60dfa3e8bbdc13845bd12a97a6e2cb424b1e27c7f25809645c12e",
+        "anchor_text_hash": "628a2564d1e567d81f887dcb074f45632d87652f77b3be921da52c5f4f9ebf7a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "        let error = admitting_interactor(Arc::clone(&store), batch_plan, Vec::new(), Some(500))\n            .transition_task(reopen(\"T001\"))\n            .unwrap_err();\n\n        assert!(matches!(error, TaskOperationError::TransitionFailed(_)), \"unexpected: {error}\");\n        assert!(error.to_string().contains(\"T001\"), \"the failure names the task: {error}\");\n        // Fail-closed and before any write: the task is still settled.\n        assert!(matches!(stored_status(&store, \"T001\"), TaskStatus::DoneTraced { .. }));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_an_override_dominates_the_derived_status_until_it_is_cleared"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_finishing_a_task_is_not_judged_by_the_admission_guard"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_the_current_batch_is_judged_like_a_start"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_an_estimate_naming_an_unconfigured_scope_makes_the_transition_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_whose_estimate_would_pass_the_ceiling_is_refused"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_whose_estimate_names_an_unconfigured_scope_is_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_the_first_contributor_to_a_scope_is_admitted_however_large_its_estimate"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_that_declares_only_the_reserved_other_scope_is_admitted"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskOperationService",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-27"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskOperationService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:clear_override"
+      },
+      "key": {
+        "bound_tests_set_hash": "2ab88af3499699a9afd5880a4ebaf1d2a72c5ed60107de251d1a3359cc5fb88c",
+        "declaration_hash": "0df93e0eecc60dfa3e8bbdc13845bd12a97a6e2cb424b1e27c7f25809645c12e",
+        "anchor_text_hash": "b2c7413977b1f386a58b3255d6390e1019bdfb8252b2192ac0be4e84f7e7cdbb"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T001\".to_owned(),\n                task_batch: \"B1\".to_owned(),\n                current_batch: \"B2\".to_owned(),\n            })\n        );\n\nassert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::ScopeCeilingWouldBeExceeded {\n                scope: \"domain\".to_owned(),\n                prior_contribution: std::num::NonZeroU32::new(400).unwrap(),\n                candidate_estimate: 200,\n                ceiling: 500,\n            })\n        );\n\nassert!(rendered.contains(\"no estimate in the batch plan\"), \"unexpected: {rendered}\");\n\nassert!(error.to_string().contains(\"domian\"), \"failure names the scope: {error}\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_an_override_dominates_the_derived_status_until_it_is_cleared"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_finishing_a_task_is_not_judged_by_the_admission_guard"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_the_current_batch_is_judged_like_a_start"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_an_estimate_naming_an_unconfigured_scope_makes_the_transition_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_whose_estimate_would_pass_the_ceiling_is_refused"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_whose_estimate_names_an_unconfigured_scope_is_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_the_first_contributor_to_a_scope_is_admitted_however_large_its_estimate"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_that_declares_only_the_reserved_other_scope_is_admitted"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
         }
       ]
     },
@@ -11640,13 +11915,13 @@
         "item_identifier": "voluntary:IN-09"
       },
       "key": {
-        "bound_tests_set_hash": "2cbf2f00d15452dc7e3920bc6dd94d8bfeb9a106e5063c64680b1b2d51411986",
+        "bound_tests_set_hash": "aae9c4223eb7ce6af5381a68c7a6aaab23280c5f29573aad62d919ef23626250",
         "declaration_hash": "2be926cc8c66aaf655493d334f81dd0e5d582d14c4ac0eb92ed30c2782de223a",
         "anchor_text_hash": "cd8cbbbe4d4110b8e002d053a1d4e701fa2b8334f907fbf9dc5711abd8c1b15d"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(\n    outcome.rejection(),\n    Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n        task_id: \"T002\".to_owned(),\n        task_batch: \"B2\".to_owned(),\n        current_batch: \"B1\".to_owned(),\n    })\n);"
+        "citation": "assert_eq!(outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            }))"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -11684,6 +11959,11 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
         }
       ]
     },
@@ -11701,13 +11981,13 @@
         "item_identifier": "voluntary:AC-10"
       },
       "key": {
-        "bound_tests_set_hash": "0181d55f9f1446a985c37c2d2884ca741bb6cc5e74cd647798400c9938c8992b",
+        "bound_tests_set_hash": "72065b51634d82b8011cc29c9c9ee7676a49588396e6509e1ea055338bed1634",
         "declaration_hash": "2be926cc8c66aaf655493d334f81dd0e5d582d14c4ac0eb92ed30c2782de223a",
         "anchor_text_hash": "7669b3f2178d882d0e0caa12e2ca90dacb12def84e7b001e4c49181fa2beb7e5"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );\n\n        // With B1's only member committed, B2 becomes the batch being consumed\n        // and the same task starts.\n        let settled = store_with(plan_of(&[\n            (\"T001\", TaskStatus::DoneTraced { commit_hash: commit_hash() }),\n            (\"T002\", TaskStatus::Todo),\n        ]));\n        let outcome = admitting_interactor(settled, batch_plan, Vec::new(), Some(500))\n            .transition_task(start_work_on(\"T002\"))\n            .unwrap();\n\n        assert_eq!(transitioned(outcome).derived_status, \"in_progress\");"
+        "citation": "assert_eq!(\n    outcome.rejection(),\n    Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n        task_id: \"T002\".to_owned(),\n        task_batch: \"B2\".to_owned(),\n        current_batch: \"B1\".to_owned(),\n    })\n);\n\n// With B1's only member committed, B2 becomes the batch being consumed\n// and the same task starts.\nlet settled = store_with(plan_of(&[\n    (\"T001\", TaskStatus::DoneTraced { commit_hash: commit_hash() }),\n    (\"T002\", TaskStatus::Todo),\n]));\nlet outcome = admitting_interactor(settled, batch_plan, Vec::new(), Some(500))\n    .transition_task(start_work_on(\"T002\"))\n    .unwrap();\n\nassert_eq!(transitioned(outcome).derived_status, \"in_progress\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -11725,6 +12005,11 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
         }
       ]
     },
@@ -11814,13 +12099,13 @@
         "item_identifier": "voluntary:IN-09"
       },
       "key": {
-        "bound_tests_set_hash": "2cbf2f00d15452dc7e3920bc6dd94d8bfeb9a106e5063c64680b1b2d51411986",
-        "declaration_hash": "c3d35c4ecaa153a4834bf93acfd09f7f32428a934b52b94f4d52a4e15af19f5e",
+        "bound_tests_set_hash": "aae9c4223eb7ce6af5381a68c7a6aaab23280c5f29573aad62d919ef23626250",
+        "declaration_hash": "f54019d71803cbc509fc97aa63bf3a0f40398d039b4317ed6fcf9d9ca0065e93",
         "anchor_text_hash": "cd8cbbbe4d4110b8e002d053a1d4e701fa2b8334f907fbf9dc5711abd8c1b15d"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );"
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        ); ... assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NoCurrentBatch {\n                task_id: \"T001\".to_owned(),\n                task_batch: \"B1\".to_owned(),\n            })\n        );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -11858,6 +12143,11 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
         }
       ]
     },
@@ -11875,13 +12165,13 @@
         "item_identifier": "voluntary:AC-10"
       },
       "key": {
-        "bound_tests_set_hash": "0181d55f9f1446a985c37c2d2884ca741bb6cc5e74cd647798400c9938c8992b",
-        "declaration_hash": "c3d35c4ecaa153a4834bf93acfd09f7f32428a934b52b94f4d52a4e15af19f5e",
+        "bound_tests_set_hash": "72065b51634d82b8011cc29c9c9ee7676a49588396e6509e1ea055338bed1634",
+        "declaration_hash": "f54019d71803cbc509fc97aa63bf3a0f40398d039b4317ed6fcf9d9ca0065e93",
         "anchor_text_hash": "7669b3f2178d882d0e0caa12e2ca90dacb12def84e7b001e4c49181fa2beb7e5"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );\n\n        // With B1's only member committed, B2 becomes the batch being consumed\n        // and the same task starts.\n        let settled = store_with(plan_of(&[\n            (\"T001\", TaskStatus::DoneTraced { commit_hash: commit_hash() }),\n            (\"T002\", TaskStatus::Todo),\n        ]));\n        let outcome = admitting_interactor(settled, batch_plan, Vec::new(), Some(500))\n            .transition_task(start_work_on(\"T002\"))\n            .unwrap();\n\n        assert_eq!(transitioned(outcome).derived_status, \"in_progress\");"
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );\n\n        assert_eq!(transitioned(outcome).derived_status, \"in_progress\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -11899,6 +12189,11 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
         }
       ]
     },
@@ -11917,12 +12212,12 @@
       },
       "key": {
         "bound_tests_set_hash": "616b7cd957bde169ef3cf7e204f59e5b71f1ee147ca08426b22fecd369f5d4d8",
-        "declaration_hash": "c3d35c4ecaa153a4834bf93acfd09f7f32428a934b52b94f4d52a4e15af19f5e",
+        "declaration_hash": "f54019d71803cbc509fc97aa63bf3a0f40398d039b4317ed6fcf9d9ca0065e93",
         "anchor_text_hash": "95f3aa6927f09837b3f404c8ffe20837feae78d7b9c33b8e60168b0adc31f8e1"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::ScopeCeilingWouldBeExceeded {\n                scope: \"domain\".to_owned(),\n                prior_contribution: std::num::NonZeroU32::new(400).unwrap(),\n                candidate_estimate: 200,\n                ceiling: 500,\n            })\n        );"
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::ScopeCeilingWouldBeExceeded {\n                scope: \"domain\".to_owned(),\n                // 100 measured + 300 declared by the member in progress.\n                prior_contribution: std::num::NonZeroU32::new(400).unwrap(),\n                candidate_estimate: 200,\n                ceiling: 500,\n            })\n        );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -11953,7 +12248,7 @@
       },
       "key": {
         "bound_tests_set_hash": "616b7cd957bde169ef3cf7e204f59e5b71f1ee147ca08426b22fecd369f5d4d8",
-        "declaration_hash": "c3d35c4ecaa153a4834bf93acfd09f7f32428a934b52b94f4d52a4e15af19f5e",
+        "declaration_hash": "f54019d71803cbc509fc97aa63bf3a0f40398d039b4317ed6fcf9d9ca0065e93",
         "anchor_text_hash": "d9b08a85d66d49d33298ae5cb8b1a9adf29f78988d1086b6c203d164cf23e094"
       },
       "verdict": {
@@ -17811,7 +18106,7 @@
         "item_identifier": "voluntary:AC-27"
       },
       "key": {
-        "bound_tests_set_hash": "90662261b5256413b069608e5c535994e7274095bb3aa2036360aa98eefbb5c4",
+        "bound_tests_set_hash": "77b41d29958e98fc80397fed570f9cacbe4a6b43dc6b550f3192a28f7e41685f",
         "declaration_hash": "2be926cc8c66aaf655493d334f81dd0e5d582d14c4ac0eb92ed30c2782de223a",
         "anchor_text_hash": "b2c7413977b1f386a58b3255d6390e1019bdfb8252b2192ac0be4e84f7e7cdbb"
       },
@@ -17840,6 +18135,11 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
         }
       ]
     },
@@ -17857,13 +18157,13 @@
         "item_identifier": "voluntary:AC-27"
       },
       "key": {
-        "bound_tests_set_hash": "c4cc3e4205417e49c02404b36bf15446362333ed1ece1c451f5dea575328f321",
-        "declaration_hash": "c3d35c4ecaa153a4834bf93acfd09f7f32428a934b52b94f4d52a4e15af19f5e",
+        "bound_tests_set_hash": "810908ae1227b7237c3936257d9a538b278fedf4bc7003174d18b4e7e551cdf7",
+        "declaration_hash": "f54019d71803cbc509fc97aa63bf3a0f40398d039b4317ed6fcf9d9ca0065e93",
         "anchor_text_hash": "b2c7413977b1f386a58b3255d6390e1019bdfb8252b2192ac0be4e84f7e7cdbb"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T001\".to_owned(),\n                task_batch: \"B1\".to_owned(),\n                current_batch: \"B2\".to_owned(),\n            })\n        );\n\nassert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::ScopeCeilingWouldBeExceeded {\n                scope: \"domain\".to_owned(),\n                prior_contribution: std::num::NonZeroU32::new(400).unwrap(),\n                candidate_estimate: 200,\n                ceiling: 500,\n            })\n        );"
+        "citation": "Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T001\".to_owned(),\n                task_batch: \"B1\".to_owned(),\n                current_batch: \"B2\".to_owned(),\n            })\n\nSome(&AdmissionRejectionOutput::ScopeCeilingWouldBeExceeded {\n                scope: \"domain\".to_owned(),\n                prior_contribution: std::num::NonZeroU32::new(400).unwrap(),\n                candidate_estimate: 200,\n                ceiling: 500,\n            })\n\nSome(&AdmissionRejectionOutput::NoCurrentBatch {\n                task_id: \"T001\".to_owned(),\n                task_batch: \"B1\".to_owned(),\n            })"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -17906,6 +18206,11 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_reopening_a_candidate_that_declares_only_the_reserved_other_scope_is_admitted"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
         }
       ]
     },
@@ -18310,6 +18615,47 @@
           "layer": "domain",
           "module_path": "domain::impl_plan::tests",
           "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdmissionRejection",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-27"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdmissionRejection",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-27"
+      },
+      "key": {
+        "bound_tests_set_hash": "07c8f6dee5ef26dd80c54add2270913d2ce4413c77094f5f618a95537ec59900",
+        "declaration_hash": "deca0d04368e7e7a08997a9becfabda53cb424bdbee3ec49a69f85628db713bc",
+        "anchor_text_hash": "b2c7413977b1f386a58b3255d6390e1019bdfb8252b2192ac0be4e84f7e7cdbb"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n        refused,\n        AdmissionDecision::Rejected(AdmissionRejection::NoCurrentBatch {\n            task_id: task(\"T003\"),\n            task_batch: batch_id(\"B2\"),\n        })\n    );\n\n    // The contrast: with B2 still holding uncommitted work, the same candidate in\n    // the same batch is admitted, so the refusal follows the absence of a current\n    // batch and not the candidate.\n    let admitted = evaluate_admission("
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_refuses_a_candidate_when_every_declared_batch_is_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_no_current_batch_rejection_renders_the_task_and_its_settled_batch"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
         }
       ]
     }

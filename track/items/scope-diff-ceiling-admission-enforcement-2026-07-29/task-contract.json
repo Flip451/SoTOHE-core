@@ -104,6 +104,10 @@
       { "layer": "domain", "entry_key": "domain::batch_plan::check_batch_plan" },
       { "layer": "domain", "entry_key": "domain::batch_plan::evaluate_admission" },
       { "layer": "usecase", "entry_key": "BatchPlanViolationOutput" }
+    ],
+    "T022": [
+      { "layer": "domain", "entry_key": "AdmissionRejection" },
+      { "layer": "usecase", "entry_key": "AdmissionRejectionOutput" }
     ]
   }
 }

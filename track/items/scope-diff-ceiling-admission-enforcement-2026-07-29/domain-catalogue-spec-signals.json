@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "a5b35b44767484593f255c6b5a999a2facc7ea21347e8069936e7500ddd62973",
+  "catalogue_declaration_hash": "926cc154795c3b23a762c05a4574dad5664e16cafbce7d15001f433459698585",
   "signals": [
     {
       "type_name": "AdmissionDecision",
@@ -15,7 +15,7 @@
     {
       "type_name": "AdmissionRejection",
       "signal": "blue",
-      "entry_hash": "ab4431adb0568c8370679ce7e33d36dfa02884afde730189a4ec39603f565592"
+      "entry_hash": "9940ce2782f29227c5d55ba90398107209550c9753ff3d8be522e8deae4bd6a2"
     },
     {
       "type_name": "BatchDeclaration",
