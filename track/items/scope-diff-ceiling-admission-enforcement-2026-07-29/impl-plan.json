@@ -145,7 +145,8 @@
     {
       "id": "T024",
       "description": "`libs/domain/src/batch_plan/estimate.rs`: TaskEstimate::new に空 scope_estimates の拒否を追加し doc comment を更新する（IN-02、AC-04）。`libs/domain/src/batch_plan/tests.rs`: 同経路の試験を追加する（IN-02、AC-04）。`libs/infrastructure/src/batch_plan_codec.rs`: 空 scope_estimates を前提にしていた fixture を差し替え、decode 経路の試験を追加する（AC-04）。",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "13aded27"
     }
   ],
   "plan": {
