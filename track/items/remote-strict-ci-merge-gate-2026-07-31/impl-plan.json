@@ -10,7 +10,7 @@
     {
       "id": "T002",
       "description": "GitHub repository settings の `develop` branch-protection rule に対する `CI / check` required status check の repository-administrator handoff を実施し、`track/items/remote-strict-ci-merge-gate-2026-07-31/observations.md` の `## Branch-protection configuration handoff` と `## Branch-protection evidence` に rule response / failed-PR result の evidence references を追加する。IN-02、CN-01、AC-03。",
-      "status": "todo",
+      "status": "done",
       "depends_on": [
         "T001"
       ]
@@ -18,7 +18,8 @@
     {
       "id": "T004",
       "description": "`Makefile.toml` の `[tasks.ci-track]` / `[tasks.ci-track-local]` と `apps/cli/tests/consumer_scaffold_host_first.rs` の `test_exported_ci_track_*` regression cases を更新し、local early-detection path の検証を追加する。IN-03、AC-04。",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "50e4497e7c0a80bf37114e61aa506196db87cb3e"
     },
     {
       "id": "T003",

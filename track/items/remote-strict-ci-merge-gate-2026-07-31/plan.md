@@ -6,7 +6,7 @@
 GO-01 → T001, T002, T004.
 GO-02 → T003.
 
-## Tasks (2/4 resolved)
+## Tasks (3/4 resolved)
 
 ### S1 — Remote strict merge gate
 
@@ -18,13 +18,13 @@ GO-02 → T003.
 
 > `Makefile.toml` `[tasks.ci-track]` / `[tasks.ci-track-local]`; `apps/cli/tests/consumer_scaffold_host_first.rs` `test_exported_ci_track_*`. IN-03、AC-04。
 
-- [x] **T004**: `Makefile.toml` の `[tasks.ci-track]` / `[tasks.ci-track-local]` と `apps/cli/tests/consumer_scaffold_host_first.rs` の `test_exported_ci_track_*` regression cases を更新し、local early-detection path の検証を追加する。IN-03、AC-04。
+- [x] **T004**: `Makefile.toml` の `[tasks.ci-track]` / `[tasks.ci-track-local]` と `apps/cli/tests/consumer_scaffold_host_first.rs` の `test_exported_ci_track_*` regression cases を更新し、local early-detection path の検証を追加する。IN-03、AC-04。 (`50e4497e7c0a80bf37114e61aa506196db87cb3e`)
 
 ### S3 — Branch protection enforcement
 
 > GitHub repository settings: `develop` branch-protection rule; `track/items/remote-strict-ci-merge-gate-2026-07-31/observations.md` headings `## Branch-protection configuration handoff` / `## Branch-protection evidence`. IN-02、CN-01、AC-03。
 
-- [ ] **T002**: GitHub repository settings の `develop` branch-protection rule に対する `CI / check` required status check の repository-administrator handoff を実施し、`track/items/remote-strict-ci-merge-gate-2026-07-31/observations.md` の `## Branch-protection configuration handoff` と `## Branch-protection evidence` に rule response / failed-PR result の evidence references を追加する。IN-02、CN-01、AC-03。
+- [x] **T002**: GitHub repository settings の `develop` branch-protection rule に対する `CI / check` required status check の repository-administrator handoff を実施し、`track/items/remote-strict-ci-merge-gate-2026-07-31/observations.md` の `## Branch-protection configuration handoff` と `## Branch-protection evidence` に rule response / failed-PR result の evidence references を追加する。IN-02、CN-01、AC-03。
 
 ### S4 — Unattended merge completion
 
