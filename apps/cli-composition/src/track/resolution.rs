@@ -87,3 +87,20 @@ impl TrackCompositionRoot {
         resolve_project_root(&items_dir)
     }
 }
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used)]
+mod tests {
+    #[test]
+    fn test_track_resolve_id_date_prefixed_branch_returns_opaque_id() {
+        let root = tempfile::tempdir().unwrap();
+        let track_id = "2026-07-31-date-prefixed-track";
+        crate::test_support::seed_repo(root.path(), &format!("track/{track_id}"));
+
+        let resolved = crate::TrackCompositionRoot::new()
+            .track_resolve_id(None, root.path().join("track").join("items"))
+            .unwrap();
+
+        assert_eq!(resolved, track_id);
+    }
+}

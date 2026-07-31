@@ -1,6 +1,125 @@
 {
   "schema_version": 2,
   "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c7e991a98880f85b1550d29dd7ce8397736a5190702ed2fb41423fcf3d49df35",
+          "at": "2026-07-31T12:45:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c7e991a98880f85b1550d29dd7ce8397736a5190702ed2fb41423fcf3d49df35",
+          "at": "2026-07-31T12:49:16Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d86c496f64206f588aa70570173f8bc4099088d684ba883ce27b415f117445b1",
+          "at": "2026-07-31T14:45:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d86c496f64206f588aa70570173f8bc4099088d684ba883ce27b415f117445b1",
+          "at": "2026-07-31T14:49:12Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f59d66bc491c4a186b33f9521f050f2866cfae38d621838448514f8ecf03a6cd",
+          "at": "2026-07-31T11:29:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f59d66bc491c4a186b33f9521f050f2866cfae38d621838448514f8ecf03a6cd",
+          "at": "2026-07-31T11:32:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c4a3e3b3d4192d829f03502ad2ff540435b099415e300b110fd5cad6629f17f",
+          "at": "2026-07-31T12:21:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c4a3e3b3d4192d829f03502ad2ff540435b099415e300b110fd5cad6629f17f",
+          "at": "2026-07-31T12:24:17Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5a735d9e5bdc7187e44934e2cae9136dbdc41122c42d19f58e28c941e9efe889",
+          "at": "2026-07-31T13:52:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5a735d9e5bdc7187e44934e2cae9136dbdc41122c42d19f58e28c941e9efe889",
+          "at": "2026-07-31T13:56:09Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-01 claims chronological ordering in track and branch listings, but no acceptance criterion deterministically verifies either listing order; the goal therefore has an acceptance-coverage gap.",
+              "severity": "P1",
+              "file": "track/items/track-id-date-prefix-2026-07-31/spec.json",
+              "line": 8,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:d90b285878ed3b1ac3558ebb33e1ab8e3266060a0cf8c9318c329732b4c8816c",
+          "at": "2026-07-31T12:45:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:787eecae16e7a3debade1761a5cf12eba0fc5056162db14913fa4304398da30d",
+          "at": "2026-07-31T12:53:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:787eecae16e7a3debade1761a5cf12eba0fc5056162db14913fa4304398da30d",
+          "at": "2026-07-31T12:55:20Z"
+        }
+      ]
+    },
     "harness-policy": {
       "rounds": [
         {
@@ -45,6 +164,24 @@
           "findings": [],
           "hash": "rvw1:sha256:2ea84c222608422af3125d67b77181033ea895c71c09e301c96ddf7ebe882d9b",
           "at": "2026-07-31T13:55:04Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c52d3b858b3eb4cef525f13463e8455da97ee8cc3b334ee2523ba4201c6b650",
+          "at": "2026-07-31T12:46:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c52d3b858b3eb4cef525f13463e8455da97ee8cc3b334ee2523ba4201c6b650",
+          "at": "2026-07-31T12:50:20Z"
         }
       ]
     },
@@ -185,125 +322,20 @@
           "findings": [],
           "hash": "rvw1:sha256:d713472d860bd6b0e9e192d5191557ff1e5d5f4bb856eea4140a5cbe8f8eb7a5",
           "at": "2026-07-31T13:56:07Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:c7e991a98880f85b1550d29dd7ce8397736a5190702ed2fb41423fcf3d49df35",
-          "at": "2026-07-31T12:45:54Z"
+          "hash": "rvw1:sha256:ec2f43915df1a3b3b9780d874fb98ba975622c28816552f257b818063793aa87",
+          "at": "2026-07-31T14:44:54Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:c7e991a98880f85b1550d29dd7ce8397736a5190702ed2fb41423fcf3d49df35",
-          "at": "2026-07-31T12:49:16Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "GO-01 claims chronological ordering in track and branch listings, but no acceptance criterion deterministically verifies either listing order; the goal therefore has an acceptance-coverage gap.",
-              "severity": "P1",
-              "file": "track/items/track-id-date-prefix-2026-07-31/spec.json",
-              "line": 8,
-              "category": "missing AC coverage for a stated goal"
-            }
-          ],
-          "hash": "rvw1:sha256:d90b285878ed3b1ac3558ebb33e1ab8e3266060a0cf8c9318c329732b4c8816c",
-          "at": "2026-07-31T12:45:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:787eecae16e7a3debade1761a5cf12eba0fc5056162db14913fa4304398da30d",
-          "at": "2026-07-31T12:53:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:787eecae16e7a3debade1761a5cf12eba0fc5056162db14913fa4304398da30d",
-          "at": "2026-07-31T12:55:20Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f59d66bc491c4a186b33f9521f050f2866cfae38d621838448514f8ecf03a6cd",
-          "at": "2026-07-31T11:29:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f59d66bc491c4a186b33f9521f050f2866cfae38d621838448514f8ecf03a6cd",
-          "at": "2026-07-31T11:32:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0c4a3e3b3d4192d829f03502ad2ff540435b099415e300b110fd5cad6629f17f",
-          "at": "2026-07-31T12:21:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0c4a3e3b3d4192d829f03502ad2ff540435b099415e300b110fd5cad6629f17f",
-          "at": "2026-07-31T12:24:17Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5a735d9e5bdc7187e44934e2cae9136dbdc41122c42d19f58e28c941e9efe889",
-          "at": "2026-07-31T13:52:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5a735d9e5bdc7187e44934e2cae9136dbdc41122c42d19f58e28c941e9efe889",
-          "at": "2026-07-31T13:56:09Z"
-        }
-      ]
-    },
-    "types": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2c52d3b858b3eb4cef525f13463e8455da97ee8cc3b334ee2523ba4201c6b650",
-          "at": "2026-07-31T12:46:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2c52d3b858b3eb4cef525f13463e8455da97ee8cc3b334ee2523ba4201c6b650",
-          "at": "2026-07-31T12:50:20Z"
+          "hash": "rvw1:sha256:ec2f43915df1a3b3b9780d874fb98ba975622c28816552f257b818063793aa87",
+          "at": "2026-07-31T14:48:15Z"
         }
       ]
     }
