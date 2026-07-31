@@ -29,6 +29,7 @@ pub mod git_cli;
 pub mod impl_catalog_signal_reader;
 pub mod impl_plan_codec;
 pub mod impl_plan_reader;
+mod lexical_path;
 pub mod planned_task_reader;
 pub mod pr;
 pub mod pr_review;
@@ -36,6 +37,7 @@ pub mod provider_session;
 pub mod ref_verify;
 pub mod review_scope_config_reader;
 pub mod review_v2;
+mod sanitized_failure;
 pub mod schema_export;
 pub mod schema_export_codec;
 #[cfg(test)]
@@ -100,23 +102,23 @@ pub use verify_adapter::FsVerifyAdapter;
 pub(crate) fn discover_repo_for_items_dir(
     items_dir: &std::path::Path,
 ) -> Result<crate::git_cli::SystemGitRepo, std::io::Error> {
-    crate::track::symlink_guard::reject_symlinks_up_to_root(items_dir).map_err(|error| {
-        std::io::Error::new(
-            std::io::ErrorKind::InvalidInput,
-            format!("symlink check failed for items_dir {}: {error}", items_dir.display()),
-        )
-    })?;
-    let anchor = items_dir.canonicalize().map_err(|error| {
-        std::io::Error::new(
-            error.kind(),
-            format!("cannot resolve items_dir {}: {error}", items_dir.display()),
-        )
-    })?;
+    // Each failure is returned with its cause intact and no path written into it.
+    // Callers report these to an operator, and a rendered path would both leak the
+    // checkout location and bury the distinction between the three causes: the
+    // guard's refusal keeps its own payload, the filesystem's error keeps its kind,
+    // and an absent repository is its own type.
+    crate::track::symlink_guard::reject_symlinks_up_to_root(items_dir)?;
+    let anchor = items_dir.canonicalize()?;
     crate::git_cli::SystemGitRepo::discover_from(&anchor).map_err(|error| {
-        std::io::Error::new(
-            std::io::ErrorKind::InvalidInput,
-            format!("cannot discover the git repository holding {}: {error}", anchor.display()),
-        )
+        crate::sanitized_failure::sanitized_io_error(match error {
+            // `rev-parse --show-toplevel` exiting nonzero is how git reports that
+            // nothing encloses the directory. Only this command gives that outcome
+            // that meaning, so only this call site states it; git failing to run,
+            // or answering with an empty root, is a different fault and keeps its
+            // own classification.
+            crate::git_cli::GitError::CommandFailed { .. } => "no enclosing git repository",
+            other => crate::sanitized_failure::git_classification(&other),
+        })
     })
 }
 

@@ -1864,6 +1864,43 @@ mod tests {
     }
 
     #[test]
+    fn test_a_start_whose_estimate_declares_only_the_reserved_other_scope_is_admitted() {
+        use domain::TaskStatus;
+        use domain::batch_plan::{BatchPlanDocument, LineCount, MeasuredScopeDiff};
+        use domain::review_v2::ScopeName;
+
+        // `other` is reserved rather than unconfigured: naming it is not the
+        // unknown-scope error, and it resolves no ceiling for its total to be
+        // compared against. T001 already contributes 500 declared lines and
+        // another 100 are measured, so this is not admitted by the
+        // first-contributor exception; T002's 1,100 lines still start because
+        // the reserved scope is exempt.
+        let batch_plan = BatchPlanDocument::new(
+            TrackId::try_new("my-track-2026").unwrap(),
+            vec![
+                estimate_in(ScopeName::Other, "T001", 400, 100),
+                estimate_in(ScopeName::Other, "T002", 900, 200),
+            ],
+            vec![batch("B1", &["T001", "T002"])],
+        )
+        .unwrap();
+
+        let store =
+            store_with(plan_of(&[("T001", TaskStatus::InProgress), ("T002", TaskStatus::Todo)]));
+        let outcome = admitting_interactor(
+            Arc::clone(&store),
+            batch_plan,
+            vec![MeasuredScopeDiff::new(ScopeName::Other, LineCount::new(100))],
+            Some(500),
+        )
+        .transition_task(start_work_on("T002"))
+        .unwrap();
+
+        assert!(matches!(outcome, TaskTransitionOutcome::Transitioned(_)));
+        assert_eq!(stored_status(&store, "T002"), TaskStatus::InProgress);
+    }
+
+    #[test]
     fn test_a_track_without_a_batch_plan_cannot_start_work_but_still_finishes_it() {
         use domain::TaskStatus;
 

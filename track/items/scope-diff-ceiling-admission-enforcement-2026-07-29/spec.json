@@ -293,6 +293,16 @@
             "anchor": "D1"
           }
         ]
+      },
+      {
+        "id": "IN-22",
+        "text": "commit hash を書くタスク状態遷移に記録時の repository 照合を組み込む。対象は hash を伴う完了記録（`Complete`）と後からの埋め戻し（`BackfillHash`）の双方であり、記録経路による例外は設けない。与えられた hash が当該 repository に commit object として実在し、かつ HEAD の祖先であることを要求する。満たさない記録は error として拒否し状態を一切書き換えない — `impl-plan.json` は遷移前のまま残り、部分適用も graceful skip も生じない。repository の読み取り自体が失敗して検証を実行できない場合も同じく error とし、検証せずに記録する経路を設けない。hash を伴わない完了記録は照合の対象外である（記録すべき値が存在せず、その done は従来どおり未 settle である）。照合は repository の読み取りを要するため usecase の port と、track 成果物が置かれた repository を items_dir 起点で解決する infrastructure adapter が担い、domain は I/O を持たず検証結果を入力として受け取る。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-30-2101-per-task-commit-hash-record-time-validation.md",
+            "anchor": "D1"
+          }
+        ]
       }
     ],
     "out_of_scope": [
@@ -868,6 +878,26 @@
           "anchor": "D3"
         }
       ]
+    },
+    {
+      "id": "AC-28",
+      "text": "形式は well-formed だが当該 repository に commit object として実在しない hash、実在するが HEAD の祖先でない hash、および repository の読み取り自体が失敗して検証を実行できない場合のそれぞれについて、hash を伴う完了記録（`Complete`）と埋め戻し（`BackfillHash`）の双方が error になり、永続化された `impl-plan.json` が遷移前と byte 単位で不変である。部分適用も、検証を実行できないことを理由に無検査で記録する graceful skip も存在しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-30-2101-per-task-commit-hash-record-time-validation.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-29",
+      "text": "当該 repository に実在し HEAD の祖先である hash は、`Complete` / `BackfillHash` のいずれの経路でも従来どおり記録される。hash を伴わない完了記録は照合の対象外であり、従来どおり記録されてその done は未 settle のままである。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-30-2101-per-task-commit-hash-record-time-validation.md",
+          "anchor": "D1"
+        }
+      ]
     }
   ],
   "related_conventions": [
@@ -881,7 +911,7 @@
     }
   ],
   "signals": {
-    "blue": 72,
+    "blue": 75,
     "yellow": 0,
     "red": 0
   }

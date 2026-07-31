@@ -86,6 +86,18 @@
         }
       ],
       "type_name": "LazyBranchReader"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "GitCommitRecordVerifier"
+        }
+      ],
+      "type_name": "GitCommitRecordVerifier"
     }
   ],
   "layer": "infrastructure",
@@ -214,6 +226,18 @@
     {
       "for_type": "LazyBranchReader",
       "trait_ref": "usecase::track_resolution::BranchReaderPort"
+    },
+    {
+      "for_type": "GitCommitRecordVerifier",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "GitCommitRecordVerifier",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "for_type": "GitCommitRecordVerifier",
+      "trait_ref": "usecase::task_ops::ports::CommitRecordVerifierPort"
     }
   ],
   "traits": {},
@@ -451,6 +475,36 @@
         },
         {
           "anchor": "AC-08",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "GitCommitRecordVerifier": {
+      "action": "add",
+      "docs": "Implements CommitRecordVerifierPort over git; unit struct, new() takes no argument (composition roots stay zero-argument wiring accessors), items_dir arrives per call (discover_repo_for_items_dir precedent). No write operation declared. IN-22, AC-28, AC-29.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "commit_record_verifier",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-22",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-28",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-29",
           "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
         }
       ]

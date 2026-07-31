@@ -23,6 +23,7 @@
 | FsBatchPlanReader | secondary_adapter | add | impl Debug, impl Default, impl BatchPlanReaderPort | 🔵 | 🔵 |
 | FsPlannedTaskReader | secondary_adapter | add | impl Debug, impl Default, impl PlannedTaskReaderPort | 🔵 | 🔵 |
 | FsReviewScopeConfigReader | secondary_adapter | add | impl Debug, impl Default, impl ScopeConfigReaderPort | 🔵 | 🔵 |
+| GitCommitRecordVerifier | secondary_adapter | add | impl Debug, impl Default, impl CommitRecordVerifierPort | 🟡 | 🔵 |
 | GitScopeDiffMeasurer | secondary_adapter | add | impl Default, impl Debug, impl ScopeDiffMeasurePort | 🔵 | 🔵 |
 | LazyBranchReader | secondary_adapter | add | impl Debug, impl Default, impl BranchReaderPort | 🔵 | 🔵 |
 

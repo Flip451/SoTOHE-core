@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "15acfed3509a6a017d8fa0939d04d4ae753a74bab89b2ddec3ac1dacd4775948",
+  "catalogue_declaration_hash": "efc768c3ea1ef50c046a2cd363c29a82bb0e07aa66f6d14072ea7c8b74d8eacc",
   "signals": [
     {
       "type_name": "BatchDeclarationDto",
@@ -31,6 +31,11 @@
       "type_name": "FsReviewScopeConfigReader",
       "signal": "blue",
       "entry_hash": "ce501d4a6b0a950d15653f86e42b324698e8d7521417c540f4c5aa149c3e2994"
+    },
+    {
+      "type_name": "GitCommitRecordVerifier",
+      "signal": "blue",
+      "entry_hash": "86db5c03ebc583ebb7a2b68e4cac6dedab0b08a0a21eca9dc3be41ba0a124231"
     },
     {
       "type_name": "GitScopeDiffMeasurer",

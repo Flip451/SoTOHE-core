@@ -4065,6 +4065,11 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_start_whose_estimate_declares_only_the_reserved_other_scope_is_admitted"
         }
       ]
     },
@@ -4165,6 +4170,11 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_start_whose_estimate_declares_only_the_reserved_other_scope_is_admitted"
         }
       ]
     },

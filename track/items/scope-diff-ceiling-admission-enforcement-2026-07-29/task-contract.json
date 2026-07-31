@@ -89,7 +89,6 @@
     ],
     "T018": [
       { "layer": "domain", "entry_key": "ImplPlanDocument" },
-      { "layer": "usecase", "entry_key": "TaskOperationInteractor" },
       { "layer": "usecase", "entry_key": "TaskOperationService" },
       { "layer": "usecase", "entry_key": "TaskTransitionOutcome" },
       { "layer": "usecase", "entry_key": "AdmissionRejectionOutput" },
@@ -112,6 +111,14 @@
     "T024": [
       { "layer": "domain", "entry_key": "BatchPlanValidationError" },
       { "layer": "domain", "entry_key": "TaskEstimate" }
+    ],
+    "T026": [
+      { "layer": "usecase", "entry_key": "CommitRecordVerifierPort" },
+      { "layer": "usecase", "entry_key": "CommitRecordVerifyError" }
+    ],
+    "T027": [
+      { "layer": "usecase", "entry_key": "TaskOperationInteractor" },
+      { "layer": "infrastructure", "entry_key": "GitCommitRecordVerifier" }
     ]
   }
 }

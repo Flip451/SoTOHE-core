@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-30T10:49:04Z",
-  "declaration_hash": "15acfed3509a6a017d8fa0939d04d4ae753a74bab89b2ddec3ac1dacd4775948",
-  "implementation_input_hash": "f552fff05cce28ed1285b98bec29f071747fa34f83bc5b352a1f14f23d768d4a",
+  "generated_at": "2026-07-30T15:07:53Z",
+  "declaration_hash": "efc768c3ea1ef50c046a2cd363c29a82bb0e07aa66f6d14072ea7c8b74d8eacc",
+  "implementation_input_hash": "243b1e8c6130347dcbd849b6a6bb5154e3d856c99c62f4dde9cfb03665ba0e17",
   "signals": [
     {
       "type_name": "BatchDeclarationDto",
@@ -66,6 +66,17 @@
         "Debug",
         "Default",
         "usecase::batch_plan::ports::ScopeConfigReaderPort"
+      ]
+    },
+    {
+      "type_name": "GitCommitRecordVerifier",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "Default",
+        "usecase::task_ops::ports::CommitRecordVerifierPort"
       ]
     },
     {

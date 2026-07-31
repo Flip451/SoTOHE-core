@@ -30,6 +30,7 @@ use crate::dry_check::FsDiffBaseResolverAdapter;
 use crate::git_cli::{SystemGitRepo, guarded_git_command};
 use crate::review_scope_config_reader::REVIEW_SCOPE_CONFIG;
 use crate::review_v2::load_v2_scope_config;
+use crate::sanitized_failure::{io_classification, scope_config_classification};
 use crate::track::symlink_guard::reject_symlinks_below;
 use crate::track_artifact::{TrackArtifactReadError, read_track_artifact};
 
@@ -65,16 +66,21 @@ impl ScopeDiffMeasurePort for GitScopeDiffMeasurer {
     ) -> Result<Vec<MeasuredScopeDiff>, ScopeDiffMeasureError> {
         // Anchored on the items directory, so the diff measured is the one of
         // the repository the track artifacts live in.
-        let repo = crate::discover_repo_for_items_dir(items_dir)
-            .map_err(|error| measure_failed(format!("git repository not discovered: {error}")))?;
+        let repo = crate::discover_repo_for_items_dir(items_dir).map_err(|error| {
+            measure_failed(format!("git repository not discovered: {}", io_classification(&error)))
+        })?;
         let root = repo.root().to_path_buf();
         let items_dir = resolve_items_dir_under(items_dir, &root)?;
         let track_dir = items_dir.join(track_id.as_ref());
 
         let base = resolve_base(&root, &items_dir, track_id, &track_dir)?;
-        let scope_config =
-            load_v2_scope_config(&root.join(REVIEW_SCOPE_CONFIG), track_id, &root)
-                .map_err(|error| measure_failed(format!("load {REVIEW_SCOPE_CONFIG}: {error}")))?;
+        let scope_config = load_v2_scope_config(&root.join(REVIEW_SCOPE_CONFIG), track_id, &root)
+            .map_err(|error| {
+            measure_failed(format!(
+                "load {REVIEW_SCOPE_CONFIG}: {}",
+                scope_config_classification(&error)
+            ))
+        })?;
 
         // Rename detection may be enabled by repository configuration. Turn it
         // off explicitly so every changed path has one unambiguous numstat row
@@ -98,18 +104,18 @@ fn resolve_items_dir_under(
     items_dir: &Path,
     root: &Path,
 ) -> Result<std::path::PathBuf, ScopeDiffMeasureError> {
-    let canonical = items_dir
-        .canonicalize()
-        .map_err(|error| measure_failed(format!("items_dir rejected: {error}")))?;
-    let canonical_root = root
-        .canonicalize()
-        .map_err(|error| measure_failed(format!("canonicalize repository root: {error}")))?;
+    let canonical = items_dir.canonicalize().map_err(|error| {
+        measure_failed(format!("items_dir rejected: {}", io_classification(&error)))
+    })?;
+    let canonical_root = root.canonicalize().map_err(|error| {
+        measure_failed(format!("canonicalize repository root: {}", io_classification(&error)))
+    })?;
     if !canonical.starts_with(&canonical_root) {
-        return Err(measure_failed(format!(
-            "items_dir {} resolves outside the repository {}",
-            canonical.display(),
-            canonical_root.display()
-        )));
+        // Neither path is named: both are absolute, and the operator supplied the
+        // one that matters.
+        return Err(measure_failed(
+            "items_dir resolves outside the repository it was discovered from".to_owned(),
+        ));
     }
     Ok(canonical)
 }
@@ -130,8 +136,11 @@ fn resolve_base(
                     "{METADATA_FILE} not found for track '{}'",
                     track_id.as_ref()
                 )),
-                TrackArtifactReadError::Failed(message) => measure_failed(format!(
-                    "read {METADATA_FILE} for track '{}': {message}",
+                // The read failure's own message names the absolute path it was
+                // reading; the file is already identified by its well-known name
+                // and its track, so only the classification is carried out.
+                TrackArtifactReadError::Failed(_) => measure_failed(format!(
+                    "read {METADATA_FILE} for track '{}': unreadable",
                     track_id.as_ref()
                 )),
             },
@@ -146,13 +155,21 @@ fn resolve_base(
             track_id.as_ref()
         )));
     }
-    let canonical_root = root
-        .canonicalize()
-        .map_err(|error| measure_failed(format!("canonicalize repository root: {error}")))?;
+    let canonical_root = root.canonicalize().map_err(|error| {
+        measure_failed(format!("canonicalize repository root: {}", io_classification(&error)))
+    })?;
 
     FsDiffBaseResolverAdapter::new(metadata.branch_strategy_snapshot().base_branch().to_owned())
         .resolve_diff_base(track_dir, &canonical_root, root)
-        .map_err(|error| measure_failed(format!("resolve diff base: {error}")))
+        // The resolver's message carries the paths it consulted; the base branch it
+        // failed to resolve is the part an operator can act on.
+        .map_err(|_| {
+            measure_failed(format!(
+                "resolve diff base: neither the track's commit record nor the '{}' base branch \
+                 could be resolved",
+                metadata.branch_strategy_snapshot().base_branch()
+            ))
+        })
 }
 
 fn git_bytes(repo: &SystemGitRepo, args: &[&str]) -> Result<Vec<u8>, ScopeDiffMeasureError> {
@@ -260,12 +277,13 @@ fn untracked_additions(
             Ok(false) => continue,
             Err(error) => {
                 return Err(measure_failed(format!(
-                    "refusing untracked path {}: {error}",
-                    absolute_path.display()
+                    "refusing untracked path {}: {}",
+                    path.as_str(),
+                    io_classification(&error)
                 )));
             }
         }
-        let lines = count_file_lines(&absolute_path, &mut remaining_bytes)?;
+        let lines = count_file_lines(&absolute_path, path.as_str(), &mut remaining_bytes)?;
         changed.push((path.clone(), lines));
     }
     Ok(changed)
@@ -276,27 +294,36 @@ fn untracked_additions(
 /// The shared byte budget bounds all untracked-file reads. Metadata makes an
 /// oversized regular file fail before I/O, while the bounded reader closes the
 /// race if that file grows after its size is checked.
-fn count_file_lines(path: &Path, remaining_bytes: &mut u64) -> Result<u32, ScopeDiffMeasureError> {
+///
+/// `relative` is the candidate's repository-relative path and is what every
+/// failure names: `path` is absolute and stays out of the reported message.
+fn count_file_lines(
+    path: &Path,
+    relative: &str,
+    remaining_bytes: &mut u64,
+) -> Result<u32, ScopeDiffMeasureError> {
     let path_metadata = std::fs::symlink_metadata(path).map_err(|error| {
-        measure_failed(format!("read metadata for untracked file {}: {error}", path.display()))
+        measure_failed(format!(
+            "read metadata for untracked file {relative}: {}",
+            io_classification(&error)
+        ))
     })?;
     if !path_metadata.file_type().is_file() {
-        return Err(measure_failed(format!(
-            "untracked file {} is not a regular file",
-            path.display()
-        )));
+        return Err(measure_failed(format!("untracked file {relative} is not a regular file")));
     }
 
     let file = std::fs::File::open(path).map_err(|error| {
-        measure_failed(format!("read untracked file {}: {error}", path.display()))
+        measure_failed(format!("read untracked file {relative}: {}", io_classification(&error)))
     })?;
     let metadata = file.metadata().map_err(|error| {
-        measure_failed(format!("read metadata for untracked file {}: {error}", path.display()))
+        measure_failed(format!(
+            "read metadata for untracked file {relative}: {}",
+            io_classification(&error)
+        ))
     })?;
     if !metadata.is_file() || metadata.len() > *remaining_bytes {
         return Err(measure_failed(format!(
-            "untracked file {} exceeds the remaining {remaining_bytes}-byte read budget",
-            path.display()
+            "untracked file {relative} exceeds the remaining {remaining_bytes}-byte read budget"
         )));
     }
 
@@ -310,7 +337,7 @@ fn count_file_lines(path: &Path, remaining_bytes: &mut u64) -> Result<u32, Scope
 
     loop {
         let bytes_read = reader.read(&mut buffer).map_err(|error| {
-            measure_failed(format!("read untracked file {}: {error}", path.display()))
+            measure_failed(format!("read untracked file {relative}: {}", io_classification(&error)))
         })?;
         if bytes_read == 0 {
             break;
@@ -318,15 +345,11 @@ fn count_file_lines(path: &Path, remaining_bytes: &mut u64) -> Result<u32, Scope
         bytes_seen = bytes_seen.saturating_add(bytes_read as u64);
         if bytes_seen > budget {
             return Err(measure_failed(format!(
-                "untracked file {} exceeds the remaining {budget}-byte read budget",
-                path.display()
+                "untracked file {relative} exceeds the remaining {budget}-byte read budget"
             )));
         }
         let Some(chunk) = buffer.get(..bytes_read) else {
-            return Err(measure_failed(format!(
-                "short read from untracked file {}",
-                path.display()
-            )));
+            return Err(measure_failed(format!("short read from untracked file {relative}")));
         };
         saw_bytes = true;
         if let Some(byte) = chunk.last() {
@@ -403,8 +426,8 @@ fn accumulate_by_scope(
 #[allow(clippy::indexing_slicing, clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
     use super::{
-        MAX_UNTRACKED_FILE_BYTES, accumulate_by_scope, coalesce_by_path, count_file_lines,
-        parse_numstat, retained_paths, untracked_additions, untracked_paths,
+        MAX_UNTRACKED_FILE_BYTES, METADATA_FILE, accumulate_by_scope, coalesce_by_path,
+        count_file_lines, parse_numstat, retained_paths, untracked_additions, untracked_paths,
     };
     use domain::TrackId;
     use domain::batch_plan::LineCount;
@@ -607,7 +630,10 @@ mod tests {
         file.as_file().set_len(MAX_UNTRACKED_FILE_BYTES.saturating_add(1)).unwrap();
         let mut remaining_bytes = MAX_UNTRACKED_FILE_BYTES;
 
-        assert!(count_file_lines(file.path(), &mut remaining_bytes).is_err());
+        assert!(
+            count_file_lines(file.path(), "libs/domain/src/oversized.rs", &mut remaining_bytes)
+                .is_err()
+        );
     }
 
     #[cfg(unix)]
@@ -619,9 +645,18 @@ mod tests {
             .unwrap();
         let mut remaining_bytes = MAX_UNTRACKED_FILE_BYTES;
 
-        let error = count_file_lines(&fifo, &mut remaining_bytes).unwrap_err();
+        let error = count_file_lines(&fifo, "libs/domain/src/untracked.rs", &mut remaining_bytes)
+            .unwrap_err();
 
         assert!(matches!(error, usecase::batch_plan::ScopeDiffMeasureError::MeasureFailed { .. }));
+        // A non-regular file is named by the relative path it was reported under,
+        // not by the absolute one it was read from.
+        let rendered = error.to_string();
+        assert!(rendered.contains("libs/domain/src/untracked.rs"), "rendered as: {rendered}");
+        assert!(
+            !rendered.contains(&directory.path().display().to_string()),
+            "rendered as: {rendered}"
+        );
     }
 
     #[test]
@@ -678,7 +713,47 @@ mod tests {
         let paths = untracked_paths(b"libs/domain/src/untracked-link.rs\0").unwrap();
         let result = untracked_additions(root, &paths);
 
-        assert!(result.is_err(), "untracked symlinks must not be followed");
+        let error = result.expect_err("untracked symlinks must not be followed");
+        // The refusal names the candidate by its repository-relative path. The
+        // absolute prefix — a temporary directory here, an operator's checkout in
+        // practice — is not part of what the measurement reports, and neither is
+        // the guard's own message, which embeds the component it rejected.
+        let rendered = error.to_string();
+        assert!(
+            rendered.contains("libs/domain/src/untracked-link.rs"),
+            "the refusal must name the relative path: {rendered}"
+        );
+        assert!(
+            !rendered.contains(&root.display().to_string()),
+            "the refusal must not embed the repository root: {rendered}"
+        );
+        assert!(
+            !rendered.contains(&target.path().display().to_string()),
+            "the refusal must not embed the symlink target either: {rendered}"
+        );
+    }
+
+    #[test]
+    fn test_a_failure_to_measure_names_no_absolute_path() {
+        use usecase::batch_plan::ScopeDiffMeasurePort;
+
+        // A track the repository does not hold: the measurement fails on the
+        // metadata read, one of the lanes whose underlying error carries the
+        // absolute path it was reading.
+        let repo = fixture_repo();
+        let root = repo.path();
+
+        let error = super::GitScopeDiffMeasurer::new()
+            .measure_scope_diff(&root.join("track/items"), &TrackId::try_new("absent").unwrap())
+            .expect_err("a track with no metadata cannot be measured");
+
+        let rendered = error.to_string();
+        assert!(rendered.contains(METADATA_FILE), "the failure names the file: {rendered}");
+        assert!(rendered.contains("absent"), "the failure names the track: {rendered}");
+        assert!(
+            !rendered.contains(&root.display().to_string()),
+            "no absolute path may reach the operator: {rendered}"
+        );
     }
 
     #[test]

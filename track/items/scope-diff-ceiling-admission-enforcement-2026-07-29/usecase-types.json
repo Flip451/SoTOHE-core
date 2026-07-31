@@ -63,6 +63,10 @@
             {
               "name": "scope_config_reader",
               "ty": "Arc<dyn ScopeConfigReaderPort>"
+            },
+            {
+              "name": "commit_record_verifier",
+              "ty": "Arc<dyn CommitRecordVerifierPort>"
             }
           ],
           "returns": "Self"
@@ -264,6 +268,18 @@
     {
       "for_type": "NonEmptyViolationOutputs",
       "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "CommitRecordVerifyError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CommitRecordVerifyError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "CommitRecordVerifyError",
+      "trait_ref": "core::error::Error"
     }
   ],
   "traits": {
@@ -384,6 +400,52 @@
         },
         {
           "anchor": "CN-09",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
+    "CommitRecordVerifierPort": {
+      "action": "add",
+      "docs": "Driven port; declares verify_commit_record(items_dir, commit_hash) -> Result<(), CommitRecordVerifyError>, is_async false (blocking, single-shot CLI callers), supertraits Send + Sync. items_dir lane per the batch-plan ports. No verdict type minted — Ok/Err carries it (R12). IN-22, AC-28, AC-29.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_commit_record",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "commit_hash",
+              "ty": "&domain::CommitHash"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(), CommitRecordVerifyError>"
+        }
+      ],
+      "module_path": "task_ops::ports",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-22",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-28",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-29",
           "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
         }
       ],
@@ -536,7 +598,7 @@
     },
     "TaskOperationService": {
       "action": "modify",
-      "docs": "Pre-existing primary port for track task mutations; transition_task's success type becomes TaskTransitionOutcome so an admission refusal travels as typed data. Type-design: no admission-specific method is added — the judgment stays inside transition_task's implementation; the other three operations and the error type are untouched. transition_task channels: structured lane = Ok(TaskTransitionOutcome::Rejected(AdmissionRejectionOutput)) — judged refusals, data for callers; Err lane = TaskOperationError::TransitionFailed(String) — unjudgeable states as terminal diagnostics. Asymmetry with the gate path's BatchPlanViolationOutput is intentional: track-ops errors are rendered immediately as string CommandOutcome by the composition root (accepted interim boundary), so a structured error variant would have no consumer; TaskOperationError stays baseline-shaped and undeclared here. CN-10.",
+      "docs": "Pre-existing primary port for track task mutations; transition_task's success type becomes TaskTransitionOutcome so an admission refusal travels as typed data. Type-design: no admission-specific method is added — the judgment stays inside transition_task's implementation; the other three operations and the error type are untouched. transition_task channels: structured lane = Ok(TaskTransitionOutcome::Rejected(AdmissionRejectionOutput)) — judged refusals, data for callers; Err lane = TaskOperationError::TransitionFailed(String) — unjudgeable states as terminal diagnostics. Asymmetry with the gate path's BatchPlanViolationOutput is intentional: track-ops errors are rendered immediately as string CommandOutcome by the composition root (accepted interim boundary), so a structured error variant would have no consumer; TaskOperationError stays baseline-shaped and undeclared here. Record-time commit verification: Err lane, no new method. CN-10.",
       "informal_grounds": [],
       "methods": [
         {
@@ -1080,6 +1142,67 @@
         }
       ]
     },
+    "CommitRecordVerifyError": {
+      "action": "add",
+      "docs": "Err type of CommitRecordVerifierPort::verify_commit_record; enum, 3 variants: CommitNotFound { commit_hash } (→ TransitionFailed lane), NotAncestorOfHead { commit_hash } (→ TransitionFailed lane), RepositoryUnreadable { message } (→ StoreFailed lane). Payloads: domain::CommitHash typed (R11); message: domain::FreeText (R9 truly-opaque). Construction owner: GitCommitRecordVerifier. IN-22, AC-28.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "CommitNotFound",
+            "payload": {
+              "fields": [
+                {
+                  "name": "commit_hash",
+                  "ty": "domain::CommitHash"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "NotAncestorOfHead",
+            "payload": {
+              "fields": [
+                {
+                  "name": "commit_hash",
+                  "ty": "domain::CommitHash"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "RepositoryUnreadable",
+            "payload": {
+              "fields": [
+                {
+                  "name": "message",
+                  "ty": "domain::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "task_ops",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-22",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-28",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
     "NonEmptyViolationOutputs": {
       "action": "add",
       "docs": "Boundary mirror of the domain's non-empty violation collection. Type-design: without it a Blocked output could carry an empty list, so the guarantee the domain establishes would be dropped exactly where the adapter consumes it; this type carries it across instead, keeping the mirror faithful in structure and not only in variant names. try_new returns Option because emptiness is a shape question at the mapping site, not an error the use case reports. Private tuple newtype, mirroring the domain collection's surface. IN-06, AC-06, AC-07.",
@@ -1239,7 +1362,7 @@
     },
     "TaskOperationInteractor": {
       "action": "modify",
-      "docs": "Existing task-operation interactor; new() gains the batch-plan reader, scope-diff measurer and scope-config reader, and transition_task delegates the judgment to evaluate_admission. The constructor is declared in the top-level inherent_impls entry rather than on this type entry, because that is the only place a generic interactor's impl-block type parameter can be expressed; it is declared once there and left empty here so the contract map does not render it twice. Type-design: the three admission collaborators are required rather than Option so no constructible interactor can transition without judging; the pre-existing branch_reader stays Option because that guard is disabled in repository-less test environments. Port calls are scoped by the items_dir already on TaskTransitionCommand, and planned tasks come from the existing store bound rather than a new port. A refusal is returned as TaskTransitionOutcome::Rejected with its typed payload intact, not flattened into the error channel, so TaskOperationError's declared shape stays baseline-identical. IN-09, IN-10, AC-10, AC-12, AC-13, CN-10.",
+      "docs": "Existing task-operation interactor; new() gains the batch-plan reader, scope-diff measurer, scope-config reader and commit-record verifier, and transition_task delegates the judgment to evaluate_admission. The verifier is consulted before a hash-writing transition is applied (Complete-with-hash / BackfillHash); required rather than Option, so no constructible interactor can record a hash unverified. CommitRecordVerifyError maps variant-wise: the two rejected variants to TransitionFailed, RepositoryUnreadable to StoreFailed. The constructor is declared in the top-level inherent_impls entry rather than on this type entry, because that is the only place a generic interactor's impl-block type parameter can be expressed; it is declared once there and left empty here so the contract map does not render it twice. Type-design: the three admission collaborators are required rather than Option so no constructible interactor can transition without judging; the pre-existing branch_reader stays Option because that guard is disabled in repository-less test environments. Port calls are scoped by the items_dir already on TaskTransitionCommand, and planned tasks come from the existing store bound rather than a new port. A refusal is returned as TaskTransitionOutcome::Rejected with its typed payload intact, not flattened into the error channel, so TaskOperationError's declared shape stays baseline-identical. IN-09, IN-10, AC-10, AC-12, AC-13, CN-10.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",

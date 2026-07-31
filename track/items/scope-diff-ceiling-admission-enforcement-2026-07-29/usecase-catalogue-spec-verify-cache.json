@@ -531,6 +531,54 @@
       }
     },
     {
+      "claim_hash": "b509a4f16bf41efe1dde254cbb591d46afa5ac6b2359009a17fde1ee4978d9ec",
+      "evidence_hash": "032b684617147b7908220c571b6c30548caea06250737a91e80a685d7ac260a1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "満たさない記録は error として拒否し状態を一切書き換えない — `impl-plan.json` は遷移前のまま残り、部分適用も graceful skip も生じない。repository の読み取り自体が失敗して検証を実行できない場合も同じく error とし、検証せずに記録する経路を設けない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CommitRecordVerifyError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-22",
+          "text_label": "commit hash を書くタスク状態遷移に記録時の repository 照合を組み込む。対象は hash を伴う完了記録（`Complete`）と後からの埋め戻し（`BackfillHash`）の双方であり、記録経路による例外は設けない。与えられた hash が当該 repository に commit object として実在し、かつ HEAD の祖先であることを要求する。満たさない記録は error として拒否し状態を一切書き換えない — `impl-plan.json` は遷移前のまま残り、部分適用も graceful skip も生じない。repository の読み取り自体が失敗して検証を実行できない場合も同じく error とし、検証せずに記録する経路を設けない。hash を伴わない完了記録は照合の対象外である（記録すべき値が存在せず、その done は従来どおり未 settle である）。照合は repository の読み取りを要するため usecase の port と、track 成果物が置かれた repository を items_dir 起点で解決する infrastructure adapter が担い、domain は I/O を持たず検証結果を入力として受け取る。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b509a4f16bf41efe1dde254cbb591d46afa5ac6b2359009a17fde1ee4978d9ec",
+      "evidence_hash": "f758bd115cf20e6ed6e85f6f99be77ec8da4ecc823727b29df105cb16a2827a4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実在するが HEAD の祖先でない hash、および repository の読み取り自体が失敗して検証を実行できない場合のそれぞれについて、hash を伴う完了記録（`Complete`）と埋め戻し（`BackfillHash`）の双方が error になり"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CommitRecordVerifyError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-28",
+          "text_label": "形式は well-formed だが当該 repository に commit object として実在しない hash、実在するが HEAD の祖先でない hash、および repository の読み取り自体が失敗して検証を実行できない場合のそれぞれについて、hash を伴う完了記録（`Complete`）と埋め戻し（`BackfillHash`）の双方が error になり、永続化された `impl-plan.json` が遷移前と byte 単位で不変である。部分適用も、検証を実行できないことを理由に無検査で記録する graceful skip も存在しない。"
+        }
+      }
+    },
+    {
       "claim_hash": "8ff2a2b585e33fad48ad979235f6d615a27c02db3769c125f3ae58a1092b80da",
       "evidence_hash": "b37a6e46c2e61d04067a1e3d5768cf0bf32d08ac8e339b479b2db31f0ba7ce51",
       "verdict": {
@@ -795,7 +843,7 @@
       }
     },
     {
-      "claim_hash": "3c434067afaacf4ad841d3fb630b2a634cd2f136f02791f8c09facd7e98221e7",
+      "claim_hash": "fe2b9d4d2b9d889e9d88eec8a5a41664f89a566233f1bfeb6c9eaee6307b23ee",
       "evidence_hash": "a36553b773468155e8afd40fabadf2c2f47ccd898e53f349ef403942e7068b65",
       "verdict": {
         "kind": "pass",
@@ -819,7 +867,7 @@
       }
     },
     {
-      "claim_hash": "3c434067afaacf4ad841d3fb630b2a634cd2f136f02791f8c09facd7e98221e7",
+      "claim_hash": "fe2b9d4d2b9d889e9d88eec8a5a41664f89a566233f1bfeb6c9eaee6307b23ee",
       "evidence_hash": "fe21877e227da9e580b0d988448a076149759312fa091267a9ff4d5b84eedf8a",
       "verdict": {
         "kind": "pass",
@@ -843,11 +891,11 @@
       }
     },
     {
-      "claim_hash": "3c434067afaacf4ad841d3fb630b2a634cd2f136f02791f8c09facd7e98221e7",
+      "claim_hash": "fe2b9d4d2b9d889e9d88eec8a5a41664f89a566233f1bfeb6c9eaee6307b23ee",
       "evidence_hash": "c0188369b660bb2cf7e9f5ff9db301aee3e08825ea3b8d160462c09421b9549f",
       "verdict": {
         "kind": "pass",
-        "citation": "admission 判定はタスク状態遷移の単一経路上に置き、どの workflow / capability から到達しても迂回できない状態を保つ。implementer 側の着手前 precondition が、遷移を経ない実装 dispatch という迂回経路を塞ぐ。"
+        "citation": "admission 判定はタスク状態遷移の単一経路上に置き、どの workflow / capability から到達しても迂回できない状態を保つ。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -867,7 +915,7 @@
       }
     },
     {
-      "claim_hash": "3c434067afaacf4ad841d3fb630b2a634cd2f136f02791f8c09facd7e98221e7",
+      "claim_hash": "fe2b9d4d2b9d889e9d88eec8a5a41664f89a566233f1bfeb6c9eaee6307b23ee",
       "evidence_hash": "ce7db4290c3c3597e07a0360c3e428b7063eb0d072e11cb8056628eb9b8b6736",
       "verdict": {
         "kind": "pass",
@@ -891,11 +939,11 @@
       }
     },
     {
-      "claim_hash": "3c434067afaacf4ad841d3fb630b2a634cd2f136f02791f8c09facd7e98221e7",
+      "claim_hash": "fe2b9d4d2b9d889e9d88eec8a5a41664f89a566233f1bfeb6c9eaee6307b23ee",
       "evidence_hash": "7e491e8cd12b3b65cfbe171bfee36beecbcf2de2f3aeb6f200b005ed06ee5362",
       "verdict": {
         "kind": "pass",
-        "citation": "`batch-plan.json` の宣言に不在の settle 済みタスクについて、done → in_progress（Reopen）が拒否される。拒否は fail-closed であり、宣言に不在であることを理由に無判定で通す graceful skip は存在しない。"
+        "citation": "`batch-plan.json` の宣言に不在の settle 済みタスクについて、done → in_progress（Reopen）が拒否される。拒否は fail-closed であり、宣言に不在であることを理由に無判定で通す graceful skip は存在しない。再開が通るのは impl-planner が当該タスクを現在 batch の member として宣言し直した後に限る。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -915,11 +963,11 @@
       }
     },
     {
-      "claim_hash": "3c434067afaacf4ad841d3fb630b2a634cd2f136f02791f8c09facd7e98221e7",
+      "claim_hash": "fe2b9d4d2b9d889e9d88eec8a5a41664f89a566233f1bfeb6c9eaee6307b23ee",
       "evidence_hash": "961f2dbce1da968ef17ae6f95edffe20e0ffad14f2779a842038595cf31e4bb0",
       "verdict": {
         "kind": "pass",
-        "citation": "宣言済みタスクの Reopen が Start と同一の判定式で判定される"
+        "citation": "宣言済みタスクの Reopen が Start と同一の判定式で判定される: AC-10（現在 batch 非 member の拒否）、AC-11（先行寄与 0 の scope の admit）、AC-12（先行寄与ありの合計超過による拒否）、AC-13（見積り欠落の error）、AC-23（未実在 scope 名の error）の各判定が Reopen 候補に対しても同じ結果で適用される。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1275,6 +1323,78 @@
       }
     },
     {
+      "claim_hash": "c6e4915d6beece77a3f7d82b9ba740af01f3d77951748b02c2fa1b842e39e22f",
+      "evidence_hash": "032b684617147b7908220c571b6c30548caea06250737a91e80a685d7ac260a1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "照合は repository の読み取りを要するため usecase の port と、track 成果物が置かれた repository を items_dir 起点で解決する infrastructure adapter が担い、domain は I/O を持たず検証結果を入力として受け取る。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "CommitRecordVerifierPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-22",
+          "text_label": "commit hash を書くタスク状態遷移に記録時の repository 照合を組み込む。対象は hash を伴う完了記録（`Complete`）と後からの埋め戻し（`BackfillHash`）の双方であり、記録経路による例外は設けない。与えられた hash が当該 repository に commit object として実在し、かつ HEAD の祖先であることを要求する。満たさない記録は error として拒否し状態を一切書き換えない — `impl-plan.json` は遷移前のまま残り、部分適用も graceful skip も生じない。repository の読み取り自体が失敗して検証を実行できない場合も同じく error とし、検証せずに記録する経路を設けない。hash を伴わない完了記録は照合の対象外である（記録すべき値が存在せず、その done は従来どおり未 settle である）。照合は repository の読み取りを要するため usecase の port と、track 成果物が置かれた repository を items_dir 起点で解決する infrastructure adapter が担い、domain は I/O を持たず検証結果を入力として受け取る。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c6e4915d6beece77a3f7d82b9ba740af01f3d77951748b02c2fa1b842e39e22f",
+      "evidence_hash": "f758bd115cf20e6ed6e85f6f99be77ec8da4ecc823727b29df105cb16a2827a4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "repository の読み取り自体が失敗して検証を実行できない場合のそれぞれについて、hash を伴う完了記録（`Complete`）と埋め戻し（`BackfillHash`）の双方が error になり"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "CommitRecordVerifierPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-28",
+          "text_label": "形式は well-formed だが当該 repository に commit object として実在しない hash、実在するが HEAD の祖先でない hash、および repository の読み取り自体が失敗して検証を実行できない場合のそれぞれについて、hash を伴う完了記録（`Complete`）と埋め戻し（`BackfillHash`）の双方が error になり、永続化された `impl-plan.json` が遷移前と byte 単位で不変である。部分適用も、検証を実行できないことを理由に無検査で記録する graceful skip も存在しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c6e4915d6beece77a3f7d82b9ba740af01f3d77951748b02c2fa1b842e39e22f",
+      "evidence_hash": "96f42364bc8042784632f7b7deb790c79b96f5ce627d9319d125a49770752b75",
+      "verdict": {
+        "kind": "pass",
+        "citation": "当該 repository に実在し HEAD の祖先である hash は、`Complete` / `BackfillHash` のいずれの経路でも従来どおり記録される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "CommitRecordVerifierPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-29",
+          "text_label": "当該 repository に実在し HEAD の祖先である hash は、`Complete` / `BackfillHash` のいずれの経路でも従来どおり記録される。hash を伴わない完了記録は照合の対象外であり、従来どおり記録されてその done は未 settle のままである。"
+        }
+      }
+    },
+    {
       "claim_hash": "8c533d4d2ee4b3f94da4b8cfe658d4c2eeaa1cbd6c3358c827ad96d3693edc26",
       "evidence_hash": "ad044a24bd9e64f1446a89b3482e2ea5aa0363d48eb18993c2ba48f1f0c50637",
       "verdict": {
@@ -1515,7 +1635,7 @@
       }
     },
     {
-      "claim_hash": "80aec26ebeea9f4dd2cbbc93fa4d542839f08e61a6a7283690050828bea7efd3",
+      "claim_hash": "470af3adbf4ec94cad0a73a73c8c10dd2afb563edfc37e4b149d092a4db7d52b",
       "evidence_hash": "a36553b773468155e8afd40fabadf2c2f47ccd898e53f349ef403942e7068b65",
       "verdict": {
         "kind": "pass",
@@ -1539,7 +1659,7 @@
       }
     },
     {
-      "claim_hash": "80aec26ebeea9f4dd2cbbc93fa4d542839f08e61a6a7283690050828bea7efd3",
+      "claim_hash": "470af3adbf4ec94cad0a73a73c8c10dd2afb563edfc37e4b149d092a4db7d52b",
       "evidence_hash": "66c2f1e0b75dbae5b1f2942d4e0faf979af317f065d8830159c4ccf2b0c14f65",
       "verdict": {
         "kind": "pass",
@@ -1563,7 +1683,7 @@
       }
     },
     {
-      "claim_hash": "80aec26ebeea9f4dd2cbbc93fa4d542839f08e61a6a7283690050828bea7efd3",
+      "claim_hash": "470af3adbf4ec94cad0a73a73c8c10dd2afb563edfc37e4b149d092a4db7d52b",
       "evidence_hash": "ce7db4290c3c3597e07a0360c3e428b7063eb0d072e11cb8056628eb9b8b6736",
       "verdict": {
         "kind": "pass",
@@ -1587,7 +1707,7 @@
       }
     },
     {
-      "claim_hash": "80aec26ebeea9f4dd2cbbc93fa4d542839f08e61a6a7283690050828bea7efd3",
+      "claim_hash": "470af3adbf4ec94cad0a73a73c8c10dd2afb563edfc37e4b149d092a4db7d52b",
       "evidence_hash": "7e491e8cd12b3b65cfbe171bfee36beecbcf2de2f3aeb6f200b005ed06ee5362",
       "verdict": {
         "kind": "pass",
@@ -1611,7 +1731,7 @@
       }
     },
     {
-      "claim_hash": "80aec26ebeea9f4dd2cbbc93fa4d542839f08e61a6a7283690050828bea7efd3",
+      "claim_hash": "470af3adbf4ec94cad0a73a73c8c10dd2afb563edfc37e4b149d092a4db7d52b",
       "evidence_hash": "961f2dbce1da968ef17ae6f95edffe20e0ffad14f2779a842038595cf31e4bb0",
       "verdict": {
         "kind": "pass",

@@ -1,7 +1,7 @@
 <!-- Generated from spec.json — DO NOT EDIT DIRECTLY -->
 ---
 version: "1.0"
-signals: { blue: 72, yellow: 0, red: 0 }
+signals: { blue: 75, yellow: 0, red: 0 }
 ---
 
 # per-scope diff ceiling の実装開始前 admission 強制
@@ -28,7 +28,7 @@ signals: { blue: 72, yellow: 0, red: 0 }
 - [IN-11] admission 判定を算術と membership 照合のみで行い、見積り欠落タスクの遷移を error とする（graceful skip なし）。候補タスクの見積りが設定済み scope 集合に存在しない main scope 名を宣言している場合も、ceiling 未解決として全 admit に落とさず、見積り欠落と同格の error とする。runtime に許すのは宣言 batch の分割のみで、合併は許さない。 [adr: knowledge/adr/2026-07-28-1521-scope-diff-ceiling-admission-enforcement.md#D3, knowledge/adr/2026-07-30-0951-batch-plan-scope-name-config-validation.md#D1, knowledge/adr/2026-07-30-0951-batch-plan-scope-name-config-validation.md#D2] [tasks: T004, T018, T021]
 - [IN-12] full-cycle の runtime greedy batch 編成ステップを削除し、宣言された `batches[]` の宣言順消化に置き換える。 [adr: knowledge/adr/2026-07-28-1521-scope-diff-ceiling-admission-enforcement.md#D3] [tasks: T017]
 - [IN-13] implementer 正本に着手前 precondition を追加する。担当タスクが `impl-plan.json`（SSoT。rendered view の `plan.md` ではない）上で `in_progress` になっていることを確認し、満たされていなければ実装せず orchestrator へ返して遷移を促す。 [adr: knowledge/adr/2026-07-28-1521-scope-diff-ceiling-admission-enforcement.md#D4] [tasks: T015]
-- [IN-14] scope 行数の数え方の正本を workflow 散文から CLI 実装へ移す。定義は既存の実測ガードのものをそのまま採用する: scope の行数 = additions + deletions（base 起点の committed / staged / unstaged を合算）、untracked ファイルは全行数を additions として計上、scope 分類は既存の review scope 分類機構を再利用する。 [adr: knowledge/adr/2026-07-28-1521-scope-diff-ceiling-admission-enforcement.md#D5] [tasks: T009, T023]
+- [IN-14] scope 行数の数え方の正本を workflow 散文から CLI 実装へ移す。定義は既存の実測ガードのものをそのまま採用する: scope の行数 = additions + deletions（base 起点の committed / staged / unstaged を合算）、untracked ファイルは全行数を additions として計上、scope 分類は既存の review scope 分類機構を再利用する。 [adr: knowledge/adr/2026-07-28-1521-scope-diff-ceiling-admission-enforcement.md#D5] [tasks: T009, T023, T025]
 - [IN-15] 正本散文から行数の数え方の再記述を除去し、CLI を参照する形に改める。 [adr: knowledge/adr/2026-07-28-1521-scope-diff-ceiling-admission-enforcement.md#D5] [tasks: T017]
 - [IN-16] full-cycle の実装後〜review 前の actual-diff guard（実測照合と advisory log）を削除する。実測が読まれるのは admission の baseline としてのみとする。 [adr: knowledge/adr/2026-07-28-1521-scope-diff-ceiling-admission-enforcement.md#D6] [tasks: T017]
 - [IN-17] impl-planner 正本の literal な上限値を config 参照へ置き換え、per-task commit 単位ではなく scope 単位の記述に改め、見積りの産出義務と test obligation 由来の試験行数を扱いに含める。 [adr: knowledge/adr/2026-07-28-1521-scope-diff-ceiling-admission-enforcement.md#D1, knowledge/adr/2026-07-28-1521-scope-diff-ceiling-admission-enforcement.md#D2] [tasks: T013]
@@ -36,6 +36,7 @@ signals: { blue: 72, yellow: 0, red: 0 }
 - [IN-19] `impl-plan.json` を schema 2 へ拡張し、task entry に省略可能な `depends_on`（同一ファイル内の task id の列）を追加する。意味は「そのタスクの実装は列挙されたタスクの完了を前提とする」であり、省略と空列はいずれも未宣言と読む。読み取りは schema 1 / 2 の双方を受理して schema 1 は未宣言として読み、書き出しは schema 2 とする。書き手は impl-planner のみで、依存宣言はタスク分解と同じ一回の書き込みで確定する。 [adr: knowledge/adr/2026-07-29-0358-task-dependency-declaration-and-batch-order-check.md#D1] [tasks: T019, T020]
 - [IN-20] `impl-plan.json` の codec に、依存宣言に関する file-internal 不変条件 3 件を fail-closed で追加する: `depends_on` の各 id が同一ファイルの `tasks[]` に実在する（参照の実在）/ 宣言された依存関係が閉路を含まない（自己参照を含む、非循環）/ plan order が宣言された依存グラフの線形拡大である。3 件目は宣言と実行順の食い違いを構造的に排除し、前提未完了のタスクを先に配る計画を表現不能にする。 [adr: knowledge/adr/2026-07-29-0358-task-dependency-declaration-and-batch-order-check.md#D1] [tasks: T019, T020]
 - [IN-21] `batch-plan.json` が宣言を要求する対象を未 settle のタスク（todo / in_progress）に限る。settle 済みのタスク — commit 記録を伴う done、または skipped。commit 記録のない done は未 settle であり要求対象に含まれる — の宣言は任意とする。settle の判定は遷移時の admission が用いる既存の定義をそのまま使い、新しい状態概念を導入しない。任意は免除ではなく、宣言された settle 済みタスクは見積り Σ の照合・単独寄与者免除・task id の実在検査の対象として未 settle タスクと同じに扱う。宣言を禁止しない理由は、現在 batch の解決が settle 済み member が宣言に残っていることを前提に成立しており、禁止すると commit ごとに Phase 3 の終端成果物を書き換える必要が生じる点にある。 [adr: knowledge/adr/2026-07-30-1022-batch-plan-declaration-domain-unsettled-tasks.md#D1] [tasks: T021]
+- [IN-22] commit hash を書くタスク状態遷移に記録時の repository 照合を組み込む。対象は hash を伴う完了記録（`Complete`）と後からの埋め戻し（`BackfillHash`）の双方であり、記録経路による例外は設けない。与えられた hash が当該 repository に commit object として実在し、かつ HEAD の祖先であることを要求する。満たさない記録は error として拒否し状態を一切書き換えない — `impl-plan.json` は遷移前のまま残り、部分適用も graceful skip も生じない。repository の読み取り自体が失敗して検証を実行できない場合も同じく error とし、検証せずに記録する経路を設けない。hash を伴わない完了記録は照合の対象外である（記録すべき値が存在せず、その done は従来どおり未 settle である）。照合は repository の読み取りを要するため usecase の port と、track 成果物が置かれた repository を items_dir 起点で解決する infrastructure adapter が担い、domain は I/O を持たず検証結果を入力として受け取る。 [adr: knowledge/adr/2026-07-30-2101-per-task-commit-hash-record-time-validation.md#D1] [tasks: T026, T027]
 
 ### Out of Scope
 - [OUT-01] 見積りと batch 宣言を `impl-plan.json` へ埋め込むことは対象外とする。これらは Phase 3 authoring の終端導出物であり `batch-plan.json` に置く。`impl-plan.json` の schema 拡張はタスク間の依存宣言に限る。 [adr: knowledge/adr/2026-07-28-1521-scope-diff-ceiling-admission-enforcement.md#D1, knowledge/adr/2026-07-29-0358-task-dependency-declaration-and-batch-order-check.md#D1] [tasks: T019, T020]
@@ -90,6 +91,8 @@ signals: { blue: 72, yellow: 0, red: 0 }
 - [ ] [AC-25] settle 済みタスクを宣言に含めた `batch-plan.json` において、その見積りが所属 batch の per-scope Σ に従来どおり計上され、単独寄与者免除の判定と task id の実在検査も同じに適用される。宣言が任意であることが照合の免除として働く経路が存在しない。 [adr: knowledge/adr/2026-07-30-1022-batch-plan-declaration-domain-unsettled-tasks.md#D1] [tasks: T021]
 - [ ] [AC-26] `batch-plan.json` の宣言に不在の settle 済みタスクについて、done → in_progress（Reopen）が拒否される。拒否は fail-closed であり、宣言に不在であることを理由に無判定で通す graceful skip は存在しない。再開が通るのは impl-planner が当該タスクを現在 batch の member として宣言し直した後に限る。skipped からの再開は ResetToTodo → Start を経る既存の判定対象であり、この判定点の追加を要しない。 [adr: knowledge/adr/2026-07-30-1022-batch-plan-declaration-domain-unsettled-tasks.md#D1, knowledge/adr/2026-07-30-1022-batch-plan-declaration-domain-unsettled-tasks.md#D3] [tasks: T021]
 - [ ] [AC-27] 宣言済みタスクの Reopen が Start と同一の判定式で判定される: AC-10（現在 batch 非 member の拒否）、AC-11（先行寄与 0 の scope の admit）、AC-12（先行寄与ありの合計超過による拒否）、AC-13（見積り欠落の error）、AC-23（未実在 scope 名の error）の各判定が Reopen 候補に対しても同じ結果で適用される。したがって宣言済み settle 済みタスクの Reopen は、その所属 batch が現在 batch である場合に限り通り、すでに閉じた batch の member であれば拒否される。判定式は変わらず、広がるのは判定対象の遷移集合のみである。 [adr: knowledge/adr/2026-07-30-1022-batch-plan-declaration-domain-unsettled-tasks.md#D3, knowledge/adr/2026-07-28-1521-scope-diff-ceiling-admission-enforcement.md#D3] [tasks: T021, T022]
+- [ ] [AC-28] 形式は well-formed だが当該 repository に commit object として実在しない hash、実在するが HEAD の祖先でない hash、および repository の読み取り自体が失敗して検証を実行できない場合のそれぞれについて、hash を伴う完了記録（`Complete`）と埋め戻し（`BackfillHash`）の双方が error になり、永続化された `impl-plan.json` が遷移前と byte 単位で不変である。部分適用も、検証を実行できないことを理由に無検査で記録する graceful skip も存在しない。 [adr: knowledge/adr/2026-07-30-2101-per-task-commit-hash-record-time-validation.md#D1] [tasks: T026, T027]
+- [ ] [AC-29] 当該 repository に実在し HEAD の祖先である hash は、`Complete` / `BackfillHash` のいずれの経路でも従来どおり記録される。hash を伴わない完了記録は照合の対象外であり、従来どおり記録されてその done は未 settle のままである。 [adr: knowledge/adr/2026-07-30-2101-per-task-commit-hash-record-time-validation.md#D1] [tasks: T027]
 
 ## Related Conventions (Required Reading)
 - knowledge/conventions/coding-principles.md#Rules
@@ -98,5 +101,5 @@ signals: { blue: 72, yellow: 0, red: 0 }
 ## Signal Summary
 
 ### Stage 1: Spec Signals
-🔵 72  🟡 0  🔴 0
+🔵 75  🟡 0  🔴 0
 

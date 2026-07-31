@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-30T09:02:34Z",
-  "declaration_hash": "82fbe98c92bb272afb3c82728cbc1c2ae19445b8ff6a7f1d11b2d26890fadab2",
-  "implementation_input_hash": "a390b0f4122676701ac8e0030996ace8bb4af4b24557f253882cc12e714985bc",
+  "generated_at": "2026-07-30T16:00:32Z",
+  "declaration_hash": "03c29801682d16bdab42649ca2a11e107904f3b82568dd6a8f5c36e88583f03f",
+  "implementation_input_hash": "31c8ea9f90367a3830d5836aadd818c66d20253d4c1b8c95d8b08ac0fc0c43b3",
   "signals": [
     {
       "type_name": "AdmissionRejectionOutput",
@@ -86,6 +86,23 @@
       ]
     },
     {
+      "type_name": "CommitRecordVerifierPort",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "CommitRecordVerifyError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
       "type_name": "NonEmptyViolationOutputs",
       "kind_tag": "dto",
       "signal": "blue",
@@ -151,7 +168,7 @@
     {
       "type_name": "TaskOperationInteractor",
       "kind_tag": "interactor",
-      "signal": "blue",
+      "signal": "yellow",
       "found_type": true,
       "found_items": [
         "TaskOperationService"

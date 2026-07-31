@@ -387,6 +387,78 @@
       }
     },
     {
+      "claim_hash": "86db5c03ebc583ebb7a2b68e4cac6dedab0b08a0a21eca9dc3be41ba0a124231",
+      "evidence_hash": "032b684617147b7908220c571b6c30548caea06250737a91e80a685d7ac260a1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "照合は repository の読み取りを要するため usecase の port と、track 成果物が置かれた repository を items_dir 起点で解決する infrastructure adapter が担い、domain は I/O を持たず検証結果を入力として受け取る。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "GitCommitRecordVerifier"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-22",
+          "text_label": "commit hash を書くタスク状態遷移に記録時の repository 照合を組み込む。対象は hash を伴う完了記録（`Complete`）と後からの埋め戻し（`BackfillHash`）の双方であり、記録経路による例外は設けない。与えられた hash が当該 repository に commit object として実在し、かつ HEAD の祖先であることを要求する。満たさない記録は error として拒否し状態を一切書き換えない — `impl-plan.json` は遷移前のまま残り、部分適用も graceful skip も生じない。repository の読み取り自体が失敗して検証を実行できない場合も同じく error とし、検証せずに記録する経路を設けない。hash を伴わない完了記録は照合の対象外である（記録すべき値が存在せず、その done は従来どおり未 settle である）。照合は repository の読み取りを要するため usecase の port と、track 成果物が置かれた repository を items_dir 起点で解決する infrastructure adapter が担い、domain は I/O を持たず検証結果を入力として受け取る。"
+        }
+      }
+    },
+    {
+      "claim_hash": "86db5c03ebc583ebb7a2b68e4cac6dedab0b08a0a21eca9dc3be41ba0a124231",
+      "evidence_hash": "f758bd115cf20e6ed6e85f6f99be77ec8da4ecc823727b29df105cb16a2827a4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "repository の読み取り自体が失敗して検証を実行できない場合のそれぞれについて、hash を伴う完了記録（`Complete`）と埋め戻し（`BackfillHash`）の双方が error になり"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "GitCommitRecordVerifier"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-28",
+          "text_label": "形式は well-formed だが当該 repository に commit object として実在しない hash、実在するが HEAD の祖先でない hash、および repository の読み取り自体が失敗して検証を実行できない場合のそれぞれについて、hash を伴う完了記録（`Complete`）と埋め戻し（`BackfillHash`）の双方が error になり、永続化された `impl-plan.json` が遷移前と byte 単位で不変である。部分適用も、検証を実行できないことを理由に無検査で記録する graceful skip も存在しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "86db5c03ebc583ebb7a2b68e4cac6dedab0b08a0a21eca9dc3be41ba0a124231",
+      "evidence_hash": "96f42364bc8042784632f7b7deb790c79b96f5ce627d9319d125a49770752b75",
+      "verdict": {
+        "kind": "pass",
+        "citation": "当該 repository に実在し HEAD の祖先である hash は、`Complete` / `BackfillHash` のいずれの経路でも従来どおり記録される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "GitCommitRecordVerifier"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-29",
+          "text_label": "当該 repository に実在し HEAD の祖先である hash は、`Complete` / `BackfillHash` のいずれの経路でも従来どおり記録される。hash を伴わない完了記録は照合の対象外であり、従来どおり記録されてその done は未 settle のままである。"
+        }
+      }
+    },
+    {
       "claim_hash": "50bf4e59d21d1a288fe265b038a5b5dd7cedfaa14f1dacf678ac11a4df39fb5e",
       "evidence_hash": "fe21877e227da9e580b0d988448a076149759312fa091267a9ff4d5b84eedf8a",
       "verdict": {

@@ -14,6 +14,7 @@ use domain::{FreeText, TrackId};
 use usecase::batch_plan::{ScopeConfigReadError, ScopeConfigReaderPort};
 
 use crate::review_v2::load_v2_scope_config;
+use crate::sanitized_failure::{io_classification, scope_config_classification};
 
 /// Repository-relative location of the review scope configuration.
 pub(crate) const REVIEW_SCOPE_CONFIG: &str = ".harness/config/review-scope.json";
@@ -43,14 +44,23 @@ impl ScopeConfigReaderPort for FsReviewScopeConfigReader {
         // repository the track artifacts do.
         let repo = crate::discover_repo_for_items_dir(items_dir).map_err(|error| {
             ScopeConfigReadError::ReadFailed {
-                message: FreeText::new(format!("git repository could not be discovered: {error}")),
+                message: FreeText::new(format!(
+                    "git repository could not be discovered: {}",
+                    io_classification(&error)
+                )),
             }
         })?;
         let root = repo.root();
 
+        // The loader's error names the absolute path it was given; the file is
+        // already identified by its repository-relative constant, so only the
+        // classification travels out to the operator.
         load_v2_scope_config(&root.join(REVIEW_SCOPE_CONFIG), track_id, root).map_err(|error| {
             ScopeConfigReadError::ReadFailed {
-                message: FreeText::new(format!("load {REVIEW_SCOPE_CONFIG}: {error}")),
+                message: FreeText::new(format!(
+                    "load {REVIEW_SCOPE_CONFIG}: {}",
+                    scope_config_classification(&error)
+                )),
             }
         })
     }
@@ -143,7 +153,13 @@ mod tests {
             .unwrap_err();
 
         let ScopeConfigReadError::ReadFailed { message } = error;
-        assert!(message.as_str().contains("refusing to follow symlink"), "unexpected: {message}");
+        // The refusal names the classification, not the guard's own message: that
+        // one renders the absolute component it rejected.
+        assert!(message.as_str().contains("rejected as a symlink"), "unexpected: {message}");
+        assert!(
+            !message.as_str().contains(&real.path().display().to_string()),
+            "no absolute path may reach the operator: {message}"
+        );
     }
 
     #[cfg(unix)]
@@ -164,7 +180,11 @@ mod tests {
             .unwrap_err();
 
         let ScopeConfigReadError::ReadFailed { message } = error;
-        assert!(message.as_str().contains("refusing to follow symlink"), "unexpected: {message}");
+        assert!(message.as_str().contains("rejected as a symlink"), "unexpected: {message}");
+        assert!(
+            !message.as_str().contains(&real.path().display().to_string()),
+            "no absolute path may reach the operator: {message}"
+        );
     }
 
     #[test]

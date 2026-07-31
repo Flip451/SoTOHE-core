@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "82fbe98c92bb272afb3c82728cbc1c2ae19445b8ff6a7f1d11b2d26890fadab2",
+  "catalogue_declaration_hash": "03c29801682d16bdab42649ca2a11e107904f3b82568dd6a8f5c36e88583f03f",
   "signals": [
     {
       "type_name": "AdmissionRejectionOutput",
@@ -33,6 +33,11 @@
       "entry_hash": "35c7b593eab28dca245187ff645a7b6ab9f2349cbd84e91e6a3a4a57e10ba887"
     },
     {
+      "type_name": "CommitRecordVerifyError",
+      "signal": "blue",
+      "entry_hash": "b509a4f16bf41efe1dde254cbb591d46afa5ac6b2359009a17fde1ee4978d9ec"
+    },
+    {
       "type_name": "NonEmptyViolationOutputs",
       "signal": "blue",
       "entry_hash": "8ff2a2b585e33fad48ad979235f6d615a27c02db3769c125f3ae58a1092b80da"
@@ -55,7 +60,7 @@
     {
       "type_name": "TaskOperationInteractor",
       "signal": "blue",
-      "entry_hash": "3c434067afaacf4ad841d3fb630b2a634cd2f136f02791f8c09facd7e98221e7"
+      "entry_hash": "fe2b9d4d2b9d889e9d88eec8a5a41664f89a566233f1bfeb6c9eaee6307b23ee"
     },
     {
       "type_name": "TaskTransitionOutcome",
@@ -78,6 +83,11 @@
       "entry_hash": "b749246ac374bcb7d78236b365f26a9f0f1e4475045453b911b7ebdda4ecd1ce"
     },
     {
+      "type_name": "CommitRecordVerifierPort",
+      "signal": "blue",
+      "entry_hash": "c6e4915d6beece77a3f7d82b9ba740af01f3d77951748b02c2fa1b842e39e22f"
+    },
+    {
       "type_name": "PlannedTaskReaderPort",
       "signal": "blue",
       "entry_hash": "8c533d4d2ee4b3f94da4b8cfe658d4c2eeaa1cbd6c3358c827ad96d3693edc26"
@@ -95,7 +105,7 @@
     {
       "type_name": "TaskOperationService",
       "signal": "blue",
-      "entry_hash": "80aec26ebeea9f4dd2cbbc93fa4d542839f08e61a6a7283690050828bea7efd3"
+      "entry_hash": "470af3adbf4ec94cad0a73a73c8c10dd2afb563edfc37e4b149d092a4db7d52b"
     },
     {
       "type_name": "TransitionTaskUseCase",

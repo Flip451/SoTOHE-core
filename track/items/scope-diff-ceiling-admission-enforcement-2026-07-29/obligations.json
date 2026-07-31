@@ -641,7 +641,7 @@
         "role": "Interactor"
       },
       "brief": "Author a result test covering 'entry' of TaskOperationInteractor",
-      "declaration_hash": "e86ba9cefaa376e16d7574f8ab05bf7ce16a0313adf3f60fe5de605d4697de31",
+      "declaration_hash": "01df50096fc37e48db538f4838be67cb6c98deaf83535831a7272feac47ed17f",
       "spec_refs": [
         {
           "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
@@ -734,6 +734,38 @@
         {
           "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
           "element_id": "AC-05"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "CommitRecordVerifierPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:verify_commit_record"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "CommitRecordVerifierPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:verify_commit_record' of CommitRecordVerifierPort",
+      "declaration_hash": "0472fdfd3aca2adb5fa9aac163b46f7e8fcbc9abb5d5d9aedd0c60add60dd5fa",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-22"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-28"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-29"
         }
       ]
     },
@@ -853,7 +885,7 @@
         "role": "ApplicationService"
       },
       "brief": "Author a result test covering 'trait_method:transition_task' of TaskOperationService",
-      "declaration_hash": "0df93e0eecc60dfa3e8bbdc13845bd12a97a6e2cb424b1e27c7f25809645c12e",
+      "declaration_hash": "1dffdcb2f96dc19adce3240c85b1df4fbf5122f3e5b99b4e8e5bcc5c4fa2394e",
       "spec_refs": [
         {
           "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
@@ -893,7 +925,7 @@
         "role": "ApplicationService"
       },
       "brief": "Author a result test covering 'trait_method:add_task' of TaskOperationService",
-      "declaration_hash": "0df93e0eecc60dfa3e8bbdc13845bd12a97a6e2cb424b1e27c7f25809645c12e",
+      "declaration_hash": "1dffdcb2f96dc19adce3240c85b1df4fbf5122f3e5b99b4e8e5bcc5c4fa2394e",
       "spec_refs": [
         {
           "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
@@ -933,7 +965,7 @@
         "role": "ApplicationService"
       },
       "brief": "Author a result test covering 'trait_method:set_override' of TaskOperationService",
-      "declaration_hash": "0df93e0eecc60dfa3e8bbdc13845bd12a97a6e2cb424b1e27c7f25809645c12e",
+      "declaration_hash": "1dffdcb2f96dc19adce3240c85b1df4fbf5122f3e5b99b4e8e5bcc5c4fa2394e",
       "spec_refs": [
         {
           "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
@@ -973,7 +1005,7 @@
         "role": "ApplicationService"
       },
       "brief": "Author a result test covering 'trait_method:clear_override' of TaskOperationService",
-      "declaration_hash": "0df93e0eecc60dfa3e8bbdc13845bd12a97a6e2cb424b1e27c7f25809645c12e",
+      "declaration_hash": "1dffdcb2f96dc19adce3240c85b1df4fbf5122f3e5b99b4e8e5bcc5c4fa2394e",
       "spec_refs": [
         {
           "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
@@ -1182,6 +1214,38 @@
         {
           "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
           "element_id": "CN-09"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "GitCommitRecordVerifier",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::task_ops::ports::CommitRecordVerifierPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "GitCommitRecordVerifier"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::task_ops::ports::CommitRecordVerifierPort' of GitCommitRecordVerifier",
+      "declaration_hash": "82cba986bfb65b4d784beedecc8a338eda238bab783de329eca466ec45f6c247",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-22"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-28"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-29"
         }
       ]
     },
