@@ -25,7 +25,8 @@
     {
       "id": "T003",
       "description": "`.harness/workflows/track/merge.md` の Step 1–2 と `.claude/commands/track/merge.md` の Invocation / Claude Code invocation constraints を更新し、invocation 後の confirmation branch を削除する。`apps/cli/src/commands/pr_tests.rs` の `wait_and_merge_with_*` regression cases を追加する。IN-04、OUT-03、CN-02、AC-05。",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "c27f74e65b1b7f682ca4f48807bec7a8d37ba6be"
     }
   ],
   "plan": {

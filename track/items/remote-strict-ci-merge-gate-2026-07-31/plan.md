@@ -30,4 +30,4 @@ GO-02 → T003.
 
 > `.harness/workflows/track/merge.md` Step 1–2; `.claude/commands/track/merge.md` Invocation / constraints. IN-04、CN-02、AC-05。
 
-- [x] **T003**: `.harness/workflows/track/merge.md` の Step 1–2 と `.claude/commands/track/merge.md` の Invocation / Claude Code invocation constraints を更新し、invocation 後の confirmation branch を削除する。`apps/cli/src/commands/pr_tests.rs` の `wait_and_merge_with_*` regression cases を追加する。IN-04、OUT-03、CN-02、AC-05。
+- [x] **T003**: `.harness/workflows/track/merge.md` の Step 1–2 と `.claude/commands/track/merge.md` の Invocation / Claude Code invocation constraints を更新し、invocation 後の confirmation branch を削除する。`apps/cli/src/commands/pr_tests.rs` の `wait_and_merge_with_*` regression cases を追加する。IN-04、OUT-03、CN-02、AC-05。 (`c27f74e65b1b7f682ca4f48807bec7a8d37ba6be`)
