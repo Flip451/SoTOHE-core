@@ -19,6 +19,8 @@ decisions:
 
 この導出は report の表示を構成するためだけに行い、signal や集計値を永続化しない。したがって `sotp signal report` は読み取り専用の view であり続ける。一方、元決定の「signals の再計算を行わず、既存の `calc-*` 成果物だけを読む」という制約は、発生単位データが永続化されている chain に限定する。4 chain を横断すること、Yellow / Red の発生箇所を所定の粒度で列挙すること、および絞り込みの契約は変更しない。
 
+chain ③ は、構成上期待されるすべての TDDD layer について、永続化された implementation-signal 成果物を読む。期待される layer の成果物が一つでも存在しない場合、選択された source は提供不能であり、query は `SourceUnavailable(ImplCatalog)` を返す。この欠落を任意の空 contribution として扱わない。存在する成果物についても、不正な形式、安全に読み取れない状態、または許容上限を超える大きさを検出した場合は失敗とし、その layer を読み飛ばさない。
+
 ## Rejected Alternatives
 
 - 全 chain の発生単位データを永続化する: report のために chain ⓪ の live-only 性質と chain ① の保存形式を変更し、永続化契約を不必要に拡大する。

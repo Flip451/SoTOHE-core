@@ -13,7 +13,9 @@
       {"layer": "usecase", "entry_key": "SignalReportReference"}, {"layer": "usecase", "entry_key": "SignalReportService"},
       {"layer": "usecase", "entry_key": "SignalReportSourcePort"}
     ],
-    "T002": [{"layer": "infrastructure", "entry_key": "SystemSignalReportSourceAdapter"}],
+    "T002": [
+      {"layer": "infrastructure", "entry_key": "SystemSignalReportSourceAdapter"}
+    ],
     "T003": [
       {"layer": "cli_driver", "entry_key": "SignalReportChainFilter"}, {"layer": "cli_driver", "entry_key": "SignalReportInput"},
       {"layer": "cli_driver", "entry_key": "SignalReportLevelFilter"}

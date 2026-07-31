@@ -4,5 +4,5 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| SystemSignalReportSourceAdapter | secondary_adapter | add | impl SignalReportSourcePort | 🟡 | 🔵 |
+| SystemSignalReportSourceAdapter | secondary_adapter | add | impl SignalReportSourcePort | 🔵 | 🔵 |
 

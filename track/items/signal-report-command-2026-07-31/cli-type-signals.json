@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-31T13:53:31Z",
+  "generated_at": "2026-07-31T18:58:19Z",
   "declaration_hash": "5e52dd353b2ec567a7652b6d050734da05faa39c4b187488b341a84170f79084",
-  "implementation_input_hash": "cdd14a3fa4406a7bb7dc5fa2a2927e302e5d158c975a1924cf38dc8246913214",
+  "implementation_input_hash": "0dcd709de5017b5bc74d3702aaa236a7971385bcf8db3085274f545e5f86f3fb",
   "signals": [
     {
       "type_name": "SignalCommand",

@@ -191,6 +191,7 @@ mod tests {
 
         // architecture-rules.json is required by FsTdddLayerBindingsAdapter.
         let rules_json = r#"{
+          "version": 2,
           "layers": [
             { "crate": "domain", "tddd": { "enabled": true, "catalogue_file": "domain-types.json" } }
           ]
@@ -222,6 +223,7 @@ mod tests {
         std::fs::create_dir_all(&track_dir).unwrap();
 
         let rules_json = r#"{
+          "version": 2,
           "layers": [
             { "crate": "domain", "tddd": { "enabled": true, "catalogue_file": "domain-types.json" } },
             {
@@ -266,6 +268,7 @@ mod tests {
         std::fs::create_dir_all(&track_dir).unwrap();
 
         let rules_json = r#"{
+          "version": 2,
           "layers": [
             { "crate": "domain", "tddd": { "enabled": true, "catalogue_file": "domain-types.json" } }
           ]
@@ -297,6 +300,7 @@ mod tests {
         std::fs::create_dir_all(&track_dir).unwrap();
 
         let rules_json = r#"{
+          "version": 2,
           "layers": [
             { "crate": "domain", "tddd": { "enabled": true, "catalogue_file": "domain-types.json" } },
             {

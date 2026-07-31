@@ -3,42 +3,53 @@
   "tasks": [
     {
       "id": "T001",
-      "description": "Implement the catalogue-defined typed report-query boundary in `libs/usecase/src/signal_report/`. GO-01, IN-01–IN-04, CN-01, CN-02, AC-01–AC-04.",
-      "status": "todo",
-      "commit_hash": null
+      "description": "Implement the catalogue-defined typed report-query boundary, `SignalReportSourcePort` contract, and interactor behavior in `libs/usecase/src/signal_report/`, with independently verifiable mock-based port and interactor tests. GO-01, IN-01–IN-04, CN-01–CN-02, AC-01–AC-04.",
+      "status": "done"
     },
     {
       "id": "T002",
-      "description": "After T001, implement the catalogue-defined report source adapter in `libs/infrastructure/src/signal_report/`. IN-04, CN-01, AC-01, AC-04.",
-      "status": "todo",
-      "commit_hash": null
+      "description": "After T001, implement the catalogue-defined infrastructure `SystemSignalReportSourceAdapter` in `libs/infrastructure/src/signal_report/`, with independently verifiable artifact-read, chain ⓪/① derivation, and non-persistence conformance tests. IN-04, CN-01, AC-04.",
+      "status": "done",
+      "depends_on": [
+        "T001"
+      ]
     },
     {
       "id": "T003",
       "description": "After T001, implement filter-to-query conversion in `apps/cli-driver/src/signal_report/`. IN-03, AC-03.",
       "status": "todo",
-      "commit_hash": null
+      "depends_on": [
+        "T001"
+      ]
     },
     {
       "id": "T004",
       "description": "After T001 and T003, implement occurrence rendering in `apps/cli-driver/src/signal_report/`. IN-02, CN-02, AC-02.",
       "status": "todo",
-      "commit_hash": null,
-      "depends_on": ["T001", "T003"]
+      "depends_on": [
+        "T001",
+        "T003"
+      ]
     },
     {
       "id": "T006",
       "description": "After T001, T002, and T004, implement and independently verify `SignalCompositionRoot::signal_report_driver` wiring in `apps/cli-composition/`, before CLI report dispatch consumes it. CN-01, AC-01, AC-04.",
       "status": "todo",
-      "commit_hash": null,
-      "depends_on": ["T001", "T002", "T004"]
+      "depends_on": [
+        "T001",
+        "T002",
+        "T004"
+      ]
     },
     {
       "id": "T005",
       "description": "After T003, T004, and T006, add signal-report CLI parsing and dispatch through the composition-root report driver, plus `sotp track resolve` regression validation in `apps/cli/`. IN-01, IN-03, OUT-01, AC-01, AC-03, AC-05.",
       "status": "todo",
-      "commit_hash": null,
-      "depends_on": ["T003", "T004", "T006"]
+      "depends_on": [
+        "T003",
+        "T004",
+        "T006"
+      ]
     }
   ],
   "plan": {
@@ -46,7 +57,8 @@
       "GO-01 → T001–T006.",
       "IN-02 / CN-02 / AC-02 → T001, T004.",
       "IN-03 / AC-03 → T001, T003, T005.",
-      "IN-04 / CN-01 / AC-01 / AC-04 → T001, T002, T005, T006.",
+      "IN-04 / CN-01 / AC-04 → T001, T002, T006.",
+      "AC-01 → T001, T002, T005, T006.",
       "OUT-01 / AC-05 → T005."
     ],
     "sections": [
@@ -54,17 +66,21 @@
         "id": "S1",
         "title": "Usecase boundary — typed report query",
         "description": [
-          "Implement `libs/usecase/src/signal_report/`. GO-01, IN-01–IN-04, CN-01, CN-02, AC-01–AC-04."
+          "Implement the typed report-query boundary, `SignalReportSourcePort` contract, and interactor behavior in `libs/usecase/src/signal_report/`. GO-01, IN-01–IN-04, CN-01–CN-02, AC-01–AC-04."
         ],
-        "task_ids": ["T001"]
+        "task_ids": [
+          "T001"
+        ]
       },
       {
         "id": "S2",
         "title": "Infrastructure — report source adapter",
         "description": [
-          "Implement `libs/infrastructure/src/signal_report/`. IN-04, CN-01, AC-01, AC-04."
+          "Implement `SystemSignalReportSourceAdapter` in `libs/infrastructure/src/signal_report/`, with artifact-read, chain ⓪/① derivation, and non-persistence conformance tests. IN-04, CN-01, AC-04."
         ],
-        "task_ids": ["T002"]
+        "task_ids": [
+          "T002"
+        ]
       },
       {
         "id": "S3",
@@ -72,7 +88,10 @@
         "description": [
           "Implement filter conversion and rendering in `apps/cli-driver/src/signal_report/`. IN-02, IN-03, CN-02, AC-02, AC-03."
         ],
-        "task_ids": ["T003", "T004"]
+        "task_ids": [
+          "T003",
+          "T004"
+        ]
       },
       {
         "id": "S4",
@@ -80,7 +99,10 @@
         "description": [
           "Wire and verify the composition-root report driver before CLI parsing and dispatch consume it; retain the `sotp track resolve` non-regression validation with the CLI task. IN-01, IN-03, OUT-01, CN-01, AC-01, AC-03–AC-05."
         ],
-        "task_ids": ["T006", "T005"]
+        "task_ids": [
+          "T006",
+          "T005"
+        ]
       }
     ]
   }

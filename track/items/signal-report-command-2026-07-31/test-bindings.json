@@ -1,1 +1,246 @@
-{"track_id":"signal-report-command-2026-07-31","records":[]}
+{
+  "track_id": "signal-report-command-2026-07-31",
+  "records": [
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "SignalReportInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::signal_report::tests",
+          "test_name": "test_report_all_chains_and_levels_returns_occurrences"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "SignalReportService",
+        "item_identifier": "trait_method:report",
+        "obligation_kind": "result"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::signal_report::tests",
+          "test_name": "test_report_all_chains_and_levels_returns_occurrences"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "SignalReportChain", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "IN-01"}},
+      "reason": "SignalReportChain is a finite passive selector with no methods or I/O. Command exposure is exercised by the CLI task; its variants are consumed by the interactor test."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "SignalReportChain", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "AC-03"}},
+      "reason": "SignalReportChain is a finite passive selector with no filtering behavior of its own. The interactor owns query selection and is covered separately."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "SignalReportChainSelection", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "IN-03"}},
+      "reason": "SignalReportChainSelection is a passive query payload whose enum makes empty selection unrepresentable. Filtering is executable only at the interactor boundary."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "SignalReportChainSelection", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "AC-03"}},
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::signal_report::tests",
+          "test_name": "test_report_propagates_typed_query_selections"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "SignalReportEntryId", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "IN-02"}},
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::signal_report::tests",
+          "test_name": "test_report_preserves_entry_id_and_reference_in_occurrence_output"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "SignalReportEntryId", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "AC-02"}},
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::signal_report::tests",
+          "test_name": "test_report_preserves_entry_id_and_reference_in_occurrence_output"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "SignalReportError", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "CN-01"}},
+      "reason": "SignalReportError is a passive typed failure taxonomy. It performs no reads, writes, derivation, or persistence; source and interactor tests exercise its propagation."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "SignalReportError", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "AC-04"}},
+      "reason": "SignalReportError only classifies port failures and cannot itself establish read-only source behavior. The source port and later adapter own that executable condition."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "SignalReportLevel", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "IN-03"}},
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::signal_report::tests",
+          "test_name": "test_report_filters_each_signal_report_level"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "SignalReportLevel", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "AC-03"}},
+      "reason": "SignalReportLevel has no selection method or collaborator. The behavior promised by this anchor is executed by SignalReportInteractor."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "SignalReportLevelSelection", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "IN-03"}},
+      "reason": "SignalReportLevelSelection is a passive enum that structurally excludes an empty level set. Filtering is executable only in the interactor."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "SignalReportLevelSelection", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "AC-03"}},
+      "reason": "SignalReportLevelSelection carries an already-formed choice and has no behavior beyond its type shape. The interactor test verifies the selection result."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "SignalReportLocation", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "IN-02"}},
+      "reason": "SignalReportLocation is a passive newtype over an already-validated FilePath. It has no occurrence collection or rendering behavior of its own."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "SignalReportLocation", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "AC-02"}},
+      "reason": "SignalReportLocation only prevents location cross-slot substitution. Rendering is owned by the later CLI-driver task."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "SignalReportOccurrence", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "IN-02"}},
+      "reason": "SignalReportOccurrence is a passive DTO with no method or collaborator. The interactor returns its rows; the CLI driver later renders their fields."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "SignalReportOccurrence", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "CN-02"}},
+      "reason": "SignalReportOccurrence contains typed row data but has no collection, filtering, or presentation behavior. Completeness is owned by the source and rendering by the CLI driver."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "SignalReportOccurrence", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "AC-02"}},
+      "reason": "SignalReportOccurrence is data-only. It cannot independently display its fields; display is the later CLI-driver adapter's responsibility."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "SignalReportOutput", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "GO-01"}},
+      "reason": "SignalReportOutput is a passive DTO. Producing occurrences is implemented by the service and displaying the result is owned by the CLI-driver adapter."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "SignalReportOutput", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "AC-01"}},
+      "reason": "SignalReportOutput has no method or port and cannot load or derive occurrences. The interactor's service result owns that behavior."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "SignalReportQuery", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "IN-03"}},
+      "reason": "SignalReportQuery is a passive typed payload. It has no filtering method; SignalReportInteractor interprets it against the injected source."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "SignalReportQuery", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "AC-03"}},
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::signal_report::tests",
+          "test_name": "test_report_propagates_typed_query_selections"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "SignalReportReason", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "IN-02"}},
+      "reason": "SignalReportReason is a passive newtype over an already-validated NonEmptyString. It has no derivation or rendering behavior of its own."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "SignalReportReason", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "AC-02"}},
+      "reason": "SignalReportReason only prevents reason cross-slot substitution. Display is owned by the later CLI-driver adapter."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "SignalReportReference", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "IN-02"}},
+      "reason": "SignalReportReference is a passive newtype over an already-validated NonEmptyString. It has no source, filtering, or rendering behavior to test independently."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "SignalReportReference", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "AC-02"}},
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::signal_report::tests",
+          "test_name": "test_report_preserves_entry_id_and_reference_in_occurrence_output"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "SignalReportSourcePort",
+        "item_identifier": "trait_method:load",
+        "obligation_kind": "contract"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_source_port_load_reads_persisted_artifact_occurrences"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_source_port_load_derives_nonpersisted_chain_occurrences"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_source_port_load_is_read_only_across_all_chains"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "SystemSignalReportSourceAdapter",
+        "item_identifier": "trait_impl:usecase::signal_report::SignalReportSourcePort",
+        "obligation_kind": "contract_conformance"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_source_port_load_reads_persisted_artifact_occurrences"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_source_port_load_derives_nonpersisted_chain_occurrences"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_source_port_load_is_read_only_across_all_chains"
+        }
+      ]
+    }
+  ]
+}

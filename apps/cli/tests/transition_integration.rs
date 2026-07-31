@@ -160,7 +160,7 @@ fn write_fixture_impl_plan(items_dir: &Path, track_id: &str) {
 /// Writes a minimal architecture-rules.json fixture so render.rs can iterate
 /// TDDD layers (fail-closed after T045 — synthetic fallback removed).
 fn write_fixture_arch_rules(root: &Path) {
-    let arch_rules = r#"{"layers":[{"crate":"domain","path":"libs/domain","tddd":{"enabled":true,"catalogue_file":"domain-types.json"}}]}"#;
+    let arch_rules = r#"{"version":2,"layers":[{"crate":"domain","path":"libs/domain","tddd":{"enabled":true,"catalogue_file":"domain-types.json"}}]}"#;
     std::fs::write(root.join("architecture-rules.json"), arch_rules).unwrap();
 }
 

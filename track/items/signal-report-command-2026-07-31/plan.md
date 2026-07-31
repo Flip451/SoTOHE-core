@@ -6,22 +6,23 @@
 GO-01 → T001–T006.
 IN-02 / CN-02 / AC-02 → T001, T004.
 IN-03 / AC-03 → T001, T003, T005.
-IN-04 / CN-01 / AC-01 / AC-04 → T001, T002, T005, T006.
+IN-04 / CN-01 / AC-04 → T001, T002, T006.
+AC-01 → T001, T002, T005, T006.
 OUT-01 / AC-05 → T005.
 
-## Tasks (0/6 resolved)
+## Tasks (2/6 resolved)
 
 ### S1 — Usecase boundary — typed report query
 
-> Implement `libs/usecase/src/signal_report/`. GO-01, IN-01–IN-04, CN-01, CN-02, AC-01–AC-04.
+> Implement the typed report-query boundary, `SignalReportSourcePort` contract, and interactor behavior in `libs/usecase/src/signal_report/`. GO-01, IN-01–IN-04, CN-01–CN-02, AC-01–AC-04.
 
-- [ ] **T001**: Implement the catalogue-defined typed report-query boundary in `libs/usecase/src/signal_report/`. GO-01, IN-01–IN-04, CN-01, CN-02, AC-01–AC-04.
+- [x] **T001**: Implement the catalogue-defined typed report-query boundary, `SignalReportSourcePort` contract, and interactor behavior in `libs/usecase/src/signal_report/`, with independently verifiable mock-based port and interactor tests. GO-01, IN-01–IN-04, CN-01–CN-02, AC-01–AC-04.
 
 ### S2 — Infrastructure — report source adapter
 
-> Implement `libs/infrastructure/src/signal_report/`. IN-04, CN-01, AC-01, AC-04.
+> Implement `SystemSignalReportSourceAdapter` in `libs/infrastructure/src/signal_report/`, with artifact-read, chain ⓪/① derivation, and non-persistence conformance tests. IN-04, CN-01, AC-04.
 
-- [ ] **T002**: After T001, implement the catalogue-defined report source adapter in `libs/infrastructure/src/signal_report/`. IN-04, CN-01, AC-01, AC-04.
+- [x] **T002**: After T001, implement the catalogue-defined infrastructure `SystemSignalReportSourceAdapter` in `libs/infrastructure/src/signal_report/`, with independently verifiable artifact-read, chain ⓪/① derivation, and non-persistence conformance tests. IN-04, CN-01, AC-04.
 
 ### S3 — CLI driver — query conversion and rendering
 

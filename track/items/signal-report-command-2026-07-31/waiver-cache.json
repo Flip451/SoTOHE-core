@@ -1,4 +1,461 @@
 {
   "track_id": "signal-report-command-2026-07-31",
-  "entries": []
+  "entries": [
+    {
+      "edge_id": {
+        "entry_key": "SignalReportChain",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportChain",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "waived_reason_hash": "a81eaef48537694ab5ba83fbdebce49c0e3d395b6bf79320fc6ee73f9ca2b260",
+        "declaration_hash": "fc4cb0eb54e55a75b635aa0edfa86e8b18ba2f62058a9b9d2402bc561733b05b",
+        "anchor_text_hash": "635fec09d775717b958a536e2f0879d492b3e0c3428e319145357568235a879c"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportChain",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportChain",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "waived_reason_hash": "60e95499768177c563104ce0baec30f2260aa7d9b3fbd38dc3d6472580a22c6b",
+        "declaration_hash": "fc4cb0eb54e55a75b635aa0edfa86e8b18ba2f62058a9b9d2402bc561733b05b",
+        "anchor_text_hash": "91b94a71556bf1763775647e4999e68ff0fc894a046fb09453701532050280e9"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportChainSelection",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportChainSelection",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "waived_reason_hash": "6666a1d2e74b762cd0a5a09873012da0ee8de1ccc92cca07082d4181704eddf7",
+        "declaration_hash": "b947be17b5e0188b2b3c061f00104bcf2915598ac1800d1b8d5309183d5f3745",
+        "anchor_text_hash": "7fd97f560a673264f2c315399fda35b4cd638562bfae79ddb61f9018eb735715"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"Usecase-scoped selection value used only by SignalReportQuery; the enum excludes an empty selection.\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportError",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "waived_reason_hash": "e9608b9a19cf3220a3034da5e7bdb23f129d24ed808120d03575cd926ebfc0b9",
+        "declaration_hash": "51060fa0b87e31061e0730846e7d4a3fcd3b042d7b1e4cc4f77575c101b3f101",
+        "anchor_text_hash": "f597b4515c60e8b8a68d66fbdd45ec775b0e4962442225ed266047ffd4dfe0c4"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportError",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-04"
+      },
+      "key": {
+        "waived_reason_hash": "f46ecbf17d8952ff74c3a4a64112e81bbe5443c6cad830fd70e3a85bb50afb65",
+        "declaration_hash": "51060fa0b87e31061e0730846e7d4a3fcd3b042d7b1e4cc4f77575c101b3f101",
+        "anchor_text_hash": "ae7bc09087175d27a40d420a8df4890f6508ad839a2b4cb42dbd88a05528f3bb"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "report の実行は既存の calculation artifacts を読み取り専用で扱い、chain ⓪・①で導出した発生単位データを含め、signal または集計値を persist しない。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportLevel",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportLevel",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "waived_reason_hash": "6f4dc3bdce722a457169b7a2e7b00c6a0062c838a9b9d51306cfba9bdb89e52f",
+        "declaration_hash": "483552942cb563a94d6f5860e126501e9184bde47200ea483b406493e149eec4",
+        "anchor_text_hash": "91b94a71556bf1763775647e4999e68ff0fc894a046fb09453701532050280e9"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportLevelSelection",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportLevelSelection",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "waived_reason_hash": "fb953db94c17f0abefb5c7c349fb31d11906466ab82c484fabfa64941fbd0ed1",
+        "declaration_hash": "0cffd9e3619ae96276b6a27dc057795a6bbf9eb8a5173afce5dbc948a1655068",
+        "anchor_text_hash": "7fd97f560a673264f2c315399fda35b4cd638562bfae79ddb61f9018eb735715"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"YellowOnly\")), payload: Unit }, VariantDecl { name: VariantName(Identifier(\"RedOnly\")), payload: Unit }, VariantDecl { name: VariantName(Identifier(\"YellowAndRed\")), payload: Unit }] }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportLevelSelection",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportLevelSelection",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "waived_reason_hash": "6a10e0e94bf807d594f4c01dc88240406e297a3881f6372fb7634c4b1f1cd39b",
+        "declaration_hash": "0cffd9e3619ae96276b6a27dc057795a6bbf9eb8a5173afce5dbc948a1655068",
+        "anchor_text_hash": "91b94a71556bf1763775647e4999e68ff0fc894a046fb09453701532050280e9"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"Usecase-scoped finite level-selection value whose enum excludes empty combinations. IN-03, AC-03.\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportLocation",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportLocation",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "waived_reason_hash": "6add15f24d9d801913ab23f7462b45b3e5403a4d987ef1cdbb0d3d132f311065",
+        "declaration_hash": "a80136084fb828d267ceb6f864a3ef77adb75ed28dd330df1130acccae9d5b91",
+        "anchor_text_hash": "c213b677768d6b2584c3d63de41fa5b00600beed27d08adcea157ddb2107d851"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportLocation",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportLocation",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "waived_reason_hash": "97f63b71938a36bc743f43e11c53112b66e5c4c0c101489a0e6e8b14611d62b2",
+        "declaration_hash": "a80136084fb828d267ceb6f864a3ef77adb75ed28dd330df1130acccae9d5b91",
+        "anchor_text_hash": "4be465a5a98f6d97a4f29c3ae254fec040c63d259333d40200bca7a3acd48a94"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Usecase boundary newtype over domain::FilePath preventing location cross-slot substitution."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportOccurrence",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportOccurrence",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "waived_reason_hash": "c8c6e298fa9945550ba956f3e264f3bc0f7e6276468a824311e2b0b1bc52f92b",
+        "declaration_hash": "bac33d8efb1d54a0b456340e629d744ef4e96fa1f78c244adb002870c368c565",
+        "anchor_text_hash": "c213b677768d6b2584c3d63de41fa5b00600beed27d08adcea157ddb2107d851"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Usecase boundary Dto for a typed occurrence row; it owns no decision or invariant."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportOccurrence",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportOccurrence",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-02"
+      },
+      "key": {
+        "waived_reason_hash": "c114f3dd766da3bb11624983156f51971934135dce04ed647a4058ae2ce577bb",
+        "declaration_hash": "bac33d8efb1d54a0b456340e629d744ef4e96fa1f78c244adb002870c368c565",
+        "anchor_text_hash": "c7b6e43b0ec3c52a6b494f7de9dab6288088f15f68767dfccb101fb3ea31740e"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Usecase boundary Dto for a typed occurrence row; it owns no decision or invariant."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportOccurrence",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportOccurrence",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "waived_reason_hash": "f56808b3d8015cddb39e714d30d2ff8e86d53ff915a5ca16033f1d0088d8a8e5",
+        "declaration_hash": "bac33d8efb1d54a0b456340e629d744ef4e96fa1f78c244adb002870c368c565",
+        "anchor_text_hash": "4be465a5a98f6d97a4f29c3ae254fec040c63d259333d40200bca7a3acd48a94"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Usecase boundary Dto for a typed occurrence row; it owns no decision or invariant."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportOutput",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "GO-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportOutput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:GO-01"
+      },
+      "key": {
+        "waived_reason_hash": "4cb1b44ba85428d6bf629a6fa35feca5fa01a79ef82bee97d611dcf64ceafaf7",
+        "declaration_hash": "dcab8998e52b8c3a97e2739e9f45a2a86bbae92e7e97a2d1fdd2c23ecfc4430b",
+        "anchor_text_hash": "58738475f1f701537f0cde2212eefb1637eaafa6f10e261cf5b6a97653478a15"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Usecase boundary Dto for report output; it owns no independent invariant or behavior."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportOutput",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportOutput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "waived_reason_hash": "c86e1ae2dba539b7e58021b40aa11e31e81962312b2d176b68118597f8110f65",
+        "declaration_hash": "dcab8998e52b8c3a97e2739e9f45a2a86bbae92e7e97a2d1fdd2c23ecfc4430b",
+        "anchor_text_hash": "2699a99dc0e6aa19d5e25cb6808bfa86e9d8718ec9ddefa2891028db6a3b62b8"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "docs: Some(DocString(\"Usecase boundary Dto for report output; it owns no independent invariant or behavior. GO-01, AC-01.\")), methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportQuery",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportQuery",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "waived_reason_hash": "bea5b24047f1233d747dec6208b340ac8836efa4054fceb03860a316c3e6ec6d",
+        "declaration_hash": "f11ff2b602935898e9aab186dcd106e335a8ad8d58308f598be79884f5aef6f2",
+        "anchor_text_hash": "7fd97f560a673264f2c315399fda35b4cd638562bfae79ddb61f9018eb735715"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportReason",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportReason",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "waived_reason_hash": "6c23e236e5f8524cd313a2220dd109e624eca29ba42556f583f55e39d593740b",
+        "declaration_hash": "2a687a1c8eb0d6ff80b99c0a81f8ac718d1e42f1267d776f8e7d5c40aa3a1c57",
+        "anchor_text_hash": "c213b677768d6b2584c3d63de41fa5b00600beed27d08adcea157ddb2107d851"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Usecase boundary newtype over domain::NonEmptyString preventing reason cross-slot substitution."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportReason",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportReason",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "waived_reason_hash": "567dd9c37ee54674c091cee25a8b42a472ffdcea97c5a130aeffe7995151f9c3",
+        "declaration_hash": "2a687a1c8eb0d6ff80b99c0a81f8ac718d1e42f1267d776f8e7d5c40aa3a1c57",
+        "anchor_text_hash": "4be465a5a98f6d97a4f29c3ae254fec040c63d259333d40200bca7a3acd48a94"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Usecase boundary newtype over domain::NonEmptyString preventing reason cross-slot substitution."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportReference",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportReference",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "waived_reason_hash": "b4c991ee55466ca273e34d4e4e0d0f6baa63909da1911a1d234d72e19552a2ca",
+        "declaration_hash": "d116f77a9942f010df83cdce338a9b1a7c7973c002ebec1bf8102d6e6683c652",
+        "anchor_text_hash": "c213b677768d6b2584c3d63de41fa5b00600beed27d08adcea157ddb2107d851"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Usecase boundary newtype over domain::NonEmptyString preventing reference cross-slot substitution. IN-02, AC-02."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    }
+  ]
 }

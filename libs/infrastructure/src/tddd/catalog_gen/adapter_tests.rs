@@ -16,7 +16,7 @@ fn setup_items_dir() -> (tempfile::TempDir, std::path::PathBuf) {
     let workspace = tempfile::tempdir().unwrap();
     std::fs::write(
         workspace.path().join("architecture-rules.json"),
-        r#"{"layers":[{"crate":"domain","tddd":{"enabled":true,"catalogue_file":"domain-types.json"}}]}"#,
+        r#"{"version":2,"layers":[{"crate":"domain","tddd":{"enabled":true,"catalogue_file":"domain-types.json"}}]}"#,
     )
     .unwrap();
     let items_dir = workspace.path().join("track/items");

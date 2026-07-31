@@ -710,6 +710,7 @@ mod tests {
         std::fs::write(track_dir.join("impl-plan.json"), minimal_impl_plan_json()).unwrap();
 
         let rules_json = r#"{
+          "version": 2,
           "layers": [{
             "crate": "domain",
             "tddd": {
@@ -756,6 +757,7 @@ mod tests {
         std::fs::create_dir_all(&items_dir).unwrap();
 
         let rules_json = r#"{
+          "version": 2,
           "layers": [{
             "crate": "domain",
             "tddd": {
