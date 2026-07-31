@@ -84,12 +84,22 @@ pub use ref_verify::{
 };
 pub use verify_adapter::FsVerifyAdapter;
 
-/// Discovers the repository the items directory belongs to.
+/// Discovers the repository the items directory belongs to, without letting the
+/// ambient Git environment name a different one, and returns the canonical
+/// anchor it was discovered from.
 ///
 /// Anchoring on the argument rather than on the process working directory keeps
 /// one command reading one tree: a call that names `--items-dir` takes its
 /// track artifacts, its configuration and its measured diff from the repository
-/// that directory sits in, not from wherever the process happens to stand.
+/// that directory sits in, not from wherever the process happens to stand. The
+/// isolation closes the other half of the same question — inheriting `GIT_DIR`
+/// would let one repository answer for another — and the anchor comes back with
+/// the repository so the caller can check that what git found actually encloses
+/// the directory it asked about.
+///
+/// There is deliberately no non-isolated counterpart: every consumer of this
+/// discovery decides a gate, and a lane that inherited the environment would be
+/// the one an attacker aims at.
 ///
 /// Every component of the supplied path — the items directory and each of its
 /// ancestors — is refused if it is a symlink, before the path is canonicalised:
@@ -100,34 +110,8 @@ pub use verify_adapter::FsVerifyAdapter;
 /// Returns an error when a component of the supplied path is a symlink, when the
 /// items directory cannot be resolved on disk, or when no git repository
 /// encloses it.
-pub(crate) fn discover_repo_for_items_dir(
-    items_dir: &std::path::Path,
-) -> Result<crate::git_cli::SystemGitRepo, std::io::Error> {
-    Ok(discover_repo_and_anchor(items_dir, crate::git_cli::SystemGitRepo::discover_from)?.0)
-}
-
-/// Discovers that repository without letting the ambient Git environment name a
-/// different one, and returns the canonical anchor it was discovered from.
-///
-/// For a caller whose verdict decides what is written into the tree under
-/// `items_dir`, inheriting `GIT_DIR` would let one repository answer for
-/// another. The anchor comes back with the repository so such a caller can also
-/// check that what git found actually encloses the directory it asked about.
-///
-/// # Errors
-///
-/// The same failures as [`discover_repo_for_items_dir`].
 pub(crate) fn discover_isolated_repo_for_items_dir(
     items_dir: &std::path::Path,
-) -> Result<(crate::git_cli::SystemGitRepo, std::path::PathBuf), std::io::Error> {
-    discover_repo_and_anchor(items_dir, crate::git_cli::SystemGitRepo::discover_from_isolated)
-}
-
-fn discover_repo_and_anchor(
-    items_dir: &std::path::Path,
-    discover: fn(
-        &std::path::Path,
-    ) -> Result<crate::git_cli::SystemGitRepo, crate::git_cli::GitError>,
 ) -> Result<(crate::git_cli::SystemGitRepo, std::path::PathBuf), std::io::Error> {
     // Each failure is returned with its cause intact and no path written into it.
     // Callers report these to an operator, and a rendered path would both leak the
@@ -136,7 +120,7 @@ fn discover_repo_and_anchor(
     // and an absent repository is its own type.
     crate::track::symlink_guard::reject_symlinks_up_to_root(items_dir)?;
     let anchor = items_dir.canonicalize()?;
-    let repo = discover(&anchor).map_err(|error| {
+    let repo = crate::git_cli::SystemGitRepo::discover_from_isolated(&anchor).map_err(|error| {
         crate::sanitized_failure::sanitized_io_error(match error {
             // `rev-parse --show-toplevel` exiting nonzero is how git reports that
             // nothing encloses the directory. Only this command gives that outcome

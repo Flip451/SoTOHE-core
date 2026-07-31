@@ -41,15 +41,21 @@ impl ScopeConfigReaderPort for FsReviewScopeConfigReader {
         track_id: &TrackId,
     ) -> Result<ReviewScopeConfig, ScopeConfigReadError> {
         // Anchored on the items directory, so the ceilings come from the same
-        // repository the track artifacts do.
-        let repo = crate::discover_repo_for_items_dir(items_dir).map_err(|error| {
-            ScopeConfigReadError::ReadFailed {
-                message: FreeText::new(format!(
-                    "git repository could not be discovered: {}",
-                    io_classification(&error)
-                )),
-            }
-        })?;
+        // repository the track artifacts do — and isolated from the ambient Git
+        // environment, which could otherwise name a different one. The measured
+        // diff this configuration is compared against is taken from the items
+        // directory's repository; reading the ceilings from anywhere else would
+        // judge one repository's work by another's limits.
+        let (repo, anchor) =
+            crate::discover_isolated_repo_for_items_dir(items_dir).map_err(|error| {
+                ScopeConfigReadError::ReadFailed {
+                    message: FreeText::new(format!(
+                        "git repository could not be discovered: {}",
+                        io_classification(&error)
+                    )),
+                }
+            })?;
+        ensure_encloses(repo.root(), &anchor)?;
         let root = repo.root();
 
         // The loader's error names the absolute path it was given; the file is
@@ -64,6 +70,32 @@ impl ScopeConfigReaderPort for FsReviewScopeConfigReader {
             }
         })
     }
+}
+
+/// Refuses a repository that does not enclose the items directory the ceilings
+/// were asked for.
+///
+/// Discovery walks up from the anchor, so its root is an ancestor of it. This
+/// asserts that outcome rather than assuming it: a root elsewhere would mean the
+/// configuration read belongs to a different tree than the plan and diff it will
+/// be compared against.
+fn ensure_encloses(root: &Path, anchor: &Path) -> Result<(), ScopeConfigReadError> {
+    let canonical_root = root.canonicalize().map_err(|error| ScopeConfigReadError::ReadFailed {
+        message: FreeText::new(format!(
+            "repository root could not be resolved: {}",
+            io_classification(&error)
+        )),
+    })?;
+    if anchor.starts_with(&canonical_root) {
+        return Ok(());
+    }
+    // Neither path is named: both are absolute, and what an operator can act on
+    // is that the two do not belong together.
+    Err(ScopeConfigReadError::ReadFailed {
+        message: FreeText::new(
+            "the discovered repository does not enclose the items directory".to_owned(),
+        ),
+    })
 }
 
 #[cfg(test)]
@@ -234,6 +266,39 @@ mod tests {
         let unknown = ScopeName::Main(MainScopeName::new("domian").unwrap());
         assert!(!config.contains_scope(&unknown));
         assert_eq!(config.diff_ceiling_for_scope(&unknown), None);
+    }
+
+    #[test]
+    fn test_a_repository_that_does_not_enclose_the_items_directory_is_refused() {
+        // Discovery walking up from the anchor cannot produce this, which is why
+        // it is asserted rather than assumed: were a redirected discovery ever to
+        // return a root elsewhere, the ceilings read would belong to a different
+        // tree than the plan and diff they are compared against.
+        let anchor = tempfile::Builder::new()
+            .prefix("review-scope-anchor-encloses-")
+            .tempdir_in(std::env::current_dir().unwrap())
+            .unwrap();
+        let elsewhere = tempfile::Builder::new()
+            .prefix("review-scope-elsewhere-")
+            .tempdir_in(std::env::current_dir().unwrap())
+            .unwrap();
+        let canonical_anchor = anchor.path().canonicalize().unwrap();
+
+        let error = ensure_encloses(elsewhere.path(), &canonical_anchor)
+            .expect_err("a repository that does not enclose the anchor cannot supply its ceilings");
+
+        let ScopeConfigReadError::ReadFailed { message } = error;
+        assert!(message.as_str().contains("does not enclose"), "unexpected: {message}");
+        assert!(
+            !message.as_str().contains(&canonical_anchor.display().to_string())
+                && !message.as_str().contains(&elsewhere.path().display().to_string()),
+            "no absolute path may reach the operator: {message}"
+        );
+
+        // The ordinary case still passes: the repository the items directory sits
+        // in encloses it.
+        ensure_encloses(anchor.path(), &canonical_anchor)
+            .expect("the enclosing repository must be accepted");
     }
 
     #[test]

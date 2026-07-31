@@ -1,6 +1,679 @@
 {
   "schema_version": 2,
   "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d9427b3c62e5f31c24c6912abf9797960c9ac949f209fb3ec4d4d17f5fb11a1f",
+          "at": "2026-07-29T01:36:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d9427b3c62e5f31c24c6912abf9797960c9ac949f209fb3ec4d4d17f5fb11a1f",
+          "at": "2026-07-29T01:38:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9c5cd89f3a5b511f4002e275ee28a9e9c0fed66b775a774641eff2d724c48104",
+          "at": "2026-07-29T07:05:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9c5cd89f3a5b511f4002e275ee28a9e9c0fed66b775a774641eff2d724c48104",
+          "at": "2026-07-29T07:09:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b4ee7d243c2795084448dde546359b6c5cdab1c4869826f6bbd25734024345a",
+          "at": "2026-07-29T07:50:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The file now contains 33 records, not the 29 covered by the briefing. The four newly appended bindings (TrackTask IN-19/AC-21 and ValidationError IN-20/AC-22) do not have verdicts frozen against the current catalogue declarations: `test-obligation check` fails with `DeclChanged` for all four edges. Re-evaluate these bindings against the current declarations before treating the obligation gate as passing.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/test-bindings.json",
+              "line": 658,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:6b4ee7d243c2795084448dde546359b6c5cdab1c4869826f6bbd25734024345a",
+          "at": "2026-07-29T07:57:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b4ee7d243c2795084448dde546359b6c5cdab1c4869826f6bbd25734024345a",
+          "at": "2026-07-29T08:08:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b4ee7d243c2795084448dde546359b6c5cdab1c4869826f6bbd25734024345a",
+          "at": "2026-07-29T08:10:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:15dbb04119a742fd0c2e13938e67b5bb5ef6b3cadb925bd2367b9de5e510666f",
+          "at": "2026-07-29T08:54:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:15dbb04119a742fd0c2e13938e67b5bb5ef6b3cadb925bd2367b9de5e510666f",
+          "at": "2026-07-29T09:02:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The file’s current diff adds 58 records (8 fulfillment, 41 voluntary_binding, and 9 waiver), whereas the briefing defines Batch A as 29 records (24 voluntary_binding and 5 waiver). The extra fulfillment records and four additional waivers make the artifact inconsistent with the stated review scope and gate evidence; reconcile the binding set before acceptance.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/test-bindings.json",
+              "line": 1126,
+              "category": "structural consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:1b15bb7484ffc44387b2e5e743b3a5266a31e2565dd0bec1bc485d369ba879ce",
+          "at": "2026-07-29T10:03:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1b15bb7484ffc44387b2e5e743b3a5266a31e2565dd0bec1bc485d369ba879ce",
+          "at": "2026-07-29T10:10:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1b15bb7484ffc44387b2e5e743b3a5266a31e2565dd0bec1bc485d369ba879ce",
+          "at": "2026-07-29T10:27:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The current file contains 120 records (14 fulfillment, 92 voluntary_binding, 14 waiver), but the briefing explicitly defines the current cumulative state as 101 records (9 fulfillment, 78 voluntary_binding, 14 waiver). The diff adds 19 records, so the artifact does not match the stated current design intent.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/test-bindings.json",
+              "line": 2585,
+              "category": "artifact consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:8729955d3e6137e90f59f52808a167044722cc8b6c5a157f73da8550ec33a677",
+          "at": "2026-07-29T11:31:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:68399c701e2de25faab455756a772ad7327f7de9e09e7e1a6ddc96e2f665863a",
+          "at": "2026-07-29T11:40:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:68399c701e2de25faab455756a772ad7327f7de9e09e7e1a6ddc96e2f665863a",
+          "at": "2026-07-29T11:44:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The current binding file has 118 records (14 fulfillment, 91 voluntary_binding, 13 waiver), while the briefing explicitly requires the current cumulative state to be 101 records (9 fulfillment, 78 voluntary_binding, 14 waiver). The scoped diff adds/rebinds records beyond that declared state, including removing one waiver, so the artifact is inconsistent with the review’s stated design intent.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/test-bindings.json",
+              "line": 1914,
+              "category": "artifact consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:1da1ffd5eb5f012a71832ad311ec8c22d11c995a3c1215952eb644eef7f894df",
+          "at": "2026-07-29T12:26:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1da1ffd5eb5f012a71832ad311ec8c22d11c995a3c1215952eb644eef7f894df",
+          "at": "2026-07-29T12:32:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dc3602bbab917566021e84ffe3bf5313b5a5b46e2fe0de30310f688afe305299",
+          "at": "2026-07-29T13:11:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dc3602bbab917566021e84ffe3bf5313b5a5b46e2fe0de30310f688afe305299",
+          "at": "2026-07-29T13:13:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3728550625bf80d3fea5735818f1b027e6d9a51bdfdd0f42c61ed0950d9da5cc",
+          "at": "2026-07-29T14:45:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3728550625bf80d3fea5735818f1b027e6d9a51bdfdd0f42c61ed0950d9da5cc",
+          "at": "2026-07-29T14:47:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The current briefing explicitly identifies `LazyBranchReader` × `IN-06` as the accepted waiver, but this diff removes that waiver and leaves only `LazyBranchReader` waivers for `AC-05` and `CN-09`. The binding artifact therefore no longer matches the briefing’s documented accepted deviation, despite the machine check passing.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/test-bindings.json",
+              "line": 3203,
+              "category": "artifact consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:07baff258d49407028d4d22522dd927c85f8c0b58ae3154904c6e35fdc8c8ca5",
+          "at": "2026-07-29T15:17:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:07baff258d49407028d4d22522dd927c85f8c0b58ae3154904c6e35fdc8c8ca5",
+          "at": "2026-07-29T15:18:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:07baff258d49407028d4d22522dd927c85f8c0b58ae3154904c6e35fdc8c8ca5",
+          "at": "2026-07-29T15:20:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ac47d1302230e6242a8f3fd3ee646101209e0d2cd23002d3de5a33555380d274",
+          "at": "2026-07-29T17:58:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ac47d1302230e6242a8f3fd3ee646101209e0d2cd23002d3de5a33555380d274",
+          "at": "2026-07-29T18:03:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:82752a2fb88e814f8a5aa62218f0a81c0f0fed117ee72f8d8a35921d6bf8b2a1",
+          "at": "2026-07-29T18:32:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:82752a2fb88e814f8a5aa62218f0a81c0f0fed117ee72f8d8a35921d6bf8b2a1",
+          "at": "2026-07-29T18:34:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:de6dc02280155b7f6d655ae31e7d70cf58d92150c596cb12589bd50726150a82",
+          "at": "2026-07-29T23:41:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:de6dc02280155b7f6d655ae31e7d70cf58d92150c596cb12589bd50726150a82",
+          "at": "2026-07-29T23:44:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e2b08554288f5a6e43c416ad88510b68b1a40ad58bddc0c7e56509c929f0d0e",
+          "at": "2026-07-30T00:16:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e2b08554288f5a6e43c416ad88510b68b1a40ad58bddc0c7e56509c929f0d0e",
+          "at": "2026-07-30T00:18:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:71797929d7cb693f8d4fc3b0e7ab17dd7a76a993209b04aff7a1163e9ad62a42",
+          "at": "2026-07-30T07:50:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:71797929d7cb693f8d4fc3b0e7ab17dd7a76a993209b04aff7a1163e9ad62a42",
+          "at": "2026-07-30T07:56:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9355bdef994678678de1fbad30a3195e8c19e2a21ee1a850c8cf85cb535cf5a1",
+          "at": "2026-07-30T09:12:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9355bdef994678678de1fbad30a3195e8c19e2a21ee1a850c8cf85cb535cf5a1",
+          "at": "2026-07-30T09:16:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2f3faae565d32187e9080d20c639845a1e0d27a531150b4e2d08fc13829b066b",
+          "at": "2026-07-30T11:00:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2f3faae565d32187e9080d20c639845a1e0d27a531150b4e2d08fc13829b066b",
+          "at": "2026-07-30T11:05:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ae98c5a89c79c07a39597336f643b76652fab08548bf17499b341642a8200387",
+          "at": "2026-07-30T16:11:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ae98c5a89c79c07a39597336f643b76652fab08548bf17499b341642a8200387",
+          "at": "2026-07-30T16:17:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:454b9e3ed1c46b8fbbdc4e63725ea987164ffe18a821382f14f2a0f9cdc8c0a4",
+          "at": "2026-07-30T21:24:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:454b9e3ed1c46b8fbbdc4e63725ea987164ffe18a821382f14f2a0f9cdc8c0a4",
+          "at": "2026-07-30T21:29:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:874a1f4301dd75d4f778ea0e0e864f23aeca4b36e6633fae051f16b73203dec4",
+          "at": "2026-07-30T22:32:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The two new TaskTransition bindings are backed by stale frozen verdicts. `bin/sotp test-obligation check --track-id scope-diff-ceiling-admission-enforcement-2026-07-29` currently exits 1 with `DeclChanged` for both IN-22 and IN-09, while results reports `status:in_progress stale=2`. Re-evaluate these bindings against the current declaration before accepting the scope.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/test-bindings.json",
+              "line": 6542,
+              "category": "test_obligation_drift"
+            }
+          ],
+          "hash": "rvw1:sha256:874a1f4301dd75d4f778ea0e0e864f23aeca4b36e6633fae051f16b73203dec4",
+          "at": "2026-07-30T22:37:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:874a1f4301dd75d4f778ea0e0e864f23aeca4b36e6633fae051f16b73203dec4",
+          "at": "2026-07-30T22:40:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:874a1f4301dd75d4f778ea0e0e864f23aeca4b36e6633fae051f16b73203dec4",
+          "at": "2026-07-30T22:41:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bdff2f81a5d389503100700930a645d5574b8d6870b48342fc6bbe349b7066a6",
+          "at": "2026-07-31T01:56:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bdff2f81a5d389503100700930a645d5574b8d6870b48342fc6bbe349b7066a6",
+          "at": "2026-07-31T01:57:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b2147d61054db000d8daa5dc8ac98f17a0772000cdffcde0832d3992561bff11",
+          "at": "2026-07-31T07:01:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b2147d61054db000d8daa5dc8ac98f17a0772000cdffcde0832d3992561bff11",
+          "at": "2026-07-31T07:05:33Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d3d9f2e438220c542f2b21650f0329a05fc4a25a5cc1f249d4046086a7953c7d",
+          "at": "2026-07-28T17:08:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 は commit 後に baseline が 0 へ戻るため残り member を次 batch として続けられるとしていますが、Context 自身が review の hash / verdict は scope 全体を単位とすると記録しています。現行 review target も merge-base 以降の committed diff を含むため、先行 batch を commit してもその変更は後続の scope review から消えず、各 batch が個別に ceiling 以下でも reviewer が再審査する累積 scope は ceiling を超えます。これは D1/D2 の「batch = commit / review 単位」と主目的を崩す内部矛盾です。解消には review target または ceiling の対象について新たな決定が必要なため hearing-required です。",
+              "severity": "P0",
+              "file": "knowledge/adr/2026-07-28-1521-scope-diff-ceiling-admission-enforcement.md",
+              "line": 160,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:d3d9f2e438220c542f2b21650f0329a05fc4a25a5cc1f249d4046086a7953c7d",
+          "at": "2026-07-28T17:16:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 unconditionally states that the next review excludes all prior batch commits (line 165), but the review implementation falls back to the base branch when `.commit_hash` is absent or invalid, causing those commits to re-enter the review diff. This contradicts the ADR’s baseline-reset narrative; clarify the fallback behavior (hearing-required ADR change).",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-28-1521-scope-diff-ceiling-admission-enforcement.md",
+              "line": 165,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:3c6ecb97188bb5addff1770f61139c7cd9509773cdcab213b5112e90ed37aee2",
+          "at": "2026-07-28T17:51:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7b850454865bc11d6905f8b8d553b76726b6f8d2218087342484d781ce227395",
+          "at": "2026-07-28T17:58:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7b850454865bc11d6905f8b8d553b76726b6f8d2218087342484d781ce227395",
+          "at": "2026-07-28T18:02:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aa52287a0add1a09809ebee0335bf747ee0dc5fafe50ad51e1b1559b4ba0b8dc",
+          "at": "2026-07-29T00:03:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aa52287a0add1a09809ebee0335bf747ee0dc5fafe50ad51e1b1559b4ba0b8dc",
+          "at": "2026-07-29T00:08:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:538c160fed882ed2e9611ee5986ee9a1bb902723fed1accf31981edeff611cf5",
+          "at": "2026-07-29T04:19:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1 claims `tasks[]` becomes the sole ordering statement, but `plan.sections[].task_ids` remains an independent ordered execution/dependency view: `ImplPlanDocument::next_open_task` and the implementation workflow explicitly follow section order, and no invariant aligns it with `tasks[]`. Reordering only `tasks[]` as the example directs can therefore make batch order disagree with the order consumed by execution, contradicting the ADR's single-order/desync-elimination rationale. Resolving which order is canonical or requiring them to agree is a new decision and is hearing-required.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-29-0358-batch-ordering-check-on-declared-task-order.md",
+              "line": 68,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:538c160fed882ed2e9611ee5986ee9a1bb902723fed1accf31981edeff611cf5",
+          "at": "2026-07-29T04:22:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a3a989f3402bc8125526e1885ce082ab4ee8b8abe77d3c17cd588ef529e5ac5f",
+          "at": "2026-07-29T04:34:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a3a989f3402bc8125526e1885ce082ab4ee8b8abe77d3c17cd588ef529e5ac5f",
+          "at": "2026-07-29T04:36:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6dbb58d84d6a83f2499d18689e2182a826df973fae346034f4e0c1bbc7205907",
+          "at": "2026-07-29T05:04:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The schema-2-only read policy leaks beyond the stated D1/D2 refinement. `collect_track_snapshots`, used by routine view sync/validation and registry rendering, decodes `impl-plan.json` for v5/v6 tracks—including completed tracks—and those artifacts remain schema 1; the current active track also already has a schema-1 plan. Rejecting schema 1 would therefore break repository-wide track rendering/validation rather than leaving historical artifacts untouched as claimed. Preserve a schema-1 read lane or explicitly include and ground the required cross-track migration/rendering change.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-29-0358-task-dependency-declaration-and-batch-order-check.md",
+              "line": 44,
+              "category": "scope leakage into ADR body"
+            }
+          ],
+          "hash": "rvw1:sha256:961a00b0905e79d2f319c4fd673cf3c418c3e4a10e1aab1d218406f2394da5ec",
+          "at": "2026-07-29T05:10:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:967376e4c09ef86aef43dc8466f3a7a370ed283c12a5b0f3966a0b1cfd04875d",
+          "at": "2026-07-29T05:15:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:967376e4c09ef86aef43dc8466f3a7a370ed283c12a5b0f3966a0b1cfd04875d",
+          "at": "2026-07-29T05:17:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4d4fdc9a2ff6fc2d44a1b2c74992c246cfe90a6886c128e82736dfde805be84b",
+          "at": "2026-07-30T03:17:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 excludes edges whose settled dependency is omitted from `batch-plan.json`, which narrows the earlier ADR 0358 D2 requirement to check every declared dependency edge. The relationship section only records a refinement of ADR 1521 D2, leaving implementers free to preserve the universal edge check or skip these edges. Explicitly record the refinement of ADR 0358 D2 or keep its original domain.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-30-1022-batch-plan-declaration-domain-unsettled-tasks.md",
+              "line": 66,
+              "category": "scope leakage into ADR body"
+            },
+            {
+              "message": "The safety argument assumes settled tasks never re-enter admission because it only handles `todo -> in_progress`, but the existing transition model permits committed `done -> in_progress` directly. A settled task omitted under D1 can therefore become `in_progress` without any batch membership or estimate, violating D1's unsettled-task declaration requirement while D3 remains unchanged. The ADR must decide how reopening preserves that invariant.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-30-1022-batch-plan-declaration-domain-unsettled-tasks.md",
+              "line": 63,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:4d4fdc9a2ff6fc2d44a1b2c74992c246cfe90a6886c128e82736dfde805be84b",
+          "at": "2026-07-30T03:20:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 additionally narrows the dependency-order check from the prior ADR’s declared-edge domain to edges whose endpoints are both declared (lines 70–72), and explicitly refines 2026-07-29-0358 D2 (lines 106–110). The briefing limits this candidate to refining input-box D2 item 1’s unplanned-task application domain; this is an unadmitted cross-ADR decision change.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-30-1022-batch-plan-declaration-domain-unsettled-tasks.md",
+              "line": 70,
+              "category": "scope leakage into ADR body"
+            },
+            {
+              "message": "D3 introduces a new semantic rule expanding admission from todo → in_progress to done → in_progress reopen transitions (lines 81–94), and records it as a refinement of the input-box D3 (lines 109–110). The briefing limits 1022 to input-box D2 item 1’s application domain and explicitly requires the admission formula and absence-of-file error to remain unchanged. This unauthorized admission decision is outside the candidate’s declared refine scope.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-30-1022-batch-plan-declaration-domain-unsettled-tasks.md",
+              "line": 81,
+              "category": "scope leakage into ADR body"
+            }
+          ],
+          "hash": "rvw1:sha256:c120ec22ee8ed238919574c141fa1a5b49622bfbff85e960e16dedef37653e21",
+          "at": "2026-07-30T04:28:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c120ec22ee8ed238919574c141fa1a5b49622bfbff85e960e16dedef37653e21",
+          "at": "2026-07-30T04:31:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 says the `skipped -> todo -> in_progress` route needs no additional protection because the later Start is judged. However, D1 defines `todo` itself as unsettled and therefore required to be declared. A legitimately omitted skipped task can be reset to `todo` before admission runs, immediately creating the exact unsettled-but-undeclared state D1 prohibits. Reconcile the declaration invariant with the ResetToTodo transition.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-30-1022-batch-plan-declaration-domain-unsettled-tasks.md",
+              "line": 94,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:c120ec22ee8ed238919574c141fa1a5b49622bfbff85e960e16dedef37653e21",
+          "at": "2026-07-30T04:33:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c21abe3c765b23871dadc1e6bb8adb5de7af094e3590c03421982f2b89200c72",
+          "at": "2026-07-30T05:30:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c21abe3c765b23871dadc1e6bb8adb5de7af094e3590c03421982f2b89200c72",
+          "at": "2026-07-30T05:31:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:52fee2ff229c25efc50e1cd94883b4f9cc522e371103c883a46e14d11afa681c",
+          "at": "2026-07-30T12:44:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1 が保証するのは入力 hash の commit-object 実在と HEAD 祖先性だけであり、99–101 行目では誤った別の祖先 commit も受理すると明記されています。そのため「誤った値が止まり」「hash の自己申告に依存しなくなる」という効果は受容済み残余リスクと矛盾します。拒否できる値を実在しない／非祖先の hash に限定して記述し、task と commit の対応まで検証済みだと下流が解釈しないようにしてください。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-30-2101-per-task-commit-hash-record-time-validation.md",
+              "line": 92,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:52fee2ff229c25efc50e1cd94883b4f9cc522e371103c883a46e14d11afa681c",
+          "at": "2026-07-30T12:47:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:569420ccca86c05485507337048a917a41b8b4044f301755c1bffa94de6f1c8b",
+          "at": "2026-07-30T12:50:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:569420ccca86c05485507337048a917a41b8b4044f301755c1bffa94de6f1c8b",
+          "at": "2026-07-30T12:52:42Z"
+        }
+      ]
+    },
     "harness-policy": {
       "rounds": [
         {
@@ -383,226 +1056,539 @@
         }
       ]
     },
-    "cli_driver": {
+    "usecase": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d2a151bea698fa149932db93d3982572f4eef52e43ff573f2ae06777ef99da86",
-          "at": "2026-07-29T11:31:35Z"
+          "hash": "rvw1:sha256:38934827b6a473810fafbcaba87113622b822cd98c54100b3aaf8f6af34f1f80",
+          "at": "2026-07-29T10:03:16Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d2a151bea698fa149932db93d3982572f4eef52e43ff573f2ae06777ef99da86",
-          "at": "2026-07-29T11:37:00Z"
+          "hash": "rvw1:sha256:38934827b6a473810fafbcaba87113622b822cd98c54100b3aaf8f6af34f1f80",
+          "at": "2026-07-29T10:14:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:377255798552d17f3cba59db58c49ee5dccd5d69e7948c91681c8782802cc31b",
+          "at": "2026-07-29T11:31:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:377255798552d17f3cba59db58c49ee5dccd5d69e7948c91681c8782802cc31b",
+          "at": "2026-07-29T11:33:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:758383d886d03213b9d20022e3192fad2a6542fe8b5e467cf5e4395ef7be0bed",
+          "at": "2026-07-29T12:26:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:758383d886d03213b9d20022e3192fad2a6542fe8b5e467cf5e4395ef7be0bed",
+          "at": "2026-07-29T12:29:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b4522b60fdb9af9b14b4122006c7e6e83e0a632f355e8956a7da45cf86325b6",
+          "at": "2026-07-29T13:11:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b4522b60fdb9af9b14b4122006c7e6e83e0a632f355e8956a7da45cf86325b6",
+          "at": "2026-07-29T13:13:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2ce7b8c3a1e84beccfd5bf771ebcc31909c2ef5e0080b24c8e1eeb3135689fdc",
+          "at": "2026-07-29T13:45:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2ce7b8c3a1e84beccfd5bf771ebcc31909c2ef5e0080b24c8e1eeb3135689fdc",
+          "at": "2026-07-29T13:47:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e8236044ca6e5dd7dd9380279a0e3cf37e5699c72217de5407f567f6da8cbd2",
+          "at": "2026-07-29T14:45:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`map_outcome` converts a domain `BatchPlanGateOutcome::Blocked` into `Passed` when output wrapping returns `None`. This duplicates the domain-owned verdict decision in the usecase layer and creates a fail-open fallback if the supposedly one-to-one mapping ever loses all findings. Preserve `Blocked` through an infallible conversion from `NonEmptyGateViolations`, or return a mapping error instead.",
+              "severity": "P1",
+              "file": "libs/usecase/src/batch_plan/output.rs",
+              "line": 144,
+              "category": "business_logic_leak"
+            }
+          ],
+          "hash": "rvw1:sha256:5e8236044ca6e5dd7dd9380279a0e3cf37e5699c72217de5407f567f6da8cbd2",
+          "at": "2026-07-29T14:47:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2dcaa21d3b6e5a0650318c8b04d09708a5bea970852d7f753f146ab250ebe356",
+          "at": "2026-07-29T14:52:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2dcaa21d3b6e5a0650318c8b04d09708a5bea970852d7f753f146ab250ebe356",
+          "at": "2026-07-29T14:53:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:79cb9634db48d1f196e50cad125e361a3fd2fd7b57f3ce3a4242183e6bedfbfe",
+          "at": "2026-07-29T17:58:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`PlanArtifactReadError::NotFound` is treated as proof that the track predates the gate, but the filesystem reader returns `NotFound` for any missing `batch-plan.json`. Consequently, any new/active track can bypass admission simply by lacking the artifact, whereas CN-09 requires missing plans to fail closed except for the explicitly exempt introducing track. Require an explicit exemption/eligibility signal and return an error for missing plans on applicable tracks.",
+              "severity": "P0",
+              "file": "libs/usecase/src/task_admission.rs",
+              "line": 156,
+              "category": "orchestration_correctness"
+            },
+            {
+              "message": "`TaskStatusKind::Done` collapses both `DonePending` and `DoneTraced`, so this marks an uncommitted `DonePending` task as settled. That advances `current_batch` and permits a later batch to start before the current batch's commit, violating IN-09; the workflow explicitly keeps `DonePending` members in the current batch. Settlement should use the full domain `TaskStatus`—only `DoneTraced` or `Skipped`—preferably through a domain-owned predicate, with a regression test that rejects the later task while the earlier one is `DonePending`.",
+              "severity": "P0",
+              "file": "libs/usecase/src/task_admission.rs",
+              "line": 213,
+              "category": "business_logic_leak"
+            }
+          ],
+          "hash": "rvw1:sha256:79cb9634db48d1f196e50cad125e361a3fd2fd7b57f3ce3a4242183e6bedfbfe",
+          "at": "2026-07-29T18:03:03Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`handle_check` invokes two separate use-case services: `track_resolver.resolve_for_read` and then `check_service.check` (lines 91 and 104). This makes the primary adapter orchestrate track resolution plus the batch-plan gate, violating the single-interactor-per-request rule. Compose this into one use-case application service/interactor before calling it from the driver.",
+              "message": "The admission path now rejects every `todo -> in_progress` transition when `batch-plan.json` is absent, but the current briefing explicitly requires missing batch plans to skip the judgment for CN-09/AC-05 non-retroactivity. This blocks pre-gate tracks from starting work and contradicts the stated contract; preserve the `NotFound => Ok(None)` behavior.",
               "severity": "P1",
-              "file": "apps/cli-driver/src/batch_plan.rs",
-              "line": 91,
-              "category": "primary-adapter orchestration"
+              "file": "libs/usecase/src/task_admission.rs",
+              "line": 156,
+              "category": "orchestration correctness"
             }
           ],
-          "hash": "rvw1:sha256:26ab5a0c43c771c622f5b9b66022bcd7b2d332f3791727267c40b1451ebfc5f2",
-          "at": "2026-07-29T12:26:50Z"
+          "hash": "rvw1:sha256:da34c2559ae9bc895bd174a6181c9142e891281460a76f22bf4434ab500ce6ab",
+          "at": "2026-07-29T18:32:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da34c2559ae9bc895bd174a6181c9142e891281460a76f22bf4434ab500ce6ab",
+          "at": "2026-07-29T18:33:49Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`handle_check` invokes two separate use-case services in sequence: `ActiveTrackResolveService::resolve_for_read` and then `BatchPlanCheckService::check`. This puts multi-interactor orchestration in the primary adapter, violating the cli_driver invariant of exactly one interactor per request. Encapsulate track resolution and the gate check behind one use-case application service and inject that single service into the driver.",
+              "message": "`TransitionTaskUseCase` remains a public, independently constructible mutation path whose `execute(TaskTransition::Start)` and `execute_by_status(..., \"in_progress\", ...)` methods write the transition without invoking admission. Although the CLI currently uses `TaskOperationInteractor`, another usecase consumer can bypass the new gate completely, so CN-10's single-path guarantee is not structurally enforced. Put admission at this lowest transition boundary or make the unguarded helper inaccessible outside the guarded path.",
+              "severity": "P0",
+              "file": "libs/usecase/src/lib.rs",
+              "line": 181,
+              "category": "orchestration_correctness"
+            },
+            {
+              "message": "`settled_task_ids` embeds the business rule that `DoneTraced` and `Skipped`—but not `DonePending`—advance the current batch. That classification controls domain membership behavior and belongs on the domain `TaskStatus`/`ImplPlanDocument` model (or inside `evaluate_admission`), not in the usecase orchestrator; keeping it here duplicates domain semantics and can silently drift when task states evolve.",
               "severity": "P1",
-              "file": "apps/cli-driver/src/batch_plan.rs",
-              "line": 91,
-              "category": "architecture"
+              "file": "libs/usecase/src/task_admission.rs",
+              "line": 219,
+              "category": "business_logic_leak"
             }
           ],
-          "hash": "rvw1:sha256:26ab5a0c43c771c622f5b9b66022bcd7b2d332f3791727267c40b1451ebfc5f2",
-          "at": "2026-07-29T12:29:45Z"
+          "hash": "rvw1:sha256:da34c2559ae9bc895bd174a6181c9142e891281460a76f22bf4434ab500ce6ab",
+          "at": "2026-07-29T18:37:47Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:73f9b38fb7f974d34801a3f0d3603cdaff37e1b6f331b2e7ef67cea959deb9a3",
-          "at": "2026-07-29T13:10:37Z"
+          "hash": "rvw1:sha256:23013506c5854aa17b72f96890bac765bc440746f06363790a1b396118c3ae5f",
+          "at": "2026-07-29T23:41:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:23013506c5854aa17b72f96890bac765bc440746f06363790a1b396118c3ae5f",
+          "at": "2026-07-29T23:44:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:af5f40090e0473c918515ec3f2487adb13c5b8ea8bd47dc05ce5aa8aba8a9310",
+          "at": "2026-07-30T03:17:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:af5f40090e0473c918515ec3f2487adb13c5b8ea8bd47dc05ce5aa8aba8a9310",
+          "at": "2026-07-30T03:21:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b676f3b69f19179960c3ccad155250b36d321824627f43eb6fc3ab41599b6f07",
+          "at": "2026-07-30T04:29:35Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The `usecase::batch_plan` import path hides a semantic domain-boundary leak: `BatchPlanGateOutcome` and `BatchPlanGateViolation` are re-exports of `domain::batch_plan` types, and the domain catalogue classifies both as `ValueObject`s. The driver consequently destructures the domain verdict and renders nested domain identifiers and line-count objects directly. Re-exporting does not turn them into usecase boundary DTOs; map the domain verdict inside the interactor and return a usecase-owned output DTO to the driver.",
+              "message": "`enters_in_progress` reimplements the domain transition table by enumerating `Todo`, `DonePending`, and `DoneTraced`. Transition legality and whether a transition enters `in_progress` already belong to `ImplPlanDocument`/`TaskTransition`; keeping a second table in usecase can drift from `execute_by_status` and let a newly valid entry bypass admission, violating CN-10 and the pure-orchestrator boundary. Expose/query the transition intent from domain instead of matching `TaskStatus` variants here.",
               "severity": "P1",
-              "file": "apps/cli-driver/src/batch_plan.rs",
-              "line": 13,
-              "category": "boundary_exposure"
+              "file": "libs/usecase/src/task_admission.rs",
+              "line": 216,
+              "category": "business_logic_leak"
             }
           ],
-          "hash": "rvw1:sha256:73f9b38fb7f974d34801a3f0d3603cdaff37e1b6f331b2e7ef67cea959deb9a3",
-          "at": "2026-07-29T13:14:21Z"
+          "hash": "rvw1:sha256:b676f3b69f19179960c3ccad155250b36d321824627f43eb6fc3ab41599b6f07",
+          "at": "2026-07-30T04:32:54Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:abae0c69cb43a9dce809614a5ee6c2b68c6326cd6fb6abf33cfa7b7c2e26f9e6",
-          "at": "2026-07-29T13:45:18Z"
+          "hash": "rvw1:sha256:8c888903bf32dc3ec5386bdedcb4e7294528c88d2168d17998b6e0ced611b752",
+          "at": "2026-07-30T05:30:36Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:abae0c69cb43a9dce809614a5ee6c2b68c6326cd6fb6abf33cfa7b7c2e26f9e6",
-          "at": "2026-07-29T13:47:02Z"
+          "hash": "rvw1:sha256:8c888903bf32dc3ec5386bdedcb4e7294528c88d2168d17998b6e0ced611b752",
+          "at": "2026-07-30T05:33:01Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:bc04f7f6299cdcf6b0caddce550297b00bb9591f3e8a9079533a42ae0df26166",
-          "at": "2026-07-29T14:45:21Z"
+          "hash": "rvw1:sha256:982a3b7529f61967250519a11c641b669b30f1b1170545dbc1d4b67188d197e6",
+          "at": "2026-07-30T09:11:16Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:bc04f7f6299cdcf6b0caddce550297b00bb9591f3e8a9079533a42ae0df26166",
-          "at": "2026-07-29T14:46:46Z"
+          "hash": "rvw1:sha256:982a3b7529f61967250519a11c641b669b30f1b1170545dbc1d4b67188d197e6",
+          "at": "2026-07-30T09:14:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "このテストは `measured` と `in_progress_task_ids` が空で、任意のスコープの最初の貢献は無条件に許可されるため、`ScopeName::Other` の予約スコープ免除を実際には検証していません。既定 ceiling の誤適用を検出できるよう、既存の貢献がある状態で Other の大きな見積もりを開始するケースにしてください。",
+              "severity": "P1",
+              "file": "libs/usecase/src/task_ops.rs",
+              "line": 1878,
+              "category": "test-coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:0b379c57e57e443256036c451aeda0dfd68fe4a1ae637d96992b780cba8dd01d",
+          "at": "2026-07-30T15:55:34Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:69db52e52fb9ce6d9e2997951516fe67c01ca19a3cd2f91c8aa6e3c26d5a0d94",
-          "at": "2026-07-30T03:16:35Z"
+          "hash": "rvw1:sha256:3142e570133bfaeeae484b3ffbeaa8ada116fdcd4ccf1a985b3516910d7c0a1e",
+          "at": "2026-07-30T16:00:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3142e570133bfaeeae484b3ffbeaa8ada116fdcd4ccf1a985b3516910d7c0a1e",
+          "at": "2026-07-30T16:04:28Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:69db52e52fb9ce6d9e2997951516fe67c01ca19a3cd2f91c8aa6e3c26d5a0d94",
-          "at": "2026-07-30T03:18:47Z"
+          "hash": "rvw1:sha256:3142e570133bfaeeae484b3ffbeaa8ada116fdcd4ccf1a985b3516910d7c0a1e",
+          "at": "2026-07-30T16:07:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56367fd5660986a21c3d2e0f1f4663700f2d071e9553e2c681888d2061428aca",
+          "at": "2026-07-30T21:21:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`records_a_commit_hash` re-encodes which `domain::TaskTransition` variants write a hash. That decision belongs on `TaskTransition`; if domain later adds or changes a hash-writing transition, this guard can silently skip verification and violate IN-22. Expose the hash-to-record (or equivalent classification) from domain and let usecase only orchestrate verification.",
+              "severity": "P1",
+              "file": "libs/usecase/src/task_ops/commit_record.rs",
+              "line": 56,
+              "category": "business_logic_leak"
+            }
+          ],
+          "hash": "rvw1:sha256:56367fd5660986a21c3d2e0f1f4663700f2d071e9553e2c681888d2061428aca",
+          "at": "2026-07-30T21:28:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f978efb0e550dd5ed9f375f57f63b34ec7716fa31fa16e2e5af1ac67a52be5f3",
+          "at": "2026-07-30T22:32:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f978efb0e550dd5ed9f375f57f63b34ec7716fa31fa16e2e5af1ac67a52be5f3",
+          "at": "2026-07-30T22:33:58Z"
         }
       ]
     },
-    "spec": {
+    "domain": {
       "rounds": [
         {
           "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bc6af2cf839f5ed501ac956d02bfb5bee1e3631c5897003bc84fb845b5458eec",
-          "at": "2026-07-29T01:37:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bc6af2cf839f5ed501ac956d02bfb5bee1e3631c5897003bc84fb845b5458eec",
-          "at": "2026-07-29T01:42:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:981d6ce819d3be287021d32a6c6882d3d4cd8b9cb8550ae2329c9e7dafc65992",
-          "at": "2026-07-29T05:28:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:981d6ce819d3be287021d32a6c6882d3d4cd8b9cb8550ae2329c9e7dafc65992",
-          "at": "2026-07-29T05:31:01Z"
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`LineCount::saturating_add` collapses totals above `u32::MAX` to `u32::MAX`, so an actual sum exceeding a maximum ceiling is incorrectly admitted. For example, production `u32::MAX` plus one test line becomes `u32::MAX`, and `ScopeCeiling::resolve(Some(u32::MAX)).admits(...)` returns true. Use checked overflow handling and fail closed.",
+              "severity": "P0",
+              "file": "libs/domain/src/batch_plan/line_count.rs",
+              "line": 33,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:93f226ecde9ebf4753aa13ab06d42cd483c3bc5ba0cd58cdc0abf150006e4729",
+          "at": "2026-07-29T07:05:31Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7939c44666e370f42670295f3f7ef4aa8ac4850d0c72611926e95e15b6c11fc7",
-          "at": "2026-07-30T03:16:56Z"
+          "hash": "rvw1:sha256:87d19e34f18611acc2f565ec048cdf43a0ac1d1dafaffeeb2507b65e89429b68",
+          "at": "2026-07-29T07:09:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:87d19e34f18611acc2f565ec048cdf43a0ac1d1dafaffeeb2507b65e89429b68",
+          "at": "2026-07-29T07:15:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cc5ad75c51442352bff92aa180e19067024c36684a0de01c4a97a0f79807dd64",
+          "at": "2026-07-29T07:48:47Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "IN-07 は「宣言されたすべての依存辺」の両端に batch 所属を要求する一方、IN-21 / AC-24 は settle 済みタスクを `batch-plan.json` から省略可能としています。未 settle タスクが省略済みの settle 済みタスクへ `depends_on` を持つ正規ケースでは依存先の所属 batch がなく順序条件を満たせず、「残作業のみ」の plan が通る AC-24 と矛盾します。settle 済み依存先への辺を順序検査から除外する境界を明記する必要があります。",
-              "severity": "P1",
-              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
-              "line": 125,
-              "category": "scope / acceptance_criteria contradiction"
+              "message": "The recursive dependency walk consumes one stack frame per edge in a dependency chain, while task count/depth is unbounded. A valid sufficiently deep acyclic plan can therefore stack-overflow inside `ImplPlanDocument::new`, aborting instead of returning `Result`. Use an iterative DFS with an explicit stack (or enforce a validated depth bound).",
+              "severity": "P0",
+              "file": "libs/domain/src/track.rs",
+              "line": 629,
+              "category": "panic-safety"
             }
           ],
-          "hash": "rvw1:sha256:7939c44666e370f42670295f3f7ef4aa8ac4850d0c72611926e95e15b6c11fc7",
-          "at": "2026-07-30T03:19:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ab29cfe3f7cbcd4073a89355a6ef9a64e928299029cf74313a9eab4ef39bad4f",
-          "at": "2026-07-30T04:28:41Z"
+          "hash": "rvw1:sha256:cc5ad75c51442352bff92aa180e19067024c36684a0de01c4a97a0f79807dd64",
+          "at": "2026-07-29T07:54:31Z"
         },
         {
           "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ab29cfe3f7cbcd4073a89355a6ef9a64e928299029cf74313a9eab4ef39bad4f",
-          "at": "2026-07-30T04:30:42Z"
-        },
-        {
-          "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "AC-24 states that absence of a settled task from `batch-plan.json` must not produce an admission error, but AC-26 requires `done → in_progress` (Reopen) to be rejected precisely when that settled task is absent. The spec therefore gives contradictory admission behavior for the same state.",
+              "message": "The deep-chain regression test never creates a deep DFS traversal: tasks are visited from T1 upward, while each Tn depends on the already-settled T(n-1), so the traversal stack stays at depth one and the previous recursive implementation would also pass. Reverse the task order (or dependency direction) so this test actually protects the prior stack-overflow boundary.",
               "severity": "P1",
-              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
-              "line": 818,
-              "category": "scope / acceptance_criteria contradiction"
+              "file": "libs/domain/src/track.rs",
+              "line": 899,
+              "category": "test-coverage"
             }
           ],
-          "hash": "rvw1:sha256:61eaa381ad4196d0a2b9da8b6246b9bf16bfe5aef34dd2f7cd96d31a4b97d579",
-          "at": "2026-07-30T07:37:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1284ca8dc0a1b2ae5369fc47074a35aab35e44c6d27c5d0c2dfd26fb36e26d83",
-          "at": "2026-07-30T07:42:36Z"
+          "hash": "rvw1:sha256:98a18876d761bf0ee82091c334f8b976bf72cc2560d43fb82661636a66b4b922",
+          "at": "2026-07-29T08:02:27Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1284ca8dc0a1b2ae5369fc47074a35aab35e44c6d27c5d0c2dfd26fb36e26d83",
-          "at": "2026-07-30T07:43:19Z"
+          "hash": "rvw1:sha256:2a578f9a0d2786c4d41dffaf51d3cb604724b8c58f34dfd20efd8b779323af09",
+          "at": "2026-07-29T08:06:20Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e1b1bdd4bb5f14829d7ca78e00d6f191e2e0ced14b91d3484cf30f9e75c9924e",
-          "at": "2026-07-30T12:13:32Z"
+          "hash": "rvw1:sha256:b900e68071494f8a73f8ad76893f115541eae3533e695987254a7a33b048c81f",
+          "at": "2026-07-29T08:55:03Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e1b1bdd4bb5f14829d7ca78e00d6f191e2e0ced14b91d3484cf30f9e75c9924e",
-          "at": "2026-07-30T12:16:06Z"
+          "hash": "rvw1:sha256:b900e68071494f8a73f8ad76893f115541eae3533e695987254a7a33b048c81f",
+          "at": "2026-07-29T09:01:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:22055b4661269f31e5fbcfb5d22b69fb328114130171ec8e42bdef703e499698",
+          "at": "2026-07-29T10:02:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:22055b4661269f31e5fbcfb5d22b69fb328114130171ec8e42bdef703e499698",
+          "at": "2026-07-29T10:17:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:14d752ce51fd8da9fcf1c3e3a3f023950de71b9be9012d0a32ca68ddca2cbcbf",
+          "at": "2026-07-29T23:41:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:14d752ce51fd8da9fcf1c3e3a3f023950de71b9be9012d0a32ca68ddca2cbcbf",
+          "at": "2026-07-29T23:44:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3d69eab3fe0d247d451ba7b0f6b22d6ee0326fed5cd1f72ab8f914ac209c3272",
+          "at": "2026-07-30T03:17:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3d69eab3fe0d247d451ba7b0f6b22d6ee0326fed5cd1f72ab8f914ac209c3272",
+          "at": "2026-07-30T03:20:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d22b2b8a92be6e150be4e2478212091d41a9fed97446be212055e804e94a6088",
+          "at": "2026-07-30T04:28:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d22b2b8a92be6e150be4e2478212091d41a9fed97446be212055e804e94a6088",
+          "at": "2026-07-30T04:31:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d434a60d31d16982940a3a91424cf806d3a045332234434497e8238e5831f495",
+          "at": "2026-07-30T05:30:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d434a60d31d16982940a3a91424cf806d3a045332234434497e8238e5831f495",
+          "at": "2026-07-30T05:34:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:096c8c6487b60321292674ac17cd86b1cb849bdc0391d56ef304c20a6256a5d4",
+          "at": "2026-07-30T09:10:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:096c8c6487b60321292674ac17cd86b1cb849bdc0391d56ef304c20a6256a5d4",
+          "at": "2026-07-30T09:14:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:72980069a9887b7e971b784c2c60a7e235a574a34e24eb6a0a324497fcc8bff7",
+          "at": "2026-07-30T10:59:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:72980069a9887b7e971b784c2c60a7e235a574a34e24eb6a0a324497fcc8bff7",
+          "at": "2026-07-30T11:02:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f94ee80aaa2721f93a4069b06b450d808127df7dba3c54a8ab6e496c8a935f96",
+          "at": "2026-07-30T22:32:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f94ee80aaa2721f93a4069b06b450d808127df7dba3c54a8ab6e496c8a935f96",
+          "at": "2026-07-30T22:34:32Z"
         }
       ]
     },
@@ -2695,745 +3681,226 @@
         }
       ]
     },
-    "other": {
+    "spec": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d9427b3c62e5f31c24c6912abf9797960c9ac949f209fb3ec4d4d17f5fb11a1f",
-          "at": "2026-07-29T01:36:56Z"
+          "hash": "rvw1:sha256:bc6af2cf839f5ed501ac956d02bfb5bee1e3631c5897003bc84fb845b5458eec",
+          "at": "2026-07-29T01:37:18Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d9427b3c62e5f31c24c6912abf9797960c9ac949f209fb3ec4d4d17f5fb11a1f",
-          "at": "2026-07-29T01:38:31Z"
+          "hash": "rvw1:sha256:bc6af2cf839f5ed501ac956d02bfb5bee1e3631c5897003bc84fb845b5458eec",
+          "at": "2026-07-29T01:42:56Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:9c5cd89f3a5b511f4002e275ee28a9e9c0fed66b775a774641eff2d724c48104",
-          "at": "2026-07-29T07:05:27Z"
+          "hash": "rvw1:sha256:981d6ce819d3be287021d32a6c6882d3d4cd8b9cb8550ae2329c9e7dafc65992",
+          "at": "2026-07-29T05:28:01Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:9c5cd89f3a5b511f4002e275ee28a9e9c0fed66b775a774641eff2d724c48104",
-          "at": "2026-07-29T07:09:12Z"
+          "hash": "rvw1:sha256:981d6ce819d3be287021d32a6c6882d3d4cd8b9cb8550ae2329c9e7dafc65992",
+          "at": "2026-07-29T05:31:01Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6b4ee7d243c2795084448dde546359b6c5cdab1c4869826f6bbd25734024345a",
-          "at": "2026-07-29T07:50:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The file now contains 33 records, not the 29 covered by the briefing. The four newly appended bindings (TrackTask IN-19/AC-21 and ValidationError IN-20/AC-22) do not have verdicts frozen against the current catalogue declarations: `test-obligation check` fails with `DeclChanged` for all four edges. Re-evaluate these bindings against the current declarations before treating the obligation gate as passing.",
-              "severity": "P1",
-              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/test-bindings.json",
-              "line": 658,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:6b4ee7d243c2795084448dde546359b6c5cdab1c4869826f6bbd25734024345a",
-          "at": "2026-07-29T07:57:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6b4ee7d243c2795084448dde546359b6c5cdab1c4869826f6bbd25734024345a",
-          "at": "2026-07-29T08:08:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6b4ee7d243c2795084448dde546359b6c5cdab1c4869826f6bbd25734024345a",
-          "at": "2026-07-29T08:10:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:15dbb04119a742fd0c2e13938e67b5bb5ef6b3cadb925bd2367b9de5e510666f",
-          "at": "2026-07-29T08:54:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:15dbb04119a742fd0c2e13938e67b5bb5ef6b3cadb925bd2367b9de5e510666f",
-          "at": "2026-07-29T09:02:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The file’s current diff adds 58 records (8 fulfillment, 41 voluntary_binding, and 9 waiver), whereas the briefing defines Batch A as 29 records (24 voluntary_binding and 5 waiver). The extra fulfillment records and four additional waivers make the artifact inconsistent with the stated review scope and gate evidence; reconcile the binding set before acceptance.",
-              "severity": "P1",
-              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/test-bindings.json",
-              "line": 1126,
-              "category": "structural consistency"
-            }
-          ],
-          "hash": "rvw1:sha256:1b15bb7484ffc44387b2e5e743b3a5266a31e2565dd0bec1bc485d369ba879ce",
-          "at": "2026-07-29T10:03:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1b15bb7484ffc44387b2e5e743b3a5266a31e2565dd0bec1bc485d369ba879ce",
-          "at": "2026-07-29T10:10:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1b15bb7484ffc44387b2e5e743b3a5266a31e2565dd0bec1bc485d369ba879ce",
-          "at": "2026-07-29T10:27:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The current file contains 120 records (14 fulfillment, 92 voluntary_binding, 14 waiver), but the briefing explicitly defines the current cumulative state as 101 records (9 fulfillment, 78 voluntary_binding, 14 waiver). The diff adds 19 records, so the artifact does not match the stated current design intent.",
-              "severity": "P1",
-              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/test-bindings.json",
-              "line": 2585,
-              "category": "artifact consistency"
-            }
-          ],
-          "hash": "rvw1:sha256:8729955d3e6137e90f59f52808a167044722cc8b6c5a157f73da8550ec33a677",
-          "at": "2026-07-29T11:31:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:68399c701e2de25faab455756a772ad7327f7de9e09e7e1a6ddc96e2f665863a",
-          "at": "2026-07-29T11:40:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:68399c701e2de25faab455756a772ad7327f7de9e09e7e1a6ddc96e2f665863a",
-          "at": "2026-07-29T11:44:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The current binding file has 118 records (14 fulfillment, 91 voluntary_binding, 13 waiver), while the briefing explicitly requires the current cumulative state to be 101 records (9 fulfillment, 78 voluntary_binding, 14 waiver). The scoped diff adds/rebinds records beyond that declared state, including removing one waiver, so the artifact is inconsistent with the review’s stated design intent.",
-              "severity": "P1",
-              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/test-bindings.json",
-              "line": 1914,
-              "category": "artifact consistency"
-            }
-          ],
-          "hash": "rvw1:sha256:1da1ffd5eb5f012a71832ad311ec8c22d11c995a3c1215952eb644eef7f894df",
-          "at": "2026-07-29T12:26:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1da1ffd5eb5f012a71832ad311ec8c22d11c995a3c1215952eb644eef7f894df",
-          "at": "2026-07-29T12:32:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dc3602bbab917566021e84ffe3bf5313b5a5b46e2fe0de30310f688afe305299",
-          "at": "2026-07-29T13:11:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dc3602bbab917566021e84ffe3bf5313b5a5b46e2fe0de30310f688afe305299",
-          "at": "2026-07-29T13:13:04Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3728550625bf80d3fea5735818f1b027e6d9a51bdfdd0f42c61ed0950d9da5cc",
-          "at": "2026-07-29T14:45:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3728550625bf80d3fea5735818f1b027e6d9a51bdfdd0f42c61ed0950d9da5cc",
-          "at": "2026-07-29T14:47:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The current briefing explicitly identifies `LazyBranchReader` × `IN-06` as the accepted waiver, but this diff removes that waiver and leaves only `LazyBranchReader` waivers for `AC-05` and `CN-09`. The binding artifact therefore no longer matches the briefing’s documented accepted deviation, despite the machine check passing.",
-              "severity": "P1",
-              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/test-bindings.json",
-              "line": 3203,
-              "category": "artifact consistency"
-            }
-          ],
-          "hash": "rvw1:sha256:07baff258d49407028d4d22522dd927c85f8c0b58ae3154904c6e35fdc8c8ca5",
-          "at": "2026-07-29T15:17:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:07baff258d49407028d4d22522dd927c85f8c0b58ae3154904c6e35fdc8c8ca5",
-          "at": "2026-07-29T15:18:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:07baff258d49407028d4d22522dd927c85f8c0b58ae3154904c6e35fdc8c8ca5",
-          "at": "2026-07-29T15:20:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ac47d1302230e6242a8f3fd3ee646101209e0d2cd23002d3de5a33555380d274",
-          "at": "2026-07-29T17:58:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ac47d1302230e6242a8f3fd3ee646101209e0d2cd23002d3de5a33555380d274",
-          "at": "2026-07-29T18:03:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:82752a2fb88e814f8a5aa62218f0a81c0f0fed117ee72f8d8a35921d6bf8b2a1",
-          "at": "2026-07-29T18:32:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:82752a2fb88e814f8a5aa62218f0a81c0f0fed117ee72f8d8a35921d6bf8b2a1",
-          "at": "2026-07-29T18:34:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:de6dc02280155b7f6d655ae31e7d70cf58d92150c596cb12589bd50726150a82",
-          "at": "2026-07-29T23:41:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:de6dc02280155b7f6d655ae31e7d70cf58d92150c596cb12589bd50726150a82",
-          "at": "2026-07-29T23:44:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4e2b08554288f5a6e43c416ad88510b68b1a40ad58bddc0c7e56509c929f0d0e",
-          "at": "2026-07-30T00:16:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4e2b08554288f5a6e43c416ad88510b68b1a40ad58bddc0c7e56509c929f0d0e",
-          "at": "2026-07-30T00:18:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:71797929d7cb693f8d4fc3b0e7ab17dd7a76a993209b04aff7a1163e9ad62a42",
-          "at": "2026-07-30T07:50:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:71797929d7cb693f8d4fc3b0e7ab17dd7a76a993209b04aff7a1163e9ad62a42",
-          "at": "2026-07-30T07:56:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9355bdef994678678de1fbad30a3195e8c19e2a21ee1a850c8cf85cb535cf5a1",
-          "at": "2026-07-30T09:12:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9355bdef994678678de1fbad30a3195e8c19e2a21ee1a850c8cf85cb535cf5a1",
-          "at": "2026-07-30T09:16:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2f3faae565d32187e9080d20c639845a1e0d27a531150b4e2d08fc13829b066b",
-          "at": "2026-07-30T11:00:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2f3faae565d32187e9080d20c639845a1e0d27a531150b4e2d08fc13829b066b",
-          "at": "2026-07-30T11:05:59Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ae98c5a89c79c07a39597336f643b76652fab08548bf17499b341642a8200387",
-          "at": "2026-07-30T16:11:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ae98c5a89c79c07a39597336f643b76652fab08548bf17499b341642a8200387",
-          "at": "2026-07-30T16:17:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:454b9e3ed1c46b8fbbdc4e63725ea987164ffe18a821382f14f2a0f9cdc8c0a4",
-          "at": "2026-07-30T21:24:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:454b9e3ed1c46b8fbbdc4e63725ea987164ffe18a821382f14f2a0f9cdc8c0a4",
-          "at": "2026-07-30T21:29:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:874a1f4301dd75d4f778ea0e0e864f23aeca4b36e6633fae051f16b73203dec4",
-          "at": "2026-07-30T22:32:38Z"
+          "hash": "rvw1:sha256:7939c44666e370f42670295f3f7ef4aa8ac4850d0c72611926e95e15b6c11fc7",
+          "at": "2026-07-30T03:16:56Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The two new TaskTransition bindings are backed by stale frozen verdicts. `bin/sotp test-obligation check --track-id scope-diff-ceiling-admission-enforcement-2026-07-29` currently exits 1 with `DeclChanged` for both IN-22 and IN-09, while results reports `status:in_progress stale=2`. Re-evaluate these bindings against the current declaration before accepting the scope.",
+              "message": "IN-07 は「宣言されたすべての依存辺」の両端に batch 所属を要求する一方、IN-21 / AC-24 は settle 済みタスクを `batch-plan.json` から省略可能としています。未 settle タスクが省略済みの settle 済みタスクへ `depends_on` を持つ正規ケースでは依存先の所属 batch がなく順序条件を満たせず、「残作業のみ」の plan が通る AC-24 と矛盾します。settle 済み依存先への辺を順序検査から除外する境界を明記する必要があります。",
               "severity": "P1",
-              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/test-bindings.json",
-              "line": 6542,
-              "category": "test_obligation_drift"
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+              "line": 125,
+              "category": "scope / acceptance_criteria contradiction"
             }
           ],
-          "hash": "rvw1:sha256:874a1f4301dd75d4f778ea0e0e864f23aeca4b36e6633fae051f16b73203dec4",
-          "at": "2026-07-30T22:37:47Z"
+          "hash": "rvw1:sha256:7939c44666e370f42670295f3f7ef4aa8ac4850d0c72611926e95e15b6c11fc7",
+          "at": "2026-07-30T03:19:26Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:874a1f4301dd75d4f778ea0e0e864f23aeca4b36e6633fae051f16b73203dec4",
-          "at": "2026-07-30T22:40:39Z"
+          "hash": "rvw1:sha256:ab29cfe3f7cbcd4073a89355a6ef9a64e928299029cf74313a9eab4ef39bad4f",
+          "at": "2026-07-30T04:28:41Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:874a1f4301dd75d4f778ea0e0e864f23aeca4b36e6633fae051f16b73203dec4",
-          "at": "2026-07-30T22:41:55Z"
+          "hash": "rvw1:sha256:ab29cfe3f7cbcd4073a89355a6ef9a64e928299029cf74313a9eab4ef39bad4f",
+          "at": "2026-07-30T04:30:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-24 states that absence of a settled task from `batch-plan.json` must not produce an admission error, but AC-26 requires `done → in_progress` (Reopen) to be rejected precisely when that settled task is absent. The spec therefore gives contradictory admission behavior for the same state.",
+              "severity": "P1",
+              "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+              "line": 818,
+              "category": "scope / acceptance_criteria contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:61eaa381ad4196d0a2b9da8b6246b9bf16bfe5aef34dd2f7cd96d31a4b97d579",
+          "at": "2026-07-30T07:37:41Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:bdff2f81a5d389503100700930a645d5574b8d6870b48342fc6bbe349b7066a6",
-          "at": "2026-07-31T01:56:07Z"
+          "hash": "rvw1:sha256:1284ca8dc0a1b2ae5369fc47074a35aab35e44c6d27c5d0c2dfd26fb36e26d83",
+          "at": "2026-07-30T07:42:36Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:bdff2f81a5d389503100700930a645d5574b8d6870b48342fc6bbe349b7066a6",
-          "at": "2026-07-31T01:57:30Z"
+          "hash": "rvw1:sha256:1284ca8dc0a1b2ae5369fc47074a35aab35e44c6d27c5d0c2dfd26fb36e26d83",
+          "at": "2026-07-30T07:43:19Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b2147d61054db000d8daa5dc8ac98f17a0772000cdffcde0832d3992561bff11",
-          "at": "2026-07-31T07:01:38Z"
+          "hash": "rvw1:sha256:e1b1bdd4bb5f14829d7ca78e00d6f191e2e0ced14b91d3484cf30f9e75c9924e",
+          "at": "2026-07-30T12:13:32Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b2147d61054db000d8daa5dc8ac98f17a0772000cdffcde0832d3992561bff11",
-          "at": "2026-07-31T07:05:33Z"
+          "hash": "rvw1:sha256:e1b1bdd4bb5f14829d7ca78e00d6f191e2e0ced14b91d3484cf30f9e75c9924e",
+          "at": "2026-07-30T12:16:06Z"
         }
       ]
     },
-    "usecase": {
+    "cli_driver": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:38934827b6a473810fafbcaba87113622b822cd98c54100b3aaf8f6af34f1f80",
-          "at": "2026-07-29T10:03:16Z"
+          "hash": "rvw1:sha256:d2a151bea698fa149932db93d3982572f4eef52e43ff573f2ae06777ef99da86",
+          "at": "2026-07-29T11:31:35Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:38934827b6a473810fafbcaba87113622b822cd98c54100b3aaf8f6af34f1f80",
-          "at": "2026-07-29T10:14:36Z"
+          "hash": "rvw1:sha256:d2a151bea698fa149932db93d3982572f4eef52e43ff573f2ae06777ef99da86",
+          "at": "2026-07-29T11:37:00Z"
         },
         {
           "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:377255798552d17f3cba59db58c49ee5dccd5d69e7948c91681c8782802cc31b",
-          "at": "2026-07-29T11:31:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:377255798552d17f3cba59db58c49ee5dccd5d69e7948c91681c8782802cc31b",
-          "at": "2026-07-29T11:33:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:758383d886d03213b9d20022e3192fad2a6542fe8b5e467cf5e4395ef7be0bed",
-          "at": "2026-07-29T12:26:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:758383d886d03213b9d20022e3192fad2a6542fe8b5e467cf5e4395ef7be0bed",
-          "at": "2026-07-29T12:29:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6b4522b60fdb9af9b14b4122006c7e6e83e0a632f355e8956a7da45cf86325b6",
-          "at": "2026-07-29T13:11:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6b4522b60fdb9af9b14b4122006c7e6e83e0a632f355e8956a7da45cf86325b6",
-          "at": "2026-07-29T13:13:57Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2ce7b8c3a1e84beccfd5bf771ebcc31909c2ef5e0080b24c8e1eeb3135689fdc",
-          "at": "2026-07-29T13:45:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2ce7b8c3a1e84beccfd5bf771ebcc31909c2ef5e0080b24c8e1eeb3135689fdc",
-          "at": "2026-07-29T13:47:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5e8236044ca6e5dd7dd9380279a0e3cf37e5699c72217de5407f567f6da8cbd2",
-          "at": "2026-07-29T14:45:40Z"
-        },
-        {
-          "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`map_outcome` converts a domain `BatchPlanGateOutcome::Blocked` into `Passed` when output wrapping returns `None`. This duplicates the domain-owned verdict decision in the usecase layer and creates a fail-open fallback if the supposedly one-to-one mapping ever loses all findings. Preserve `Blocked` through an infallible conversion from `NonEmptyGateViolations`, or return a mapping error instead.",
+              "message": "`handle_check` invokes two separate use-case services: `track_resolver.resolve_for_read` and then `check_service.check` (lines 91 and 104). This makes the primary adapter orchestrate track resolution plus the batch-plan gate, violating the single-interactor-per-request rule. Compose this into one use-case application service/interactor before calling it from the driver.",
               "severity": "P1",
-              "file": "libs/usecase/src/batch_plan/output.rs",
-              "line": 144,
-              "category": "business_logic_leak"
+              "file": "apps/cli-driver/src/batch_plan.rs",
+              "line": 91,
+              "category": "primary-adapter orchestration"
             }
           ],
-          "hash": "rvw1:sha256:5e8236044ca6e5dd7dd9380279a0e3cf37e5699c72217de5407f567f6da8cbd2",
-          "at": "2026-07-29T14:47:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2dcaa21d3b6e5a0650318c8b04d09708a5bea970852d7f753f146ab250ebe356",
-          "at": "2026-07-29T14:52:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2dcaa21d3b6e5a0650318c8b04d09708a5bea970852d7f753f146ab250ebe356",
-          "at": "2026-07-29T14:53:59Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:79cb9634db48d1f196e50cad125e361a3fd2fd7b57f3ce3a4242183e6bedfbfe",
-          "at": "2026-07-29T17:58:30Z"
+          "hash": "rvw1:sha256:26ab5a0c43c771c622f5b9b66022bcd7b2d332f3791727267c40b1451ebfc5f2",
+          "at": "2026-07-29T12:26:50Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`PlanArtifactReadError::NotFound` is treated as proof that the track predates the gate, but the filesystem reader returns `NotFound` for any missing `batch-plan.json`. Consequently, any new/active track can bypass admission simply by lacking the artifact, whereas CN-09 requires missing plans to fail closed except for the explicitly exempt introducing track. Require an explicit exemption/eligibility signal and return an error for missing plans on applicable tracks.",
-              "severity": "P0",
-              "file": "libs/usecase/src/task_admission.rs",
-              "line": 156,
-              "category": "orchestration_correctness"
-            },
-            {
-              "message": "`TaskStatusKind::Done` collapses both `DonePending` and `DoneTraced`, so this marks an uncommitted `DonePending` task as settled. That advances `current_batch` and permits a later batch to start before the current batch's commit, violating IN-09; the workflow explicitly keeps `DonePending` members in the current batch. Settlement should use the full domain `TaskStatus`—only `DoneTraced` or `Skipped`—preferably through a domain-owned predicate, with a regression test that rejects the later task while the earlier one is `DonePending`.",
-              "severity": "P0",
-              "file": "libs/usecase/src/task_admission.rs",
-              "line": 213,
-              "category": "business_logic_leak"
-            }
-          ],
-          "hash": "rvw1:sha256:79cb9634db48d1f196e50cad125e361a3fd2fd7b57f3ce3a4242183e6bedfbfe",
-          "at": "2026-07-29T18:03:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The admission path now rejects every `todo -> in_progress` transition when `batch-plan.json` is absent, but the current briefing explicitly requires missing batch plans to skip the judgment for CN-09/AC-05 non-retroactivity. This blocks pre-gate tracks from starting work and contradicts the stated contract; preserve the `NotFound => Ok(None)` behavior.",
+              "message": "`handle_check` invokes two separate use-case services in sequence: `ActiveTrackResolveService::resolve_for_read` and then `BatchPlanCheckService::check`. This puts multi-interactor orchestration in the primary adapter, violating the cli_driver invariant of exactly one interactor per request. Encapsulate track resolution and the gate check behind one use-case application service and inject that single service into the driver.",
               "severity": "P1",
-              "file": "libs/usecase/src/task_admission.rs",
-              "line": 156,
-              "category": "orchestration correctness"
+              "file": "apps/cli-driver/src/batch_plan.rs",
+              "line": 91,
+              "category": "architecture"
             }
           ],
-          "hash": "rvw1:sha256:da34c2559ae9bc895bd174a6181c9142e891281460a76f22bf4434ab500ce6ab",
-          "at": "2026-07-29T18:32:17Z"
+          "hash": "rvw1:sha256:26ab5a0c43c771c622f5b9b66022bcd7b2d332f3791727267c40b1451ebfc5f2",
+          "at": "2026-07-29T12:29:45Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:da34c2559ae9bc895bd174a6181c9142e891281460a76f22bf4434ab500ce6ab",
-          "at": "2026-07-29T18:33:49Z"
+          "hash": "rvw1:sha256:73f9b38fb7f974d34801a3f0d3603cdaff37e1b6f331b2e7ef67cea959deb9a3",
+          "at": "2026-07-29T13:10:37Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`TransitionTaskUseCase` remains a public, independently constructible mutation path whose `execute(TaskTransition::Start)` and `execute_by_status(..., \"in_progress\", ...)` methods write the transition without invoking admission. Although the CLI currently uses `TaskOperationInteractor`, another usecase consumer can bypass the new gate completely, so CN-10's single-path guarantee is not structurally enforced. Put admission at this lowest transition boundary or make the unguarded helper inaccessible outside the guarded path.",
-              "severity": "P0",
-              "file": "libs/usecase/src/lib.rs",
-              "line": 181,
-              "category": "orchestration_correctness"
-            },
-            {
-              "message": "`settled_task_ids` embeds the business rule that `DoneTraced` and `Skipped`—but not `DonePending`—advance the current batch. That classification controls domain membership behavior and belongs on the domain `TaskStatus`/`ImplPlanDocument` model (or inside `evaluate_admission`), not in the usecase orchestrator; keeping it here duplicates domain semantics and can silently drift when task states evolve.",
+              "message": "The `usecase::batch_plan` import path hides a semantic domain-boundary leak: `BatchPlanGateOutcome` and `BatchPlanGateViolation` are re-exports of `domain::batch_plan` types, and the domain catalogue classifies both as `ValueObject`s. The driver consequently destructures the domain verdict and renders nested domain identifiers and line-count objects directly. Re-exporting does not turn them into usecase boundary DTOs; map the domain verdict inside the interactor and return a usecase-owned output DTO to the driver.",
               "severity": "P1",
-              "file": "libs/usecase/src/task_admission.rs",
-              "line": 219,
-              "category": "business_logic_leak"
+              "file": "apps/cli-driver/src/batch_plan.rs",
+              "line": 13,
+              "category": "boundary_exposure"
             }
           ],
-          "hash": "rvw1:sha256:da34c2559ae9bc895bd174a6181c9142e891281460a76f22bf4434ab500ce6ab",
-          "at": "2026-07-29T18:37:47Z"
+          "hash": "rvw1:sha256:73f9b38fb7f974d34801a3f0d3603cdaff37e1b6f331b2e7ef67cea959deb9a3",
+          "at": "2026-07-29T13:14:21Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:23013506c5854aa17b72f96890bac765bc440746f06363790a1b396118c3ae5f",
-          "at": "2026-07-29T23:41:12Z"
+          "hash": "rvw1:sha256:abae0c69cb43a9dce809614a5ee6c2b68c6326cd6fb6abf33cfa7b7c2e26f9e6",
+          "at": "2026-07-29T13:45:18Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:23013506c5854aa17b72f96890bac765bc440746f06363790a1b396118c3ae5f",
-          "at": "2026-07-29T23:44:32Z"
+          "hash": "rvw1:sha256:abae0c69cb43a9dce809614a5ee6c2b68c6326cd6fb6abf33cfa7b7c2e26f9e6",
+          "at": "2026-07-29T13:47:02Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:af5f40090e0473c918515ec3f2487adb13c5b8ea8bd47dc05ce5aa8aba8a9310",
-          "at": "2026-07-30T03:17:00Z"
+          "hash": "rvw1:sha256:bc04f7f6299cdcf6b0caddce550297b00bb9591f3e8a9079533a42ae0df26166",
+          "at": "2026-07-29T14:45:21Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:af5f40090e0473c918515ec3f2487adb13c5b8ea8bd47dc05ce5aa8aba8a9310",
-          "at": "2026-07-30T03:21:56Z"
+          "hash": "rvw1:sha256:bc04f7f6299cdcf6b0caddce550297b00bb9591f3e8a9079533a42ae0df26166",
+          "at": "2026-07-29T14:46:46Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b676f3b69f19179960c3ccad155250b36d321824627f43eb6fc3ab41599b6f07",
-          "at": "2026-07-30T04:29:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`enters_in_progress` reimplements the domain transition table by enumerating `Todo`, `DonePending`, and `DoneTraced`. Transition legality and whether a transition enters `in_progress` already belong to `ImplPlanDocument`/`TaskTransition`; keeping a second table in usecase can drift from `execute_by_status` and let a newly valid entry bypass admission, violating CN-10 and the pure-orchestrator boundary. Expose/query the transition intent from domain instead of matching `TaskStatus` variants here.",
-              "severity": "P1",
-              "file": "libs/usecase/src/task_admission.rs",
-              "line": 216,
-              "category": "business_logic_leak"
-            }
-          ],
-          "hash": "rvw1:sha256:b676f3b69f19179960c3ccad155250b36d321824627f43eb6fc3ab41599b6f07",
-          "at": "2026-07-30T04:32:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8c888903bf32dc3ec5386bdedcb4e7294528c88d2168d17998b6e0ced611b752",
-          "at": "2026-07-30T05:30:36Z"
+          "hash": "rvw1:sha256:69db52e52fb9ce6d9e2997951516fe67c01ca19a3cd2f91c8aa6e3c26d5a0d94",
+          "at": "2026-07-30T03:16:35Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8c888903bf32dc3ec5386bdedcb4e7294528c88d2168d17998b6e0ced611b752",
-          "at": "2026-07-30T05:33:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:982a3b7529f61967250519a11c641b669b30f1b1170545dbc1d4b67188d197e6",
-          "at": "2026-07-30T09:11:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:982a3b7529f61967250519a11c641b669b30f1b1170545dbc1d4b67188d197e6",
-          "at": "2026-07-30T09:14:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "このテストは `measured` と `in_progress_task_ids` が空で、任意のスコープの最初の貢献は無条件に許可されるため、`ScopeName::Other` の予約スコープ免除を実際には検証していません。既定 ceiling の誤適用を検出できるよう、既存の貢献がある状態で Other の大きな見積もりを開始するケースにしてください。",
-              "severity": "P1",
-              "file": "libs/usecase/src/task_ops.rs",
-              "line": 1878,
-              "category": "test-coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:0b379c57e57e443256036c451aeda0dfd68fe4a1ae637d96992b780cba8dd01d",
-          "at": "2026-07-30T15:55:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3142e570133bfaeeae484b3ffbeaa8ada116fdcd4ccf1a985b3516910d7c0a1e",
-          "at": "2026-07-30T16:00:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3142e570133bfaeeae484b3ffbeaa8ada116fdcd4ccf1a985b3516910d7c0a1e",
-          "at": "2026-07-30T16:04:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3142e570133bfaeeae484b3ffbeaa8ada116fdcd4ccf1a985b3516910d7c0a1e",
-          "at": "2026-07-30T16:07:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:56367fd5660986a21c3d2e0f1f4663700f2d071e9553e2c681888d2061428aca",
-          "at": "2026-07-30T21:21:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`records_a_commit_hash` re-encodes which `domain::TaskTransition` variants write a hash. That decision belongs on `TaskTransition`; if domain later adds or changes a hash-writing transition, this guard can silently skip verification and violate IN-22. Expose the hash-to-record (or equivalent classification) from domain and let usecase only orchestrate verification.",
-              "severity": "P1",
-              "file": "libs/usecase/src/task_ops/commit_record.rs",
-              "line": 56,
-              "category": "business_logic_leak"
-            }
-          ],
-          "hash": "rvw1:sha256:56367fd5660986a21c3d2e0f1f4663700f2d071e9553e2c681888d2061428aca",
-          "at": "2026-07-30T21:28:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f978efb0e550dd5ed9f375f57f63b34ec7716fa31fa16e2e5af1ac67a52be5f3",
-          "at": "2026-07-30T22:32:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f978efb0e550dd5ed9f375f57f63b34ec7716fa31fa16e2e5af1ac67a52be5f3",
-          "at": "2026-07-30T22:33:58Z"
+          "hash": "rvw1:sha256:69db52e52fb9ce6d9e2997951516fe67c01ca19a3cd2f91c8aa6e3c26d5a0d94",
+          "at": "2026-07-30T03:18:47Z"
         }
       ]
     },
@@ -3561,473 +4028,6 @@
           "findings": [],
           "hash": "rvw1:sha256:064a8327ff59d28955403e5314721fae0a2c86b6e7d1c44f57918f6b24ef6b3c",
           "at": "2026-07-30T21:27:18Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`LineCount::saturating_add` collapses totals above `u32::MAX` to `u32::MAX`, so an actual sum exceeding a maximum ceiling is incorrectly admitted. For example, production `u32::MAX` plus one test line becomes `u32::MAX`, and `ScopeCeiling::resolve(Some(u32::MAX)).admits(...)` returns true. Use checked overflow handling and fail closed.",
-              "severity": "P0",
-              "file": "libs/domain/src/batch_plan/line_count.rs",
-              "line": 33,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:93f226ecde9ebf4753aa13ab06d42cd483c3bc5ba0cd58cdc0abf150006e4729",
-          "at": "2026-07-29T07:05:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:87d19e34f18611acc2f565ec048cdf43a0ac1d1dafaffeeb2507b65e89429b68",
-          "at": "2026-07-29T07:09:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:87d19e34f18611acc2f565ec048cdf43a0ac1d1dafaffeeb2507b65e89429b68",
-          "at": "2026-07-29T07:15:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cc5ad75c51442352bff92aa180e19067024c36684a0de01c4a97a0f79807dd64",
-          "at": "2026-07-29T07:48:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The recursive dependency walk consumes one stack frame per edge in a dependency chain, while task count/depth is unbounded. A valid sufficiently deep acyclic plan can therefore stack-overflow inside `ImplPlanDocument::new`, aborting instead of returning `Result`. Use an iterative DFS with an explicit stack (or enforce a validated depth bound).",
-              "severity": "P0",
-              "file": "libs/domain/src/track.rs",
-              "line": 629,
-              "category": "panic-safety"
-            }
-          ],
-          "hash": "rvw1:sha256:cc5ad75c51442352bff92aa180e19067024c36684a0de01c4a97a0f79807dd64",
-          "at": "2026-07-29T07:54:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The deep-chain regression test never creates a deep DFS traversal: tasks are visited from T1 upward, while each Tn depends on the already-settled T(n-1), so the traversal stack stays at depth one and the previous recursive implementation would also pass. Reverse the task order (or dependency direction) so this test actually protects the prior stack-overflow boundary.",
-              "severity": "P1",
-              "file": "libs/domain/src/track.rs",
-              "line": 899,
-              "category": "test-coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:98a18876d761bf0ee82091c334f8b976bf72cc2560d43fb82661636a66b4b922",
-          "at": "2026-07-29T08:02:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2a578f9a0d2786c4d41dffaf51d3cb604724b8c58f34dfd20efd8b779323af09",
-          "at": "2026-07-29T08:06:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b900e68071494f8a73f8ad76893f115541eae3533e695987254a7a33b048c81f",
-          "at": "2026-07-29T08:55:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b900e68071494f8a73f8ad76893f115541eae3533e695987254a7a33b048c81f",
-          "at": "2026-07-29T09:01:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:22055b4661269f31e5fbcfb5d22b69fb328114130171ec8e42bdef703e499698",
-          "at": "2026-07-29T10:02:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:22055b4661269f31e5fbcfb5d22b69fb328114130171ec8e42bdef703e499698",
-          "at": "2026-07-29T10:17:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:14d752ce51fd8da9fcf1c3e3a3f023950de71b9be9012d0a32ca68ddca2cbcbf",
-          "at": "2026-07-29T23:41:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:14d752ce51fd8da9fcf1c3e3a3f023950de71b9be9012d0a32ca68ddca2cbcbf",
-          "at": "2026-07-29T23:44:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3d69eab3fe0d247d451ba7b0f6b22d6ee0326fed5cd1f72ab8f914ac209c3272",
-          "at": "2026-07-30T03:17:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3d69eab3fe0d247d451ba7b0f6b22d6ee0326fed5cd1f72ab8f914ac209c3272",
-          "at": "2026-07-30T03:20:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d22b2b8a92be6e150be4e2478212091d41a9fed97446be212055e804e94a6088",
-          "at": "2026-07-30T04:28:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d22b2b8a92be6e150be4e2478212091d41a9fed97446be212055e804e94a6088",
-          "at": "2026-07-30T04:31:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d434a60d31d16982940a3a91424cf806d3a045332234434497e8238e5831f495",
-          "at": "2026-07-30T05:30:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d434a60d31d16982940a3a91424cf806d3a045332234434497e8238e5831f495",
-          "at": "2026-07-30T05:34:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:096c8c6487b60321292674ac17cd86b1cb849bdc0391d56ef304c20a6256a5d4",
-          "at": "2026-07-30T09:10:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:096c8c6487b60321292674ac17cd86b1cb849bdc0391d56ef304c20a6256a5d4",
-          "at": "2026-07-30T09:14:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:72980069a9887b7e971b784c2c60a7e235a574a34e24eb6a0a324497fcc8bff7",
-          "at": "2026-07-30T10:59:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:72980069a9887b7e971b784c2c60a7e235a574a34e24eb6a0a324497fcc8bff7",
-          "at": "2026-07-30T11:02:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f94ee80aaa2721f93a4069b06b450d808127df7dba3c54a8ab6e496c8a935f96",
-          "at": "2026-07-30T22:32:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f94ee80aaa2721f93a4069b06b450d808127df7dba3c54a8ab6e496c8a935f96",
-          "at": "2026-07-30T22:34:32Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d3d9f2e438220c542f2b21650f0329a05fc4a25a5cc1f249d4046086a7953c7d",
-          "at": "2026-07-28T17:08:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D3 は commit 後に baseline が 0 へ戻るため残り member を次 batch として続けられるとしていますが、Context 自身が review の hash / verdict は scope 全体を単位とすると記録しています。現行 review target も merge-base 以降の committed diff を含むため、先行 batch を commit してもその変更は後続の scope review から消えず、各 batch が個別に ceiling 以下でも reviewer が再審査する累積 scope は ceiling を超えます。これは D1/D2 の「batch = commit / review 単位」と主目的を崩す内部矛盾です。解消には review target または ceiling の対象について新たな決定が必要なため hearing-required です。",
-              "severity": "P0",
-              "file": "knowledge/adr/2026-07-28-1521-scope-diff-ceiling-admission-enforcement.md",
-              "line": 160,
-              "category": "inconsistent decisions within the same ADR"
-            }
-          ],
-          "hash": "rvw1:sha256:d3d9f2e438220c542f2b21650f0329a05fc4a25a5cc1f249d4046086a7953c7d",
-          "at": "2026-07-28T17:16:04Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D3 unconditionally states that the next review excludes all prior batch commits (line 165), but the review implementation falls back to the base branch when `.commit_hash` is absent or invalid, causing those commits to re-enter the review diff. This contradicts the ADR’s baseline-reset narrative; clarify the fallback behavior (hearing-required ADR change).",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-28-1521-scope-diff-ceiling-admission-enforcement.md",
-              "line": 165,
-              "category": "inconsistent decisions within the same ADR"
-            }
-          ],
-          "hash": "rvw1:sha256:3c6ecb97188bb5addff1770f61139c7cd9509773cdcab213b5112e90ed37aee2",
-          "at": "2026-07-28T17:51:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7b850454865bc11d6905f8b8d553b76726b6f8d2218087342484d781ce227395",
-          "at": "2026-07-28T17:58:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7b850454865bc11d6905f8b8d553b76726b6f8d2218087342484d781ce227395",
-          "at": "2026-07-28T18:02:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:aa52287a0add1a09809ebee0335bf747ee0dc5fafe50ad51e1b1559b4ba0b8dc",
-          "at": "2026-07-29T00:03:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:aa52287a0add1a09809ebee0335bf747ee0dc5fafe50ad51e1b1559b4ba0b8dc",
-          "at": "2026-07-29T00:08:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:538c160fed882ed2e9611ee5986ee9a1bb902723fed1accf31981edeff611cf5",
-          "at": "2026-07-29T04:19:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D1 claims `tasks[]` becomes the sole ordering statement, but `plan.sections[].task_ids` remains an independent ordered execution/dependency view: `ImplPlanDocument::next_open_task` and the implementation workflow explicitly follow section order, and no invariant aligns it with `tasks[]`. Reordering only `tasks[]` as the example directs can therefore make batch order disagree with the order consumed by execution, contradicting the ADR's single-order/desync-elimination rationale. Resolving which order is canonical or requiring them to agree is a new decision and is hearing-required.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-29-0358-batch-ordering-check-on-declared-task-order.md",
-              "line": 68,
-              "category": "inconsistent decisions within the same ADR"
-            }
-          ],
-          "hash": "rvw1:sha256:538c160fed882ed2e9611ee5986ee9a1bb902723fed1accf31981edeff611cf5",
-          "at": "2026-07-29T04:22:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a3a989f3402bc8125526e1885ce082ab4ee8b8abe77d3c17cd588ef529e5ac5f",
-          "at": "2026-07-29T04:34:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a3a989f3402bc8125526e1885ce082ab4ee8b8abe77d3c17cd588ef529e5ac5f",
-          "at": "2026-07-29T04:36:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6dbb58d84d6a83f2499d18689e2182a826df973fae346034f4e0c1bbc7205907",
-          "at": "2026-07-29T05:04:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The schema-2-only read policy leaks beyond the stated D1/D2 refinement. `collect_track_snapshots`, used by routine view sync/validation and registry rendering, decodes `impl-plan.json` for v5/v6 tracks—including completed tracks—and those artifacts remain schema 1; the current active track also already has a schema-1 plan. Rejecting schema 1 would therefore break repository-wide track rendering/validation rather than leaving historical artifacts untouched as claimed. Preserve a schema-1 read lane or explicitly include and ground the required cross-track migration/rendering change.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-29-0358-task-dependency-declaration-and-batch-order-check.md",
-              "line": 44,
-              "category": "scope leakage into ADR body"
-            }
-          ],
-          "hash": "rvw1:sha256:961a00b0905e79d2f319c4fd673cf3c418c3e4a10e1aab1d218406f2394da5ec",
-          "at": "2026-07-29T05:10:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:967376e4c09ef86aef43dc8466f3a7a370ed283c12a5b0f3966a0b1cfd04875d",
-          "at": "2026-07-29T05:15:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:967376e4c09ef86aef43dc8466f3a7a370ed283c12a5b0f3966a0b1cfd04875d",
-          "at": "2026-07-29T05:17:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4d4fdc9a2ff6fc2d44a1b2c74992c246cfe90a6886c128e82736dfde805be84b",
-          "at": "2026-07-30T03:17:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D2 excludes edges whose settled dependency is omitted from `batch-plan.json`, which narrows the earlier ADR 0358 D2 requirement to check every declared dependency edge. The relationship section only records a refinement of ADR 1521 D2, leaving implementers free to preserve the universal edge check or skip these edges. Explicitly record the refinement of ADR 0358 D2 or keep its original domain.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-30-1022-batch-plan-declaration-domain-unsettled-tasks.md",
-              "line": 66,
-              "category": "scope leakage into ADR body"
-            },
-            {
-              "message": "The safety argument assumes settled tasks never re-enter admission because it only handles `todo -> in_progress`, but the existing transition model permits committed `done -> in_progress` directly. A settled task omitted under D1 can therefore become `in_progress` without any batch membership or estimate, violating D1's unsettled-task declaration requirement while D3 remains unchanged. The ADR must decide how reopening preserves that invariant.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-30-1022-batch-plan-declaration-domain-unsettled-tasks.md",
-              "line": 63,
-              "category": "inconsistent decisions within the same ADR"
-            }
-          ],
-          "hash": "rvw1:sha256:4d4fdc9a2ff6fc2d44a1b2c74992c246cfe90a6886c128e82736dfde805be84b",
-          "at": "2026-07-30T03:20:57Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D2 additionally narrows the dependency-order check from the prior ADR’s declared-edge domain to edges whose endpoints are both declared (lines 70–72), and explicitly refines 2026-07-29-0358 D2 (lines 106–110). The briefing limits this candidate to refining input-box D2 item 1’s unplanned-task application domain; this is an unadmitted cross-ADR decision change.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-30-1022-batch-plan-declaration-domain-unsettled-tasks.md",
-              "line": 70,
-              "category": "scope leakage into ADR body"
-            },
-            {
-              "message": "D3 introduces a new semantic rule expanding admission from todo → in_progress to done → in_progress reopen transitions (lines 81–94), and records it as a refinement of the input-box D3 (lines 109–110). The briefing limits 1022 to input-box D2 item 1’s application domain and explicitly requires the admission formula and absence-of-file error to remain unchanged. This unauthorized admission decision is outside the candidate’s declared refine scope.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-30-1022-batch-plan-declaration-domain-unsettled-tasks.md",
-              "line": 81,
-              "category": "scope leakage into ADR body"
-            }
-          ],
-          "hash": "rvw1:sha256:c120ec22ee8ed238919574c141fa1a5b49622bfbff85e960e16dedef37653e21",
-          "at": "2026-07-30T04:28:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c120ec22ee8ed238919574c141fa1a5b49622bfbff85e960e16dedef37653e21",
-          "at": "2026-07-30T04:31:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D3 says the `skipped -> todo -> in_progress` route needs no additional protection because the later Start is judged. However, D1 defines `todo` itself as unsettled and therefore required to be declared. A legitimately omitted skipped task can be reset to `todo` before admission runs, immediately creating the exact unsettled-but-undeclared state D1 prohibits. Reconcile the declaration invariant with the ResetToTodo transition.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-30-1022-batch-plan-declaration-domain-unsettled-tasks.md",
-              "line": 94,
-              "category": "inconsistent decisions within the same ADR"
-            }
-          ],
-          "hash": "rvw1:sha256:c120ec22ee8ed238919574c141fa1a5b49622bfbff85e960e16dedef37653e21",
-          "at": "2026-07-30T04:33:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c21abe3c765b23871dadc1e6bb8adb5de7af094e3590c03421982f2b89200c72",
-          "at": "2026-07-30T05:30:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c21abe3c765b23871dadc1e6bb8adb5de7af094e3590c03421982f2b89200c72",
-          "at": "2026-07-30T05:31:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:52fee2ff229c25efc50e1cd94883b4f9cc522e371103c883a46e14d11afa681c",
-          "at": "2026-07-30T12:44:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D1 が保証するのは入力 hash の commit-object 実在と HEAD 祖先性だけであり、99–101 行目では誤った別の祖先 commit も受理すると明記されています。そのため「誤った値が止まり」「hash の自己申告に依存しなくなる」という効果は受容済み残余リスクと矛盾します。拒否できる値を実在しない／非祖先の hash に限定して記述し、task と commit の対応まで検証済みだと下流が解釈しないようにしてください。",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-30-2101-per-task-commit-hash-record-time-validation.md",
-              "line": 92,
-              "category": "inconsistent decisions within the same ADR"
-            }
-          ],
-          "hash": "rvw1:sha256:52fee2ff229c25efc50e1cd94883b4f9cc522e371103c883a46e14d11afa681c",
-          "at": "2026-07-30T12:47:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:569420ccca86c05485507337048a917a41b8b4044f301755c1bffa94de6f1c8b",
-          "at": "2026-07-30T12:50:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:569420ccca86c05485507337048a917a41b8b4044f301755c1bffa94de6f1c8b",
-          "at": "2026-07-30T12:52:42Z"
         }
       ]
     },
@@ -5714,6 +5714,57 @@
           "findings": [],
           "hash": "rvw1:sha256:042fcde58bf3007c5b6b776b8ba98a6fedb8020eed995c2422c40aee031a36c6",
           "at": "2026-07-31T06:54:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0ec0aee81a9a3b9ea7b5cc861f77aa72db9d5cdb7a84df9c755bf67699f011c",
+          "at": "2026-07-31T07:25:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`read` delegates directly to `load_v2_scope_config`, which uses unbounded `std::fs::read_to_string`. A repository-controlled oversized `review-scope.json` can exhaust memory during admission or batch-plan checks instead of producing a typed refusal. Enforce an explicit size cap on the actual read, including a post-limit check.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_scope_config_reader.rs",
+              "line": 64,
+              "category": "unbounded_io"
+            }
+          ],
+          "hash": "rvw1:sha256:c0ec0aee81a9a3b9ea7b5cc861f77aa72db9d5cdb7a84df9c755bf67699f011c",
+          "at": "2026-07-31T07:30:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new size check only bounds a discarded preflight read; `load_v2_scope_config` then reopens the path and performs its existing unbounded `read_to_string`. If the file grows or is replaced between those operations, the admission path can still allocate without limit. Parse the bytes obtained through the capped handle, or add the bound to the shared loader’s actual read.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_scope_config_reader.rs",
+              "line": 93,
+              "category": "unbounded_io"
+            }
+          ],
+          "hash": "rvw1:sha256:e57315fe1fd2209dd75ea11c59979cedbbf4ea929e7faab0ae102007d3c64cb6",
+          "at": "2026-07-31T07:39:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1561498c9cebcb1e2068f97873aaa4364488ed55861a0f2d30d8992296f90cce",
+          "at": "2026-07-31T07:49:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1561498c9cebcb1e2068f97873aaa4364488ed55861a0f2d30d8992296f90cce",
+          "at": "2026-07-31T07:53:12Z"
         }
       ]
     }

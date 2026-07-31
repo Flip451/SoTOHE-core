@@ -158,7 +158,7 @@ mod tests {
         // filesystem itself calls invalid is a third, unrelated case.
         let refusal = io_classification(&symlink_refusal());
         let absent_repository = io_classification(
-            &crate::discover_repo_for_items_dir(&std::env::temp_dir())
+            &crate::discover_isolated_repo_for_items_dir(&std::env::temp_dir())
                 .expect_err("the system temp directory is not inside a git repository"),
         );
         let malformed = io_classification(&std::io::Error::from(std::io::ErrorKind::InvalidInput));
