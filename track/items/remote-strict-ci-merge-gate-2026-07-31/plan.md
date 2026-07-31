@@ -6,7 +6,7 @@
 GO-01 → T001, T002, T004.
 GO-02 → T003.
 
-## Tasks (3/4 resolved)
+## Tasks (4/4 resolved)
 
 ### S1 — Remote strict merge gate
 
@@ -24,10 +24,10 @@ GO-02 → T003.
 
 > GitHub repository settings: `develop` branch-protection rule; `track/items/remote-strict-ci-merge-gate-2026-07-31/observations.md` headings `## Branch-protection configuration handoff` / `## Branch-protection evidence`. IN-02、CN-01、AC-03。
 
-- [x] **T002**: GitHub repository settings の `develop` branch-protection rule に対する `CI / check` required status check の repository-administrator handoff を実施し、`track/items/remote-strict-ci-merge-gate-2026-07-31/observations.md` の `## Branch-protection configuration handoff` と `## Branch-protection evidence` に rule response / failed-PR result の evidence references を追加する。IN-02、CN-01、AC-03。
+- [x] **T002**: GitHub repository settings の `develop` branch-protection rule に対する `CI / check` required status check の repository-administrator handoff を実施し、`track/items/remote-strict-ci-merge-gate-2026-07-31/observations.md` の `## Branch-protection configuration handoff` と `## Branch-protection evidence` に rule response / failed-PR result の evidence references を追加する。IN-02、CN-01、AC-03。 (`0b2a6ec0f1d3fd35baf8e8f75c281505c0fc0b0e`)
 
 ### S4 — Unattended merge completion
 
 > `.harness/workflows/track/merge.md` Step 1–2; `.claude/commands/track/merge.md` Invocation / constraints. IN-04、CN-02、AC-05。
 
-- [ ] **T003**: `.harness/workflows/track/merge.md` の Step 1–2 と `.claude/commands/track/merge.md` の Invocation / Claude Code invocation constraints を更新し、invocation 後の confirmation branch を削除する。`apps/cli/src/commands/pr_tests.rs` の `wait_and_merge_with_*` regression cases を追加する。IN-04、OUT-03、CN-02、AC-05。
+- [x] **T003**: `.harness/workflows/track/merge.md` の Step 1–2 と `.claude/commands/track/merge.md` の Invocation / Claude Code invocation constraints を更新し、invocation 後の confirmation branch を削除する。`apps/cli/src/commands/pr_tests.rs` の `wait_and_merge_with_*` regression cases を追加する。IN-04、OUT-03、CN-02、AC-05。

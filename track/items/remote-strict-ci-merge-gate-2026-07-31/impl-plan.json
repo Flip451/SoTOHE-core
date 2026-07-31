@@ -11,6 +11,7 @@
       "id": "T002",
       "description": "GitHub repository settings の `develop` branch-protection rule に対する `CI / check` required status check の repository-administrator handoff を実施し、`track/items/remote-strict-ci-merge-gate-2026-07-31/observations.md` の `## Branch-protection configuration handoff` と `## Branch-protection evidence` に rule response / failed-PR result の evidence references を追加する。IN-02、CN-01、AC-03。",
       "status": "done",
+      "commit_hash": "0b2a6ec0f1d3fd35baf8e8f75c281505c0fc0b0e",
       "depends_on": [
         "T001"
       ]
@@ -24,7 +25,7 @@
     {
       "id": "T003",
       "description": "`.harness/workflows/track/merge.md` の Step 1–2 と `.claude/commands/track/merge.md` の Invocation / Claude Code invocation constraints を更新し、invocation 後の confirmation branch を削除する。`apps/cli/src/commands/pr_tests.rs` の `wait_and_merge_with_*` regression cases を追加する。IN-04、OUT-03、CN-02、AC-05。",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "plan": {
