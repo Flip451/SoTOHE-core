@@ -392,6 +392,26 @@ fn test_task_estimate_finds_the_estimate_declared_for_a_named_scope() {
 }
 
 #[test]
+fn test_task_estimate_rejects_an_estimate_that_names_no_scope() {
+    let result = TaskEstimate::new(task("T001"), Vec::new(), TaskDecomposition::Decomposable);
+
+    let Err(BatchPlanValidationError::EmptyScopeEstimates { task_id }) = result else {
+        panic!("an estimate naming no scope must be rejected");
+    };
+    assert_eq!(task_id, task("T001"));
+
+    // The contrast: one named scope is enough, so the refusal follows emptiness
+    // rather than the shape of the declaration.
+    let declared = TaskEstimate::new(
+        task("T001"),
+        vec![scope_estimate("domain", 10, 5)],
+        TaskDecomposition::Decomposable,
+    )
+    .unwrap();
+    assert_eq!(declared.scope_estimates().len(), 1);
+}
+
+#[test]
 fn test_task_estimate_rejects_two_figures_for_the_same_scope() {
     let result = TaskEstimate::new(
         task("T001"),

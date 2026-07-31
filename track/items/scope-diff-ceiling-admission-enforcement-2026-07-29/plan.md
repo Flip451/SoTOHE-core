@@ -8,8 +8,9 @@ GO-02 → T003、T004、T006、T012、T018: Phase 3 終端と todo → in_progre
 GO-03 → T001、T002、T019、T020、T007、T008、T013、T014、T017: batch と依存宣言を Phase 3 宣言成果物へ移し、impl-plan review と full-cycle consumption の対象にする。
 GO-01 / GO-02 → T021: PR #228 round 1 のデルタ 3 件（scope 名の設定照合、宣言対象の未 settle 限定、判定対象遷移集合の拡張）を実装する。
 GO-01 / GO-02 → T022、T023: PR #228 round 2 の diagnoser 経由 2 件（current_batch 不在の拒否、実測 baseline の repo 固定）を実装する。
+GO-01 → T024: PR #228 round 5 の diagnoser 経由 1 件（空 scope_estimates の拒否）を実装する。
 
-## Tasks (23/23 resolved)
+## Tasks (24/24 resolved)
 
 ### S1 — ドメイン中核 — 見積り・batch 宣言と 2 つの純粋判定
 
@@ -51,3 +52,4 @@ GO-01 / GO-02 → T022、T023: PR #228 round 2 の diagnoser 経由 2 件（curr
 - [x] **T021**: `libs/domain/src/batch_plan/{mod,gate,admission}.rs`: check_batch_plan に scope 名の設定照合検査を追加、BatchPlanGateViolation と AdmissionEvaluationError に UnknownMainScopeName を追加、collect_task_set_violations の UnplannedTask 報告域を限定（IN-03、IN-07、IN-11、IN-21、AC-07、AC-08、AC-23、AC-24、AC-25）。`libs/domain/src/impl_plan.rs`: ImplPlanDocument に transition_for を追加。`libs/usecase/src/{batch_plan/output,task_admission,task_ops}.rs`: BatchPlanViolationOutput の鏡像 variant と写像、admission error の写像、judge_start_of_work の判定対象条件を transition_for 経由へ差し替え（IN-09、AC-26、AC-27）。`apps/cli-driver/src/batch_plan.rs`: 描画 arm を追加（AC-07）。 (`3551f266`)
 - [x] **T022**: `libs/domain/src/batch_plan/mod.rs`: membership_rejection の current_batch 不在経路を AdmissionRejection::NoCurrentBatch として報告し、同経路の doc comment を更新（IN-09、AC-27）。`libs/usecase/src/task_admission.rs`: map_rejection と Display 写像に AdmissionRejectionOutput の対応 variant を追加（AC-27）。`libs/domain/src/batch_plan/tests.rs`: 全 batch settle 済みの plan に対する Reopen 候補の NoCurrentBatch 拒否と、現在 batch が残る場合との対比を試験する（IN-09、AC-27）。`libs/usecase/src/task_ops.rs`: interactor 段で、全 member settle 済みの宣言に対する reopen の拒否・鏡像 variant 経由の描画・状態非書き込みを試験する（IN-09、AC-27）。`apps/cli/tests/transition_integration.rs`: 新しい拒否経路に合わせて round-trip fixture を修復する（AC-27）。 (`87f40f2c`)
 - [x] **T023**: `libs/infrastructure/src/dry_check/commit_hash_store.rs`: ancestry 検査の repo 解決を SystemGitRepo::discover() から discover_from(self.trusted_root) へ差し替え、CWD が別 repo のときの一貫性試験を追加する（CN-05、IN-14）。 (`87f40f2c`)
+- [x] **T024**: `libs/domain/src/batch_plan/estimate.rs`: TaskEstimate::new に空 scope_estimates の拒否を追加し doc comment を更新する（IN-02、AC-04）。`libs/domain/src/batch_plan/tests.rs`: 同経路の試験を追加する（IN-02、AC-04）。`libs/infrastructure/src/batch_plan_codec.rs`: 空 scope_estimates を前提にしていた fixture を差し替え、decode 経路の試験を追加する（AC-04）。

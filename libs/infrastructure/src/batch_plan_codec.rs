@@ -353,11 +353,15 @@ mod tests {
 
     #[test]
     fn test_decode_reads_an_omitted_justification_the_same_as_an_explicit_null() {
+        // The estimate names a scope: the omitted justification is what this case
+        // is about, and an estimate naming none is refused outright.
         let json = r#"{
           "schema_version": 1,
           "track_id": "some-track",
           "task_estimates": [
-            {"task_id": "T001", "scope_estimates": []}
+            {"task_id": "T001", "scope_estimates": [
+              {"scope": "domain", "production_lines": 10, "test_lines": 5}
+            ]}
           ],
           "batches": [{"id": "B1", "task_ids": ["T001"]}]
         }"#;
@@ -370,6 +374,34 @@ mod tests {
                 .unwrap()
                 .decomposition()
                 .is_indivisible()
+        );
+    }
+
+    #[test]
+    fn test_decode_rejects_an_estimate_that_names_no_scope() {
+        let json = r#"{
+          "schema_version": 1,
+          "track_id": "some-track",
+          "task_estimates": [
+            {"task_id": "T001", "scope_estimates": []}
+          ],
+          "batches": [{"id": "B1", "task_ids": ["T001"]}]
+        }"#;
+
+        let err = decode(json).unwrap_err();
+
+        // The domain rejection travels out unchanged: the codec re-implements no
+        // invariant of its own for it.
+        let BatchPlanCodecError::InvalidDocument { source } = err else {
+            panic!("an estimate naming no scope must be refused: {err}");
+        };
+        assert!(
+            matches!(
+                &source,
+                BatchPlanValidationError::EmptyScopeEstimates { task_id }
+                    if task_id.as_ref() == "T001"
+            ),
+            "unexpected rejection: {source}"
         );
     }
 

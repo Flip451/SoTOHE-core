@@ -59,6 +59,22 @@
         }
       ],
       "oversize_justification": null
+    },
+    {
+      "task_id": "T024",
+      "scope_estimates": [
+        {
+          "scope": "domain",
+          "production_lines": 17,
+          "test_lines": 20
+        },
+        {
+          "scope": "infrastructure",
+          "production_lines": 0,
+          "test_lines": 33
+        }
+      ],
+      "oversize_justification": null
     }
   ],
   "batches": [
@@ -69,6 +85,10 @@
     {
       "id": "B2",
       "task_ids": ["T022", "T023"]
+    },
+    {
+      "id": "B3",
+      "task_ids": ["T024"]
     }
   ]
 }

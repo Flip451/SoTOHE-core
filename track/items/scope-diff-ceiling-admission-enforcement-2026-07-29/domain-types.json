@@ -1608,7 +1608,7 @@
     },
     "BatchPlanValidationError": {
       "action": "add",
-      "docs": "Err type of BatchPlanDocument::new; enum, 9 variants. Payloads: TaskId / BatchId / ScopeName; DuplicateBatchMembership carries Vec<BatchId>, not a count (R11). Construction owners: EmptyJustification — IndivisibilityJustification::try_new; EmptyBatchId — BatchId::try_new; EmptyBatch — BatchDeclaration::new; DuplicateScopeEstimate — TaskEstimate::new; rest — BatchPlanDocument::new. No variant declared for ceiling- or task-list-dependent invariants (constructor takes neither); owner: check_batch_plan. IN-05, IN-21, AC-04, AC-25.",
+      "docs": "Err type of BatchPlanDocument::new; enum, 10 variants. Payloads: TaskId / BatchId / ScopeName; DuplicateBatchMembership carries Vec<BatchId>, not a count (R11). Construction owners: EmptyJustification — IndivisibilityJustification::try_new; EmptyBatchId — BatchId::try_new; EmptyBatch — BatchDeclaration::new; DuplicateScopeEstimate + EmptyScopeEstimates — TaskEstimate::new; rest — BatchPlanDocument::new. EmptyScopeEstimates: Vec non-emptiness by constructor validation (prefer-type-safe-abstractions: type-level limit), no NonEmpty newtype minted (R12 — the value never travels apart from TaskEstimate, whose constructor is already fallible); distinct variant from MissingTaskEstimate (entry absence, owner BatchPlanDocument::new). No variant declared for ceiling- or task-list-dependent invariants (constructor takes neither); owner: check_batch_plan. IN-02, IN-05, IN-21, AC-04, AC-25.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -1660,6 +1660,18 @@
                 {
                   "name": "scope",
                   "ty": "ScopeName"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "EmptyScopeEstimates",
+            "payload": {
+              "fields": [
+                {
+                  "name": "task_id",
+                  "ty": "TaskId"
                 }
               ],
               "kind": "struct"
@@ -1739,6 +1751,10 @@
         },
         {
           "anchor": "AC-25",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-02",
           "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
         }
       ]
@@ -2340,7 +2356,7 @@
     },
     "TaskEstimate": {
       "action": "add",
-      "docs": "One task's per-scope estimates plus its decomposition state. Type-design: the constructor rejects a repeated scope so a task cannot declare two competing figures for one scope. IN-02, IN-04, AC-02, AC-03, OUT-10.",
+      "docs": "One task's per-scope estimates plus its decomposition state; plain struct, private fields. new is fallible and rejects two shapes: a repeated scope (DuplicateScopeEstimate) and an empty scope_estimates list (EmptyScopeEstimates — constructor validation, no NonEmpty newtype minted). IN-02, IN-04, AC-02, AC-03, AC-04, OUT-10.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -2370,6 +2386,10 @@
         },
         {
           "anchor": "AC-03",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-04",
           "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
         }
       ]

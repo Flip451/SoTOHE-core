@@ -488,13 +488,13 @@
         "item_identifier": "voluntary:IN-02"
       },
       "key": {
-        "bound_tests_set_hash": "0dce456e11c2019f5c5a452592518d97978f3d587e284f8a15ce68211c93b9b9",
-        "declaration_hash": "61a0e21ab31935205be13b8e3066e086b6a295fa87f8d0ed559f8f1b13263b65",
+        "bound_tests_set_hash": "2fd617f3b53ea6303eb6f1affe56d42a47035df6d07e6e5d4527117b4777fe1d",
+        "declaration_hash": "275752603ad11b11a190c9816e0410175fc384a91a944306a0ee8ab15fbc6b8f",
         "anchor_text_hash": "d8de42db992de765998a5464b3b4da9852019d9036e59fb2b3f3501b9c14c5b3"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let domain = estimate.estimate_for(&scope(\"domain\")).unwrap();\nassert_eq!(domain.production_lines(), LineCount::new(180));\nassert_eq!(domain.test_lines(), LineCount::new(120));"
+        "citation": "assert_eq!(domain.production_lines(), LineCount::new(180));\nassert_eq!(domain.test_lines(), LineCount::new(120));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -512,6 +512,11 @@
           "layer": "domain",
           "module_path": "domain::batch_plan::tests",
           "test_name": "test_task_estimate_rejects_two_figures_for_the_same_scope"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_task_estimate_rejects_an_estimate_that_names_no_scope"
         }
       ]
     },
@@ -529,13 +534,13 @@
         "item_identifier": "voluntary:AC-02"
       },
       "key": {
-        "bound_tests_set_hash": "3b8dd9b430c7be930327bd9a673c26a9674e98f8508ecb45287c7c6b75f44d7f",
-        "declaration_hash": "61a0e21ab31935205be13b8e3066e086b6a295fa87f8d0ed559f8f1b13263b65",
+        "bound_tests_set_hash": "06a3b1109c1271445054ff6f9a184029c10b84f2dc412341c8bbb7eb07ec12c0",
+        "declaration_hash": "275752603ad11b11a190c9816e0410175fc384a91a944306a0ee8ab15fbc6b8f",
         "anchor_text_hash": "f200e4cf5e631db8bce89f041ac137d6fba827394dd40604074d73483f2a2cdc"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(estimate.test_lines(), LineCount::new(120));\n    assert_eq!(estimate.production_lines(), LineCount::new(180));\n    assert_eq!(estimate.total(), LineCount::new(300));"
+        "citation": "// The test figure is one summed quantity covering both kinds of test code,\n    // and it stays separate from the production figure.\n    assert_eq!(estimate.test_lines(), LineCount::new(120));\n    assert_eq!(estimate.production_lines(), LineCount::new(180));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -553,6 +558,11 @@
           "layer": "domain",
           "module_path": "domain::batch_plan::tests",
           "test_name": "test_task_estimate_rejects_two_figures_for_the_same_scope"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_task_estimate_rejects_an_estimate_that_names_no_scope"
         }
       ]
     },
@@ -571,7 +581,7 @@
       },
       "key": {
         "bound_tests_set_hash": "d4bf2f7598e06700a6a4a2186fa4efd87a3375e4813654b5e464abb3c1eb2d87",
-        "declaration_hash": "61a0e21ab31935205be13b8e3066e086b6a295fa87f8d0ed559f8f1b13263b65",
+        "declaration_hash": "275752603ad11b11a190c9816e0410175fc384a91a944306a0ee8ab15fbc6b8f",
         "anchor_text_hash": "8187fcf3fc0928bb8bdd99a55992af8f4d58fc1532a2e8b235553bec4c5327d8"
       },
       "verdict": {
@@ -607,7 +617,7 @@
       },
       "key": {
         "bound_tests_set_hash": "c36db73bb81d962c031610ea1e6869d1765de804329cc89e678d9e55cb05b51c",
-        "declaration_hash": "61a0e21ab31935205be13b8e3066e086b6a295fa87f8d0ed559f8f1b13263b65",
+        "declaration_hash": "275752603ad11b11a190c9816e0410175fc384a91a944306a0ee8ab15fbc6b8f",
         "anchor_text_hash": "b44058bf93f66a07fa038f2e376711a61d20b87ac9eb3d4983c509889eefb624"
       },
       "verdict": {
@@ -729,13 +739,13 @@
         "item_identifier": "voluntary:IN-05"
       },
       "key": {
-        "bound_tests_set_hash": "a068cc6de3742c26f55d5c2f9d5badc120410e2f3fda21e03c489c90eddf345e",
-        "declaration_hash": "f93351dfce67f244f8e5d3b0e79ab8034e5e1631a4b646d1bbbaa6418e04c9a4",
+        "bound_tests_set_hash": "3afff9e94d6d1a11f0d97615b3793415c50cd1e8572f6167735f24e02a16172a",
+        "declaration_hash": "4472f0bf92b14edf0f518e78767035611410fe373c9d7eb3ca4395ac25457ca0",
         "anchor_text_hash": "b9f5e83a9863c95ab642c68f0860766cc06b000b96527823d9680291c5f0ecce"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "panic!(\"a batch member without an estimate must be rejected\");\npanic!(\"an estimated task in no batch must be rejected\");\npanic!(\"a task claimed by two batches must be rejected\");"
+        "citation": "assert!(matches!(err, BatchPlanCodecError::InvalidDocument { source: BatchPlanValidationError::MissingTaskEstimate { .. } }))\nassert!(matches!(err, BatchPlanCodecError::InvalidDocument { source: BatchPlanValidationError::UnassignedTask { .. } }))\nassert!(matches!(err, BatchPlanCodecError::InvalidDocument { source: BatchPlanValidationError::DuplicateBatchMembership { .. } }))"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -763,6 +773,31 @@
           "layer": "domain",
           "module_path": "domain::batch_plan::tests",
           "test_name": "test_task_estimate_rejects_two_figures_for_the_same_scope"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_task_estimate_rejects_an_estimate_that_names_no_scope"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_an_estimate_that_names_no_scope"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_a_batch_member_with_no_declared_estimate"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_hands_a_file_internal_inconsistency_to_the_domain_unchanged"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_a_task_claimed_by_more_than_one_batch"
         }
       ]
     },
@@ -780,13 +815,13 @@
         "item_identifier": "voluntary:AC-04"
       },
       "key": {
-        "bound_tests_set_hash": "5c6f63211d58c2e3e2a9f3ebf1aa733dff0a634ffd9bd0ba43ee5b4d7d3d2b14",
-        "declaration_hash": "f93351dfce67f244f8e5d3b0e79ab8034e5e1631a4b646d1bbbaa6418e04c9a4",
+        "bound_tests_set_hash": "2738552544271bf87991f7646ed6ec901af61dd8cf829ba05fc40fc9712646cf",
+        "declaration_hash": "4472f0bf92b14edf0f518e78767035611410fe373c9d7eb3ca4395ac25457ca0",
         "anchor_text_hash": "220331a95d2bc318a00f3048c4098bfa0ace56170fb5604b5f6a202aa8f306ca"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let Err(BatchPlanValidationError::MissingTaskEstimate { task_id }) = result else {\n        panic!(\"a batch member without an estimate must be rejected\");\n    }; ... let Err(BatchPlanValidationError::UnassignedTask { task_id }) = result else {\n        panic!(\"an estimated task in no batch must be rejected\");\n    }; ... let Err(BatchPlanValidationError::DuplicateBatchMembership { task_id, batch_ids }) = result\n    else {\n        panic!(\"a task claimed by two batches must be rejected\");\n    };"
+        "citation": "let err = decode(&json).unwrap_err();\n\n        assert!(\n            matches!(\n                err,\n                BatchPlanCodecError::InvalidDocument {\n                    source: BatchPlanValidationError::MissingTaskEstimate { .. }\n                }\n            ),\n            \"unexpected error: {err}\"\n        );\n\nlet err = decode(&json).unwrap_err();\n\n        assert!(\n            matches!(\n                err,\n                BatchPlanCodecError::InvalidDocument {\n                    source: BatchPlanValidationError::UnassignedTask { .. }\n                }\n            ),\n            \"unexpected error: {err}\"\n        );\n\nlet err = decode(&json).unwrap_err();\n\n        assert!(\n            matches!(\n                err,\n                BatchPlanCodecError::InvalidDocument {\n                    source: BatchPlanValidationError::DuplicateBatchMembership { .. }\n                }\n            ),\n            \"unexpected error: {err}\"\n        );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -804,6 +839,31 @@
           "layer": "domain",
           "module_path": "domain::batch_plan::tests",
           "test_name": "test_the_plan_rejects_a_task_claimed_by_more_than_one_batch"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_task_estimate_rejects_an_estimate_that_names_no_scope"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_an_estimate_that_names_no_scope"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_a_batch_member_with_no_declared_estimate"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_hands_a_file_internal_inconsistency_to_the_domain_unchanged"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_a_task_claimed_by_more_than_one_batch"
         }
       ]
     },
@@ -5254,13 +5314,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "1139dba488298528aefb9f342a543bd44b5ab92b1614244cfc717e5706c9c18e",
+        "bound_tests_set_hash": "328817fc58dab345bc5dcf9f614512f90acbf3250c3fee30c352bfa9f11e9bc9",
         "declaration_hash": "6d3eb1d9cfa8e286a47963daecf97acbad186b33112f77f568cf566a04b9ba99",
         "anchor_text_hash": "b9f5e83a9863c95ab642c68f0860766cc06b000b96527823d9680291c5f0ecce"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let err = decode(&json).unwrap_err();\n\n        assert!(\n            matches!(\n                err,\n                BatchPlanCodecError::InvalidDocument {\n                    source: BatchPlanValidationError::UnassignedTask { .. }\n                }\n            ),\n            \"unexpected error: {err}\"\n        );\n\nlet err = decode(&json).unwrap_err();\n\n        assert!(\n            matches!(\n                err,\n                BatchPlanCodecError::InvalidDocument {\n                    source: BatchPlanValidationError::MissingTaskEstimate { .. }\n                }\n            ),\n            \"unexpected error: {err}\"\n        );\n\nlet err = decode(&json).unwrap_err();\n\n        assert!(\n            matches!(\n                err,\n                BatchPlanCodecError::InvalidDocument {\n                    source: BatchPlanValidationError::DuplicateBatchMembership { .. }\n                }\n            ),\n            \"unexpected error: {err}\"\n        );"
+        "citation": "matches!(err, BatchPlanCodecError::InvalidDocument { source: BatchPlanValidationError::UnassignedTask { .. } }) ... matches!(err, BatchPlanCodecError::InvalidDocument { source: BatchPlanValidationError::MissingTaskEstimate { .. } }) ... matches!(err, BatchPlanCodecError::InvalidDocument { source: BatchPlanValidationError::DuplicateBatchMembership { .. } })"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -5338,6 +5398,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::batch_plan_codec::tests",
           "test_name": "test_decode_rejects_a_per_scope_estimate_it_cannot_read"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_an_estimate_that_names_no_scope"
         }
       ]
     },
@@ -5355,13 +5420,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "1139dba488298528aefb9f342a543bd44b5ab92b1614244cfc717e5706c9c18e",
+        "bound_tests_set_hash": "328817fc58dab345bc5dcf9f614512f90acbf3250c3fee30c352bfa9f11e9bc9",
         "declaration_hash": "6d3eb1d9cfa8e286a47963daecf97acbad186b33112f77f568cf566a04b9ba99",
         "anchor_text_hash": "220331a95d2bc318a00f3048c4098bfa0ace56170fb5604b5f6a202aa8f306ca"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "        // T002 is estimated but no batch claims it.\n        let json = VALID_JSON.replace(\"{\\\"id\\\": \\\"B2\\\", \\\"task_ids\\\": [\\\"T002\\\"]}\", \"\");\n        let json = json.replace(\n            \"{\\\"id\\\": \\\"B1\\\", \\\"task_ids\\\": [\\\"T001\\\"]},\",\n            \"{\\\"id\\\": \\\"B1\\\", \\\"task_ids\\\": [\\\"T001\\\"]}\"\n        );\n\n        let err = decode(&json).unwrap_err();\n\n        assert!(\n            matches!(\n                err,\n                BatchPlanCodecError::InvalidDocument {\n                    source: BatchPlanValidationError::UnassignedTask { .. }\n                }\n            ),\n            \"unexpected error: {err}\"\n        );\n    }\n{\n        let json = VALID_JSON.replace(\n            \"{\\\"id\\\": \\\"B1\\\", \\\"task_ids\\\": [\\\"T001\\\"]}\",\n            \"{\\\"id\\\": \\\"B1\\\", \\\"task_ids\\\": [\\\"T001\\\", \\\"T003\\\"]}\",\n        );\n\n        let err = decode(&json).unwrap_err();\n\n        assert!(\n            matches!(\n                err,\n                BatchPlanCodecError::InvalidDocument {\n                    source: BatchPlanValidationError::MissingTaskEstimate { .. }\n                }\n            ),\n            \"unexpected error: {err}\"\n        );\n    }\n{\n        let json = VALID_JSON.replace(\n            \"{\\\"id\\\": \\\"B2\\\", \\\"task_ids\\\": [\\\"T002\\\"]}\",\n            \"{\\\"id\\\": \\\"B2\\\", \\\"task_ids\\\": [\\\"T002\\\", \\\"T001\\\"]}\",\n        );\n\n        let err = decode(&json).unwrap_err();\n\n        assert!(\n            matches!(\n                err,\n                BatchPlanCodecError::InvalidDocument {\n                    source: BatchPlanValidationError::DuplicateBatchMembership { .. }\n                }\n            ),\n            \"unexpected error: {err}\"\n        );\n    }"
+        "citation": "\"// T002 is estimated but no batch claims it.\" ... \"BatchPlanValidationError::UnassignedTask { .. }\"; \"BatchPlanValidationError::MissingTaskEstimate { .. }\"; \"BatchPlanValidationError::DuplicateBatchMembership { .. }\""
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -5439,6 +5504,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::batch_plan_codec::tests",
           "test_name": "test_decode_rejects_a_per_scope_estimate_it_cannot_read"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_an_estimate_that_names_no_scope"
         }
       ]
     },
@@ -6440,7 +6510,7 @@
         "item_identifier": "voluntary:IN-02"
       },
       "key": {
-        "bound_tests_set_hash": "cbea15014c905850df3f005bd49eb63888c2052ff615963364845cb160c2b5b9",
+        "bound_tests_set_hash": "7bf4de7736a5bc54f5e2c58fce2d262bcd7869ffb5a162e493d5f40b9ad5d26e",
         "declaration_hash": "6fb5058f2fe0cc01ef5b6e8075d04f9d52d0a51c0699049c2840f688cc2c0d73",
         "anchor_text_hash": "d8de42db992de765998a5464b3b4da9852019d9036e59fb2b3f3501b9c14c5b3"
       },
@@ -6454,6 +6524,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::batch_plan_codec::tests",
           "test_name": "test_decode_reads_a_declared_batch_plan_into_the_domain_document"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_an_estimate_that_names_no_scope"
         }
       ]
     },
@@ -6502,13 +6577,13 @@
         "item_identifier": "voluntary:IN-04"
       },
       "key": {
-        "bound_tests_set_hash": "77d72cac3e3c38b92167627fdeeb014c02a022e501a17c2247562a1682b68217",
+        "bound_tests_set_hash": "7abeaed402261f2fc053cc6fc6419524102ba3672e009d818f4b954768f65983",
         "declaration_hash": "6fb5058f2fe0cc01ef5b6e8075d04f9d52d0a51c0699049c2840f688cc2c0d73",
         "anchor_text_hash": "8187fcf3fc0928bb8bdd99a55992af8f4d58fc1532a2e8b235553bec4c5327d8"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(!decomposable.decomposition().is_indivisible());\n        assert!(decomposable.decomposition().justification().is_none());\n\n        assert!(indivisible.decomposition().is_indivisible());\n        assert_eq!(\n            indivisible.decomposition().justification().map(|reason| reason.as_str()),\n            Some(\"the transition table cannot be split\")\n        );"
+        "citation": "assert!(!decomposable.decomposition().is_indivisible());\n        assert!(decomposable.decomposition().justification().is_none());\n...\nassert!(indivisible.decomposition().is_indivisible());\nassert_eq!(\n            indivisible.decomposition().justification().map(|reason| reason.as_str()),\n            Some(\"the transition table cannot be split\")\n        );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -6579,7 +6654,7 @@
         "item_identifier": "voluntary:IN-05"
       },
       "key": {
-        "bound_tests_set_hash": "6e89f5c66925e1703ac21aedadb83f5d67fa42c521700e8499d576060392a406",
+        "bound_tests_set_hash": "30d8ccabc9f87a53cd437d53945168e707636c8a240a4a6d206c0cb7b32abbfd",
         "declaration_hash": "6fb5058f2fe0cc01ef5b6e8075d04f9d52d0a51c0699049c2840f688cc2c0d73",
         "anchor_text_hash": "b9f5e83a9863c95ab642c68f0860766cc06b000b96527823d9680291c5f0ecce"
       },
@@ -6603,6 +6678,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::batch_plan_codec::tests",
           "test_name": "test_decode_hands_a_file_internal_inconsistency_to_the_domain_unchanged"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_an_estimate_that_names_no_scope"
         }
       ]
     },
@@ -17932,13 +18012,13 @@
         "item_identifier": "voluntary:IN-21"
       },
       "key": {
-        "bound_tests_set_hash": "ee92ec9bac67926620f836add4702c82414c10582c33749d11843a033795b087",
-        "declaration_hash": "f93351dfce67f244f8e5d3b0e79ab8034e5e1631a4b646d1bbbaa6418e04c9a4",
+        "bound_tests_set_hash": "063c378e8b5e31ff4737ab9724bf08c09b21565a75b0b52c04bc1620dbbd78f2",
+        "declaration_hash": "4472f0bf92b14edf0f518e78767035611410fe373c9d7eb3ca4395ac25457ca0",
         "anchor_text_hash": "6f9b59674e60454bb5ed38b8e579da944bce665d03d33f9d23fb4dce20f54c40"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let Err(BatchPlanValidationError::MissingTaskEstimate { task_id }) = member_without_estimate\nelse {\n    panic!(\"a declared member still needs an estimate, settled or not\");\n};\nassert_eq!(task_id, task(\"T001\"));"
+        "citation": "\"Declaring a settled task is optional, not exempting: these invariants judge\\n// the declaration against itself, so they apply to every id the plan names\\n// whatever state the task carries in the implementation plan.\""
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -17961,6 +18041,21 @@
           "layer": "domain",
           "module_path": "domain::batch_plan::tests",
           "test_name": "test_the_plan_rejects_a_task_claimed_by_more_than_one_batch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_a_batch_member_with_no_declared_estimate"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_hands_a_file_internal_inconsistency_to_the_domain_unchanged"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_a_task_claimed_by_more_than_one_batch"
         }
       ]
     },
@@ -17978,13 +18073,13 @@
         "item_identifier": "voluntary:AC-25"
       },
       "key": {
-        "bound_tests_set_hash": "ee92ec9bac67926620f836add4702c82414c10582c33749d11843a033795b087",
-        "declaration_hash": "f93351dfce67f244f8e5d3b0e79ab8034e5e1631a4b646d1bbbaa6418e04c9a4",
+        "bound_tests_set_hash": "063c378e8b5e31ff4737ab9724bf08c09b21565a75b0b52c04bc1620dbbd78f2",
+        "declaration_hash": "4472f0bf92b14edf0f518e78767035611410fe373c9d7eb3ca4395ac25457ca0",
         "anchor_text_hash": "1d25b503de9f1e2039e8813436add83c7993862d0fa3394692c28710be600cca"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let Err(BatchPlanValidationError::MissingTaskEstimate { task_id }) = member_without_estimate\nelse {\n    panic!(\"a declared member still needs an estimate, settled or not\");\n};\nassert_eq!(task_id, task(\"T001\"));"
+        "citation": "panic!(\"a declared member still needs an estimate, settled or not\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -18007,6 +18102,21 @@
           "layer": "domain",
           "module_path": "domain::batch_plan::tests",
           "test_name": "test_the_plan_rejects_a_task_claimed_by_more_than_one_batch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_a_batch_member_with_no_declared_estimate"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_hands_a_file_internal_inconsistency_to_the_domain_unchanged"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_a_task_claimed_by_more_than_one_batch"
         }
       ]
     },
@@ -18656,6 +18766,78 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BatchPlanValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BatchPlanValidationError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "24f202142f193f44a9b81d9e8b707eea1825e37e2c447214b24d12203a3f9c2e",
+        "declaration_hash": "4472f0bf92b14edf0f518e78767035611410fe373c9d7eb3ca4395ac25457ca0",
+        "anchor_text_hash": "d8de42db992de765998a5464b3b4da9852019d9036e59fb2b3f3501b9c14c5b3"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let Err(BatchPlanValidationError::EmptyScopeEstimates { task_id }) = result else {\n        panic!(\"an estimate naming no scope must be rejected\");\n    };\n    assert_eq!(task_id, task(\"T001\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_task_estimate_rejects_an_estimate_that_names_no_scope"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_an_estimate_that_names_no_scope"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskEstimate",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskEstimate",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "24f202142f193f44a9b81d9e8b707eea1825e37e2c447214b24d12203a3f9c2e",
+        "declaration_hash": "275752603ad11b11a190c9816e0410175fc384a91a944306a0ee8ab15fbc6b8f",
+        "anchor_text_hash": "220331a95d2bc318a00f3048c4098bfa0ace56170fb5604b5f6a202aa8f306ca"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let err = decode(json).unwrap_err();\n\n        // The domain rejection travels out unchanged: the codec re-implements no\n        // invariant of its own for it.\n        let BatchPlanCodecError::InvalidDocument { source } = err else {\n            panic!(\"an estimate naming no scope must be refused: {err}\");\n        };"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_task_estimate_rejects_an_estimate_that_names_no_scope"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_an_estimate_that_names_no_scope"
         }
       ]
     }

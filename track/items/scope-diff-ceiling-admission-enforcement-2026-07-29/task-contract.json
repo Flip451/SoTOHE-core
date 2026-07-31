@@ -108,6 +108,10 @@
     "T022": [
       { "layer": "domain", "entry_key": "AdmissionRejection" },
       { "layer": "usecase", "entry_key": "AdmissionRejectionOutput" }
+    ],
+    "T024": [
+      { "layer": "domain", "entry_key": "BatchPlanValidationError" },
+      { "layer": "domain", "entry_key": "TaskEstimate" }
     ]
   }
 }

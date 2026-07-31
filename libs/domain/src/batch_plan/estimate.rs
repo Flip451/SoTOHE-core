@@ -129,6 +129,11 @@ impl TaskEstimate {
     ///
     /// # Errors
     ///
+    /// Returns [`BatchPlanValidationError::EmptyScopeEstimates`] when
+    /// `scope_estimates` is empty: an estimate that names no scope declares
+    /// nothing to compare, so it is refused here rather than carried as a task
+    /// that silently contributes to no batch total.
+    ///
     /// Returns [`BatchPlanValidationError::DuplicateScopeEstimate`] when
     /// `scope_estimates` declares two competing figures for one scope.
     pub fn new(
@@ -136,6 +141,9 @@ impl TaskEstimate {
         scope_estimates: Vec<ScopeLineEstimate>,
         decomposition: TaskDecomposition,
     ) -> Result<TaskEstimate, BatchPlanValidationError> {
+        if scope_estimates.is_empty() {
+            return Err(BatchPlanValidationError::EmptyScopeEstimates { task_id });
+        }
         let mut seen: Vec<&ScopeName> = Vec::new();
         for estimate in &scope_estimates {
             if seen.contains(&estimate.scope()) {

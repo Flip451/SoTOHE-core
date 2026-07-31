@@ -33,7 +33,7 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | AdmissionEvaluationError | error_type | add | MissingTaskEstimate, UnknownMainScopeName | 🔵 | 🔵 |
-| BatchPlanValidationError | error_type | add | EmptyJustification, EmptyBatchId, EmptyBatch, DuplicateTaskEstimate, DuplicateScopeEstimate, DuplicateBatchId, MissingTaskEstimate, UnassignedTask, DuplicateBatchMembership | 🔵 | 🔵 |
+| BatchPlanValidationError | error_type | add | EmptyJustification, EmptyBatchId, EmptyBatch, DuplicateTaskEstimate, DuplicateScopeEstimate, EmptyScopeEstimates, DuplicateBatchId, MissingTaskEstimate, UnassignedTask, DuplicateBatchMembership | 🔵 | 🔵 |
 | ValidationError | error_type | modify | EmptyString, InvalidTrackId, InvalidTaskId, InvalidCommitHash, InvalidTimestamp, InvalidTrackBranch, BranchIdMismatch, StatusOverrideMismatch, EmptyTrackTitle, EmptyTaskDescription, EmptyPlanSectionId, EmptyPlanSectionTitle, DuplicateTaskId, DuplicatePlanSectionId, UnknownTaskReference, DuplicateTaskReference, UnreferencedTask, OverrideIncompatibleWithResolvedTasks, TrackActivationRequiresPlanningOnly, TrackActivationRequiresSchemaV3, TrackAlreadyMaterialized, UnsupportedTargetStatus, SectionNotFound, NoSectionsAvailable, TaskDescriptionMutated, TaskRemoved, DuplicateElementId, InvalidLayerId, InvalidSpecElementId, EmptyAdrAnchor, EmptyConventionAnchor, InvalidContentHash, EmptyInformalGroundSummary, MultiLineInformalGroundSummary, EmptyDecisionGroundRef, InvalidObligationMinimum, InvalidDetectionRate, UnknownDependencyReference, DependencyCycle, PlanOrderViolatesDependency | 🔵 | 🔵 |
 
 ## Domain Services

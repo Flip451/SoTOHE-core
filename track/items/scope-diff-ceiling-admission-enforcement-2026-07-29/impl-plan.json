@@ -141,6 +141,11 @@
       "description": "`libs/infrastructure/src/dry_check/commit_hash_store.rs`: ancestry 検査の repo 解決を SystemGitRepo::discover() から discover_from(self.trusted_root) へ差し替え、CWD が別 repo のときの一貫性試験を追加する（CN-05、IN-14）。",
       "status": "done",
       "commit_hash": "87f40f2c"
+    },
+    {
+      "id": "T024",
+      "description": "`libs/domain/src/batch_plan/estimate.rs`: TaskEstimate::new に空 scope_estimates の拒否を追加し doc comment を更新する（IN-02、AC-04）。`libs/domain/src/batch_plan/tests.rs`: 同経路の試験を追加する（IN-02、AC-04）。`libs/infrastructure/src/batch_plan_codec.rs`: 空 scope_estimates を前提にしていた fixture を差し替え、decode 経路の試験を追加する（AC-04）。",
+      "status": "done"
     }
   ],
   "plan": {
@@ -149,7 +154,8 @@
       "GO-02 → T003、T004、T006、T012、T018: Phase 3 終端と todo → in_progress 遷移の実装開始前 gate を配置する。",
       "GO-03 → T001、T002、T019、T020、T007、T008、T013、T014、T017: batch と依存宣言を Phase 3 宣言成果物へ移し、impl-plan review と full-cycle consumption の対象にする。",
       "GO-01 / GO-02 → T021: PR #228 round 1 のデルタ 3 件（scope 名の設定照合、宣言対象の未 settle 限定、判定対象遷移集合の拡張）を実装する。",
-      "GO-01 / GO-02 → T022、T023: PR #228 round 2 の diagnoser 経由 2 件（current_batch 不在の拒否、実測 baseline の repo 固定）を実装する。"
+      "GO-01 / GO-02 → T022、T023: PR #228 round 2 の diagnoser 経由 2 件（current_batch 不在の拒否、実測 baseline の repo 固定）を実装する。",
+      "GO-01 → T024: PR #228 round 5 の diagnoser 経由 1 件（空 scope_estimates の拒否）を実装する。"
     ],
     "sections": [
       {
@@ -214,7 +220,8 @@
         "task_ids": [
           "T021",
           "T022",
-          "T023"
+          "T023",
+          "T024"
         ]
       }
     ]

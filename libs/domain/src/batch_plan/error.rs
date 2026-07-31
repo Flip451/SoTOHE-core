@@ -44,6 +44,15 @@ pub enum BatchPlanValidationError {
         /// The scope estimated more than once.
         scope: ScopeName,
     },
+    /// A task declares an estimate that names no scope at all.
+    ///
+    /// Distinct from [`BatchPlanValidationError::MissingTaskEstimate`], which is
+    /// an absent entry rather than a present but empty one.
+    #[error("task '{task_id}' declares an estimate naming no scope")]
+    EmptyScopeEstimates {
+        /// The task whose estimate names no scope.
+        task_id: TaskId,
+    },
     /// The plan declares the same batch identifier more than once.
     #[error("batch id '{}' is declared more than once", .batch_id.as_str())]
     DuplicateBatchId {

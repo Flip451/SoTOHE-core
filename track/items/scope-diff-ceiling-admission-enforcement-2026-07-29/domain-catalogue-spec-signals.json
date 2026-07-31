@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "926cc154795c3b23a762c05a4574dad5664e16cafbce7d15001f433459698585",
+  "catalogue_declaration_hash": "ee8d263206dc3823481b5c9300fddf21c03587aefc1b1772d97972df62e59df5",
   "signals": [
     {
       "type_name": "AdmissionDecision",
@@ -45,7 +45,7 @@
     {
       "type_name": "BatchPlanValidationError",
       "signal": "blue",
-      "entry_hash": "dadb91091f62f75f88ab21a0bcbedbc5cb20e0642e3ba8fab2a110407ed8a08a"
+      "entry_hash": "509c4e4f02a8965f4bda6e3aae849af8ecbc61c30786b1bdf4bd819ed0df4f20"
     },
     {
       "type_name": "ImplPlanDocument",
@@ -100,7 +100,7 @@
     {
       "type_name": "TaskEstimate",
       "signal": "blue",
-      "entry_hash": "c7b4018456e32d9f67bc9269a44e933b0485656ce3fcf11f21678b19ebafacc2"
+      "entry_hash": "be453c01cf77176a43163f0be8327fde12c7d5acd480a0170366daceb3cf80d7"
     },
     {
       "type_name": "TaskStatusKind",

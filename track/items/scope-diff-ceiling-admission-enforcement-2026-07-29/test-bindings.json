@@ -349,6 +349,11 @@
           "layer": "domain",
           "module_path": "domain::batch_plan::tests",
           "test_name": "test_task_estimate_rejects_two_figures_for_the_same_scope"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_task_estimate_rejects_an_estimate_that_names_no_scope"
         }
       ]
     },
@@ -376,6 +381,11 @@
           "layer": "domain",
           "module_path": "domain::batch_plan::tests",
           "test_name": "test_task_estimate_rejects_two_figures_for_the_same_scope"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_task_estimate_rejects_an_estimate_that_names_no_scope"
         }
       ]
     },
@@ -516,6 +526,31 @@
           "layer": "domain",
           "module_path": "domain::batch_plan::tests",
           "test_name": "test_task_estimate_rejects_two_figures_for_the_same_scope"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_task_estimate_rejects_an_estimate_that_names_no_scope"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_an_estimate_that_names_no_scope"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_a_batch_member_with_no_declared_estimate"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_hands_a_file_internal_inconsistency_to_the_domain_unchanged"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_a_task_claimed_by_more_than_one_batch"
         }
       ]
     },
@@ -543,6 +578,31 @@
           "layer": "domain",
           "module_path": "domain::batch_plan::tests",
           "test_name": "test_the_plan_rejects_a_task_claimed_by_more_than_one_batch"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_task_estimate_rejects_an_estimate_that_names_no_scope"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_an_estimate_that_names_no_scope"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_a_batch_member_with_no_declared_estimate"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_hands_a_file_internal_inconsistency_to_the_domain_unchanged"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_a_task_claimed_by_more_than_one_batch"
         }
       ]
     },
@@ -1702,6 +1762,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::batch_plan_codec::tests",
           "test_name": "test_decode_rejects_a_per_scope_estimate_it_cannot_read"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_an_estimate_that_names_no_scope"
         }
       ]
     },
@@ -2367,6 +2432,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::batch_plan_codec::tests",
           "test_name": "test_decode_reads_a_declared_batch_plan_into_the_domain_document"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_an_estimate_that_names_no_scope"
         }
       ]
     },
@@ -2460,6 +2530,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::batch_plan_codec::tests",
           "test_name": "test_decode_hands_a_file_internal_inconsistency_to_the_domain_unchanged"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_an_estimate_that_names_no_scope"
         }
       ]
     },
@@ -5950,6 +6025,21 @@
           "layer": "domain",
           "module_path": "domain::batch_plan::tests",
           "test_name": "test_the_plan_rejects_a_task_claimed_by_more_than_one_batch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_a_batch_member_with_no_declared_estimate"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_hands_a_file_internal_inconsistency_to_the_domain_unchanged"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_a_task_claimed_by_more_than_one_batch"
         }
       ]
     },
@@ -5982,6 +6072,21 @@
           "layer": "domain",
           "module_path": "domain::batch_plan::tests",
           "test_name": "test_the_plan_rejects_a_task_claimed_by_more_than_one_batch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_a_batch_member_with_no_declared_estimate"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_hands_a_file_internal_inconsistency_to_the_domain_unchanged"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_a_task_claimed_by_more_than_one_batch"
         }
       ]
     },
@@ -6242,6 +6347,50 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_reopening_a_member_of_a_fully_settled_declaration_is_refused_for_want_of_a_batch"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "BatchPlanValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_task_estimate_rejects_an_estimate_that_names_no_scope"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_an_estimate_that_names_no_scope"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TaskEstimate",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_task_estimate_rejects_an_estimate_that_names_no_scope"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::batch_plan_codec::tests",
+          "test_name": "test_decode_rejects_an_estimate_that_names_no_scope"
         }
       ]
     }

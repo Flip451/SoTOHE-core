@@ -795,7 +795,7 @@
       }
     },
     {
-      "claim_hash": "dadb91091f62f75f88ab21a0bcbedbc5cb20e0642e3ba8fab2a110407ed8a08a",
+      "claim_hash": "509c4e4f02a8965f4bda6e3aae849af8ecbc61c30786b1bdf4bd819ed0df4f20",
       "evidence_hash": "7a8f18b1e0d4c792be7732200471d503878c37e2db4cd169b52f7931b0806382",
       "verdict": {
         "kind": "pass",
@@ -819,7 +819,7 @@
       }
     },
     {
-      "claim_hash": "dadb91091f62f75f88ab21a0bcbedbc5cb20e0642e3ba8fab2a110407ed8a08a",
+      "claim_hash": "509c4e4f02a8965f4bda6e3aae849af8ecbc61c30786b1bdf4bd819ed0df4f20",
       "evidence_hash": "15b3fa3b5549b15f16cecde0c9291e55ba46e5cfb4adc8fda41079bd49fb9046",
       "verdict": {
         "kind": "pass",
@@ -843,11 +843,11 @@
       }
     },
     {
-      "claim_hash": "dadb91091f62f75f88ab21a0bcbedbc5cb20e0642e3ba8fab2a110407ed8a08a",
+      "claim_hash": "509c4e4f02a8965f4bda6e3aae849af8ecbc61c30786b1bdf4bd819ed0df4f20",
       "evidence_hash": "97351d2ef276ebeb29381626a8ca3cd53d267ea8d3acfccb63bdf24b7cbb5232",
       "verdict": {
         "kind": "pass",
-        "citation": "`batch-plan.json` が宣言を要求する対象を未 settle のタスク（todo / in_progress）に限る。settle 済みのタスク — commit 記録を伴う done、または skipped。commit 記録のない done は未 settle であり要求対象に含まれる — の宣言は任意とする。任意は免除ではなく、宣言された settle 済みタスクは見積り Σ の照合・単独寄与者免除・task id の実在検査の対象として未 settle タスクと同じに扱う。"
+        "citation": "任意は免除ではなく、宣言された settle 済みタスクは見積り Σ の照合・単独寄与者免除・task id の実在検査の対象として未 settle タスクと同じに扱う。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -867,7 +867,7 @@
       }
     },
     {
-      "claim_hash": "dadb91091f62f75f88ab21a0bcbedbc5cb20e0642e3ba8fab2a110407ed8a08a",
+      "claim_hash": "509c4e4f02a8965f4bda6e3aae849af8ecbc61c30786b1bdf4bd819ed0df4f20",
       "evidence_hash": "5c65bd4504dab5b53ef7fabe3819e42bb635ee64f0af3d3d90910badf0611f1a",
       "verdict": {
         "kind": "pass",
@@ -887,6 +887,30 @@
           "section": "acceptance_criteria",
           "element_id": "AC-25",
           "text_label": "settle 済みタスクを宣言に含めた `batch-plan.json` において、その見積りが所属 batch の per-scope Σ に従来どおり計上され、単独寄与者免除の判定と task id の実在検査も同じに適用される。宣言が任意であることが照合の免除として働く経路が存在しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "509c4e4f02a8965f4bda6e3aae849af8ecbc61c30786b1bdf4bd819ed0df4f20",
+      "evidence_hash": "85f314b8e1f1ca0a95c337c53191d4789bf1640989bf715f791e7937befdbe42",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`batch-plan.json` に task 見積りを持たせる。各タスクは触れる review scope ごとに `production_lines` と `test_lines` を分けて申告し、`test_lines` は test obligation 由来の試験コードを含む合算とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/domain-types.json",
+          "section_key": "types",
+          "entry_key": "BatchPlanValidationError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "`batch-plan.json` に task 見積りを持たせる。各タスクは触れる review scope ごとに `production_lines` と `test_lines` を分けて申告し、`test_lines` は test obligation 由来の試験コードを含む合算とする。タスクごとの obligation 件数は obligation 成果物と契約帰属成果物の join で機械的に導出できるため、impl-planner の判断は 1 件あたり行数の乗数に限定される。"
         }
       }
     },
@@ -1539,11 +1563,11 @@
       }
     },
     {
-      "claim_hash": "c7b4018456e32d9f67bc9269a44e933b0485656ce3fcf11f21678b19ebafacc2",
+      "claim_hash": "be453c01cf77176a43163f0be8327fde12c7d5acd480a0170366daceb3cf80d7",
       "evidence_hash": "85f314b8e1f1ca0a95c337c53191d4789bf1640989bf715f791e7937befdbe42",
       "verdict": {
         "kind": "pass",
-        "citation": "`batch-plan.json` に task 見積りを持たせる。各タスクは触れる review scope ごとに `production_lines` と `test_lines` を分けて申告し"
+        "citation": "`batch-plan.json` に task 見積りを持たせる。各タスクは触れる review scope ごとに `production_lines` と `test_lines` を分けて申告し、`test_lines` は test obligation 由来の試験コードを含む合算とする。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1563,7 +1587,7 @@
       }
     },
     {
-      "claim_hash": "c7b4018456e32d9f67bc9269a44e933b0485656ce3fcf11f21678b19ebafacc2",
+      "claim_hash": "be453c01cf77176a43163f0be8327fde12c7d5acd480a0170366daceb3cf80d7",
       "evidence_hash": "92d45809a85981b2a9d3db8cdc1268aa6d5ce4756f8ca858e8ea4a5654bdc804",
       "verdict": {
         "kind": "pass",
@@ -1587,7 +1611,7 @@
       }
     },
     {
-      "claim_hash": "c7b4018456e32d9f67bc9269a44e933b0485656ce3fcf11f21678b19ebafacc2",
+      "claim_hash": "be453c01cf77176a43163f0be8327fde12c7d5acd480a0170366daceb3cf80d7",
       "evidence_hash": "99645debe85d0bb2fde6d17160e91f4ae4df35652ff1ab43f48e140aff6b2287",
       "verdict": {
         "kind": "pass",
@@ -1611,7 +1635,7 @@
       }
     },
     {
-      "claim_hash": "c7b4018456e32d9f67bc9269a44e933b0485656ce3fcf11f21678b19ebafacc2",
+      "claim_hash": "be453c01cf77176a43163f0be8327fde12c7d5acd480a0170366daceb3cf80d7",
       "evidence_hash": "6db5ffb79cc150e3c35f2fbec8c57ad7225e22e0bc2bd8b27acc019344db54a1",
       "verdict": {
         "kind": "pass",
@@ -1631,6 +1655,30 @@
           "section": "acceptance_criteria",
           "element_id": "AC-03",
           "text_label": "`batches[]` が順序付きの batch 列であり、各 batch が member task id の列のみを宣言して行数を宣言しない。ceiling 超過タスクが非空の分解不能理由を伴い、通常タスクが分解不能理由を伴わないことを、`batch-plan.json` から機械可読に判別できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "be453c01cf77176a43163f0be8327fde12c7d5acd480a0170366daceb3cf80d7",
+      "evidence_hash": "15b3fa3b5549b15f16cecde0c9291e55ba46e5cfb4adc8fda41079bd49fb9046",
+      "verdict": {
+        "kind": "pass",
+        "citation": "見積りの欠落、batch への無所属、複数 batch への重複所属という file 内不整合のそれぞれについて、codec が fail-closed で拒否し graceful skip しないことを確認できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TaskEstimate"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "見積りの欠落、batch への無所属、複数 batch への重複所属という file 内不整合のそれぞれについて、codec が fail-closed で拒否し graceful skip しないことを確認できる。"
         }
       }
     },
