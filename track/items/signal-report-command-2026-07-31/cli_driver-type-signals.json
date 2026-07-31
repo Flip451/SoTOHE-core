@@ -1,15 +1,15 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-31T13:53:31Z",
+  "generated_at": "2026-07-31T20:55:07Z",
   "declaration_hash": "f686024f7a77eacc159ba7297bfec4f546b67b8f30ae498df3648597e5147295",
-  "implementation_input_hash": "ebc0c71312207b18f846f9a628a516e3db4c5c6fcb5c21b07bdea63c02f9ed8e",
+  "implementation_input_hash": "bb0e9ef8f03f3348e6f9c75e1a723aa117a78f28cfca48755556148e49c7c351",
   "signals": [
     {
       "type_name": "SignalReportChainFilter",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Copy",
         "Debug",
@@ -26,9 +26,9 @@
     {
       "type_name": "SignalReportInput",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Copy",
         "Debug",
@@ -39,9 +39,9 @@
     {
       "type_name": "SignalReportLevelFilter",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Copy",
         "Debug",

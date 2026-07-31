@@ -19,7 +19,7 @@ signals: { blue: 14, yellow: 0, red: 0 }
 - [IN-04] 発生単位 signal 成果物がある chain はその成果物を読み、存在しない chain ⓪・①は正規の入力成果物から既存の評価規則で発生単位データをメモリ上に導出する。report は導出した signal または集計値を永続化しない読み取り専用 view とする。 [adr: knowledge/adr/2026-07-29-0839-signal-report-command.md#D1, knowledge/adr/2026-07-31-2134-signal-report-occurrence-source.md#D1] [tasks: T001, T002]
 
 ### Out of Scope
-- [OUT-01] `sotp track resolve` の blocker 表示へ signal occurrence の要約を統合することは対象外とする。 [adr: knowledge/adr/2026-07-29-0839-signal-report-command.md#D1] [tasks: T005]
+- [OUT-01] `sotp track resolve` の blocker 表示へ signal occurrence の要約を統合することは対象外とする。 [adr: knowledge/adr/2026-07-29-0839-signal-report-command.md#D1] [tasks: T007]
 - [OUT-02] 通常の signal 評価規則、signal または集計値の永続化、ならびに gate 合否と strictness の判定規則を変更することは対象外とする。chain ⓪・①で report 表示用に既存の評価規則から発生単位データをメモリ上に導出することは、この除外に含まれない。 [adr: knowledge/adr/2026-07-29-0839-signal-report-command.md#D1, knowledge/adr/2026-07-31-2134-signal-report-occurrence-source.md#D1] [tasks: T002]
 
 ## Constraints
@@ -31,7 +31,7 @@ signals: { blue: 14, yellow: 0, red: 0 }
 - [ ] [AC-02] report の各 occurrence には entry id、参照文字列、判定理由、および対象ファイル位置が表示される。 [adr: knowledge/adr/2026-07-29-0839-signal-report-command.md#D1] [tasks: T001, T004]
 - [ ] [AC-03] `sotp signal report --chain <id>` は指定した chain の occurrence のみを報告し、Yellow / Red 選択を指定した実行は選択した色の occurrence のみを報告する。 [adr: knowledge/adr/2026-07-29-0839-signal-report-command.md#D1] [tasks: T001, T003, T005]
 - [ ] [AC-04] report の実行は既存の calculation artifacts を読み取り専用で扱い、chain ⓪・①で導出した発生単位データを含め、signal または集計値を persist しない。 [adr: knowledge/adr/2026-07-29-0839-signal-report-command.md#D1, knowledge/adr/2026-07-31-2134-signal-report-occurrence-source.md#D1] [tasks: T001, T002, T006]
-- [ ] [AC-05] `sotp track resolve` の表示は、この report command によって新たな signal occurrence の要約を追加されず従来どおりである。 [adr: knowledge/adr/2026-07-29-0839-signal-report-command.md#D1] [tasks: T005]
+- [ ] [AC-05] `sotp track resolve` の表示は、この report command によって新たな signal occurrence の要約を追加されず従来どおりである。 [adr: knowledge/adr/2026-07-29-0839-signal-report-command.md#D1] [tasks: T007]
 
 ## Related Conventions (Required Reading)
 - knowledge/conventions/coding-principles.md#Rules

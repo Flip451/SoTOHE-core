@@ -241,6 +241,82 @@
           "test_name": "test_signal_report_source_port_load_is_read_only_across_all_chains"
         }
       ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "SignalReportChainFilter", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "IN-03"}},
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::signal_report::tests",
+          "test_name": "test_signal_report_input_each_chain_filter_converts_to_expected_selection"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "SignalReportChainFilter", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "AC-03"}},
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::signal_report::tests",
+          "test_name": "test_signal_report_input_each_chain_filter_converts_to_expected_selection"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "SignalReportInput", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "IN-03"}},
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::signal_report::tests",
+          "test_name": "test_signal_report_input_each_chain_filter_converts_to_expected_selection"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::signal_report::tests",
+          "test_name": "test_signal_report_input_each_level_filter_converts_to_expected_selection"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "SignalReportInput", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "AC-03"}},
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::signal_report::tests",
+          "test_name": "test_signal_report_input_each_chain_filter_converts_to_expected_selection"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::signal_report::tests",
+          "test_name": "test_signal_report_input_each_level_filter_converts_to_expected_selection"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "SignalReportLevelFilter", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "IN-03"}},
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::signal_report::tests",
+          "test_name": "test_signal_report_input_each_level_filter_converts_to_expected_selection"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "SignalReportLevelFilter", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "AC-03"}},
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::signal_report::tests",
+          "test_name": "test_signal_report_input_each_level_filter_converts_to_expected_selection"
+        }
+      ]
     }
   ]
 }

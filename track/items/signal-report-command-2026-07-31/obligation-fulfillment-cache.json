@@ -556,6 +556,202 @@
           "test_name": "test_signal_report_source_port_load_is_read_only_across_all_chains"
         }
       ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportChainFilter",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportChainFilter",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "832c560ff15b7238dfc48e4f16960c5b553e049a5acad45192bdbef786f4aed4",
+        "declaration_hash": "9494f2ff665b00b9a74c28b09a715f16986df0145cbfaeb31bc05752ee30406d",
+        "anchor_text_hash": "7fd97f560a673264f2c315399fda35b4cd638562bfae79ddb61f9018eb735715"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(query.chain, expected_chain);\n            assert_eq!(query.levels, SignalReportLevelSelection::YellowAndRed);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::signal_report::tests",
+          "test_name": "test_signal_report_input_each_chain_filter_converts_to_expected_selection"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportChainFilter",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportChainFilter",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "832c560ff15b7238dfc48e4f16960c5b553e049a5acad45192bdbef786f4aed4",
+        "declaration_hash": "9494f2ff665b00b9a74c28b09a715f16986df0145cbfaeb31bc05752ee30406d",
+        "anchor_text_hash": "91b94a71556bf1763775647e4999e68ff0fc894a046fb09453701532050280e9"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(query.chain, expected_chain);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::signal_report::tests",
+          "test_name": "test_signal_report_input_each_chain_filter_converts_to_expected_selection"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportInput",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportInput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "0f811abd7f61661fca0a551c0d2d2476b7643306a82b405ede962677a093ad96",
+        "declaration_hash": "422bd688090f30ba08286313ba0228e6eaeae141a09dce157c5bd5abb0a2d019",
+        "anchor_text_hash": "7fd97f560a673264f2c315399fda35b4cd638562bfae79ddb61f9018eb735715"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(query.chain, expected_chain);\n            assert_eq!(query.levels, SignalReportLevelSelection::YellowAndRed);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::signal_report::tests",
+          "test_name": "test_signal_report_input_each_chain_filter_converts_to_expected_selection"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::signal_report::tests",
+          "test_name": "test_signal_report_input_each_level_filter_converts_to_expected_selection"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportInput",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportInput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "0f811abd7f61661fca0a551c0d2d2476b7643306a82b405ede962677a093ad96",
+        "declaration_hash": "422bd688090f30ba08286313ba0228e6eaeae141a09dce157c5bd5abb0a2d019",
+        "anchor_text_hash": "91b94a71556bf1763775647e4999e68ff0fc894a046fb09453701532050280e9"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(query.chain, expected_chain);\n            assert_eq!(query.levels, SignalReportLevelSelection::YellowAndRed);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::signal_report::tests",
+          "test_name": "test_signal_report_input_each_chain_filter_converts_to_expected_selection"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::signal_report::tests",
+          "test_name": "test_signal_report_input_each_level_filter_converts_to_expected_selection"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportLevelFilter",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportLevelFilter",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "5931b0f80d3c71a60e1660b9ac59e34d802a2c503c9b97ec5f567e6f54042c7d",
+        "declaration_hash": "0cf84ecd314fa6cef3efb98f0f04a83c3f3f2c9d9dd82f16a714921ac378b82d",
+        "anchor_text_hash": "7fd97f560a673264f2c315399fda35b4cd638562bfae79ddb61f9018eb735715"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(query.levels, expected_levels);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::signal_report::tests",
+          "test_name": "test_signal_report_input_each_level_filter_converts_to_expected_selection"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportLevelFilter",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportLevelFilter",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "5931b0f80d3c71a60e1660b9ac59e34d802a2c503c9b97ec5f567e6f54042c7d",
+        "declaration_hash": "0cf84ecd314fa6cef3efb98f0f04a83c3f3f2c9d9dd82f16a714921ac378b82d",
+        "anchor_text_hash": "91b94a71556bf1763775647e4999e68ff0fc894a046fb09453701532050280e9"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(query.levels, expected_levels);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::signal_report::tests",
+          "test_name": "test_signal_report_input_each_level_filter_converts_to_expected_selection"
+        }
+      ]
     }
   ]
 }

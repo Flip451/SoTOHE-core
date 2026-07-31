@@ -26,6 +26,7 @@
       {"layer": "cli", "entry_key": "SignalReportArgs"}, {"layer": "cli", "entry_key": "SignalReportChainArg"},
       {"layer": "cli", "entry_key": "SignalReportOnlyArg"}, {"layer": "cli", "entry_key": "cli::commands::signal::execute"}
     ],
-    "T006": [{"layer": "cli_composition", "entry_key": "SignalCompositionRoot"}]
+    "T006": [{"layer": "cli_composition", "entry_key": "SignalCompositionRoot"}],
+    "T007": []
   }
 }

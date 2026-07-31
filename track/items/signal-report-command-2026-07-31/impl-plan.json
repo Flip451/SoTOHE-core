@@ -4,12 +4,14 @@
     {
       "id": "T001",
       "description": "Implement the catalogue-defined typed report-query boundary, `SignalReportSourcePort` contract, and interactor behavior in `libs/usecase/src/signal_report/`, with independently verifiable mock-based port and interactor tests. GO-01, IN-01–IN-04, CN-01–CN-02, AC-01–AC-04.",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "43e23a96"
     },
     {
       "id": "T002",
       "description": "After T001, implement the catalogue-defined infrastructure `SystemSignalReportSourceAdapter` in `libs/infrastructure/src/signal_report/`, with independently verifiable artifact-read, chain ⓪/① derivation, and non-persistence conformance tests. IN-04, CN-01, AC-04.",
       "status": "done",
+      "commit_hash": "43e23a96",
       "depends_on": [
         "T001"
       ]
@@ -17,7 +19,7 @@
     {
       "id": "T003",
       "description": "After T001, implement filter-to-query conversion in `apps/cli-driver/src/signal_report/`. IN-03, AC-03.",
-      "status": "todo",
+      "status": "done",
       "depends_on": [
         "T001"
       ]
@@ -43,23 +45,31 @@
     },
     {
       "id": "T005",
-      "description": "After T003, T004, and T006, add signal-report CLI parsing and dispatch through the composition-root report driver, plus `sotp track resolve` regression validation in `apps/cli/`. IN-01, IN-03, OUT-01, AC-01, AC-03, AC-05.",
+      "description": "After T003, T004, and T006, add signal-report CLI parsing and dispatch through the composition-root report driver in `apps/cli/`. IN-01, IN-03, AC-01, AC-03.",
       "status": "todo",
       "depends_on": [
         "T003",
         "T004",
         "T006"
       ]
+    },
+    {
+      "id": "T007",
+      "description": "After T005, add `sotp track resolve` regression tests in `apps/cli/src/commands/track/resolve.rs`. OUT-01, AC-05.",
+      "status": "todo",
+      "depends_on": [
+        "T005"
+      ]
     }
   ],
   "plan": {
     "summary": [
-      "GO-01 → T001–T006.",
+      "GO-01 → T001–T007.",
       "IN-02 / CN-02 / AC-02 → T001, T004.",
       "IN-03 / AC-03 → T001, T003, T005.",
       "IN-04 / CN-01 / AC-04 → T001, T002, T006.",
       "AC-01 → T001, T002, T005, T006.",
-      "OUT-01 / AC-05 → T005."
+      "OUT-01 / AC-05 → T007."
     ],
     "sections": [
       {
@@ -97,11 +107,12 @@
         "id": "S4",
         "title": "CLI transport and composition root",
         "description": [
-          "Wire and verify the composition-root report driver before CLI parsing and dispatch consume it; retain the `sotp track resolve` non-regression validation with the CLI task. IN-01, IN-03, OUT-01, CN-01, AC-01, AC-03–AC-05."
+          "Wire the signal-report CLI through the composition-root report driver, then add `apps/cli/src/commands/track/resolve.rs` regression validation. IN-01, IN-03, OUT-01, CN-01, AC-01, AC-03–AC-05."
         ],
         "task_ids": [
           "T006",
-          "T005"
+          "T005",
+          "T007"
         ]
       }
     ]
