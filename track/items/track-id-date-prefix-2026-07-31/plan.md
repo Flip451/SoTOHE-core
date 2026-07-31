@@ -17,4 +17,4 @@ GO-01 → T001–T003; D1。
 
 ### S3 — Suffix-form fixtures
 
-- [x] **T003**: `apps/cli-composition/src/track/mod.rs` test module、`apps/cli-composition/src/track/branch_strategy.rs`、`apps/cli-composition/src/track/resolution.rs` に `TrackCompositionRoot::{track_init, track_branch_create, track_resolve_id}` の suffix-form fixture 回帰試験を追加する。D1; OUT-01; CN-01、CN-02; AC-03。
+- [x] **T003**: `apps/cli-composition/src/track/mod.rs` test module、`apps/cli-composition/src/track/branch_strategy.rs`、`apps/cli-composition/src/track/resolution.rs` に `TrackCompositionRoot::{track_init, track_branch_create, track_resolve_id}` の suffix-form fixture 回帰試験を追加する。D1; OUT-01; CN-01、CN-02; AC-03。 (`8ad09a51036a6eb956dc10a8464e96e6cf0787a4`)
