@@ -124,7 +124,8 @@
     {
       "id": "T021",
       "description": "`libs/domain/src/batch_plan/{mod,gate,admission}.rs`: check_batch_plan に scope 名の設定照合検査を追加、BatchPlanGateViolation と AdmissionEvaluationError に UnknownMainScopeName を追加、collect_task_set_violations の UnplannedTask 報告域を限定（IN-03、IN-07、IN-11、IN-21、AC-07、AC-08、AC-23、AC-24、AC-25）。`libs/domain/src/impl_plan.rs`: ImplPlanDocument に transition_for を追加。`libs/usecase/src/{batch_plan/output,task_admission,task_ops}.rs`: BatchPlanViolationOutput の鏡像 variant と写像、admission error の写像、judge_start_of_work の判定対象条件を transition_for 経由へ差し替え（IN-09、AC-26、AC-27）。`apps/cli-driver/src/batch_plan.rs`: 描画 arm を追加（AC-07）。",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "3551f266"
     }
   ],
   "plan": {
