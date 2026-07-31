@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "track_id": "remote-strict-ci-merge-gate-2026-07-31",
+  "task_estimates": [
+    {
+      "task_id": "T001",
+      "scope_estimates": [
+        {
+          "scope": "other",
+          "production_lines": 90,
+          "test_lines": 80
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T002",
+      "scope_estimates": [
+        {
+          "scope": "impl-plan",
+          "production_lines": 20,
+          "test_lines": 30
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T003",
+      "scope_estimates": [
+        {
+          "scope": "harness-policy",
+          "production_lines": 70,
+          "test_lines": 25
+        },
+        {
+          "scope": "cli",
+          "production_lines": 0,
+          "test_lines": 80
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T004",
+      "scope_estimates": [
+        {
+          "scope": "harness-policy",
+          "production_lines": 10,
+          "test_lines": 10
+        },
+        {
+          "scope": "cli",
+          "production_lines": 0,
+          "test_lines": 60
+        }
+      ],
+      "oversize_justification": null
+    }
+  ],
+  "batches": [
+    {
+      "id": "B1",
+      "task_ids": ["T001"]
+    },
+    {
+      "id": "B2",
+      "task_ids": ["T004"]
+    },
+    {
+      "id": "B3",
+      "task_ids": ["T002"]
+    },
+    {
+      "id": "B4",
+      "task_ids": ["T003"]
+    }
+  ]
+}

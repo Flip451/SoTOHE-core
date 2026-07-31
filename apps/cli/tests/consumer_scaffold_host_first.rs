@@ -109,9 +109,41 @@ fn task_toml_value<'a>(makefile: &'a str, task_name: &str, key: &str) -> &'a str
     panic!("TOML key {key} missing from task {task_name}")
 }
 
+fn task_toml_optional_bool_value(makefile: &str, task_name: &str, key: &str) -> Option<bool> {
+    let task_header = format!("[tasks.{task_name}]");
+    let mut in_task = false;
+
+    for line in makefile.lines().map(str::trim) {
+        if line.starts_with('[') && line.ends_with(']') {
+            in_task = line == task_header;
+        } else if in_task
+            && let Some((candidate_key, value)) = line.split_once('=')
+            && candidate_key.trim() == key
+        {
+            let boolean = value
+                .split_whitespace()
+                .next()
+                .unwrap_or_else(|| panic!("TOML boolean {key} missing from task {task_name}"));
+            return Some(match boolean {
+                "true" => true,
+                "false" => false,
+                _ => panic!("TOML key {key} in task {task_name} must be a boolean"),
+            });
+        }
+    }
+
+    None
+}
+
 fn task_toml_string_array(makefile: &str, task_name: &str, key: &str) -> Vec<String> {
     serde_json::from_str(task_toml_value(makefile, task_name, key)).unwrap_or_else(|error| {
         panic!("{key} for task {task_name} must be a TOML string array: {error}")
+    })
+}
+
+fn task_toml_string_value(makefile: &str, task_name: &str, key: &str) -> String {
+    serde_json::from_str(task_toml_value(makefile, task_name, key)).unwrap_or_else(|error| {
+        panic!("{key} for task {task_name} must be a TOML basic string: {error}")
     })
 }
 
@@ -603,6 +635,39 @@ fn test_exported_ci_track_avoids_nightly_refresh_dependency() {
         !closure.contains("task-contract-refresh-impl-catalog"),
         "ci-track must not depend on the nightly-required implementation-catalogue refresh: {closure:?}"
     );
+}
+
+#[test]
+fn test_exported_ci_track_local_early_detection_preserves_track_gates() {
+    let makefile = exported_file("Makefile.toml");
+    let description = task_toml_string_value(&makefile, "ci-track", "description");
+    let closure = task_dependency_closure(&makefile, "ci-track");
+    let script = task_toml_value(&makefile, "ci-track", "script");
+
+    assert!(description.contains("local early-detection"));
+    assert!(description.contains("Requires a track/<id> branch"));
+    assert!(
+        !task_toml_optional_bool_value(&makefile, "ci-track", "private").unwrap_or(false),
+        "ci-track must remain a public cargo-make route for local early detection"
+    );
+    assert!(
+        !task_toml_optional_bool_value(&makefile, "ci-track", "disabled").unwrap_or(false),
+        "ci-track must remain enabled for local early detection"
+    );
+    assert_eq!(script, "['bin/sotp adr-baseline check-commit']");
+    assert!(closure.contains("task-contract-check-local"));
+    assert!(closure.contains("verify-spec-states-current"));
+    assert!(closure.contains("signal-check-impl-catalog"));
+    assert!(closure.contains("verify-catalogue-spec-refs"));
+    assert!(closure.contains("check-catalogue-spec-signals"));
+}
+
+#[test]
+fn test_exported_ci_track_remote_enforcement_is_documented() {
+    let makefile = exported_file("Makefile.toml");
+    let description = task_toml_string_value(&makefile, "ci-track", "description");
+
+    assert!(description.contains("Remote CI plus branch protection enforce merge eligibility"));
 }
 
 #[test]

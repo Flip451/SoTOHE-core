@@ -8,6 +8,12 @@ description: Wait for PR CI checks to pass, then merge.
 
 User invokes this command as `/track:merge`. `$ARGUMENTS` supplies the PR number and, optionally, a merge method appended after a space (e.g. `123 squash`). When `$ARGUMENTS` is empty, resolve the PR for the current branch via `gh pr view --json number -q .number` before delegating to the workflow.
 
+This invocation is the user's single normal-path merge approval. Present the required terminal
+audit, but after a clean audit do not ask for another yes/no confirmation: continue to remote-CI
+polling and merge when green. A user decision remains necessary only for a real terminal-audit
+misclassification, a post-outcome head-OID mismatch that invalidates that audit, or an
+admitted-draft recovery directed by the workflow SSoT.
+
 **IMPORTANT — do NOT auto-select the merge method**: when `$ARGUMENTS` does not include a method, omit `--method` entirely so the workflow resolves the configured default from the PR's track `branch_strategy_snapshot.merge_method`. Do NOT substitute `squash`, `rebase`, or `merge` based on prior knowledge of how other projects merge.
 
 ## Claude Code invocation constraints
@@ -18,6 +24,10 @@ User invokes this command as `/track:merge`. `$ARGUMENTS` supplies the PR number
     and post-outcome head-OID verification reads)
   - `bin/sotp pr wait-and-merge <pr_number>` (method omitted → configured default)
   - `bin/sotp pr wait-and-merge <pr_number> --method <method>` (only when the user explicitly supplied a method)
+- **No redundant confirmation**: after the terminal audit completes without a recovery, invoke
+  `wait-and-merge` directly. Do not introduce a prompt-capable dependency or a second merge
+  approval branch; retain user interaction only for the workflow SSoT's genuine adjudication and
+  recovery cases.
 - **Head-OID verification**: perform the workflow SSoT's pre-invocation and post-outcome
   head-OID checks around the wrapper call. Once the head-bound wrapper form ships, it becomes
   the only authorized invocation and replaces the unbound forms above.
