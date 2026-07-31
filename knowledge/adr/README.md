@@ -167,6 +167,11 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [impl-plan task ステータス遷移後の review refresh](2026-07-22-0633-impl-plan-transition-review-refresh.md) | Proposed | 2026-07-22 |
 | [上流収束における意味論検証の chain scope 明確化](2026-07-22-0817-deferred-upstream-semantic-verification.md) | Proposed | 2026-07-22 |
 | [dry gate 評価点における設定無効と feature 無効の優先規則](2026-07-22-1541-dry-gate-evaluation-feature-off-precedence.md) | Proposed | 2026-07-22 |
+| [per-scope diff ceiling を実装開始前の admission で機構強制する](2026-07-28-1521-scope-diff-ceiling-admission-enforcement.md) | Proposed | 2026-07-28 |
+| [タスク間の依存関係を impl-plan で宣言し、batch 順序をその宣言に対して検査する](2026-07-29-0358-task-dependency-declaration-and-batch-order-check.md) | Accepted | 2026-07-29 |
+| [`batch-plan.json` の scope 名を review scope 設定に照合し、未知名を fail-closed で拒否する](2026-07-30-0951-batch-plan-scope-name-config-validation.md) | Accepted | 2026-07-30 |
+| [`batch-plan.json` の宣言対象を未 settle タスクに限定する](2026-07-30-1022-batch-plan-declaration-domain-unsettled-tasks.md) | Accepted | 2026-07-30 |
+| [per-task commit hash の記録時に repository 実在と HEAD 到達可能性を要求する](2026-07-30-2101-per-task-commit-hash-record-time-validation.md) | Accepted | 2026-07-30 |
 
 ### ADR 運用
 

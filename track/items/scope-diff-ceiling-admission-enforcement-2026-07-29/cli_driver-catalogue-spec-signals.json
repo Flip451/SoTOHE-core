@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "6d443c097434e44bfa47dc9157f3a09c95bdd57def1e9e72a284eee66947d5f5",
+  "signals": [
+    {
+      "type_name": "BatchPlanDriver",
+      "signal": "blue",
+      "entry_hash": "1e2125796e5a281011fed7950777d4245aa3dd3ee7fcef848669f39aafa735bc"
+    },
+    {
+      "type_name": "BatchPlanInput",
+      "signal": "blue",
+      "entry_hash": "60b8731ceabd8689379443d27aa83393bc4181dec467fe3fa4ae5d3405daa6b7"
+    }
+  ]
+}

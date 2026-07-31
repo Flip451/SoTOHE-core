@@ -4,6 +4,7 @@
 pub mod adr_baseline;
 pub mod adr_decision;
 pub mod auto_phase;
+pub mod batch_plan;
 pub mod branch_strategy;
 pub mod chain;
 mod decision;

@@ -52,7 +52,7 @@ Workflow logic SSoT for workflow-backed track commands is `.harness/workflows/tr
 | Track identity (Phase 0) | `track/items/<id>/metadata.json` |
 | Behavioral contract (Phase 1) | `track/items/<id>/spec.json` |
 | Type contracts (Phase 2) | `track/items/<id>/<layer>-types.json` (schema: `.harness/reference/catalogue-schema.md`) |
-| Implementation plan / spec coverage / contract attribution (Phase 3) | `track/items/<id>/impl-plan.json` + `task-coverage.json` + `task-contract.json` |
+| Implementation plan / spec coverage / contract attribution / batch declaration (Phase 3) | `track/items/<id>/impl-plan.json` + `task-coverage.json` + `task-contract.json` + `batch-plan.json` |
 | Architectural decisions | `knowledge/adr/` (index: `knowledge/adr/README.md`) |
 | ADR baseline ledger and verbatim copies | `track/items/<id>/adr-baseline/` (written only by `bin/sotp adr-baseline snapshot`) |
 
@@ -62,7 +62,7 @@ Derived read-only views — never hand-edit, regenerate via `bin/sotp track view
 
 - Public UI is `/track:*`; never use legacy aliases.
 - No direct `git add` / `commit` / `merge` / `rebase` / `switch` — use `/track:*` or the guarded `bin/sotp git`, `bin/sotp track branch`, and `bin/sotp pr` workflow commands (`.claude/rules/guardrails.md`).
-- The orchestrator never edits SoT files directly (1 file = 1 writer): ADR → `adr-editor`, `spec.json` → `spec-designer`, catalogues → `type-designer`, `impl-plan.json` → `impl-planner`. Task state transitions go through `bin/sotp track transition`.
+- The orchestrator never edits SoT files directly (1 file = 1 writer): ADR → `adr-editor`, `spec.json` → `spec-designer`, catalogues → `type-designer`, `impl-plan.json` / `task-coverage.json` / `task-contract.json` / `batch-plan.json` → `impl-planner`. Task state transitions go through `bin/sotp track transition`.
 - No change reaches merge without a reviewer-capability verdict; the default is a local cycle to `zero_findings` before every commit (plan artifacts included), and the PR-review lane defers that verdict rather than waiving it. Inline self-review is never a substitute (`.harness/policies/review-protocol.md`).
 - Do not manually copy, edit, or remove ADR baseline records. A missing init snapshot blocks review and commit; a byte mismatch blocks commit and track-aware CI (not review — a Phase 0 draft divergence is normal). Use the sanctioned snapshot, restore, and diagnoser routes.
 - Read `.claude/rules/orchestration.md` and `.claude/rules/guardrails.md` before making changes.

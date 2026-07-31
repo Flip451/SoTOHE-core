@@ -99,6 +99,59 @@ struct GroupEntry {
     diff_ceiling_lines: Option<u32>,
 }
 
+/// The most a review-scope configuration may weigh.
+///
+/// One megabyte is far beyond any hand-authored scope list — the shipped one is
+/// a few kilobytes — while staying an allocation this process can always afford.
+/// The point is not to guess the largest legitimate configuration but to keep an
+/// oversized or hostile file from being read into memory before anything has
+/// looked at it.
+const MAX_REVIEW_SCOPE_CONFIG_BYTES: u64 = 1024 * 1024;
+
+/// Reads the configuration under an explicit size bound.
+///
+/// Three steps, as the crate's other bounded reads do: metadata refuses what is
+/// not a regular file or is already too large, the read itself is capped so a
+/// file that grows after that check cannot escape the bound, and the result is
+/// re-checked because a capped read succeeds by design.
+///
+/// The refusal travels as an `Io` variant carrying a classification rather than
+/// a rendered path: this error's own `Display` prints the path it was given, and
+/// the reason is what an operator acts on.
+fn read_bounded_config(path: &Path, path_display: &str) -> Result<String, ScopeConfigLoadError> {
+    use std::io::Read as _;
+
+    let oversized = || ScopeConfigLoadError::Io {
+        path: path_display.to_owned(),
+        source: crate::sanitized_failure::sanitized_io_error(
+            "larger than a review-scope configuration may be",
+        ),
+    };
+
+    let metadata = std::fs::symlink_metadata(path)
+        .map_err(|source| ScopeConfigLoadError::Io { path: path_display.to_owned(), source })?;
+    if !metadata.file_type().is_file() {
+        return Err(ScopeConfigLoadError::Io {
+            path: path_display.to_owned(),
+            source: crate::sanitized_failure::sanitized_io_error("not a regular file"),
+        });
+    }
+    if metadata.len() > MAX_REVIEW_SCOPE_CONFIG_BYTES {
+        return Err(oversized());
+    }
+
+    let file = std::fs::File::open(path)
+        .map_err(|source| ScopeConfigLoadError::Io { path: path_display.to_owned(), source })?;
+    let mut content = String::new();
+    file.take(MAX_REVIEW_SCOPE_CONFIG_BYTES.saturating_add(1))
+        .read_to_string(&mut content)
+        .map_err(|source| ScopeConfigLoadError::Io { path: path_display.to_owned(), source })?;
+    if content.len() as u64 > MAX_REVIEW_SCOPE_CONFIG_BYTES {
+        return Err(oversized());
+    }
+    Ok(content)
+}
+
 fn has_windows_drive_prefix(path: &str) -> bool {
     let bytes = path.as_bytes();
     matches!(
@@ -162,8 +215,7 @@ pub fn load_v2_scope_config(
         }
     })?;
 
-    let content = std::fs::read_to_string(review_scope_path)
-        .map_err(|source| ScopeConfigLoadError::Io { path: path_display.clone(), source })?;
+    let content = read_bounded_config(review_scope_path, &path_display)?;
 
     // Typed deserialization with deny_unknown_fields — rejects typos and v1 fields
     let doc: ReviewScopeJsonV2 = serde_json::from_str(&content)
@@ -873,6 +925,57 @@ mod tests {
             domain::review_v2::MainScopeName::new("domain").unwrap(),
         );
         assert!(config.diff_ceiling_for_scope(&domain).is_none());
+    }
+
+    // ── bounded read ───────────────────────────────────────────────────
+
+    #[test]
+    fn test_a_configuration_larger_than_the_bound_is_refused_before_it_is_read() {
+        // A sparse file: it costs no disk, and reading it would cost the process
+        // its whole length. The refusal has to come from the size, before any of
+        // it is in memory.
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("review-scope.json");
+        let file = std::fs::File::create(&path).unwrap();
+        file.set_len(MAX_REVIEW_SCOPE_CONFIG_BYTES.saturating_add(1)).unwrap();
+        drop(file);
+
+        let track_id = TrackId::try_new("test-track").unwrap();
+        let err = load_v2_scope_config(&path, &track_id, dir.path()).unwrap_err();
+
+        let classification = match &err {
+            ScopeConfigLoadError::Io { source, .. } => {
+                crate::sanitized_failure::io_classification(source)
+            }
+            _ => "not refused as unreadable",
+        };
+        assert_eq!(
+            classification, "larger than a review-scope configuration may be",
+            "an oversized configuration must be refused by its size, got: {err}"
+        );
+    }
+
+    #[test]
+    fn test_a_configuration_at_the_bound_is_still_loaded() {
+        // The bound admits what it says it admits: a legitimate configuration
+        // padded to exactly the limit still parses, so the guard cannot be an
+        // off-by-one that refuses a file it was meant to accept.
+        let dir = tempfile::tempdir().unwrap();
+        let head = r#"{"version": 2, "groups": {"domain": {"patterns": ["libs/domain/**"]}}}"#;
+        let padding = usize::try_from(MAX_REVIEW_SCOPE_CONFIG_BYTES).unwrap() - head.len();
+        let path = write_scope_json(dir.path(), &format!("{head}{}", " ".repeat(padding)));
+        assert_eq!(
+            std::fs::metadata(&path).unwrap().len(),
+            MAX_REVIEW_SCOPE_CONFIG_BYTES,
+            "the fixture must sit exactly on the bound"
+        );
+
+        let track_id = TrackId::try_new("test-track").unwrap();
+        let config = load_v2_scope_config(&path, &track_id, dir.path()).unwrap();
+
+        assert!(config.contains_scope(&domain::review_v2::ScopeName::Main(
+            domain::review_v2::MainScopeName::new("domain").unwrap(),
+        )));
     }
 
     // ── layer-group drift guard (D5-b / IN-09 / AC-09 / CN-08) ─────────

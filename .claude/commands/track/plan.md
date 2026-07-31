@@ -31,7 +31,8 @@ User invokes this command as `/track:plan`. `$ARGUMENTS`:
   - `CAPABILITY_EXEC_OUTCOME: executed` — the subprocess dispatch already ran. Exit code 0
     only proves the provider exited cleanly; **parse the capability's terminal status /
     gate verdict from its output** (e.g. `IMPL_PLAN_STATUS: completed` + task-coverage
-    gate OK, per-phase writer completion contract). Advance to the next phase ONLY on the
+    gate OK + batch-plan structural gate OK, per-phase writer completion contract).
+    Advance to the next phase ONLY on the
     capability's explicit success verdict; on `blocked` / `failed` or a red signal, run the
     corresponding back-and-forth loop instead.
   - `CAPABILITY_EXEC_OUTCOME: delegate-in-host` — an in-host delegation instruction with
@@ -54,7 +55,7 @@ User invokes this command as `/track:plan`. `$ARGUMENTS`:
 On completion, present:
 
 1. Per-phase gate results (🔵🟡🔴 / OK / ERROR) and final `max_retry` counters per loop.
-2. Generated track artifact paths (`metadata.json` / `spec.json` / `<layer>-types.json` / `impl-plan.json` / `task-coverage.json` / `task-contract.json`).
+2. Generated track artifact paths (`metadata.json` / `spec.json` / `<layer>-types.json` / `impl-plan.json` / `task-coverage.json` / `task-contract.json` / `batch-plan.json`).
 3. Back-and-forth edits that occurred (target artifact and its writer).
 4. Input-box divergence triage results (if any) and the admitted delta drafts left 🟡 for
    the merge-stage adjudication — no synchronous termination decision is requested.

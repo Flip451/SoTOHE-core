@@ -51,6 +51,8 @@ Forbidden writes:
   before review, so the review sees the final task state, and it backfills the commit hash
   after the batch commit) — a timeline no implementer run can observe.
 - Other tracks' artifacts.
+- `track/items/<track-id>/batch-plan.json` — the impl-planner capability is its sole writer;
+  estimate or batch changes route back through the orchestrator to impl-planner.
 - ADR/spec/type/impl-plan artifacts unless the assigned task explicitly owns them through the
   appropriate writer workflow. Normal implementation tasks should route those changes back to
   the owning capability.
@@ -64,9 +66,15 @@ Per `.harness/policies/sot-reentry-sequencing.md`, a (re-)dispatch of this capab
 ### Step 1 — Ground The Task
 
 1. Confirm the current branch is `track/<id>`.
-2. Read the assigned task descriptions and the cited spec anchors.
-3. Read the relevant catalogue entries (`<layer>-types.json`) and existing implementation.
-4. Check architecture boundaries before introducing or moving types.
+2. **Pre-work precondition (task state)**: confirm every assigned task is `in_progress` in
+   `track/items/<id>/impl-plan.json` — the SSoT, **not** the rendered `plan.md` view. If any
+   assigned task is not `in_progress`, do not implement anything: return to the orchestrator
+   naming the task and asking it to perform the transition (`bin/sotp track transition` is the
+   orchestrator's lane). This precondition closes the bypass where an implementation dispatch
+   reaches source code without passing the transition path's admission judgment.
+3. Read the assigned task descriptions and the cited spec anchors.
+4. Read the relevant catalogue entries (`<layer>-types.json`) and existing implementation.
+5. Check architecture boundaries before introducing or moving types.
 
 ### Step 2 — Implement And Test
 

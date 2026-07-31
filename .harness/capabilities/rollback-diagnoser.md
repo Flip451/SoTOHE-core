@@ -51,6 +51,8 @@ active track. The track id is taken from the current branch (`track/<id>`).
   Phase 3 implementation plan (task ↔ spec coverage).
 - `track/items/<track-id>/task-contract.json` — PreReviewGate attribution map (task ↔ catalogue
   entry).
+- `track/items/<track-id>/batch-plan.json` — Phase 3 estimation and batch declaration
+  (read-only here, as everywhere outside impl-planner: that capability is its sole writer).
 - `track/items/<track-id>/*-signals.json` and `track/items/<track-id>/*-type-signals.json` —
   per-layer Chain ② / Chain ③ signal snapshots.
 - Any ADR cited by the failing spec element(s) under `knowledge/adr/`.

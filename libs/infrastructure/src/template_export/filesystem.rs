@@ -1,10 +1,11 @@
 //! Filesystem safety checks and deterministic directory access for template export.
 
-use std::path::{Component, Path, PathBuf};
+use std::path::{Path, PathBuf};
 
 use domain::FreeText;
 use usecase::template_export::{TemplateExportCommand, TemplateExportPortError};
 
+use crate::lexical_path::lexical_normalize;
 use crate::track::symlink_guard::reject_symlinks_below;
 
 /// Reads metadata for `path`, rejecting symlinks before any operation can follow
@@ -22,14 +23,44 @@ pub(super) fn non_symlink_metadata(
     std::fs::symlink_metadata(path).map_err(|error| io_error(path, &error))
 }
 
+/// The most entries one exported directory may hold.
+///
+/// Orders of magnitude above any directory in this workspace — the largest holds
+/// a few hundred files — so an honest export never meets it, while a directory
+/// large enough to exhaust memory stops the export instead of being collected.
+const MAX_TEMPLATE_DIR_ENTRIES: usize = 10_000;
+
 /// Reads entries in file-name order so traversal remains deterministic.
+///
+/// # Errors
+///
+/// Returns [`TemplateExportPortError::Io`] when the directory cannot be read, or
+/// when it holds more entries than an export will collect.
 pub(super) fn sorted_dir_entries(
     dir: &Path,
 ) -> Result<Vec<std::fs::DirEntry>, TemplateExportPortError> {
-    let mut entries = std::fs::read_dir(dir)
-        .map_err(|error| io_error(dir, &error))?
-        .collect::<Result<Vec<_>, _>>()
-        .map_err(|error| io_error(dir, &error))?;
+    sorted_dir_entries_within(dir, MAX_TEMPLATE_DIR_ENTRIES)
+}
+
+/// The body of [`sorted_dir_entries`], with the budget supplied so the refusal can
+/// be exercised without building a directory of the production size.
+fn sorted_dir_entries_within(
+    dir: &Path,
+    budget: usize,
+) -> Result<Vec<std::fs::DirEntry>, TemplateExportPortError> {
+    let mut entries = Vec::new();
+    // Counted while reading rather than collected and measured: the point of the
+    // budget is that an oversized directory never occupies memory in the first
+    // place.
+    for entry in std::fs::read_dir(dir).map_err(|error| io_error(dir, &error))? {
+        if entries.len() >= budget {
+            return Err(TemplateExportPortError::Io {
+                path: dir.to_path_buf(),
+                reason: FreeText::new(format!("directory holds more than {budget} entries")),
+            });
+        }
+        entries.push(entry.map_err(|error| io_error(dir, &error))?);
+    }
     entries.sort_by_key(std::fs::DirEntry::file_name);
     Ok(entries)
 }
@@ -88,27 +119,6 @@ fn absolute_lexical_path(path: &Path) -> Result<PathBuf, TemplateExportPortError
     Ok(lexical_normalize(&absolute))
 }
 
-fn lexical_normalize(path: &Path) -> PathBuf {
-    let mut components: Vec<Component<'_>> = Vec::new();
-    for component in path.components() {
-        match component {
-            Component::ParentDir => match components.last() {
-                Some(Component::Normal(_)) => {
-                    components.pop();
-                }
-                _ => {
-                    components.push(component);
-                }
-            },
-            Component::CurDir => {}
-            _ => {
-                components.push(component);
-            }
-        }
-    }
-    components.iter().collect()
-}
-
 pub(super) fn reject_export_path_symlinks(path: &Path) -> Result<bool, TemplateExportPortError> {
     reject_symlinks_below(path, symlink_guard_root(path)).map_err(|error| io_error(path, &error))
 }
@@ -123,5 +133,41 @@ pub(super) fn io_error(path: &Path, error: &std::io::Error) -> TemplateExportPor
     TemplateExportPortError::Io {
         path: path.to_path_buf(),
         reason: FreeText::new(error.to_string()),
+    }
+}
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_a_directory_within_the_budget_is_read_in_file_name_order() {
+        let dir = tempfile::tempdir().unwrap();
+        for name in ["c.txt", "a.txt", "b.txt"] {
+            std::fs::write(dir.path().join(name), "x").unwrap();
+        }
+
+        let entries = sorted_dir_entries_within(dir.path(), 3).unwrap();
+
+        let names: Vec<String> =
+            entries.iter().map(|entry| entry.file_name().to_string_lossy().into_owned()).collect();
+        assert_eq!(names, vec!["a.txt", "b.txt", "c.txt"], "order is deterministic");
+    }
+
+    #[test]
+    fn test_a_directory_past_the_budget_stops_the_export_instead_of_being_collected() {
+        let dir = tempfile::tempdir().unwrap();
+        for index in 0..4 {
+            std::fs::write(dir.path().join(format!("entry-{index}.txt")), "x").unwrap();
+        }
+
+        let error = sorted_dir_entries_within(dir.path(), 3)
+            .expect_err("a directory past the budget must be refused");
+
+        let TemplateExportPortError::Io { reason, .. } = error else {
+            panic!("expected an I/O refusal: {error:?}");
+        };
+        assert!(reason.as_str().contains("more than 3 entries"), "got: {reason}");
     }
 }

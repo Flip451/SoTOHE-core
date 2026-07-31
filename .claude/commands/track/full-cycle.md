@@ -1,5 +1,5 @@
 ---
-description: Run feature-batch implement → DRY check → review → commit loop for the current track (per-task split only when a per-scope diff ceiling is about to be exceeded).
+description: Run the declared-batch implement → DRY check → review → commit loop for the current track (batches consumed from batch-plan.json in declaration order).
 ---
 
 > Operational SSoT: `.harness/workflows/track/full-cycle.md` — provider 非依存 workflow logic はそちらを参照。本ファイルは Claude Code 固有 adapter として、起動形態 / Tool 制約 / 報告形式のみを残す。
@@ -19,8 +19,7 @@ This command sequences sub-commands by reading their `.claude/commands/track/*.m
 
 Key tool interactions:
 
-- Scope ceiling config: Read `.harness/config/review-scope.json`
-- Diff measurement: `git diff --numstat <batch-base> --`, `git ls-files --others --exclude-standard` (read-only)
+- Batch declaration: Read `track/items/<id>/batch-plan.json` (read-only — impl-planner is its sole writer)
 - Staging: `bin/sotp git add-all`
 - Task transitions: run `bin/sotp track transition` from the orchestrator host. The command's sequencing, timing, and ownership boundary live in the workflow SSoT (`.harness/workflows/track/full-cycle.md` Step 1d / Step 3) — do not restate them here.
 

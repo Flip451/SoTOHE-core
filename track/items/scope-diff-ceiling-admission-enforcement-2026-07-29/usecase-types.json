@@ -1,0 +1,1473 @@
+{
+  "crate_name": "usecase",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "batch_plan_reader",
+              "ty": "std::sync::Arc<dyn BatchPlanReaderPort>"
+            },
+            {
+              "name": "planned_task_reader",
+              "ty": "std::sync::Arc<dyn PlannedTaskReaderPort>"
+            },
+            {
+              "name": "scope_config_reader",
+              "ty": "std::sync::Arc<dyn ScopeConfigReaderPort>"
+            },
+            {
+              "name": "track_resolver",
+              "ty": "std::sync::Arc<dyn crate::track_resolution::ActiveTrackResolveService>"
+            }
+          ],
+          "returns": "BatchPlanCheckInteractor"
+        }
+      ],
+      "type_name": "BatchPlanCheckInteractor"
+    },
+    {
+      "impl_generics": [
+        {
+          "bounds": [],
+          "name": "S"
+        }
+      ],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "store",
+              "ty": "Arc<S>"
+            },
+            {
+              "name": "branch_reader",
+              "ty": "Option<Arc<dyn BranchReaderPort>>"
+            },
+            {
+              "name": "batch_plan_reader",
+              "ty": "Arc<dyn BatchPlanReaderPort>"
+            },
+            {
+              "name": "scope_diff_measurer",
+              "ty": "Arc<dyn ScopeDiffMeasurePort>"
+            },
+            {
+              "name": "scope_config_reader",
+              "ty": "Arc<dyn ScopeConfigReaderPort>"
+            },
+            {
+              "name": "commit_record_verifier",
+              "ty": "Arc<dyn CommitRecordVerifierPort>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "TaskOperationInteractor"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "rejection",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&AdmissionRejectionOutput>"
+        }
+      ],
+      "type_name": "TaskTransitionOutcome"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "violations",
+              "ty": "Vec<BatchPlanViolationOutput>"
+            }
+          ],
+          "returns": "Option<NonEmptyViolationOutputs>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_slice",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[BatchPlanViolationOutput]"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "into_vec",
+          "params": [],
+          "receiver": "self",
+          "returns": "Vec<BatchPlanViolationOutput>"
+        }
+      ],
+      "type_name": "NonEmptyViolationOutputs"
+    }
+  ],
+  "layer": "usecase",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "modify",
+      "for_type": "TaskOperationInteractor",
+      "trait_ref": "TaskOperationService"
+    },
+    {
+      "for_type": "PlanArtifactReadError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "PlanArtifactReadError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "PlanArtifactReadError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "ScopeDiffMeasureError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ScopeDiffMeasureError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "ScopeDiffMeasureError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "BatchPlanCheckCommand",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "BatchPlanCheckCommand",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "BatchPlanCheckCommand",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "BatchPlanCheckCommand",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "BatchPlanCheckError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "BatchPlanCheckError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "BatchPlanCheckError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "BatchPlanCheckInteractor",
+      "trait_ref": "BatchPlanCheckService"
+    },
+    {
+      "for_type": "ScopeConfigReadError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ScopeConfigReadError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "ScopeConfigReadError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "TaskTransitionOutcome",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "BatchPlanViolationOutput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "BatchPlanViolationOutput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "BatchPlanViolationOutput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "BatchPlanViolationOutput",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "BatchPlanCheckOutput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "BatchPlanCheckOutput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "BatchPlanCheckOutput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "BatchPlanCheckOutput",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "AdmissionRejectionOutput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "AdmissionRejectionOutput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "AdmissionRejectionOutput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "AdmissionRejectionOutput",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "AdmissionRejectionOutput",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "NonEmptyViolationOutputs",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "NonEmptyViolationOutputs",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "NonEmptyViolationOutputs",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "NonEmptyViolationOutputs",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "CommitRecordVerifyError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CommitRecordVerifyError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "CommitRecordVerifyError",
+      "trait_ref": "core::error::Error"
+    }
+  ],
+  "traits": {
+    "BatchPlanCheckService": {
+      "action": "add",
+      "docs": "Primary port for the Phase 3 gate, driven by the CLI batch-plan check command. Type-design: the verdict is returned as data and the error channel is reserved for failures that prevented the check, so the two stay distinguishable at the adapter boundary. The success type is this crate's own output DTO rather than the domain verdict, so no domain value object crosses into the adapter. IN-06, IN-07, AC-06, AC-07.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "check",
+          "params": [
+            {
+              "name": "cmd",
+              "ty": "BatchPlanCheckCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<BatchPlanCheckOutput, BatchPlanCheckError>"
+        }
+      ],
+      "module_path": "batch_plan",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
+    "BatchPlanReaderPort": {
+      "action": "add",
+      "docs": "Driven port with a single read operation returning a validated domain document; no write operation. Type-design: decoding stays in the adapter so the domain never sees the wire format. Blocking: the callers are single-shot CLI gates with no concurrency and no async runtime on this path, so is_async is false for every method here — matching the existing driven ports in this crate. IN-01, AC-01, AC-05.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "read",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<domain::batch_plan::BatchPlanDocument, PlanArtifactReadError>"
+        }
+      ],
+      "module_path": "batch_plan::ports",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
+    "BranchReaderPort": {
+      "action": "reference",
+      "docs": "Pre-existing driven port supplying the current git branch; unchanged by this track, declared because a new secondary adapter in this change set implements it (R7 — without the declaration the adapter's impl edge is dropped from the contract map). Blocking: the implementing adapter shells out to git and the callers are single-shot CLI gates with no async runtime on this path, so is_async is false. AC-05, CN-09.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "current_branch",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Result<Option<String>, BranchReadError>"
+        }
+      ],
+      "module_path": "track_resolution",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
+    "CommitRecordVerifierPort": {
+      "action": "add",
+      "docs": "Driven port; declares verify_commit_record(items_dir, commit_hash) -> Result<(), CommitRecordVerifyError>, is_async false (blocking, single-shot CLI callers), supertraits Send + Sync. items_dir lane per the batch-plan ports. No verdict type minted — Ok/Err carries it (R12). IN-22, AC-28, AC-29.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_commit_record",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "commit_hash",
+              "ty": "&domain::CommitHash"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(), CommitRecordVerifyError>"
+        }
+      ],
+      "module_path": "task_ops::ports",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-22",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-28",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-29",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
+    "PlannedTaskReaderPort": {
+      "action": "add",
+      "docs": "Driven port; declares read_planned_tasks(items_dir, track_id) -> Result<Vec<domain::TrackTask>, PlanArtifactReadError>, is_async false (blocking, single-shot CLI callers), supertraits Send + Sync. Separate port from the pre-existing plan-status reader (unordered map, no commit-bearing status, no dependency declarations). Returns whole TrackTask values, not a near-duplicate VO (R12 reuse decision); no filter declared at this port. IN-07, IN-19, IN-21, AC-07, AC-24.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "read_planned_tasks",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<Vec<domain::TrackTask>, PlanArtifactReadError>"
+        }
+      ],
+      "module_path": "batch_plan::ports",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-21",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-24",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
+    "ScopeConfigReaderPort": {
+      "action": "add",
+      "docs": "Driven port that loads the review scope configuration, the source of the per-scope ceilings. Type-design: a port rather than a pre-built injected value so composition roots stay zero-argument wiring accessors and the items directory travels per call. Blocking: single-shot CLI callers, no async runtime on this path, so is_async is false. IN-06, AC-08.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "read",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<domain::review_v2::ReviewScopeConfig, ScopeConfigReadError>"
+        }
+      ],
+      "module_path": "batch_plan::ports",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
+    "ScopeDiffMeasurePort": {
+      "action": "add",
+      "docs": "Driven port that measures the actual per-scope diff for a track. Type-design: the port surface exposes only the resulting figures — the counting definition and base resolution are the adapter's responsibility. Blocking: the adapter shells out to git and the caller is a single-shot CLI gate, so is_async is false. IN-10, IN-14, AC-17, CN-05.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "measure_scope_diff",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<Vec<domain::batch_plan::MeasuredScopeDiff>, ScopeDiffMeasureError>"
+        }
+      ],
+      "module_path": "batch_plan::ports",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-10",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-14",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-17",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "CN-05",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
+    "TaskOperationService": {
+      "action": "modify",
+      "docs": "Pre-existing primary port for track task mutations; transition_task's success type becomes TaskTransitionOutcome so an admission refusal travels as typed data. Type-design: no admission-specific method is added — the judgment stays inside transition_task's implementation; the other three operations and the error type are untouched. transition_task channels: structured lane = Ok(TaskTransitionOutcome::Rejected(AdmissionRejectionOutput)) — judged refusals, data for callers; Err lane = TaskOperationError::TransitionFailed(String) — unjudgeable states as terminal diagnostics. Asymmetry with the gate path's BatchPlanViolationOutput is intentional: track-ops errors are rendered immediately as string CommandOutcome by the composition root (accepted interim boundary), so a structured error variant would have no consumer; TaskOperationError stays baseline-shaped and undeclared here. Record-time commit verification: Err lane, no new method. CN-10.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "transition_task",
+          "params": [
+            {
+              "name": "cmd",
+              "ty": "TaskTransitionCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<TaskTransitionOutcome, TaskOperationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "add_task",
+          "params": [
+            {
+              "name": "cmd",
+              "ty": "AddTaskCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<TaskOperationOutput, TaskOperationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "set_override",
+          "params": [
+            {
+              "name": "cmd",
+              "ty": "SetOverrideCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<TaskOperationOutput, TaskOperationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "clear_override",
+          "params": [
+            {
+              "name": "cmd",
+              "ty": "ClearOverrideCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<TaskOperationOutput, TaskOperationError>"
+        }
+      ],
+      "module_path": "task_ops",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-23",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-26",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-27",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    }
+  },
+  "types": {
+    "AdmissionRejectionOutput": {
+      "action": "add",
+      "docs": "Usecase-owned mirror of AdmissionRejection; enum, 3 variants (NotCurrentBatchMember, NoCurrentBatch, ScopeCeilingWouldBeExceeded), names and payload arity 1:1 with the domain refusal (R11). Payloads: String / u32 / core::num::NonZeroU32 (R9 presentation boundary: validated upstream, rendered by the driver; matches this crate's existing output DTOs). Declared so no domain value object reaches the adapter. IN-09, IN-10, AC-10, AC-12, AC-27.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NotCurrentBatchMember",
+            "payload": {
+              "fields": [
+                {
+                  "name": "task_id",
+                  "ty": "String"
+                },
+                {
+                  "name": "task_batch",
+                  "ty": "String"
+                },
+                {
+                  "name": "current_batch",
+                  "ty": "String"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "NoCurrentBatch",
+            "payload": {
+              "fields": [
+                {
+                  "name": "task_id",
+                  "ty": "String"
+                },
+                {
+                  "name": "task_batch",
+                  "ty": "String"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ScopeCeilingWouldBeExceeded",
+            "payload": {
+              "fields": [
+                {
+                  "name": "scope",
+                  "ty": "String"
+                },
+                {
+                  "name": "prior_contribution",
+                  "ty": "core::num::NonZeroU32"
+                },
+                {
+                  "name": "candidate_estimate",
+                  "ty": "u32"
+                },
+                {
+                  "name": "ceiling",
+                  "ty": "u32"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "task_ops",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-10",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-27",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "BatchPlanCheckCommand": {
+      "action": "add",
+      "docs": "Command object for the Phase 3 gate, carrying the track context unresolved. Type-design: track_id is Option<String> because resolving it is part of this use case rather than a separate step the adapter performs first — the interactor owns both resolution and the check, so a request maps to one interactor. The raw String is the deliberately-unresolved transport value; converting it to a domain identifier is exactly the resolution the interactor does (R9 boundary case). items_dir is a raw path with no domain meaning and travels with the command rather than with construction, which keeps the composition root a zero-argument wiring accessor. IN-06, AC-06.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "track_id",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "batch_plan",
+      "role": {
+        "Command": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "BatchPlanCheckError": {
+      "action": "add",
+      "docs": "Failures that prevented the Phase 3 gate from running, kept separate from the verdict (structural findings are data inside BatchPlanCheckOutput::Blocked). TrackResolutionFailed covers an unresolvable track context, which is now part of this use case rather than of the adapter. Type-design: message payloads use FreeText because they are opaque adapter diagnostics with no domain structure (R9 truly-opaque case). Construction owner: BatchPlanCheckInteractor mapping its port and resolver errors. IN-06, AC-05, AC-06, CN-09.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "BatchPlanNotFound",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "BatchPlanReadFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "message",
+                  "ty": "domain::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ImplPlanNotFound",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ImplPlanReadFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "message",
+                  "ty": "domain::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ScopeConfigReadFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "message",
+                  "ty": "domain::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "TrackResolutionFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "message",
+                  "ty": "domain::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "batch_plan",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "BatchPlanCheckInteractor": {
+      "action": "add",
+      "docs": "Implements BatchPlanCheckService: resolves the track context with READ semantics through the pre-existing resolve service, reads the batch plan, the planned tasks and the scope config through its three injected ports, and delegates to check_batch_plan, then maps the domain verdict into this crate's output DTO. Type-design: resolution is absorbed here rather than performed by the adapter beforehand, so one request drives one interactor; it reuses the shared resolve service instead of a second mechanism. The domain-to-DTO mapping lives here so the domain verdict stops at this layer. Holds no ceiling arithmetic of its own, and an absent batch plan is mapped to an error rather than a pass — the opposite of the pre-review task-contract gate's absent-artifact tolerance. IN-06, IN-07, AC-05, AC-06, AC-07, AC-08, CN-09.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "batch_plan",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "BatchPlanCheckOutput": {
+      "action": "add",
+      "docs": "Usecase-owned verdict returned to the driver. Type-design: enum-first, mirroring the domain verdict so Passed carries nothing and Blocked carries the findings; the interactor maps the domain value into this type so no domain verdict reaches the adapter. Blocked carries NonEmptyViolationOutputs, so an empty blocked verdict stays unrepresentable on this side of the boundary too rather than relying on the upstream invariant. IN-06, AC-06.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Passed",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Blocked",
+            "payload": {
+              "fields": [
+                {
+                  "name": "violations",
+                  "ty": "NonEmptyViolationOutputs"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "batch_plan",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "BatchPlanViolationOutput": {
+      "action": "add",
+      "docs": "Usecase-owned mirror of one gate finding; enum, 6 variants matching the domain finding one-to-one in name and payload arity (R11). Payloads: String / u32 / Vec<String> (R9 presentation boundary: validated upstream, rendered by the driver; matches this crate's existing output DTOs). UnknownMainScopeName.scope renders the domain MainScopeName; interactor is the only declared reader. Declared so no domain value object crosses into the adapter. IN-06, IN-07, AC-06, AC-07, AC-08.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "CeilingExceeded",
+            "payload": {
+              "fields": [
+                {
+                  "name": "batch_id",
+                  "ty": "String"
+                },
+                {
+                  "name": "scope",
+                  "ty": "String"
+                },
+                {
+                  "name": "total",
+                  "ty": "u32"
+                },
+                {
+                  "name": "ceiling",
+                  "ty": "u32"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "OversizeScopeHasMultipleContributors",
+            "payload": {
+              "fields": [
+                {
+                  "name": "batch_id",
+                  "ty": "String"
+                },
+                {
+                  "name": "scope",
+                  "ty": "String"
+                },
+                {
+                  "name": "indivisible_task",
+                  "ty": "String"
+                },
+                {
+                  "name": "other_contributors",
+                  "ty": "Vec<String>"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "UnknownTaskRef",
+            "payload": {
+              "fields": [
+                {
+                  "name": "task_id",
+                  "ty": "String"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "UnplannedTask",
+            "payload": {
+              "fields": [
+                {
+                  "name": "task_id",
+                  "ty": "String"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "DependencyInLaterBatch",
+            "payload": {
+              "fields": [
+                {
+                  "name": "task_id",
+                  "ty": "String"
+                },
+                {
+                  "name": "task_batch",
+                  "ty": "String"
+                },
+                {
+                  "name": "dependency",
+                  "ty": "String"
+                },
+                {
+                  "name": "dependency_batch",
+                  "ty": "String"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "UnknownMainScopeName",
+            "payload": {
+              "fields": [
+                {
+                  "name": "task_id",
+                  "ty": "String"
+                },
+                {
+                  "name": "scope",
+                  "ty": "String"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "batch_plan",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "CommitRecordVerifyError": {
+      "action": "add",
+      "docs": "Err type of CommitRecordVerifierPort::verify_commit_record; enum, 3 variants: CommitNotFound { commit_hash } (→ TransitionFailed lane), NotAncestorOfHead { commit_hash } (→ TransitionFailed lane), RepositoryUnreadable { message } (→ StoreFailed lane). Payloads: domain::CommitHash typed (R11); message: domain::FreeText (R9 truly-opaque). Construction owner: GitCommitRecordVerifier. IN-22, AC-28.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "CommitNotFound",
+            "payload": {
+              "fields": [
+                {
+                  "name": "commit_hash",
+                  "ty": "domain::CommitHash"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "NotAncestorOfHead",
+            "payload": {
+              "fields": [
+                {
+                  "name": "commit_hash",
+                  "ty": "domain::CommitHash"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "RepositoryUnreadable",
+            "payload": {
+              "fields": [
+                {
+                  "name": "message",
+                  "ty": "domain::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "task_ops",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-22",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-28",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "NonEmptyViolationOutputs": {
+      "action": "add",
+      "docs": "Boundary mirror of the domain's non-empty violation collection. Type-design: without it a Blocked output could carry an empty list, so the guarantee the domain establishes would be dropped exactly where the adapter consumes it; this type carries it across instead, keeping the mirror faithful in structure and not only in variant names. try_new returns Option because emptiness is a shape question at the mapping site, not an error the use case reports. Private tuple newtype, mirroring the domain collection's surface. IN-06, AC-06, AC-07.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "batch_plan",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "PlanArtifactReadError": {
+      "action": "add",
+      "docs": "Failure of reading a track planning artifact, shared by the batch-plan and planned-task ports. Type-design: both ports read a per-track JSON artifact that may be absent or unreadable, so they share one contract rather than declaring identical enums; which artifact failed is already carried by the call site, and BatchPlanCheckError keeps separate variants for the two. NotFound is its own variant because callers act on it distinctly rather than folding it into a generic read failure; the message payload uses FreeText as an opaque adapter diagnostic (R9 truly-opaque case). IN-01, IN-07, AC-05, AC-07.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NotFound",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ReadFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "message",
+                  "ty": "domain::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "batch_plan",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "ScopeConfigReadError": {
+      "action": "add",
+      "docs": "Failure of the scope-configuration reading port. Type-design: covers only a configuration that could not be loaded — an unconfigured ceiling is ScopeCeiling::Unconstrained, not an error; the message payload uses FreeText as an opaque adapter diagnostic (R9 truly-opaque case). IN-06, AC-08.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ReadFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "message",
+                  "ty": "domain::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "batch_plan",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "ScopeDiffMeasureError": {
+      "action": "add",
+      "docs": "Failure of the per-scope diff measurement port. Type-design: covers only a measurement that could not be produced — base degradation is not modelled as a failure; the message payload uses FreeText as an opaque adapter diagnostic (R9 truly-opaque case). IN-10, IN-14, AC-17, CN-05.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "MeasureFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "message",
+                  "ty": "domain::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "batch_plan",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-14",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-17",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "TaskOperationInteractor": {
+      "action": "modify",
+      "docs": "Existing task-operation interactor; new() gains the batch-plan reader, scope-diff measurer, scope-config reader and commit-record verifier, and transition_task delegates the judgment to evaluate_admission. The verifier is consulted before a hash-writing transition is applied (Complete-with-hash / BackfillHash); required rather than Option, so no constructible interactor can record a hash unverified. CommitRecordVerifyError maps variant-wise: the two rejected variants to TransitionFailed, RepositoryUnreadable to StoreFailed. The constructor is declared in the top-level inherent_impls entry rather than on this type entry, because that is the only place a generic interactor's impl-block type parameter can be expressed; it is declared once there and left empty here so the contract map does not render it twice. Type-design: the three admission collaborators are required rather than Option so no constructible interactor can transition without judging; the pre-existing branch_reader stays Option because that guard is disabled in repository-less test environments. Port calls are scoped by the items_dir already on TaskTransitionCommand, and planned tasks come from the existing store bound rather than a new port. A refusal is returned as TaskTransitionOutcome::Rejected with its typed payload intact, not flattened into the error channel, so TaskOperationError's declared shape stays baseline-identical. IN-09, IN-10, AC-10, AC-12, AC-13, CN-10.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "task_ops",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-10",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "CN-10",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-23",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-26",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-27",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "TaskTransitionOutcome": {
+      "action": "add",
+      "docs": "Result of transition_task: the transition happened, or it was refused with the typed reason. Type-design: an admission refusal is a legitimate result rather than an exceptional condition, so it travels as data and keeps its scope, contribution, ceiling and batch payloads intact — the same outcome-as-data shape the Phase 3 gate path uses, instead of collapsing to a rendered string in the error channel. The refusal is carried as this crate's own output DTO, so no domain value object reaches the adapter. This also leaves TaskOperationError's declared shape identical to its baseline. Role Dto in usecase (R1 △, justification): it is the output carrier of the pre-existing TaskOperationOutput DTO in this same module, crossing the usecase-to-driver boundary; it is not identified by value equality, so ValueObject would be the wrong classification. IN-09, IN-10, AC-10, AC-12.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Transitioned",
+            "payload": {
+              "fields": [
+                "TaskOperationOutput"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Rejected",
+            "payload": {
+              "fields": [
+                "AdmissionRejectionOutput"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "task_ops",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-10",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-27",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "TransitionTaskUseCase": {
+      "action": "delete",
+      "informal_grounds": [],
+      "spec_refs": [
+        {
+          "anchor": "CN-10",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    }
+  }
+}

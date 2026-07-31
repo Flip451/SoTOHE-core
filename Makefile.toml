@@ -846,6 +846,11 @@ description = "[internal] Liveness gate (`sotp task-contract check`): verifies i
 command = "cargo"
 args = ["run", "--quiet", "-p", "cli", "--", "task-contract", "check"]
 
+[tasks.batch-plan-check]
+description = "[verify] Run the Phase 3 batch-plan structural check for the active track (declared per-scope estimate sums vs resolved ceilings, batch/task structure, dependency batch order). Standalone by design: intentionally not chained into ci-track or the commit gate — admission enforcement lives on the task-transition path, and post-implementation diff growth is never re-checked against ceilings."
+command = "bin/sotp"
+args = ["batch-plan", "check"]
+
 [tasks.test-obligation-check-local]
 private = true
 description = "[internal] Pure-read test-obligation fulfillment gate. Active track auto-resolved by CLI. Uses cargo-run so CI containers exercise the current source tree without requiring a host-installed bin/sotp."

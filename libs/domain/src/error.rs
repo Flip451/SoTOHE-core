@@ -1,7 +1,7 @@
 use thiserror::Error;
 
 use crate::tddd::test_obligation::ids::DiagnosticMessage;
-use crate::{TaskStatusKind, TrackStatus};
+use crate::{TaskId, TaskStatusKind, TrackStatus};
 
 /// Top-level domain error encompassing validation and transition errors.
 #[derive(Debug, Error)]
@@ -110,6 +110,31 @@ pub enum ValidationError {
     InvalidObligationMinimum(usize),
     #[error("detection rate '{0}' must be a percentage in 0..=100")]
     InvalidDetectionRate(u8),
+    #[error("task '{task_id}' declares a dependency on unknown task '{dependency}'")]
+    UnknownDependencyReference {
+        /// The task carrying the declaration.
+        task_id: TaskId,
+        /// The declared dependency that no task in the plan provides.
+        dependency: TaskId,
+    },
+    #[error("declared task dependencies form a cycle: {}", render_task_ids(.task_ids))]
+    DependencyCycle {
+        /// The tasks on the cycle, in traversal order; a single id is a
+        /// self-reference.
+        task_ids: Vec<TaskId>,
+    },
+    #[error("plan order places task '{task_id}' before its declared dependency '{dependency}'")]
+    PlanOrderViolatesDependency {
+        /// The task placed too early.
+        task_id: TaskId,
+        /// The declared dependency that plan order puts after it.
+        dependency: TaskId,
+    },
+}
+
+/// Renders the tasks on a declared dependency cycle.
+fn render_task_ids(task_ids: &[TaskId]) -> String {
+    task_ids.iter().map(ToString::to_string).collect::<Vec<_>>().join(" -> ")
 }
 
 /// Errors from invalid task state transitions.

@@ -1,0 +1,18 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-30T17:07:37Z",
+  "declaration_hash": "2ac352f0a27b2ce270e8afdff5bcee59f21e5aeaf78702a4ae5756cedfc6a39a",
+  "implementation_input_hash": "8265bf14748c159ac9fa94bca4826297c478e92707353353055a3ee455d31333",
+  "signals": [
+    {
+      "type_name": "BatchPlanCompositionRoot",
+      "kind_tag": "composition_root",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Debug",
+        "Default"
+      ]
+    }
+  ]
+}

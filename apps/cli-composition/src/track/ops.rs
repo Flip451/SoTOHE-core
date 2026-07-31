@@ -13,7 +13,8 @@ use crate::error::CompositionError;
 use crate::track::composition_root::TrackCompositionRoot;
 
 use super::{
-    build_branch_reader, resolve_project_root, sync_views_to_stdout, validate_track_id_str,
+    build_branch_reader, build_task_operation_interactor, resolve_project_root,
+    sync_views_to_stdout, validate_track_id_str,
 };
 
 impl TrackCompositionRoot {
@@ -41,8 +42,7 @@ impl TrackCompositionRoot {
 
         let store = Arc::new(FsTrackStore::new(items_dir.clone()));
         let branch_reader = build_branch_reader(&project_root);
-        let service =
-            usecase::task_ops::TaskOperationInteractor::new(Arc::clone(&store), branch_reader);
+        let service = build_task_operation_interactor(Arc::clone(&store), branch_reader);
 
         let after_task_id = match after {
             Some(ref a)
@@ -103,8 +103,7 @@ impl TrackCompositionRoot {
 
         let store = Arc::new(FsTrackStore::new(items_dir.clone()));
         let branch_reader = build_branch_reader(&project_root);
-        let service =
-            usecase::task_ops::TaskOperationInteractor::new(Arc::clone(&store), branch_reader);
+        let service = build_task_operation_interactor(Arc::clone(&store), branch_reader);
 
         let cmd = usecase::task_ops::SetOverrideCommand {
             items_dir,
@@ -143,8 +142,7 @@ impl TrackCompositionRoot {
 
         let store = Arc::new(FsTrackStore::new(items_dir.clone()));
         let branch_reader = build_branch_reader(&project_root);
-        let service =
-            usecase::task_ops::TaskOperationInteractor::new(Arc::clone(&store), branch_reader);
+        let service = build_task_operation_interactor(Arc::clone(&store), branch_reader);
 
         let cmd = usecase::task_ops::ClearOverrideCommand { items_dir, track_id: track_id.clone() };
         let output = service

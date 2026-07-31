@@ -1,0 +1,205 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-30T21:49:56Z",
+  "declaration_hash": "03c29801682d16bdab42649ca2a11e107904f3b82568dd6a8f5c36e88583f03f",
+  "implementation_input_hash": "944480e64a282c30d32e03d9cef6134638a05e92db8964dc2392ae654ede9ff7",
+  "signals": [
+    {
+      "type_name": "AdmissionRejectionOutput",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Display",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "BatchPlanCheckCommand",
+      "kind_tag": "command",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "BatchPlanCheckError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "BatchPlanCheckInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "BatchPlanCheckService"
+      ]
+    },
+    {
+      "type_name": "BatchPlanCheckOutput",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "BatchPlanCheckService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "BatchPlanReaderPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "BatchPlanViolationOutput",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "CommitRecordVerifierPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CommitRecordVerifyError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "NonEmptyViolationOutputs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "PlanArtifactReadError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "PlannedTaskReaderPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ScopeConfigReadError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "ScopeConfigReaderPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ScopeDiffMeasureError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "ScopeDiffMeasurePort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TaskOperationInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "TaskOperationService"
+      ]
+    },
+    {
+      "type_name": "TaskOperationService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TaskTransitionOutcome",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Debug"
+      ]
+    },
+    {
+      "type_name": "TransitionTaskUseCase",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "BranchReaderPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

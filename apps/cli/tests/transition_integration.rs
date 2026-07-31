@@ -10,12 +10,16 @@
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-fn sotp_bin() -> Command {
+/// Runs the CLI from inside `root`, the way it is run in a checkout: the
+/// repository-scoped reads a transition makes resolve against the repository the
+/// process stands in.
+fn sotp_bin_in(root: &Path) -> Command {
     let mut cmd = Command::new(env!("CARGO_BIN_EXE_sotp"));
     // Disable telemetry in spawned binary so integration tests never write to
     // the real track/items/ tree (CN-06 / AC-07).  The #[cfg(test)] guard only
     // applies to in-process code; spawned binaries are full production processes.
     cmd.env("SOTP_TELEMETRY", "0");
+    cmd.current_dir(root);
     cmd
 }
 
@@ -66,6 +70,25 @@ fn init_git_repo_on_track_branch(root: &Path, track_id: &str) {
         .status()
         .expect("git branch -m failed");
     assert!(status.success(), "git branch -m must succeed");
+
+    // Keep the base branch the metadata snapshot names, so the diff the
+    // admission guard measures has a base to start from.
+    let status = Command::new("git")
+        .args(["branch", "main"])
+        .current_dir(root)
+        .status()
+        .expect("git branch main failed");
+    assert!(status.success(), "creating the base branch must succeed");
+}
+
+/// The fixture repository's `HEAD` commit: the one hash a recording transition
+/// can use, since a recorded hash must exist in the repository the track lives
+/// in and be an ancestor of its `HEAD`.
+fn head_hash(root: &Path) -> String {
+    let output =
+        Command::new("git").args(["rev-parse", "HEAD"]).current_dir(root).output().unwrap();
+    assert!(output.status.success(), "the fixture repository must have a resolvable HEAD");
+    String::from_utf8(output.stdout).unwrap().trim().to_owned()
 }
 
 /// Writes a minimal v6 metadata.json fixture (identity-only, branchless).
@@ -113,15 +136,20 @@ fn write_fixture_metadata(items_dir: &Path, track_id: &str) -> PathBuf {
 /// Writes an impl-plan.json with a single todo task T001.
 fn write_fixture_impl_plan(items_dir: &Path, track_id: &str) {
     let track_dir = items_dir.join(track_id);
+    // T002 is remaining work nothing in these tests transitions. It keeps the
+    // batch it shares with T001 open, so committing T001 does not settle the whole
+    // declaration and leave no batch being consumed — the state a reopen is
+    // refused in.
     let impl_plan = r#"{
   "schema_version": 1,
   "tasks": [
-    { "id": "T001", "description": "First task", "status": "todo" }
+    { "id": "T001", "description": "First task", "status": "todo" },
+    { "id": "T002", "description": "Remaining work", "status": "todo" }
   ],
   "plan": {
     "summary": [],
     "sections": [
-      { "id": "S1", "title": "Phase 1", "description": [], "task_ids": ["T001"] }
+      { "id": "S1", "title": "Phase 1", "description": [], "task_ids": ["T001", "T002"] }
     ]
   }
 }
@@ -132,15 +160,58 @@ fn write_fixture_impl_plan(items_dir: &Path, track_id: &str) {
 /// Writes a minimal architecture-rules.json fixture so render.rs can iterate
 /// TDDD layers (fail-closed after T045 — synthetic fallback removed).
 fn write_fixture_arch_rules(root: &Path) {
-    let arch_rules = r#"{"layers":[{"crate":"domain","tddd":{"enabled":true,"catalogue_file":"domain-types.json"}}]}"#;
+    let arch_rules = r#"{"layers":[{"crate":"domain","path":"libs/domain","tddd":{"enabled":true,"catalogue_file":"domain-types.json"}}]}"#;
     std::fs::write(root.join("architecture-rules.json"), arch_rules).unwrap();
+}
+
+/// Writes the batch plan the admission guard judges an entry into work against:
+/// T001 and the untouched T002 in the first batch, each with a small `domain`
+/// estimate. T002 is what keeps the batch open once T001 is committed, so a
+/// reopen of T001 still has a batch being consumed to belong to.
+fn write_fixture_batch_plan(items_dir: &Path, track_id: &str) {
+    let batch_plan = format!(
+        r#"{{
+  "schema_version": 1,
+  "track_id": "{track_id}",
+  "task_estimates": [
+    {{
+      "task_id": "T001",
+      "scope_estimates": [
+        {{ "scope": "domain", "production_lines": 10, "test_lines": 5 }}
+      ],
+      "oversize_justification": null
+    }},
+    {{
+      "task_id": "T002",
+      "scope_estimates": [
+        {{ "scope": "domain", "production_lines": 10, "test_lines": 5 }}
+      ],
+      "oversize_justification": null
+    }}
+  ],
+  "batches": [{{ "id": "B1", "task_ids": ["T001", "T002"] }}]
+}}
+"#
+    );
+    std::fs::write(items_dir.join(track_id).join("batch-plan.json"), batch_plan).unwrap();
+}
+
+/// Writes the review-scope configuration the ceilings are resolved from.
+fn write_fixture_review_scope(root: &Path) {
+    let config = r#"{"version": 2, "groups": {"domain": {"patterns": ["libs/domain/**"]}},
+      "review_operational": [], "other_track": [], "default_diff_ceiling_lines": 500}"#;
+    let config_dir = root.join(".harness/config");
+    std::fs::create_dir_all(&config_dir).unwrap();
+    std::fs::write(config_dir.join("review-scope.json"), config).unwrap();
 }
 
 fn project_root_with_full_track(root: &Path, track_id: &str) -> PathBuf {
     let items_dir = root.join("track/items");
     write_fixture_metadata(&items_dir, track_id);
     write_fixture_impl_plan(&items_dir, track_id);
+    write_fixture_batch_plan(&items_dir, track_id);
     write_fixture_arch_rules(root);
+    write_fixture_review_scope(root);
     // Bootstrap a git repo on the track branch so `resolve_track_id_for_write`
     // can discover it from the items_dir project root.
     init_git_repo_on_track_branch(root, track_id);
@@ -165,7 +236,7 @@ fn transition_subcommand_success_updates_status_and_persists() {
     let root_dir = tempfile::tempdir().unwrap();
     let items_dir = project_root_with_full_track(root_dir.path(), track_id);
 
-    let output = sotp_bin()
+    let output = sotp_bin_in(root_dir.path())
         .args([
             "track",
             "transition",
@@ -207,8 +278,8 @@ fn transition_subcommand_success_updates_status_and_persists() {
 #[test]
 fn transition_subcommand_rejects_invalid_status_transition() {
     // todo -> done is invalid (must go todo -> in_progress -> done).
-    // Also verifies that impl-plan.json is NOT partially written on a failed
-    // transition — the task state must remain "todo" after rejection.
+    // Also verifies that impl-plan.json is not written at all on a failed
+    // transition: the whole document must survive byte for byte.
     //
     // Uses a fixed synthetic track id and an isolated git repo so the test runs
     // unconditionally on any CI/dev checkout branch (D7 / AC-18).
@@ -216,8 +287,10 @@ fn transition_subcommand_rejects_invalid_status_transition() {
 
     let root_dir = tempfile::tempdir().unwrap();
     let items_dir = project_root_with_full_track(root_dir.path(), track_id);
+    let impl_plan_path = items_dir.join(format!("{track_id}/impl-plan.json"));
+    let before = std::fs::read(&impl_plan_path).unwrap();
 
-    let output = sotp_bin()
+    let output = sotp_bin_in(root_dir.path())
         .args([
             "track",
             "transition",
@@ -233,16 +306,15 @@ fn transition_subcommand_rejects_invalid_status_transition() {
 
     assert!(!output.status.success(), "expected non-zero exit for invalid transition todo->done");
 
-    // impl-plan.json must not have been partially written — T001 stays "todo".
-    let impl_plan_path = items_dir.join(format!("{track_id}/impl-plan.json"));
-    let content = std::fs::read_to_string(&impl_plan_path).unwrap();
-    assert!(
-        content.contains("\"todo\""),
-        "impl-plan.json must still contain \"todo\" status after rejected transition:\n{content}"
-    );
-    assert!(
-        !content.contains("\"done\""),
-        "impl-plan.json must NOT contain \"done\" status after rejected transition:\n{content}"
+    // The whole document, not one task's status: a rejected transition writes
+    // nothing, so any partial write — to the candidate, to another task, or to a
+    // field outside the task list — fails this comparison.
+    let after = std::fs::read(&impl_plan_path).unwrap();
+    assert_eq!(
+        after,
+        before,
+        "a rejected transition must leave impl-plan.json untouched; after:\n{}",
+        String::from_utf8_lossy(&after)
     );
 }
 
@@ -256,7 +328,7 @@ fn transition_subcommand_fails_on_missing_items_dir() {
     // Path does NOT end in `track/items` → resolve_project_root returns Err.
     let bogus = root_dir.path().join("does/not/exist/wrong/path");
 
-    let output = sotp_bin()
+    let output = sotp_bin_in(root_dir.path())
         .args([
             "track",
             "transition",
@@ -286,7 +358,7 @@ fn transition_subcommand_persists_commit_hash_on_done_transition() {
     let items_dir = project_root_with_full_track(root_dir.path(), track_id);
 
     // Step 1: todo -> in_progress
-    let out1 = sotp_bin()
+    let out1 = sotp_bin_in(root_dir.path())
         .args([
             "track",
             "transition",
@@ -302,15 +374,18 @@ fn transition_subcommand_persists_commit_hash_on_done_transition() {
     let stderr1 = String::from_utf8_lossy(&out1.stderr);
     assert!(out1.status.success(), "step1 transition to in_progress failed:\nstderr: {stderr1}");
 
-    // Step 2: in_progress -> done with commit hash
-    let out2 = sotp_bin()
+    // Step 2: in_progress -> done with commit hash. The hash is the fixture
+    // repository's own HEAD: a recorded hash is verified against that repository
+    // before it is written, so an invented one would be refused.
+    let head = head_hash(root_dir.path());
+    let out2 = sotp_bin_in(root_dir.path())
         .args([
             "track",
             "transition",
             "--items-dir",
             items_dir.to_str().unwrap(),
             "--commit-hash",
-            "abc1234",
+            &head,
             "--track-id",
             track_id,
             "T001",
@@ -324,7 +399,7 @@ fn transition_subcommand_persists_commit_hash_on_done_transition() {
     // Verify commit hash is persisted in impl-plan.json.
     let impl_plan_path = items_dir.join(format!("{track_id}/impl-plan.json"));
     let content = std::fs::read_to_string(&impl_plan_path).unwrap();
-    assert!(content.contains("abc1234"), "impl-plan.json must contain commit hash:\n{content}");
+    assert!(content.contains(&head), "impl-plan.json must contain commit hash:\n{content}");
     assert!(content.contains("\"done\""), "impl-plan.json must reflect done status:\n{content}");
 }
 
@@ -342,7 +417,7 @@ fn transition_subcommand_full_round_trip_including_reopen() {
     let items_dir = project_root_with_full_track(root_dir.path(), track_id);
 
     // Step 1: todo -> in_progress
-    let out1 = sotp_bin()
+    let out1 = sotp_bin_in(root_dir.path())
         .args([
             "track",
             "transition",
@@ -359,7 +434,7 @@ fn transition_subcommand_full_round_trip_including_reopen() {
     assert!(out1.status.success(), "step1 (todo->in_progress) failed:\nstderr: {stderr1}");
 
     // Step 2: in_progress -> done
-    let out2 = sotp_bin()
+    let out2 = sotp_bin_in(root_dir.path())
         .args([
             "track",
             "transition",
@@ -381,7 +456,7 @@ fn transition_subcommand_full_round_trip_including_reopen() {
     assert!(content.contains("\"done\""), "impl-plan.json must reflect done status:\n{content}");
 
     // Step 3: done -> in_progress (Reopen)
-    let out3 = sotp_bin()
+    let out3 = sotp_bin_in(root_dir.path())
         .args([
             "track",
             "transition",
@@ -421,7 +496,7 @@ fn transition_subcommand_full_round_trip_with_commit_hash_and_reopen() {
     let impl_plan_path = items_dir.join(format!("{track_id}/impl-plan.json"));
 
     // Step 1: todo -> in_progress
-    let out1 = sotp_bin()
+    let out1 = sotp_bin_in(root_dir.path())
         .args([
             "track",
             "transition",
@@ -437,15 +512,17 @@ fn transition_subcommand_full_round_trip_with_commit_hash_and_reopen() {
     let stderr1 = String::from_utf8_lossy(&out1.stderr);
     assert!(out1.status.success(), "step1 (todo->in_progress) failed:\nstderr: {stderr1}");
 
-    // Step 2: in_progress -> done with commit hash
-    let out2 = sotp_bin()
+    // Step 2: in_progress -> done with the fixture repository's own HEAD, the
+    // hash a recording transition accepts.
+    let head = head_hash(root_dir.path());
+    let out2 = sotp_bin_in(root_dir.path())
         .args([
             "track",
             "transition",
             "--items-dir",
             items_dir.to_str().unwrap(),
             "--commit-hash",
-            "def5678",
+            &head,
             "--track-id",
             track_id,
             "T001",
@@ -462,13 +539,13 @@ fn transition_subcommand_full_round_trip_with_commit_hash_and_reopen() {
     // Verify commit hash is persisted after done transition.
     let content = std::fs::read_to_string(&impl_plan_path).unwrap();
     assert!(
-        content.contains("def5678"),
+        content.contains(&head),
         "impl-plan.json must contain commit hash after done:\n{content}"
     );
     assert!(content.contains("\"done\""), "impl-plan.json must reflect done status:\n{content}");
 
     // Step 3: done -> in_progress (Reopen)
-    let out3 = sotp_bin()
+    let out3 = sotp_bin_in(root_dir.path())
         .args([
             "track",
             "transition",
@@ -493,8 +570,64 @@ fn transition_subcommand_full_round_trip_with_commit_hash_and_reopen() {
         "impl-plan.json must reflect reopened in_progress status:\n{content}"
     );
     assert!(
-        !content.contains("def5678"),
+        !content.contains(&head),
         "impl-plan.json must NOT contain commit hash after DoneTraced->InProgress reopen:\n{content}"
+    );
+}
+
+#[test]
+fn transition_subcommand_refuses_a_hash_the_repository_does_not_hold() {
+    // The end-to-end refusal: a well-formed hash the fixture repository holds no
+    // commit for is checked before the completion is applied, so impl-plan.json
+    // survives the attempt byte for byte (AC-28).
+    let track_id = "synthetic-2026";
+
+    let root_dir = tempfile::tempdir().unwrap();
+    let items_dir = project_root_with_full_track(root_dir.path(), track_id);
+    let impl_plan_path = items_dir.join(format!("{track_id}/impl-plan.json"));
+
+    let out1 = sotp_bin_in(root_dir.path())
+        .args([
+            "track",
+            "transition",
+            "--items-dir",
+            items_dir.to_str().unwrap(),
+            "--track-id",
+            track_id,
+            "T001",
+            "in_progress",
+        ])
+        .output()
+        .unwrap();
+    assert!(out1.status.success(), "step1 (todo->in_progress) failed");
+
+    let before = std::fs::read(&impl_plan_path).unwrap();
+    let output = sotp_bin_in(root_dir.path())
+        .args([
+            "track",
+            "transition",
+            "--items-dir",
+            items_dir.to_str().unwrap(),
+            "--commit-hash",
+            "0123456789abcdef0123456789abcdef01234567",
+            "--track-id",
+            track_id,
+            "T001",
+            "done",
+        ])
+        .output()
+        .unwrap();
+
+    assert!(
+        !output.status.success(),
+        "expected non-zero exit for a hash the repository does not hold"
+    );
+    let after = std::fs::read(&impl_plan_path).unwrap();
+    assert_eq!(
+        after,
+        before,
+        "a refused hash must leave impl-plan.json untouched; after:\n{}",
+        String::from_utf8_lossy(&after)
     );
 }
 
@@ -503,7 +636,7 @@ fn views_sync_subcommand_renders_plan_and_registry() {
     let root_dir = tempfile::tempdir().unwrap();
     let _items_dir = project_root_with_full_track(root_dir.path(), "demo");
 
-    let output = sotp_bin()
+    let output = sotp_bin_in(root_dir.path())
         .args([
             "track",
             "views",
@@ -562,9 +695,11 @@ fn transition_subcommand_write_guard_success_with_synthetic_track_branch() {
     let items_dir = root_dir.path().join("track/items");
     write_fixture_metadata(&items_dir, track_id);
     write_fixture_impl_plan(&items_dir, track_id);
+    write_fixture_batch_plan(&items_dir, track_id);
     write_fixture_arch_rules(root_dir.path());
+    write_fixture_review_scope(root_dir.path());
 
-    let output = sotp_bin()
+    let output = sotp_bin_in(root_dir.path())
         .args([
             "track",
             "transition",
@@ -619,7 +754,7 @@ fn transition_subcommand_write_guard_rejects_mismatched_track_id() {
     write_fixture_impl_plan(&items_dir, sentinel_track);
     write_fixture_arch_rules(root_dir.path());
 
-    let output = sotp_bin()
+    let output = sotp_bin_in(root_dir.path())
         .args([
             "track",
             "transition",

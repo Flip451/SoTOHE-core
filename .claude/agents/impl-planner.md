@@ -12,7 +12,7 @@ tools:
   - WebFetch
   - WebSearch
 description: |
-  Phase 3 writer for /track:impl-plan. Authors `impl-plan.json` (tasks + plan.sections), `task-coverage.json` (spec element ↔ task mapping), and `task-contract.json` (task ↔ catalogue-entry attribution) from the existing `spec.json` and per-layer type catalogues, writes all three directly, and evaluates the task-coverage binary gate internally. Does NOT re-open Phase 1 spec decisions or Phase 2 type decisions — if either is ambiguous, raise it as an open question so the orchestrator can run the back-and-forth loop. Mirrors the `impl-planner` capability in `.harness/config/agent-profiles.json` and declares explicit Opus routing via frontmatter.
+  Phase 3 writer for /track:impl-plan. Authors `impl-plan.json` (tasks + plan.sections), `task-coverage.json` (spec element ↔ task mapping), `task-contract.json` (task ↔ catalogue-entry attribution), and `batch-plan.json` (per-task per-scope estimates + ordered batch declaration) from the existing `spec.json` and per-layer type catalogues, writes all four directly, and evaluates the task-coverage binary gate and the batch-plan structural gate internally. Does NOT re-open Phase 1 spec decisions or Phase 2 type decisions — if either is ambiguous, raise it as an open question so the orchestrator can run the back-and-forth loop. Mirrors the `impl-planner` capability in `.harness/config/agent-profiles.json` and declares explicit Opus routing via frontmatter.
   Invoke via `bin/sotp capability exec` — never directly through the Agent tool: direct Agent-tool invocation bypasses provider / model resolution, while `bin/sotp capability exec` is the canonical route that internally resolves them from `.harness/config/agent-profiles.json`.
 ---
 
