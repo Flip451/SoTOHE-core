@@ -1,6 +1,7 @@
-//! The admission judgement on the `todo -> in_progress` transition
-//! (spec `IN-09`, `IN-10`, `IN-11`, `AC-10`, `AC-11`, `AC-12`, `AC-13`,
-//! `AC-14`, `CN-04`, `CN-09`, `CN-10`).
+//! The admission judgement on every transition that enters `in_progress` — a
+//! start from `todo` and a reopen from done alike (spec `IN-09`, `IN-10`,
+//! `IN-11`, `AC-10`, `AC-11`, `AC-12`, `AC-13`, `AC-14`, `AC-26`, `AC-27`,
+//! `CN-04`, `CN-09`, `CN-10`).
 //!
 //! Re-exported from [`crate::task_ops`], whose type contract this file is part
 //! of; it is a separate file only so that neither module outgrows the workspace
@@ -26,7 +27,7 @@ use std::sync::Arc;
 use domain::batch_plan::{
     AdmissionDecision, AdmissionEvaluationError, AdmissionRejection, LineCount, evaluate_admission,
 };
-use domain::{ImplPlanDocument, TaskId, TaskStatus, TrackId};
+use domain::{ImplPlanDocument, TaskId, TaskStatusKind, TaskTransition, TrackId};
 
 use crate::batch_plan::{
     BatchPlanReaderPort, PlanArtifactReadError, ScopeConfigReadError, ScopeConfigReaderPort,
@@ -138,11 +139,12 @@ pub(crate) struct AdmissionPorts<'a> {
 /// # Errors
 ///
 /// Returns [`TaskOperationError::TransitionFailed`] when the track declares no
-/// batch plan and when the plan holds no estimate for the candidate: in both
-/// cases there is nothing to judge the start of work against, and starting it
-/// anyway would be the silent pass the gate exists to prevent (`AC-05`,
-/// `AC-13`). Returns [`TaskOperationError::StoreFailed`] when one of the three
-/// reads could not be made.
+/// batch plan, when the plan holds no estimate for the candidate, and when that
+/// estimate names a scope the review scope configuration does not define: in
+/// every case there is nothing to judge the start of work against, and starting
+/// it anyway would be the silent pass the gate exists to prevent (`AC-05`,
+/// `AC-13`, `AC-23`). Returns [`TaskOperationError::StoreFailed`] when one of the
+/// three reads could not be made.
 pub(crate) fn judge_admission(
     ports: &AdmissionPorts<'_>,
     items_dir: &std::path::Path,
@@ -187,11 +189,7 @@ pub(crate) fn judge_admission(
         &plan.in_progress_task_ids(),
         &measured,
     )
-    .map_err(|AdmissionEvaluationError::MissingTaskEstimate { task_id }| {
-        TaskOperationError::TransitionFailed(format!(
-            "task '{task_id}' has no estimate in the batch plan"
-        ))
-    })?;
+    .map_err(map_evaluation_error)?;
 
     Ok(match decision {
         AdmissionDecision::Admitted => None,
@@ -199,12 +197,38 @@ pub(crate) fn judge_admission(
     })
 }
 
-/// Reports whether `candidate` is a planned task that has not been started.
+/// Reports whether `transition` enters `in_progress` (`IN-09`, `AC-26`,
+/// `AC-27`).
 ///
-/// The guard is about starting work: a task already in progress, done or
-/// skipped is not judged again.
-pub(crate) fn starts_from_todo(plan: &ImplPlanDocument, candidate: &TaskId) -> bool {
-    plan.tasks().iter().any(|task| task.id() == candidate && *task.status() == TaskStatus::Todo)
+/// The judged set is every transition whose target is `in_progress` — a start
+/// from `todo` and a reopen from done alike. Which source statuses those are is
+/// the domain's transition table to state, not this layer's: the caller resolves
+/// the transition through the plan and this asks the resolved value where it
+/// leads, so no status enumeration is restated here.
+pub(crate) fn enters_in_progress(transition: &TaskTransition) -> bool {
+    transition.target_kind() == TaskStatusKind::InProgress
+}
+
+/// Turns a failure to judge the transition into the refusal the caller reports.
+///
+/// Both failures carry the same posture: the judgement could not be made, so the
+/// transition fails rather than proceeding unjudged (`AC-13`, `AC-23`). Each
+/// message names the task, and the unknown-name one also names the scope, so the
+/// operator can see which declaration to correct.
+fn map_evaluation_error(error: AdmissionEvaluationError) -> TaskOperationError {
+    match error {
+        AdmissionEvaluationError::MissingTaskEstimate { task_id } => {
+            TaskOperationError::TransitionFailed(format!(
+                "task '{task_id}' has no estimate in the batch plan"
+            ))
+        }
+        AdmissionEvaluationError::UnknownMainScopeName { task_id, scope } => {
+            TaskOperationError::TransitionFailed(format!(
+                "task '{task_id}' declares an estimate for scope '{scope}', which the review \
+                 scope configuration does not define"
+            ))
+        }
+    }
 }
 
 fn map_rejection(rejection: AdmissionRejection) -> AdmissionRejectionOutput {

@@ -4,14 +4,15 @@
 //! judges.
 
 use crate::TaskId;
-use crate::review_v2::ScopeName;
+use crate::review_v2::{MainScopeName, ScopeName};
 
 use super::batch::BatchId;
 use super::line_count::LineCount;
 
 // ── BatchPlanGateViolation ────────────────────────────────────────────────────
 
-/// One structural finding of the Phase 3 gate (IN-06 / IN-07 / AC-06 / AC-07).
+/// One structural finding of the Phase 3 gate
+/// (IN-06 / IN-07 / AC-06 / AC-07 / AC-08).
 ///
 /// Findings are data inside the verdict rather than an error type: the gate
 /// reports every violation it finds instead of failing at the first one. Each
@@ -48,9 +49,13 @@ pub enum BatchPlanGateViolation {
         /// The task id the batch plan declares.
         task_id: TaskId,
     },
-    /// A planned task belongs to no batch.
+    /// An unsettled planned task belongs to no batch.
+    ///
+    /// Only unsettled work is reported: the plan is required to declare the
+    /// remaining work, so a settled task it leaves out is not a finding and this
+    /// variant is never constructed for one.
     UnplannedTask {
-        /// The planned task the batch plan does not place.
+        /// The unsettled planned task the batch plan does not place.
         task_id: TaskId,
     },
     /// A declared dependency edge points into a batch that runs after the
@@ -64,6 +69,17 @@ pub enum BatchPlanGateViolation {
         dependency: TaskId,
         /// The batch the dependency belongs to.
         dependency_batch: BatchId,
+    },
+    /// An estimate names a main scope the configured scope set does not hold.
+    ///
+    /// The payload is a [`MainScopeName`] rather than a [`ScopeName`], so a
+    /// finding about the reserved implicit scope `other` — which is always valid
+    /// — is unrepresentable rather than merely never produced.
+    UnknownMainScopeName {
+        /// The task whose estimate names the scope.
+        task_id: TaskId,
+        /// The main scope name the configuration does not hold.
+        scope: MainScopeName,
     },
 }
 

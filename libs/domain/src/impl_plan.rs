@@ -93,9 +93,7 @@ impl ImplPlanDocument {
     pub fn settled_task_ids(&self) -> std::collections::BTreeSet<TaskId> {
         self.tasks
             .iter()
-            .filter(|task| {
-                matches!(task.status(), TaskStatus::DoneTraced { .. } | TaskStatus::Skipped)
-            })
+            .filter(|task| task.status().is_settled())
             .map(|task| task.id().clone())
             .collect()
     }
@@ -188,16 +186,40 @@ impl ImplPlanDocument {
         target_status: &str,
         commit_hash: Option<crate::CommitHash>,
     ) -> Result<(), DomainError> {
+        let transition = self.transition_for(task_id, target_status, commit_hash)?;
+        self.apply_transition(task_id, transition)
+    }
+
+    /// Resolves the transition a target status names for `task_id`, without
+    /// applying it.
+    ///
+    /// Takes `&self` and mutates nothing, so a caller that must know what a
+    /// transition would be — which status it enters, for instance — can ask
+    /// instead of restating the table. `apply_transition_by_status` resolves
+    /// through this same method, so there is one table and no second copy of it
+    /// can drift away.
+    ///
+    /// Target strings: `"todo"`, `"in_progress"`, `"done"`, `"skipped"`.
+    ///
+    /// # Errors
+    ///
+    /// Returns `TransitionError::TaskNotFound` if the task does not exist.
+    /// Returns `ValidationError::UnsupportedTargetStatus` if the status string is
+    /// unrecognised or incompatible with the task's current state.
+    pub fn transition_for(
+        &self,
+        task_id: &TaskId,
+        target_status: &str,
+        commit_hash: Option<crate::CommitHash>,
+    ) -> Result<TaskTransition, DomainError> {
         let current_status = self
             .tasks
             .iter()
             .find(|t| t.id() == task_id)
             .ok_or_else(|| TransitionError::TaskNotFound { task_id: task_id.to_string() })?
-            .status()
-            .clone();
+            .status();
 
-        let transition = resolve_transition(&current_status, target_status, commit_hash)?;
-        self.apply_transition(task_id, transition)
+        resolve_transition(current_status, target_status, commit_hash)
     }
 
     /// Adds a new task (in `Todo` status) and appends it to the end of the
@@ -1006,5 +1028,93 @@ mod tests {
         );
         // The two classifications never overlap: a task under way is not settled.
         assert!(doc.settled_task_ids().is_empty());
+    }
+
+    #[test]
+    fn test_transition_for_resolves_the_same_table_the_applier_uses() {
+        use crate::{TaskStatusKind, TaskTransition};
+
+        // Every source status against every target, resolved and applied side by
+        // side. `transition_for` agreeing with `apply_transition_by_status` on each
+        // pair is what makes the table single: a caller that needs to know the
+        // transition asks instead of restating it.
+        let statuses = [
+            TaskStatus::Todo,
+            TaskStatus::InProgress,
+            TaskStatus::DonePending,
+            TaskStatus::DoneTraced { commit_hash: commit_hash() },
+            TaskStatus::Skipped,
+        ];
+        let id = TaskId::try_new("T001").unwrap();
+
+        for status in &statuses {
+            for target in ["todo", "in_progress", "done", "skipped", "nonsense"] {
+                let resolved = doc_with(status).transition_for(&id, target, Some(commit_hash()));
+                let mut applier = doc_with(status);
+                let applied = applier.apply_transition_by_status(&id, target, Some(commit_hash()));
+
+                assert_eq!(
+                    resolved.is_ok(),
+                    applied.is_ok(),
+                    "{status:?} -> {target} must be resolvable exactly when it is appliable"
+                );
+                if let Ok(transition) = resolved {
+                    // Resolution mutates nothing, so the same document answers twice
+                    // and still reports the status it started with.
+                    let untouched = doc_with(status);
+                    assert_eq!(untouched.tasks()[0].status(), status);
+                    assert_eq!(
+                        untouched.transition_for(&id, target, Some(commit_hash())).unwrap(),
+                        transition,
+                        "resolution is pure and repeatable"
+                    );
+                }
+            }
+        }
+
+        // Entering `in_progress` is what the admission guard keys on, and exactly
+        // three source statuses reach it.
+        let entering: Vec<&TaskStatus> = statuses
+            .iter()
+            .filter(|status| {
+                doc_with(status)
+                    .transition_for(&id, "in_progress", None)
+                    .is_ok_and(|t| t.target_kind() == TaskStatusKind::InProgress)
+            })
+            .collect();
+        assert_eq!(
+            entering,
+            vec![
+                &TaskStatus::Todo,
+                &TaskStatus::DonePending,
+                &TaskStatus::DoneTraced { commit_hash: commit_hash() }
+            ]
+        );
+        assert_eq!(
+            doc_with(&TaskStatus::Todo).transition_for(&id, "in_progress", None).unwrap(),
+            TaskTransition::Start
+        );
+        assert_eq!(
+            doc_with(&TaskStatus::DoneTraced { commit_hash: commit_hash() })
+                .transition_for(&id, "in_progress", None)
+                .unwrap(),
+            TaskTransition::Reopen
+        );
+    }
+
+    #[test]
+    fn test_transition_for_reports_a_task_it_does_not_hold() {
+        let doc = doc_with(&TaskStatus::Todo);
+
+        let error =
+            doc.transition_for(&TaskId::try_new("T404").unwrap(), "in_progress", None).unwrap_err();
+
+        assert!(error.to_string().contains("T404"), "unexpected: {error}");
+    }
+
+    /// A one-task document holding `status`.
+    fn doc_with(status: &TaskStatus) -> ImplPlanDocument {
+        ImplPlanDocument::new(vec![task_with_status("T001", status.clone())], plan(&["T001"]))
+            .unwrap()
     }
 }

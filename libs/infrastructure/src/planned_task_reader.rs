@@ -83,6 +83,23 @@ mod tests {
       ]}
     }"#;
 
+    /// A settled pair beside unsettled work: T001 done with a commit recorded,
+    /// T002 skipped, T003 done with no commit recorded, T004 still todo.
+    const SETTLED_JSON: &str = r#"{
+      "schema_version": 2,
+      "tasks": [
+        {"id": "T001", "description": "Committed", "status": "done",
+         "commit_hash": "a1b2c3d4e5f60718293a4b5c6d7e8f9012345678"},
+        {"id": "T002", "description": "Skipped", "status": "skipped"},
+        {"id": "T003", "description": "Done, uncommitted", "status": "done"},
+        {"id": "T004", "description": "Remaining", "status": "todo"}
+      ],
+      "plan": {"summary": [], "sections": [
+        {"id": "S1", "title": "Impl", "description": [],
+         "task_ids": ["T001", "T002", "T003", "T004"]}
+      ]}
+    }"#;
+
     fn track_id(value: &str) -> TrackId {
         TrackId::try_new(value).unwrap()
     }
@@ -111,6 +128,28 @@ mod tests {
         assert!(tasks[0].depends_on().is_empty());
         assert_eq!(tasks[1].depends_on(), &[TaskId::try_new("T001").unwrap()]);
         assert_eq!(tasks[1].status(), &domain::TaskStatus::Todo);
+    }
+
+    #[test]
+    fn test_the_reader_returns_settled_tasks_in_the_whole_list_with_their_status_preserved() {
+        let dir = temp_items_dir();
+        let track_dir = dir.path().join("my-track");
+        fs::create_dir_all(&track_dir).unwrap();
+        fs::write(track_dir.join("impl-plan.json"), SETTLED_JSON).unwrap();
+
+        let tasks = FsPlannedTaskReader::new()
+            .read_planned_tasks(dir.path(), &track_id("my-track"))
+            .unwrap();
+
+        // Nothing is filtered out: the whole task list crosses the boundary, and
+        // each status arrives intact so the gate can tell settled work — done with
+        // a commit recorded, or skipped — from the rest. A batch plan that omits
+        // the settled tasks is then judged against the same list.
+        assert_eq!(tasks.len(), 4);
+        assert!(matches!(tasks[0].status(), domain::TaskStatus::DoneTraced { .. }));
+        assert_eq!(tasks[1].status(), &domain::TaskStatus::Skipped);
+        assert_eq!(tasks[2].status(), &domain::TaskStatus::DonePending);
+        assert_eq!(tasks[3].status(), &domain::TaskStatus::Todo);
     }
 
     #[test]

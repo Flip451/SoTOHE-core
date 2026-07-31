@@ -8,7 +8,7 @@
 //!
 //! See ADR 2026-07-28-1521-scope-diff-ceiling-admission-enforcement.
 
-use crate::review_v2::{ReviewScopeConfig, ScopeName};
+use crate::review_v2::{MainScopeName, ReviewScopeConfig, ScopeName};
 use crate::{TaskId, TrackTask};
 
 mod admission;
@@ -46,18 +46,23 @@ pub use line_count::{LineCount, MeasuredScopeDiff, ScopeCeiling};
 /// declares, so the batch plan needs no dependency field of its own.
 ///
 /// Checks, in report order:
-/// 1. every task the plan names exists in `planned_tasks`;
-/// 2. every planned task belongs to a batch;
+/// 1. every task the plan names exists in `planned_tasks`, whatever state that
+///    task is in;
+/// 2. every unsettled planned task belongs to a batch — a settled one need not be
+///    declared, though declaring it is permitted and then judged in full;
 /// 3. every declared dependency edge points at the dependent task's own batch
 ///    or an earlier one — task pairs that declare no dependency are not
 ///    examined;
 /// 4. every batch's per-scope total stays within the resolved ceiling, unless
-///    the only contributor to that scope states why it cannot be split.
+///    the only contributor to that scope states why it cannot be split;
+/// 5. every main scope name an estimate declares exists in the configured scope
+///    set — the reserved implicit scope `other` is always valid.
 ///
 /// A scope with no configured ceiling is not compared, so its total cannot
-/// change the verdict. This gate judges structure only: whether an
-/// indivisibility reason is convincing, and whether a batch is composed
-/// sensibly, stay with the reviewer.
+/// change the verdict; a name the configuration does not hold reaches that state
+/// by no third route, because check 5 reports it. This gate judges structure
+/// only: whether an indivisibility reason is convincing, and whether a batch is
+/// composed sensibly, stay with the reviewer.
 pub fn check_batch_plan(
     plan: &BatchPlanDocument,
     scope_config: &ReviewScopeConfig,
@@ -67,12 +72,20 @@ pub fn check_batch_plan(
     collect_task_set_violations(plan, planned_tasks, &mut violations);
     collect_dependency_order_violations(plan, planned_tasks, &mut violations);
     collect_ceiling_violations(plan, scope_config, &mut violations);
+    collect_scope_name_violations(plan, scope_config, &mut violations);
     BatchPlanGateOutcome::from_violations(violations)
 }
 
 /// Reports the two directions of disagreement between the batch plan's task set
-/// and the implementation plan's: a plan-declared id no task provides, and a
-/// planned task no batch claims.
+/// and the implementation plan's: a plan-declared id no task provides, and an
+/// unsettled planned task no batch claims.
+///
+/// The two directions deliberately have different domains. Id existence is asked
+/// of every declared id whatever state the task it names is in, because a plan
+/// that names a task nobody planned is wrong either way. Membership is asked only
+/// of unsettled tasks: what the plan must declare is the remaining work, so a
+/// settled task the plan leaves out is not a finding. Settledness is read off the
+/// status each task already carries, by the same rule the admission uses.
 fn collect_task_set_violations(
     plan: &BatchPlanDocument,
     planned_tasks: &[TrackTask],
@@ -86,6 +99,9 @@ fn collect_task_set_violations(
         }
     }
     for task in planned_tasks {
+        if task.status().is_settled() {
+            continue;
+        }
         if plan.batch_of(task.id()).is_none() {
             violations.push(BatchPlanGateViolation::UnplannedTask { task_id: task.id().clone() });
         }
@@ -166,6 +182,48 @@ fn collect_ceiling_violations(
     }
 }
 
+/// Reports estimates that name a main scope the configured scope set does not
+/// hold.
+///
+/// Fail-closed: an unrecognised name is a finding rather than a scope quietly
+/// left uncompared, so the only ways a total goes unchecked stay the two
+/// legitimate ones — a configured scope with no ceiling, and the reserved
+/// implicit scope `other`.
+fn collect_scope_name_violations(
+    plan: &BatchPlanDocument,
+    scope_config: &ReviewScopeConfig,
+    violations: &mut Vec<BatchPlanGateViolation>,
+) {
+    for estimate in plan.task_estimates() {
+        for scope_estimate in estimate.scope_estimates() {
+            let Some(unknown) = unknown_main_scope_name(scope_config, scope_estimate.scope())
+            else {
+                continue;
+            };
+            violations.push(BatchPlanGateViolation::UnknownMainScopeName {
+                task_id: estimate.task_id().clone(),
+                scope: unknown.clone(),
+            });
+        }
+    }
+}
+
+/// Returns the main scope name `scope` carries when the configuration does not
+/// hold it, and `None` when it is configured or is the reserved implicit scope.
+///
+/// The one place the question is asked, so the Phase 3 gate and the admission
+/// judgement cannot drift apart on which names are acceptable. `other` yields
+/// `None` because the configuration treats it as valid.
+fn unknown_main_scope_name<'a>(
+    scope_config: &ReviewScopeConfig,
+    scope: &'a ScopeName,
+) -> Option<&'a MainScopeName> {
+    match scope {
+        ScopeName::Other => None,
+        ScopeName::Main(name) => (!scope_config.contains_scope(scope)).then_some(name),
+    }
+}
+
 /// Returns `batch_id`'s place in the declared batch order.
 fn batch_position(plan: &BatchPlanDocument, batch_id: &BatchId) -> Option<usize> {
     plan.batches().iter().position(|batch| batch.id() == batch_id)
@@ -230,7 +288,11 @@ fn contributors_to<'a>(
 ///
 /// Returns [`AdmissionEvaluationError::MissingTaskEstimate`] when the batch plan
 /// holds no estimate for `candidate`: without one there is nothing to compare,
-/// and the transition is an error rather than a silent pass.
+/// and the transition is an error rather than a silent pass. Returns
+/// [`AdmissionEvaluationError::UnknownMainScopeName`], of the same rank, when the
+/// candidate's estimate names a main scope the configuration does not hold: such
+/// a name must not resolve to an unconstrained ceiling and admit the transition
+/// on that basis.
 pub fn evaluate_admission(
     plan: &BatchPlanDocument,
     scope_config: &ReviewScopeConfig,
@@ -242,6 +304,17 @@ pub fn evaluate_admission(
     let Some(candidate_estimate) = plan.estimate_for(candidate) else {
         return Err(AdmissionEvaluationError::MissingTaskEstimate { task_id: candidate.clone() });
     };
+    // Asked of every declared scope before any comparison is made, so an
+    // unrecognised name fails the evaluation whatever the arithmetic would have
+    // said about it.
+    for scope_estimate in candidate_estimate.scope_estimates() {
+        if let Some(unknown) = unknown_main_scope_name(scope_config, scope_estimate.scope()) {
+            return Err(AdmissionEvaluationError::UnknownMainScopeName {
+                task_id: candidate.clone(),
+                scope: unknown.clone(),
+            });
+        }
+    }
 
     if let Some(rejection) = membership_rejection(plan, candidate, committed_task_ids) {
         return Ok(AdmissionDecision::Rejected(rejection));

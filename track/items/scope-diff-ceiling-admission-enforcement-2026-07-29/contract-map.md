@@ -48,6 +48,7 @@ subgraph domain["domain"]
     direction TB
     T38_domain_domain_AdmissionEvaluationError__self[AdmissionEvaluationError]
     T38_domain_domain_AdmissionEvaluationError_MissingTaskEstimate[MissingTaskEstimate]
+    T38_domain_domain_AdmissionEvaluationError_UnknownMainScopeName[UnknownMainScopeName]
   end
   subgraph T32_domain_domain_AdmissionRejection["batch_plan::AdmissionRejection"]
     direction TB
@@ -97,6 +98,7 @@ subgraph domain["domain"]
     T36_domain_domain_BatchPlanGateViolation_UnknownTaskRef[UnknownTaskRef]
     T36_domain_domain_BatchPlanGateViolation_UnplannedTask[UnplannedTask]
     T36_domain_domain_BatchPlanGateViolation_DependencyInLaterBatch[DependencyInLaterBatch]
+    T36_domain_domain_BatchPlanGateViolation_UnknownMainScopeName[UnknownMainScopeName]
   end
   subgraph T38_domain_domain_BatchPlanValidationError["batch_plan::BatchPlanValidationError"]
     direction TB
@@ -245,6 +247,7 @@ subgraph domain["domain"]
     T30_domain_domain_ImplPlanDocument_next_open_task([next_open_task])
     T30_domain_domain_ImplPlanDocument_apply_transition([apply_transition])
     T30_domain_domain_ImplPlanDocument_apply_transition_by_status([apply_transition_by_status])
+    T30_domain_domain_ImplPlanDocument_transition_for([transition_for])
     T30_domain_domain_ImplPlanDocument_add_task([add_task])
   end
   end
@@ -264,6 +267,25 @@ subgraph domain["domain"]
   end
   subgraph domain_domain_module_track["domain::track"]
     direction TB
+  subgraph T28_domain_domain_TaskStatusKind["track::TaskStatusKind"]
+    direction TB
+    T28_domain_domain_TaskStatusKind__self[TaskStatusKind]
+    T28_domain_domain_TaskStatusKind_Todo[Todo]
+    T28_domain_domain_TaskStatusKind_InProgress[InProgress]
+    T28_domain_domain_TaskStatusKind_Done[Done]
+    T28_domain_domain_TaskStatusKind_Skipped[Skipped]
+  end
+  subgraph T28_domain_domain_TaskTransition["track::TaskTransition"]
+    direction TB
+    T28_domain_domain_TaskTransition__self[TaskTransition]
+    T28_domain_domain_TaskTransition_Start[Start]
+    T28_domain_domain_TaskTransition_Complete[Complete]
+    T28_domain_domain_TaskTransition_BackfillHash[BackfillHash]
+    T28_domain_domain_TaskTransition_ResetToTodo[ResetToTodo]
+    T28_domain_domain_TaskTransition_Skip[Skip]
+    T28_domain_domain_TaskTransition_Reopen[Reopen]
+    T28_domain_domain_TaskTransition_target_kind([target_kind])
+  end
   subgraph T23_domain_domain_TrackTask["track::TrackTask"]
     direction TB
     T23_domain_domain_TrackTask__self[TrackTask]
@@ -315,6 +337,7 @@ subgraph usecase["usecase"]
     T40_usecase_usecase_BatchPlanViolationOutput_UnknownTaskRef[UnknownTaskRef]
     T40_usecase_usecase_BatchPlanViolationOutput_UnplannedTask[UnplannedTask]
     T40_usecase_usecase_BatchPlanViolationOutput_DependencyInLaterBatch[DependencyInLaterBatch]
+    T40_usecase_usecase_BatchPlanViolationOutput_UnknownMainScopeName[UnknownMainScopeName]
   end
   subgraph T40_usecase_usecase_NonEmptyViolationOutputs["batch_plan::NonEmptyViolationOutputs"]
     direction TB
@@ -641,12 +664,16 @@ T30_domain_domain_ImplPlanDocument_new --o T23_domain_domain_TrackTask__self
 T30_domain_domain_ImplPlanDocument_new --> T30_domain_domain_ImplPlanDocument__self
 T30_domain_domain_ImplPlanDocument_tasks --> T23_domain_domain_TrackTask__self
 T30_domain_domain_ImplPlanDocument_next_open_task --> T23_domain_domain_TrackTask__self
+T30_domain_domain_ImplPlanDocument_apply_transition --o T28_domain_domain_TaskTransition__self
+T30_domain_domain_ImplPlanDocument_transition_for --> T28_domain_domain_TaskTransition__self
 T31_domain_domain_ReviewScopeConfig_new --> T31_domain_domain_ReviewScopeConfig__self
+T28_domain_domain_TaskTransition_target_kind --> T28_domain_domain_TaskStatusKind__self
 T23_domain_domain_TrackTask_new --> T23_domain_domain_TrackTask__self
 T23_domain_domain_TrackTask_new --> T29_domain_domain_ValidationError__self
 T23_domain_domain_TrackTask_with_status --> T23_domain_domain_TrackTask__self
 T23_domain_domain_TrackTask_with_status --> T29_domain_domain_ValidationError__self
 T23_domain_domain_TrackTask_with_dependencies --> T23_domain_domain_TrackTask__self
+T23_domain_domain_TrackTask_transition --o T28_domain_domain_TaskTransition__self
 T40_usecase_usecase_BatchPlanCheckInteractor_new --o R35_usecase_usecase_BatchPlanReaderPort__self
 T40_usecase_usecase_BatchPlanCheckInteractor_new --o R37_usecase_usecase_PlannedTaskReaderPort__self
 T40_usecase_usecase_BatchPlanCheckInteractor_new --o R37_usecase_usecase_ScopeConfigReaderPort__self
@@ -711,6 +738,7 @@ class T31_domain_domain_AdmissionDecision_is_admitted method_node
 class T31_domain_domain_AdmissionDecision_rejection method_node
 class T31_domain_domain_AdmissionDecision__self value_object
 class T38_domain_domain_AdmissionEvaluationError_MissingTaskEstimate variant_node
+class T38_domain_domain_AdmissionEvaluationError_UnknownMainScopeName variant_node
 class T38_domain_domain_AdmissionEvaluationError__self error_type
 class T32_domain_domain_AdmissionRejection_NotCurrentBatchMember variant_node
 class T32_domain_domain_AdmissionRejection_ScopeCeilingWouldBeExceeded variant_node
@@ -742,6 +770,7 @@ class T36_domain_domain_BatchPlanGateViolation_OversizeScopeHasMultipleContribut
 class T36_domain_domain_BatchPlanGateViolation_UnknownTaskRef variant_node
 class T36_domain_domain_BatchPlanGateViolation_UnplannedTask variant_node
 class T36_domain_domain_BatchPlanGateViolation_DependencyInLaterBatch variant_node
+class T36_domain_domain_BatchPlanGateViolation_UnknownMainScopeName variant_node
 class T36_domain_domain_BatchPlanGateViolation__self value_object
 class T38_domain_domain_BatchPlanValidationError_EmptyJustification variant_node
 class T38_domain_domain_BatchPlanValidationError_EmptyBatchId variant_node
@@ -850,6 +879,7 @@ class T30_domain_domain_ImplPlanDocument_in_progress_task_ids method_node
 class T30_domain_domain_ImplPlanDocument_next_open_task method_node
 class T30_domain_domain_ImplPlanDocument_apply_transition method_node
 class T30_domain_domain_ImplPlanDocument_apply_transition_by_status method_node
+class T30_domain_domain_ImplPlanDocument_transition_for method_node
 class T30_domain_domain_ImplPlanDocument_add_task method_node
 class T30_domain_domain_ImplPlanDocument__self domain_service
 class T31_domain_domain_ReviewScopeConfig_new method_node
@@ -860,6 +890,19 @@ class T31_domain_domain_ReviewScopeConfig_contains_scope method_node
 class T31_domain_domain_ReviewScopeConfig_all_scope_names method_node
 class T31_domain_domain_ReviewScopeConfig_briefing_file_for_scope method_node
 class T31_domain_domain_ReviewScopeConfig__self domain_service
+class T28_domain_domain_TaskStatusKind_Todo variant_node
+class T28_domain_domain_TaskStatusKind_InProgress variant_node
+class T28_domain_domain_TaskStatusKind_Done variant_node
+class T28_domain_domain_TaskStatusKind_Skipped variant_node
+class T28_domain_domain_TaskStatusKind__self value_object
+class T28_domain_domain_TaskTransition_Start variant_node
+class T28_domain_domain_TaskTransition_Complete variant_node
+class T28_domain_domain_TaskTransition_BackfillHash variant_node
+class T28_domain_domain_TaskTransition_ResetToTodo variant_node
+class T28_domain_domain_TaskTransition_Skip variant_node
+class T28_domain_domain_TaskTransition_Reopen variant_node
+class T28_domain_domain_TaskTransition_target_kind method_node
+class T28_domain_domain_TaskTransition__self value_object
 class T23_domain_domain_TrackTask_new method_node
 class T23_domain_domain_TrackTask_with_status method_node
 class T23_domain_domain_TrackTask_with_dependencies method_node
@@ -887,6 +930,7 @@ class T40_usecase_usecase_BatchPlanViolationOutput_OversizeScopeHasMultipleContr
 class T40_usecase_usecase_BatchPlanViolationOutput_UnknownTaskRef variant_node
 class T40_usecase_usecase_BatchPlanViolationOutput_UnplannedTask variant_node
 class T40_usecase_usecase_BatchPlanViolationOutput_DependencyInLaterBatch variant_node
+class T40_usecase_usecase_BatchPlanViolationOutput_UnknownMainScopeName variant_node
 class T40_usecase_usecase_BatchPlanViolationOutput__self dto
 class T40_usecase_usecase_NonEmptyViolationOutputs_try_new method_node
 class T40_usecase_usecase_NonEmptyViolationOutputs_as_slice method_node

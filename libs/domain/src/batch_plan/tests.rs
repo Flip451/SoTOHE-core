@@ -4,10 +4,20 @@ use std::collections::BTreeSet;
 
 use super::*;
 use crate::review_v2::{MainScopeName, ReviewScopeConfig, ScopeName};
-use crate::{NonEmptyString, TaskId, TaskStatus, TrackId, TrackTask};
+use crate::{CommitHash, NonEmptyString, TaskId, TaskStatus, TrackId, TrackTask};
 
 fn scope(name: &str) -> ScopeName {
     ScopeName::Main(MainScopeName::new(name).unwrap())
+}
+
+fn main_scope(name: &str) -> MainScopeName {
+    MainScopeName::new(name).unwrap()
+}
+
+/// An estimate for the reserved implicit scope, which no configuration declares
+/// and no ceiling ever constrains.
+fn other_scope_estimate(production: u32, test: u32) -> ScopeLineEstimate {
+    ScopeLineEstimate::new(ScopeName::Other, LineCount::new(production), LineCount::new(test))
 }
 
 fn task(id: &str) -> TaskId {
@@ -76,6 +86,26 @@ fn planned(id: &str, depends_on: &[&str]) -> TrackTask {
         NonEmptyString::try_new(format!("task {id}")).unwrap(),
         TaskStatus::Todo,
         depends_on.iter().map(|dependency| task(dependency)).collect(),
+    )
+}
+
+/// An implementation-plan task in `status`, declaring no dependency.
+fn planned_in(id: &str, status: TaskStatus) -> TrackTask {
+    TrackTask::with_dependencies(
+        task(id),
+        NonEmptyString::try_new(format!("task {id}")).unwrap(),
+        status,
+        Vec::new(),
+    )
+}
+
+/// A task settled the committed way: done with a commit recorded.
+fn settled_by_commit(id: &str) -> TrackTask {
+    planned_in(
+        id,
+        TaskStatus::DoneTraced {
+            commit_hash: CommitHash::try_new("a1b2c3d4e5f60718293a4b5c6d7e8f9012345678").unwrap(),
+        },
     )
 }
 
@@ -629,6 +659,44 @@ fn test_the_plan_rejects_a_task_claimed_by_more_than_one_batch() {
 }
 
 #[test]
+fn test_a_declared_settled_task_is_not_exempt_from_the_file_internal_invariants() {
+    // Declaring a settled task is optional, not exempting: these invariants judge
+    // the declaration against itself, so they apply to every id the plan names
+    // whatever state the task carries in the implementation plan.
+    let settled = settled_by_commit("T001");
+    assert!(matches!(settled.status(), TaskStatus::DoneTraced { .. }), "the fixture is settled");
+
+    let member_without_estimate = BatchPlanDocument::new(
+        track(),
+        vec![estimate(
+            "T002",
+            vec![scope_estimate("domain", 10, 5)],
+            TaskDecomposition::Decomposable,
+        )],
+        vec![declaration("B1", &[settled.id().as_ref(), "T002"])],
+    );
+    let Err(BatchPlanValidationError::MissingTaskEstimate { task_id }) = member_without_estimate
+    else {
+        panic!("a declared member still needs an estimate, settled or not");
+    };
+    assert_eq!(task_id, task("T001"));
+
+    let claimed_twice = BatchPlanDocument::new(
+        track(),
+        vec![estimate(
+            "T001",
+            vec![scope_estimate("domain", 10, 5)],
+            TaskDecomposition::Decomposable,
+        )],
+        vec![declaration("B1", &["T001"]), declaration("B2", &["T001"])],
+    );
+    assert!(matches!(
+        claimed_twice,
+        Err(BatchPlanValidationError::DuplicateBatchMembership { .. })
+    ));
+}
+
+#[test]
 fn test_the_plan_rejects_a_task_estimated_more_than_once() {
     let result = BatchPlanDocument::new(
         track(),
@@ -1016,6 +1084,139 @@ fn test_the_gate_blocks_a_planned_task_that_belongs_to_no_batch() {
 }
 
 #[test]
+fn test_the_gate_passes_a_plan_that_declares_only_the_remaining_work() {
+    // T001 is done with a commit recorded and T002 is skipped, so a plan holding
+    // only T003 declares everything it is required to.
+    let plan = planned_plan(
+        vec![estimate(
+            "T003",
+            vec![scope_estimate("domain", 10, 5)],
+            TaskDecomposition::Decomposable,
+        )],
+        vec![declaration("B1", &["T003"])],
+    );
+    let config = scope_config(&[("domain", Some(500))]);
+    let planned_tasks =
+        [settled_by_commit("T001"), planned_in("T002", TaskStatus::Skipped), planned("T003", &[])];
+
+    assert_eq!(check_batch_plan(&plan, &config, &planned_tasks), BatchPlanGateOutcome::Passed);
+
+    // With the settled tasks undeclared, the one declared batch is the current
+    // one, so its todo member is not refused for membership either.
+    let decision = evaluate_admission(
+        &plan,
+        &config,
+        &task("T003"),
+        &committed(&["T001", "T002"]),
+        &in_progress(&[]),
+        &measured(&[]),
+    )
+    .unwrap();
+    assert_eq!(decision, AdmissionDecision::Admitted);
+}
+
+#[test]
+fn test_the_gate_reports_an_unsettled_planned_task_in_no_batch_whichever_unsettled_state_it_is_in()
+{
+    let plan = planned_plan(
+        vec![estimate(
+            "T001",
+            vec![scope_estimate("domain", 10, 5)],
+            TaskDecomposition::Decomposable,
+        )],
+        vec![declaration("B1", &["T001"])],
+    );
+    let config = scope_config(&[("domain", Some(500))]);
+
+    // Done without a commit recorded is unsettled too: the work is not on the
+    // branch, so the plan is still required to declare it.
+    for status in [TaskStatus::Todo, TaskStatus::InProgress, TaskStatus::DonePending] {
+        let outcome = check_batch_plan(
+            &plan,
+            &config,
+            &[planned("T001", &[]), planned_in("T002", status.clone())],
+        );
+
+        assert_eq!(
+            violations_of(&outcome),
+            &[BatchPlanGateViolation::UnplannedTask { task_id: task("T002") }],
+            "{status:?} is unsettled and must still be reported"
+        );
+    }
+}
+
+#[test]
+fn test_a_declared_settled_task_is_judged_exactly_as_an_unsettled_one_would_be() {
+    let config = scope_config(&[("domain", Some(500))]);
+
+    // Its estimate counts towards the batch total: 400 declared by the settled
+    // task plus 250 by the todo one is 650 against 500.
+    let summed = planned_plan(
+        vec![
+            estimate(
+                "T001",
+                vec![scope_estimate("domain", 300, 100)],
+                TaskDecomposition::Decomposable,
+            ),
+            estimate(
+                "T002",
+                vec![scope_estimate("domain", 200, 50)],
+                TaskDecomposition::Decomposable,
+            ),
+        ],
+        vec![declaration("B1", &["T001", "T002"])],
+    );
+    assert_eq!(
+        violations_of(&check_batch_plan(
+            &summed,
+            &config,
+            &[settled_by_commit("T001"), planned("T002", &[])]
+        )),
+        &[BatchPlanGateViolation::CeilingExceeded {
+            batch_id: batch_id("B1"),
+            scope: scope("domain"),
+            total: LineCount::new(650),
+            ceiling: LineCount::new(500),
+        }]
+    );
+
+    // The single-contributor exemption is applied to it on the same terms.
+    let indivisible = planned_plan(
+        vec![estimate(
+            "T001",
+            vec![scope_estimate("domain", 700, 300)],
+            TaskDecomposition::Indivisible(justification("the transition table cannot be split")),
+        )],
+        vec![declaration("B1", &["T001"])],
+    );
+    assert_eq!(
+        check_batch_plan(&indivisible, &config, &[settled_by_commit("T001")]),
+        BatchPlanGateOutcome::Passed
+    );
+
+    // An unknown scope name it declares still fires, and so does the existence
+    // check on an id no task provides.
+    let misdeclared = planned_plan(
+        vec![estimate(
+            "T404",
+            vec![scope_estimate("domian", 10, 5)],
+            TaskDecomposition::Decomposable,
+        )],
+        vec![declaration("B1", &["T404"])],
+    );
+    assert_eq!(
+        violations_of(&check_batch_plan(&misdeclared, &config, &[settled_by_commit("T001")])),
+        &[
+            BatchPlanGateViolation::UnknownTaskRef { task_id: task("T404") },
+            BatchPlanGateViolation::UnknownMainScopeName {
+                task_id: task("T404"),
+                scope: main_scope("domian"),
+            },
+        ]
+    );
+}
+
+#[test]
 fn test_the_gate_blocks_a_declared_dependency_whose_target_sits_in_a_later_batch() {
     let plan = planned_plan(
         vec![
@@ -1045,6 +1246,63 @@ fn test_the_gate_blocks_a_declared_dependency_whose_target_sits_in_a_later_batch
             task_id: task("T001"),
             task_batch: batch_id("B1"),
             dependency: task("T002"),
+            dependency_batch: batch_id("B2"),
+        }]
+    );
+}
+
+#[test]
+fn test_the_gate_ignores_a_dependency_edge_whose_settled_endpoint_the_plan_does_not_declare() {
+    let config = scope_config(&[("domain", Some(500))]);
+
+    // T002 declares a dependency on the settled T001, which the plan leaves out.
+    // The edge has no batch to compare against, so the ordering check skips it —
+    // and a delivered endpoint can never be the later batch anyway.
+    let remaining_work_only = planned_plan(
+        vec![estimate(
+            "T002",
+            vec![scope_estimate("domain", 10, 5)],
+            TaskDecomposition::Decomposable,
+        )],
+        vec![declaration("B1", &["T002"])],
+    );
+    assert_eq!(
+        check_batch_plan(
+            &remaining_work_only,
+            &config,
+            &[settled_by_commit("T001"), planned("T002", &["T001"])]
+        ),
+        BatchPlanGateOutcome::Passed,
+        "neither the skipped edge nor the undeclared settled task is a finding"
+    );
+
+    // The contrast: with both endpoints unsettled and declared, the same edge
+    // shape pointing into a later batch is still reported.
+    let both_declared = planned_plan(
+        vec![
+            estimate(
+                "T001",
+                vec![scope_estimate("domain", 10, 5)],
+                TaskDecomposition::Decomposable,
+            ),
+            estimate(
+                "T002",
+                vec![scope_estimate("domain", 10, 5)],
+                TaskDecomposition::Decomposable,
+            ),
+        ],
+        vec![declaration("B1", &["T002"]), declaration("B2", &["T001"])],
+    );
+    assert_eq!(
+        violations_of(&check_batch_plan(
+            &both_declared,
+            &config,
+            &[planned("T001", &[]), planned("T002", &["T001"])]
+        )),
+        &[BatchPlanGateViolation::DependencyInLaterBatch {
+            task_id: task("T002"),
+            task_batch: batch_id("B1"),
+            dependency: task("T001"),
             dependency_batch: batch_id("B2"),
         }]
     );
@@ -1109,6 +1367,53 @@ fn test_the_gate_ignores_the_batch_placement_of_tasks_that_declare_no_dependency
     );
 
     assert_eq!(outcome, BatchPlanGateOutcome::Passed);
+}
+
+#[test]
+fn test_the_gate_blocks_an_estimate_naming_a_scope_the_configuration_does_not_define() {
+    // The canonical case: a misspelled configured name. It is reported rather
+    // than resolving no ceiling and going uncompared, so the uncompared lanes
+    // stay the two legitimate ones (AC-08).
+    let plan = planned_plan(
+        vec![estimate(
+            "T001",
+            vec![scope_estimate("domian", 10, 5)],
+            TaskDecomposition::Decomposable,
+        )],
+        vec![declaration("B1", &["T001"])],
+    );
+
+    let outcome =
+        check_batch_plan(&plan, &scope_config(&[("domain", Some(500))]), &[planned("T001", &[])]);
+
+    assert_eq!(
+        violations_of(&outcome),
+        &[BatchPlanGateViolation::UnknownMainScopeName {
+            task_id: task("T001"),
+            scope: main_scope("domian"),
+        }]
+    );
+}
+
+#[test]
+fn test_the_gate_never_reports_the_reserved_other_scope_as_an_unknown_name() {
+    let plan = planned_plan(
+        vec![estimate(
+            "T001",
+            vec![other_scope_estimate(5_000, 5_000), scope_estimate("domain", 10, 5)],
+            TaskDecomposition::Decomposable,
+        )],
+        vec![declaration("B1", &["T001"])],
+    );
+
+    let outcome =
+        check_batch_plan(&plan, &scope_config(&[("domain", Some(500))]), &[planned("T001", &[])]);
+
+    assert_eq!(
+        outcome,
+        BatchPlanGateOutcome::Passed,
+        "`other` is always valid and carries no ceiling, so its size changes no verdict"
+    );
 }
 
 #[test]
@@ -1440,4 +1745,65 @@ fn test_admission_errors_when_the_batch_plan_holds_no_estimate_for_the_candidate
         panic!("an unestimated candidate must be an error, not a silent pass");
     };
     assert_eq!(task_id, task("T404"));
+}
+
+#[test]
+fn test_admission_errors_when_the_candidate_declares_a_scope_the_configuration_does_not_define() {
+    let plan = planned_plan(
+        vec![estimate(
+            "T001",
+            vec![scope_estimate("domian", 900, 200)],
+            TaskDecomposition::Decomposable,
+        )],
+        vec![declaration("B1", &["T001"])],
+    );
+
+    let result = evaluate_admission(
+        &plan,
+        &admission_config(),
+        &task("T001"),
+        &committed(&[]),
+        &in_progress(&[]),
+        &measured(&[("domian", 400)]),
+    );
+
+    // Same rank as a missing estimate: it leaves through the error channel rather
+    // than becoming a decision, and names both parties.
+    let error = result.expect_err("an unrecognised name must not admit on an unresolved ceiling");
+    assert!(
+        matches!(
+            &error,
+            AdmissionEvaluationError::UnknownMainScopeName { task_id, scope }
+                if task_id == &task("T001") && scope == &main_scope("domian")
+        ),
+        "unexpected: {error:?}"
+    );
+    assert!(error.to_string().contains("domian"), "rendered as: {error}");
+}
+
+#[test]
+fn test_admission_never_errors_on_an_estimate_for_the_reserved_other_scope() {
+    let plan = planned_plan(
+        vec![estimate(
+            "T001",
+            vec![other_scope_estimate(900, 200)],
+            TaskDecomposition::Decomposable,
+        )],
+        vec![declaration("B1", &["T001"])],
+    );
+
+    let decision = evaluate_admission(
+        &plan,
+        &admission_config(),
+        &task("T001"),
+        &committed(&[]),
+        &in_progress(&[]),
+        // `other` already carries lines, so the guard is reached rather than
+        // short-circuited by a zero prior contribution — and still admits, since
+        // `other` resolves no ceiling.
+        &[MeasuredScopeDiff::new(ScopeName::Other, LineCount::new(9_000))],
+    )
+    .unwrap();
+
+    assert_eq!(decision, AdmissionDecision::Admitted);
 }

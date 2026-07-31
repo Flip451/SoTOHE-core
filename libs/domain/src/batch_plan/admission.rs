@@ -8,7 +8,7 @@ use std::fmt;
 use thiserror::Error;
 
 use crate::TaskId;
-use crate::review_v2::ScopeName;
+use crate::review_v2::{MainScopeName, ScopeName};
 
 use super::batch::BatchId;
 use super::line_count::LineCount;
@@ -133,11 +133,13 @@ impl AdmissionDecision {
 // ── AdmissionEvaluationError ──────────────────────────────────────────────────
 
 /// A failure of the admission evaluation, as distinct from a rejection
-/// (IN-11 / AC-13).
+/// (IN-11 / AC-13 / AC-23).
 ///
-/// Only one case: the batch plan holds no estimate for the candidate, so no
-/// judgement can be made and the transition is an error rather than a silent
-/// pass. Every other malformed-plan shape is already refused by
+/// Two cases of equal rank, both meaning the transition cannot be judged and so
+/// must fail rather than pass unjudged: the batch plan holds no estimate for the
+/// candidate, and the candidate's estimate names a main scope the configured set
+/// does not hold — which must not degrade into an unconstrained ceiling that
+/// admits everything. Every other malformed-plan shape is already refused by
 /// `BatchPlanDocument::new`.
 #[derive(Debug, Error)]
 pub enum AdmissionEvaluationError {
@@ -146,5 +148,21 @@ pub enum AdmissionEvaluationError {
     MissingTaskEstimate {
         /// The candidate task.
         task_id: TaskId,
+    },
+    /// The candidate's estimate names a main scope the configured scope set does
+    /// not hold.
+    ///
+    /// The payload is a [`MainScopeName`], so an error about the reserved
+    /// implicit scope `other` — which never resolves a ceiling and never fails
+    /// here — is unrepresentable.
+    #[error(
+        "task '{task_id}' declares an estimate for scope '{scope}', which the review scope \
+         configuration does not define"
+    )]
+    UnknownMainScopeName {
+        /// The candidate task.
+        task_id: TaskId,
+        /// The main scope name the configuration does not hold.
+        scope: MainScopeName,
     },
 }

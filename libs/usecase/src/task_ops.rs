@@ -297,26 +297,34 @@ where
         }
     }
 
-    /// Judges a `todo -> in_progress` transition, returning the refusal when
-    /// there is one.
+    /// Judges every transition that enters `in_progress` — a start from `todo`
+    /// and a reopen from done alike — returning the refusal when there is one
+    /// (`IN-09`, `AC-26`, `AC-27`).
     ///
     /// Every other transition passes through untouched: the guard is about
-    /// starting work, not about finishing or skipping it.
-    fn judge_start_of_work(
+    /// entering work, not about finishing or skipping it. Widening it to reopens
+    /// closes the route by which an undeclared settled task could become
+    /// unsettled unjudged; the judgement itself is unchanged.
+    fn judge_entry_into_work(
         &self,
         cmd: &TaskTransitionCommand,
         track_id: &TrackId,
         task_id: &TaskId,
+        commit_hash: Option<CommitHash>,
     ) -> Result<Option<AdmissionRejectionOutput>, TaskOperationError> {
-        if cmd.target_status != "in_progress" {
-            return Ok(None);
-        }
         let plan = self
             .store
             .load_impl_plan(track_id)
             .map_err(|e| TaskOperationError::StoreFailed(e.to_string()))?;
         let Some(plan) = plan else { return Ok(None) };
-        if !crate::task_admission::starts_from_todo(&plan, task_id) {
+
+        // Which transition the request names is the plan's to resolve. An
+        // unresolvable one is left to the applier to report, so this guard neither
+        // duplicates the transition table nor pre-empts its errors.
+        let Ok(transition) = plan.transition_for(task_id, &cmd.target_status, commit_hash) else {
+            return Ok(None);
+        };
+        if !crate::task_admission::enters_in_progress(&transition) {
             return Ok(None);
         }
         judge_admission(&self.admission_ports(), &cmd.items_dir, track_id, task_id, &plan)
@@ -418,10 +426,12 @@ where
         // Enforce branch guard before mutating state.
         enforce_branch_guard(&*self.store, &track_id, &cmd.items_dir, self.branch_reader.as_ref())?;
 
-        // Judge the start of work before anything is written: the guard sits on
+        // Judge the entry into work before anything is written: the guard sits on
         // the one transition path, so no workflow reaches `in_progress` around
         // it (CN-10).
-        if let Some(rejection) = self.judge_start_of_work(&cmd, &track_id, &task_id)? {
+        if let Some(rejection) =
+            self.judge_entry_into_work(&cmd, &track_id, &task_id, commit_hash.clone())?
+        {
             return Ok(TaskTransitionOutcome::Rejected(rejection));
         }
 
@@ -1218,18 +1228,34 @@ mod tests {
 
     /// One task's estimate for the `domain` scope, split as production + test.
     fn estimate(id: &str, production: u32, test: u32) -> domain::batch_plan::TaskEstimate {
+        estimate_in(main_scope("domain"), id, production, test)
+    }
+
+    /// The same estimate against any scope, so a test can declare one the
+    /// configuration does not hold or the reserved implicit scope.
+    fn estimate_in(
+        scope: domain::review_v2::ScopeName,
+        id: &str,
+        production: u32,
+        test: u32,
+    ) -> domain::batch_plan::TaskEstimate {
         use domain::batch_plan::{LineCount, ScopeLineEstimate, TaskDecomposition, TaskEstimate};
-        use domain::review_v2::{MainScopeName, ScopeName};
         TaskEstimate::new(
             TaskId::try_new(id).unwrap(),
-            vec![ScopeLineEstimate::new(
-                ScopeName::Main(MainScopeName::new("domain").unwrap()),
-                LineCount::new(production),
-                LineCount::new(test),
-            )],
+            vec![ScopeLineEstimate::new(scope, LineCount::new(production), LineCount::new(test))],
             TaskDecomposition::Decomposable,
         )
         .unwrap()
+    }
+
+    fn main_scope(name: &str) -> domain::review_v2::ScopeName {
+        domain::review_v2::ScopeName::Main(domain::review_v2::MainScopeName::new(name).unwrap())
+    }
+
+    /// A measured diff of `lines` on the `domain` scope.
+    fn measured_domain(lines: u32) -> Vec<domain::batch_plan::MeasuredScopeDiff> {
+        use domain::batch_plan::{LineCount, MeasuredScopeDiff};
+        vec![MeasuredScopeDiff::new(main_scope("domain"), LineCount::new(lines))]
     }
 
     fn batch(id: &str, members: &[&str]) -> domain::batch_plan::BatchDeclaration {
@@ -1278,6 +1304,311 @@ mod tests {
         store.tracks.lock().unwrap().insert(track.id().clone(), track);
         store.impl_plans.lock().unwrap().insert(TrackId::try_new("my-track-2026").unwrap(), plan);
         store
+    }
+
+    /// The same command as a start: entering `in_progress` from done is a reopen,
+    /// and both are judged by the one guard.
+    fn reopen(task_id: &str) -> TaskTransitionCommand {
+        start_work_on(task_id)
+    }
+
+    /// The status the store currently holds for `task_id`.
+    fn stored_status(store: &StubStore, task_id: &str) -> domain::TaskStatus {
+        let plans = store.impl_plans.lock().unwrap();
+        let plan = plans.get(&TrackId::try_new("my-track-2026").unwrap()).unwrap();
+        let wanted = TaskId::try_new(task_id).unwrap();
+        plan.tasks().iter().find(|task| *task.id() == wanted).unwrap().status().clone()
+    }
+
+    /// B1 holds the settled T001 — declared with `t001` as its estimate — beside
+    /// the todo T002, so B1 still has an uncommitted member and is the batch being
+    /// consumed: T001's reopen is a current-batch candidate and reaches the
+    /// measured guard rather than stopping at membership.
+    fn reopen_fixture(
+        t001: domain::batch_plan::TaskEstimate,
+    ) -> (Arc<StubStore>, domain::batch_plan::BatchPlanDocument) {
+        use domain::TaskStatus;
+        use domain::batch_plan::BatchPlanDocument;
+
+        let batch_plan = BatchPlanDocument::new(
+            TrackId::try_new("my-track-2026").unwrap(),
+            vec![t001, estimate("T002", 10, 5)],
+            vec![batch("B1", &["T001", "T002"])],
+        )
+        .unwrap();
+        let store = store_with(plan_of(&[
+            ("T001", TaskStatus::DoneTraced { commit_hash: commit_hash() }),
+            ("T002", TaskStatus::Todo),
+        ]));
+        (store, batch_plan)
+    }
+
+    #[test]
+    fn test_reopening_a_candidate_whose_estimate_would_pass_the_ceiling_is_refused() {
+        // 400 measured domain lines plus the reopened task's declared 200 would
+        // reach 600 against a ceiling of 500: the cumulative rejection applies to a
+        // reopen exactly as it does to a start.
+        let (store, batch_plan) = reopen_fixture(estimate("T001", 150, 50));
+
+        let outcome = admitting_interactor(store, batch_plan, measured_domain(400), Some(500))
+            .transition_task(reopen("T001"))
+            .unwrap();
+
+        assert_eq!(
+            outcome.rejection(),
+            Some(&AdmissionRejectionOutput::ScopeCeilingWouldBeExceeded {
+                scope: "domain".to_owned(),
+                prior_contribution: std::num::NonZeroU32::new(400).unwrap(),
+                candidate_estimate: 200,
+                ceiling: 500,
+            })
+        );
+    }
+
+    #[test]
+    fn test_reopening_a_candidate_whose_estimate_names_an_unconfigured_scope_is_an_error() {
+        // The same fail-closed error a start gets: an unresolvable ceiling must not
+        // admit the reopen on the grounds that nothing constrains it.
+        let (store, batch_plan) = reopen_fixture(estimate_in(main_scope("domian"), "T001", 10, 5));
+
+        let error = admitting_interactor(store, batch_plan, Vec::new(), Some(500))
+            .transition_task(reopen("T001"))
+            .unwrap_err();
+
+        assert!(matches!(error, TaskOperationError::TransitionFailed(_)), "unexpected: {error}");
+        assert!(error.to_string().contains("T001"), "the failure names the task: {error}");
+        assert!(error.to_string().contains("domian"), "the failure names the scope: {error}");
+    }
+
+    #[test]
+    fn test_reopening_the_first_contributor_to_a_scope_is_admitted_however_large_its_estimate() {
+        // Nothing measured and no member in progress, so the scope carries nothing:
+        // the first contribution gets in on a reopen too, and the guard cannot
+        // deadlock a reopen it would have to refuse forever.
+        let (store, batch_plan) = reopen_fixture(estimate("T001", 700, 300));
+
+        let outcome = admitting_interactor(Arc::clone(&store), batch_plan, Vec::new(), Some(500))
+            .transition_task(reopen("T001"))
+            .unwrap();
+
+        assert!(matches!(outcome, TaskTransitionOutcome::Transitioned(_)));
+        assert_eq!(stored_status(&store, "T001"), domain::TaskStatus::InProgress);
+    }
+
+    #[test]
+    fn test_reopening_a_candidate_that_declares_only_the_reserved_other_scope_is_admitted() {
+        // `other` resolves no ceiling, so its total is never compared — on a reopen
+        // as on a start, and even with the scope already carrying more than the
+        // configured limit for a named scope.
+        let (store, batch_plan) =
+            reopen_fixture(estimate_in(domain::review_v2::ScopeName::Other, "T001", 900, 200));
+
+        let outcome = admitting_interactor(Arc::clone(&store), batch_plan, Vec::new(), Some(500))
+            .transition_task(reopen("T001"))
+            .unwrap();
+
+        assert!(matches!(outcome, TaskTransitionOutcome::Transitioned(_)));
+        assert_eq!(stored_status(&store, "T001"), domain::TaskStatus::InProgress);
+    }
+
+    #[test]
+    fn test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error() {
+        use domain::TaskStatus;
+        use domain::batch_plan::BatchPlanDocument;
+
+        // The missing-estimate failure on a reopen, isolated from the membership
+        // one. B1 = [T002] is a well-formed current batch, so membership is
+        // decidable here; the settled T001 is simply not declared, and the
+        // evaluation asks for the candidate's estimate before it asks about
+        // membership, so the missing-estimate error is what fires.
+        //
+        // The neighbouring state — a *declared* member carrying no estimate — is
+        // unrepresentable rather than untested: `BatchPlanDocument::new` refuses to
+        // build such a plan, as
+        // `domain::batch_plan::tests::test_the_plan_rejects_a_batch_member_without_a_declared_estimate`
+        // and, for a settled member,
+        // `test_a_declared_settled_task_is_not_exempt_from_the_file_internal_invariants`
+        // establish. An undeclared candidate is therefore the only input that
+        // reaches this error at all.
+        let batch_plan = BatchPlanDocument::new(
+            TrackId::try_new("my-track-2026").unwrap(),
+            vec![estimate("T002", 10, 5)],
+            vec![batch("B1", &["T002"])],
+        )
+        .unwrap();
+        let store = store_with(plan_of(&[
+            ("T001", TaskStatus::DoneTraced { commit_hash: commit_hash() }),
+            ("T002", TaskStatus::Todo),
+        ]));
+
+        let error = admitting_interactor(Arc::clone(&store), batch_plan, Vec::new(), Some(500))
+            .transition_task(reopen("T001"))
+            .unwrap_err();
+
+        let rendered = error.to_string();
+        assert!(matches!(error, TaskOperationError::TransitionFailed(_)), "unexpected: {error}");
+        assert!(rendered.contains("no estimate in the batch plan"), "unexpected: {rendered}");
+        assert!(rendered.contains("T001"), "the failure names the candidate: {rendered}");
+        // Specifically not the membership refusal, which renders the batch names.
+        assert!(!rendered.contains("being consumed"), "not a membership refusal: {rendered}");
+        assert!(matches!(stored_status(&store, "T001"), TaskStatus::DoneTraced { .. }));
+    }
+
+    #[test]
+    fn test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write() {
+        use domain::TaskStatus;
+        use domain::batch_plan::BatchPlanDocument;
+
+        // The plan declares only the remaining work, so the settled T001 has no
+        // estimate and no batch. Reopening it would make it unsettled with neither,
+        // which is exactly what the judged set is widened to prevent (AC-26).
+        let batch_plan = BatchPlanDocument::new(
+            TrackId::try_new("my-track-2026").unwrap(),
+            vec![estimate("T002", 10, 5)],
+            vec![batch("B2", &["T002"])],
+        )
+        .unwrap();
+        let store = store_with(plan_of(&[
+            ("T001", TaskStatus::DoneTraced { commit_hash: commit_hash() }),
+            ("T002", TaskStatus::Todo),
+        ]));
+
+        let error = admitting_interactor(Arc::clone(&store), batch_plan, Vec::new(), Some(500))
+            .transition_task(reopen("T001"))
+            .unwrap_err();
+
+        assert!(matches!(error, TaskOperationError::TransitionFailed(_)), "unexpected: {error}");
+        assert!(error.to_string().contains("T001"), "the failure names the task: {error}");
+        // Fail-closed and before any write: the task is still settled.
+        assert!(matches!(stored_status(&store, "T001"), TaskStatus::DoneTraced { .. }));
+    }
+
+    #[test]
+    fn test_reopening_a_declared_member_of_the_current_batch_is_judged_like_a_start() {
+        use domain::TaskStatus;
+        use domain::batch_plan::BatchPlanDocument;
+
+        // B1 holds the settled T001 and the todo T002, so B1 still has an
+        // uncommitted member and is the batch being consumed. T001 is declared, so
+        // the same formula that admits a start admits its reopen (AC-27).
+        let batch_plan = BatchPlanDocument::new(
+            TrackId::try_new("my-track-2026").unwrap(),
+            vec![estimate("T001", 10, 5), estimate("T002", 10, 5)],
+            vec![batch("B1", &["T001", "T002"])],
+        )
+        .unwrap();
+        let store = store_with(plan_of(&[
+            ("T001", TaskStatus::DoneTraced { commit_hash: commit_hash() }),
+            ("T002", TaskStatus::Todo),
+        ]));
+
+        let outcome = admitting_interactor(Arc::clone(&store), batch_plan, Vec::new(), Some(500))
+            .transition_task(reopen("T001"))
+            .unwrap();
+
+        assert_eq!(transitioned(outcome).derived_status, "in_progress");
+        assert_eq!(stored_status(&store, "T001"), TaskStatus::InProgress);
+    }
+
+    #[test]
+    fn test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member() {
+        use domain::TaskStatus;
+        use domain::batch_plan::BatchPlanDocument;
+
+        // B1 is fully committed, so B2 is the batch being consumed and B1's member
+        // is no longer part of it: the reopen needs the declaration updated first.
+        let batch_plan = BatchPlanDocument::new(
+            TrackId::try_new("my-track-2026").unwrap(),
+            vec![estimate("T001", 10, 5), estimate("T002", 10, 5)],
+            vec![batch("B1", &["T001"]), batch("B2", &["T002"])],
+        )
+        .unwrap();
+        let store = store_with(plan_of(&[
+            ("T001", TaskStatus::DoneTraced { commit_hash: commit_hash() }),
+            ("T002", TaskStatus::Todo),
+        ]));
+
+        let outcome = admitting_interactor(Arc::clone(&store), batch_plan, Vec::new(), Some(500))
+            .transition_task(reopen("T001"))
+            .unwrap();
+
+        assert_eq!(
+            outcome.rejection(),
+            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {
+                task_id: "T001".to_owned(),
+                task_batch: "B1".to_owned(),
+                current_batch: "B2".to_owned(),
+            })
+        );
+        assert!(matches!(stored_status(&store, "T001"), TaskStatus::DoneTraced { .. }));
+    }
+
+    #[test]
+    fn test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were() {
+        use domain::TaskStatus;
+        use domain::batch_plan::BatchPlanDocument;
+
+        // A declared todo member of the current batch still starts, unchanged.
+        let batch_plan = BatchPlanDocument::new(
+            TrackId::try_new("my-track-2026").unwrap(),
+            vec![estimate("T001", 10, 5)],
+            vec![batch("B1", &["T001"])],
+        )
+        .unwrap();
+        let started = admitting_interactor(
+            store_with(plan_of(&[("T001", TaskStatus::Todo)])),
+            batch_plan.clone(),
+            Vec::new(),
+            Some(500),
+        )
+        .transition_task(start_work_on("T001"))
+        .unwrap();
+        assert_eq!(transitioned(started).derived_status, "in_progress");
+
+        // A transition that does not enter `in_progress` is still not judged: the
+        // undeclared T002 completes even though the plan holds no estimate for it.
+        let store =
+            store_with(plan_of(&[("T001", TaskStatus::Todo), ("T002", TaskStatus::InProgress)]));
+        let finished = admitting_interactor(Arc::clone(&store), batch_plan, Vec::new(), Some(500))
+            .transition_task(TaskTransitionCommand {
+                items_dir: PathBuf::new(),
+                track_id: "my-track-2026".to_owned(),
+                task_id: "T002".to_owned(),
+                target_status: "done".to_owned(),
+                commit_hash: Some(commit_hash().as_ref().to_owned()),
+            })
+            .unwrap();
+
+        assert!(matches!(finished, TaskTransitionOutcome::Transitioned(_)));
+        assert!(matches!(stored_status(&store, "T002"), TaskStatus::DoneTraced { .. }));
+
+        // Nor is a reset judged, though it too is now resolved before the guard
+        // runs: what decides is where the resolved transition leads, not the target
+        // string, and only `in_progress` is entered.
+        let store =
+            store_with(plan_of(&[("T001", TaskStatus::Todo), ("T002", TaskStatus::InProgress)]));
+        let reset = admitting_interactor(
+            Arc::clone(&store),
+            BatchPlanDocument::new(
+                TrackId::try_new("my-track-2026").unwrap(),
+                vec![estimate("T001", 10, 5)],
+                vec![batch("B1", &["T001"])],
+            )
+            .unwrap(),
+            Vec::new(),
+            Some(500),
+        )
+        .transition_task(TaskTransitionCommand {
+            items_dir: PathBuf::new(),
+            track_id: "my-track-2026".to_owned(),
+            task_id: "T002".to_owned(),
+            target_status: "todo".to_owned(),
+            commit_hash: None,
+        })
+        .unwrap();
+
+        assert!(matches!(reset, TaskTransitionOutcome::Transitioned(_)));
+        assert_eq!(stored_status(&store, "T002"), TaskStatus::Todo);
     }
 
     #[test]
@@ -1456,6 +1787,45 @@ mod tests {
         assert!(matches!(error, TaskOperationError::TransitionFailed(_)), "unexpected: {error}");
         assert!(error.to_string().contains("T002"), "the failure names the task: {error}");
         assert!(error.to_string().contains("no estimate"), "unexpected: {error}");
+    }
+
+    #[test]
+    fn test_an_estimate_naming_an_unconfigured_scope_makes_the_transition_an_error() {
+        use domain::TaskStatus;
+        use domain::batch_plan::{
+            BatchPlanDocument, LineCount, ScopeLineEstimate, TaskDecomposition, TaskEstimate,
+        };
+        use domain::review_v2::{MainScopeName, ScopeName};
+
+        // The estimate names a misspelled scope, so no ceiling can be resolved
+        // for it: the start fails rather than degrading into an unconstrained
+        // comparison that admits any figure.
+        let scope = ScopeName::Main(MainScopeName::new("domian").unwrap());
+        let misspelled = TaskEstimate::new(
+            TaskId::try_new("T001").unwrap(),
+            vec![ScopeLineEstimate::new(scope, LineCount::new(10), LineCount::new(5))],
+            TaskDecomposition::Decomposable,
+        )
+        .unwrap();
+        let batch_plan = BatchPlanDocument::new(
+            TrackId::try_new("my-track-2026").unwrap(),
+            vec![misspelled],
+            vec![batch("B1", &["T001"])],
+        )
+        .unwrap();
+
+        let error = admitting_interactor(
+            store_with(plan_of(&[("T001", TaskStatus::Todo)])),
+            batch_plan,
+            Vec::new(),
+            Some(500),
+        )
+        .transition_task(start_work_on("T001"))
+        .unwrap_err();
+
+        assert!(matches!(error, TaskOperationError::TransitionFailed(_)), "unexpected: {error}");
+        assert!(error.to_string().contains("T001"), "the failure names the task: {error}");
+        assert!(error.to_string().contains("domian"), "the failure names the scope: {error}");
     }
 
     #[test]

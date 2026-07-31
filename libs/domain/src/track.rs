@@ -97,6 +97,18 @@ impl TaskStatus {
     pub fn is_resolved(&self) -> bool {
         matches!(self, Self::DonePending | Self::DoneTraced { .. } | Self::Skipped)
     }
+
+    /// Returns `true` if the task's work is settled: done with a commit recorded,
+    /// or skipped and therefore never to be committed at all.
+    ///
+    /// A task marked done with no commit recorded is deliberately unsettled: work
+    /// that is not on the branch has not been delivered. This is the one
+    /// definition of settledness the crate uses — the admission's settled task
+    /// set and the batch-plan gate's declaration domain both read it — and it
+    /// stays crate-internal so no second rule can appear on the public surface.
+    pub(crate) fn is_settled(&self) -> bool {
+        matches!(self, Self::DoneTraced { .. } | Self::Skipped)
+    }
 }
 
 /// Command enum representing valid task state transition requests.

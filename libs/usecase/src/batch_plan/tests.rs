@@ -9,7 +9,7 @@ use domain::batch_plan::{
     TaskDecomposition, TaskEstimate,
 };
 use domain::review_v2::{MainScopeName, ReviewScopeConfig, ScopeName};
-use domain::{FreeText, NonEmptyString, TaskId, TaskStatus, TrackId, TrackTask};
+use domain::{CommitHash, FreeText, NonEmptyString, TaskId, TaskStatus, TrackId, TrackTask};
 
 use super::{
     BatchPlanCheckCommand, BatchPlanCheckError, BatchPlanCheckInteractor, BatchPlanCheckOutput,
@@ -45,6 +45,26 @@ fn planned_task(id: &str, depends_on: &[&str]) -> TrackTask {
         NonEmptyString::try_new(format!("task {id}")).unwrap(),
         TaskStatus::Todo,
         depends_on.iter().map(|dependency| task(dependency)).collect(),
+    )
+}
+
+/// A planned task in `status`, declaring no dependency.
+fn planned_task_in(id: &str, status: TaskStatus) -> TrackTask {
+    TrackTask::with_dependencies(
+        task(id),
+        NonEmptyString::try_new(format!("task {id}")).unwrap(),
+        status,
+        Vec::new(),
+    )
+}
+
+/// A task settled the committed way: done with a commit recorded.
+fn settled_task(id: &str) -> TrackTask {
+    planned_task_in(
+        id,
+        TaskStatus::DoneTraced {
+            commit_hash: CommitHash::try_new("a1b2c3d4e5f60718293a4b5c6d7e8f9012345678").unwrap(),
+        },
     )
 }
 
@@ -219,7 +239,13 @@ impl ScopeConfigReaderPort for StubScopeConfigReader {
         }
         ReviewScopeConfig::new(
             track_id,
-            vec![("domain".to_owned(), vec!["libs/domain/**".to_owned()], None, self.ceiling)],
+            // Two configured scopes under the same ceiling: a plan naming either
+            // is judged, and a plan naming anything else is not configured at
+            // all.
+            vec![
+                ("domain".to_owned(), vec!["libs/domain/**".to_owned()], None, self.ceiling),
+                ("usecase".to_owned(), vec!["libs/usecase/**".to_owned()], None, self.ceiling),
+            ],
             Vec::new(),
             Vec::new(),
             None,
@@ -411,6 +437,27 @@ fn test_the_planned_task_reader_port_returns_the_tasks_with_their_declared_depen
 }
 
 #[test]
+fn test_the_planned_task_reader_port_returns_settled_tasks_in_the_full_list_with_their_status() {
+    let reader = StubPlannedTaskReader::new(PlannedTaskStub::Tasks(vec![
+        settled_task("T001"),
+        planned_task_in("T002", TaskStatus::Skipped),
+        planned_task_in("T003", TaskStatus::DonePending),
+        planned_task("T004", &[]),
+    ]));
+
+    let tasks = reader.read_planned_tasks(&items_dir(), &track()).unwrap();
+
+    // The port hands back the whole task list, settled tasks included: the gate
+    // reads each status to decide which tasks the plan must place, and the
+    // id-existence check needs the settled ones present to resolve a declared id.
+    assert_eq!(tasks.len(), 4);
+    assert!(matches!(tasks[0].status(), TaskStatus::DoneTraced { .. }));
+    assert_eq!(tasks[1].status(), &TaskStatus::Skipped);
+    assert_eq!(tasks[2].status(), &TaskStatus::DonePending);
+    assert_eq!(tasks[3].status(), &TaskStatus::Todo);
+}
+
+#[test]
 fn test_the_planned_task_reader_port_reports_an_absent_plan_apart_from_a_read_failure() {
     let absent = StubPlannedTaskReader::new(PlannedTaskStub::NotFound);
     let unreadable = StubPlannedTaskReader::new(PlannedTaskStub::ReadFailed);
@@ -432,7 +479,11 @@ fn test_the_scope_config_reader_port_returns_the_configuration_the_ceilings_come
     let config = reader.read(&items_dir(), &track()).unwrap();
 
     assert_eq!(config.diff_ceiling_for_scope(&scope("domain")), Some(500));
-    assert_eq!(config.diff_ceiling_for_scope(&scope("usecase")), None);
+    assert_eq!(config.diff_ceiling_for_scope(&scope("usecase")), Some(500));
+    // A name the configuration does not hold resolves no ceiling, which is why
+    // the gate reports it rather than leaving its total uncompared.
+    assert_eq!(config.diff_ceiling_for_scope(&scope("infrastructure")), None);
+    assert!(!config.contains_scope(&scope("infrastructure")));
     assert_eq!(reader.calls.lock().unwrap().as_slice(), &[(items_dir(), track())]);
     assert!(matches!(
         StubScopeConfigReader::failing().read(&items_dir(), &track()),
@@ -940,6 +991,147 @@ fn test_a_batch_member_no_task_provides_is_reported_whichever_batch_claims_it() 
         Some(500),
     );
     assert_eq!(both_planned, BatchPlanCheckOutput::Passed);
+}
+
+#[test]
+fn test_the_check_reports_an_estimate_naming_a_scope_the_configuration_does_not_define() {
+    // The mirror of the fifth domain finding: the interactor is the only place
+    // that reads the domain scope name, and the driver receives it as a string.
+    let outcome = gate_over(
+        plan_of(vec![estimate("T001", &[("domian", 10, 5)], None)], vec![batch("B1", &["T001"])]),
+        vec![planned_task("T001", &[])],
+        Some(500),
+    );
+
+    assert_eq!(
+        outcome,
+        BatchPlanCheckOutput::Blocked {
+            violations: NonEmptyViolationOutputs::try_new(vec![
+                BatchPlanViolationOutput::UnknownMainScopeName {
+                    task_id: "T001".to_owned(),
+                    scope: "domian".to_owned(),
+                }
+            ])
+            .unwrap()
+        }
+    );
+}
+
+#[test]
+fn test_the_check_accepts_an_estimate_for_the_reserved_other_scope() {
+    // `other` is the implicit scope: valid without being configured, and outside
+    // every Σ comparison because it resolves no ceiling. Its total is far past the
+    // configured ceiling and the check still passes, so this is the second
+    // legitimate unresolved-ceiling lane rather than a scope-name failure.
+    let plan = plan_of(
+        vec![
+            TaskEstimate::new(
+                task("T001"),
+                vec![ScopeLineEstimate::new(
+                    ScopeName::Other,
+                    LineCount::new(3_000),
+                    LineCount::new(2_000),
+                )],
+                TaskDecomposition::Decomposable,
+            )
+            .unwrap(),
+        ],
+        vec![batch("B1", &["T001"])],
+    );
+
+    let outcome = gate_over(plan, vec![planned_task("T001", &[])], Some(500));
+
+    assert_eq!(outcome, BatchPlanCheckOutput::Passed);
+}
+
+#[test]
+fn test_the_check_ignores_a_dependency_edge_whose_settled_endpoint_is_not_declared() {
+    // T002 depends on the settled T001, which the remaining-work-only plan does not
+    // declare: the ordering check has no batch for that endpoint and skips the edge,
+    // so the verdict is unchanged.
+    let skipped_edge = gate_over(
+        plan_of(vec![estimate("T002", &[("domain", 10, 5)], None)], vec![batch("B1", &["T002"])]),
+        vec![settled_task("T001"), planned_task("T002", &["T001"])],
+        Some(500),
+    );
+    assert_eq!(skipped_edge, BatchPlanCheckOutput::Passed);
+
+    // The contrast: both endpoints unsettled and declared, and the edge points into
+    // a later batch — still reported.
+    let both_declared = gate_over(
+        plan_of(
+            vec![
+                estimate("T001", &[("domain", 10, 5)], None),
+                estimate("T002", &[("domain", 10, 5)], None),
+            ],
+            vec![batch("B1", &["T002"]), batch("B2", &["T001"])],
+        ),
+        vec![planned_task("T001", &[]), planned_task("T002", &["T001"])],
+        Some(500),
+    );
+    assert_eq!(
+        both_declared,
+        BatchPlanCheckOutput::Blocked {
+            violations: NonEmptyViolationOutputs::try_new(vec![
+                BatchPlanViolationOutput::DependencyInLaterBatch {
+                    task_id: "T002".to_owned(),
+                    task_batch: "B1".to_owned(),
+                    dependency: "T001".to_owned(),
+                    dependency_batch: "B2".to_owned(),
+                }
+            ])
+            .unwrap()
+        }
+    );
+}
+
+#[test]
+fn test_the_check_passes_a_plan_that_declares_only_the_remaining_work() {
+    // T001 is done with a commit recorded and T002 is skipped, so a plan holding
+    // only the unsettled T003 is complete: their absence is no finding.
+    let outcome = gate_over(
+        plan_of(vec![estimate("T003", &[("domain", 10, 5)], None)], vec![batch("B1", &["T003"])]),
+        vec![
+            settled_task("T001"),
+            planned_task_in("T002", TaskStatus::Skipped),
+            planned_task("T003", &[]),
+        ],
+        Some(500),
+    );
+
+    assert_eq!(outcome, BatchPlanCheckOutput::Passed);
+}
+
+#[test]
+fn test_the_check_judges_a_declared_settled_task_exactly_as_an_unsettled_one() {
+    // Declaring a settled task is permitted, and then it is judged in full: its
+    // 400 lines plus the todo task's 250 reach 650 against the ceiling of 500.
+    let outcome = gate_over(
+        plan_of(
+            vec![
+                estimate("T001", &[("domain", 300, 100)], None),
+                estimate("T002", &[("domain", 200, 50)], None),
+            ],
+            vec![batch("B1", &["T001", "T002"])],
+        ),
+        vec![settled_task("T001"), planned_task("T002", &[])],
+        Some(500),
+    );
+
+    assert_eq!(
+        outcome,
+        BatchPlanCheckOutput::Blocked {
+            violations: NonEmptyViolationOutputs::try_new(vec![
+                BatchPlanViolationOutput::CeilingExceeded {
+                    batch_id: "B1".to_owned(),
+                    scope: "domain".to_owned(),
+                    total: 650,
+                    ceiling: 500,
+                }
+            ])
+            .unwrap()
+        }
+    );
 }
 
 #[test]

@@ -6,7 +6,7 @@
 |------|------|--------|---------|--------|----------|
 | AdmissionRejectionOutput | enum | add | NotCurrentBatchMember, ScopeCeilingWouldBeExceeded | 🔵 | 🔵 |
 | BatchPlanCheckOutput | enum | add | Passed, Blocked | 🔵 | 🔵 |
-| BatchPlanViolationOutput | enum | add | CeilingExceeded, OversizeScopeHasMultipleContributors, UnknownTaskRef, UnplannedTask, DependencyInLaterBatch | 🔵 | 🔵 |
+| BatchPlanViolationOutput | enum | add | CeilingExceeded, OversizeScopeHasMultipleContributors, UnknownTaskRef, UnplannedTask, DependencyInLaterBatch, UnknownMainScopeName | 🔵 | 🔵 |
 | TaskTransitionOutcome | enum | add | Transitioned, Rejected | 🔵 | 🔵 |
 
 ## Error Types

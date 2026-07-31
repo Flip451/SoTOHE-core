@@ -88,12 +88,12 @@
       },
       "key": {
         "waived_reason_hash": "5b3c3230460854c044a24a80f7f056cd0ff36998784711f92ba5e6b3136d49c4",
-        "declaration_hash": "118094875a090cabde506ab37cada74cd4deaa342b227dc9fba862b96d1f46a9",
+        "declaration_hash": "a0b8517bdd7ccd446cc6ddf6d09f9903fb1cf093704bc7a74bced760520e379e",
         "anchor_text_hash": "9683b81e7639049c9f0d9fcc535e1fd9d50c190e2b084ae0cea60372eb6684b3"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "書き手は impl-planner のみ（1 file = 1 writer）で、admission を判定する CLI は読むだけである。"
+        "citation": "Domain model of batch-plan.json; plain struct, private fields."
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -112,12 +112,12 @@
       },
       "key": {
         "waived_reason_hash": "fb2e69717a3602a1e1e9604dec3e0578acbc1b5c7dc6f49eeba4dc9412f70b31",
-        "declaration_hash": "118094875a090cabde506ab37cada74cd4deaa342b227dc9fba862b96d1f46a9",
+        "declaration_hash": "a0b8517bdd7ccd446cc6ddf6d09f9903fb1cf093704bc7a74bced760520e379e",
         "anchor_text_hash": "0f13d211aab11d6e0b46e0830657059fb92e8b2b8968baa9983b5702f958c101"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "\"Domain model of batch-plan.json.\"; \"wire-format metadata stays in the infrastructure DTO and codec\""
+        "citation": "No cross-file check declared here; owner: check_batch_plan."
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -329,11 +329,11 @@
       "key": {
         "waived_reason_hash": "893d499880ef7dacc19091b644e16616b89131867b0991254b81313b6eddd180",
         "declaration_hash": "03613e42886c99dcbdd909cb12f6796f1ad7c081d9c2384454cf4b6ff0640534",
-        "anchor_text_hash": "eb481557772cce6c718a0698518d721bb1cfe4faed60c6fa68d0cf0d5979cd4f"
+        "anchor_text_hash": "6fab39162b7be323c8a7264ccdf8f247c1a038e8fe4e9ed3fd472f3f74b512ff"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "依存辺の検査の入力は `impl-plan.json` の依存宣言と `batches[]` のみであり、`batch-plan.json` 側に新しい宣言フィールドを要求しない。"
+        "citation": "NotFound is its own variant because callers act on it distinctly rather than folding it into a generic read failure"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -353,11 +353,11 @@
       "key": {
         "waived_reason_hash": "d30c7435bdc13cda6d6b3bd91fd610683b9e5deff39a8825f7979f5586e87841",
         "declaration_hash": "03613e42886c99dcbdd909cb12f6796f1ad7c081d9c2384454cf4b6ff0640534",
-        "anchor_text_hash": "c2929a4e1e266bb67ee1550b8f08cbe7d63072dc726a0c6c09dbed623a4d1678"
+        "anchor_text_hash": "1db6608612c106d1fd3af5e00e49f4ac77cd7d9d50e3ab6d9368cc14af9b5d4f"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "Failure of reading a track planning artifact... that may be absent or unreadable"
+        "citation": "TypeEntry ... kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"NotFound\")), payload: Unit }, VariantDecl { name: VariantName(Identifier(\"ReadFailed\")), payload: Struct([FieldDecl { name: FieldName(Identifier(\"message\")), ty: TypeRef(\"domain::FreeText\") }]) }] ..."
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },

@@ -4,7 +4,7 @@
   "entries": [
     {
       "claim_hash": "dc3c1f75cb416656b2b3ac8297065cd39bb04b110db4e780d12cfc369971db5c",
-      "evidence_hash": "67e577aebc390c40ab22918fef23accc02695b761541e71ec80410d2555b4ed6",
+      "evidence_hash": "c13ad5190a1c073a041823c2bc56ba467b4a9a7c6f6d27570ae8c23903988ecd",
       "verdict": {
         "kind": "pass",
         "citation": "`batch-plan.json` に順序付きの batch 列 `batches[]` を宣言させる。各 batch は member task id の列のみを宣言し"
@@ -22,7 +22,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-03",
-          "text_label": "`batch-plan.json` に順序付きの batch 列 `batches[]` を宣言させる。各 batch は member task id の列のみを宣言し、すべてのタスクはちょうど 1 つの batch に属する。"
+          "text_label": "`batch-plan.json` に順序付きの batch 列 `batches[]` を宣言させる。各 batch は member task id の列のみを宣言し、宣言対象のタスク（宣言対象の範囲は IN-21）はちょうど 1 つの batch に属する。"
         }
       }
     },
@@ -292,10 +292,10 @@
     },
     {
       "claim_hash": "9c4671ecf78b81139cf015b43f4f8a0a45efb3e5019d174a3de03d73065b1372",
-      "evidence_hash": "95ef0c3d6dd7169a480f7fe4f4be96ff7d43fa28b1f17f1042a1c2338136185c",
+      "evidence_hash": "ad044a24bd9e64f1446a89b3482e2ea5aa0363d48eb18993c2ba48f1f0c50637",
       "verdict": {
         "kind": "pass",
-        "citation": "`impl-plan.json` の全タスクがちょうど 1 つの batch に属す / 見積りと batch member の task id が実在のタスクを指す / 宣言されたすべての依存辺について、依存先タスクの所属 batch が依存元タスクの所属 batch と同一であるか `batches[]` の宣言順でそれより先行する / 超過タスクがその超過 scope について batch 内唯一の寄与者である。"
+        "citation": "同 gate が cross-file の構造検査もあわせて行う: `impl-plan.json` の未 settle タスク（todo / in_progress）がそれぞれちょうど 1 つの batch に属す"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -310,16 +310,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-07",
-          "text_label": "同 gate が cross-file の構造検査もあわせて行う: `impl-plan.json` の全タスクがちょうど 1 つの batch に属す / 見積りと batch member の task id が実在のタスクを指す / 宣言されたすべての依存辺について、依存先タスクの所属 batch が依存元タスクの所属 batch と同一であるか `batches[]` の宣言順でそれより先行する / 超過タスクがその超過 scope について batch 内唯一の寄与者である。依存辺の検査の入力は `impl-plan.json` の依存宣言と `batches[]` のみであり、`batch-plan.json` 側に新しい宣言フィールドを要求しない。依存を宣言していないタスク対は検査の対象外である。"
+          "text_label": "同 gate が cross-file の構造検査もあわせて行う: `impl-plan.json` の未 settle タスク（todo / in_progress）がそれぞれちょうど 1 つの batch に属す / 見積りと batch member の task id が実在のタスクを指す / 依存元と依存先の双方が宣言に含まれる（したがって双方が未 settle の）依存辺について、依存先タスクの所属 batch が依存元タスクの所属 batch と同一であるか `batches[]` の宣言順でそれより先行する / 超過タスクがその超過 scope について batch 内唯一の寄与者である / 見積りが宣言する main scope 名が review scope 設定の設定済み scope 集合に実在する。無所属の検査は未 settle タスクにのみ適用し、settle 済みタスクがどの batch にも属さないことは違反として報告しない。task id の実在検査は settle 状態を問わず宣言されたすべての id に適用する。依存辺の検査の入力は `impl-plan.json` の依存宣言と `batches[]` のみであり、`batch-plan.json` 側に新しい宣言フィールドを要求しない。依存を宣言していないタスク対は検査の対象外である。いずれかの端が settle 済みで宣言に含まれない依存辺も順序検査の対象外とし、無検査で通す — 宣言に不在の端は所属 batch を解決する手段がなく、また settle 済みの端は既に delivered であって「後続 batch」になり得ないため、この除外によって順序保証は失われない。scope 名の照合では、実在しない名前を fail-closed で拒否し graceful skip を設けない。予約名 `other` は暗黙 scope として常に有効である。"
         }
       }
     },
     {
       "claim_hash": "9c4671ecf78b81139cf015b43f4f8a0a45efb3e5019d174a3de03d73065b1372",
-      "evidence_hash": "d465e1b389f7b509f7eca1dde25c2adfb3018d4bcdb5a40791a2028a576da2d9",
+      "evidence_hash": "066ac434f24eeed8fec277e7f1ba298088024a7eed5fe45b3a7bdbac54505a4f",
       "verdict": {
         "kind": "pass",
-        "citation": "どの batch にも属さないタスク、実在しないタスクを指す task id、依存先タスクの所属 batch が依存元タスクの所属 batch より後にある宣言済み依存辺、超過タスクがその超過 scope の唯一の寄与者でない batch — について、同 check が ERROR を返す。"
+        "citation": "実在しない task id は宣言が指すタスクの settle 状態を問わず ERROR になる。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -334,7 +334,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-07",
-          "text_label": "cross-file 構造違反のそれぞれ — どの batch にも属さないタスク、実在しないタスクを指す task id、依存先タスクの所属 batch が依存元タスクの所属 batch より後にある宣言済み依存辺、超過タスクがその超過 scope の唯一の寄与者でない batch — について、同 check が ERROR を返す。依存を宣言していないタスク対の batch 割当は同 check の結果を変えない。"
+          "text_label": "cross-file 構造違反のそれぞれ — どの batch にも属さない未 settle タスク、実在しないタスクを指す task id、依存元と依存先の双方が宣言に含まれ、依存先の所属 batch が依存元タスクの所属 batch より後にある依存辺、超過タスクがその超過 scope の唯一の寄与者でない batch、設定済み scope 集合に存在しない main scope 名を宣言する見積り — について、同 check が ERROR を返す。どの batch にも属さない settle 済みタスクは同 check の結果を変えない。実在しない task id は宣言が指すタスクの settle 状態を問わず ERROR になる。依存を宣言していないタスク対の batch 割当と、いずれかの端が settle 済みで宣言に含まれない依存辺は、いずれも同 check の結果を変えない。予約名 `other` を宣言する見積りは scope 名の照合で ERROR にならない。"
         }
       }
     },
@@ -364,10 +364,10 @@
     },
     {
       "claim_hash": "ce501d4a6b0a950d15653f86e42b324698e8d7521417c540f4c5aa149c3e2994",
-      "evidence_hash": "4d8cadbef743951218b5cc588c03d35069cc62a0925034e723654f30a7718f34",
+      "evidence_hash": "aee51e5b7039a93c2ee15154052d037c426db95ca2dacd9edbd04507b10804ab",
       "verdict": {
         "kind": "pass",
-        "citation": "ceiling が解決されない scope については Σ の照合が行われず、その scope の合計値の大小が Phase 3 gate の結果を変えない。"
+        "citation": "ceiling が解決されない状態が、設定済みで per-scope 上限も global 既定も持たない scope と予約名 `other` の 2 通りに限られる。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -382,7 +382,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-08",
-          "text_label": "ceiling が解決されない scope については Σ の照合が行われず、その scope の合計値の大小が Phase 3 gate の結果を変えない。"
+          "text_label": "ceiling が解決されない状態が、設定済みで per-scope 上限も global 既定も持たない scope と予約名 `other` の 2 通りに限られる。この 2 通りについては Σ の照合が行われず、その scope の合計値の大小が Phase 3 gate の結果を変えない。設定済み scope 集合に存在しない名前から「照合されない」状態に至る第 3 の経路は存在せず、その名前は AC-07 の照合で ERROR になる。"
         }
       }
     },

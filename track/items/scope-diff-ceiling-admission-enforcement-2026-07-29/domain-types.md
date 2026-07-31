@@ -7,9 +7,11 @@
 | AdmissionDecision | enum | add | Admitted, Rejected | 🔵 | 🔵 |
 | AdmissionRejection | enum | add | NotCurrentBatchMember, ScopeCeilingWouldBeExceeded | 🔵 | 🔵 |
 | BatchPlanGateOutcome | enum | add | Passed, Blocked | 🔵 | 🔵 |
-| BatchPlanGateViolation | enum | add | CeilingExceeded, OversizeScopeHasMultipleContributors, UnknownTaskRef, UnplannedTask, DependencyInLaterBatch | 🔵 | 🔵 |
+| BatchPlanGateViolation | enum | add | CeilingExceeded, OversizeScopeHasMultipleContributors, UnknownTaskRef, UnplannedTask, DependencyInLaterBatch, UnknownMainScopeName | 🔵 | 🔵 |
 | ScopeCeiling | enum | add | Unconstrained, Limited | 🔵 | 🔵 |
 | TaskDecomposition | enum | add | Decomposable, Indivisible | 🔵 | 🔵 |
+| TaskStatusKind | enum | reference | Todo, InProgress, Done, Skipped | 🔵 | 🔵 |
+| TaskTransition | enum | reference | Start, Complete, BackfillHash, ResetToTodo, Skip, Reopen | 🔵 | 🔵 |
 
 ## Value Objects
 
@@ -30,7 +32,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| AdmissionEvaluationError | error_type | add | MissingTaskEstimate | 🔵 | 🔵 |
+| AdmissionEvaluationError | error_type | add | MissingTaskEstimate, UnknownMainScopeName | 🔵 | 🔵 |
 | BatchPlanValidationError | error_type | add | EmptyJustification, EmptyBatchId, EmptyBatch, DuplicateTaskEstimate, DuplicateScopeEstimate, DuplicateBatchId, MissingTaskEstimate, UnassignedTask, DuplicateBatchMembership | 🔵 | 🔵 |
 | ValidationError | error_type | modify | EmptyString, InvalidTrackId, InvalidTaskId, InvalidCommitHash, InvalidTimestamp, InvalidTrackBranch, BranchIdMismatch, StatusOverrideMismatch, EmptyTrackTitle, EmptyTaskDescription, EmptyPlanSectionId, EmptyPlanSectionTitle, DuplicateTaskId, DuplicatePlanSectionId, UnknownTaskReference, DuplicateTaskReference, UnreferencedTask, OverrideIncompatibleWithResolvedTasks, TrackActivationRequiresPlanningOnly, TrackActivationRequiresSchemaV3, TrackAlreadyMaterialized, UnsupportedTargetStatus, SectionNotFound, NoSectionsAvailable, TaskDescriptionMutated, TaskRemoved, DuplicateElementId, InvalidLayerId, InvalidSpecElementId, EmptyAdrAnchor, EmptyConventionAnchor, InvalidContentHash, EmptyInformalGroundSummary, MultiLineInformalGroundSummary, EmptyDecisionGroundRef, InvalidObligationMinimum, InvalidDetectionRate, UnknownDependencyReference, DependencyCycle, PlanOrderViolatesDependency | 🔵 | 🔵 |
 

@@ -168,6 +168,55 @@ mod tests {
     }
 
     #[test]
+    fn test_the_two_unresolved_ceiling_lanes_are_the_only_ones_the_configuration_offers() {
+        // A configuration with one scope that declares no ceiling and no global
+        // default, so both legitimate unresolved-ceiling lanes are observable on
+        // the configuration this reader returns.
+        let repo = tempfile::Builder::new()
+            .prefix("review-scope-lanes-")
+            .tempdir_in(std::env::current_dir().unwrap())
+            .unwrap();
+        let root = repo.path();
+        std::fs::create_dir_all(root.join(".harness/config")).unwrap();
+        std::fs::write(
+            root.join(".harness/config/review-scope.json"),
+            r#"{"version": 2, "groups": {"domain": {"patterns": ["libs/domain/**"]}},
+                "review_operational": [], "other_track": []}"#,
+        )
+        .unwrap();
+        std::fs::write(
+            root.join("architecture-rules.json"),
+            r#"{"layers":[{"crate":"domain","path":"libs/domain"}]}"#,
+        )
+        .unwrap();
+        std::fs::create_dir_all(root.join("track/items/some-track")).unwrap();
+        let status = std::process::Command::new("git")
+            .args(["init", "-q"])
+            .current_dir(root)
+            .status()
+            .unwrap();
+        assert!(status.success(), "the fixture needs a repository of its own");
+
+        let config = FsReviewScopeConfigReader::new()
+            .read(&root.join("track/items"), &TrackId::try_new("some-track").unwrap())
+            .unwrap();
+
+        // Lane one: a configured scope with neither a per-scope ceiling nor a
+        // global default to inherit.
+        let domain = ScopeName::Main(MainScopeName::new("domain").unwrap());
+        assert!(config.contains_scope(&domain));
+        assert_eq!(config.diff_ceiling_for_scope(&domain), None);
+        // Lane two: the reserved implicit scope, valid but never configured.
+        assert!(config.contains_scope(&ScopeName::Other));
+        assert_eq!(config.diff_ceiling_for_scope(&ScopeName::Other), None);
+        // No third lane: a name the configuration does not hold is not a scope
+        // whose total goes uncompared, it is a name the gate reports.
+        let unknown = ScopeName::Main(MainScopeName::new("domian").unwrap());
+        assert!(!config.contains_scope(&unknown));
+        assert_eq!(config.diff_ceiling_for_scope(&unknown), None);
+    }
+
+    #[test]
     fn test_a_scope_with_no_configured_ceiling_is_unconstrained_rather_than_a_failure() {
         let config = FsReviewScopeConfigReader::new()
             .read(&workspace_items_dir(), &TrackId::try_new("some-track").unwrap())

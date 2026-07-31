@@ -70,13 +70,21 @@ specific `task_id` or `section.id`, or quote the offending text.
   not flag an over-ceiling task that carries a non-empty indivisibility
   justification you judge valid — that is the designed single-exemption lane;
   review the justification itself under the category below instead. Do not
-  flag tasks merely close to the ceiling.
+  flag tasks merely close to the ceiling. **Temporal boundary**: this category
+  applies only to tasks whose implementation has NOT started (`todo`). The
+  ceiling concept exists in the planning and admission domains only; once a
+  task is `in_progress` or done, no review route may apply a line-ceiling lens
+  to it.
 - **implausible indivisibility justification**: a `batch-plan.json` task whose
   over-ceiling estimate carries a justification that does not actually argue
   indivisibility — e.g., it names convenience or schedule rather than a reason
   the task cannot be split at a behavior boundary, or the described work
   visibly contains independently verifiable behavior units that could stand as
-  separate tasks. Quote the justification text.
+  separate tasks. Quote the justification text. **Same temporal boundary as
+  above**: judge justifications only for tasks not yet started. For a task
+  whose implementation has started or completed, diff growth from review fixes
+  and obligation-mandated tests is the legitimate consequence of correct
+  behaviour — never report it as 超過 or demand a retroactive justification.
 - **unsound batch composition**: an ordered `batches[]` declaration that is
   structurally valid but semantically unsound — e.g., a batch grouping tasks
   whose per-scope estimate sum leaves no room for the estimates' stated
@@ -98,6 +106,14 @@ specific `task_id` or `section.id`, or quote the offending text.
 
 ## What NOT to report
 
+- Ceiling- or size-derived findings against a task whose implementation has
+  started or completed (`in_progress` / any done state) — the ceiling concept
+  belongs to the planning and admission domains, and review-fix / DFP diff
+  growth is the legitimate consequence of correct behaviour, never 超過. This
+  covers batch-size infeasibility, indivisibility-justification validity,
+  estimate-sum headroom concerns, and retroactive split demands alike; the one
+  forward-looking split lane is the pre-implementation category above, and it
+  closes when implementation starts.
 - Missing `GO-NN` mappings in `task-coverage.json` — the schema has no `goal`
   section; goal traceability belongs to `impl-plan.json` `plan.summary`
 - Task attributions for `action: reference` catalogue entries in

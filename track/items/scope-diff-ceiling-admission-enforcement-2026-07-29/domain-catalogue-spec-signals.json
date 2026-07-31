@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "70152195e8500879873d91196db72b90f285f0f8707f6b3638063d63ae9f23f8",
+  "catalogue_declaration_hash": "a5b35b44767484593f255c6b5a999a2facc7ea21347e8069936e7500ddd62973",
   "signals": [
     {
       "type_name": "AdmissionDecision",
@@ -10,7 +10,7 @@
     {
       "type_name": "AdmissionEvaluationError",
       "signal": "blue",
-      "entry_hash": "675430bd788bfb7613dace83272aa5780a167d2ef14bafbafcf283a579f5cdff"
+      "entry_hash": "c4709afd73518138459b9867f477691a2d9ae814c68d3d2312b8b36319a5c68d"
     },
     {
       "type_name": "AdmissionRejection",
@@ -30,7 +30,7 @@
     {
       "type_name": "BatchPlanDocument",
       "signal": "blue",
-      "entry_hash": "4d5045503c610845eab3c548e5cc7bb4b15dc9cf23cfbe76f9f5bbf50919bb5c"
+      "entry_hash": "c5a05ec4b345c696ebe3aa265fdf711f88222858c4d1d3c91f1931e77026dd00"
     },
     {
       "type_name": "BatchPlanGateOutcome",
@@ -40,17 +40,17 @@
     {
       "type_name": "BatchPlanGateViolation",
       "signal": "blue",
-      "entry_hash": "df9896d58ab543b370fbbbec432793952d1cd86fb83f24d65df9ed4412933676"
+      "entry_hash": "5e533342e9ac4ab7b89e9aa47d22c3c124ce6b0b0ec5fb75c3eab0a344308a3d"
     },
     {
       "type_name": "BatchPlanValidationError",
       "signal": "blue",
-      "entry_hash": "2dcab97da47e31e31f53ba3afb920fb86cc7f7368e26306058ec0c23c451efcc"
+      "entry_hash": "dadb91091f62f75f88ab21a0bcbedbc5cb20e0642e3ba8fab2a110407ed8a08a"
     },
     {
       "type_name": "ImplPlanDocument",
       "signal": "blue",
-      "entry_hash": "7d13047f3a17997fca37ad329473bb003e7f54fc363e98e8bf8de7b503986bb9"
+      "entry_hash": "23b262a098a2b9804614666a8727fc7c6e49c6adda8410ea2defe82a2e79fb3c"
     },
     {
       "type_name": "IndivisibilityJustification",
@@ -80,12 +80,12 @@
     {
       "type_name": "ReviewScopeConfig",
       "signal": "blue",
-      "entry_hash": "0b0529c4b8051737bcdda65d456930015dcc6db59980bdb1bda8a87285545731"
+      "entry_hash": "f760fa8264e3757e42c975c382e71075c4e1474e3b752cb182aa169f85ce0659"
     },
     {
       "type_name": "ScopeCeiling",
       "signal": "blue",
-      "entry_hash": "55387230f8b94c4abb427cf919985ae0926adb0c47023e61859930f0ede63a54"
+      "entry_hash": "e6fb32f1094ad8528ccac2a75b50caba9a826d633a5945c3607960daca495d7c"
     },
     {
       "type_name": "ScopeLineEstimate",
@@ -103,9 +103,19 @@
       "entry_hash": "c7b4018456e32d9f67bc9269a44e933b0485656ce3fcf11f21678b19ebafacc2"
     },
     {
+      "type_name": "TaskStatusKind",
+      "signal": "blue",
+      "entry_hash": "fcd32213b7f347dd682ba4d6ad833f1dcda6519a39671c7fb9da78c3016c938e"
+    },
+    {
+      "type_name": "TaskTransition",
+      "signal": "blue",
+      "entry_hash": "92d8f70316e40df271d3e9745c05a70118f2a6a685890ea08d797873f6d6a453"
+    },
+    {
       "type_name": "TrackTask",
       "signal": "blue",
-      "entry_hash": "cc04a4f1dec8be7669bdcac9207c6011ecd4eb25ff0c7c3c3ae1336862f55f19"
+      "entry_hash": "341e22266024f70d733fb0e0adffffb1fea7e4cf3105705b6ad2dff5d18db3e4"
     },
     {
       "type_name": "ValidationError",
@@ -115,12 +125,12 @@
     {
       "type_name": "domain::batch_plan::check_batch_plan",
       "signal": "blue",
-      "entry_hash": "f389cfd7c43923759f4d8664be597fb1c9026d24fa2c01c2d3baafe1b26c708c"
+      "entry_hash": "3d7e0dd8b9a7c0238e18a47503258694ce69d54bab521ac38f3be5a37e3c2a5d"
     },
     {
       "type_name": "domain::batch_plan::evaluate_admission",
       "signal": "blue",
-      "entry_hash": "413de341f9236d4e374e13b571c359bcfb9272ca18754dcd8358bf01d01cc414"
+      "entry_hash": "6918b9d6d5dd5ca33e28359a758bb7f741fa077710fe4c5689a25adae0938c5b"
     }
   ]
 }

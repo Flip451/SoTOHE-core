@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "2bca6e722c4a896360dcf8c5dffbbd9adb5af36b372c8685b4ec3c2401b4480e",
+  "catalogue_declaration_hash": "6ebd4ef75dd4b15ba0c776c43f53454e4f7908610577a4e33a7009d42b60b5d6",
   "signals": [
     {
       "type_name": "AdmissionRejectionOutput",
       "signal": "blue",
-      "entry_hash": "195abe2403df74564da8bae50b12cbd292adb773f841346d5aff7d7d1f55c1a2"
+      "entry_hash": "3fbf36c9a091f68f525f8cabaa00c9b2a9ddeaf7c25345a81e0970c359eccf56"
     },
     {
       "type_name": "BatchPlanCheckCommand",
@@ -30,7 +30,7 @@
     {
       "type_name": "BatchPlanViolationOutput",
       "signal": "blue",
-      "entry_hash": "36844801cfc33ee5f307b32d9073a5bc6eff91b03e3d883d28669fe2cfa1f9d9"
+      "entry_hash": "35c7b593eab28dca245187ff645a7b6ab9f2349cbd84e91e6a3a4a57e10ba887"
     },
     {
       "type_name": "NonEmptyViolationOutputs",
@@ -55,12 +55,12 @@
     {
       "type_name": "TaskOperationInteractor",
       "signal": "blue",
-      "entry_hash": "d46c2fe5fc26a1795c4a6d3fc2c1243aa27f9749d31c7ddb07f6ba5f1fb7543a"
+      "entry_hash": "3c434067afaacf4ad841d3fb630b2a634cd2f136f02791f8c09facd7e98221e7"
     },
     {
       "type_name": "TaskTransitionOutcome",
       "signal": "blue",
-      "entry_hash": "4d2f8f9067d142026578201b5b7a3af88bd88b63d2ee34ee4873bc24eefa7d55"
+      "entry_hash": "4d49b063426ee76f5197274ec3f3956fdf38343e345f12de9cc4b2b453ac6587"
     },
     {
       "type_name": "BatchPlanCheckService",
@@ -80,7 +80,7 @@
     {
       "type_name": "PlannedTaskReaderPort",
       "signal": "blue",
-      "entry_hash": "22fbc53cbde9227fc0395f0473b6092f6d1171f3bc3e8f4d4cd4fefb34dea3fa"
+      "entry_hash": "8c533d4d2ee4b3f94da4b8cfe658d4c2eeaa1cbd6c3358c827ad96d3693edc26"
     },
     {
       "type_name": "ScopeConfigReaderPort",
@@ -95,7 +95,7 @@
     {
       "type_name": "TaskOperationService",
       "signal": "blue",
-      "entry_hash": "4a6c88e8c1be37ba8b9b467cfcf972f3094f47d8c39d5a007694856d6ead4d8e"
+      "entry_hash": "80aec26ebeea9f4dd2cbbc93fa4d542839f08e61a6a7283690050828bea7efd3"
     },
     {
       "type_name": "TransitionTaskUseCase",

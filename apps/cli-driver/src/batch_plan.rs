@@ -138,6 +138,10 @@ fn render_violation(violation: &BatchPlanViolationOutput) -> String {
             "- task '{task_id}' in batch '{task_batch}' declares a dependency on '{dependency}', \
              which batch '{dependency_batch}' only delivers later"
         ),
+        BatchPlanViolationOutput::UnknownMainScopeName { task_id, scope } => format!(
+            "- task '{task_id}' declares an estimate for scope '{scope}', which the review scope \
+             configuration does not define"
+        ),
     }
 }
 #[cfg(test)]
@@ -350,6 +354,14 @@ mod tests {
                 },
                 "T001",
             ),
+            (
+                "an unconfigured scope name",
+                BatchPlanViolationOutput::UnknownMainScopeName {
+                    task_id: "T001".to_owned(),
+                    scope: "domian".to_owned(),
+                },
+                "domian",
+            ),
         ];
 
         for (label, violation, named) in cases {
@@ -360,6 +372,23 @@ mod tests {
             assert!(rendered.contains("1 violation(s)"), "{label}: {rendered}");
             assert!(rendered.contains(named), "{label} must name {named}: {rendered}");
         }
+    }
+
+    #[test]
+    fn test_an_unconfigured_scope_name_is_rendered_with_the_task_and_the_name_it_declared() {
+        let rendered =
+            driver(Some(blocked(vec![BatchPlanViolationOutput::UnknownMainScopeName {
+                task_id: "T007".to_owned(),
+                scope: "domian".to_owned(),
+            }])))
+            .handle(check("some-track"))
+            .stderr
+            .unwrap();
+
+        assert!(rendered.contains("T007"), "{rendered}");
+        assert!(rendered.contains("domian"), "{rendered}");
+        assert!(rendered.contains("does not define"), "{rendered}");
+        assert_eq!(rendered.lines().count(), 2, "one header plus the finding");
     }
 
     #[test]

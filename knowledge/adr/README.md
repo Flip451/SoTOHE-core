@@ -169,6 +169,8 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [dry gate 評価点における設定無効と feature 無効の優先規則](2026-07-22-1541-dry-gate-evaluation-feature-off-precedence.md) | Proposed | 2026-07-22 |
 | [per-scope diff ceiling を実装開始前の admission で機構強制する](2026-07-28-1521-scope-diff-ceiling-admission-enforcement.md) | Proposed | 2026-07-28 |
 | [タスク間の依存関係を impl-plan で宣言し、batch 順序をその宣言に対して検査する](2026-07-29-0358-task-dependency-declaration-and-batch-order-check.md) | Proposed | 2026-07-29 |
+| [`batch-plan.json` の scope 名を review scope 設定に照合し、未知名を fail-closed で拒否する](2026-07-30-0951-batch-plan-scope-name-config-validation.md) | Proposed | 2026-07-30 |
+| [`batch-plan.json` の宣言対象を未 settle タスクに限定する](2026-07-30-1022-batch-plan-declaration-domain-unsettled-tasks.md) | Proposed | 2026-07-30 |
 
 ### ADR 運用
 

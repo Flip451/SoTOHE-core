@@ -394,7 +394,7 @@
     },
     "PlannedTaskReaderPort": {
       "action": "add",
-      "docs": "Driven port returning the track's tasks with their status and declared dependencies. Type-design: a separate port from the pre-existing plan-status reader, which returns an unordered map and drops both the commit-bearing status and the dependency declarations; returns whole TrackTask values rather than a near-duplicate VO (reuse decision), which is what carries the declared edges the batch-order check reads. Blocking: single-shot CLI callers, no async runtime on this path, so is_async is false. IN-07, IN-19, AC-07.",
+      "docs": "Driven port; declares read_planned_tasks(items_dir, track_id) -> Result<Vec<domain::TrackTask>, PlanArtifactReadError>, is_async false (blocking, single-shot CLI callers), supertraits Send + Sync. Separate port from the pre-existing plan-status reader (unordered map, no commit-bearing status, no dependency declarations). Returns whole TrackTask values, not a near-duplicate VO (R12 reuse decision); no filter declared at this port. IN-07, IN-19, IN-21, AC-07, AC-24.",
       "informal_grounds": [],
       "methods": [
         {
@@ -426,6 +426,14 @@
         },
         {
           "anchor": "AC-07",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-21",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-24",
           "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
         }
       ],
@@ -528,7 +536,7 @@
     },
     "TaskOperationService": {
       "action": "modify",
-      "docs": "Pre-existing primary port for track task mutations; transition_task's success type becomes TaskTransitionOutcome so an admission refusal travels as typed data. Type-design: no admission-specific method is added — the judgment stays inside transition_task's implementation; the other three operations and the error type are untouched. CN-10.",
+      "docs": "Pre-existing primary port for track task mutations; transition_task's success type becomes TaskTransitionOutcome so an admission refusal travels as typed data. Type-design: no admission-specific method is added — the judgment stays inside transition_task's implementation; the other three operations and the error type are untouched. transition_task channels: structured lane = Ok(TaskTransitionOutcome::Rejected(AdmissionRejectionOutput)) — judged refusals, data for callers; Err lane = TaskOperationError::TransitionFailed(String) — unjudgeable states as terminal diagnostics. Asymmetry with the gate path's BatchPlanViolationOutput is intentional: track-ops errors are rendered immediately as string CommandOutcome by the composition root (accepted interim boundary), so a structured error variant would have no consumer; TaskOperationError stays baseline-shaped and undeclared here. CN-10.",
       "informal_grounds": [],
       "methods": [
         {
@@ -595,6 +603,18 @@
         },
         {
           "anchor": "AC-10",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-23",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-26",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-27",
           "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
         }
       ],
@@ -678,6 +698,10 @@
         },
         {
           "anchor": "AC-12",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-27",
           "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
         }
       ]
@@ -893,7 +917,7 @@
     },
     "BatchPlanViolationOutput": {
       "action": "add",
-      "docs": "Usecase-owned mirror of one gate finding, produced for the driver. Type-design: it exists so the domain verdict stops at this layer — a primary adapter must not destructure domain value objects, so the interactor maps each finding here and the driver renders only this type. Variant names and payload arity mirror the domain finding one-to-one so nothing is lost in the crossing (R11); payloads are display Strings and counts because this is the presentation boundary, the values were validated upstream, and the driver only renders them — matching the existing usecase output DTOs in this crate (R9 boundary justification). IN-06, IN-07, AC-06, AC-07.",
+      "docs": "Usecase-owned mirror of one gate finding; enum, 6 variants matching the domain finding one-to-one in name and payload arity (R11). Payloads: String / u32 / Vec<String> (R9 presentation boundary: validated upstream, rendered by the driver; matches this crate's existing output DTOs). UnknownMainScopeName.scope renders the domain MainScopeName; interactor is the only declared reader. Declared so no domain value object crosses into the adapter. IN-06, IN-07, AC-06, AC-07, AC-08.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -993,6 +1017,22 @@
               ],
               "kind": "struct"
             }
+          },
+          {
+            "name": "UnknownMainScopeName",
+            "payload": {
+              "fields": [
+                {
+                  "name": "task_id",
+                  "ty": "String"
+                },
+                {
+                  "name": "scope",
+                  "ty": "String"
+                }
+              ],
+              "kind": "struct"
+            }
           }
         ]
       },
@@ -1016,6 +1056,10 @@
         },
         {
           "anchor": "AC-07",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-08",
           "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
         }
       ]
@@ -1206,6 +1250,18 @@
         {
           "anchor": "CN-10",
           "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-23",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-26",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-27",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
         }
       ]
     },
@@ -1256,6 +1312,10 @@
         },
         {
           "anchor": "AC-12",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-27",
           "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
         }
       ]

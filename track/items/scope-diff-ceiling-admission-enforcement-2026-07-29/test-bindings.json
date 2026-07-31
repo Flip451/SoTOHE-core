@@ -859,6 +859,36 @@
           "layer": "domain",
           "module_path": "domain::batch_plan::tests",
           "test_name": "test_an_unknown_task_id_is_reported_once_because_estimates_and_batch_members_are_one_set"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_an_estimate_naming_a_scope_the_configuration_does_not_define"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_never_reports_the_reserved_other_scope_as_an_unknown_name"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_passes_a_plan_that_declares_only_the_remaining_work"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_reports_an_unsettled_planned_task_in_no_batch_whichever_unsettled_state_it_is_in"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_declared_settled_task_is_judged_exactly_as_an_unsettled_one_would_be"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_ignores_a_dependency_edge_whose_settled_endpoint_the_plan_does_not_declare"
         }
       ]
     },
@@ -1006,6 +1036,11 @@
           "layer": "domain",
           "module_path": "domain::batch_plan::tests",
           "test_name": "test_the_gate_judges_each_scope_of_a_batch_separately"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_exempts_a_scope_whose_only_contributor_states_why_it_cannot_be_split"
         }
       ]
     },
@@ -1058,6 +1093,31 @@
           "layer": "domain",
           "module_path": "domain::batch_plan::tests",
           "test_name": "test_an_unknown_task_id_is_reported_once_because_estimates_and_batch_members_are_one_set"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_an_estimate_naming_a_scope_the_configuration_does_not_define"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_never_reports_the_reserved_other_scope_as_an_unknown_name"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_passes_a_plan_that_declares_only_the_remaining_work"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_reports_an_unsettled_planned_task_in_no_batch_whichever_unsettled_state_it_is_in"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_declared_settled_task_is_judged_exactly_as_an_unsettled_one_would_be"
         }
       ]
     },
@@ -1117,6 +1177,36 @@
           "layer": "domain",
           "module_path": "domain::batch_plan::tests",
           "test_name": "test_the_gate_ignores_the_batch_placement_of_tasks_that_declare_no_dependency"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_an_estimate_naming_a_scope_the_configuration_does_not_define"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_never_reports_the_reserved_other_scope_as_an_unknown_name"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_passes_a_plan_that_declares_only_the_remaining_work"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_reports_an_unsettled_planned_task_in_no_batch_whichever_unsettled_state_it_is_in"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_declared_settled_task_is_judged_exactly_as_an_unsettled_one_would_be"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_ignores_a_dependency_edge_whose_settled_endpoint_the_plan_does_not_declare"
         }
       ]
     },
@@ -1162,6 +1252,31 @@
           "layer": "domain",
           "module_path": "domain::batch_plan::tests",
           "test_name": "test_admission_errors_when_the_batch_plan_holds_no_estimate_for_the_candidate"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_errors_when_the_candidate_declares_a_scope_the_configuration_does_not_define"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_never_errors_on_an_estimate_for_the_reserved_other_scope"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_passes_a_plan_that_declares_only_the_remaining_work"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_declared_settled_task_is_judged_exactly_as_an_unsettled_one_would_be"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_ignores_a_dependency_edge_whose_settled_endpoint_the_plan_does_not_declare"
         }
       ]
     },
@@ -1252,6 +1367,31 @@
           "layer": "usecase",
           "module_path": "usecase::batch_plan::tests",
           "test_name": "test_the_check_accepts_a_declared_dependency_in_the_same_batch_or_an_earlier_one"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_reports_an_estimate_naming_a_scope_the_configuration_does_not_define"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_accepts_an_estimate_for_the_reserved_other_scope"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_passes_a_plan_that_declares_only_the_remaining_work"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_judges_a_declared_settled_task_exactly_as_an_unsettled_one"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_ignores_a_dependency_edge_whose_settled_endpoint_is_not_declared"
         }
       ]
     },
@@ -1332,6 +1472,31 @@
           "layer": "usecase",
           "module_path": "usecase::batch_plan::tests",
           "test_name": "test_the_check_accepts_a_declared_dependency_in_the_same_batch_or_an_earlier_one"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_reports_an_estimate_naming_a_scope_the_configuration_does_not_define"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_accepts_an_estimate_for_the_reserved_other_scope"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_passes_a_plan_that_declares_only_the_remaining_work"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_judges_a_declared_settled_task_exactly_as_an_unsettled_one"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_ignores_a_dependency_edge_whose_settled_endpoint_is_not_declared"
         }
       ]
     },
@@ -1392,6 +1557,21 @@
           "layer": "usecase",
           "module_path": "usecase::batch_plan::tests",
           "test_name": "test_the_check_leaves_the_batch_placement_of_undeclared_task_pairs_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_planned_task_reader_port_returns_settled_tasks_in_the_full_list_with_their_status"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_passes_a_plan_that_declares_only_the_remaining_work"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_judges_a_declared_settled_task_exactly_as_an_unsettled_one"
         }
       ]
     },
@@ -1705,6 +1885,16 @@
           "layer": "domain",
           "module_path": "domain::batch_plan::tests",
           "test_name": "test_admission_errors_when_the_batch_plan_holds_no_estimate_for_the_candidate"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_errors_when_the_candidate_declares_a_scope_the_configuration_does_not_define"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_never_errors_on_an_estimate_for_the_reserved_other_scope"
         }
       ]
     },
@@ -2675,6 +2865,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::planned_task_reader::tests",
           "test_name": "test_an_undecodable_implementation_plan_is_reported_as_a_read_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::planned_task_reader::tests",
+          "test_name": "test_the_reader_returns_settled_tasks_in_the_whole_list_with_their_status_preserved"
         }
       ]
     },
@@ -2695,6 +2890,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::review_scope_config_reader::tests",
           "test_name": "test_a_scope_with_no_configured_ceiling_is_unconstrained_rather_than_a_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_scope_config_reader::tests",
+          "test_name": "test_the_two_unresolved_ceiling_lanes_are_the_only_ones_the_configuration_offers"
         }
       ]
     },
@@ -3405,6 +3605,31 @@
           "layer": "cli_driver",
           "module_path": "cli_driver::batch_plan::tests",
           "test_name": "test_every_finding_kind_renders_the_parties_it_names"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_reports_an_estimate_naming_a_scope_the_configuration_does_not_define"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_accepts_an_estimate_for_the_reserved_other_scope"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::batch_plan::tests",
+          "test_name": "test_an_unconfigured_scope_name_is_rendered_with_the_task_and_the_name_it_declared"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_returns_a_fail_closed_error_when_a_batch_scope_sum_passes_the_ceiling"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_judges_a_declared_settled_task_exactly_as_an_unsettled_one"
         }
       ]
     },
@@ -3452,6 +3677,21 @@
           "layer": "cli_driver",
           "module_path": "cli_driver::batch_plan::tests",
           "test_name": "test_every_finding_kind_renders_the_parties_it_names"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_reports_an_estimate_naming_a_scope_the_configuration_does_not_define"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_accepts_an_estimate_for_the_reserved_other_scope"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::batch_plan::tests",
+          "test_name": "test_an_unconfigured_scope_name_is_rendered_with_the_task_and_the_name_it_declared"
         }
       ]
     },
@@ -3655,6 +3895,56 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_the_current_batch_is_judged_like_a_start"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_an_estimate_naming_an_unconfigured_scope_makes_the_transition_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_whose_estimate_would_pass_the_ceiling_is_refused"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_whose_estimate_names_an_unconfigured_scope_is_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_the_first_contributor_to_a_scope_is_admitted_however_large_its_estimate"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_that_declares_only_the_reserved_other_scope_is_admitted"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
         }
       ]
     },
@@ -3700,6 +3990,56 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_the_current_batch_is_judged_like_a_start"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_an_estimate_naming_an_unconfigured_scope_makes_the_transition_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_whose_estimate_would_pass_the_ceiling_is_refused"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_whose_estimate_names_an_unconfigured_scope_is_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_the_first_contributor_to_a_scope_is_admitted_however_large_its_estimate"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_that_declares_only_the_reserved_other_scope_is_admitted"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
         }
       ]
     },
@@ -3730,6 +4070,56 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_the_current_batch_is_judged_like_a_start"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_an_estimate_naming_an_unconfigured_scope_makes_the_transition_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_whose_estimate_would_pass_the_ceiling_is_refused"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_whose_estimate_names_an_unconfigured_scope_is_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_the_first_contributor_to_a_scope_is_admitted_however_large_its_estimate"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_that_declares_only_the_reserved_other_scope_is_admitted"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
         }
       ]
     },
@@ -3760,6 +4150,56 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_the_current_batch_is_judged_like_a_start"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_an_estimate_naming_an_unconfigured_scope_makes_the_transition_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_whose_estimate_would_pass_the_ceiling_is_refused"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_whose_estimate_names_an_unconfigured_scope_is_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_the_first_contributor_to_a_scope_is_admitted_however_large_its_estimate"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_that_declares_only_the_reserved_other_scope_is_admitted"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
         }
       ]
     },
@@ -3790,6 +4230,56 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_the_current_batch_is_judged_like_a_start"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_an_estimate_naming_an_unconfigured_scope_makes_the_transition_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_whose_estimate_would_pass_the_ceiling_is_refused"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_whose_estimate_names_an_unconfigured_scope_is_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_the_first_contributor_to_a_scope_is_admitted_however_large_its_estimate"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_that_declares_only_the_reserved_other_scope_is_admitted"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
         }
       ]
     },
@@ -3817,6 +4307,26 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_the_current_batch_is_judged_like_a_start"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
         }
       ]
     },
@@ -3915,6 +4425,26 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_the_current_batch_is_judged_like_a_start"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
         }
       ]
     },
@@ -4026,6 +4556,51 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_the_current_batch_is_judged_like_a_start"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_transition_for_resolves_the_same_table_the_applier_uses"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_transition_for_reports_a_task_it_does_not_hold"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_leaves_scopes_the_candidate_does_not_declare_out_of_the_comparison"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_counts_the_measured_diff_and_the_in_progress_estimates_together"
         }
       ]
     },
@@ -4066,6 +4641,51 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_the_current_batch_is_judged_like_a_start"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_transition_for_resolves_the_same_table_the_applier_uses"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_transition_for_reports_a_task_it_does_not_hold"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_leaves_scopes_the_candidate_does_not_declare_out_of_the_comparison"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_counts_the_measured_diff_and_the_in_progress_estimates_together"
         }
       ]
     },
@@ -4141,6 +4761,51 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_the_current_batch_is_judged_like_a_start"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_transition_for_resolves_the_same_table_the_applier_uses"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_transition_for_reports_a_task_it_does_not_hold"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_leaves_scopes_the_candidate_does_not_declare_out_of_the_comparison"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_counts_the_measured_diff_and_the_in_progress_estimates_together"
         }
       ]
     },
@@ -4186,6 +4851,51 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_the_current_batch_is_judged_like_a_start"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_transition_for_resolves_the_same_table_the_applier_uses"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_transition_for_reports_a_task_it_does_not_hold"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_leaves_scopes_the_candidate_does_not_declare_out_of_the_comparison"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_counts_the_measured_diff_and_the_in_progress_estimates_together"
         }
       ]
     },
@@ -4231,6 +4941,51 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_the_current_batch_is_judged_like_a_start"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_transition_for_resolves_the_same_table_the_applier_uses"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_transition_for_reports_a_task_it_does_not_hold"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_leaves_scopes_the_candidate_does_not_declare_out_of_the_comparison"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_counts_the_measured_diff_and_the_in_progress_estimates_together"
         }
       ]
     },
@@ -4276,6 +5031,51 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_the_current_batch_is_judged_like_a_start"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_transition_for_resolves_the_same_table_the_applier_uses"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_transition_for_reports_a_task_it_does_not_hold"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_leaves_scopes_the_candidate_does_not_declare_out_of_the_comparison"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_counts_the_measured_diff_and_the_in_progress_estimates_together"
         }
       ]
     },
@@ -4331,6 +5131,51 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_the_current_batch_is_judged_like_a_start"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_transition_for_resolves_the_same_table_the_applier_uses"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_transition_for_reports_a_task_it_does_not_hold"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_leaves_scopes_the_candidate_does_not_declare_out_of_the_comparison"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_counts_the_measured_diff_and_the_in_progress_estimates_together"
         }
       ]
     },
@@ -4376,6 +5221,51 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_the_current_batch_is_judged_like_a_start"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_transition_for_resolves_the_same_table_the_applier_uses"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_transition_for_reports_a_task_it_does_not_hold"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_leaves_scopes_the_candidate_does_not_declare_out_of_the_comparison"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_counts_the_measured_diff_and_the_in_progress_estimates_together"
         }
       ]
     },
@@ -4431,6 +5321,51 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_the_current_batch_is_judged_like_a_start"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_transition_for_resolves_the_same_table_the_applier_uses"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_transition_for_reports_a_task_it_does_not_hold"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_leaves_scopes_the_candidate_does_not_declare_out_of_the_comparison"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_counts_the_measured_diff_and_the_in_progress_estimates_together"
         }
       ]
     },
@@ -4481,6 +5416,51 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_the_current_batch_is_judged_like_a_start"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_transition_for_resolves_the_same_table_the_applier_uses"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_transition_for_reports_a_task_it_does_not_hold"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_leaves_scopes_the_candidate_does_not_declare_out_of_the_comparison"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_counts_the_measured_diff_and_the_in_progress_estimates_together"
         }
       ]
     },
@@ -4546,6 +5526,51 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_transition_for_resolves_the_same_table_the_applier_uses"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_transition_for_reports_a_task_it_does_not_hold"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_the_current_batch_is_judged_like_a_start"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_leaves_scopes_the_candidate_does_not_declare_out_of_the_comparison"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_counts_the_measured_diff_and_the_in_progress_estimates_together"
         }
       ]
     },
@@ -4606,6 +5631,495 @@
           "layer": "usecase",
           "module_path": "usecase::task_ops::tests",
           "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_the_current_batch_is_judged_like_a_start"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_transition_for_resolves_the_same_table_the_applier_uses"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_transition_for_reports_a_task_it_does_not_hold"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_leaves_scopes_the_candidate_does_not_declare_out_of_the_comparison"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_counts_the_measured_diff_and_the_in_progress_estimates_together"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "AdmissionEvaluationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-23"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_errors_when_the_candidate_declares_a_scope_the_configuration_does_not_define"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_never_errors_on_an_estimate_for_the_reserved_other_scope"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "BatchPlanDocument",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-21"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_passes_a_plan_that_declares_only_the_remaining_work"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_current_batch_is_the_earliest_batch_with_an_uncommitted_member"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_declared_settled_task_is_judged_exactly_as_an_unsettled_one_would_be"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "BatchPlanDocument",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-24"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_passes_a_plan_that_declares_only_the_remaining_work"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_current_batch_is_the_earliest_batch_with_an_uncommitted_member"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_declared_settled_task_is_judged_exactly_as_an_unsettled_one_would_be"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "BatchPlanGateViolation",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_blocks_an_estimate_naming_a_scope_the_configuration_does_not_define"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_never_reports_the_reserved_other_scope_as_an_unknown_name"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_does_not_compare_a_scope_with_no_resolved_ceiling"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "BatchPlanGateViolation",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-21"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_reports_an_unsettled_planned_task_in_no_batch_whichever_unsettled_state_it_is_in"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_passes_a_plan_that_declares_only_the_remaining_work"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_declared_settled_task_is_judged_exactly_as_an_unsettled_one_would_be"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "BatchPlanGateViolation",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-24"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_reports_an_unsettled_planned_task_in_no_batch_whichever_unsettled_state_it_is_in"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_passes_a_plan_that_declares_only_the_remaining_work"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_declared_settled_task_is_judged_exactly_as_an_unsettled_one_would_be"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "BatchPlanValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-21"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_declared_settled_task_is_not_exempt_from_the_file_internal_invariants"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_plan_rejects_a_batch_member_without_a_declared_estimate"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_plan_rejects_an_estimated_task_that_no_batch_claims"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_plan_rejects_a_task_claimed_by_more_than_one_batch"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "BatchPlanValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-25"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_a_declared_settled_task_is_not_exempt_from_the_file_internal_invariants"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_plan_rejects_a_batch_member_without_a_declared_estimate"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_plan_rejects_an_estimated_task_that_no_batch_claims"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_plan_rejects_a_task_claimed_by_more_than_one_batch"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TrackTask",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-21"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_reports_an_unsettled_planned_task_in_no_batch_whichever_unsettled_state_it_is_in"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_the_gate_passes_a_plan_that_declares_only_the_remaining_work"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "BatchPlanViolationOutput",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_accepts_an_estimate_for_the_reserved_other_scope"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_reports_an_estimate_naming_a_scope_the_configuration_does_not_define"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::batch_plan::tests",
+          "test_name": "test_the_check_leaves_a_scope_with_no_resolved_ceiling_out_of_the_comparison"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TaskTransitionOutcome",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-27"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_the_current_batch_is_judged_like_a_start"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "AdmissionRejectionOutput",
+        "anchor_id": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-27"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_the_current_batch_is_judged_like_a_start"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_whose_estimate_would_pass_the_ceiling_is_refused"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_whose_estimate_names_an_unconfigured_scope_is_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_the_first_contributor_to_a_scope_is_admitted_however_large_its_estimate"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_that_declares_only_the_reserved_other_scope_is_admitted"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "ImplPlanDocument",
+        "item_identifier": "method:transition_for",
+        "obligation_kind": "logic_result"
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_transition_for_resolves_the_same_table_the_applier_uses"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_transition_for_reports_a_task_it_does_not_hold"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_widening_the_judged_set_leaves_starts_and_other_transitions_as_they_were"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_the_current_batch_is_judged_like_a_start"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_settled_task_the_batch_plan_does_not_declare_is_refused_without_a_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_declared_member_of_a_closed_batch_is_refused_as_a_non_member"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_reopening_a_candidate_with_no_declared_estimate_is_the_missing_estimate_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_task_from_a_later_batch_cannot_start_until_the_current_batch_is_settled"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_batch_advances_on_a_recorded_commit_and_not_on_a_done_mark_alone"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_the_first_contribution_to_a_scope_starts_however_large_its_estimate_is"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::task_ops::tests",
+          "test_name": "test_a_scope_that_already_carries_work_refuses_a_candidate_that_would_pass_its_ceiling"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_leaves_scopes_the_candidate_does_not_declare_out_of_the_comparison"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::batch_plan::tests",
+          "test_name": "test_admission_counts_the_measured_diff_and_the_in_progress_estimates_together"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_only_committed_or_skipped_work_counts_as_settled"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::impl_plan::tests",
+          "test_name": "test_in_progress_ids_name_the_tasks_currently_under_way"
         }
       ]
     }

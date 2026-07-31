@@ -51,9 +51,9 @@ pub enum BatchPlanViolationOutput {
         /// The task id the batch plan declares.
         task_id: String,
     },
-    /// A planned task belongs to no batch.
+    /// An unsettled planned task belongs to no batch.
     UnplannedTask {
-        /// The planned task the batch plan does not place.
+        /// The unsettled planned task the batch plan does not place.
         task_id: String,
     },
     /// A declared dependency edge points into a batch that runs after the
@@ -67,6 +67,13 @@ pub enum BatchPlanViolationOutput {
         dependency: String,
         /// The batch the dependency belongs to.
         dependency_batch: String,
+    },
+    /// An estimate names a main scope the configured scope set does not hold.
+    UnknownMainScopeName {
+        /// The task whose estimate names the scope.
+        task_id: String,
+        /// The main scope name the configuration does not hold.
+        scope: String,
     },
 }
 
@@ -189,5 +196,11 @@ fn map_violation(violation: BatchPlanGateViolation) -> BatchPlanViolationOutput 
             dependency: dependency.to_string(),
             dependency_batch: dependency_batch.as_str().to_owned(),
         },
+        BatchPlanGateViolation::UnknownMainScopeName { task_id, scope } => {
+            BatchPlanViolationOutput::UnknownMainScopeName {
+                task_id: task_id.to_string(),
+                scope: scope.as_str().to_owned(),
+            }
+        }
     }
 }

@@ -3,7 +3,7 @@
   "functions": {
     "domain::batch_plan::check_batch_plan": {
       "action": "add",
-      "docs": "Pure Phase 3 terminal gate over a declared batch plan. Takes the batch plan, the scope config and the impl-plan tasks; returns the verdict as data. Type-design: the task parameter carries whole TrackTask values rather than ids because the dependency-edge check reads each task's declared depends_on, and no dependency field is required on the batch plan itself. IN-06, IN-07, AC-06, AC-07, AC-08, CN-02.",
+      "docs": "Phase 3 terminal gate (IN-06 / IN-07); free function, pure. Params: plan, scope_config, planned_tasks. Returns BatchPlanGateOutcome; no error channel. planned_tasks: whole TrackTask values, not ids (R11 — status and depends_on stay typed). Adds no public method to TaskStatus / TrackTask. Construction owner: BatchPlanGateViolation. IN-03, IN-06, IN-07, IN-21, AC-06, AC-07, AC-08, AC-24, AC-25, CN-02.",
       "informal_grounds": [],
       "is_async": false,
       "params": [
@@ -42,12 +42,28 @@
         {
           "anchor": "AC-08",
           "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-21",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-24",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-25",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
         }
       ]
     },
     "domain::batch_plan::evaluate_admission": {
       "action": "add",
-      "docs": "Pure admission judgment for a todo -> in_progress transition. Takes the batch plan, the scope config, the candidate task, the committed / in-progress task sets and the measured per-scope diffs; returns the verdict as data. IN-09, IN-10, IN-11, AC-10, AC-11, AC-12, AC-14, CN-02, CN-03.",
+      "docs": "Admission judgment for a transition into in_progress (IN-09); free function, pure. Params: plan, scope_config, candidate, committed_task_ids, in_progress_task_ids, measured. Returns Result<AdmissionDecision, AdmissionEvaluationError> — verdict in Ok, unjudgeable input in Err. Params and return unchanged by this track's later deltas. Construction owner: AdmissionDecision, AdmissionRejection, AdmissionEvaluationError. IN-09, IN-10, IN-11, IN-21, AC-10, AC-11, AC-12, AC-14, AC-23, AC-24, CN-02, CN-03.",
       "informal_grounds": [],
       "is_async": false,
       "params": [
@@ -105,6 +121,18 @@
         },
         {
           "anchor": "CN-03",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-23",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-21",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-24",
           "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
         }
       ]
@@ -1118,7 +1146,7 @@
     },
     "AdmissionEvaluationError": {
       "action": "add",
-      "docs": "Failure of the admission evaluation, distinct from a rejection. Type-design: single variant — every other malformed-plan shape is already rejected by BatchPlanDocument::new, so no unreachable variant is minted. Construction owner: evaluate_admission. IN-11, AC-13.",
+      "docs": "Err channel of evaluate_admission; enum. Variants: MissingTaskEstimate { task_id: TaskId }, UnknownMainScopeName { task_id: TaskId, scope: MainScopeName }. Separate type from AdmissionRejection (Ok-channel refusal). scope: MainScopeName (R11 — reserved-scope value unrepresentable; R12 — existing domain name type reused, none minted). Construction owner: evaluate_admission. IN-11, AC-13, AC-23.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -1130,6 +1158,22 @@
                 {
                   "name": "task_id",
                   "ty": "TaskId"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "UnknownMainScopeName",
+            "payload": {
+              "fields": [
+                {
+                  "name": "task_id",
+                  "ty": "TaskId"
+                },
+                {
+                  "name": "scope",
+                  "ty": "MainScopeName"
                 }
               ],
               "kind": "struct"
@@ -1149,6 +1193,10 @@
         },
         {
           "anchor": "AC-13",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-23",
           "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
         }
       ]
@@ -1292,7 +1340,7 @@
     },
     "BatchPlanDocument": {
       "action": "add",
-      "docs": "Domain model of batch-plan.json. Type-design: the constructor owns every file-internal invariant so the codec re-implements none of them; scope_total derives per-scope figures instead of reading a declared total; current_batch is a pure derivation from the committed-task set. Exposes no schema-version accessor — wire-format metadata stays in the infrastructure DTO and codec, keeping this aggregate independent of the serialised representation. Cross-file agreement with impl-plan.json is not checked here — that owner is check_batch_plan. IN-01, IN-05, AC-01, AC-04, AC-10, CN-01.",
+      "docs": "Domain model of batch-plan.json; plain struct, private fields. Declares new (fallible, owns the file-internal invariants — codec re-declares none), accessors track_id / task_estimates / batches, estimate_for, batch_of, scope_total (derived per-scope figure, no declared total — CN-01), current_batch (derived from the task-id set param). No schema-version accessor (wire metadata: infrastructure DTO). No cross-file check declared here; owner: check_batch_plan. IN-01, IN-05, IN-21, AC-01, AC-04, AC-10, AC-24, CN-01.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -1326,6 +1374,14 @@
         },
         {
           "anchor": "CN-01",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-21",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-24",
           "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
         }
       ]
@@ -1375,7 +1431,7 @@
     },
     "BatchPlanGateViolation": {
       "action": "add",
-      "docs": "One structural finding of the Phase 3 gate. Type-design: modelled as data inside the outcome rather than as an error type; contributor and batch payloads carry ids rather than counts (R11). OversizeScopeHasMultipleContributors is owned here rather than by the codec because deciding it requires the resolved ceiling, and check_batch_plan is the only declared operation that receives the scope configuration. DependencyInLaterBatch names both endpoints of the offending declared edge and both their batches, so the report identifies the relationship rather than an ordering artefact; it is decided on the edges declared in impl-plan, not on plan order, and an undeclared task pair produces no finding. Construction owner: check_batch_plan. IN-06, IN-07, AC-06, AC-07.",
+      "docs": "One structural finding of the Phase 3 gate; enum, 6 variants (CeilingExceeded, OversizeScopeHasMultipleContributors, UnknownTaskRef, UnplannedTask, DependencyInLaterBatch, UnknownMainScopeName). Data inside BatchPlanGateOutcome, not an error type. Payloads: BatchId / ScopeName / TaskId / LineCount — typed ids and figures, no counts or rendered text (R11); DependencyInLaterBatch carries both endpoints and both batches (R11). UnknownMainScopeName.scope: MainScopeName (R11 — reserved-scope finding unrepresentable; R12 — existing name type reused). No scope-name lookup method declared (config already has contains_scope / all_scope_names). Construction owner: check_batch_plan. IN-06, IN-07, IN-21, AC-06, AC-07, AC-08, AC-24.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -1475,6 +1531,22 @@
               ],
               "kind": "struct"
             }
+          },
+          {
+            "name": "UnknownMainScopeName",
+            "payload": {
+              "fields": [
+                {
+                  "name": "task_id",
+                  "ty": "TaskId"
+                },
+                {
+                  "name": "scope",
+                  "ty": "MainScopeName"
+                }
+              ],
+              "kind": "struct"
+            }
           }
         ]
       },
@@ -1499,12 +1571,24 @@
         {
           "anchor": "AC-07",
           "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-21",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-24",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
         }
       ]
     },
     "BatchPlanValidationError": {
       "action": "add",
-      "docs": "Rejection of a batch plan by BatchPlanDocument::new, covering the invariants decidable from the file alone. Construction owners: EmptyJustification from IndivisibilityJustification::try_new, EmptyBatchId from BatchId::try_new, EmptyBatch from BatchDeclaration::new, DuplicateScopeEstimate from TaskEstimate::new, the rest from BatchPlanDocument::new. Type-design: DuplicateBatchMembership lists the offending batch ids rather than counting them (R11). Invariants that need the resolved ceiling are not decidable here because this constructor takes no scope configuration; their owner is check_batch_plan, which does. IN-05, AC-04.",
+      "docs": "Err type of BatchPlanDocument::new; enum, 9 variants. Payloads: TaskId / BatchId / ScopeName; DuplicateBatchMembership carries Vec<BatchId>, not a count (R11). Construction owners: EmptyJustification — IndivisibilityJustification::try_new; EmptyBatchId — BatchId::try_new; EmptyBatch — BatchDeclaration::new; DuplicateScopeEstimate — TaskEstimate::new; rest — BatchPlanDocument::new. No variant declared for ceiling- or task-list-dependent invariants (constructor takes neither); owner: check_batch_plan. IN-05, IN-21, AC-04, AC-25.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -1628,12 +1712,20 @@
         {
           "anchor": "AC-04",
           "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-21",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-25",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
         }
       ]
     },
     "ImplPlanDocument": {
       "action": "modify",
-      "docs": "Existing Phase 3 plan document; gains settled_task_ids and in_progress_task_ids, placed on the type that owns the task list beside unresolved_task_ids. Both return owned sets to match the shape their declared consumer takes; a borrowed view would move the same allocation to the caller. Role DomainService: the document is compared by value and carries no identity of its own, and its behaviour is over the task collection it holds -- the task state machine itself belongs to TrackTask. The other signatures are restated from baseline unchanged, legacy raw-primitive slots included (schema_version, target_status, section_id). IN-09, IN-10, AC-10.",
+      "docs": "Existing Phase 3 plan document; declares settled_task_ids + in_progress_task_ids beside unresolved_task_ids, both returning owned BTreeSet<TaskId> (matches the declared consumer's param shape), plus transition_for — pure resolution (&self, no mutation) over the same table apply_transition_by_status consumes, which delegates to it so the table stays single. transition_for producible errors: TransitionError::TaskNotFound and ValidationError::UnsupportedTargetStatus only; DomainError reused rather than a bespoke enum, keeping the resolver signature-identical to the sibling applier apply_transition_by_status (baseline precedent — the pair the delegation unifies). Role DomainService (R6: field-holding behaviour over the task collection, no injected dependencies; task state machine belongs to TrackTask). Remaining methods restated from baseline verbatim, legacy raw-primitive slots included (schema_version, target_status, section_id — R9 baseline-inherited). IN-09, IN-10, IN-21, AC-10.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -1765,6 +1857,27 @@
         {
           "has_default_impl": false,
           "is_async": false,
+          "name": "transition_for",
+          "params": [
+            {
+              "name": "task_id",
+              "ty": "&TaskId"
+            },
+            {
+              "name": "target_status",
+              "ty": "&str"
+            },
+            {
+              "name": "commit_hash",
+              "ty": "Option<CommitHash>"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<TaskTransition, DomainError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
           "name": "add_task",
           "params": [
             {
@@ -1799,6 +1912,10 @@
         },
         {
           "anchor": "AC-10",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-21",
           "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
         }
       ]
@@ -1957,7 +2074,7 @@
     },
     "ReviewScopeConfig": {
       "action": "reference",
-      "docs": "Pre-existing scope-classification and ceiling configuration; unchanged by this track, declared for edge exposure. Its diff_ceiling_for_scope gains its first production callers here (check_batch_plan / evaluate_admission); the Option<u32> return is left as-is because this is a reference entry, and ScopeCeiling::resolve converts it. Role DomainService follows the classification an earlier track recorded for this type (R6: field-holding domain behaviour, no injected dependencies, no state transitions). IN-06, AC-08.",
+      "docs": "Pre-existing scope-classification and ceiling configuration; action reference — byte-identical to baseline, declared for edge exposure. diff_ceiling_for_scope (callers: check_batch_plan / evaluate_admission; Option<u32> return kept as baseline, ScopeCeiling::resolve is the declared converter), contains_scope / all_scope_names carried unchanged. No method added or modified by this track. Role DomainService per the classification an earlier track recorded (R6). IN-06, IN-07, IN-11, AC-08.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -2082,12 +2199,20 @@
         {
           "anchor": "AC-08",
           "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-11",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
         }
       ]
     },
     "ScopeCeiling": {
       "action": "add",
-      "docs": "Resolved per-scope diff ceiling. Type-design: enum-first rendering of the Option<u32> the config accessor returns, so the unconstrained state is a named state rather than a missing number (prefer-type-safe-abstractions: Option-None mapping 1:1 to a state). resolve is the single conversion point from the config boundary into LineCount; admits is the only comparison both callers use. IN-06, AC-08.",
+      "docs": "Resolved per-scope diff ceiling; enum, variants Unconstrained + Limited(LineCount). Enum-first over the config accessor's Option<u32> (prefer-type-safe-abstractions: Option-None 1:1 with a named state). Declares resolve (single conversion point into LineCount) and admits (the only comparison both callers use). Unknown scope name is not a state here — declared on BatchPlanGateViolation / AdmissionEvaluationError. IN-06, AC-08.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -2229,9 +2354,134 @@
         }
       ]
     },
+    "TaskStatusKind": {
+      "action": "reference",
+      "docs": "Baseline discriminant view of TaskStatus; action reference — byte-identical to baseline, declared for edge exposure (TaskTransition::target_kind return). 4 variants restated from baseline. Role ValueObject (R1 △: finite value set identified by value, no dependency). IN-09, CN-10.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Todo",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "InProgress",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Done",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Skipped",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "track",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "CN-10",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "TaskTransition": {
+      "action": "reference",
+      "docs": "Baseline transition command enum; action reference — byte-identical to baseline, declared for edge exposure (ImplPlanDocument::transition_for return, apply_transition / TrackTask::transition param). 6 variants and target_kind restated from baseline; target_kind derives TaskStatusKind from the value (R3 side-effect-free derivation). Role ValueObject (R1 △: finite value set identified by value, no dependency, no state of its own). IN-09, CN-10.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Start",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Complete",
+            "payload": {
+              "fields": [
+                "Option<CommitHash>"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "BackfillHash",
+            "payload": {
+              "fields": [
+                "CommitHash"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "ResetToTodo",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Skip",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Reopen",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "target_kind",
+          "params": [],
+          "receiver": "&self",
+          "returns": "TaskStatusKind"
+        }
+      ],
+      "module_path": "track",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "CN-10",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
     "TrackTask": {
       "action": "modify",
-      "docs": "Existing task record; gains an optional declared dependency list and its accessor, plus a constructor that accepts one. Type-design: dependencies are declared on the task SoT and fixed in the same single write as the task list, so no separate artifact holds them; an empty list and an omitted list are the same unstated state, which is why the field is a plain Vec rather than an Option. with_dependencies is total — every parameter is an already-validated type, so it takes NonEmptyString rather than a raw string and returns Self with no error channel; the description's non-emptiness is established once at the boundary that holds the raw value, and the graph-level dependency invariants belong to the plan-document constructor, not here. The two pre-existing constructors keep their baseline fallible signatures. Role Entity with identity accessor id — it is identified by its id and carries a mutating state machine, so ValueObject does not apply. IN-19, AC-21.",
+      "docs": "Existing task record; declares depends_on: Vec<TaskId>, its accessor, and with_dependencies. Plain Vec, not Option (empty == undeclared, one state). with_dependencies is total: params are already-validated types (description: NonEmptyString — R12 existing type reused), no error channel; graph-level dependency invariants declared on ImplPlanDocument::new. Pre-existing constructors and the status accessor restated from baseline verbatim; no predicate method added. Role Entity, identity accessor id (mutating state machine, so not ValueObject). IN-19, IN-21, AC-21.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -2363,6 +2613,10 @@
         },
         {
           "anchor": "AC-21",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-21",
           "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
         }
       ]

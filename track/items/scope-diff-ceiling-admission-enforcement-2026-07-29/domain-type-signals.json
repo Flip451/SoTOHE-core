@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-29T23:53:37Z",
-  "declaration_hash": "70152195e8500879873d91196db72b90f285f0f8707f6b3638063d63ae9f23f8",
-  "implementation_input_hash": "91398c19284c6adf83215b6a218b00740df4fa367081d0e754bd0d61f00016ad",
+  "generated_at": "2026-07-30T05:45:44Z",
+  "declaration_hash": "a5b35b44767484593f255c6b5a999a2facc7ea21347e8069936e7500ddd62973",
+  "implementation_input_hash": "615d0c201f92d363ebff637440b2178fdc55b91469988e23b2520a6e6a6b90b5",
   "signals": [
     {
       "type_name": "AdmissionDecision",
@@ -272,6 +272,18 @@
     {
       "type_name": "ReviewScopeConfig",
       "kind_tag": "domain_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TaskStatusKind",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TaskTransition",
+      "kind_tag": "enum",
       "signal": "blue",
       "found_type": true
     }
