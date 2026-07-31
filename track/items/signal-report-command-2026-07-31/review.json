@@ -1,0 +1,56 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f3300d882f7f8e7a3746dc1556723c5d61465e4921ce03560f01e7a3df39cf48",
+          "at": "2026-07-31T11:29:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1 requires `adr_user` to be included while forbidding signal recalculation and limiting the view to persisted `calc-*` artifacts. Chain ⓪'s `calc-adr-user` performs a live scan and persists no signal document, so the command cannot enumerate all four chains under the recorded boundary. This incompatibility must be resolved before downstream behavior can be derived.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-29-0839-signal-report-command.md",
+              "line": 18,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:f3300d882f7f8e7a3746dc1556723c5d61465e4921ce03560f01e7a3df39cf48",
+          "at": "2026-07-31T11:32:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f3300d882f7f8e7a3746dc1556723c5d61465e4921ce03560f01e7a3df39cf48",
+          "at": "2026-07-31T11:42:44Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
+          "at": "2026-07-31T11:44:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
+          "at": "2026-07-31T11:49:20Z"
+        }
+      ]
+    }
+  }
+}
