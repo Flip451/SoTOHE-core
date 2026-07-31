@@ -1,6 +1,57 @@
 {
   "schema_version": 2,
   "scopes": {
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4a2bba2e80ee6b93efcac6413d61433e0e7a6290075d59accbed48ec16809cba",
+          "at": "2026-07-31T12:27:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-02 and CN-02 require eliminating duplicate confirmation prompts from both the workflow and the adapter, but AC-05 only verifies the workflow. An implementation that leaves an adapter confirmation prompt would satisfy every acceptance criterion while violating the stated goal and ADR D2, so GO-02 lacks complete deterministic acceptance coverage.",
+              "severity": "P1",
+              "file": "track/items/remote-strict-ci-merge-gate-2026-07-31/spec.json",
+              "line": 168,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:4a2bba2e80ee6b93efcac6413d61433e0e7a6290075d59accbed48ec16809cba",
+          "at": "2026-07-31T12:31:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe735f85ab3d40ff6310fe655b11c0a44f7db0bca4f861ef4bd509f504f2fdce",
+          "at": "2026-07-31T12:33:00Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2b9c01989185915d5b01537a0c897a37b0cda578e88f7cd38d1c8f61a3464615",
+          "at": "2026-07-31T12:28:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2b9c01989185915d5b01537a0c897a37b0cda578e88f7cd38d1c8f61a3464615",
+          "at": "2026-07-31T12:32:30Z"
+        }
+      ]
+    },
     "harness-policy": {
       "rounds": [
         {
@@ -16,6 +67,24 @@
           "findings": [],
           "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
           "at": "2026-07-31T11:47:56Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:168f21efca7ef2d05af430cfaa40fd9bec6da32637f0e8cd968d56ae5ebd09a7",
+          "at": "2026-07-31T12:28:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:168f21efca7ef2d05af430cfaa40fd9bec6da32637f0e8cd968d56ae5ebd09a7",
+          "at": "2026-07-31T12:31:01Z"
         }
       ]
     },
@@ -48,6 +117,140 @@
           "findings": [],
           "hash": "rvw1:sha256:7444b2430f355932f82ff469acaacdd5c4d0d83b4b23c2ceb49bcc6dbe0aa58b",
           "at": "2026-07-31T12:04:29Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001–T004 descriptions do not name concrete target files or symbols, so an executor must invent the implementation boundaries. T002 also omits the external branch-protection authorization/configuration boundary and its evidence hand-off.",
+              "severity": "P1",
+              "file": "track/items/remote-strict-ci-merge-gate-2026-07-31/impl-plan.json",
+              "line": 6,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "Task descriptions T001–T004 restate upstream behavior and rationale instead of using only target + operation + anchor cites, contrary to the no-upstream-restatement policy.",
+              "severity": "P1",
+              "file": "track/items/remote-strict-ci-merge-gate-2026-07-31/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Plan sections S1–S4 repeat the spec behavior contract in prose. These sections should contain only executable planning information and anchors, not upstream behavior restatements.",
+              "severity": "P1",
+              "file": "track/items/remote-strict-ci-merge-gate-2026-07-31/impl-plan.json",
+              "line": 37,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "impl-plan.plan has no summary or goal traceability for GO-01 and GO-02. Goal mappings are intentionally excluded from task-coverage.json, so the required SSoT location is missing.",
+              "severity": "P1",
+              "file": "track/items/remote-strict-ci-merge-gate-2026-07-31/impl-plan.json",
+              "line": 31,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:c32f3ed16f15d2bf094b419b4df1c4d3d7c4af356347f063523a4956d4b19731",
+          "at": "2026-07-31T12:28:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9bfe0ec406c26fc98e3207608d7345da86accce879adb6b3d064398cd9b81c71",
+          "at": "2026-07-31T12:37:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001's only implementation target is `.github/workflows/ci.yml`, which the current review classifier assigns to `other`, but its estimate is attributed to `harness-policy`; T004 repeats this mismatch for its workflow contribution. Consequently B1/B3 do not represent the scopes actually touched. Attribute those contributions to `other` (retaining `cli` for T004), or name genuine harness-policy targets.",
+              "severity": "P1",
+              "file": "track/items/remote-strict-ci-merge-gate-2026-07-31/batch-plan.json",
+              "line": 9,
+              "category": "unsound batch composition"
+            },
+            {
+              "message": "T002 says to record the rule response and failed-PR evidence handoff but names no file, symbol, or durable evidence destination. Its sole `harness-policy` estimate likewise has no corresponding target, leaving the executor to invent the task boundary. Name the exact recording artifact/symbol while retaining the administrator-authority handoff.",
+              "severity": "P1",
+              "file": "track/items/remote-strict-ci-merge-gate-2026-07-31/impl-plan.json",
+              "line": 12,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "B3 defers T004—the only task explicitly adding regression cases for AC-01 through AC-05—until after B1/B2 have committed the producer work. T004 also bundles independently verifiable remote-CI (AC-01/02/04), branch-protection (AC-03), and confirmation-free merge (AC-05) units. Split those validation units and place each with its corresponding producer task so every batch is verifiable before commit.",
+              "severity": "P1",
+              "file": "track/items/remote-strict-ci-merge-gate-2026-07-31/batch-plan.json",
+              "line": 65,
+              "category": "unsound batch composition / pre-implementation split proposal"
+            }
+          ],
+          "hash": "rvw1:sha256:9bfe0ec406c26fc98e3207608d7345da86accce879adb6b3d064398cd9b81c71",
+          "at": "2026-07-31T12:44:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "B1 groups T004 with its declared prerequisite T001, so the CI evidence/regression task can be admitted before T001's workflow change is verifiably complete. Move T004 to a later batch.",
+              "severity": "P1",
+              "file": "track/items/remote-strict-ci-merge-gate-2026-07-31/batch-plan.json",
+              "line": 75,
+              "category": "unsound batch composition"
+            },
+            {
+              "message": "B2 groups T005 with its declared prerequisite T002, so branch-protection evidence can be handled before the administrator handoff/configuration task completes. Move T005 to a later batch.",
+              "severity": "P1",
+              "file": "track/items/remote-strict-ci-merge-gate-2026-07-31/batch-plan.json",
+              "line": 79,
+              "category": "unsound batch composition"
+            },
+            {
+              "message": "B3 groups T006 with its declared prerequisite T003, so merge-flow regression validation can be admitted before the workflow/adapter change is verifiably complete. Move T006 to a later batch.",
+              "severity": "P1",
+              "file": "track/items/remote-strict-ci-merge-gate-2026-07-31/batch-plan.json",
+              "line": 83,
+              "category": "unsound batch composition"
+            }
+          ],
+          "hash": "rvw1:sha256:1b8ee2a1d99418db477d88fd0c7f8b3aff4762b74e4a80752c3a94e14ea2f1b7",
+          "at": "2026-07-31T12:47:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 bundles independently verifiable behavior units: implementing the remote strict track-aware gate and fail-closed unresolved-track behavior (AC-01/AC-02), and preserving the local early-detection path (AC-04). Split these into separate pre-implementation tasks with distinct validation obligations.",
+              "severity": "P1",
+              "file": "track/items/remote-strict-ci-merge-gate-2026-07-31/impl-plan.json",
+              "line": 6,
+              "category": "pre-implementation split proposal"
+            }
+          ],
+          "hash": "rvw1:sha256:87016245fc5793c5b6607425db2583d6cd3df7a12a0f1975ae428219b8547b8f",
+          "at": "2026-07-31T12:50:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3e381481814c7755eeb2593abd9a89546a0114049e04d6518f3b4fcc9b89ffab",
+          "at": "2026-07-31T12:54:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3e381481814c7755eeb2593abd9a89546a0114049e04d6518f3b4fcc9b89ffab",
+          "at": "2026-07-31T12:56:49Z"
         }
       ]
     }

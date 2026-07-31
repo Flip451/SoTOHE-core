@@ -1,0 +1,373 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "2da5bae24e876f72e3f694e82086e89f6df3a6911ad99b9b0366c9ddd3920769",
+      "evidence_hash": "850f9a189d57d0b0c288cdc7daabc0bc18d1dab62c839bec3f9efcaf86000970",
+      "verdict": {
+        "kind": "pass",
+        "citation": "remote CI で `sotp signal check --gate merge`（strict）を含む track-aware gate を実行し、branch protection により CI 失敗時はマージ不可とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "strict な track-aware merge gate を remote CI と branch protection で強制し、gate を通らない merge を構造的に防ぐ。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-remote-strict-ci-merge-gate.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "eaf153a6b8e7c40dcdea093e449a24d2c84eacf8bfa750381067419e2614586c",
+      "evidence_hash": "850f9a189d57d0b0c288cdc7daabc0bc18d1dab62c839bec3f9efcaf86000970",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`/track:merge` の発行自体を merge 承認とみなし、以降の確認プロンプトを workflow / adapter から除去する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "`/track:merge` の発行を merge 承認として一度だけ扱い、重複した確認なしに remote CI green 後の merge へ進める。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-remote-strict-ci-merge-gate.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "88397be366892b4ee8b340ef1b3f23bcc921708bed49d00ff67f35bbfd4fc486",
+      "evidence_hash": "850f9a189d57d0b0c288cdc7daabc0bc18d1dab62c839bec3f9efcaf86000970",
+      "verdict": {
+        "kind": "pass",
+        "citation": "remote CI で `sotp signal check --gate merge`（strict）を含む track-aware gate を実行し、branch protection により CI 失敗時はマージ不可とする。track 解決は checkout ref から行う（アクティブ track 不明時に graceful skip はしない — 解決失敗は workflow 側の ref 指定で対処する既定方針に従う）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "remote CI は merge の判定に strict な track-aware gate を実行し、checkout ref から対象 track を解決する。対象 track を解決できない場合は検査を skip せず失敗として扱う。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-remote-strict-ci-merge-gate.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "5864fd877527dc0e7d918f7926a7eadc225d652f7653dccdb5473dadd0d68a48",
+      "evidence_hash": "850f9a189d57d0b0c288cdc7daabc0bc18d1dab62c839bec3f9efcaf86000970",
+      "verdict": {
+        "kind": "pass",
+        "citation": "remote CI で `sotp signal check --gate merge`（strict）を含む track-aware gate を実行し、branch protection により CI 失敗時はマージ不可とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "branch protection は remote CI の track-aware gate が失敗した pull request の merge を拒否する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-remote-strict-ci-merge-gate.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "b275ad97db1498f60109f9d55ff36002819ea5acd64a47368c4ad2391ded1eb3",
+      "evidence_hash": "850f9a189d57d0b0c288cdc7daabc0bc18d1dab62c839bec3f9efcaf86000970",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ローカルの merge gate 実行は早期検知用として残るが、強制の実体は remote に移る。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "ローカルでの merge gate 実行は早期検知として維持するが、merge 可否を強制する主体は remote CI と branch protection とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-remote-strict-ci-merge-gate.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "d71c88e166e1d39ca52c8e2a9af4062f5ad7590ca826a23d847e0908aa000b0f",
+      "evidence_hash": "850f9a189d57d0b0c288cdc7daabc0bc18d1dab62c839bec3f9efcaf86000970",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`/track:merge` の発行自体を merge 承認とみなし、以降の確認プロンプトを workflow / adapter から除去する。安全性は D1 の remote strict CI が担保する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "`/track:merge` は invocation 後に追加のユーザー確認を求めず、remote CI が green になるまで待機して merge を実行する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-remote-strict-ci-merge-gate.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "ae3406b26507e371d425bdbdb5f1382c90e24113e1d997d3734a058b97e2fcbd",
+      "evidence_hash": "850f9a189d57d0b0c288cdc7daabc0bc18d1dab62c839bec3f9efcaf86000970",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ローカルの merge gate 実行は早期検知用として残るが、強制の実体は remote に移る。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-01",
+          "text_label": "remote CI を伴わずローカル merge gate だけで merge 可否を強制する方式へ戻すことは対象外とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-remote-strict-ci-merge-gate.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "5f8d329e49fcf5fa400492cf5f5a0fe5d73ef3f582728561b72ffdeae6568047",
+      "evidence_hash": "850f9a189d57d0b0c288cdc7daabc0bc18d1dab62c839bec3f9efcaf86000970",
+      "verdict": {
+        "kind": "pass",
+        "citation": "アクティブ track 不明時に graceful skip はしない — 解決失敗は workflow 側の ref 指定で対処する既定方針に従う"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-02",
+          "text_label": "対象 track を解決できない remote workflow を成功または graceful skip として扱う例外経路を設けることは対象外とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-remote-strict-ci-merge-gate.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "cb598aa456642d84ad65da4b7a9e74a5a83715fa9c260e4fce77dff5179760a9",
+      "evidence_hash": "850f9a189d57d0b0c288cdc7daabc0bc18d1dab62c839bec3f9efcaf86000970",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`/track:merge` の発行自体を merge 承認とみなし、以降の確認プロンプトを workflow / adapter から除去する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-03",
+          "text_label": "`/track:merge` の発行後に別の merge 承認確認を再導入することは対象外とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-remote-strict-ci-merge-gate.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "8ad465551e696e0c1b99dfd0d75953c1bd9c2bafbf13a7427b4e80384e772265",
+      "evidence_hash": "850f9a189d57d0b0c288cdc7daabc0bc18d1dab62c839bec3f9efcaf86000970",
+      "verdict": {
+        "kind": "pass",
+        "citation": "remote CI で `sotp signal check --gate merge`（strict）を含む track-aware gate を実行し、branch protection により CI 失敗時はマージ不可とする。track 解決は checkout ref から行う（アクティブ track 不明時に graceful skip はしない — 解決失敗は workflow 側の ref 指定で対処する既定方針に従う）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "remote strict gate の失敗または対象 track の解決不能は merge を fail-closed で停止させなければならない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-remote-strict-ci-merge-gate.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "82e4ca3f642efa17e9cbd484934b15a5973263ad44a7116950f217e6feb37ce8",
+      "evidence_hash": "850f9a189d57d0b0c288cdc7daabc0bc18d1dab62c839bec3f9efcaf86000970",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`/track:merge` の発行自体を merge 承認とみなし、以降の確認プロンプトを workflow / adapter から除去する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "`/track:merge` の invocation は merge 承認として扱い、その後の workflow と adapter は追加の確認 prompt を表示してはならない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-remote-strict-ci-merge-gate.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "da309dd3659efe3db8d16837f5cf38a32484968d396e807bf4b6ffabe39ef784",
+      "evidence_hash": "850f9a189d57d0b0c288cdc7daabc0bc18d1dab62c839bec3f9efcaf86000970",
+      "verdict": {
+        "kind": "pass",
+        "citation": "remote CI で `sotp signal check --gate merge`（strict）を含む track-aware gate を実行し、… track 解決は checkout ref から行う"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "remote CI 上で merge gate が実行されると、checkout ref に対応する track を用いて strict な track-aware signal 検査が実行される。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-remote-strict-ci-merge-gate.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "7d5880e4c8424fc820ba2850fee4af1acd004ae80b0d83d23200b79e4ab929e0",
+      "evidence_hash": "850f9a189d57d0b0c288cdc7daabc0bc18d1dab62c839bec3f9efcaf86000970",
+      "verdict": {
+        "kind": "pass",
+        "citation": "アクティブ track 不明時に graceful skip はしない — 解決失敗は workflow 側の ref 指定で対処する既定方針に従う"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "checkout ref から対象 track を解決できない remote CI 実行は graceful skip や成功ではなく失敗になり、merge 可と報告されない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-remote-strict-ci-merge-gate.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "141b3e4ffa0f4137e74b6a2ef7f87185b1c686015606ad8ab691968c94798220",
+      "evidence_hash": "850f9a189d57d0b0c288cdc7daabc0bc18d1dab62c839bec3f9efcaf86000970",
+      "verdict": {
+        "kind": "pass",
+        "citation": "remote CI で `sotp signal check --gate merge`（strict）を含む track-aware gate を実行し、branch protection により CI 失敗時はマージ不可とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "remote strict gate が失敗する pull request は branch protection により merge できず、gate が成功するまで保護 branch へ取り込めない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-remote-strict-ci-merge-gate.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "26bd5a69b52b12215edbd1864438be3b483494fb53b556b58b47788e59e2905c",
+      "evidence_hash": "850f9a189d57d0b0c288cdc7daabc0bc18d1dab62c839bec3f9efcaf86000970",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ローカルの merge gate 実行は早期検知用として残るが、強制の実体は remote に移る。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "ローカルの merge gate 実行経路は早期検知として利用可能なまま残り、remote gate の結果を置き換える唯一の merge 強制手段にはならない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-remote-strict-ci-merge-gate.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "ec50591662fd7f8be8d9a929e7d1e1624c95365f6aeb76c22213fda1c98e744f",
+      "evidence_hash": "850f9a189d57d0b0c288cdc7daabc0bc18d1dab62c839bec3f9efcaf86000970",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`/track:merge` の発行自体を merge 承認とみなし、以降の確認プロンプトを workflow / adapter から除去する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "`/track:merge` の発行後、workflow と adapter は追加の確認を求めず、remote CI が green になるのを待って merge を実行する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-remote-strict-ci-merge-gate.md",
+          "decision_id": "D2"
+        }
+      }
+    }
+  ]
+}
