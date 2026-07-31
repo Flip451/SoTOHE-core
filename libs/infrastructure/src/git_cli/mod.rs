@@ -8,13 +8,18 @@ use usecase::git_workflow::DiagnosticText;
 use usecase::track_resolution::{BranchReadError, BranchReaderPort};
 
 pub(crate) mod bounded;
+pub(crate) mod isolation;
 pub(crate) mod show;
 pub mod workflow_adapter;
 
-// The bounded runner is this adapter's, and its callers reach it by the module
-// path they always used; only the file it lives in changed.
+// The bounded runner and the isolation helpers are this adapter's, and their
+// callers reach them by the module path they always used; only the files they
+// live in changed.
 pub(crate) use bounded::{
     collect_bounded_git_output, spawn_bounded_git_child, terminate_bounded_git_child,
+};
+pub(crate) use isolation::{
+    isolated_bounded_git_output, without_history_rewrites, without_repository_selection,
 };
 
 /// `rev-parse --show-toplevel` returns a filesystem path, which can validly be
@@ -57,43 +62,6 @@ pub(crate) fn guarded_git_command() -> Command {
     let mut command = Command::new("git");
     command.env(GUARDED_GIT_ENV, GUARDED_GIT_VALUE);
     command
-}
-
-/// Git variables which may select a different repository, object database, or
-/// ref namespace than the directory a command is aimed at.
-///
-/// `GIT_DIR` alone is enough to redirect a whole invocation: git documents it as
-/// disabling ordinary discovery, so a command run inside one checkout can answer
-/// about another.
-pub(crate) const REPOSITORY_SELECTING_GIT_ENV: &[&str] = &[
-    "GIT_DIR",
-    "GIT_WORK_TREE",
-    "GIT_COMMON_DIR",
-    "GIT_OBJECT_DIRECTORY",
-    "GIT_ALTERNATE_OBJECT_DIRECTORIES",
-    "GIT_NAMESPACE",
-    "GIT_INDEX_FILE",
-    "GIT_CONFIG",
-    "GIT_CONFIG_COUNT",
-    "GIT_CONFIG_PARAMETERS",
-    "GIT_CONFIG_GLOBAL",
-    "GIT_CONFIG_SYSTEM",
-    "GIT_SHALLOW_FILE",
-];
-
-/// Clears every variable by which the ambient environment could aim `command` at
-/// a repository other than the one its working directory sits in.
-///
-/// This is deliberately a step a caller opts into rather than part of
-/// [`guarded_git_command`]: the workflow commands are run by an operator who may
-/// legitimately have pointed their environment at a repository, and taking that
-/// away from them here would change what every existing call answers. The
-/// callers that must not inherit it are the ones whose answer decides what gets
-/// written into a specific tree.
-pub(crate) fn without_repository_selection(command: &mut Command) {
-    for variable in REPOSITORY_SELECTING_GIT_ENV {
-        command.env_remove(variable);
-    }
 }
 
 fn diagnostic_stderr(stderr: &str) -> DiagnosticText {
@@ -681,11 +649,11 @@ mod tests {
 
     use usecase::track_resolution::{BranchReadError, BranchReaderPort};
 
+    use super::isolation::REPOSITORY_SELECTING_GIT_ENV;
     use super::{
-        GUARDED_GIT_ENV, GUARDED_GIT_VALUE, REPOSITORY_SELECTING_GIT_ENV, SyncError, SystemGitRepo,
-        classify_sync_failure, collect_track_branch_claims, guarded_git_command,
-        load_explicit_track_branch, load_explicit_track_branch_from_items_dir, resolve_repo_path,
-        without_repository_selection,
+        GUARDED_GIT_ENV, GUARDED_GIT_VALUE, SyncError, SystemGitRepo, classify_sync_failure,
+        collect_track_branch_claims, guarded_git_command, load_explicit_track_branch,
+        load_explicit_track_branch_from_items_dir, resolve_repo_path, without_repository_selection,
     };
 
     use crate::verify::test_support::run_git;

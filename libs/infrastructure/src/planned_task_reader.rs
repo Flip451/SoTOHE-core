@@ -43,8 +43,16 @@ impl PlannedTaskReaderPort for FsPlannedTaskReader {
             read_track_artifact(items_dir, track_id, IMPL_PLAN_FILE, MAX_IMPL_PLAN_BYTES).map_err(
                 |error| match error {
                     TrackArtifactReadError::NotFound => PlanArtifactReadError::NotFound,
-                    TrackArtifactReadError::Failed(message) => {
-                        PlanArtifactReadError::ReadFailed { message: FreeText::new(message) }
+                    // The reader states what was wrong and nothing about where it
+                    // looked; the artifact is identified by the well-known name
+                    // this adapter owns and by the track it was asked for.
+                    TrackArtifactReadError::Failed(classification) => {
+                        PlanArtifactReadError::ReadFailed {
+                            message: FreeText::new(format!(
+                                "read {IMPL_PLAN_FILE} for track '{}': {classification}",
+                                track_id.as_ref()
+                            )),
+                        }
                     }
                 },
             )?;
@@ -161,6 +169,34 @@ mod tests {
             .unwrap_err();
 
         assert!(matches!(error, PlanArtifactReadError::NotFound), "unexpected error: {error}");
+    }
+
+    #[test]
+    fn test_a_read_failure_names_the_artifact_and_never_the_directory_it_was_read_from() {
+        // A directory where the plan belongs is refused by the guarded read, and
+        // that refusal is what the operator sees rendered at the admission
+        // decision: it names the well-known file, the track asked for, and what
+        // was wrong — not the absolute location the process was pointed at.
+        let dir = temp_items_dir();
+        let track_dir = dir.path().join("my-track");
+        fs::create_dir_all(track_dir.join("impl-plan.json")).unwrap();
+
+        let error = FsPlannedTaskReader::new()
+            .read_planned_tasks(dir.path(), &track_id("my-track"))
+            .unwrap_err();
+
+        let rendered = error.to_string();
+        assert!(
+            rendered.contains("impl-plan.json") && rendered.contains("my-track"),
+            "the artifact stays identified: {rendered}"
+        );
+        assert!(rendered.contains("not a regular file"), "the cause is stated: {rendered}");
+        for spelling in [dir.path().to_path_buf(), dir.path().canonicalize().unwrap()] {
+            assert!(
+                !rendered.contains(&spelling.display().to_string()),
+                "no host path reaches the port error: {rendered}"
+            );
+        }
     }
 
     #[test]

@@ -3034,7 +3034,7 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::scope_diff_measure::tests",
-          "test_name": "test_a_binary_file_contributes_no_countable_lines"
+          "test_name": "test_a_binary_numstat_record_is_retained_for_safe_counting"
         },
         {
           "layer": "infrastructure",

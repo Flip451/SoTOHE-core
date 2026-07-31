@@ -25,7 +25,7 @@ use usecase::task_ops::{CommitRecordVerifierPort, CommitRecordVerifyError};
 // apart.
 use crate::git_cli::{
     SystemGitRepo, collect_bounded_git_output, spawn_bounded_git_child,
-    terminate_bounded_git_child, without_repository_selection,
+    terminate_bounded_git_child, without_history_rewrites, without_repository_selection,
 };
 use crate::sanitized_failure::{git_classification, io_classification};
 
@@ -120,11 +120,6 @@ fn verification_git_command(command_dir: &Path, args: &[&str]) -> Command {
     let mut command = crate::git_cli::guarded_git_command();
     command
         .env("GIT_NO_LAZY_FETCH", "1")
-        .env("GIT_NO_REPLACE_OBJECTS", "1")
-        // Grafts predate replacement refs and provide another history-rewrite
-        // input. Pointing at the empty device disables both a repository's
-        // `info/grafts` default and any inherited `GIT_GRAFT_FILE`.
-        .env("GIT_GRAFT_FILE", "/dev/null")
         .args(args)
         // Keep discovery anchored at the canonical items directory. In
         // particular, `core.worktree` can make `--show-toplevel` name an
@@ -132,6 +127,10 @@ fn verification_git_command(command_dir: &Path, args: &[&str]) -> Command {
         // that discovery selected.
         .current_dir(command_dir);
     without_repository_selection(&mut command);
+    // The replacement-object and graft opt-outs are shared with base resolution
+    // and measurement: one list, so a lane cannot be hardened while its
+    // neighbours drift.
+    without_history_rewrites(&mut command);
     command
 }
 
@@ -376,7 +375,7 @@ fn is_ancestor_of_head(
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
     use super::*;
-    use crate::git_cli::REPOSITORY_SELECTING_GIT_ENV;
+    use crate::git_cli::isolation::REPOSITORY_SELECTING_GIT_ENV;
 
     fn git(dir: &Path, args: &[&str]) {
         let status = std::process::Command::new("git")

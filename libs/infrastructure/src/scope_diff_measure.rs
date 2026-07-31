@@ -1,19 +1,9 @@
 //! Git secondary adapter measuring a track's per-scope diff
 //! (IN-10, IN-14, IN-15, AC-17, CN-05, OUT-08).
 //!
-//! [`GitScopeDiffMeasurer`] owns the line-count definition that used to live in
-//! workflow prose:
-//!
-//! - a scope's figure is `additions + deletions`,
-//! - measured from the batch base over the committed, staged and unstaged
-//!   changes in one `git diff <base>` pass,
-//! - untracked files count their whole length as additions,
-//! - and files are attributed to scopes by the existing review-scope
-//!   classification, which this adapter reuses rather than reimplements.
-//!
-//! The base itself is resolved by the existing per-track diff-base resolver:
-//! the track's recorded commit hash, degrading to the configured base branch
-//! when that record is missing, malformed or no longer an ancestor (CN-05).
+//! It sums additions and deletions from the batch base, counts untracked files
+//! as additions, and reuses existing scope classification. Base resolution
+//! degrades from the recorded commit to the configured base branch (CN-05).
 
 use std::collections::{BTreeMap, HashSet};
 use std::io::{BufReader, Read};
@@ -27,7 +17,10 @@ use usecase::batch_plan::{ScopeDiffMeasureError, ScopeDiffMeasurePort};
 use usecase::fixpoint_resolve::DiffBaseResolverPort;
 
 use crate::dry_check::FsDiffBaseResolverAdapter;
-use crate::git_cli::{SystemGitRepo, guarded_git_command};
+use crate::git_cli::{
+    collect_bounded_git_output, guarded_git_command, spawn_bounded_git_child,
+    without_history_rewrites, without_repository_selection,
+};
 use crate::review_scope_config_reader::REVIEW_SCOPE_CONFIG;
 use crate::review_v2::load_v2_scope_config;
 use crate::sanitized_failure::{io_classification, scope_config_classification};
@@ -38,6 +31,42 @@ const METADATA_FILE: &str = "metadata.json";
 const MAX_TRACK_METADATA_BYTES: u64 = 4 * 1024 * 1024;
 const MAX_GIT_OUTPUT_BYTES: u64 = 16 * 1024 * 1024;
 const MAX_UNTRACKED_FILE_BYTES: u64 = 16 * 1024 * 1024;
+const MAX_BINARY_TREE_PATHSPEC_BYTES: usize = 64 * 1024;
+/// Generated build, cache, and credential outputs excluded before collection.
+const IGNORED_NON_REVIEW_PATHS: [&str; 32] = [
+    ":(top,exclude)target/**",
+    ":(top,exclude)target-*/**",
+    ":(top,exclude)**/*.rs.bk",
+    ":(top,exclude).claude/logs/**",
+    ":(top,exclude).claude/worktrees/**",
+    ":(top,exclude).fastembed_cache/**",
+    ":(top,exclude)**/.fastembed_cache/**",
+    ":(top,exclude).semantic_index/**",
+    ":(top,exclude)**/.semantic_index/**",
+    ":(top,exclude).semantic_index.*",
+    ":(top,exclude)sotp-dry-index-*/**",
+    ":(top,exclude).env",
+    ":(top,exclude).env.*",
+    ":(top,exclude)**/*.pem",
+    ":(top,exclude)**/*.key",
+    ":(top,exclude)private/**",
+    ":(top,exclude)config/secrets/**",
+    ":(top,exclude)tmp/**",
+    ":(top,exclude).cache/**",
+    ":(top,exclude).harness/tools/**",
+    ":(top,exclude)bin/sotp",
+    ":(top,exclude).cargo-install/**",
+    ":(top,exclude)repomix-output.txt",
+    ":(top,exclude)repomix-output.xml",
+    ":(top,exclude)repomix-output.*/**",
+    ":(top,exclude).idea/**",
+    ":(top,exclude).vscode/**",
+    ":(top,exclude).locks/**",
+    ":(top,exclude)track/items/**/.commit_hash",
+    ":(top,exclude)track/items/**/.commit_hash.tmp",
+    ":(top,exclude)track/items/*/*-graph*/**",
+    ":(top,exclude)track/items/*/logs/**",
+];
 
 fn measure_failed(message: impl Into<String>) -> ScopeDiffMeasureError {
     ScopeDiffMeasureError::MeasureFailed { message: FreeText::new(message.into()) }
@@ -66,9 +95,13 @@ impl ScopeDiffMeasurePort for GitScopeDiffMeasurer {
     ) -> Result<Vec<MeasuredScopeDiff>, ScopeDiffMeasureError> {
         // Anchored on the items directory, so the diff measured is the one of
         // the repository the track artifacts live in.
-        let repo = crate::discover_repo_for_items_dir(items_dir).map_err(|error| {
-            measure_failed(format!("git repository not discovered: {}", io_classification(&error)))
-        })?;
+        let (repo, _) =
+            crate::discover_isolated_repo_for_items_dir(items_dir).map_err(|error| {
+                measure_failed(format!(
+                    "git repository not discovered: {}",
+                    io_classification(&error)
+                ))
+            })?;
         let root = repo.root().to_path_buf();
         let items_dir = resolve_items_dir_under(items_dir, &root)?;
         let track_dir = items_dir.join(track_id.as_ref());
@@ -82,24 +115,63 @@ impl ScopeDiffMeasurePort for GitScopeDiffMeasurer {
             ))
         })?;
 
-        // Rename detection may be enabled by repository configuration. Turn it
-        // off explicitly so every changed path has one unambiguous numstat row
-        // and can be classified by its real repository-relative location.
-        let numstat =
-            git_bytes(&repo, &["diff", "--no-renames", "--numstat", "-z", base.as_ref(), "--"])?;
-        let untracked = git_bytes(&repo, &["ls-files", "-z", "--others", "--exclude-standard"])?;
+        // Run from the discovery anchor, with paths pinned to the full tree.
+        // Disable rename, textconv, and external-diff configuration so numstat
+        // is a raw, unambiguous gate measurement.
+        let numstat = git_bytes(
+            &items_dir,
+            &[
+                "diff",
+                "--no-renames",
+                "--no-relative",
+                "--no-textconv",
+                "--no-ext-diff",
+                "--ignore-submodules=none",
+                "--numstat",
+                "-z",
+                base.as_ref(),
+                "--",
+            ],
+        )?;
+        // Enumerate ordinary and ignored files separately. The ignored pass is
+        // needed for in-scope source files. Only the ignored pass excludes
+        // trusted non-review outputs: a visible file may be explicitly
+        // re-included by an ignore negation and must reach classification.
+        let visible_untracked = git_bytes(
+            &items_dir,
+            &["ls-files", "-z", "--others", "--exclude-standard", "--full-name", "--", ":/"],
+        )?;
+        let ignored_args = [
+            "ls-files",
+            "-z",
+            "--others",
+            "--ignored",
+            "--exclude-standard",
+            "--full-name",
+            "--",
+            ":/",
+        ]
+        .into_iter()
+        .chain(IGNORED_NON_REVIEW_PATHS)
+        .collect::<Vec<_>>();
+        let ignored_untracked = git_bytes(&items_dir, &ignored_args)?;
 
-        let mut changed = parse_numstat(&numstat)?;
-        let untracked = retained_paths(&scope_config, untracked_paths(&untracked)?);
+        let mut changed = binary_safe_numstat_additions(
+            &root,
+            &items_dir,
+            base.as_ref(),
+            retained_numstat_entries(&scope_config, parse_numstat(&numstat)?),
+        )?;
+        let mut untracked = untracked_paths(&visible_untracked)?;
+        untracked.extend(untracked_paths(&ignored_untracked)?);
+        let untracked = retained_paths(&scope_config, untracked);
         changed.extend(untracked_additions(&root, &untracked)?);
 
         Ok(accumulate_by_scope(&scope_config, &coalesce_by_path(changed)))
     }
 }
 
-/// Resolves the items directory against the repository it was discovered from,
-/// refusing one that resolves outside it: a measurement only means something
-/// for a track inside the repository being measured.
+/// Resolves the items directory inside its discovered repository.
 fn resolve_items_dir_under(
     items_dir: &Path,
     root: &Path,
@@ -117,12 +189,39 @@ fn resolve_items_dir_under(
             "items_dir resolves outside the repository it was discovered from".to_owned(),
         ));
     }
+    ensure_anchor_has_no_nested_git_directory(&canonical, &canonical_root)?;
     Ok(canonical)
 }
 
-/// Resolves the batch base: the track's recorded commit hash, or the base branch
-/// captured in the track's immutable metadata snapshot when that record cannot
-/// be used (CN-05).
+/// Refuses a nested Git directory between the discovery anchor and reported root.
+fn ensure_anchor_has_no_nested_git_directory(
+    items_dir: &Path,
+    reported_root: &Path,
+) -> Result<(), ScopeDiffMeasureError> {
+    let mut ancestor = items_dir;
+    while ancestor != reported_root {
+        match std::fs::symlink_metadata(ancestor.join(".git")) {
+            Ok(_) => {
+                return Err(measure_failed(
+                    "items_dir is nested beneath a different git repository".to_owned(),
+                ));
+            }
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
+            Err(error) => {
+                return Err(measure_failed(format!(
+                    "inspect items_dir ancestry: {}",
+                    io_classification(&error)
+                )));
+            }
+        }
+        ancestor = ancestor.parent().ok_or_else(|| {
+            measure_failed("items_dir ancestry could not reach the repository root".to_owned())
+        })?;
+    }
+    Ok(())
+}
+
+/// Resolves the recorded base, degrading to the metadata base branch (CN-05).
 fn resolve_base(
     root: &Path,
     items_dir: &Path,
@@ -136,11 +235,11 @@ fn resolve_base(
                     "{METADATA_FILE} not found for track '{}'",
                     track_id.as_ref()
                 )),
-                // The read failure's own message names the absolute path it was
-                // reading; the file is already identified by its well-known name
-                // and its track, so only the classification is carried out.
-                TrackArtifactReadError::Failed(_) => measure_failed(format!(
-                    "read {METADATA_FILE} for track '{}': unreadable",
+                // The failure names what was wrong and nothing about where the
+                // reader looked; the file is already identified by its
+                // well-known name and its track.
+                TrackArtifactReadError::Failed(classification) => measure_failed(format!(
+                    "read {METADATA_FILE} for track '{}': {classification}",
                     track_id.as_ref()
                 )),
             },
@@ -172,48 +271,51 @@ fn resolve_base(
         })
 }
 
-fn git_bytes(repo: &SystemGitRepo, args: &[&str]) -> Result<Vec<u8>, ScopeDiffMeasureError> {
-    let mut child = guarded_git_command()
+fn git_bytes(command_dir: &Path, args: &[&str]) -> Result<Vec<u8>, ScopeDiffMeasureError> {
+    git_bytes_with_limit(command_dir, args, MAX_GIT_OUTPUT_BYTES as usize)
+}
+
+fn git_bytes_with_limit(
+    command_dir: &Path,
+    args: &[&str],
+    max_output_bytes: usize,
+) -> Result<Vec<u8>, ScopeDiffMeasureError> {
+    let mut command = guarded_git_command();
+    without_repository_selection(&mut command);
+    // Ignore replacement objects so they cannot understate a measured scope.
+    without_history_rewrites(&mut command);
+    command.env("GIT_NO_LAZY_FETCH", "1");
+    command
         .args(args)
-        .current_dir(repo.root())
+        .current_dir(command_dir)
+        .stdin(Stdio::null())
         .stdout(Stdio::piped())
-        .stderr(Stdio::null())
-        .spawn()
-        .map_err(|error| measure_failed(format!("git {}: {error}", args.join(" "))))?;
-    let mut output = Vec::new();
-    let read_result = child
-        .stdout
-        .take()
-        .ok_or_else(|| measure_failed(format!("git {} did not provide stdout", args.join(" "))))?
-        .take(MAX_GIT_OUTPUT_BYTES.saturating_add(1))
-        .read_to_end(&mut output);
-    if output.len() as u64 > MAX_GIT_OUTPUT_BYTES {
-        let _ = child.kill();
-        let _ = child.wait();
-        return Err(measure_failed(format!(
-            "git {} exceeded maximum output size of {MAX_GIT_OUTPUT_BYTES} bytes",
-            args.join(" ")
-        )));
-    }
-    read_result
-        .map_err(|error| measure_failed(format!("read git {} output: {error}", args.join(" "))))?;
-    let status = child
-        .wait()
-        .map_err(|error| measure_failed(format!("wait for git {}: {error}", args.join(" "))))?;
+        .stderr(Stdio::piped());
+    let child = spawn_bounded_git_child(&mut command).map_err(|error| {
+        measure_failed(format!("start git {}: {}", args.join(" "), io_classification(&error)))
+    })?;
+    let output = collect_bounded_git_output(child, max_output_bytes).map_err(|error| {
+        measure_failed(format!(
+            "collect git {} output: {}",
+            args.join(" "),
+            io_classification(&error)
+        ))
+    })?;
+    let status = output.status;
     if !status.success() {
         return Err(measure_failed(format!(
             "git {} failed (exit {})",
             args.join(" "),
-            status.code().unwrap_or(-1)
+            status.code().map_or_else(|| "terminated".to_owned(), |code| code.to_string())
         )));
     }
-    Ok(output)
+    Ok(output.stdout)
 }
 
 /// Reads NUL-delimited `git diff --numstat -z` output as one `additions +
-/// deletions` figure per file. A binary file reports `-` for both counts and
-/// contributes nothing.
-fn parse_numstat(output: &[u8]) -> Result<Vec<(FilePath, u32)>, ScopeDiffMeasureError> {
+/// deletions` figure per file. A binary marker is retained so the caller can
+/// derive a conservative attribute-independent figure rather than drop it.
+fn parse_numstat(output: &[u8]) -> Result<Vec<NumstatEntry>, ScopeDiffMeasureError> {
     let mut changed = Vec::new();
     for record in output.split(|byte| *byte == b'\0') {
         if record.is_empty() {
@@ -229,13 +331,174 @@ fn parse_numstat(output: &[u8]) -> Result<Vec<(FilePath, u32)>, ScopeDiffMeasure
             )));
         };
         if additions == b"-" || deletions == b"-" {
+            changed.push(NumstatEntry::Binary(file_path_bytes(path)?));
             continue;
         }
         let additions = parse_numstat_count(additions, record)?;
         let deletions = parse_numstat_count(deletions, record)?;
-        changed.push((file_path_bytes(path)?, additions.saturating_add(deletions)));
+        changed.push(NumstatEntry::Counted(
+            file_path_bytes(path)?,
+            additions.saturating_add(deletions),
+        ));
     }
     Ok(changed)
+}
+
+enum NumstatEntry {
+    Counted(FilePath, u32),
+    Binary(FilePath),
+}
+
+/// Gives every `-/-` row an attribute-independent conservative figure.
+fn binary_safe_numstat_additions(
+    root: &Path,
+    command_dir: &Path,
+    base: &str,
+    entries: Vec<NumstatEntry>,
+) -> Result<Vec<(FilePath, u32)>, ScopeDiffMeasureError> {
+    let mut changed = Vec::new();
+    let binary_paths: Vec<FilePath> = entries
+        .iter()
+        .filter_map(|entry| match entry {
+            NumstatEntry::Counted(_, _) => None,
+            NumstatEntry::Binary(path) => Some(path.clone()),
+        })
+        .collect();
+    let base_sizes = binary_base_sizes(command_dir, base, &binary_paths)?;
+    for entry in entries {
+        match entry {
+            NumstatEntry::Counted(path, lines) => changed.push((path, lines)),
+            NumstatEntry::Binary(path) => {
+                let base_size = base_sizes.get(path.as_str()).copied().unwrap_or(0);
+                changed.push((
+                    path.clone(),
+                    base_size.saturating_add(binary_worktree_size(root, command_dir, &path)?),
+                ));
+            }
+        }
+    }
+    Ok(changed)
+}
+
+/// Batches base-tree lookups into bounded argv-sized requests.
+fn binary_base_sizes(
+    command_dir: &Path,
+    base: &str,
+    paths: &[FilePath],
+) -> Result<BTreeMap<String, u32>, ScopeDiffMeasureError> {
+    let mut sizes = BTreeMap::new();
+    let mut start = 0;
+    while start < paths.len() {
+        let mut pathspecs = Vec::new();
+        let mut bytes = 0;
+        while let Some(path) = paths.get(start + pathspecs.len()) {
+            let pathspec = format!("./{}", path.as_str());
+            if !pathspecs.is_empty() && bytes + pathspec.len() > MAX_BINARY_TREE_PATHSPEC_BYTES {
+                break;
+            }
+            bytes += pathspec.len();
+            pathspecs.push(pathspec);
+        }
+        start += pathspecs.len();
+        let mut args = vec![
+            "ls-tree".to_owned(),
+            "--full-tree".to_owned(),
+            "-l".to_owned(),
+            "-z".to_owned(),
+            base.to_owned(),
+            "--".to_owned(),
+        ];
+        args.extend(pathspecs);
+        let refs: Vec<&str> = args.iter().map(String::as_str).collect();
+        let output = git_bytes_with_limit(command_dir, &refs, MAX_GIT_OUTPUT_BYTES as usize)?;
+        for record in output.split(|byte| *byte == b'\0').filter(|record| !record.is_empty()) {
+            let Some(separator) = record.iter().position(|byte| *byte == b'\t') else {
+                return Err(measure_failed("unreadable base-tree entry for binary numstat path"));
+            };
+            let metadata = record.get(..separator).ok_or_else(|| {
+                measure_failed("unreadable base-tree entry for binary numstat path")
+            })?;
+            let path_bytes = record.get(separator.saturating_add(1)..).ok_or_else(|| {
+                measure_failed("unreadable base-tree entry for binary numstat path")
+            })?;
+            let path = file_path_bytes(path_bytes)?;
+            let size = match metadata.split(|byte| *byte == b' ').nth(1) {
+                Some(b"tree") => 0,
+                Some(b"commit") => u32::MAX,
+                Some(b"blob") => metadata
+                    .split(|byte| *byte == b' ')
+                    .rfind(|field| !field.is_empty())
+                    .and_then(|size| std::str::from_utf8(size).ok())
+                    .and_then(|size| size.parse::<u64>().ok())
+                    .map(conservative_line_upper_bound)
+                    .ok_or_else(|| {
+                        measure_failed("unreadable base-blob size for binary numstat path")
+                    })?,
+                _ => {
+                    return Err(measure_failed(
+                        "unreadable base-tree entry for binary numstat path",
+                    ));
+                }
+            };
+            sizes.insert(path.as_str().to_owned(), size);
+        }
+    }
+    Ok(sizes)
+}
+
+/// Derives an attribute-independent count for the current working-tree entry.
+fn binary_worktree_size(
+    root: &Path,
+    command_dir: &Path,
+    path: &FilePath,
+) -> Result<u32, ScopeDiffMeasureError> {
+    let absolute_path = root.join(path.as_str());
+    match reject_symlinks_below(&absolute_path, root) {
+        Ok(true) => {}
+        Ok(false) => return Ok(0),
+        Err(error) => {
+            return Err(measure_failed(format!(
+                "refusing binary numstat path {}: {}",
+                path.as_str(),
+                io_classification(&error)
+            )));
+        }
+    }
+    match std::fs::symlink_metadata(&absolute_path) {
+        Ok(metadata) if metadata.file_type().is_dir() => {
+            if is_worktree_gitlink(command_dir, path)? { Ok(u32::MAX) } else { Ok(0) }
+        }
+        Ok(metadata) if metadata.file_type().is_file() => {
+            Ok(conservative_line_upper_bound(metadata.len()))
+        }
+        Ok(_) => Err(measure_failed(format!(
+            "binary numstat path {} is not a regular file",
+            path.as_str()
+        ))),
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(0),
+        Err(error) => Err(measure_failed(format!(
+            "read metadata for binary numstat path {}: {}",
+            path.as_str(),
+            io_classification(&error)
+        ))),
+    }
+}
+
+fn is_worktree_gitlink(command_dir: &Path, path: &FilePath) -> Result<bool, ScopeDiffMeasureError> {
+    let pathspec = format!(":(top,literal){}", path.as_str());
+    let output = git_bytes_with_limit(
+        command_dir,
+        &["ls-files", "--stage", "--full-name", "-z", "--", &pathspec],
+        MAX_GIT_OUTPUT_BYTES as usize,
+    )?;
+    Ok(output.split(|byte| *byte == b'\0').filter(|record| !record.is_empty()).any(|record| {
+        record.starts_with(b"160000 ")
+            && record.splitn(2, |byte| *byte == b'\t').nth(1) == Some(path.as_str().as_bytes())
+    }))
+}
+
+fn conservative_line_upper_bound(bytes: u64) -> u32 {
+    u32::try_from(bytes).unwrap_or(u32::MAX)
 }
 
 fn parse_numstat_count(field: &[u8], record: &[u8]) -> Result<u32, ScopeDiffMeasureError> {
@@ -264,6 +527,27 @@ fn retained_paths(scope_config: &ReviewScopeConfig, paths: Vec<FilePath>) -> Vec
     paths.into_iter().filter(|path| included.contains(path)).collect()
 }
 
+/// Applies the same operational and other-track exclusions to tracked rows
+/// before a binary fallback can inspect their working-tree paths.
+fn retained_numstat_entries(
+    scope_config: &ReviewScopeConfig,
+    entries: Vec<NumstatEntry>,
+) -> Vec<NumstatEntry> {
+    let paths = entries
+        .iter()
+        .map(|entry| match entry {
+            NumstatEntry::Counted(path, _) | NumstatEntry::Binary(path) => path.clone(),
+        })
+        .collect();
+    let retained: HashSet<FilePath> = retained_paths(scope_config, paths).into_iter().collect();
+    entries
+        .into_iter()
+        .filter(|entry| match entry {
+            NumstatEntry::Counted(path, _) | NumstatEntry::Binary(path) => retained.contains(path),
+        })
+        .collect()
+}
+
 fn untracked_additions(
     root: &Path,
     paths: &[FilePath],
@@ -289,11 +573,7 @@ fn untracked_additions(
     Ok(changed)
 }
 
-/// Counts newline-delimited lines without requiring UTF-8 or buffering a whole file.
-///
-/// The shared byte budget bounds all untracked-file reads. Metadata makes an
-/// oversized regular file fail before I/O, while the bounded reader closes the
-/// race if that file grows after its size is checked.
+/// Counts newline-delimited lines without requiring UTF-8 or whole-file buffering.
 ///
 /// `relative` is the candidate's repository-relative path and is what every
 /// failure names: `path` is absolute and stays out of the reported message.
@@ -381,9 +661,7 @@ fn file_path_bytes(raw: &[u8]) -> Result<FilePath, ScopeDiffMeasureError> {
     file_path(raw)
 }
 
-/// Merges a path's tracked and untracked contributions before it is classified.
-/// A path can legitimately occur in both inventories when a tracked file is
-/// deleted or renamed and a new untracked file is created at the old path.
+/// Merges tracked and untracked contributions for a path before classification.
 fn coalesce_by_path(changed: Vec<(FilePath, u32)>) -> Vec<(FilePath, u32)> {
     let mut coalesced: BTreeMap<String, (FilePath, u32)> = BTreeMap::new();
     for (path, lines) in changed {
@@ -395,9 +673,7 @@ fn coalesce_by_path(changed: Vec<(FilePath, u32)>) -> Vec<(FilePath, u32)> {
     coalesced.into_values().collect()
 }
 
-/// Attributes each changed file to the scopes the review configuration puts it
-/// in and sums their figures. A file in two scopes counts in both, matching the
-/// classification's own independent-review rule.
+/// Attributes changed files to their configured scopes and sums their figures.
 fn accumulate_by_scope(
     scope_config: &ReviewScopeConfig,
     changed: &[(FilePath, u32)],
@@ -426,8 +702,9 @@ fn accumulate_by_scope(
 #[allow(clippy::indexing_slicing, clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
     use super::{
-        MAX_UNTRACKED_FILE_BYTES, METADATA_FILE, accumulate_by_scope, coalesce_by_path,
-        count_file_lines, parse_numstat, retained_paths, untracked_additions, untracked_paths,
+        MAX_UNTRACKED_FILE_BYTES, METADATA_FILE, NumstatEntry, accumulate_by_scope,
+        binary_base_sizes, coalesce_by_path, count_file_lines, parse_numstat,
+        retained_numstat_entries, retained_paths, untracked_additions, untracked_paths,
     };
     use domain::TrackId;
     use domain::batch_plan::LineCount;
@@ -451,6 +728,18 @@ mod tests {
 
     fn git(dir: &std::path::Path, args: &[&str]) {
         let status = std::process::Command::new("git")
+            .args(args)
+            .current_dir(dir)
+            .stdout(std::process::Stdio::null())
+            .stderr(std::process::Stdio::null())
+            .status()
+            .unwrap();
+        assert!(status.success(), "git {args:?} failed in {}", dir.display());
+    }
+
+    fn git_with_file_protocol(dir: &std::path::Path, args: &[&str]) {
+        let status = std::process::Command::new("git")
+            .args(["-c", "protocol.file.allow=always"])
             .args(args)
             .current_dir(dir)
             .stdout(std::process::Stdio::null())
@@ -537,6 +826,51 @@ mod tests {
             .map_or(0, |diff| diff.lines().value())
     }
 
+    fn counted_entries(entries: Vec<NumstatEntry>) -> Vec<(FilePath, u32)> {
+        entries
+            .into_iter()
+            .map(|entry| match entry {
+                NumstatEntry::Counted(path, lines) => (path, lines),
+                NumstatEntry::Binary(_) => {
+                    panic!("this fixture contains only counted numstat rows")
+                }
+            })
+            .collect()
+    }
+
+    #[test]
+    fn test_a_replacement_object_cannot_hide_the_committed_diff() {
+        // The base is the `main` tip and the track branch carries +3 committed
+        // lines over it. A `refs/replace` entry standing the base in for that tip
+        // makes an ordinary `git diff <base>` compare the tip with itself and
+        // report nothing at all — a scope measured as zero, and a ceiling that
+        // cannot be exceeded. Repository state, not environment: clearing the
+        // repository-selecting variables does not touch it.
+        let repo = fixture_repo();
+        let root = repo.path().to_path_buf();
+        assert_eq!(domain_lines(&measure_in(&root)), 3, "the honest figure before any replacement");
+
+        let base = rev_parse(&root, "main");
+        let tip = rev_parse(&root, "HEAD");
+        git(&root, &["replace", &base, &tip]);
+
+        assert_eq!(
+            domain_lines(&measure_in(&root)),
+            3,
+            "the measurement must read the recorded history, not the presented one"
+        );
+    }
+
+    fn rev_parse(dir: &std::path::Path, revision: &str) -> String {
+        let output = std::process::Command::new("git")
+            .args(["rev-parse", revision])
+            .current_dir(dir)
+            .output()
+            .unwrap();
+        assert!(output.status.success(), "the fixture must resolve {revision}");
+        String::from_utf8(output.stdout).unwrap().trim().to_owned()
+    }
+
     #[test]
     fn test_the_measurer_sums_committed_staged_and_unstaged_changes_from_the_base() {
         let repo = fixture_repo();
@@ -577,6 +911,31 @@ mod tests {
     }
 
     #[test]
+    fn test_the_measurer_refuses_an_items_dir_outside_the_anchor_reported_worktree() {
+        use usecase::batch_plan::ScopeDiffMeasurePort;
+
+        // Git can discover this inner repository from its items directory while
+        // `core.worktree` makes --show-toplevel report the unrelated outer
+        // checkout. In that shape, paths emitted by the inner repository must
+        // never be joined to the outer worktree for an untracked-file read.
+        let outer = fixture_repo();
+        let inner = outer.path().join("nested");
+        let items_dir = inner.join("track/items");
+        std::fs::create_dir_all(&items_dir).unwrap();
+        git(&inner, &["init", "-b", "main"]);
+        git(&inner, &["config", "core.worktree", outer.path().to_str().unwrap()]);
+
+        let error = super::GitScopeDiffMeasurer::new()
+            .measure_scope_diff(&items_dir, &TrackId::try_new("some-track").unwrap())
+            .expect_err("the reported worktree must enclose the items-dir anchor");
+
+        assert!(
+            error.to_string().contains("items_dir is nested beneath a different git repository"),
+            "the anchor mismatch is refused before reading untracked paths: {error}"
+        );
+    }
+
+    #[test]
     fn test_an_untracked_file_is_counted_as_additions_for_all_of_its_lines() {
         let repo = fixture_repo();
         let root = repo.path().to_path_buf();
@@ -591,6 +950,223 @@ mod tests {
             3 + 7,
             "an untracked file adds its whole length, with no deletions"
         );
+    }
+
+    #[test]
+    fn test_an_ignored_untracked_in_scope_file_is_counted_as_additions() {
+        let repo = fixture_repo();
+        let root = repo.path().to_path_buf();
+        write(&root, ".gitignore", "libs/domain/src/ignored.rs\n");
+        write(&root, "libs/domain/src/ignored.rs", &"line\n".repeat(7));
+
+        assert_eq!(
+            domain_lines(&measure_in(&root)),
+            3 + 7,
+            "ignore configuration must not suppress an in-scope untracked file"
+        );
+    }
+
+    #[test]
+    fn test_an_ignore_negated_visible_file_is_kept_for_scope_classification() {
+        let repo = fixture_repo();
+        let root = repo.path().to_path_buf();
+        write(&root, ".gitignore", ".env*\n!.env.example\n");
+        write(&root, ".env.example", &"line\n".repeat(5));
+
+        let measured = measure_in(&root);
+        assert_eq!(
+            measured
+                .iter()
+                .find(|diff| diff.scope().to_string() == "other")
+                .map(|diff| diff.lines().value()),
+            Some(7),
+            "a visible ignore negation must not be filtered as a generated output"
+        );
+    }
+
+    #[test]
+    fn test_an_ignored_build_artifact_is_excluded_before_the_untracked_read_budget() {
+        let repo = fixture_repo();
+        let root = repo.path().to_path_buf();
+        write(&root, ".gitignore", "target/\n");
+        let artifact = root.join("target/generated.rs");
+        std::fs::create_dir_all(artifact.parent().unwrap()).unwrap();
+        std::fs::File::create(&artifact)
+            .unwrap()
+            .set_len(MAX_UNTRACKED_FILE_BYTES.saturating_add(1))
+            .unwrap();
+
+        assert_eq!(
+            domain_lines(&measure_in(&root)),
+            3,
+            "ignored build output must not consume the untracked-file read budget"
+        );
+    }
+
+    #[test]
+    fn test_current_track_generated_outputs_are_excluded_before_the_untracked_read_budget() {
+        let repo = fixture_repo();
+        let root = repo.path().to_path_buf();
+        write(
+            &root,
+            ".gitignore",
+            "track/items/some-track/.commit_hash\ntrack/items/some-track/.commit_hash.tmp\ntrack/items/some-track/infrastructure-graph/\ntrack/items/some-track/logs/\n",
+        );
+        for path in [
+            "track/items/some-track/.commit_hash",
+            "track/items/some-track/.commit_hash.tmp",
+            "track/items/some-track/infrastructure-graph/cache.json",
+            "track/items/some-track/logs/telemetry.jsonl",
+        ] {
+            let artifact = root.join(path);
+            std::fs::create_dir_all(artifact.parent().unwrap()).unwrap();
+            std::fs::File::create(artifact)
+                .unwrap()
+                .set_len(MAX_UNTRACKED_FILE_BYTES.saturating_add(1))
+                .unwrap();
+        }
+
+        assert_eq!(
+            domain_lines(&measure_in(&root)),
+            3,
+            "generated current-track state must not reach the untracked reader"
+        );
+    }
+
+    #[test]
+    fn test_a_current_track_artifact_is_kept_for_scope_classification() {
+        let repo = fixture_repo();
+        let root = repo.path().to_path_buf();
+        write(&root, "track/items/some-track/spec.json", &"line\n".repeat(5));
+
+        let measured = measure_in(&root);
+        let other = measured
+            .iter()
+            .find(|diff| diff.scope().to_string() == "other")
+            .map(|diff| diff.lines().value());
+        assert_eq!(other, Some(5), "track artifacts must reach configuration classification");
+    }
+
+    #[test]
+    fn test_base_blob_counter_treats_a_leading_colon_as_a_literal_path() {
+        let repo = fixture_repo();
+        let root = repo.path();
+        write(root, ":binary.rs", "first\nsecond\n");
+        git(root, &["add", "--", "./:binary.rs"]);
+        git(root, &["commit", "-m", "colon path"]);
+        assert_eq!(
+            binary_base_sizes(root, "HEAD", &[FilePath::new(":binary.rs").unwrap()])
+                .unwrap()
+                .get(":binary.rs"),
+            Some(&13)
+        );
+    }
+
+    #[test]
+    fn test_base_tree_entry_counts_as_zero_for_a_file_type_transition() {
+        let repo = fixture_repo();
+        let root = repo.path();
+        write(root, "replaced/child", "base\n");
+        git(root, &["add", "replaced/child"]);
+        git(root, &["commit", "-m", "base tree"]);
+
+        assert_eq!(
+            binary_base_sizes(root, "HEAD", &[FilePath::new("replaced").unwrap()])
+                .unwrap()
+                .get("replaced"),
+            Some(&0)
+        );
+    }
+
+    #[test]
+    fn test_base_gitlink_entry_counts_conservatively() {
+        let repo = fixture_repo();
+        let root = repo.path();
+        let cache_info = format!("160000,{},submodule", rev_parse(root, "HEAD"));
+        git(root, &["update-index", "--add", "--cacheinfo", &cache_info]);
+        git(root, &["commit", "-m", "base gitlink"]);
+
+        assert_eq!(
+            binary_base_sizes(root, "HEAD", &[FilePath::new("submodule").unwrap()])
+                .unwrap()
+                .get("submodule"),
+            Some(&u32::MAX)
+        );
+    }
+
+    #[test]
+    fn test_a_submodule_ignore_configuration_cannot_suppress_a_gitlink_diff() {
+        let repo = fixture_repo();
+        let root = repo.path().to_path_buf();
+        let path = "libs/domain/src/gitlink";
+        let source = tempfile::Builder::new()
+            .prefix("scope-diff-measure-submodule-")
+            .tempdir_in(root.parent().unwrap())
+            .unwrap();
+        git(source.path(), &["init", "-b", "main"]);
+        git(source.path(), &["config", "user.email", "fixture@example.com"]);
+        git(source.path(), &["config", "user.name", "fixture"]);
+        write(source.path(), "lib.rs", "source\n");
+        git(source.path(), &["add", "lib.rs"]);
+        git(source.path(), &["commit", "-m", "source"]);
+
+        git_with_file_protocol(&root, &["submodule", "add", source.path().to_str().unwrap(), path]);
+        git(&root, &["config", "diff.ignoreSubmodules", "all"]);
+
+        assert_eq!(
+            domain_lines(&measure_in(&root)),
+            4,
+            "a configured submodule ignore must not understate a gitlink change"
+        );
+    }
+
+    #[test]
+    fn test_binary_worktree_size_from_items_dir_counts_a_gitlink_conservatively() {
+        let repo = fixture_repo();
+        let root = repo.path().to_path_buf();
+        let path = FilePath::new("libs/domain/src/gitlink").unwrap();
+        let cache_info = format!("160000,{},{}", rev_parse(&root, "HEAD"), path.as_str());
+        git(&root, &["update-index", "--add", "--cacheinfo", &cache_info]);
+        std::fs::create_dir_all(root.join(path.as_str())).unwrap();
+
+        assert_eq!(
+            super::binary_worktree_size(&root, &root.join("track/items"), &path).unwrap(),
+            u32::MAX,
+            "the top-level gitlink must be visible from the nested discovery anchor"
+        );
+    }
+
+    #[test]
+    fn test_a_binary_attribute_cannot_suppress_a_tracked_text_change() {
+        let repo = fixture_repo();
+        let root = repo.path().to_path_buf();
+        write(&root, ".gitattributes", "libs/domain/src/committed.rs binary\n");
+
+        assert_eq!(
+            domain_lines(&measure_in(&root)),
+            50 + 65,
+            "a repository attribute must produce a conservative count, not zero lines"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_binary_worktree_metadata_is_not_read_through_a_symlinked_ancestor() {
+        let root = tempfile::tempdir().unwrap();
+        let outside = tempfile::tempdir().unwrap();
+        let external_file = outside.path().join("domain/src/binary.bin");
+        std::fs::create_dir_all(external_file.parent().unwrap()).unwrap();
+        std::fs::write(&external_file, "outside").unwrap();
+        std::os::unix::fs::symlink(outside.path(), root.path().join("libs")).unwrap();
+
+        let error = super::binary_worktree_size(
+            root.path(),
+            root.path(),
+            &FilePath::new("libs/domain/src/binary.bin").unwrap(),
+        )
+        .expect_err("the ancestor symlink must be refused before metadata can short-circuit");
+
+        assert!(error.to_string().contains("rejected as a symlink"), "got: {error}");
     }
 
     #[test]
@@ -778,6 +1354,29 @@ mod tests {
     }
 
     #[test]
+    fn test_retained_numstat_entries_excludes_operational_binary_paths_before_fallbacks() {
+        let config = ReviewScopeConfig::new(
+            &TrackId::try_new("some-track").unwrap(),
+            vec![("domain".to_owned(), vec!["libs/domain/**".to_owned()], None, None)],
+            vec!["track/items/<track-id>/review.json".to_owned()],
+            Vec::new(),
+            None,
+        )
+        .unwrap();
+        let entries = vec![
+            NumstatEntry::Binary(FilePath::new("track/items/some-track/review.json").unwrap()),
+            NumstatEntry::Counted(FilePath::new("libs/domain/src/lib.rs").unwrap(), 3),
+        ];
+
+        let retained = retained_numstat_entries(&config, entries);
+
+        assert!(matches!(
+            retained.as_slice(),
+            [NumstatEntry::Counted(path, 3)] if path.as_str() == "libs/domain/src/lib.rs"
+        ));
+    }
+
+    #[test]
     fn test_coalesce_by_path_sums_tracked_and_untracked_contributions() {
         let path = FilePath::new("libs/domain/src/recreated.rs").unwrap();
         let coalesced = coalesce_by_path(vec![(path.clone(), 4), (path.clone(), 7)]);
@@ -896,11 +1495,13 @@ mod tests {
 
     #[test]
     fn test_a_scope_figure_is_additions_plus_deletions() {
-        let changed = parse_numstat(
-            b"12\t5\tlibs/domain/src/a.rs\0\
-            3\t0\tlibs/domain/src/b.rs\0",
-        )
-        .unwrap();
+        let changed = counted_entries(
+            parse_numstat(
+                b"12\t5\tlibs/domain/src/a.rs\0\
+                3\t0\tlibs/domain/src/b.rs\0",
+            )
+            .unwrap(),
+        );
 
         assert_eq!(changed.len(), 2);
         assert_eq!(changed[0].1, 17, "12 additions + 5 deletions");
@@ -912,15 +1513,13 @@ mod tests {
     }
 
     #[test]
-    fn test_a_binary_file_contributes_no_countable_lines() {
-        let changed = parse_numstat(
-            b"-\t-\tlibs/domain/src/logo.png\0\
-            7\t1\tlibs/domain/src/a.rs\0",
-        )
-        .unwrap();
+    fn test_a_binary_numstat_record_is_retained_for_safe_counting() {
+        let changed = parse_numstat(b"-\t-\tlibs/domain/src/logo.png\0").unwrap();
 
-        assert_eq!(changed.len(), 1);
-        assert_eq!(changed[0].1, 8);
+        assert!(matches!(
+            changed.as_slice(),
+            [NumstatEntry::Binary(path)] if path.as_str() == "libs/domain/src/logo.png"
+        ));
     }
 
     #[test]
@@ -931,7 +1530,8 @@ mod tests {
 
     #[test]
     fn test_nul_delimited_numstat_preserves_a_path_containing_a_newline() {
-        let changed = parse_numstat(b"1\t0\tlibs/domain/src/line\nbreak.rs\0").unwrap();
+        let changed =
+            counted_entries(parse_numstat(b"1\t0\tlibs/domain/src/line\nbreak.rs\0").unwrap());
 
         assert_eq!(changed.len(), 1);
         assert_eq!(changed[0].0.as_str(), "libs/domain/src/line\nbreak.rs");

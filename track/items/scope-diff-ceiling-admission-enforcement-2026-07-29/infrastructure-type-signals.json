@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-31T01:50:01Z",
+  "generated_at": "2026-07-31T06:51:31Z",
   "declaration_hash": "efc768c3ea1ef50c046a2cd363c29a82bb0e07aa66f6d14072ea7c8b74d8eacc",
-  "implementation_input_hash": "0e94459a69cc21a6ad4f18392d5a35f35315979801c180172955ab2d9c5395f3",
+  "implementation_input_hash": "23aebd267598d86364dd6b1c8029fd5717450faf9100af05c8ba71e5c0028958",
   "signals": [
     {
       "type_name": "BatchDeclarationDto",

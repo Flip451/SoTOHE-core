@@ -13,6 +13,10 @@ use thiserror::Error;
 use crate::git_cli::SystemGitRepo;
 use crate::track::symlink_guard::reject_symlinks_below;
 
+/// `merge-base --is-ancestor` answers with its exit code and prints nothing, so
+/// the retention limit only has to cover a diagnostic line.
+const MAX_ANCESTRY_OUTPUT_BYTES: usize = 1024;
+
 // ── DryCheckCommitHashError ───────────────────────────────────────────────────
 
 /// Error from [`FsDryCheckCommitHashStore::read`].
@@ -120,9 +124,25 @@ impl FsDryCheckCommitHashStore {
         // trusted root the record was read from, not on the process working
         // directory, so the answer describes the repository holding the record
         // rather than whichever repository the process happens to stand in.
-        match SystemGitRepo::discover_from(&self.trusted_root) {
-            Ok(git) => {
-                let output = git.output(&["merge-base", "--is-ancestor", trimmed, "HEAD"]);
+        //
+        // Isolated and bounded like every other read whose answer decides a
+        // gate: the ambient environment must not be able to name the repository
+        // this ancestry is asked of, a replacement object or graft must not be
+        // able to invent the reachability that makes the record usable, and a
+        // git call that never returns must not hold the gate open. Every
+        // outcome other than a clean success stays fail-closed, exactly as
+        // before.
+        // The query runs from the directory discovery started at, not from the
+        // root it reported: a nested repository configured with `core.worktree`
+        // makes `--show-toplevel` name an enclosing checkout, and asking that
+        // checkout would answer about a different HEAD.
+        match SystemGitRepo::discover_from_isolated(&self.trusted_root) {
+            Ok(_) => {
+                let output = crate::git_cli::isolated_bounded_git_output(
+                    &self.trusted_root,
+                    &["merge-base", "--is-ancestor", trimmed, "HEAD"],
+                    MAX_ANCESTRY_OUTPUT_BYTES,
+                );
                 match output {
                     Ok(o) if o.status.success() => Ok(Some(hash)),
                     // Not an ancestor or any error → fail-closed (main fallback).
@@ -396,6 +416,71 @@ mod tests {
         // OR returns Ok(Some) if it happens to be. Either is valid here.
         let result = store.read();
         assert!(result.is_ok(), "valid hash format should not return Err(Format), got: {result:?}");
+    }
+
+    fn git(dir: &Path, args: &[&str]) {
+        let status = std::process::Command::new("git")
+            .args(args)
+            .current_dir(dir)
+            .stdout(std::process::Stdio::null())
+            .stderr(std::process::Stdio::null())
+            .status()
+            .unwrap();
+        assert!(status.success(), "git {args:?} must succeed in the fixture");
+    }
+
+    fn rev_parse(dir: &Path, revision: &str) -> String {
+        let output = std::process::Command::new("git")
+            .args(["rev-parse", revision])
+            .current_dir(dir)
+            .output()
+            .unwrap();
+        assert!(output.status.success(), "the fixture must resolve {revision}");
+        String::from_utf8(output.stdout).unwrap().trim().to_owned()
+    }
+
+    #[test]
+    fn test_a_graft_cannot_make_an_unreachable_record_usable() {
+        // A record naming a commit that is not reachable from HEAD must fall back
+        // to the configured branch. A graft adding that commit as a parent of
+        // HEAD makes an ordinary `merge-base --is-ancestor` answer yes, which
+        // would hand the gate a base outside the branch's own history and shrink
+        // the measured diff to whatever that base makes small.
+        //
+        // Grafts are the mechanism that reaches this lane: a replacement object
+        // standing in for the queried commit does not move the answer, because
+        // reachability is computed from the commit the argument names.
+        let repo = tempfile::Builder::new()
+            .prefix("dry-check-commit-hash-store-")
+            .tempdir_in(std::env::current_dir().unwrap())
+            .unwrap();
+        let root = repo.path();
+        git(root, &["init", "-b", "main"]);
+        git(root, &["config", "user.email", "fixture@example.com"]);
+        git(root, &["config", "user.name", "fixture"]);
+        git(root, &["commit", "--allow-empty", "-m", "base"]);
+        let head = rev_parse(root, "HEAD");
+
+        // An unrelated commit on a detached history: no ancestry to HEAD at all.
+        git(root, &["checkout", "-q", "--orphan", "unrelated"]);
+        git(root, &["commit", "--allow-empty", "-m", "unrelated"]);
+        let unreachable = rev_parse(root, "HEAD");
+        git(root, &["checkout", "-q", "main"]);
+
+        std::fs::write(root.join(".commit_hash"), format!("{unreachable}\n")).unwrap();
+        let store = FsDryCheckCommitHashStore::new(root.join(".commit_hash"), root.to_path_buf());
+        assert!(
+            store.read().unwrap().is_none(),
+            "an unreachable record must fall back before any replacement is in play"
+        );
+
+        std::fs::create_dir_all(root.join(".git/info")).unwrap();
+        std::fs::write(root.join(".git/info/grafts"), format!("{head} {unreachable}\n")).unwrap();
+
+        assert!(
+            store.read().unwrap().is_none(),
+            "a graft must not turn an unreachable record into a usable base"
+        );
     }
 
     #[cfg(unix)]

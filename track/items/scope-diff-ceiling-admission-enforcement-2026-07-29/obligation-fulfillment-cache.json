@@ -7565,13 +7565,13 @@
         "item_identifier": "trait_impl:usecase::batch_plan::ports::ScopeDiffMeasurePort"
       },
       "key": {
-        "bound_tests_set_hash": "be41a6666f10c9276913172dc4cd0bcaf35965e424cf3924c20bcbbe3e7f5f62",
+        "bound_tests_set_hash": "083035bd96ad900e7538f9590b61fc80d0da76342fd8f9d00609335099c25ead",
         "declaration_hash": "61109d5cb0f522559552e8238cbd76bf82bf8a7b612e5a6ca0622b30b03eedbd",
         "anchor_text_hash": "95f3aa6927f09837b3f404c8ffe20837feae78d7b9c33b8e60168b0adc31f8e1"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(domain_lines(&measured), 3 + 2 + 4, \"all three change kinds are summed against the base\");"
+        "citation": "assert_eq!(\n            domain_lines(&measured),\n            4,\n            \"the record is honoured, so the committed +3 sits behind the base and only the \\\n             unstaged +4 is measured\"\n        );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -7593,7 +7593,7 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::scope_diff_measure::tests",
-          "test_name": "test_a_binary_file_contributes_no_countable_lines"
+          "test_name": "test_a_binary_numstat_record_is_retained_for_safe_counting"
         },
         {
           "layer": "infrastructure",
@@ -7646,13 +7646,13 @@
         "item_identifier": "trait_impl:usecase::batch_plan::ports::ScopeDiffMeasurePort"
       },
       "key": {
-        "bound_tests_set_hash": "be41a6666f10c9276913172dc4cd0bcaf35965e424cf3924c20bcbbe3e7f5f62",
+        "bound_tests_set_hash": "083035bd96ad900e7538f9590b61fc80d0da76342fd8f9d00609335099c25ead",
         "declaration_hash": "61109d5cb0f522559552e8238cbd76bf82bf8a7b612e5a6ca0622b30b03eedbd",
         "anchor_text_hash": "ffdc22721890fd01dada6c95d08bcde7973a523171d5a1657e8f7ab3596e20e2"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(domain.lines(), LineCount::new(20));\n\n\"all three change kinds are summed against the base\"\n\n\"an untracked file adds its whole length, with no deletions\"\n\n\"both awkward names are counted under `domain`\""
+        "citation": "assert_eq!(\n            domain_lines(&measured),\n            3 + 2 + 4,\n            \"all three change kinds are summed against the base\"\n        );\n\nassert_eq!(\n            domain_lines(&measure_in(&root)),\n            3 + 7,\n            \"an untracked file adds its whole length, with no deletions\"\n        );\n\nassert_eq!(domain.lines(), LineCount::new(20));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -7674,7 +7674,7 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::scope_diff_measure::tests",
-          "test_name": "test_a_binary_file_contributes_no_countable_lines"
+          "test_name": "test_a_binary_numstat_record_is_retained_for_safe_counting"
         },
         {
           "layer": "infrastructure",
@@ -7727,13 +7727,13 @@
         "item_identifier": "trait_impl:usecase::batch_plan::ports::ScopeDiffMeasurePort"
       },
       "key": {
-        "bound_tests_set_hash": "be41a6666f10c9276913172dc4cd0bcaf35965e424cf3924c20bcbbe3e7f5f62",
+        "bound_tests_set_hash": "083035bd96ad900e7538f9590b61fc80d0da76342fd8f9d00609335099c25ead",
         "declaration_hash": "61109d5cb0f522559552e8238cbd76bf82bf8a7b612e5a6ca0622b30b03eedbd",
         "anchor_text_hash": "88b0b5d03fd4d86a87adeccb80ba003f2c27cb47ea187dfb176beb5f14792fb8"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(changed[0].1, 17, \"12 additions + 5 deletions\");\n\nassert_eq!(\n    domain_lines(&measure_in(&root)),\n    3 + 7,\n    \"an untracked file adds its whole length, with no deletions\"\n);\n\nlet measured = accumulate_by_scope(&config(), &changed);\nlet domain = measured.iter().find(|diff| diff.scope().to_string() == \"domain\").unwrap();\nassert_eq!(domain.lines(), LineCount::new(20));"
+        "citation": "assert_eq!(changed[0].1, 17, \"12 additions + 5 deletions\"); ... assert_eq!(domain_lines(&measure_in(&root)), 3 + 7, \"an untracked file adds its whole length, with no deletions\"); ... assert_eq!(figure(\"domain\"), Some(LineCount::new(100))); assert_eq!(figure(\"usecase\"), Some(LineCount::new(40))); assert_eq!(figure(\"other\"), Some(LineCount::new(9)));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -7755,7 +7755,7 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::scope_diff_measure::tests",
-          "test_name": "test_a_binary_file_contributes_no_countable_lines"
+          "test_name": "test_a_binary_numstat_record_is_retained_for_safe_counting"
         },
         {
           "layer": "infrastructure",
@@ -7808,7 +7808,7 @@
         "item_identifier": "trait_impl:usecase::batch_plan::ports::ScopeDiffMeasurePort"
       },
       "key": {
-        "bound_tests_set_hash": "be41a6666f10c9276913172dc4cd0bcaf35965e424cf3924c20bcbbe3e7f5f62",
+        "bound_tests_set_hash": "083035bd96ad900e7538f9590b61fc80d0da76342fd8f9d00609335099c25ead",
         "declaration_hash": "61109d5cb0f522559552e8238cbd76bf82bf8a7b612e5a6ca0622b30b03eedbd",
         "anchor_text_hash": "6f39c6a6690cc059399beb1b142b4869ea15ad8ee0648aa396dfba14c22d4fb2"
       },
@@ -7836,7 +7836,7 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::scope_diff_measure::tests",
-          "test_name": "test_a_binary_file_contributes_no_countable_lines"
+          "test_name": "test_a_binary_numstat_record_is_retained_for_safe_counting"
         },
         {
           "layer": "infrastructure",

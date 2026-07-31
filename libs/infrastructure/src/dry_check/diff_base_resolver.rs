@@ -22,7 +22,14 @@ use domain::CommitHash;
 use usecase::fixpoint_resolve::{DiffBaseResolverError, DiffBaseResolverPort};
 
 use crate::dry_check::{DryCheckCommitHashError, FsDryCheckCommitHashStore};
-use crate::git_cli::SystemGitRepo;
+use crate::git_cli::{GitError, SystemGitRepo, isolated_bounded_git_output};
+
+/// A resolved base is one commit hash and a refusal is one short line, so the
+/// same small retention limit the other verdict-bearing probes use applies here.
+const MAX_BASE_RESOLUTION_OUTPUT_BYTES: usize = 1024;
+/// `check-ref-format --branch` echoes the accepted branch name, unlike the
+/// fixed-size object id returned by `rev-parse`.
+const MAX_BRANCH_VALIDATION_OUTPUT_BYTES: usize = 8 * 1024;
 
 /// Filesystem adapter implementing [`DiffBaseResolverPort`].
 ///
@@ -118,13 +125,51 @@ fn commit_hash_path_failure(what: &str, cause: &std::io::Error) -> String {
     )
 }
 
+/// Runs one base-resolution git command, reporting a failure the way this
+/// module's messages already do: the sanitized classification only, never git's
+/// own text, which renders the repository path and its stderr.
+///
+/// The runner's own refusals — its deadline and its retention limit — arrive as
+/// the same classification a failure to start does. Both mean the command
+/// produced no answer, which is the only distinction the caller makes.
+fn base_resolution_output(
+    repo_root: &Path,
+    args: &[&str],
+) -> Result<std::process::Output, &'static str> {
+    base_resolution_output_with_limit(repo_root, args, MAX_BASE_RESOLUTION_OUTPUT_BYTES)
+}
+
+fn base_resolution_output_with_limit(
+    repo_root: &Path,
+    args: &[&str],
+    max_output_bytes: usize,
+) -> Result<std::process::Output, &'static str> {
+    isolated_bounded_git_output(repo_root, args, max_output_bytes).map_err(|source| {
+        crate::sanitized_failure::git_classification(&GitError::Spawn {
+            command: args.join(" "),
+            source,
+        })
+    })
+}
+
 /// Run `git rev-parse <base_branch>` from `repo_root` and return the resulting
 /// `CommitHash`. `base_branch` is passed argv-style (AC-04).
 ///
 /// The branch name is the identifier an operator acts on and is named; git's own
 /// error text is not, because it renders the repository path and its stderr.
+///
+/// Every step runs in the isolated, bounded lane the rest of the gate's git
+/// reads use. The base decides what the measured diff is measured against, so an
+/// ambient `GIT_DIR` or `GIT_NAMESPACE` selecting a crafted `main` — or a
+/// replacement object standing in for its tip — would silently move the figure
+/// the ceiling is compared with.
 fn git_rev_parse_base(repo_root: &Path, base_branch: &str) -> Result<CommitHash, String> {
-    let git = SystemGitRepo::discover_from(repo_root).map_err(|e| {
+    // Discovery selects the repository; every command then runs from the same
+    // directory discovery started at, never from the root it reported. A nested
+    // repository configured with `core.worktree` makes `--show-toplevel` name an
+    // enclosing checkout, and resolving the base from there would answer with
+    // that checkout's `main`.
+    SystemGitRepo::discover_from_isolated(repo_root).map_err(|e| {
         format!(
             "cannot resolve {base_branch}: {}",
             crate::sanitized_failure::git_classification(&e)
@@ -148,24 +193,22 @@ fn git_rev_parse_base(repo_root: &Path, base_branch: &str) -> Result<CommitHash,
     // `check-ref-format` accepts no option terminator (neither `--end-of-options`
     // nor `--`), but it needs none here: an option-shaped value makes it exit
     // nonzero, which is the refusal this wants.
-    let checked = git.output(&["check-ref-format", "--branch", base_branch]).map_err(|e| {
-        format!(
-            "cannot resolve {base_branch}: {}",
-            crate::sanitized_failure::git_classification(&e)
-        )
-    })?;
+    let checked = base_resolution_output_with_limit(
+        repo_root,
+        &["check-ref-format", "--branch", base_branch],
+        MAX_BRANCH_VALIDATION_OUTPUT_BYTES,
+    )
+    .map_err(|e| format!("cannot resolve {base_branch}: {e}"))?;
     if !checked.status.success() {
         return Err(format!("cannot resolve {base_branch}: not a valid branch name"));
     }
 
     let revision = format!("refs/heads/{base_branch}^{{commit}}");
-    let output =
-        git.output(&["rev-parse", "--verify", "--end-of-options", &revision]).map_err(|e| {
-            format!(
-                "cannot resolve {base_branch}: {}",
-                crate::sanitized_failure::git_classification(&e)
-            )
-        })?;
+    let output = base_resolution_output(
+        repo_root,
+        &["rev-parse", "--verify", "--end-of-options", &revision],
+    )
+    .map_err(|e| format!("cannot resolve {base_branch}: {e}"))?;
     if !output.status.success() {
         return Err(format!("cannot resolve {base_branch}: git rev-parse refused it"));
     }
@@ -337,6 +380,90 @@ mod tests {
 
         // The configured base itself still resolves.
         assert_eq!(git_rev_parse_base(repo.path(), "main").unwrap().as_ref().len(), 40);
+    }
+
+    #[test]
+    fn test_a_long_valid_base_branch_is_not_limited_by_the_commit_reply_cap() {
+        let repo = repo_with_a_commit();
+        // Keep every path component below the filesystem's name limit while the
+        // complete ref name exceeds the 1 KiB object-id reply cap.
+        let base_branch = (0..8)
+            .map(|segment| format!("segment-{segment}-{}", "x".repeat(180)))
+            .collect::<Vec<_>>()
+            .join("/");
+        let status = std::process::Command::new("git")
+            .args(["branch", &base_branch])
+            .current_dir(repo.path())
+            .status()
+            .unwrap();
+        assert!(status.success(), "the fixture must create the long branch");
+        assert!(base_branch.len() > MAX_BASE_RESOLUTION_OUTPUT_BYTES);
+
+        assert_eq!(
+            git_rev_parse_base(repo.path(), &base_branch).unwrap().as_ref().len(),
+            40,
+            "validation may echo a long name, but resolution still returns one object id"
+        );
+    }
+
+    #[test]
+    fn test_the_base_is_resolved_against_the_repository_selected_at_the_anchor() {
+        // A repository nested inside another, configured so that its own
+        // `--show-toplevel` names the enclosing checkout. Resolving from that
+        // reported root would answer with the outer repository's `main` — a base
+        // outside the measured branch's history, and a diff measured against the
+        // wrong tree.
+        let outer = repo_with_a_commit();
+        let inner = outer.path().join("nested-repository");
+        std::fs::create_dir_all(&inner).unwrap();
+        for args in [
+            ["init", "-b", "main"].as_slice(),
+            ["config", "user.email", "fixture@example.com"].as_slice(),
+            ["config", "user.name", "fixture"].as_slice(),
+            ["commit", "--allow-empty", "-m", "inner base"].as_slice(),
+        ] {
+            let status = std::process::Command::new("git")
+                .args(args)
+                .current_dir(&inner)
+                .stdout(std::process::Stdio::null())
+                .stderr(std::process::Stdio::null())
+                .status()
+                .unwrap();
+            assert!(status.success(), "git {args:?} must succeed in the inner fixture");
+        }
+        let inner_main = rev_parse(&inner, "refs/heads/main");
+        let outer_main = rev_parse(outer.path(), "refs/heads/main");
+        assert_ne!(inner_main, outer_main, "the two fixtures must have distinct tips");
+
+        let status = std::process::Command::new("git")
+            .args(["config", "core.worktree", outer.path().to_str().unwrap()])
+            .current_dir(&inner)
+            .status()
+            .unwrap();
+        assert!(status.success(), "the fixture must be able to redirect the reported worktree");
+        assert_eq!(
+            SystemGitRepo::discover_from(&inner).unwrap().root().canonicalize().unwrap(),
+            outer.path().canonicalize().unwrap(),
+            "core.worktree deliberately makes --show-toplevel name the enclosing directory"
+        );
+
+        let resolved = git_rev_parse_base(&inner, "main").unwrap();
+
+        assert_eq!(
+            resolved.as_ref(),
+            inner_main,
+            "the base must come from the repository the anchor selected"
+        );
+    }
+
+    fn rev_parse(dir: &Path, revision: &str) -> String {
+        let output = std::process::Command::new("git")
+            .args(["rev-parse", revision])
+            .current_dir(dir)
+            .output()
+            .unwrap();
+        assert!(output.status.success(), "the fixture must resolve {revision}");
+        String::from_utf8(output.stdout).unwrap().trim().to_owned()
     }
 
     #[test]
