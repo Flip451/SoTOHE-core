@@ -1,0 +1,258 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "2fa237b6cbde88ecf9ccfc2227d5a5befa30f14dc5763416b8ceddb73ea1d515",
+      "evidence_hash": "c9c55bbae4d648401bba9868dcc83fe4acf35abf8af517299d7f5ac7299674d1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`/track:init` の id 生成を日付プレフィックス形式に変更し、ADR ファイル名と並び順規則を揃える。既存 track の id は改名しない（新規 track からの適用）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "新規に生成する track ID を `<YYYY-MM-DD>-<slug>` の日付プレフィックス形式へ統一し、track 一覧と branch 一覧で時系列の並び順を得ながら、既存 track を継続して利用可能にする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-track-id-date-prefix.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "8e30661107da34293217f333ce339705c49091831973dbcc4a034e4132707c25",
+      "evidence_hash": "c9c55bbae4d648401bba9868dcc83fe4acf35abf8af517299d7f5ac7299674d1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`/track:init` の id 生成を日付プレフィックス形式に変更し"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "新規 track の ID 生成を、日付と slug を `<YYYY-MM-DD>-<slug>` の順で連結する形式へ変更する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-track-id-date-prefix.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "4a4a1bb0bc0c0da3ea3f21d041c11526afc8f02af2a3f5a24e4ebd96f1af430a",
+      "evidence_hash": "c9c55bbae4d648401bba9868dcc83fe4acf35abf8af517299d7f5ac7299674d1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`/track:init` の id 生成を日付プレフィックス形式に変更し、ADR ファイル名と並び順規則を揃える。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "新規 ID が数字で始まる場合も、そこから導出される `track/<id>` branch と `track/items/<id>/` の配置を一貫して作成・利用できるようにする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-track-id-date-prefix.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "09613d059f4e32b57bcc6708f380dc8ae5e7ae4ed159faf27966a89b51be1178",
+      "evidence_hash": "c9c55bbae4d648401bba9868dcc83fe4acf35abf8af517299d7f5ac7299674d1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`/track:init` の id 生成を日付プレフィックス形式に変更し、ADR ファイル名と並び順規則を揃える。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "branch に束縛された track 解決が、日付プレフィックス形式の新規 ID を有効な不透明識別子として解決できるようにする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-track-id-date-prefix.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "c2a01605246f7222ec0eea3629fe5036dfd523d0e3588ccfafc3c545bbfd64e1",
+      "evidence_hash": "c9c55bbae4d648401bba9868dcc83fe4acf35abf8af517299d7f5ac7299674d1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存 track の id は改名しない（新規 track からの適用）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-01",
+          "text_label": "既存 track ID、既存 branch 名、または既存 `track/items/<id>/` 配置の改名・移行は行わない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-track-id-date-prefix.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "01982cf29c452c8777dbfc26d4e7fc1f6b81cba004acf17faff7aac7ed7b987a",
+      "evidence_hash": "c9c55bbae4d648401bba9868dcc83fe4acf35abf8af517299d7f5ac7299674d1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存 track の id は改名しない（新規 track からの適用）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "この命名形式の変更は新規 track の ID 生成にのみ適用し、既存 ID を変更しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-track-id-date-prefix.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "6a72c1d40b3a9d9699f780d215b781bddf4709aa72f55d59c67ae07a0307d3d5",
+      "evidence_hash": "c9c55bbae4d648401bba9868dcc83fe4acf35abf8af517299d7f5ac7299674d1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`/track:init` の id 生成を日付プレフィックス形式に変更し、ADR ファイル名と並び順規則を揃える。既存 track の id は改名しない（新規 track からの適用）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "新旧形式が混在する間も、track ID を扱う branch 名、item-directory 配置、および branch-bound 解決は、ID の先頭文字種や日付位置に依存して動作を失わない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-track-id-date-prefix.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "4896332128e9dd19384cb5198be5e260f0c2f12d0f071dcf244f71e0b720ce11",
+      "evidence_hash": "c9c55bbae4d648401bba9868dcc83fe4acf35abf8af517299d7f5ac7299674d1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`/track:init` の id 生成を日付プレフィックス形式に変更し、ADR ファイル名と並び順規則を揃える。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "2026-07-31 に slug `example-track` で新規 track を生成すると、その ID は `2026-07-31-example-track` となり、旧来の `<slug>-<date>` 形式にならない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-track-id-date-prefix.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "cd3fa92d86d01d16acc51692e853aa835bd413002e17757195add0590f9e4179",
+      "evidence_hash": "c9c55bbae4d648401bba9868dcc83fe4acf35abf8af517299d7f5ac7299674d1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`/track:init` の id 生成を日付プレフィックス形式に変更し、ADR ファイル名と並び順規則を揃える。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "日付プレフィックスの新規 ID を生成した後、その track は対応する `track/<id>` branch、`track/items/<id>/` 配置、および branch-bound track 解決を通じて利用できる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-track-id-date-prefix.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "4f507b31f9d97f2a09af45e922704aca8f5391f1819917224cfb32c25fac6ed6",
+      "evidence_hash": "c9c55bbae4d648401bba9868dcc83fe4acf35abf8af517299d7f5ac7299674d1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存 track の id は改名しない（新規 track からの適用）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "既存のサフィックス形式 track ID と、それに対応する branch、item-directory、branch-bound 解決の識別子は変更されず、引き続き利用できる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-track-id-date-prefix.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "4677b0506d6d90a2ce3a242010dc9db06b807ffae809c1758081557000b4f4f1",
+      "evidence_hash": "c9c55bbae4d648401bba9868dcc83fe4acf35abf8af517299d7f5ac7299674d1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`/track:init` の id 生成を日付プレフィックス形式に変更し、ADR ファイル名と並び順規則を揃える。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "異なる日付に生成した二つの新規 track ID を昇順に一覧表示すると、先の日付の track とその `track/<id>` branch が後の日付のものより先に表示される。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-track-id-date-prefix.md",
+          "decision_id": "D1"
+        }
+      }
+    }
+  ]
+}
