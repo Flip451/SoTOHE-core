@@ -19,74 +19,6 @@
         }
       ]
     },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d86c496f64206f588aa70570173f8bc4099088d684ba883ce27b415f117445b1",
-          "at": "2026-07-31T14:45:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d86c496f64206f588aa70570173f8bc4099088d684ba883ce27b415f117445b1",
-          "at": "2026-07-31T14:49:12Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f59d66bc491c4a186b33f9521f050f2866cfae38d621838448514f8ecf03a6cd",
-          "at": "2026-07-31T11:29:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f59d66bc491c4a186b33f9521f050f2866cfae38d621838448514f8ecf03a6cd",
-          "at": "2026-07-31T11:32:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0c4a3e3b3d4192d829f03502ad2ff540435b099415e300b110fd5cad6629f17f",
-          "at": "2026-07-31T12:21:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0c4a3e3b3d4192d829f03502ad2ff540435b099415e300b110fd5cad6629f17f",
-          "at": "2026-07-31T12:24:17Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5a735d9e5bdc7187e44934e2cae9136dbdc41122c42d19f58e28c941e9efe889",
-          "at": "2026-07-31T13:52:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5a735d9e5bdc7187e44934e2cae9136dbdc41122c42d19f58e28c941e9efe889",
-          "at": "2026-07-31T13:56:09Z"
-        }
-      ]
-    },
     "spec": {
       "rounds": [
         {
@@ -117,53 +49,6 @@
           "findings": [],
           "hash": "rvw1:sha256:787eecae16e7a3debade1761a5cf12eba0fc5056162db14913fa4304398da30d",
           "at": "2026-07-31T12:55:20Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
-          "at": "2026-07-31T12:01:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`capabilities.orchestrator.reasoning_effort` declares `medium`, but Codex root orchestration is configured by `.codex/config.toml`, which still pins `model_reasoning_effort = \"low\"`; the generic capability dispatcher does not execute this typed-pipeline row. The routing SSoT therefore disagrees with actual orchestrator execution. Align the profile with `low` or update the provider-native Codex configuration in the same change.",
-              "severity": "P1",
-              "file": ".harness/config/agent-profiles.json",
-              "line": 18,
-              "category": "capability_routing_mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
-          "at": "2026-07-31T12:06:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b20d7607c725320a347f91c3a940f85ae9a48868208f94bf9c40c7f05621ce0d",
-          "at": "2026-07-31T12:09:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2ea84c222608422af3125d67b77181033ea895c71c09e301c96ddf7ebe882d9b",
-          "at": "2026-07-31T13:52:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2ea84c222608422af3125d67b77181033ea895c71c09e301c96ddf7ebe882d9b",
-          "at": "2026-07-31T13:55:04Z"
         }
       ]
     },
@@ -336,6 +221,149 @@
           "findings": [],
           "hash": "rvw1:sha256:ec2f43915df1a3b3b9780d874fb98ba975622c28816552f257b818063793aa87",
           "at": "2026-07-31T14:48:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:49ec3eca419fea7ad73a329f9bb2f8eca2da5a2ce210cfd2326167af88180492",
+          "at": "2026-07-31T15:34:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:49ec3eca419fea7ad73a329f9bb2f8eca2da5a2ce210cfd2326167af88180492",
+          "at": "2026-07-31T15:36:27Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5a735d9e5bdc7187e44934e2cae9136dbdc41122c42d19f58e28c941e9efe889",
+          "at": "2026-07-31T13:52:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5a735d9e5bdc7187e44934e2cae9136dbdc41122c42d19f58e28c941e9efe889",
+          "at": "2026-07-31T13:56:09Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
+          "at": "2026-07-31T12:01:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`capabilities.orchestrator.reasoning_effort` declares `medium`, but Codex root orchestration is configured by `.codex/config.toml`, which still pins `model_reasoning_effort = \"low\"`; the generic capability dispatcher does not execute this typed-pipeline row. The routing SSoT therefore disagrees with actual orchestrator execution. Align the profile with `low` or update the provider-native Codex configuration in the same change.",
+              "severity": "P1",
+              "file": ".harness/config/agent-profiles.json",
+              "line": 18,
+              "category": "capability_routing_mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
+          "at": "2026-07-31T12:06:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b20d7607c725320a347f91c3a940f85ae9a48868208f94bf9c40c7f05621ce0d",
+          "at": "2026-07-31T12:09:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2ea84c222608422af3125d67b77181033ea895c71c09e301c96ddf7ebe882d9b",
+          "at": "2026-07-31T13:52:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2ea84c222608422af3125d67b77181033ea895c71c09e301c96ddf7ebe882d9b",
+          "at": "2026-07-31T13:55:04Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f59d66bc491c4a186b33f9521f050f2866cfae38d621838448514f8ecf03a6cd",
+          "at": "2026-07-31T11:29:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f59d66bc491c4a186b33f9521f050f2866cfae38d621838448514f8ecf03a6cd",
+          "at": "2026-07-31T11:32:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c4a3e3b3d4192d829f03502ad2ff540435b099415e300b110fd5cad6629f17f",
+          "at": "2026-07-31T12:21:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c4a3e3b3d4192d829f03502ad2ff540435b099415e300b110fd5cad6629f17f",
+          "at": "2026-07-31T12:24:17Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d86c496f64206f588aa70570173f8bc4099088d684ba883ce27b415f117445b1",
+          "at": "2026-07-31T14:45:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d86c496f64206f588aa70570173f8bc4099088d684ba883ce27b415f117445b1",
+          "at": "2026-07-31T14:49:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b25651b78f89f5fa62a38b33c9d15e996e138ccc0438d59d18e00715a861a9e2",
+          "at": "2026-07-31T15:34:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b25651b78f89f5fa62a38b33c9d15e996e138ccc0438d59d18e00715a861a9e2",
+          "at": "2026-07-31T15:36:56Z"
         }
       ]
     }

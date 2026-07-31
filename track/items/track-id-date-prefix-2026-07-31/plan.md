@@ -5,7 +5,7 @@
 
 GO-01 → T001–T003; D1。
 
-## Tasks (2/3 resolved)
+## Tasks (3/3 resolved)
 
 ### S1 — Init Workflow
 
@@ -13,8 +13,8 @@ GO-01 → T001–T003; D1。
 
 ### S2 — Date-prefixed fixtures
 
-- [x] **T002**: `apps/cli-composition/src/track/mod.rs` test module、`apps/cli-composition/src/track/branch_strategy.rs`、`apps/cli-composition/src/track/resolution.rs` に `TrackCompositionRoot::{track_init, track_branch_create, track_resolve_id}` の date-prefixed fixture 回帰試験を追加する。D1; IN-02、IN-03; CN-02; AC-02、AC-04。
+- [x] **T002**: `apps/cli-composition/src/track/mod.rs` test module、`apps/cli-composition/src/track/branch_strategy.rs`、`apps/cli-composition/src/track/resolution.rs` に `TrackCompositionRoot::{track_init, track_branch_create, track_resolve_id}` の date-prefixed fixture 回帰試験を追加する。D1; IN-02、IN-03; CN-02; AC-02、AC-04。 (`8408e6d61db144567f75618b7d6dec3603e9903f`)
 
 ### S3 — Suffix-form fixtures
 
-- [ ] **T003**: `apps/cli-composition/src/track/mod.rs` test module、`apps/cli-composition/src/track/branch_strategy.rs`、`apps/cli-composition/src/track/resolution.rs` に `TrackCompositionRoot::{track_init, track_branch_create, track_resolve_id}` の suffix-form fixture 回帰試験を追加する。D1; OUT-01; CN-01、CN-02; AC-03。
+- [x] **T003**: `apps/cli-composition/src/track/mod.rs` test module、`apps/cli-composition/src/track/branch_strategy.rs`、`apps/cli-composition/src/track/resolution.rs` に `TrackCompositionRoot::{track_init, track_branch_create, track_resolve_id}` の suffix-form fixture 回帰試験を追加する。D1; OUT-01; CN-01、CN-02; AC-03。

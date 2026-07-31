@@ -248,4 +248,30 @@ mod tests {
             "ascending branch listing must put the earlier date first"
         );
     }
+
+    #[test]
+    fn test_track_branch_create_suffix_form_id_preserves_branch_name() {
+        let root = tempfile::tempdir().unwrap();
+        crate::test_support::seed_repo(root.path(), "main");
+        write_branch_strategy_config(root.path());
+        let items_dir = root.path().join("track").join("items");
+        let track_id = "legacy-suffix-track-2026-07-31";
+
+        let outcome = crate::TrackCompositionRoot::new()
+            .track_branch_create(items_dir, track_id.to_owned())
+            .unwrap();
+
+        assert_eq!(outcome.exit_code, 0);
+        let branch = Command::new("git")
+            .args(["branch", "--show-current"])
+            .current_dir(root.path())
+            .output()
+            .unwrap();
+        assert!(branch.status.success());
+        assert_eq!(
+            String::from_utf8(branch.stdout).unwrap().trim(),
+            format!("track/{track_id}"),
+            "a suffix-form ID must remain unchanged in its track branch"
+        );
+    }
 }

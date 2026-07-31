@@ -103,4 +103,17 @@ mod tests {
 
         assert_eq!(resolved, track_id);
     }
+
+    #[test]
+    fn test_track_resolve_id_suffix_form_branch_returns_opaque_id() {
+        let root = tempfile::tempdir().unwrap();
+        let track_id = "legacy-suffix-track-2026-07-31";
+        crate::test_support::seed_repo(root.path(), &format!("track/{track_id}"));
+
+        let resolved = crate::TrackCompositionRoot::new()
+            .track_resolve_id(None, root.path().join("track").join("items"))
+            .unwrap();
+
+        assert_eq!(resolved, track_id);
+    }
 }

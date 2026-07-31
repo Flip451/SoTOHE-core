@@ -11,6 +11,7 @@
       "id": "T002",
       "description": "`apps/cli-composition/src/track/mod.rs` test module、`apps/cli-composition/src/track/branch_strategy.rs`、`apps/cli-composition/src/track/resolution.rs` に `TrackCompositionRoot::{track_init, track_branch_create, track_resolve_id}` の date-prefixed fixture 回帰試験を追加する。D1; IN-02、IN-03; CN-02; AC-02、AC-04。",
       "status": "done",
+      "commit_hash": "8408e6d61db144567f75618b7d6dec3603e9903f",
       "depends_on": [
         "T001"
       ]
@@ -18,7 +19,7 @@
     {
       "id": "T003",
       "description": "`apps/cli-composition/src/track/mod.rs` test module、`apps/cli-composition/src/track/branch_strategy.rs`、`apps/cli-composition/src/track/resolution.rs` に `TrackCompositionRoot::{track_init, track_branch_create, track_resolve_id}` の suffix-form fixture 回帰試験を追加する。D1; OUT-01; CN-01、CN-02; AC-03。",
-      "status": "todo",
+      "status": "done",
       "depends_on": [
         "T002"
       ]
