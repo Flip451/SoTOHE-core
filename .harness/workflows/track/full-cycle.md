@@ -27,10 +27,11 @@ Sub-workflows used:
 - **Current branch** — must match `track/<id>`. If not, stop and suggest switching.
 - **`impl-plan.json`** — task list with status and declared dependencies.
 - **`batch-plan.json`** — the declared ordered `batches[]` (read-only here; impl-planner is its
-  sole writer). For a track planned after this artifact's introduction, absence on the active
-  track is an error (fail-closed). The track that introduced the mechanism predates its own
-  Phase 3 output and completes under orchestrator-driven batching — that is the only
-  declaration-less lane, per the non-retroactivity constraint.
+  sole writer). Absence on the active track is an error (fail-closed) — admission refuses every
+  transition into work without it, so there is no declaration-less execution lane. A track
+  planned before this artifact existed re-enters by declaring its REMAINING work only (the
+  unsettled-task declaration domain): the impl-planner issues a batch-plan covering the open
+  tasks, and settled history stays undeclared per the non-retroactivity constraint.
 - **`spec.md`, `plan.md`, `metadata.json`** — task context for the implement sub-workflow.
 
 ## Sequence
@@ -43,16 +44,16 @@ into a concrete execution plan. Treat them as a state machine to execute, not ba
 **Step 0a: Load the declared batches**
 
 Read `track/items/<id>/batch-plan.json` and take `batches[]` as the execution sequence,
-in declaration order. This workflow composes no batches and re-checks no ceilings: the
-declared composition already passed the Phase 3 structural check (`bin/sotp batch-plan
-check`), and execution never re-judges admission.
+in declaration order. This workflow composes no batches and re-runs no Phase 3
+structural check: the declared composition already passed `bin/sotp batch-plan check`.
+Per-transition admission — the machine judgment on every entry into work — still fires
+at Step 1 and may reject a member at runtime; the workflow's only response is the unit
+split described there. It never re-composes or merges batches.
 
-When `batch-plan.json` is absent: for a track planned after the artifact's introduction this
-is an error — stop and route to Phase 3 (impl-planner) instead of composing batches here. For
-the introducing track only (its Phase 3 predates its own output), fall back to
-orchestrator-driven batching: the orchestrator selects the remaining `todo` / `in_progress`
-tasks into batches at its own judgment, honouring `depends_on` order; every other step of this
-workflow applies unchanged.
+When `batch-plan.json` is absent: this is an error on every active track — stop and
+route to Phase 3 (impl-planner) instead of composing batches here. A track planned
+before the artifact existed re-enters the same way, declaring its remaining unsettled
+work only (settled history stays undeclared per the non-retroactivity constraint).
 
 Select the current batch: the first batch in declaration order that still has a member task
 not yet `done`-with-`commit_hash` (skip `skipped` members). Within it, carry a `done` member

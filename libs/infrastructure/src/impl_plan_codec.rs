@@ -2,20 +2,25 @@
 //!
 //! Schema version 1: introduced by ADR 2026-04-19-1242 §D1.4.
 //! Schema version 2 adds each task's declared dependencies; both versions are
-//! read and version 2 is written, so an existing schema-1 plan keeps decoding
-//! and simply declares no dependencies (IN-19, AC-05, AC-21).
+//! read and the current version is written, so an existing schema-1 plan keeps
+//! decoding and simply declares no dependencies (IN-19, AC-05, AC-21).
+//!
+//! The current version has one definition, [`domain::IMPL_PLAN_SCHEMA_VERSION`],
+//! which this codec writes and every decoded document reports. Schema 1 is a
+//! read-only wire format and does not survive decoding as a document version.
 //! All DTOs are defined locally with `deny_unknown_fields` to enforce
 //! the strict schema boundary at every nesting level.
 
 use domain::{
-    CommitHash, DomainError, ImplPlanDocument, NonEmptyString, PlanSection, PlanView, TaskId,
-    TaskStatus, TrackTask, ValidationError,
+    CommitHash, DomainError, IMPL_PLAN_SCHEMA_VERSION, ImplPlanDocument, NonEmptyString,
+    PlanSection, PlanView, TaskId, TaskStatus, TrackTask, ValidationError,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
 
-/// The schema version [`encode`] emits.
-const WRITTEN_SCHEMA_VERSION: u32 = 2;
+/// The oldest wire schema [`decode`] still reads. It is a read-only legacy
+/// format: no document is ever written at this version.
+const OLDEST_READABLE_SCHEMA_VERSION: u32 = 1;
 
 // ---------------------------------------------------------------------------
 // Error type
@@ -27,7 +32,9 @@ pub enum ImplPlanCodecError {
     #[error("JSON error: {0}")]
     Json(#[from] serde_json::Error),
 
-    #[error("unsupported schema_version: expected 1 or 2, got {0}")]
+    #[error(
+        "unsupported schema_version: expected {OLDEST_READABLE_SCHEMA_VERSION} or {IMPL_PLAN_SCHEMA_VERSION}, got {0}"
+    )]
     UnsupportedSchemaVersion(u32),
 
     #[error("validation error: {0}")]
@@ -198,12 +205,12 @@ pub struct ImplPlanSectionDto {
 pub fn decode(json: &str) -> Result<ImplPlanDocument, ImplPlanCodecError> {
     let envelope: SchemaVersionEnvelope = serde_json::from_str(json)?;
     let (tasks, plan) = match envelope.schema_version {
-        1 => {
+        OLDEST_READABLE_SCHEMA_VERSION => {
             let dto: ImplPlanDocumentV1Dto = serde_json::from_str(json)?;
             let tasks = tasks_from_dtos(dto.tasks.into_iter().map(Into::into).collect())?;
             (tasks, plan_from_dto(dto.plan)?)
         }
-        2 => {
+        IMPL_PLAN_SCHEMA_VERSION => {
             let dto: ImplPlanDocumentDto = serde_json::from_str(json)?;
             (tasks_from_dtos(dto.tasks)?, plan_from_dto(dto.plan)?)
         }
@@ -301,8 +308,9 @@ pub fn encode(doc: &ImplPlanDocument) -> Result<String, ImplPlanCodecError> {
 fn impl_plan_to_dto(doc: &ImplPlanDocument) -> ImplPlanDocumentDto {
     ImplPlanDocumentDto {
         // The writer always emits the current wire schema, whatever version the
-        // document was read from (IN-19, AC-21).
-        schema_version: WRITTEN_SCHEMA_VERSION,
+        // document was read from (IN-19, AC-21) — and that is the same version
+        // the document itself reports, because there is one definition of it.
+        schema_version: doc.schema_version(),
         tasks: doc.tasks().iter().map(task_to_dto).collect(),
         plan: plan_to_dto(doc.plan()),
     }
@@ -385,7 +393,7 @@ mod tests {
     #[test]
     fn test_decode_minimal_json_succeeds() {
         let doc = decode(MINIMAL_JSON).unwrap();
-        assert_eq!(doc.schema_version(), 1);
+        assert_eq!(doc.schema_version(), IMPL_PLAN_SCHEMA_VERSION);
         assert!(doc.tasks().is_empty());
         assert!(doc.plan().sections().is_empty());
     }
@@ -631,6 +639,58 @@ mod tests {
         let json = encode(&doc).unwrap();
         let parsed: serde_json::Value = serde_json::from_str(&json).unwrap();
         assert_eq!(parsed["schema_version"], 2);
+    }
+
+    #[test]
+    fn test_a_document_reports_the_version_encoding_it_writes_whichever_version_it_was_read_from() {
+        // The failure this pins: a document reporting one version through its
+        // public API while producing another on the wire, which would let a
+        // consumer reading the reported version select the wrong contract.
+        for source in [MINIMAL_JSON, FULL_JSON] {
+            let doc = decode(source).unwrap();
+            let encoded = encode(&doc).unwrap();
+            let written: serde_json::Value = serde_json::from_str(&encoded).unwrap();
+
+            assert_eq!(
+                written["schema_version"].as_u64().unwrap(),
+                u64::from(doc.schema_version()),
+                "reported version must be the version written: {encoded}"
+            );
+            assert_eq!(doc.schema_version(), IMPL_PLAN_SCHEMA_VERSION);
+            // And re-reading what was written reports the same version again,
+            // so the property survives a round trip rather than only the write.
+            assert_eq!(decode(&encoded).unwrap().schema_version(), doc.schema_version());
+        }
+    }
+
+    #[test]
+    fn test_a_schema_two_document_reports_schema_two() {
+        let json = r#"{
+          "schema_version": 2,
+          "tasks": [
+            {"id": "T001", "description": "First", "status": "todo"},
+            {"id": "T002", "description": "Second", "status": "todo", "depends_on": ["T001"]}
+          ],
+          "plan": {"summary": [], "sections": [
+            {"id": "S1", "title": "Impl", "description": [], "task_ids": ["T001", "T002"]}
+          ]}
+        }"#;
+
+        let doc = decode(json).unwrap();
+
+        assert_eq!(doc.schema_version(), 2);
+    }
+
+    #[test]
+    fn test_a_schema_one_document_reads_as_a_current_version_document() {
+        // The decided read compatibility: schema 1 is a wire format the codec
+        // still accepts, not a document version that survives decoding. Nothing
+        // branches on the reported value, so a decoded legacy plan is an
+        // ordinary current-version document declaring no dependencies.
+        let doc = decode(FULL_JSON).unwrap();
+
+        assert_eq!(doc.schema_version(), 2, "a schema-1 read does not preserve the wire version");
+        assert!(doc.tasks().iter().all(|task| task.depends_on().is_empty()));
     }
 
     // --- declared task dependencies (schema 2) ---

@@ -5015,7 +5015,7 @@
         {
           "layer": "domain",
           "module_path": "domain::impl_plan::tests",
-          "test_name": "test_schema_version_is_1"
+          "test_name": "test_a_fresh_document_reports_the_current_schema_version"
         },
         {
           "layer": "domain",

@@ -13376,13 +13376,13 @@
         "item_identifier": "method:new"
       },
       "key": {
-        "bound_tests_set_hash": "dd0553a6350fb8a8c96df7a05f7927e867da8cb54dc43ae338da4ffe1dbbc00c",
+        "bound_tests_set_hash": "a6f21090c94d7fc11da8e06071f62491409df9e09995553af0b068ec31a922af",
         "declaration_hash": "8723f7348e639547f697b0259203927d141a49907a26d54cd55bea04b818092d",
         "anchor_text_hash": "cd8cbbbe4d4110b8e002d053a1d4e701fa2b8334f907fbf9dc5711abd8c1b15d"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );\n\n        // With B1's only member committed, B2 becomes the batch being consumed\n        // and the same task starts.\n        let settled = store_with(plan_of(&[\n            (\"T001\", TaskStatus::DoneTraced { commit_hash: commit_hash() }),\n            (\"T002\", TaskStatus::Todo),\n        ]));\n        let outcome = admitting_interactor(settled, batch_plan, Vec::new(), Some(500))\n            .transition_task(start_work_on(\"T002\"))\n            .unwrap();\n\n        assert_eq!(transitioned(outcome).derived_status, \"in_progress\");"
+        "citation": "`Some(&AdmissionRejectionOutput::NotCurrentBatchMember { task_id: \"T002\".to_owned(), task_batch: \"B2\".to_owned(), current_batch: \"B1\".to_owned(), })` and `assert_eq!(transitioned(outcome).derived_status, \"in_progress\");`; `assert!(matches!(error, TaskOperationError::TransitionFailed(_)))` for reopening undeclared `T001`; `assert_eq!(transitioned(outcome).derived_status, \"in_progress\");` for reopening a declared current-batch member; and `Some(&AdmissionRejectionOutput::NotCurrentBatchMember { task_id: \"T001\".to_owned(), task_batch: \"B1\".to_owned(), current_batch: \"B2\".to_owned(), })` for reopening a closed-batch member."
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -13512,13 +13512,13 @@
         "item_identifier": "method:new"
       },
       "key": {
-        "bound_tests_set_hash": "dd0553a6350fb8a8c96df7a05f7927e867da8cb54dc43ae338da4ffe1dbbc00c",
+        "bound_tests_set_hash": "a6f21090c94d7fc11da8e06071f62491409df9e09995553af0b068ec31a922af",
         "declaration_hash": "8723f7348e639547f697b0259203927d141a49907a26d54cd55bea04b818092d",
         "anchor_text_hash": "95f3aa6927f09837b3f404c8ffe20837feae78d7b9c33b8e60168b0adc31f8e1"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(\n        decision,\n        AdmissionDecision::Admitted\n    );"
+        "citation": "// 100 measured + T001's declared 150 = 250 prior, plus T002's 300 = 550.\nlet decision = evaluate_admission(\n    &admission_plan(),\n    &admission_config(),\n    &task(\"T002\"),\n    &committed(&[]),\n    &in_progress(&[\"T001\"]),\n    &measured(&[(\"domain\", 100)]),\n)\n.unwrap();\n\nlet Some(AdmissionRejection::ScopeCeilingWouldBeExceeded { prior_contribution, .. }) =\n    decision.rejection()\nelse {\n    panic!(\"the accumulated contribution must refuse the transition: {decision:?}\");\n};\nassert_eq!(prior_contribution.get(), LineCount::new(250));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -13648,7 +13648,7 @@
         "item_identifier": "method:new"
       },
       "key": {
-        "bound_tests_set_hash": "dd0553a6350fb8a8c96df7a05f7927e867da8cb54dc43ae338da4ffe1dbbc00c",
+        "bound_tests_set_hash": "a6f21090c94d7fc11da8e06071f62491409df9e09995553af0b068ec31a922af",
         "declaration_hash": "8723f7348e639547f697b0259203927d141a49907a26d54cd55bea04b818092d",
         "anchor_text_hash": "7669b3f2178d882d0e0caa12e2ca90dacb12def84e7b001e4c49181fa2beb7e5"
       },
@@ -13784,13 +13784,13 @@
         "item_identifier": "method:new"
       },
       "key": {
-        "bound_tests_set_hash": "dd0553a6350fb8a8c96df7a05f7927e867da8cb54dc43ae338da4ffe1dbbc00c",
+        "bound_tests_set_hash": "a6f21090c94d7fc11da8e06071f62491409df9e09995553af0b068ec31a922af",
         "declaration_hash": "8723f7348e639547f697b0259203927d141a49907a26d54cd55bea04b818092d",
         "anchor_text_hash": "6f9b59674e60454bb5ed38b8e579da944bce665d03d33f9d23fb4dce20f54c40"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(\n            doc.settled_task_ids(),\n            [TaskId::try_new(\"T001\").unwrap(), TaskId::try_new(\"T002\").unwrap()]\n                .into_iter()\n                .collect::<std::collections::BTreeSet<TaskId>>()\n        );"
+        "citation": "assert_eq!(\n            doc.settled_task_ids(),\n            [TaskId::try_new(\"T001\").unwrap(), TaskId::try_new(\"T002\").unwrap()]\n                .into_iter()\n                .collect::<std::collections::BTreeSet<TaskId>>()\n        );\n\n// T001 is marked done with no commit recorded: its work is not on the\n// branch yet, so B1 is still the batch being consumed."
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -13920,20 +13920,20 @@
         "item_identifier": "method:schema_version"
       },
       "key": {
-        "bound_tests_set_hash": "fee93b5f583403dece084a88349a2cf67a272b10798f5fe98aff68abceec2f0a",
+        "bound_tests_set_hash": "e9e26e165584557fc547e61e5c172a290da9a1ec44f30b4c3fba64c2fc562887",
         "declaration_hash": "8723f7348e639547f697b0259203927d141a49907a26d54cd55bea04b818092d",
         "anchor_text_hash": "cd8cbbbe4d4110b8e002d053a1d4e701fa2b8334f907fbf9dc5711abd8c1b15d"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );\n\n        // With B1's only member committed, B2 becomes the batch being consumed\n        // and the same task starts.\n        let settled = store_with(plan_of(&[\n            (\"T001\", TaskStatus::DoneTraced { commit_hash: commit_hash() }),\n            (\"T002\", TaskStatus::Todo),\n        ]));\n        let outcome = admitting_interactor(settled, batch_plan, Vec::new(), Some(500))\n            .transition_task(start_work_on(\"T002\"))\n            .unwrap();\n\n        assert_eq!(transitioned(outcome).derived_status, \"in_progress\");"
+        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );\n\n        assert_eq!(transitioned(outcome).derived_status, \"in_progress\");\n\nassert!(matches!(error, TaskOperationError::TransitionFailed(_)), \"unexpected: {error}\");\n\nassert_eq!(transitioned(outcome).derived_status, \"in_progress\");\nassert_eq!(stored_status(&store, \"T001\"), TaskStatus::InProgress);\n\nassert!(matches!(stored_status(&store, \"T001\"), TaskStatus::DoneTraced { .. }));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
         {
           "layer": "domain",
           "module_path": "domain::impl_plan::tests",
-          "test_name": "test_schema_version_is_1"
+          "test_name": "test_a_fresh_document_reports_the_current_schema_version"
         },
         {
           "layer": "domain",
@@ -14026,20 +14026,20 @@
         "item_identifier": "method:schema_version"
       },
       "key": {
-        "bound_tests_set_hash": "fee93b5f583403dece084a88349a2cf67a272b10798f5fe98aff68abceec2f0a",
+        "bound_tests_set_hash": "e9e26e165584557fc547e61e5c172a290da9a1ec44f30b4c3fba64c2fc562887",
         "declaration_hash": "8723f7348e639547f697b0259203927d141a49907a26d54cd55bea04b818092d",
         "anchor_text_hash": "95f3aa6927f09837b3f404c8ffe20837feae78d7b9c33b8e60168b0adc31f8e1"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(\n            doc.in_progress_task_ids(),\n            [TaskId::try_new(\"T001\").unwrap(), TaskId::try_new(\"T004\").unwrap()]\n                .into_iter()\n                .collect::<std::collections::BTreeSet<TaskId>>()\n        );"
+        "citation": "assert_eq!(\n            entering,\n            vec![\n                &TaskStatus::Todo,\n                &TaskStatus::DonePending,\n                &TaskStatus::DoneTraced { commit_hash: commit_hash() }\n            ]\n        );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
         {
           "layer": "domain",
           "module_path": "domain::impl_plan::tests",
-          "test_name": "test_schema_version_is_1"
+          "test_name": "test_a_fresh_document_reports_the_current_schema_version"
         },
         {
           "layer": "domain",
@@ -14132,20 +14132,20 @@
         "item_identifier": "method:schema_version"
       },
       "key": {
-        "bound_tests_set_hash": "fee93b5f583403dece084a88349a2cf67a272b10798f5fe98aff68abceec2f0a",
+        "bound_tests_set_hash": "e9e26e165584557fc547e61e5c172a290da9a1ec44f30b4c3fba64c2fc562887",
         "declaration_hash": "8723f7348e639547f697b0259203927d141a49907a26d54cd55bea04b818092d",
         "anchor_text_hash": "7669b3f2178d882d0e0caa12e2ca90dacb12def84e7b001e4c49181fa2beb7e5"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(\n            outcome.rejection(),\n            Some(&AdmissionRejectionOutput::NotCurrentBatchMember {\n                task_id: \"T002\".to_owned(),\n                task_batch: \"B2\".to_owned(),\n                current_batch: \"B1\".to_owned(),\n            })\n        );\n\n        // With B1's only member committed, B2 becomes the batch being consumed\n        // and the same task starts.\n        let settled = store_with(plan_of(&[\n            (\"T001\", TaskStatus::DoneTraced { commit_hash: commit_hash() }),\n            (\"T002\", TaskStatus::Todo),\n        ]));\n        let outcome = admitting_interactor(settled, batch_plan, Vec::new(), Some(500))\n            .transition_task(start_work_on(\"T002\"))\n            .unwrap();\n\n        assert_eq!(transitioned(outcome).derived_status, \"in_progress\");"
+        "citation": "assert_eq!(\n            doc.settled_task_ids(),\n            [TaskId::try_new(\"T001\").unwrap(), TaskId::try_new(\"T002\").unwrap()]\n                .into_iter()\n                .collect::<std::collections::BTreeSet<TaskId>>()\n        );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
         {
           "layer": "domain",
           "module_path": "domain::impl_plan::tests",
-          "test_name": "test_schema_version_is_1"
+          "test_name": "test_a_fresh_document_reports_the_current_schema_version"
         },
         {
           "layer": "domain",
@@ -14238,7 +14238,7 @@
         "item_identifier": "method:schema_version"
       },
       "key": {
-        "bound_tests_set_hash": "fee93b5f583403dece084a88349a2cf67a272b10798f5fe98aff68abceec2f0a",
+        "bound_tests_set_hash": "e9e26e165584557fc547e61e5c172a290da9a1ec44f30b4c3fba64c2fc562887",
         "declaration_hash": "8723f7348e639547f697b0259203927d141a49907a26d54cd55bea04b818092d",
         "anchor_text_hash": "6f9b59674e60454bb5ed38b8e579da944bce665d03d33f9d23fb4dce20f54c40"
       },
@@ -14251,7 +14251,7 @@
         {
           "layer": "domain",
           "module_path": "domain::impl_plan::tests",
-          "test_name": "test_schema_version_is_1"
+          "test_name": "test_a_fresh_document_reports_the_current_schema_version"
         },
         {
           "layer": "domain",

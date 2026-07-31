@@ -11,8 +11,16 @@ use crate::{
     TaskTransition, TrackTask, TransitionError, ValidationError,
 };
 
-/// The current schema version for `impl-plan.json`.
-pub const IMPL_PLAN_SCHEMA_VERSION: u32 = 1;
+/// The current schema version for `impl-plan.json`, and the single definition of
+/// it: the codec writes this version and every in-memory document reports it.
+///
+/// Version 2 adds each task's declared dependencies (ADR 2026-07-29-0358 §D1).
+/// Version 1 stays readable at the codec boundary and needs no retroactive
+/// migration, but it is a wire format only — a decoded schema-1 plan becomes an
+/// ordinary current-version document that declares no dependencies, so there is
+/// no version for a consumer to branch on and no way for the value a document
+/// reports to disagree with the value encoding it produces.
+pub const IMPL_PLAN_SCHEMA_VERSION: u32 = 2;
 
 /// Aggregate root for `track/items/<id>/impl-plan.json`.
 ///
@@ -415,7 +423,7 @@ mod tests {
         let tasks = vec![task("T001", "First"), task("T002", "Second")];
         let p = plan(&["T001", "T002"]);
         let doc = ImplPlanDocument::new(tasks, p).unwrap();
-        assert_eq!(doc.schema_version(), 1);
+        assert_eq!(doc.schema_version(), 2);
         assert_eq!(doc.tasks().len(), 2);
         assert_eq!(doc.plan().sections().len(), 1);
     }
@@ -536,9 +544,14 @@ mod tests {
     // --- accessors ---
 
     #[test]
-    fn test_schema_version_is_1() {
+    fn test_a_fresh_document_reports_the_current_schema_version() {
         let doc = ImplPlanDocument::new(vec![task("T001", "task")], plan(&["T001"])).unwrap();
-        assert_eq!(doc.schema_version(), 1);
+
+        // Pinned twice on purpose: against the constant, so the two can never
+        // drift apart, and against the literal, so moving the constant is a
+        // deliberate edit here rather than a silent one.
+        assert_eq!(doc.schema_version(), crate::IMPL_PLAN_SCHEMA_VERSION);
+        assert_eq!(doc.schema_version(), 2, "schema 2 is the current impl-plan.json version");
     }
 
     #[test]
