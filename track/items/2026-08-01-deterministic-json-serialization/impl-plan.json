@@ -148,27 +148,32 @@
     {
       "id": "T25",
       "description": "Update `libs/infrastructure/src/dry_check/coverage.rs::FsDryCheckCoverageAdapter::write_coverage`; add writer-local serialization regression. [IN-01; IN-02; CN-01; AC-01]",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "7dcc3069bf7197c389291479d2fd9950a5877a61"
     },
     {
       "id": "T26",
       "description": "Update `libs/infrastructure/src/provider_session.rs::FsProviderSessionCacheAdapter::save`; add writer-local serialization regression. [IN-01; IN-02; CN-01; AC-01]",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "7dcc3069bf7197c389291479d2fd9950a5877a61"
     },
     {
       "id": "T27",
       "description": "Update `libs/infrastructure/src/telemetry/writer.rs::build_line`; add writer-local serialization regression. [IN-01; IN-02; CN-01; AC-01]",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "7dcc3069bf7197c389291479d2fd9950a5877a61"
     },
     {
       "id": "T28",
       "description": "Update `libs/infrastructure/src/telemetry/archived_track.rs::FsArchivedTrackTelemetryAdapter::emit`; add writer-local serialization regression. [IN-01; IN-02; CN-01; AC-01]",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "7dcc3069bf7197c389291479d2fd9950a5877a61"
     },
     {
       "id": "T29",
       "description": "Update `libs/infrastructure/src/pr/poll.rs::save_trigger_state`; add writer-local serialization regression. [IN-01; IN-02; CN-01; AC-01]",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "7dcc3069bf7197c389291479d2fd9950a5877a61"
     }
   ],
   "plan": {

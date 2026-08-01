@@ -44,7 +44,7 @@ GO-01: T1-T29.
 - [x] **T15**: Update `libs/infrastructure/src/dry_check/store.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01] (`940c6788dae096b8d43b7ffa6629a4ee2b3b273d`)
 - [x] **T16**: Update `libs/infrastructure/src/dry_check/dry_write_driver/manifest.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01] (`940c6788dae096b8d43b7ffa6629a4ee2b3b273d`)
 - [x] **T24**: Update `libs/infrastructure/src/dry_check/dry_write_driver.rs::FsDryCorpusRootManifestAdapter::write`; add writer-local serialization regression. [IN-01; IN-02; CN-01; AC-01] (`768d65c819d7a5966a8f8bccd38a91221da94146`)
-- [x] **T25**: Update `libs/infrastructure/src/dry_check/coverage.rs::FsDryCheckCoverageAdapter::write_coverage`; add writer-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
+- [x] **T25**: Update `libs/infrastructure/src/dry_check/coverage.rs::FsDryCheckCoverageAdapter::write_coverage`; add writer-local serialization regression. [IN-01; IN-02; CN-01; AC-01] (`7dcc3069bf7197c389291479d2fd9950a5877a61`)
 
 ### test-obligation-codecs — Test-obligation codecs
 
@@ -59,10 +59,10 @@ GO-01: T1-T29.
 
 > Update provider-session, telemetry, archived-track telemetry, and PR trigger-state writers; add local regressions. [IN-01; IN-02; CN-01; AC-01]
 
-- [x] **T26**: Update `libs/infrastructure/src/provider_session.rs::FsProviderSessionCacheAdapter::save`; add writer-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
-- [x] **T27**: Update `libs/infrastructure/src/telemetry/writer.rs::build_line`; add writer-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
-- [x] **T28**: Update `libs/infrastructure/src/telemetry/archived_track.rs::FsArchivedTrackTelemetryAdapter::emit`; add writer-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
-- [x] **T29**: Update `libs/infrastructure/src/pr/poll.rs::save_trigger_state`; add writer-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
+- [x] **T26**: Update `libs/infrastructure/src/provider_session.rs::FsProviderSessionCacheAdapter::save`; add writer-local serialization regression. [IN-01; IN-02; CN-01; AC-01] (`7dcc3069bf7197c389291479d2fd9950a5877a61`)
+- [x] **T27**: Update `libs/infrastructure/src/telemetry/writer.rs::build_line`; add writer-local serialization regression. [IN-01; IN-02; CN-01; AC-01] (`7dcc3069bf7197c389291479d2fd9950a5877a61`)
+- [x] **T28**: Update `libs/infrastructure/src/telemetry/archived_track.rs::FsArchivedTrackTelemetryAdapter::emit`; add writer-local serialization regression. [IN-01; IN-02; CN-01; AC-01] (`7dcc3069bf7197c389291479d2fd9950a5877a61`)
+- [x] **T29**: Update `libs/infrastructure/src/pr/poll.rs::save_trigger_state`; add writer-local serialization regression. [IN-01; IN-02; CN-01; AC-01] (`7dcc3069bf7197c389291479d2fd9950a5877a61`)
 
 ### track-lifecycle-fixtures — Track lifecycle fixtures
 

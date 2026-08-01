@@ -1,6 +1,185 @@
 {
   "schema_version": 2,
   "scopes": {
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4dec35b2ce6cd412c928fba53eb0401fb60a3d8719b866e113f75b084704c4c7",
+          "at": "2026-08-01T05:14:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4dec35b2ce6cd412c928fba53eb0401fb60a3d8719b866e113f75b084704c4c7",
+          "at": "2026-08-01T05:26:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e3894c47033ce099214a53f6d91958391d87bdabc7156e98ff713e1daa08456e",
+          "at": "2026-08-01T09:40:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`domain::ObligationDeriveError::ArtifactCodec` is dead vocabulary. The derive path only calls `ObligationsArtifactPort::save`, whose `DiagnosticMessage` error maps to `ArtifactWrite`; no production caller can supply the declared `ArtifactCodecError` payload. Remove this variant or establish a real construction path.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/domain-types.json",
+              "line": 85,
+              "category": "unconstructible error variant"
+            },
+            {
+              "message": "`domain::ObligationDeriveError` restates CN-02/AC-04 behavior as a “fail-closed completed-track” guard. Per `.harness/policies/no-upstream-restatement.md`, the docs must identify the contract through anchor cites without reproducing its behavior.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/domain-types.json",
+              "line": 10,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`usecase::DeriveTestObligationsInteractor` restates CN-02/AC-04 by specifying active-only derivation and rejection before writes. Replace the behavioral sentence with a concise target/purpose plus anchor cites, as required by `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/usecase-types.json",
+              "line": 10,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:e3894c47033ce099214a53f6d91958391d87bdabc7156e98ff713e1daa08456e",
+          "at": "2026-08-01T09:45:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:89d201a8d84f452cebed1b0596e70b8aae8ecbd175fa9e72cf9b2ad1bdf86d01",
+          "at": "2026-08-01T10:01:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:89d201a8d84f452cebed1b0596e70b8aae8ecbd175fa9e72cf9b2ad1bdf86d01",
+          "at": "2026-08-01T10:02:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:087867a0af6ccf58a4e13700354ea8b510641ec900c6184e425d357e8e061667",
+          "at": "2026-08-01T11:06:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::DeriveTestObligationsInteractor` is the only declared type capable of enforcing CN-02/AC-04 through `TrackStatusReaderPort`, but its docs merely call it a derivation interactor; the domain entries only define status/error vocabulary. The fail-closed rule therefore has no named enforcement owner. Identify this interactor as the guard owner using anchor cites without restating the upstream behavior.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/usecase-types.json",
+              "line": 10,
+              "category": "enforcement-owner contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:087867a0af6ccf58a4e13700354ea8b510641ec900c6184e425d357e8e061667",
+          "at": "2026-08-01T11:09:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7ca25acc2ec8af7dec974a96b1c22748f1239ed4241745da821f3647d09ff3b2",
+          "at": "2026-08-01T11:15:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7ca25acc2ec8af7dec974a96b1c22748f1239ed4241745da821f3647d09ff3b2",
+          "at": "2026-08-01T11:16:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fc1018ae2a1c3bb5abcb48f319f6b8588ecc2f4da727b83b62e27b759ffbe93e",
+          "at": "2026-08-01T13:13:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`domain::TrackStatus::frozen_status` restates the active/frozen behavior by enumerating `Done`, `Archived`, and the `None` result for active statuses. Per `.harness/policies/no-upstream-restatement.md`, this method documentation should reference OS-02/CN-02/AC-04 without reproducing the behavioral contract.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/domain-types.json",
+              "line": 280,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`usecase::DeriveTestObligationsInteractor` restates the guard’s cross-layer behavior and pre-write rejection sequence in prose. Keep the ownership identification, but express it through concise OS-02/CN-02/AC-04 anchor cites as required by `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/usecase-types.json",
+              "line": 10,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:fc1018ae2a1c3bb5abcb48f319f6b8588ecc2f4da727b83b62e27b759ffbe93e",
+          "at": "2026-08-01T13:15:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:459c0089c6af1aadc53a75300cf8fb16860d7de11b24e5a37964ae4a662760dc",
+          "at": "2026-08-01T13:24:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:459c0089c6af1aadc53a75300cf8fb16860d7de11b24e5a37964ae4a662760dc",
+          "at": "2026-08-01T13:27:14Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:860d7738e9dd8d32339a2adfc1caa731073e65a830206a7445d59c09e41f2fba",
+          "at": "2026-08-01T04:31:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:860d7738e9dd8d32339a2adfc1caa731073e65a830206a7445d59c09e41f2fba",
+          "at": "2026-08-01T04:34:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9208ee3b0168c2a1bde20d6a2a90dcc219e23b222b06802ccb47ce8ee888bd62",
+          "at": "2026-08-01T04:44:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9208ee3b0168c2a1bde20d6a2a90dcc219e23b222b06802ccb47ce8ee888bd62",
+          "at": "2026-08-01T04:47:50Z"
+        }
+      ]
+    },
     "usecase": {
       "rounds": [
         {
@@ -73,677 +252,6 @@
           "findings": [],
           "hash": "rvw1:sha256:9e5c7b326eeb33ae931bf4974e7c6038addcebf9f81396ef1fc3712a3af8e4ba",
           "at": "2026-08-01T12:54:19Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:860d7738e9dd8d32339a2adfc1caa731073e65a830206a7445d59c09e41f2fba",
-          "at": "2026-08-01T04:31:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:860d7738e9dd8d32339a2adfc1caa731073e65a830206a7445d59c09e41f2fba",
-          "at": "2026-08-01T04:34:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9208ee3b0168c2a1bde20d6a2a90dcc219e23b222b06802ccb47ce8ee888bd62",
-          "at": "2026-08-01T04:44:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9208ee3b0168c2a1bde20d6a2a90dcc219e23b222b06802ccb47ce8ee888bd62",
-          "at": "2026-08-01T04:47:50Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:69847c32b7e59990c9c77131b2ec3e50989b71497c5587fbf85dff1f1ec6368c",
-          "at": "2026-08-01T10:35:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:69847c32b7e59990c9c77131b2ec3e50989b71497c5587fbf85dff1f1ec6368c",
-          "at": "2026-08-01T10:39:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:69847c32b7e59990c9c77131b2ec3e50989b71497c5587fbf85dff1f1ec6368c",
-          "at": "2026-08-01T11:39:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:69847c32b7e59990c9c77131b2ec3e50989b71497c5587fbf85dff1f1ec6368c",
-          "at": "2026-08-01T11:44:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:69847c32b7e59990c9c77131b2ec3e50989b71497c5587fbf85dff1f1ec6368c",
-          "at": "2026-08-01T11:58:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:69847c32b7e59990c9c77131b2ec3e50989b71497c5587fbf85dff1f1ec6368c",
-          "at": "2026-08-01T13:01:51Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new fast/final review tests invoke `run_claude_review_str` only once and assert key-order substrings; they never compare serialized bytes across repeated equivalent invocations, so they do not prove the required deterministic-output behavior for either review round.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/review_v2/run.rs",
-              "line": 733,
-              "category": "test-coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:819ab04e3c486ef48dc213d75cc3868375c53cd56732485c266048502b3db32c",
-          "at": "2026-08-01T07:32:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2d558d735fafa9275f3b85ecaa90726d7d783257c9510b582433c6832126ef18",
-          "at": "2026-08-01T07:38:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`assert_review_round_writes_canonical_json` mutates the process-wide current directory while holding only this module's `ENV_LOCK`. The new derive fixture mutates it under `crate::test_support::process_env_lock`, so both tests can run concurrently and capture or restore each other's temporary directory, causing nondeterministic failures or execution in the wrong repository. Use the shared process-wide lock or avoid changing CWD.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/review_v2/run.rs",
-              "line": 747,
-              "category": "test_independence"
-            }
-          ],
-          "hash": "rvw1:sha256:2d558d735fafa9275f3b85ecaa90726d7d783257c9510b582433c6832126ef18",
-          "at": "2026-08-01T07:45:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:876463862e530d05c558e3a51f292663d3f7c777f901518673a7664d0519109a",
-          "at": "2026-08-01T07:50:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The completed-track regression test never exercises a completed track. It checks out `track/active-track` but requests `completed-track`, so the active-branch guard rejects before any artifact is loaded or written. Thus it only proves mismatched-branch rejection and does not establish OS-02/CN-02/AC-04 or deterministic artifact bytes.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/test_obligation.rs",
-              "line": 593,
-              "category": "test coverage gap"
-            }
-          ],
-          "hash": "rvw1:sha256:fafa59b0b24f336746ea728b61266d1e8209d0fff338147f1ac9ed57410aee7e",
-          "at": "2026-08-01T08:18:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The fixture still does not establish that `completed-track` is completed: it creates only an `obligations.json` file, while the active derive call uses a different track. The completed invocation is rejected solely because its ID does not match the current `track/<ACTIVE_TRACK_ID>` branch, so the unchanged-artifact assertion would pass for any arbitrary nonexistent/non-active track and does not verify OS-02/CN-02/AC-04.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/test_obligation.rs",
-              "line": 584,
-              "category": "test coverage gap"
-            }
-          ],
-          "hash": "rvw1:sha256:70faff7edd6d75aadd4bf91eaa567f9a82b3751e55af33631bd43cc05517e957",
-          "at": "2026-08-01T08:24:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8e772659b15ca745ad372bae37e120a9380e2854b4f5792e89198f908b38145d",
-          "at": "2026-08-01T08:27:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The supposed completed-track invocation passes `track/{ACTIVE_TRACK_ID}` as `current_branch`, so `is_active_branch` rejects it before any completed-track artifact loader or writer is reached. The successful active-track call only proves that the same composition graph works for a different track, while the independent status assertion only proves the fixture metadata says `Done`; together they still allow a regression that rewrites artifacts when the completed track's own branch is checked out. Invoke the handler with `track/{COMPLETED_TRACK_ID}` and the required completed-track inputs so the completed-state protection itself is exercised, then verify the artifact after each invocation.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/test_obligation.rs",
-              "line": 634,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:8e772659b15ca745ad372bae37e120a9380e2854b4f5792e89198f908b38145d",
-          "at": "2026-08-01T08:30:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:47303806e979230507dc3d21e438f4c59a25390907918661632de9b074f8deb1",
-          "at": "2026-08-01T10:34:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:47303806e979230507dc3d21e438f4c59a25390907918661632de9b074f8deb1",
-          "at": "2026-08-01T10:38:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:47303806e979230507dc3d21e438f4c59a25390907918661632de9b074f8deb1",
-          "at": "2026-08-01T11:39:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:47303806e979230507dc3d21e438f4c59a25390907918661632de9b074f8deb1",
-          "at": "2026-08-01T11:44:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:47303806e979230507dc3d21e438f4c59a25390907918661632de9b074f8deb1",
-          "at": "2026-08-01T11:59:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The active fixture copies the live implementation track's `impl-plan.json` and relies on it remaining nonterminal. Once this track's remaining tasks are marked done, `FsTrackStatusReaderAdapter` will derive `Done`, so both derives will be rejected by the production frozen-track guard and the success assertion will fail. Make the copied fixture deterministically active—for example, rewrite one valid task to `todo`/`in_progress` with no commit hash—and assert its derived status before invoking the handler.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/test_obligation.rs",
-              "line": 559,
-              "category": "test_stability"
-            }
-          ],
-          "hash": "rvw1:sha256:47303806e979230507dc3d21e438f4c59a25390907918661632de9b074f8deb1",
-          "at": "2026-08-01T13:04:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:23870b170a937660ec9efe965a757ab4cc89e1536ef01d1d5c654c3cffe58d68",
-          "at": "2026-08-01T13:08:08Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8e933242abf043664e6fe6a004f2acaef6aa00cdd557840dc55f49eac083fcb8",
-          "at": "2026-08-01T06:49:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8e933242abf043664e6fe6a004f2acaef6aa00cdd557840dc55f49eac083fcb8",
-          "at": "2026-08-01T06:55:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:636fdc72418438b84af5c9014c2a82aa5f96bde31d683eea768062b4fa3a1f84",
-          "at": "2026-08-01T07:31:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new determinism regression uses an empty schema and checks only pretty output beginning with `crate_name`. Both assertions also pass with the pre-change direct DTO serialization because `crate_name` is already the DTO's first field, so the test does not exercise recursive canonical ordering or the compact branch. Use a populated nested DTO whose declaration order differs from lexical order and assert canonical bytes for both `pretty` values.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/schema_export_codec.rs",
-              "line": 430,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:636fdc72418438b84af5c9014c2a82aa5f96bde31d683eea768062b4fa3a1f84",
-          "at": "2026-08-01T07:45:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2fc0c47780eedb9ca7c2f82a2d27183b64dccd6958c6ab93c15b3810abd2d24a",
-          "at": "2026-08-01T07:51:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "CatalogueSpecVerifyCacheDocumentCodec の encode だけが直接 `serde_json::to_string_pretty(&dto)` を使い続けています。トップレベルおよびネストした DTO のキー順が canonical 化されず、同じ semantic verify codec の SpecAdr 出力や要求された byte-stable canonical JSON と不一致になります。`serde_json::to_value(&dto)` を経由してから pretty-print してください。",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/semantic_verify_codec.rs",
-              "line": 606,
-              "category": "serialization"
-            }
-          ],
-          "hash": "rvw1:sha256:a4030fd251dd506c57170012ebae721905164080582ee0e4315f88b5a64970fa",
-          "at": "2026-08-01T08:18:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c5517047da57640417d603552593e9aabbf7fc2fb2b4358af1960839dca99d9e",
-          "at": "2026-08-01T08:24:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "B-03 excludes T11 and T11 remains `todo`, but this diff implements `CatalogueSpecVerifyCacheDocumentCodec::encode` and its regression, moving B-04 work into the current batch without valid task/commit attribution. Defer these hunks to T11 or update the sanctioned batch/task state before including them.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/semantic_verify_codec.rs",
-              "line": 598,
-              "category": "cross_batch_consistency"
-            },
-            {
-              "message": "The new regression uses an empty catalogue and checks only top-level ordering, so it never exercises the nested entry objects that `encode` now claims to canonicalize recursively. Add a populated entry and assert its nested canonical key order.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs",
-              "line": 509,
-              "category": "test_coverage"
-            },
-            {
-              "message": "The deterministic-output regression checks only the top-level prefix even though `sample_doc()` contains nested signal objects. A top-level-only canonicalizer would pass; assert canonical ordering inside `signals[]` as well.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_spec_signals_codec.rs",
-              "line": 258,
-              "category": "test_coverage"
-            },
-            {
-              "message": "The T10 regression serializes populated nested entries but verifies only the top-level `entries` key. It does not cover canonical ordering within entry, origin, or verdict objects; add nested ordering assertions or an exact canonical fixture.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/semantic_verify_codec.rs",
-              "line": 778,
-              "category": "test_coverage"
-            },
-            {
-              "message": "`sample_doc()` has an empty `signals` vector, so this regression never exercises the newly canonicalized `TypeSignalDto` objects. Use at least one populated signal and assert its nested key order.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_signals_codec.rs",
-              "line": 177,
-              "category": "test_coverage"
-            },
-            {
-              "message": "The writer regression supplies only empty catalogue sections and therefore validates top-level ordering only. Add a nested catalogue entry and assert recursive key ordering while retaining the byte-stability and trailing-newline checks.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalog_gen/fs_access.rs",
-              "line": 503,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:c5517047da57640417d603552593e9aabbf7fc2fb2b4358af1960839dca99d9e",
-          "at": "2026-08-01T08:39:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4ab9910bf9d0e00f6c01c31b470b150117282e039fed0eeb3ab38deb7e4f1a62",
-          "at": "2026-08-01T10:34:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "B-03 still excludes T11 and T11 remains `todo`, but this diff implements `CatalogueSpecVerifyCacheDocumentCodec::encode` and its regression. These B-04 changes lack valid B-03 task attribution; defer the hunks to T11 or update the sanctioned task/batch state.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/semantic_verify_codec.rs",
-              "line": 598,
-              "category": "cross_batch_consistency"
-            },
-            {
-              "message": "The corrected T10 regression orders only the five `SemanticVerifyEntryDto` keys. It does not inspect keys inside the origin or verdict objects despite claiming those are covered, so a serializer that stops canonicalizing below the entry level would pass. Assert the actual nested `data`/`kind`, reference, and verdict ordering or use an exact pretty-JSON fixture.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/semantic_verify_codec.rs",
-              "line": 787,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:4ab9910bf9d0e00f6c01c31b470b150117282e039fed0eeb3ab38deb7e4f1a62",
-          "at": "2026-08-01T10:41:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "While reverting the out-of-batch T11 implementation, this diff also deletes the pre-existing `catalogue_spec_encode_is_deterministic` regression. B-03 is not authorized to reduce T11 coverage, and the documented deterministic-output guarantee is now untested until a later batch. Restore the original test unchanged; defer only the new T11 canonicalization work.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/semantic_verify_codec.rs",
-              "line": 840,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:4f6d86137476cc75ce1123407e2802695e4f5b9d46d82570d60b5bd2fc4eb60c",
-          "at": "2026-08-01T10:48:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:06b0548b8df130f9eb89130dfcbbe3cc4078c0bde465daaa2c8cd3e4dbcd8024",
-          "at": "2026-08-01T11:39:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:06b0548b8df130f9eb89130dfcbbe3cc4078c0bde465daaa2c8cd3e4dbcd8024",
-          "at": "2026-08-01T11:44:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:06b0548b8df130f9eb89130dfcbbe3cc4078c0bde465daaa2c8cd3e4dbcd8024",
-          "at": "2026-08-01T11:50:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:06b0548b8df130f9eb89130dfcbbe3cc4078c0bde465daaa2c8cd3e4dbcd8024",
-          "at": "2026-08-01T11:58:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "B-03 still excludes T11 and T11 remains `todo`, but the current diff again implements `CatalogueSpecVerifyCacheDocumentCodec::encode` canonicalization and extends its regression. These B-04 changes have no valid B-03 task attribution; restore the pre-B-03 production code and original test, then implement the canonicalization under T11.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/semantic_verify_codec.rs",
-              "line": 598,
-              "category": "cross_batch_consistency"
-            }
-          ],
-          "hash": "rvw1:sha256:06b0548b8df130f9eb89130dfcbbe3cc4078c0bde465daaa2c8cd3e4dbcd8024",
-          "at": "2026-08-01T12:55:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a43077e00cfb11ab4cb58916a2cf1e639d07efd59ec8fdc221d31228a69c9e27",
-          "at": "2026-08-01T12:58:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e20d4476b31cae9cf589d25821b2038a15537fac267f2e9524f40696815a8b49",
-          "at": "2026-08-01T14:04:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The regression uses `DryCheckJsonV1::empty()`, so it verifies only top-level envelope ordering. It would still pass if nested record/verdict objects stopped being canonicalized, contrary to B-04's explicit recursive-order coverage requirement. Use a non-empty record (including a nested violation verdict) and assert its key order while retaining the repeated-byte check.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/dry_check/store.rs",
-              "line": 645,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:e20d4476b31cae9cf589d25821b2038a15537fac267f2e9524f40696815a8b49",
-          "at": "2026-08-01T14:13:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:50fdebadd544d3d2d766f7c1fbded2dcaa8bab27ae9fb162a0f80dcc8886a09c",
-          "at": "2026-08-01T14:17:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Converting the entire cache DTO with `serde_json::to_value` happens before the bounded writer runs, so an oversized fulfillment cache can allocate an unbounded intermediate JSON tree and defeat the documented fixed-memory bound. Canonical ordering must be achieved without bypassing the bounded serialization boundary.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec/fulfillment_cache_io.rs",
-              "line": 58,
-              "category": "bounded-buffer"
-            },
-            {
-              "message": "Converting the entire waiver cache DTO with `serde_json::to_value` happens before the bounded writer runs, so an oversized cache can allocate an unbounded intermediate JSON tree despite the documented fixed-memory guarantee. Preserve canonical ordering without materializing the full value before the size-limited writer.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/test_obligation/waiver_cache_codec.rs",
-              "line": 241,
-              "category": "bounded-buffer"
-            }
-          ],
-          "hash": "rvw1:sha256:fe924df01cf7df89a39371505ca6647878a5c11a505c9c4c5b9b69ffbfc99a37",
-          "at": "2026-08-01T14:44:05Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8a8151e9c3b562a733a296358af0659c4814f192825b5bfd0f79568e5e3839dc",
-          "at": "2026-08-01T14:49:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new waiver-cache regression does not verify canonical ordering of the populated nested `verdict`; it only asserts ordering within `key`. A regression that stops recursively canonicalizing tagged verdict objects would therefore pass despite B-05's explicit nested-verdict coverage requirement. Assert that the waived verdict emits `citation` before `kind`.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/test_obligation/waiver_cache_codec.rs",
-              "line": 605,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:8a8151e9c3b562a733a296358af0659c4814f192825b5bfd0f79568e5e3839dc",
-          "at": "2026-08-01T14:57:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:04b85f81897270ed16b1d76fdaa4cc4dd07c9e8c5a0e50adfbdd41b18a436d6d",
-          "at": "2026-08-01T15:00:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bf176a82f69dbba389f66554ff4dcf9b411f075ee9dcb9f155850a83ddb5484a",
-          "at": "2026-08-01T15:27:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The canonical-order regression reparses the emitted bytes into `serde_json::Value` before inspecting keys. With the current default `serde_json::Map` backing, parsing itself sorts object keys, so this test would still pass if `write_coverage` reverted to direct, non-canonical struct serialization; the repeated-byte assertion would also pass because that output remains deterministic. The same ineffective pattern appears in the new tests in `pr/poll.rs`, `provider_session.rs`, `telemetry/archived_track.rs`, and `telemetry/writer.rs`, including the nested coverage assertions. Verify key order directly against the raw string/bytes (preferably an exact populated golden containing the nested objects).",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/dry_check/coverage.rs",
-              "line": 398,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:bf176a82f69dbba389f66554ff4dcf9b411f075ee9dcb9f155850a83ddb5484a",
-          "at": "2026-08-01T15:31:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:831649febb49926c7ded16637b60c9fc2d367a09182171f8b663e0c4cefd6fa6",
-          "at": "2026-08-01T15:52:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:831649febb49926c7ded16637b60c9fc2d367a09182171f8b663e0c4cefd6fa6",
-          "at": "2026-08-01T15:54:47Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e5c8488e60a7444907dcf35e21d6b9f13202c0aa3b83e182b6e18bf17429c9a7",
-          "at": "2026-08-01T10:34:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TrackFrozen` carries an unconstrained `TrackStatus`, so public callers can construct contradictory states such as `TrackFrozen { status: TrackStatus::Planned }` even though `Planned`, `InProgress`, `Blocked`, and `Cancelled` are active. Represent only `Done`/`Archived` with a frozen-status type or validated constructor so the error invariant is enforced by the type system.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/test_obligation/errors.rs",
-              "line": 116,
-              "category": "domain-invariant"
-            },
-            {
-              "message": "`TrackStatusRead` exposes `TrackStatusReadError` through the enum's derived `Debug`; that error contains an unrestricted raw string populated with filesystem paths and read/parse details, while the CLI renders `ObligationDeriveError` with `{:?}`. A status-read failure can therefore leak internal paths. Carry a stable categorical/redacted public error and keep the raw source detail behind a non-rendered boundary.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/test_obligation/errors.rs",
-              "line": 119,
-              "category": "error-information-leak"
-            }
-          ],
-          "hash": "rvw1:sha256:e5c8488e60a7444907dcf35e21d6b9f13202c0aa3b83e182b6e18bf17429c9a7",
-          "at": "2026-08-01T10:39:57Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c7602153666c541237e6f4a5b1c7f083ce7e2d348d3a5bb4cc00e557f01b0ab9",
-          "at": "2026-08-01T11:39:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c7602153666c541237e6f4a5b1c7f083ce7e2d348d3a5bb4cc00e557f01b0ab9",
-          "at": "2026-08-01T11:44:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c7602153666c541237e6f4a5b1c7f083ce7e2d348d3a5bb4cc00e557f01b0ab9",
-          "at": "2026-08-01T11:49:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c7602153666c541237e6f4a5b1c7f083ce7e2d348d3a5bb4cc00e557f01b0ab9",
-          "at": "2026-08-01T11:57:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c7602153666c541237e6f4a5b1c7f083ce7e2d348d3a5bb4cc00e557f01b0ab9",
-          "at": "2026-08-01T12:03:15Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7fd5d5204bce60bebd955683b964a72064de417e50bf922c1bf5b1c26e2a5684",
-          "at": "2026-08-01T12:40:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7fd5d5204bce60bebd955683b964a72064de417e50bf922c1bf5b1c26e2a5684",
-          "at": "2026-08-01T12:53:05Z"
-        }
-      ]
-    },
-    "cli_driver": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6b3e99198273ec22159243e4ffc25a5dd68cdc00060695239979756fc7a91baf",
-          "at": "2026-08-01T11:47:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6b3e99198273ec22159243e4ffc25a5dd68cdc00060695239979756fc7a91baf",
-          "at": "2026-08-01T11:58:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6b3e99198273ec22159243e4ffc25a5dd68cdc00060695239979756fc7a91baf",
-          "at": "2026-08-01T13:00:05Z"
         }
       ]
     },
@@ -1441,6 +949,20 @@
           "findings": [],
           "hash": "rvw1:sha256:94c641abb81eaa5f94d849db8495345fdd0ddb5af8e8ee1e69651f61718b3b79",
           "at": "2026-08-01T15:57:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a85418a3d3d0ef82acac2732e1bf202b5faf9a66fb28bdfe206749def7fe40f",
+          "at": "2026-08-01T16:04:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a85418a3d3d0ef82acac2732e1bf202b5faf9a66fb28bdfe206749def7fe40f",
+          "at": "2026-08-01T16:06:57Z"
         }
       ]
     },
@@ -1570,6 +1092,159 @@
         }
       ]
     },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69847c32b7e59990c9c77131b2ec3e50989b71497c5587fbf85dff1f1ec6368c",
+          "at": "2026-08-01T10:35:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69847c32b7e59990c9c77131b2ec3e50989b71497c5587fbf85dff1f1ec6368c",
+          "at": "2026-08-01T10:39:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69847c32b7e59990c9c77131b2ec3e50989b71497c5587fbf85dff1f1ec6368c",
+          "at": "2026-08-01T11:39:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69847c32b7e59990c9c77131b2ec3e50989b71497c5587fbf85dff1f1ec6368c",
+          "at": "2026-08-01T11:44:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69847c32b7e59990c9c77131b2ec3e50989b71497c5587fbf85dff1f1ec6368c",
+          "at": "2026-08-01T11:58:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69847c32b7e59990c9c77131b2ec3e50989b71497c5587fbf85dff1f1ec6368c",
+          "at": "2026-08-01T13:01:51Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b3e99198273ec22159243e4ffc25a5dd68cdc00060695239979756fc7a91baf",
+          "at": "2026-08-01T11:47:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b3e99198273ec22159243e4ffc25a5dd68cdc00060695239979756fc7a91baf",
+          "at": "2026-08-01T11:58:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b3e99198273ec22159243e4ffc25a5dd68cdc00060695239979756fc7a91baf",
+          "at": "2026-08-01T13:00:05Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e5c8488e60a7444907dcf35e21d6b9f13202c0aa3b83e182b6e18bf17429c9a7",
+          "at": "2026-08-01T10:34:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TrackFrozen` carries an unconstrained `TrackStatus`, so public callers can construct contradictory states such as `TrackFrozen { status: TrackStatus::Planned }` even though `Planned`, `InProgress`, `Blocked`, and `Cancelled` are active. Represent only `Done`/`Archived` with a frozen-status type or validated constructor so the error invariant is enforced by the type system.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/test_obligation/errors.rs",
+              "line": 116,
+              "category": "domain-invariant"
+            },
+            {
+              "message": "`TrackStatusRead` exposes `TrackStatusReadError` through the enum's derived `Debug`; that error contains an unrestricted raw string populated with filesystem paths and read/parse details, while the CLI renders `ObligationDeriveError` with `{:?}`. A status-read failure can therefore leak internal paths. Carry a stable categorical/redacted public error and keep the raw source detail behind a non-rendered boundary.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/test_obligation/errors.rs",
+              "line": 119,
+              "category": "error-information-leak"
+            }
+          ],
+          "hash": "rvw1:sha256:e5c8488e60a7444907dcf35e21d6b9f13202c0aa3b83e182b6e18bf17429c9a7",
+          "at": "2026-08-01T10:39:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c7602153666c541237e6f4a5b1c7f083ce7e2d348d3a5bb4cc00e557f01b0ab9",
+          "at": "2026-08-01T11:39:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c7602153666c541237e6f4a5b1c7f083ce7e2d348d3a5bb4cc00e557f01b0ab9",
+          "at": "2026-08-01T11:44:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c7602153666c541237e6f4a5b1c7f083ce7e2d348d3a5bb4cc00e557f01b0ab9",
+          "at": "2026-08-01T11:49:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c7602153666c541237e6f4a5b1c7f083ce7e2d348d3a5bb4cc00e557f01b0ab9",
+          "at": "2026-08-01T11:57:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c7602153666c541237e6f4a5b1c7f083ce7e2d348d3a5bb4cc00e557f01b0ab9",
+          "at": "2026-08-01T12:03:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7fd5d5204bce60bebd955683b964a72064de417e50bf922c1bf5b1c26e2a5684",
+          "at": "2026-08-01T12:40:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7fd5d5204bce60bebd955683b964a72064de417e50bf922c1bf5b1c26e2a5684",
+          "at": "2026-08-01T12:53:05Z"
+        }
+      ]
+    },
     "spec": {
       "rounds": [
         {
@@ -1603,150 +1278,489 @@
         }
       ]
     },
-    "types": {
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new fast/final review tests invoke `run_claude_review_str` only once and assert key-order substrings; they never compare serialized bytes across repeated equivalent invocations, so they do not prove the required deterministic-output behavior for either review round.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/review_v2/run.rs",
+              "line": 733,
+              "category": "test-coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:819ab04e3c486ef48dc213d75cc3868375c53cd56732485c266048502b3db32c",
+          "at": "2026-08-01T07:32:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2d558d735fafa9275f3b85ecaa90726d7d783257c9510b582433c6832126ef18",
+          "at": "2026-08-01T07:38:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`assert_review_round_writes_canonical_json` mutates the process-wide current directory while holding only this module's `ENV_LOCK`. The new derive fixture mutates it under `crate::test_support::process_env_lock`, so both tests can run concurrently and capture or restore each other's temporary directory, causing nondeterministic failures or execution in the wrong repository. Use the shared process-wide lock or avoid changing CWD.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/review_v2/run.rs",
+              "line": 747,
+              "category": "test_independence"
+            }
+          ],
+          "hash": "rvw1:sha256:2d558d735fafa9275f3b85ecaa90726d7d783257c9510b582433c6832126ef18",
+          "at": "2026-08-01T07:45:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:876463862e530d05c558e3a51f292663d3f7c777f901518673a7664d0519109a",
+          "at": "2026-08-01T07:50:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The completed-track regression test never exercises a completed track. It checks out `track/active-track` but requests `completed-track`, so the active-branch guard rejects before any artifact is loaded or written. Thus it only proves mismatched-branch rejection and does not establish OS-02/CN-02/AC-04 or deterministic artifact bytes.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/test_obligation.rs",
+              "line": 593,
+              "category": "test coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:fafa59b0b24f336746ea728b61266d1e8209d0fff338147f1ac9ed57410aee7e",
+          "at": "2026-08-01T08:18:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The fixture still does not establish that `completed-track` is completed: it creates only an `obligations.json` file, while the active derive call uses a different track. The completed invocation is rejected solely because its ID does not match the current `track/<ACTIVE_TRACK_ID>` branch, so the unchanged-artifact assertion would pass for any arbitrary nonexistent/non-active track and does not verify OS-02/CN-02/AC-04.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/test_obligation.rs",
+              "line": 584,
+              "category": "test coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:70faff7edd6d75aadd4bf91eaa567f9a82b3751e55af33631bd43cc05517e957",
+          "at": "2026-08-01T08:24:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8e772659b15ca745ad372bae37e120a9380e2854b4f5792e89198f908b38145d",
+          "at": "2026-08-01T08:27:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The supposed completed-track invocation passes `track/{ACTIVE_TRACK_ID}` as `current_branch`, so `is_active_branch` rejects it before any completed-track artifact loader or writer is reached. The successful active-track call only proves that the same composition graph works for a different track, while the independent status assertion only proves the fixture metadata says `Done`; together they still allow a regression that rewrites artifacts when the completed track's own branch is checked out. Invoke the handler with `track/{COMPLETED_TRACK_ID}` and the required completed-track inputs so the completed-state protection itself is exercised, then verify the artifact after each invocation.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/test_obligation.rs",
+              "line": 634,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:8e772659b15ca745ad372bae37e120a9380e2854b4f5792e89198f908b38145d",
+          "at": "2026-08-01T08:30:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:47303806e979230507dc3d21e438f4c59a25390907918661632de9b074f8deb1",
+          "at": "2026-08-01T10:34:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:47303806e979230507dc3d21e438f4c59a25390907918661632de9b074f8deb1",
+          "at": "2026-08-01T10:38:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:47303806e979230507dc3d21e438f4c59a25390907918661632de9b074f8deb1",
+          "at": "2026-08-01T11:39:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:47303806e979230507dc3d21e438f4c59a25390907918661632de9b074f8deb1",
+          "at": "2026-08-01T11:44:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:47303806e979230507dc3d21e438f4c59a25390907918661632de9b074f8deb1",
+          "at": "2026-08-01T11:59:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The active fixture copies the live implementation track's `impl-plan.json` and relies on it remaining nonterminal. Once this track's remaining tasks are marked done, `FsTrackStatusReaderAdapter` will derive `Done`, so both derives will be rejected by the production frozen-track guard and the success assertion will fail. Make the copied fixture deterministically active—for example, rewrite one valid task to `todo`/`in_progress` with no commit hash—and assert its derived status before invoking the handler.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/test_obligation.rs",
+              "line": 559,
+              "category": "test_stability"
+            }
+          ],
+          "hash": "rvw1:sha256:47303806e979230507dc3d21e438f4c59a25390907918661632de9b074f8deb1",
+          "at": "2026-08-01T13:04:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:23870b170a937660ec9efe965a757ab4cc89e1536ef01d1d5c654c3cffe58d68",
+          "at": "2026-08-01T13:08:08Z"
+        }
+      ]
+    },
+    "infrastructure": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4dec35b2ce6cd412c928fba53eb0401fb60a3d8719b866e113f75b084704c4c7",
-          "at": "2026-08-01T05:14:09Z"
+          "hash": "rvw1:sha256:8e933242abf043664e6fe6a004f2acaef6aa00cdd557840dc55f49eac083fcb8",
+          "at": "2026-08-01T06:49:25Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4dec35b2ce6cd412c928fba53eb0401fb60a3d8719b866e113f75b084704c4c7",
-          "at": "2026-08-01T05:26:25Z"
+          "hash": "rvw1:sha256:8e933242abf043664e6fe6a004f2acaef6aa00cdd557840dc55f49eac083fcb8",
+          "at": "2026-08-01T06:55:21Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e3894c47033ce099214a53f6d91958391d87bdabc7156e98ff713e1daa08456e",
-          "at": "2026-08-01T09:40:22Z"
+          "hash": "rvw1:sha256:636fdc72418438b84af5c9014c2a82aa5f96bde31d683eea768062b4fa3a1f84",
+          "at": "2026-08-01T07:31:49Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`domain::ObligationDeriveError::ArtifactCodec` is dead vocabulary. The derive path only calls `ObligationsArtifactPort::save`, whose `DiagnosticMessage` error maps to `ArtifactWrite`; no production caller can supply the declared `ArtifactCodecError` payload. Remove this variant or establish a real construction path.",
+              "message": "The new determinism regression uses an empty schema and checks only pretty output beginning with `crate_name`. Both assertions also pass with the pre-change direct DTO serialization because `crate_name` is already the DTO's first field, so the test does not exercise recursive canonical ordering or the compact branch. Use a populated nested DTO whose declaration order differs from lexical order and assert canonical bytes for both `pretty` values.",
               "severity": "P1",
-              "file": "track/items/2026-08-01-deterministic-json-serialization/domain-types.json",
-              "line": 85,
-              "category": "unconstructible error variant"
-            },
-            {
-              "message": "`domain::ObligationDeriveError` restates CN-02/AC-04 behavior as a “fail-closed completed-track” guard. Per `.harness/policies/no-upstream-restatement.md`, the docs must identify the contract through anchor cites without reproducing its behavior.",
-              "severity": "P1",
-              "file": "track/items/2026-08-01-deterministic-json-serialization/domain-types.json",
-              "line": 10,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "`usecase::DeriveTestObligationsInteractor` restates CN-02/AC-04 by specifying active-only derivation and rejection before writes. Replace the behavioral sentence with a concise target/purpose plus anchor cites, as required by `.harness/policies/no-upstream-restatement.md`.",
-              "severity": "P1",
-              "file": "track/items/2026-08-01-deterministic-json-serialization/usecase-types.json",
-              "line": 10,
-              "category": "upstream restatement"
+              "file": "libs/infrastructure/src/schema_export_codec.rs",
+              "line": 430,
+              "category": "test_coverage"
             }
           ],
-          "hash": "rvw1:sha256:e3894c47033ce099214a53f6d91958391d87bdabc7156e98ff713e1daa08456e",
-          "at": "2026-08-01T09:45:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:89d201a8d84f452cebed1b0596e70b8aae8ecbd175fa9e72cf9b2ad1bdf86d01",
-          "at": "2026-08-01T10:01:23Z"
+          "hash": "rvw1:sha256:636fdc72418438b84af5c9014c2a82aa5f96bde31d683eea768062b4fa3a1f84",
+          "at": "2026-08-01T07:45:15Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:89d201a8d84f452cebed1b0596e70b8aae8ecbd175fa9e72cf9b2ad1bdf86d01",
-          "at": "2026-08-01T10:02:53Z"
+          "hash": "rvw1:sha256:2fc0c47780eedb9ca7c2f82a2d27183b64dccd6958c6ab93c15b3810abd2d24a",
+          "at": "2026-08-01T07:51:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CatalogueSpecVerifyCacheDocumentCodec の encode だけが直接 `serde_json::to_string_pretty(&dto)` を使い続けています。トップレベルおよびネストした DTO のキー順が canonical 化されず、同じ semantic verify codec の SpecAdr 出力や要求された byte-stable canonical JSON と不一致になります。`serde_json::to_value(&dto)` を経由してから pretty-print してください。",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/semantic_verify_codec.rs",
+              "line": 606,
+              "category": "serialization"
+            }
+          ],
+          "hash": "rvw1:sha256:a4030fd251dd506c57170012ebae721905164080582ee0e4315f88b5a64970fa",
+          "at": "2026-08-01T08:18:53Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:087867a0af6ccf58a4e13700354ea8b510641ec900c6184e425d357e8e061667",
-          "at": "2026-08-01T11:06:08Z"
+          "hash": "rvw1:sha256:c5517047da57640417d603552593e9aabbf7fc2fb2b4358af1960839dca99d9e",
+          "at": "2026-08-01T08:24:29Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`usecase::DeriveTestObligationsInteractor` is the only declared type capable of enforcing CN-02/AC-04 through `TrackStatusReaderPort`, but its docs merely call it a derivation interactor; the domain entries only define status/error vocabulary. The fail-closed rule therefore has no named enforcement owner. Identify this interactor as the guard owner using anchor cites without restating the upstream behavior.",
+              "message": "B-03 excludes T11 and T11 remains `todo`, but this diff implements `CatalogueSpecVerifyCacheDocumentCodec::encode` and its regression, moving B-04 work into the current batch without valid task/commit attribution. Defer these hunks to T11 or update the sanctioned batch/task state before including them.",
               "severity": "P1",
-              "file": "track/items/2026-08-01-deterministic-json-serialization/usecase-types.json",
-              "line": 10,
-              "category": "enforcement-owner contradiction"
+              "file": "libs/infrastructure/src/tddd/semantic_verify_codec.rs",
+              "line": 598,
+              "category": "cross_batch_consistency"
+            },
+            {
+              "message": "The new regression uses an empty catalogue and checks only top-level ordering, so it never exercises the nested entry objects that `encode` now claims to canonicalize recursively. Add a populated entry and assert its nested canonical key order.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs",
+              "line": 509,
+              "category": "test_coverage"
+            },
+            {
+              "message": "The deterministic-output regression checks only the top-level prefix even though `sample_doc()` contains nested signal objects. A top-level-only canonicalizer would pass; assert canonical ordering inside `signals[]` as well.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_spec_signals_codec.rs",
+              "line": 258,
+              "category": "test_coverage"
+            },
+            {
+              "message": "The T10 regression serializes populated nested entries but verifies only the top-level `entries` key. It does not cover canonical ordering within entry, origin, or verdict objects; add nested ordering assertions or an exact canonical fixture.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/semantic_verify_codec.rs",
+              "line": 778,
+              "category": "test_coverage"
+            },
+            {
+              "message": "`sample_doc()` has an empty `signals` vector, so this regression never exercises the newly canonicalized `TypeSignalDto` objects. Use at least one populated signal and assert its nested key order.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_codec.rs",
+              "line": 177,
+              "category": "test_coverage"
+            },
+            {
+              "message": "The writer regression supplies only empty catalogue sections and therefore validates top-level ordering only. Add a nested catalogue entry and assert recursive key ordering while retaining the byte-stability and trailing-newline checks.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalog_gen/fs_access.rs",
+              "line": 503,
+              "category": "test_coverage"
             }
           ],
-          "hash": "rvw1:sha256:087867a0af6ccf58a4e13700354ea8b510641ec900c6184e425d357e8e061667",
-          "at": "2026-08-01T11:09:40Z"
+          "hash": "rvw1:sha256:c5517047da57640417d603552593e9aabbf7fc2fb2b4358af1960839dca99d9e",
+          "at": "2026-08-01T08:39:24Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7ca25acc2ec8af7dec974a96b1c22748f1239ed4241745da821f3647d09ff3b2",
-          "at": "2026-08-01T11:15:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7ca25acc2ec8af7dec974a96b1c22748f1239ed4241745da821f3647d09ff3b2",
-          "at": "2026-08-01T11:16:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fc1018ae2a1c3bb5abcb48f319f6b8588ecc2f4da727b83b62e27b759ffbe93e",
-          "at": "2026-08-01T13:13:24Z"
+          "hash": "rvw1:sha256:4ab9910bf9d0e00f6c01c31b470b150117282e039fed0eeb3ab38deb7e4f1a62",
+          "at": "2026-08-01T10:34:45Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`domain::TrackStatus::frozen_status` restates the active/frozen behavior by enumerating `Done`, `Archived`, and the `None` result for active statuses. Per `.harness/policies/no-upstream-restatement.md`, this method documentation should reference OS-02/CN-02/AC-04 without reproducing the behavioral contract.",
+              "message": "B-03 still excludes T11 and T11 remains `todo`, but this diff implements `CatalogueSpecVerifyCacheDocumentCodec::encode` and its regression. These B-04 changes lack valid B-03 task attribution; defer the hunks to T11 or update the sanctioned task/batch state.",
               "severity": "P1",
-              "file": "track/items/2026-08-01-deterministic-json-serialization/domain-types.json",
-              "line": 280,
-              "category": "upstream restatement"
+              "file": "libs/infrastructure/src/tddd/semantic_verify_codec.rs",
+              "line": 598,
+              "category": "cross_batch_consistency"
             },
             {
-              "message": "`usecase::DeriveTestObligationsInteractor` restates the guard’s cross-layer behavior and pre-write rejection sequence in prose. Keep the ownership identification, but express it through concise OS-02/CN-02/AC-04 anchor cites as required by `.harness/policies/no-upstream-restatement.md`.",
+              "message": "The corrected T10 regression orders only the five `SemanticVerifyEntryDto` keys. It does not inspect keys inside the origin or verdict objects despite claiming those are covered, so a serializer that stops canonicalizing below the entry level would pass. Assert the actual nested `data`/`kind`, reference, and verdict ordering or use an exact pretty-JSON fixture.",
               "severity": "P1",
-              "file": "track/items/2026-08-01-deterministic-json-serialization/usecase-types.json",
-              "line": 10,
-              "category": "upstream restatement"
+              "file": "libs/infrastructure/src/tddd/semantic_verify_codec.rs",
+              "line": 787,
+              "category": "test_coverage"
             }
           ],
-          "hash": "rvw1:sha256:fc1018ae2a1c3bb5abcb48f319f6b8588ecc2f4da727b83b62e27b759ffbe93e",
-          "at": "2026-08-01T13:15:44Z"
+          "hash": "rvw1:sha256:4ab9910bf9d0e00f6c01c31b470b150117282e039fed0eeb3ab38deb7e4f1a62",
+          "at": "2026-08-01T10:41:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "While reverting the out-of-batch T11 implementation, this diff also deletes the pre-existing `catalogue_spec_encode_is_deterministic` regression. B-03 is not authorized to reduce T11 coverage, and the documented deterministic-output guarantee is now untested until a later batch. Restore the original test unchanged; defer only the new T11 canonicalization work.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/semantic_verify_codec.rs",
+              "line": 840,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:4f6d86137476cc75ce1123407e2802695e4f5b9d46d82570d60b5bd2fc4eb60c",
+          "at": "2026-08-01T10:48:25Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:459c0089c6af1aadc53a75300cf8fb16860d7de11b24e5a37964ae4a662760dc",
-          "at": "2026-08-01T13:24:59Z"
+          "hash": "rvw1:sha256:06b0548b8df130f9eb89130dfcbbe3cc4078c0bde465daaa2c8cd3e4dbcd8024",
+          "at": "2026-08-01T11:39:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:06b0548b8df130f9eb89130dfcbbe3cc4078c0bde465daaa2c8cd3e4dbcd8024",
+          "at": "2026-08-01T11:44:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:06b0548b8df130f9eb89130dfcbbe3cc4078c0bde465daaa2c8cd3e4dbcd8024",
+          "at": "2026-08-01T11:50:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:06b0548b8df130f9eb89130dfcbbe3cc4078c0bde465daaa2c8cd3e4dbcd8024",
+          "at": "2026-08-01T11:58:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "B-03 still excludes T11 and T11 remains `todo`, but the current diff again implements `CatalogueSpecVerifyCacheDocumentCodec::encode` canonicalization and extends its regression. These B-04 changes have no valid B-03 task attribution; restore the pre-B-03 production code and original test, then implement the canonicalization under T11.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/semantic_verify_codec.rs",
+              "line": 598,
+              "category": "cross_batch_consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:06b0548b8df130f9eb89130dfcbbe3cc4078c0bde465daaa2c8cd3e4dbcd8024",
+          "at": "2026-08-01T12:55:24Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:459c0089c6af1aadc53a75300cf8fb16860d7de11b24e5a37964ae4a662760dc",
-          "at": "2026-08-01T13:27:14Z"
+          "hash": "rvw1:sha256:a43077e00cfb11ab4cb58916a2cf1e639d07efd59ec8fdc221d31228a69c9e27",
+          "at": "2026-08-01T12:58:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e20d4476b31cae9cf589d25821b2038a15537fac267f2e9524f40696815a8b49",
+          "at": "2026-08-01T14:04:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The regression uses `DryCheckJsonV1::empty()`, so it verifies only top-level envelope ordering. It would still pass if nested record/verdict objects stopped being canonicalized, contrary to B-04's explicit recursive-order coverage requirement. Use a non-empty record (including a nested violation verdict) and assert its key order while retaining the repeated-byte check.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/store.rs",
+              "line": 645,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:e20d4476b31cae9cf589d25821b2038a15537fac267f2e9524f40696815a8b49",
+          "at": "2026-08-01T14:13:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:50fdebadd544d3d2d766f7c1fbded2dcaa8bab27ae9fb162a0f80dcc8886a09c",
+          "at": "2026-08-01T14:17:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Converting the entire cache DTO with `serde_json::to_value` happens before the bounded writer runs, so an oversized fulfillment cache can allocate an unbounded intermediate JSON tree and defeat the documented fixed-memory bound. Canonical ordering must be achieved without bypassing the bounded serialization boundary.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec/fulfillment_cache_io.rs",
+              "line": 58,
+              "category": "bounded-buffer"
+            },
+            {
+              "message": "Converting the entire waiver cache DTO with `serde_json::to_value` happens before the bounded writer runs, so an oversized cache can allocate an unbounded intermediate JSON tree despite the documented fixed-memory guarantee. Preserve canonical ordering without materializing the full value before the size-limited writer.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/test_obligation/waiver_cache_codec.rs",
+              "line": 241,
+              "category": "bounded-buffer"
+            }
+          ],
+          "hash": "rvw1:sha256:fe924df01cf7df89a39371505ca6647878a5c11a505c9c4c5b9b69ffbfc99a37",
+          "at": "2026-08-01T14:44:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8a8151e9c3b562a733a296358af0659c4814f192825b5bfd0f79568e5e3839dc",
+          "at": "2026-08-01T14:49:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new waiver-cache regression does not verify canonical ordering of the populated nested `verdict`; it only asserts ordering within `key`. A regression that stops recursively canonicalizing tagged verdict objects would therefore pass despite B-05's explicit nested-verdict coverage requirement. Assert that the waived verdict emits `citation` before `kind`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/test_obligation/waiver_cache_codec.rs",
+              "line": 605,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:8a8151e9c3b562a733a296358af0659c4814f192825b5bfd0f79568e5e3839dc",
+          "at": "2026-08-01T14:57:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:04b85f81897270ed16b1d76fdaa4cc4dd07c9e8c5a0e50adfbdd41b18a436d6d",
+          "at": "2026-08-01T15:00:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bf176a82f69dbba389f66554ff4dcf9b411f075ee9dcb9f155850a83ddb5484a",
+          "at": "2026-08-01T15:27:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The canonical-order regression reparses the emitted bytes into `serde_json::Value` before inspecting keys. With the current default `serde_json::Map` backing, parsing itself sorts object keys, so this test would still pass if `write_coverage` reverted to direct, non-canonical struct serialization; the repeated-byte assertion would also pass because that output remains deterministic. The same ineffective pattern appears in the new tests in `pr/poll.rs`, `provider_session.rs`, `telemetry/archived_track.rs`, and `telemetry/writer.rs`, including the nested coverage assertions. Verify key order directly against the raw string/bytes (preferably an exact populated golden containing the nested objects).",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/coverage.rs",
+              "line": 398,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:bf176a82f69dbba389f66554ff4dcf9b411f075ee9dcb9f155850a83ddb5484a",
+          "at": "2026-08-01T15:31:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:831649febb49926c7ded16637b60c9fc2d367a09182171f8b663e0c4cefd6fa6",
+          "at": "2026-08-01T15:52:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:831649febb49926c7ded16637b60c9fc2d367a09182171f8b663e0c4cefd6fa6",
+          "at": "2026-08-01T15:54:47Z"
         }
       ]
     }
