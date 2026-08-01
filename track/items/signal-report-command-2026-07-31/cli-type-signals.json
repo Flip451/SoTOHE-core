@@ -1,13 +1,13 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-31T18:58:19Z",
+  "generated_at": "2026-07-31T23:54:18Z",
   "declaration_hash": "5e52dd353b2ec567a7652b6d050734da05faa39c4b187488b341a84170f79084",
-  "implementation_input_hash": "0dcd709de5017b5bc74d3702aaa236a7971385bcf8db3085274f545e5f86f3fb",
+  "implementation_input_hash": "a076e12f011d21758e506686afadcd93a36bc53edaf1f926d39fdd128f68d50d",
   "signals": [
     {
       "type_name": "SignalCommand",
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "Debug",
@@ -18,9 +18,9 @@
     {
       "type_name": "SignalReportArgs",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Args",
         "Debug",
         "FromArgMatches"
@@ -29,9 +29,9 @@
     {
       "type_name": "SignalReportChainArg",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Copy",
         "Debug",
@@ -43,9 +43,9 @@
     {
       "type_name": "SignalReportOnlyArg",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Copy",
         "Debug",

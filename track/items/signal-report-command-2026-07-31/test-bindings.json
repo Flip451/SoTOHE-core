@@ -382,6 +382,99 @@
           "test_name": "test_signal_report_driver_factory_is_wiring_only"
         }
       ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "cli::commands::signal::execute",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::signal::tests",
+          "test_name": "test_signal_report_execute_report_branch_dispatches_default_query_once"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::signal::tests",
+          "test_name": "test_signal_report_execute_report_branch_propagates_driver_failure_exit_code"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::signal_report::tests",
+          "test_name": "test_signal_report_driver_renders_complete_occurrences_in_service_order"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_source_port_load_reads_persisted_artifact_occurrences"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_source_port_load_derives_nonpersisted_chain_occurrences"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_source_port_load_is_read_only_across_all_chains"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "SignalCommand", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "IN-01"}},
+      "tests": [{"layer": "cli", "module_path": "cli::commands::signal::tests", "test_name": "test_signal_report_command_shape_contains_typed_args"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "SignalCommand", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "AC-01"}},
+      "tests": [{"layer": "cli", "module_path": "cli::commands::signal::tests", "test_name": "test_signal_report_command_shape_contains_typed_args"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "SignalCommand", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "AC-03"}},
+      "tests": [{"layer": "cli", "module_path": "cli::commands::signal::tests", "test_name": "test_signal_report_each_chain_spelling_parses_to_its_typed_selector"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "SignalReportArgs", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "IN-03"}},
+      "tests": [
+        {"layer": "cli", "module_path": "cli::commands::signal::tests", "test_name": "test_signal_report_bare_command_defaults_to_all_chains_and_levels"},
+        {"layer": "cli", "module_path": "cli::commands::signal::tests", "test_name": "test_signal_report_each_chain_spelling_parses_to_its_typed_selector"},
+        {"layer": "cli", "module_path": "cli::commands::signal::tests", "test_name": "test_signal_report_each_only_spelling_parses_to_its_typed_selector"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "SignalReportArgs", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "AC-03"}},
+      "tests": [
+        {"layer": "cli", "module_path": "cli::commands::signal::tests", "test_name": "test_signal_report_bare_command_defaults_to_all_chains_and_levels"},
+        {"layer": "cli", "module_path": "cli::commands::signal::tests", "test_name": "test_signal_report_each_chain_spelling_parses_to_its_typed_selector"},
+        {"layer": "cli", "module_path": "cli::commands::signal::tests", "test_name": "test_signal_report_each_only_spelling_parses_to_its_typed_selector"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "SignalReportChainArg", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "IN-03"}},
+      "tests": [{"layer": "cli", "module_path": "cli::commands::signal::tests", "test_name": "test_signal_report_each_chain_spelling_parses_to_its_typed_selector"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "SignalReportChainArg", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "AC-03"}},
+      "tests": [{"layer": "cli", "module_path": "cli::commands::signal::tests", "test_name": "test_signal_report_each_chain_spelling_parses_to_its_typed_selector"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "SignalReportOnlyArg", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "IN-03"}},
+      "tests": [{"layer": "cli", "module_path": "cli::commands::signal::tests", "test_name": "test_signal_report_each_only_spelling_parses_to_its_typed_selector"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "SignalReportOnlyArg", "anchor_id": {"file_path": "track/items/signal-report-command-2026-07-31/spec.json", "element_id": "AC-03"}},
+      "tests": [{"layer": "cli", "module_path": "cli::commands::signal::tests", "test_name": "test_signal_report_each_only_spelling_parses_to_its_typed_selector"}]
     }
   ]
 }
