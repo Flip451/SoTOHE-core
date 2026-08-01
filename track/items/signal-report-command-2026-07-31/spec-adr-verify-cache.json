@@ -26,7 +26,7 @@
     },
     {
       "claim_hash": "3efd2b6e00a051c796f0c0505fa40221d21936fe08b9e4dfab9aba9ee502e34e",
-      "evidence_hash": "0869b22d58eadb993b0e3d6db71e87b4b0241a2569b49eba43ce775f0c5f6c26",
+      "evidence_hash": "afeb666d2fae914fa0a506a05c620aed1b24e7fe40e88b6b3262e0c92611c26f",
       "verdict": {
         "kind": "pass",
         "citation": "「4 chain を横断すること、Yellow / Red の発生箇所を所定の粒度で列挙すること、および絞り込みの契約は変更しない。」"
@@ -141,7 +141,7 @@
     },
     {
       "claim_hash": "850053170a621fdedb58205dc6fe8ff8ffba366394bc5bdc22f6a5f26b28a1f2",
-      "evidence_hash": "0869b22d58eadb993b0e3d6db71e87b4b0241a2569b49eba43ce775f0c5f6c26",
+      "evidence_hash": "afeb666d2fae914fa0a506a05c620aed1b24e7fe40e88b6b3262e0c92611c26f",
       "verdict": {
         "kind": "pass",
         "citation": "発生単位の signal 成果物が存在する chain はその成果物を読み、存在しない chain ⓪・①は正規の入力成果物から既存の評価規則で発生単位データをメモリ上に導出する。この導出は report の表示を構成するためだけに行い、signal や集計値を永続化しない。したがって `sotp signal report` は読み取り専用の view であり続ける。"
@@ -210,7 +210,7 @@
     },
     {
       "claim_hash": "f98203997fc78108bde3b066e508663664baa7ee4ffbf8ffb654b64f7077abfb",
-      "evidence_hash": "0869b22d58eadb993b0e3d6db71e87b4b0241a2569b49eba43ce775f0c5f6c26",
+      "evidence_hash": "afeb666d2fae914fa0a506a05c620aed1b24e7fe40e88b6b3262e0c92611c26f",
       "verdict": {
         "kind": "pass",
         "citation": "この導出は report の表示を構成するためだけに行い、signal や集計値を永続化しない。"
@@ -256,7 +256,7 @@
     },
     {
       "claim_hash": "25075c3d63c3af9dcac74d85c23f1b23a11d735f74e8c491d609cf1a55f4372b",
-      "evidence_hash": "0869b22d58eadb993b0e3d6db71e87b4b0241a2569b49eba43ce775f0c5f6c26",
+      "evidence_hash": "afeb666d2fae914fa0a506a05c620aed1b24e7fe40e88b6b3262e0c92611c26f",
       "verdict": {
         "kind": "pass",
         "citation": "この導出は report の表示を構成するためだけに行い、signal や集計値を永続化しない。したがって `sotp signal report` は読み取り専用の view であり続ける。"
@@ -325,10 +325,10 @@
     },
     {
       "claim_hash": "55e8e58e0763db0818a133ccf47c4e86cad123b896bc61d5354388b88527cdb1",
-      "evidence_hash": "0869b22d58eadb993b0e3d6db71e87b4b0241a2569b49eba43ce775f0c5f6c26",
+      "evidence_hash": "afeb666d2fae914fa0a506a05c620aed1b24e7fe40e88b6b3262e0c92611c26f",
       "verdict": {
         "kind": "pass",
-        "citation": "4 chain を横断すること、Yellow / Red の発生箇所を所定の粒度で列挙すること、および絞り込みの契約は変更しない。"
+        "citation": "発生単位の signal 成果物が存在する chain はその成果物を読み、存在しない chain ⓪・①は正規の入力成果物から既存の評価規則で発生単位データをメモリ上に導出する。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -417,7 +417,7 @@
     },
     {
       "claim_hash": "ce4548c77f72b43a14eb8be6511c43ac05196f65fb7e7cb33592ee393592c024",
-      "evidence_hash": "0869b22d58eadb993b0e3d6db71e87b4b0241a2569b49eba43ce775f0c5f6c26",
+      "evidence_hash": "afeb666d2fae914fa0a506a05c620aed1b24e7fe40e88b6b3262e0c92611c26f",
       "verdict": {
         "kind": "pass",
         "citation": "この導出は report の表示を構成するためだけに行い、signal や集計値を永続化しない。したがって `sotp signal report` は読み取り専用の view であり続ける。"
