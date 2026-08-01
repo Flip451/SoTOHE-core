@@ -1,6 +1,82 @@
 {
   "schema_version": 2,
   "scopes": {
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-02 is untestable: “運用上管理可能” defines no deterministic rotation bound or observable condition, forcing downstream phases to invent the contract.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+              "line": 96,
+              "category": "constraint vague or untestable"
+            },
+            {
+              "message": "AC-04 is non-observable: “運用可能な状態” lacks a measurable file-size, retention, or rotation condition that a deterministic test can verify.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+              "line": 138,
+              "category": "acceptance criterion non-observable"
+            }
+          ],
+          "hash": "rvw1:sha256:4bf46cb46b23513f5de5085bcd94bca41c2c1b2fd4edafc241163fa3419066ea",
+          "at": "2026-08-01T08:45:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-02 is untestable: “運用上管理可能” defines no deterministic rotation bound or observable condition, forcing downstream phases to invent the contract.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+              "line": 96,
+              "category": "constraint vague or untestable"
+            },
+            {
+              "message": "AC-04 is non-observable: “運用可能な状態” lacks a measurable file-size, retention, or rotation condition that a deterministic test can verify.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+              "line": 138,
+              "category": "acceptance criterion non-observable"
+            }
+          ],
+          "hash": "rvw1:sha256:4bf46cb46b23513f5de5085bcd94bca41c2c1b2fd4edafc241163fa3419066ea",
+          "at": "2026-08-01T08:47:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:50e25023da8f4d7de35579201f9bfb28874699a8c10c02afd301f379fd9757a5",
+          "at": "2026-08-01T08:54:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:50e25023da8f4d7de35579201f9bfb28874699a8c10c02afd301f379fd9757a5",
+          "at": "2026-08-01T08:57:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4b9b19dde70a553386199e5ecd3d44d5ea7c86c2898d3207ebd1cf2a86533826",
+          "at": "2026-08-01T09:18:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4b9b19dde70a553386199e5ecd3d44d5ea7c86c2898d3207ebd1cf2a86533826",
+          "at": "2026-08-01T09:20:41Z"
+        }
+      ]
+    },
     "types": {
       "rounds": [
         {
@@ -202,6 +278,20 @@
           "findings": [],
           "hash": "rvw1:sha256:dc097807619d8017c66484e7bf74d5cfa8438a8faac17458247eb52752d2700d",
           "at": "2026-08-01T11:28:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a131562241db7634802d8c127267906cedae18b035a1c9df2e9d4474eabf3bce",
+          "at": "2026-08-01T12:24:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a131562241db7634802d8c127267906cedae18b035a1c9df2e9d4474eabf3bce",
+          "at": "2026-08-01T12:30:02Z"
         }
       ]
     },
@@ -220,6 +310,96 @@
           "findings": [],
           "hash": "rvw1:sha256:8506571ec0dcb04ec4dbcb52a9677844f3d2a365452fbc71e215c4e4da1f2bf3",
           "at": "2026-08-01T08:49:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This binding overclaims AC-01: the referenced test only constructs an in-memory failure result and asserts its exit code; it does not execute a command or verify local JSONL recording. Remove the AC-01 binding or bind it to an entrypoint/persistence integration test.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
+              "line": 16,
+              "category": "test-obligation-evidence"
+            },
+            {
+              "message": "This binding overclaims IN-01: the referenced test only constructs a CommandTraceRecord and checks fields; it does not prove common-entrypoint instrumentation across `sotp` commands. Remove the IN-01 binding or bind it to the later entrypoint integration evidence.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
+              "line": 29,
+              "category": "test-obligation-evidence"
+            },
+            {
+              "message": "This binding overclaims AC-01: the referenced test only validates fields on an in-memory CommandTraceRecord and does not verify that executing a command generates a local JSONL record. Remove the AC-01 binding or replace it with end-to-end recording evidence.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
+              "line": 39,
+              "category": "test-obligation-evidence"
+            }
+          ],
+          "hash": "rvw1:sha256:970c2057079fb215e801c8e4ad3e932909f57647c3be773bf0435076f3d34b32",
+          "at": "2026-08-01T12:38:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:27f6c5ad4be8d2d9cb477a40b26d266330c97aa98f51e96ea2a4b45cbc87e5cf",
+          "at": "2026-08-01T12:41:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a317cc34f0e7858375a7c77e18ac8ab7f5c9f02e16c84cbcbbede2c0e87dae3",
+          "at": "2026-08-01T12:44:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The current binding set lacks fresh verifier coverage. `bin/sotp test-obligation results` reports `stale=4 verdict_absent=3` for completed tasks, and `test-obligation check` exits 1 with declaration drift. The three newly converted waivers—including this AC-01 record—have no matching waiver verdicts. Re-run host evaluation and require a fresh successful check before accepting this artifact.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
+              "line": 14,
+              "category": "test-obligation-freshness"
+            }
+          ],
+          "hash": "rvw1:sha256:1a317cc34f0e7858375a7c77e18ac8ab7f5c9f02e16c84cbcbbede2c0e87dae3",
+          "at": "2026-08-01T12:50:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a317cc34f0e7858375a7c77e18ac8ab7f5c9f02e16c84cbcbbede2c0e87dae3",
+          "at": "2026-08-01T12:55:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a317cc34f0e7858375a7c77e18ac8ab7f5c9f02e16c84cbcbbede2c0e87dae3",
+          "at": "2026-08-01T12:58:14Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b14186c030944ee1b6beba5d3b5605033ffa35b8f6dbe6c7785b0891593e2e28",
+          "at": "2026-08-01T12:38:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b14186c030944ee1b6beba5d3b5605033ffa35b8f6dbe6c7785b0891593e2e28",
+          "at": "2026-08-01T12:48:02Z"
         }
       ]
     },
@@ -773,82 +953,20 @@
           "findings": [],
           "hash": "rvw1:sha256:e5e872436d22854f3c7d884614742b4424822c2cd7941a887426f1ee9c5507c4",
           "at": "2026-08-01T11:40:08Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "CN-02 is untestable: “運用上管理可能” defines no deterministic rotation bound or observable condition, forcing downstream phases to invent the contract.",
-              "severity": "P1",
-              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
-              "line": 96,
-              "category": "constraint vague or untestable"
-            },
-            {
-              "message": "AC-04 is non-observable: “運用可能な状態” lacks a measurable file-size, retention, or rotation condition that a deterministic test can verify.",
-              "severity": "P1",
-              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
-              "line": 138,
-              "category": "acceptance criterion non-observable"
-            }
-          ],
-          "hash": "rvw1:sha256:4bf46cb46b23513f5de5085bcd94bca41c2c1b2fd4edafc241163fa3419066ea",
-          "at": "2026-08-01T08:45:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "CN-02 is untestable: “運用上管理可能” defines no deterministic rotation bound or observable condition, forcing downstream phases to invent the contract.",
-              "severity": "P1",
-              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
-              "line": 96,
-              "category": "constraint vague or untestable"
-            },
-            {
-              "message": "AC-04 is non-observable: “運用可能な状態” lacks a measurable file-size, retention, or rotation condition that a deterministic test can verify.",
-              "severity": "P1",
-              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
-              "line": 138,
-              "category": "acceptance criterion non-observable"
-            }
-          ],
-          "hash": "rvw1:sha256:4bf46cb46b23513f5de5085bcd94bca41c2c1b2fd4edafc241163fa3419066ea",
-          "at": "2026-08-01T08:47:49Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:50e25023da8f4d7de35579201f9bfb28874699a8c10c02afd301f379fd9757a5",
-          "at": "2026-08-01T08:54:03Z"
+          "hash": "rvw1:sha256:c303dd9fd86c4d9420924f9b49008e2aff1d70a89a6916ca19387ab368193749",
+          "at": "2026-08-01T12:32:28Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:50e25023da8f4d7de35579201f9bfb28874699a8c10c02afd301f379fd9757a5",
-          "at": "2026-08-01T08:57:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4b9b19dde70a553386199e5ecd3d44d5ea7c86c2898d3207ebd1cf2a86533826",
-          "at": "2026-08-01T09:18:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4b9b19dde70a553386199e5ecd3d44d5ea7c86c2898d3207ebd1cf2a86533826",
-          "at": "2026-08-01T09:20:41Z"
+          "hash": "rvw1:sha256:c303dd9fd86c4d9420924f9b49008e2aff1d70a89a6916ca19387ab368193749",
+          "at": "2026-08-01T12:35:51Z"
         }
       ]
     }

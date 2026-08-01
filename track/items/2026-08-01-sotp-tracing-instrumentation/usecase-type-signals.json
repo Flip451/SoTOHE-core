@@ -1,15 +1,15 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-01T09:30:17Z",
-  "declaration_hash": "40bb75ed278e2602bc0f47a535c626b16e431d2afe3d40ed05b282a38fab81e1",
-  "implementation_input_hash": "40907195913ab44162524c373b308d5b75370aa2c0b9bb065f77a2e9eacd261f",
+  "generated_at": "2026-08-01T12:16:46Z",
+  "declaration_hash": "f5437e949541cff2845aab3485c0cd389ab5d7ebd7748077908e4a0641819874",
+  "implementation_input_hash": "98f172ede79e7ab87743548d462e47fbf2c18c81604d94d91b7b680def93a0d3",
   "signals": [
     {
       "type_name": "CommandDurationMillis",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "AsRef<u64>",
         "Clone",
         "Copy",
@@ -49,9 +49,9 @@
     {
       "type_name": "CommandExecutionResult",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -61,9 +61,9 @@
     {
       "type_name": "CommandExitCode",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Copy",
         "Debug",
@@ -98,9 +98,9 @@
     {
       "type_name": "CommandTraceRecord",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -116,9 +116,9 @@
     {
       "type_name": "CommandTraceValueError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Debug",
         "Display",
         "Error"
@@ -144,9 +144,9 @@
     {
       "type_name": "SotpCommandIdentity",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",

@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "40bb75ed278e2602bc0f47a535c626b16e431d2afe3d40ed05b282a38fab81e1",
+  "catalogue_declaration_hash": "f5437e949541cff2845aab3485c0cd389ab5d7ebd7748077908e4a0641819874",
   "signals": [
     {
       "type_name": "CommandDurationMillis",
       "signal": "blue",
-      "entry_hash": "c93b41eb522ae6b8eeb5b6601d76fbe9cfe16e9db7aba156c9d13a1bd236d442"
+      "entry_hash": "543c0bd7cd986767e30424372c4c091a8417666fe84e3e3e5716b1e77a2bd602"
     },
     {
       "type_name": "CommandExecutionCount",
@@ -25,7 +25,7 @@
     {
       "type_name": "CommandExitCode",
       "signal": "blue",
-      "entry_hash": "bb410b775cede0ff0e141d2c6f2f5b7847d2709ccfe4b9bf98e471942b759da3"
+      "entry_hash": "25aac33211a7fdaa5c074ad5d8172f3d74eb6bb4ee0d50d719bb26dacf1cd0c7"
     },
     {
       "type_name": "CommandFailureRateBasisPoints",
@@ -55,7 +55,7 @@
     {
       "type_name": "SotpCommandIdentity",
       "signal": "blue",
-      "entry_hash": "586ce208678de3f0e15243ddf6093dc98830ae7414c0f24558e4653772e72600"
+      "entry_hash": "560b6a62fc352cd4981d5337adcb495a9cc3b6c659e3f87cf3561b59c4ba8c41"
     },
     {
       "type_name": "TelemetryReportOutput",

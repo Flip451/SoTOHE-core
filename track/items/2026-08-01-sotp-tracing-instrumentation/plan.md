@@ -5,13 +5,13 @@
 
 GO-01 → T001, T002, T003, T004, T005, T006, T007, T008, T009, T010.
 
-## Tasks (0/10 resolved)
+## Tasks (1/10 resolved)
 
 ### S1 — Typed command-trace application model
 
 > Establish validated values, the recording usecase boundary, and typed aggregation output. IN-01, IN-02, IN-03, CN-01, AC-01, AC-02.
 
-- [ ] **T001**: Add `libs/usecase/src/telemetry/command_trace.rs` with `SotpCommandIdentity`, `CommandDurationMillis`, `CommandExitCode`, `CommandExecutionResult`, `CommandTraceRecord`, and `CommandTraceValueError`, including their validating constructors and value tests. IN-01, IN-02, CN-01, AC-01, AC-03.
+- [x] **T001**: Add `libs/usecase/src/telemetry/command_trace.rs` with `SotpCommandIdentity`, `CommandDurationMillis`, `CommandExitCode`, `CommandExecutionResult`, `CommandTraceRecord`, and `CommandTraceValueError`, including their validating constructors and value tests. IN-01, IN-02, CN-01, AC-01, AC-03.
 - [ ] **T002**: Add `CommandTraceService`, `CommandTraceWriterPort`, `CommandTraceInteractor`, and `CommandTraceWriteError` in `libs/usecase/src/telemetry/command_trace.rs`, including recording-flow result and port-contract tests. IN-01, IN-02, CN-01, AC-01, AC-03.
 - [ ] **T003**: Extend `TelemetryAggregateInteractor` and the usecase telemetry output with typed per-command execution metrics, bounded failure-rate data, and malformed-record accounting, with focused aggregation-conversion tests. IN-03, CN-01, AC-02, AC-03.
 

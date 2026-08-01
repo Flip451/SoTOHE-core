@@ -1,4 +1,165 @@
 {
   "track_id": "2026-08-01-sotp-tracing-instrumentation",
-  "entries": []
+  "entries": [
+    {
+      "edge_id": {
+        "entry_key": "CommandDurationMillis",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandDurationMillis",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "9f164b62075f4fc71001fa01c16bcd647f601791ba17529f69fed6df567e147e",
+        "declaration_hash": "07989b7947391460edff56660b0083e18fb9b8dac7b427d24f4347751cfc67ef",
+        "anchor_text_hash": "886b259b72d31a9481887873baede5471f2b81415aad543979b98bd24b8f0528"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let duration = CommandDurationMillis::from(275_u64);\n\n        assert_eq!(*duration.as_ref(), 275);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::command_trace::tests",
+          "test_name": "test_command_duration_millis_from_u64_exposes_value"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandExecutionResult",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandExecutionResult",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "1fa0b3b4f67c7b3b037ec484399959a751345f1d18debceafe7a0bce7d2582f1",
+        "declaration_hash": "d55cf73f9815e43106b3cca3c7db027f3f5ba7b65f9f3a1e639d6b33d429eb23",
+        "anchor_text_hash": "886b259b72d31a9481887873baede5471f2b81415aad543979b98bd24b8f0528"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let result = CommandExecutionResult::Failure(exit_code(1)?);\n\n        assert_eq!(result, CommandExecutionResult::Failure(exit_code(1)?));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::command_trace::tests",
+          "test_name": "test_command_execution_result_failure_retains_exit_code"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandExitCode",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandExitCode",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "10ce56d5d9ca59e6e766fca066e44653e3f0d90fa717af5780c01dbdd3547fe9",
+        "declaration_hash": "d1f6a74b0fd674a87a517e19af953edf3b41eec545df8f2d87938f564db5659e",
+        "anchor_text_hash": "886b259b72d31a9481887873baede5471f2b81415aad543979b98bd24b8f0528"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let exit_code = exit_code(17)?;\n\n        assert_eq!(exit_code.value(), 17);\n        Ok(())\n    }\n{\n        let result = CommandExitCode::try_new(0);\n\n        assert!(matches!(result, Err(CommandTraceValueError::ZeroExitCode)));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::command_trace::tests",
+          "test_name": "test_command_exit_code_nonzero_retains_value"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::command_trace::tests",
+          "test_name": "test_command_exit_code_zero_returns_zero_exit_code_error"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandTraceRecord",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandTraceRecord",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "2159083f46fb190760522373d0daca4c1f82fdfaf6a10fbdba668426348948b9",
+        "declaration_hash": "201629ff14ada99e7fa65067742e6edd162b6b64421a693ab976517ba5da709e",
+        "anchor_text_hash": "886b259b72d31a9481887873baede5471f2b81415aad543979b98bd24b8f0528"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(record.command.as_str(), \"telemetry\");\n        assert_eq!(*record.duration.as_ref(), 36);\n        assert_eq!(record.result, CommandExecutionResult::Success);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::command_trace::tests",
+          "test_name": "test_command_trace_record_validated_values_preserves_fields"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SotpCommandIdentity",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SotpCommandIdentity",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "2159083f46fb190760522373d0daca4c1f82fdfaf6a10fbdba668426348948b9",
+        "declaration_hash": "73989c7c9b9a06d5df0797e0ebdc575b5c1362ff4c1503501a9e78e8c3df3b1f",
+        "anchor_text_hash": "886b259b72d31a9481887873baede5471f2b81415aad543979b98bd24b8f0528"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(record.command.as_str(), \"telemetry\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::command_trace::tests",
+          "test_name": "test_command_trace_record_validated_values_preserves_fields"
+        }
+      ]
+    }
+  ]
 }

@@ -1,4 +1,63 @@
 {
   "track_id": "2026-08-01-sotp-tracing-instrumentation",
-  "records": []
+  "records": [
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CommandDurationMillis", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "IN-02"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::telemetry::command_trace::tests", "test_name": "test_command_duration_millis_from_u64_exposes_value"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CommandExecutionResult", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "IN-02"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::telemetry::command_trace::tests", "test_name": "test_command_execution_result_failure_retains_exit_code"}]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "CommandExecutionResult", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "AC-01"}},
+      "reason": "CommandExecutionResult only represents an in-memory completed-command outcome and neither executes a command nor persists JSONL. Local record writing is owned by the later T004 adapter work, while cross-command invocation is exercised by T010 entrypoint integration."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CommandExitCode", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "IN-02"}},
+      "tests": [
+        {"layer": "usecase", "module_path": "usecase::telemetry::command_trace::tests", "test_name": "test_command_exit_code_nonzero_retains_value"},
+        {"layer": "usecase", "module_path": "usecase::telemetry::command_trace::tests", "test_name": "test_command_exit_code_zero_returns_zero_exit_code_error"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CommandTraceRecord", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "IN-02"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::telemetry::command_trace::tests", "test_name": "test_command_trace_record_validated_values_preserves_fields"}]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "CommandTraceRecord", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "IN-01"}},
+      "reason": "CommandTraceRecord only holds validated in-memory values and does not dispatch commands or apply common-entrypoint instrumentation. Cross-command tracing is exercised by the later T010 entrypoint integration work."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "CommandTraceRecord", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "AC-01"}},
+      "reason": "CommandTraceRecord only holds validated in-memory values and has no JSONL serialization or persistence behavior. Local record writing is owned by the later T004 adapter work."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "CommandTraceValueError", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "IN-01"}},
+      "reason": "CommandTraceValueError only represents local constructor-validation failures and does not dispatch or instrument commands. Common-entrypoint tracing is exercised by the later T010 entrypoint integration work."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "CommandTraceValueError", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "IN-02"}},
+      "reason": "CommandTraceValueError only represents in-memory validation failures and has no JSONL serialization or persistence behavior. Local record writing is owned by the later T004 adapter work."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "SotpCommandIdentity", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "IN-01"}},
+      "reason": "SotpCommandIdentity validates one command label but does not own command dispatch or common-entrypoint instrumentation. Cross-command tracing is exercised by the later T010 entrypoint integration work."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "SotpCommandIdentity", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "IN-02"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::telemetry::command_trace::tests", "test_name": "test_command_trace_record_validated_values_preserves_fields"}]
+    }
+  ]
 }

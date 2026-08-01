@@ -16,6 +16,8 @@ use thiserror::Error;
 
 use crate::git_workflow::GitPrimitivePort;
 
+pub mod command_trace;
+
 // ── TelemetryReportPort ───────────────────────────────────────────────────────
 
 /// Report record for a single telemetry phase duration.

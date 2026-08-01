@@ -494,7 +494,7 @@
         "shape": {
           "fields": [],
           "has_stripped_fields": true,
-          "kind": "plain"
+          "kind": "tuple"
         }
       },
       "methods": [],
@@ -614,7 +614,7 @@
         "shape": {
           "fields": [],
           "has_stripped_fields": true,
-          "kind": "plain"
+          "kind": "tuple"
         }
       },
       "methods": [],
@@ -821,7 +821,7 @@
         "shape": {
           "fields": [],
           "has_stripped_fields": true,
-          "kind": "plain"
+          "kind": "tuple"
         }
       },
       "methods": [],
