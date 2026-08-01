@@ -1,121 +1,81 @@
 {
   "schema_version": 2,
   "scopes": {
-    "spec": {
+    "adr": {
       "rounds": [
         {
           "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "CN-02 is untestable: “運用上管理可能” defines no deterministic rotation bound or observable condition, forcing downstream phases to invent the contract.",
-              "severity": "P1",
-              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
-              "line": 96,
-              "category": "constraint vague or untestable"
-            },
-            {
-              "message": "AC-04 is non-observable: “運用可能な状態” lacks a measurable file-size, retention, or rotation condition that a deterministic test can verify.",
-              "severity": "P1",
-              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
-              "line": 138,
-              "category": "acceptance criterion non-observable"
-            }
-          ],
-          "hash": "rvw1:sha256:4bf46cb46b23513f5de5085bcd94bca41c2c1b2fd4edafc241163fa3419066ea",
-          "at": "2026-08-01T08:45:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "CN-02 is untestable: “運用上管理可能” defines no deterministic rotation bound or observable condition, forcing downstream phases to invent the contract.",
-              "severity": "P1",
-              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
-              "line": 96,
-              "category": "constraint vague or untestable"
-            },
-            {
-              "message": "AC-04 is non-observable: “運用可能な状態” lacks a measurable file-size, retention, or rotation condition that a deterministic test can verify.",
-              "severity": "P1",
-              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
-              "line": 138,
-              "category": "acceptance criterion non-observable"
-            }
-          ],
-          "hash": "rvw1:sha256:4bf46cb46b23513f5de5085bcd94bca41c2c1b2fd4edafc241163fa3419066ea",
-          "at": "2026-08-01T08:47:49Z"
-        },
-        {
-          "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:50e25023da8f4d7de35579201f9bfb28874699a8c10c02afd301f379fd9757a5",
-          "at": "2026-08-01T08:54:03Z"
+          "hash": "rvw1:sha256:e5fd22cc4b56991d32e6e4d9dd3fd700b2e2cb7e02af5cd248028423f0163949",
+          "at": "2026-08-01T07:02:22Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:50e25023da8f4d7de35579201f9bfb28874699a8c10c02afd301f379fd9757a5",
-          "at": "2026-08-01T08:57:21Z"
+          "hash": "rvw1:sha256:e5fd22cc4b56991d32e6e4d9dd3fd700b2e2cb7e02af5cd248028423f0163949",
+          "at": "2026-08-01T07:05:04Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4b9b19dde70a553386199e5ecd3d44d5ea7c86c2898d3207ebd1cf2a86533826",
-          "at": "2026-08-01T09:18:22Z"
+          "hash": "rvw1:sha256:e5fd22cc4b56991d32e6e4d9dd3fd700b2e2cb7e02af5cd248028423f0163949",
+          "at": "2026-08-01T07:50:28Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4b9b19dde70a553386199e5ecd3d44d5ea7c86c2898d3207ebd1cf2a86533826",
-          "at": "2026-08-01T09:20:41Z"
+          "hash": "rvw1:sha256:e5fd22cc4b56991d32e6e4d9dd3fd700b2e2cb7e02af5cd248028423f0163949",
+          "at": "2026-08-01T07:53:28Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:566e6723c5f4c5b88898402b0eb2cefc19c96239baf6f9b8a32d2bfdc8403ff5",
-          "at": "2026-08-01T14:38:02Z"
+          "hash": "rvw1:sha256:353367f31fdf361c4996447d43a5ecc6a92a21f7c9895a33e17929f420811646",
+          "at": "2026-08-01T09:09:43Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:566e6723c5f4c5b88898402b0eb2cefc19c96239baf6f9b8a32d2bfdc8403ff5",
-          "at": "2026-08-01T14:44:02Z"
+          "hash": "rvw1:sha256:353367f31fdf361c4996447d43a5ecc6a92a21f7c9895a33e17929f420811646",
+          "at": "2026-08-01T09:13:10Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0c9b886e3dc4b3271f56983a3d07b4922eae61a8cd0b1875304ef38517c08778",
-          "at": "2026-08-01T15:10:21Z"
+          "hash": "rvw1:sha256:34fa4360038f5a946d0779f1f5ceb1115dda5abfacb303ad871ab4e67d00bfc3",
+          "at": "2026-08-01T15:10:20Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0c9b886e3dc4b3271f56983a3d07b4922eae61a8cd0b1875304ef38517c08778",
-          "at": "2026-08-01T15:12:26Z"
-        },
+          "hash": "rvw1:sha256:34fa4360038f5a946d0779f1f5ceb1115dda5abfacb303ad871ab4e67d00bfc3",
+          "at": "2026-08-01T15:12:47Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:2d6e8326e977a8f5e5517fe90d01408719f2e383a3c58ad79bd0e3ac966c98aa",
-          "at": "2026-08-01T16:26:00Z"
+          "hash": "rvw1:sha256:8272034d5c8b9580f1065ec48f2c25641df48fa4acf1b2b5a9f16fc95ac0ff8e",
+          "at": "2026-08-01T16:26:41Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:2d6e8326e977a8f5e5517fe90d01408719f2e383a3c58ad79bd0e3ac966c98aa",
-          "at": "2026-08-01T16:28:59Z"
+          "hash": "rvw1:sha256:8272034d5c8b9580f1065ec48f2c25641df48fa4acf1b2b5a9f16fc95ac0ff8e",
+          "at": "2026-08-01T16:29:20Z"
         }
       ]
     },
@@ -765,70 +725,20 @@
           "findings": [],
           "hash": "rvw1:sha256:940483e983da09a451e4f26d90c7b5e5a50ac00811ed8ca212417baea945a0ce",
           "at": "2026-08-01T20:48:14Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b14186c030944ee1b6beba5d3b5605033ffa35b8f6dbe6c7785b0891593e2e28",
-          "at": "2026-08-01T12:38:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b14186c030944ee1b6beba5d3b5605033ffa35b8f6dbe6c7785b0891593e2e28",
-          "at": "2026-08-01T12:48:02Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7cc05756992e09db4c2fec3de56aa5a10e4c255383dd5b6b8652d26a53d6395c",
-          "at": "2026-08-01T14:38:05Z"
+          "hash": "rvw1:sha256:a7ef0455b77b972b34e26675ba68423064915f8c5c70b7dd9b172fb0a4246621",
+          "at": "2026-08-01T21:37:14Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7cc05756992e09db4c2fec3de56aa5a10e4c255383dd5b6b8652d26a53d6395c",
-          "at": "2026-08-01T14:44:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dd8809d397a718881ba3b9d2385393c9a9376dae0e45f79f3d0a06ea29f47942",
-          "at": "2026-08-01T16:26:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dd8809d397a718881ba3b9d2385393c9a9376dae0e45f79f3d0a06ea29f47942",
-          "at": "2026-08-01T16:30:53Z"
-        }
-      ]
-    },
-    "cli_driver": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8272034d5c8b9580f1065ec48f2c25641df48fa4acf1b2b5a9f16fc95ac0ff8e",
-          "at": "2026-08-01T16:26:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8272034d5c8b9580f1065ec48f2c25641df48fa4acf1b2b5a9f16fc95ac0ff8e",
-          "at": "2026-08-01T16:29:20Z"
+          "hash": "rvw1:sha256:a7ef0455b77b972b34e26675ba68423064915f8c5c70b7dd9b172fb0a4246621",
+          "at": "2026-08-01T21:57:19Z"
         }
       ]
     },
@@ -1012,66 +922,199 @@
           "findings": [],
           "hash": "rvw1:sha256:934922f9e1516ca16b18d7f3ec27cb5c467084ba2d332b4b3c80a86d842504b3",
           "at": "2026-08-01T20:49:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-04's voluntary binding covers unknown-schema fail-open handling but omits the existing malformed-record test `test_aggregate_malformed_command_record_is_skipped_and_counted`; bind both concrete failure modes so the constraint's evidence is complete.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
+              "line": 129,
+              "category": "test-obligation-evidence"
+            }
+          ],
+          "hash": "rvw1:sha256:486dd1055a2250d6d48eeb30f312271687cb6f065ad727f1a0ec4c4cfdb44c78",
+          "at": "2026-08-01T21:38:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:94016988a8fbf3e892b1d9d728825baf07a01545534b11339249ad7a8e528dd3",
+          "at": "2026-08-01T21:42:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:94016988a8fbf3e892b1d9d728825baf07a01545534b11339249ad7a8e528dd3",
+          "at": "2026-08-01T21:57:10Z"
         }
       ]
     },
-    "adr": {
+    "usecase": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e5fd22cc4b56991d32e6e4d9dd3fd700b2e2cb7e02af5cd248028423f0163949",
-          "at": "2026-08-01T07:02:22Z"
+          "hash": "rvw1:sha256:b14186c030944ee1b6beba5d3b5605033ffa35b8f6dbe6c7785b0891593e2e28",
+          "at": "2026-08-01T12:38:08Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e5fd22cc4b56991d32e6e4d9dd3fd700b2e2cb7e02af5cd248028423f0163949",
-          "at": "2026-08-01T07:05:04Z"
+          "hash": "rvw1:sha256:b14186c030944ee1b6beba5d3b5605033ffa35b8f6dbe6c7785b0891593e2e28",
+          "at": "2026-08-01T12:48:02Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e5fd22cc4b56991d32e6e4d9dd3fd700b2e2cb7e02af5cd248028423f0163949",
-          "at": "2026-08-01T07:50:28Z"
+          "hash": "rvw1:sha256:7cc05756992e09db4c2fec3de56aa5a10e4c255383dd5b6b8652d26a53d6395c",
+          "at": "2026-08-01T14:38:05Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e5fd22cc4b56991d32e6e4d9dd3fd700b2e2cb7e02af5cd248028423f0163949",
-          "at": "2026-08-01T07:53:28Z"
+          "hash": "rvw1:sha256:7cc05756992e09db4c2fec3de56aa5a10e4c255383dd5b6b8652d26a53d6395c",
+          "at": "2026-08-01T14:44:56Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:353367f31fdf361c4996447d43a5ecc6a92a21f7c9895a33e17929f420811646",
-          "at": "2026-08-01T09:09:43Z"
+          "hash": "rvw1:sha256:dd8809d397a718881ba3b9d2385393c9a9376dae0e45f79f3d0a06ea29f47942",
+          "at": "2026-08-01T16:26:21Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:353367f31fdf361c4996447d43a5ecc6a92a21f7c9895a33e17929f420811646",
-          "at": "2026-08-01T09:13:10Z"
+          "hash": "rvw1:sha256:dd8809d397a718881ba3b9d2385393c9a9376dae0e45f79f3d0a06ea29f47942",
+          "at": "2026-08-01T16:30:53Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-02 is untestable: “運用上管理可能” defines no deterministic rotation bound or observable condition, forcing downstream phases to invent the contract.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+              "line": 96,
+              "category": "constraint vague or untestable"
+            },
+            {
+              "message": "AC-04 is non-observable: “運用可能な状態” lacks a measurable file-size, retention, or rotation condition that a deterministic test can verify.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+              "line": 138,
+              "category": "acceptance criterion non-observable"
+            }
+          ],
+          "hash": "rvw1:sha256:4bf46cb46b23513f5de5085bcd94bca41c2c1b2fd4edafc241163fa3419066ea",
+          "at": "2026-08-01T08:45:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-02 is untestable: “運用上管理可能” defines no deterministic rotation bound or observable condition, forcing downstream phases to invent the contract.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+              "line": 96,
+              "category": "constraint vague or untestable"
+            },
+            {
+              "message": "AC-04 is non-observable: “運用可能な状態” lacks a measurable file-size, retention, or rotation condition that a deterministic test can verify.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+              "line": 138,
+              "category": "acceptance criterion non-observable"
+            }
+          ],
+          "hash": "rvw1:sha256:4bf46cb46b23513f5de5085bcd94bca41c2c1b2fd4edafc241163fa3419066ea",
+          "at": "2026-08-01T08:47:49Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:34fa4360038f5a946d0779f1f5ceb1115dda5abfacb303ad871ab4e67d00bfc3",
-          "at": "2026-08-01T15:10:20Z"
+          "hash": "rvw1:sha256:50e25023da8f4d7de35579201f9bfb28874699a8c10c02afd301f379fd9757a5",
+          "at": "2026-08-01T08:54:03Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:34fa4360038f5a946d0779f1f5ceb1115dda5abfacb303ad871ab4e67d00bfc3",
-          "at": "2026-08-01T15:12:47Z"
+          "hash": "rvw1:sha256:50e25023da8f4d7de35579201f9bfb28874699a8c10c02afd301f379fd9757a5",
+          "at": "2026-08-01T08:57:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4b9b19dde70a553386199e5ecd3d44d5ea7c86c2898d3207ebd1cf2a86533826",
+          "at": "2026-08-01T09:18:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4b9b19dde70a553386199e5ecd3d44d5ea7c86c2898d3207ebd1cf2a86533826",
+          "at": "2026-08-01T09:20:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:566e6723c5f4c5b88898402b0eb2cefc19c96239baf6f9b8a32d2bfdc8403ff5",
+          "at": "2026-08-01T14:38:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:566e6723c5f4c5b88898402b0eb2cefc19c96239baf6f9b8a32d2bfdc8403ff5",
+          "at": "2026-08-01T14:44:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c9b886e3dc4b3271f56983a3d07b4922eae61a8cd0b1875304ef38517c08778",
+          "at": "2026-08-01T15:10:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c9b886e3dc4b3271f56983a3d07b4922eae61a8cd0b1875304ef38517c08778",
+          "at": "2026-08-01T15:12:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2d6e8326e977a8f5e5517fe90d01408719f2e383a3c58ad79bd0e3ac966c98aa",
+          "at": "2026-08-01T16:26:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2d6e8326e977a8f5e5517fe90d01408719f2e383a3c58ad79bd0e3ac966c98aa",
+          "at": "2026-08-01T16:28:59Z"
         }
       ]
     },
@@ -1228,6 +1271,204 @@
           "findings": [],
           "hash": "rvw1:sha256:1272d6ac31f89849b5971cca67f22c60d5853f001ed099374150fd46c1954e0e",
           "at": "2026-08-01T21:14:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`PersistedCommandTraceRecord` lacks `#[serde(deny_unknown_fields)]`. A future command-trace record with `schema_version: 1` plus new fields is accepted and silently truncated, so the fail-open reader can report incomplete metrics instead of counting the row as skipped. Add strict unknown-field rejection (while preserving the intentionally unversioned current writer format).",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/telemetry/report.rs",
+              "line": 46,
+              "category": "serde codec break"
+            }
+          ],
+          "hash": "rvw1:sha256:70ca1bc3cba2409b705bc071203d609153f625eb7f79387cc9895b58ea42f9aa",
+          "at": "2026-08-01T21:37:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The persisted command DTO still treats `schema_version: null` as equivalent to an absent schema version because it uses `Option<u32>` with `#[serde(default)]`. A malformed record such as `{\"schema_version\":null,...}` is therefore aggregated instead of being skipped and counted, violating the fail-closed schema check. Preserve support for the current writer's omitted field, but reject explicit `null` (for example with a custom deserializer or an explicit presence marker).",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/telemetry/report.rs",
+              "line": 48,
+              "category": "serde codec break"
+            }
+          ],
+          "hash": "rvw1:sha256:1edb169abd36a592362213c997d44324125a157ab6e87d2dc585d09a9fcd2bb8",
+          "at": "2026-08-01T21:42:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`PersistedCommandTraceResult` is not strict, so unknown fields inside the nested `result` object are ignored even though the outer record has `deny_unknown_fields`. A forward record such as `{\"result\":{\"status\":\"success\",\"new_field\":...}}` is accepted and silently truncated instead of being skipped and counted. Make the nested result representation reject unknown fields as well.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/telemetry/report.rs",
+              "line": 75,
+              "category": "serde codec break"
+            }
+          ],
+          "hash": "rvw1:sha256:175a801dcfe297d20728f9c6ce75506248488d6fc1f0e30c768dad9d3fb2ed40",
+          "at": "2026-08-01T21:47:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cce98ab89fb72f273f982f87270ab6644964bd0c8cb5a880e7fe5f42dd6d58ca",
+          "at": "2026-08-01T21:53:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TelemetryEvent` is a versioned wire DTO, but Serde silently accepts unknown fields. Such records are treated as valid instead of contributing to `skipped_lines`, contrary to the strict versioned-codec policy. Parse the version envelope first and deserialize through strict `deny_unknown_fields` payload DTOs.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/telemetry/mod.rs",
+              "line": 51,
+              "category": "serde codec break"
+            },
+            {
+              "message": "Aggregation opens only the active `telemetry.jsonl`. The command-trace writer retains rotated generations as suffixed files, so after rotation the report omits historical executions and produces incorrect counts, durations, and failure rates. Aggregate all retained generations with the same typed I/O and symlink checks.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/telemetry/report.rs",
+              "line": 304,
+              "category": "aggregation correctness"
+            },
+            {
+              "message": "`read_until` grows `line` without any record-size bound. A malformed or oversized JSONL record can exhaust memory before the fail-open parser can skip and count it. Enforce a bounded line read and discard/count over-limit records.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/telemetry/report.rs",
+              "line": 322,
+              "category": "unbounded read"
+            }
+          ],
+          "hash": "rvw1:sha256:cce98ab89fb72f273f982f87270ab6644964bd0c8cb5a880e7fe5f42dd6d58ca",
+          "at": "2026-08-01T22:00:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Rotated-path discovery and later file opens are not coordinated with the command-trace writer's rotation lock. If rotation renames or replaces generations between these steps, aggregation can silently omit or double-count valid records. Acquire the writer-compatible lock while opening a stable set of file handles, then read those handles.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/telemetry/report.rs",
+              "line": 305,
+              "category": "aggregation correctness"
+            },
+            {
+              "message": "Rotated-generation discovery iterates the entire logs directory and stores every positive `u64` suffix. Arbitrarily many matching entries cause unbounded work and memory use, and suffixes outside the writer's `u16` generation domain are accepted. Probe a bounded owned-generation range or enforce a hard entry cap.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/telemetry/report.rs",
+              "line": 470,
+              "category": "unbounded I/O"
+            },
+            {
+              "message": "The new limit bounds only one line's buffer. Aggregation still reads every record from every discovered file and grows `errors`, `hook_blocks`, and the metric maps without a total byte or record bound, so many short valid records can exhaust memory. Enforce a total input/output budget in addition to the per-record limit.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/telemetry/report.rs",
+              "line": 325,
+              "category": "unbounded read"
+            }
+          ],
+          "hash": "rvw1:sha256:4fdaaf83e48670f8c584a856b3f9da0444c4e862cc1f104aa00820b27fc6a148",
+          "at": "2026-08-01T22:14:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The global 1 MiB budget terminates aggregation with a successful partial snapshot. Valid records after the cutoff are omitted without an error or any increment to skipped_lines, so callers cannot distinguish incomplete metrics from a complete report. Return a typed truncation error or expose/count the truncation explicitly.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/telemetry/report.rs",
+              "line": 341,
+              "category": "correctness"
+            },
+            {
+              "message": "The read adapter always creates or opens the lock file for writing. Consequently, an otherwise readable telemetry directory or archived read-only copy fails aggregation solely because the lock file or directory is not writable; reporting also mutates an empty logs directory. Existing lock files should be opened read-only for a shared lock, with missing-lock handling that preserves the read-only adapter contract.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/telemetry/report.rs",
+              "line": 496,
+              "category": "architecture"
+            },
+            {
+              "message": "All retained log files are opened simultaneously before any input is read. The supported u16 retention domain permits far more generations than a normal process file-descriptor limit, so valid telemetry configurations can fail with EMFILE even though aggregation is capped at 1 MiB and would read only a prefix. Process files sequentially while holding the shared lock, or enforce a validated retention bound consistent with this reader.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/telemetry/report.rs",
+              "line": 486,
+              "category": "resource_exhaustion"
+            }
+          ],
+          "hash": "rvw1:sha256:6a641b351f8e0b45f0f7f4fc30af5b04395e727859104b4cbd79659be44e40dc",
+          "at": "2026-08-01T22:27:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "When the lock file is absent, aggregation proceeds completely unsynchronized. A current writer can create the lock and rotate files after this check, causing the sequential reader to omit or duplicate pre-existing records or fail opening a renamed path. Retry under a newly appeared lock or use a stable snapshot strategy for the lockless compatibility path.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/telemetry/report.rs",
+              "line": 496,
+              "category": "concurrency"
+            },
+            {
+              "message": "The lock path is opened without verifying that it is a regular file or applying nonblocking semantics. On Unix, an in-root FIFO named telemetry.jsonl.lock makes this read-only open block indefinitely instead of returning a typed filesystem failure. Open nonblocking and validate the opened handle's file type before locking.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/telemetry/report.rs",
+              "line": 494,
+              "category": "unbounded_io"
+            }
+          ],
+          "hash": "rvw1:sha256:5530ac9b1210753704375157ac4b432a2f7a2e351a66b786bd9e5dd04b1640ab",
+          "at": "2026-08-01T22:43:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The lockless retry check runs only after a completely successful aggregation. If a writer creates the lock and rotates generations while telemetry_log_paths, open_read_no_follow, or the reader is running, a transient NotFound/I/O error returns immediately through `?` and bypasses the lock-appearance check, so reporting can still fail during the compatibility race this retry is intended to handle. Route errors from a lockless attempt through the same lock check and retry once under the shared lock.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/telemetry/report.rs",
+              "line": 355,
+              "category": "concurrency"
+            }
+          ],
+          "hash": "rvw1:sha256:ea26275acd298693a094869a7034e618ef679b6fd680bcf38893d686ea521af9",
+          "at": "2026-08-01T22:52:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The production portion of this module now runs through line 702, exceeding the repository's hard 700-line production-module limit. Extract the aggregation/locking helpers into an in-scope submodule or otherwise reduce the production module below the limit; test code remains exempt.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/telemetry/report.rs",
+              "line": 703,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:811ef8903700ade7a253d58277be34cba1a83a8c220f903cf179a18a35c6f93b",
+          "at": "2026-08-01T22:59:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:af3cc21323719636c4e8c4d9c434120d6e46fcfd513eeea03aafff0e6ceeeaab",
+          "at": "2026-08-01T23:04:59Z"
         }
       ]
     },

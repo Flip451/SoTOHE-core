@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-01T21:12:43Z",
+  "generated_at": "2026-08-01T23:03:27Z",
   "declaration_hash": "78399ada641dc69c17e97b263893ccf15a30e339e34e9da374b77a1af562b2a6",
-  "implementation_input_hash": "bf1f0d8945ad7aa4c8b12f8fde7d7d99b03fd9d4478d7c8f1ff6c646ee91f9fc",
+  "implementation_input_hash": "5faad9cfe0b0b2fcaaf907ca5ce2132a75355c0bee47b865e1f38455702d8c94",
   "signals": [
     {
       "type_name": "CommandTraceFileSizeLimitBytes",
@@ -67,7 +67,7 @@
     {
       "type_name": "TelemetryReport",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "Debug"
@@ -76,9 +76,9 @@
     {
       "type_name": "TelemetryReportSnapshot",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug"
       ]
@@ -86,12 +86,8 @@
     {
       "type_name": "TelemetryReportOutput",
       "kind_tag": "unknown",
-      "signal": "yellow",
-      "found_type": true,
-      "missing_items": [
-        "Clone",
-        "Debug"
-      ]
+      "signal": "blue",
+      "found_type": false
     }
   ]
 }

@@ -613,13 +613,13 @@
         "item_identifier": "voluntary:CN-04"
       },
       "key": {
-        "bound_tests_set_hash": "193c7cff180098e2c11fb1da3d56d31ebaceb67c7341cf815f21363f70842b65",
+        "bound_tests_set_hash": "f28889470b7fec97f3a4a5957006a827f606827afd68f42bd9bc21233e0fa89b",
         "declaration_hash": "e7e487166a4b3633505396897f17e0be5461b15d74c250c1f814babe4b19cc70",
         "anchor_text_hash": "09206e1e7a070ff894d6aec08359cc87d6e162f063df4b893135fb5e2642b785"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "skipped_lines: TelemetrySkippedLineCount::from(2),\n            command_metrics: vec![metric],\n        };\n        let git = Arc::new(StubGit { repo_root: Some(PathBuf::from(\"/repo\")) });\n        let report = Arc::new(StubReport { result: Mutex::new(Some(Ok(output))) });\n        let factory = Arc::new(StubFactory {\n            built_dir: Mutex::new(None),\n            port: Arc::new(RecordingArchivedPort::default()),\n        });\n        let interactor = facade(git, report, factory);\n\n        let output = interactor.report(\"t\", Path::new(\"track/items\"))?;\n\n        assert_eq!(*output.skipped_lines.as_ref(), 2);"
+        "citation": "assert_eq!(*output.skipped_lines.as_ref(), 1);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -627,6 +627,16 @@
           "layer": "usecase",
           "module_path": "usecase::telemetry::aggregate_interactor_tests",
           "test_name": "test_telemetry_aggregate_interactor_report_typed_metrics_preserves_values"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::report::tests",
+          "test_name": "test_aggregate_malformed_command_record_is_skipped_and_counted"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::report::tests",
+          "test_name": "test_aggregate_unknown_schema_command_record_is_skipped_and_counted"
         }
       ]
     },
@@ -1111,6 +1121,135 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::telemetry::command_trace::tests",
           "test_name": "test_fs_command_trace_adapter_record_excess_rotations_delete_oldest_file_first"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TelemetryReport",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TelemetryReport",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "88a454159d4b6a5eed8a8b4e038e82cb5d777fc85e64eed0f0be3e3ad53ca730",
+        "declaration_hash": "1ea441b310c43de24d5ce9e2092cf29cf75c9483adfe1b5fabb2adf2c0ce9a9d",
+        "anchor_text_hash": "9aa2ab81cfe9da837ec1df59e054f2d063869ef34a03c3a3356a357fc9fad436"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(*metric.executions().as_ref(), 3);\n        assert_eq!(*metric.failures().as_ref(), 1);\n        assert_eq!(*metric.total_duration().as_ref(), 320);\n        assert_eq!(metric.failure_rate().value(), 3_333);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::report::tests",
+          "test_name": "test_aggregate_persisted_command_records_produces_typed_metrics"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::report::tests",
+          "test_name": "test_aggregate_malformed_command_record_is_skipped_and_counted"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TelemetryReport",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TelemetryReport",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "63e5390e0fde9c4e37cf3c63f2d21a0d6b95d479ddcdffdcfb838522ce551610",
+        "declaration_hash": "1ea441b310c43de24d5ce9e2092cf29cf75c9483adfe1b5fabb2adf2c0ce9a9d",
+        "anchor_text_hash": "4a56d1978d1635e0824090a3dc23d8b1a68442cc68800529fe04faef0373f783"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(*metric.executions().as_ref(), 3);\n        assert_eq!(*metric.failures().as_ref(), 1);\n        assert_eq!(*metric.total_duration().as_ref(), 320);\n        assert_eq!(metric.failure_rate().value(), 3_333);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::report::tests",
+          "test_name": "test_aggregate_persisted_command_records_produces_typed_metrics"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TelemetryReportSnapshot",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TelemetryReportSnapshot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "89e44a743ccf132d0e34fe6d55d02b895a7ef7243063a5509a55b65da526c580",
+        "declaration_hash": "284b0b6b8449f9e9f484506db8d7362d2d98e07cac2679aa9302865b832fc52d",
+        "anchor_text_hash": "9aa2ab81cfe9da837ec1df59e054f2d063869ef34a03c3a3356a357fc9fad436"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(output.command_metrics.len(), 1);\n        let metric = output.command_metrics.first().unwrap();\n        assert_eq!(metric.command().as_str(), \"track plan\");\n        assert_eq!(*metric.executions().as_ref(), 2);\n        assert_eq!(*metric.failures().as_ref(), 1);\n        assert_eq!(*metric.total_duration().as_ref(), 200);\n        assert_eq!(metric.failure_rate().value(), 5_000);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::report_adapter::tests",
+          "test_name": "aggregate_converts_persisted_command_metrics_to_usecase_output"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TelemetryReportSnapshot",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TelemetryReportSnapshot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "89e44a743ccf132d0e34fe6d55d02b895a7ef7243063a5509a55b65da526c580",
+        "declaration_hash": "284b0b6b8449f9e9f484506db8d7362d2d98e07cac2679aa9302865b832fc52d",
+        "anchor_text_hash": "4a56d1978d1635e0824090a3dc23d8b1a68442cc68800529fe04faef0373f783"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(*metric.executions().as_ref(), 2);\n        assert_eq!(*metric.failures().as_ref(), 1);\n        assert_eq!(*metric.total_duration().as_ref(), 200);\n        assert_eq!(metric.failure_rate().value(), 5_000);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::report_adapter::tests",
+          "test_name": "aggregate_converts_persisted_command_metrics_to_usecase_output"
         }
       ]
     }

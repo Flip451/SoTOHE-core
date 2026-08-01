@@ -5,7 +5,7 @@
 
 GO-01 → T001, T002, T003, T004, T005, T006, T007, T008, T009, T010.
 
-## Tasks (5/10 resolved)
+## Tasks (6/10 resolved)
 
 ### S1 — Typed command-trace application model
 
@@ -25,13 +25,13 @@ GO-01 → T001, T002, T003, T004, T005, T006, T007, T008, T009, T010.
 
 > Complete the terminal filesystem writer contract using the validated policy: local persistence, typed failures, pre-append rotation, bounded retention, and focused verification. IN-02, IN-04, OUT-01, CN-01, CN-02, CN-03, AC-01, AC-03, AC-04.
 
-- [x] **T005**: Complete the terminal `FsCommandTraceAdapter` as the local JSONL `CommandTraceWriterPort` implementation, building on the uncommitted append-only adapter: typed write-failure propagation, JSONL persistence, pre-append rotation, and oldest-first retention, with record-format, write-failure, AC-01, and AC-04 tests. IN-02, IN-04, OUT-01, CN-01, CN-02, CN-03, AC-01, AC-03, AC-04.
+- [x] **T005**: Complete the terminal `FsCommandTraceAdapter` as the local JSONL `CommandTraceWriterPort` implementation, building on the uncommitted append-only adapter: typed write-failure propagation, JSONL persistence, pre-append rotation, and oldest-first retention, with record-format, write-failure, AC-01, and AC-04 tests. IN-02, IN-04, OUT-01, CN-01, CN-02, CN-03, AC-01, AC-03, AC-04. (`faf97afdf260eecce2ecaa30487c1e5f5e1e120f`)
 
 ### S4 — Telemetry aggregation and display
 
 > Replace the infrastructure report DTO with its snapshot model, convert persisted command records through the existing aggregation path, and render the resulting metrics through the telemetry command. IN-03, OUT-01, CN-01, CN-04, AC-02, AC-03.
 
-- [ ] **T006**: Delete the old infrastructure `TelemetryReportOutput`, modify `TelemetryReport::aggregate`, add the layer-unique `TelemetryReportSnapshot` read model, and update `FsTelemetryReportAdapter` parser-to-usecase conversion for persisted command metrics and fail-open malformed- and unknown-schema-record skip reporting, with focused aggregation-path tests. IN-03, OUT-01, CN-01, CN-04, AC-02, AC-03.
+- [x] **T006**: Delete the old infrastructure `TelemetryReportOutput`, modify `TelemetryReport::aggregate`, add the layer-unique `TelemetryReportSnapshot` read model, and update `FsTelemetryReportAdapter` parser-to-usecase conversion for persisted command metrics and fail-open malformed- and unknown-schema-record skip reporting, with focused aggregation-path tests. IN-03, OUT-01, CN-01, CN-04, AC-02, AC-03.
 - [ ] **T009**: Extend `TelemetryDriver::telemetry_report` and `apps/cli/src/commands/telemetry.rs::execute` to render command metrics from the existing aggregation path; add focused AC-02 CLI regression tests for frequency, duration, and failure rate. IN-03, CN-01, AC-02, AC-03.
 
 ### S5 — Tracing composition

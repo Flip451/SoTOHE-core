@@ -124,7 +124,11 @@
     {
       "kind": "voluntary_binding",
       "edge_id": {"entry_key": "TelemetrySkippedLineCount", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "CN-04"}},
-      "tests": [{"layer": "usecase", "module_path": "usecase::telemetry::aggregate_interactor_tests", "test_name": "test_telemetry_aggregate_interactor_report_typed_metrics_preserves_values"}]
+      "tests": [
+        {"layer": "usecase", "module_path": "usecase::telemetry::aggregate_interactor_tests", "test_name": "test_telemetry_aggregate_interactor_report_typed_metrics_preserves_values"},
+        {"layer": "infrastructure", "module_path": "infrastructure::telemetry::report::tests", "test_name": "test_aggregate_malformed_command_record_is_skipped_and_counted"},
+        {"layer": "infrastructure", "module_path": "infrastructure::telemetry::report::tests", "test_name": "test_aggregate_unknown_schema_command_record_is_skipped_and_counted"}
+      ]
     },
     {
       "kind": "voluntary_binding",
@@ -222,6 +226,29 @@
       "kind": "waiver",
       "edge_id": {"entry_key": "FsCommandTraceAdapter", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "IN-01"}},
       "reason": "FsCommandTraceAdapter persists one completed record passed through its secondary port but does not dispatch a command or instrument the common entrypoint. Cross-command tracing is exercised by the later T010 entrypoint integration work."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "TelemetryReport", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "IN-03"}},
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::telemetry::report::tests", "test_name": "test_aggregate_persisted_command_records_produces_typed_metrics"},
+        {"layer": "infrastructure", "module_path": "infrastructure::telemetry::report::tests", "test_name": "test_aggregate_malformed_command_record_is_skipped_and_counted"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "TelemetryReport", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "AC-02"}},
+      "tests": [{"layer": "infrastructure", "module_path": "infrastructure::telemetry::report::tests", "test_name": "test_aggregate_persisted_command_records_produces_typed_metrics"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "TelemetryReportSnapshot", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "IN-03"}},
+      "tests": [{"layer": "infrastructure", "module_path": "infrastructure::telemetry::report_adapter::tests", "test_name": "aggregate_converts_persisted_command_metrics_to_usecase_output"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "TelemetryReportSnapshot", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "AC-02"}},
+      "tests": [{"layer": "infrastructure", "module_path": "infrastructure::telemetry::report_adapter::tests", "test_name": "aggregate_converts_persisted_command_metrics_to_usecase_output"}]
     }
   ]
 }

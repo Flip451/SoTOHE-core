@@ -35,6 +35,7 @@
       "id": "T005",
       "description": "Complete the terminal `FsCommandTraceAdapter` as the local JSONL `CommandTraceWriterPort` implementation, building on the uncommitted append-only adapter: typed write-failure propagation, JSONL persistence, pre-append rotation, and oldest-first retention, with record-format, write-failure, AC-01, and AC-04 tests. IN-02, IN-04, OUT-01, CN-01, CN-02, CN-03, AC-01, AC-03, AC-04.",
       "status": "done",
+      "commit_hash": "faf97afdf260eecce2ecaa30487c1e5f5e1e120f",
       "depends_on": [
         "T002",
         "T004"
@@ -43,7 +44,7 @@
     {
       "id": "T006",
       "description": "Delete the old infrastructure `TelemetryReportOutput`, modify `TelemetryReport::aggregate`, add the layer-unique `TelemetryReportSnapshot` read model, and update `FsTelemetryReportAdapter` parser-to-usecase conversion for persisted command metrics and fail-open malformed- and unknown-schema-record skip reporting, with focused aggregation-path tests. IN-03, OUT-01, CN-01, CN-04, AC-02, AC-03.",
-      "status": "todo",
+      "status": "done",
       "depends_on": [
         "T003",
         "T005"

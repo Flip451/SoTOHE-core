@@ -9,11 +9,12 @@
 use std::path::{Component, Path, PathBuf};
 use std::sync::Arc;
 
+use domain::TrackId;
 use usecase::telemetry::{
     TelemetryEmitDynamicPort, TelemetryEmitDynamicPortError,
     TelemetryErrorEntry as UsecaseErrorEntry, TelemetryHookBlockEntry as UsecaseHookBlockEntry,
     TelemetryPhaseDuration, TelemetryReportError as UsecaseError, TelemetryReportOutput,
-    TelemetryReportPort, command_trace::TelemetrySkippedLineCount,
+    TelemetryReportPort,
 };
 
 use usecase::{
@@ -62,8 +63,10 @@ impl TelemetryReportPort for FsTelemetryReportAdapter {
         let trusted_items_dir = resolve_items_dir_under_current_repo(items_dir)
             .map_err(|e| UsecaseError::ReportUnavailable(e.to_string()))?;
 
+        let valid_track_id = TrackId::try_new(track_id.to_owned())
+            .map_err(|_| UsecaseError::TrackNotFound(track_id.to_owned()))?;
         let report = TelemetryReport::new(trusted_items_dir);
-        let infra_output = report.aggregate(track_id).map_err(|e| match e {
+        let infra_output = report.aggregate(&valid_track_id).map_err(|e| match e {
             InfraError::TrackNotFound { track_id: tid, .. } => UsecaseError::TrackNotFound(tid),
             InfraError::Io { path, message } => {
                 UsecaseError::ReportUnavailable(format!("{path}: {message}"))
@@ -101,8 +104,8 @@ impl TelemetryReportPort for FsTelemetryReportAdapter {
             phase_durations,
             errors,
             hook_blocks,
-            skipped_lines: TelemetrySkippedLineCount::from(u64::from(infra_output.skipped_lines)),
-            command_metrics: Vec::new(),
+            skipped_lines: infra_output.skipped_lines,
+            command_metrics: infra_output.command_metrics,
         })
     }
 }
@@ -449,6 +452,33 @@ mod tests {
         assert!(output.errors.is_empty());
         assert!(output.hook_blocks.is_empty());
         assert_eq!(*output.skipped_lines.as_ref(), 0);
+    }
+
+    #[test]
+    fn aggregate_converts_persisted_command_metrics_to_usecase_output() {
+        let tmp = tempdir_in_current_repo();
+        let logs_dir = tmp.path().join("some-track").join("logs");
+        std::fs::create_dir_all(&logs_dir).unwrap();
+        std::fs::write(
+            logs_dir.join("telemetry.jsonl"),
+            concat!(
+                r#"{"command":"track plan","duration_ms":120,"result":{"status":"success"}}"#,
+                "\n",
+                r#"{"command":"track plan","duration_ms":80,"result":{"status":"failure","exit_code":17}}"#,
+                "\n"
+            ),
+        )
+        .unwrap();
+
+        let output = FsTelemetryReportAdapter::new().aggregate("some-track", tmp.path()).unwrap();
+
+        assert_eq!(output.command_metrics.len(), 1);
+        let metric = output.command_metrics.first().unwrap();
+        assert_eq!(metric.command().as_str(), "track plan");
+        assert_eq!(*metric.executions().as_ref(), 2);
+        assert_eq!(*metric.failures().as_ref(), 1);
+        assert_eq!(*metric.total_duration().as_ref(), 200);
+        assert_eq!(metric.failure_rate().value(), 5_000);
     }
 
     #[test]
