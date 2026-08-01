@@ -589,7 +589,7 @@ mod tests {
 
     fn single_domain_binding() -> Vec<TdddLayerBinding> {
         crate::verify::tddd_layers::parse_tddd_layers(
-            r#"{"layers":[{"crate":"domain","tddd":{"enabled":true,"catalogue_file":"domain-types.json"}}]}"#,
+            r#"{"version":2,"layers":[{"crate":"domain","tddd":{"enabled":true,"catalogue_file":"domain-types.json"}}]}"#,
         )
         .unwrap()
     }

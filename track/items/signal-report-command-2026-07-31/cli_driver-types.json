@@ -1,0 +1,320 @@
+{
+  "crate_name": "cli_driver",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "service",
+              "ty": "std::sync::Arc<dyn usecase::signal_report::SignalReportService>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [
+            {
+              "name": "input",
+              "ty": "SignalReportInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "CommandOutcome"
+        }
+      ],
+      "type_name": "SignalReportDriver"
+    }
+  ],
+  "layer": "cli_driver",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "SignalReportChainFilter",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "SignalReportChainFilter",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "SignalReportChainFilter",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "SignalReportChainFilter",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "SignalReportChainFilter",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "SignalReportLevelFilter",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "SignalReportLevelFilter",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "SignalReportLevelFilter",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "SignalReportLevelFilter",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "SignalReportLevelFilter",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "SignalReportInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "SignalReportInput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "SignalReportInput",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "SignalReportInput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "SignalReportInput",
+      "trait_ref": "core::cmp::Eq"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "SignalDriver": {
+      "action": "reference",
+      "docs": "Reference the existing SignalDriver for composition-root edge exposure. CN-01.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "service",
+              "ty": "Arc<dyn SignalService>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [
+            {
+              "name": "input",
+              "ty": "SignalInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "CommandOutcome"
+        }
+      ],
+      "module_path": "signal",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-01",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "SignalReportChainFilter": {
+      "action": "add",
+      "docs": "Driver-boundary Dto intentionally flattened for a scalar transport selector; conversion reconstructs usecase::SignalReportChainSelection::One. IN-03, AC-03.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "All",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "AdrUser",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "SpecAdr",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "CatalogSpec",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ImplCatalog",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "signal_report",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "SignalReportDriver": {
+      "action": "add",
+      "docs": "Add the PrimaryAdapter for the SignalReportService boundary. GO-01, AC-01, AC-02.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "signal_report",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "GO-01",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "SignalReportInput": {
+      "action": "add",
+      "docs": "Add the driver-boundary Dto between transport parsing and SignalReportQuery; its `chain` and `levels` fields mirror both boundary payloads. IN-03, AC-03.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "chain",
+              "ty": "SignalReportChainFilter"
+            },
+            {
+              "name": "levels",
+              "ty": "SignalReportLevelFilter"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "signal_report",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "SignalReportLevelFilter": {
+      "action": "add",
+      "docs": "Driver-boundary enum structurally mirroring usecase::SignalReportLevelSelection. IN-03, AC-03.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "YellowOnly",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "RedOnly",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "YellowAndRed",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "signal_report",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        }
+      ]
+    }
+  }
+}

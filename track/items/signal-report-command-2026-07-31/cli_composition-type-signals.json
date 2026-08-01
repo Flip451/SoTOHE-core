@@ -1,0 +1,14 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-08-01T05:13:14Z",
+  "declaration_hash": "55ede06c029beea9b0cba2c24959a52be9e83c08652fc94bbb804189290ead8f",
+  "implementation_input_hash": "36a28f2f1b83ed3b20ff8072817123bc5be9e6243a753d97ea9b2b1f89fe94e1",
+  "signals": [
+    {
+      "type_name": "SignalCompositionRoot",
+      "kind_tag": "composition_root",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

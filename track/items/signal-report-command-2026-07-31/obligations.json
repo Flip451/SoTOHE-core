@@ -1,0 +1,153 @@
+{
+  "track_id": "signal-report-command-2026-07-31",
+  "obligations": [
+    {
+      "id": {
+        "entry_key": "SignalReportInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/signal-report-command-2026-07-31/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "SignalReportInteractor"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      },
+      "brief": "Author a result test covering 'entry' of SignalReportInteractor",
+      "declaration_hash": "f60567e6b8226ba78468b269d0c8452c3f7c8840d063eb4986f8490c9c1b19ee",
+      "spec_refs": [
+        {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "GO-01"
+        },
+        {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "AC-01"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "SignalReportService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:report"
+      },
+      "target_entry": {
+        "file_path": "track/items/signal-report-command-2026-07-31/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "SignalReportService"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      },
+      "brief": "Author a result test covering 'trait_method:report' of SignalReportService",
+      "declaration_hash": "71de95e6d1016d7608f7ef53c5691f5463c0322b5c2881e770291d235891c62e",
+      "spec_refs": [
+        {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "GO-01"
+        },
+        {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "AC-01"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "SignalReportSourcePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load"
+      },
+      "target_entry": {
+        "file_path": "track/items/signal-report-command-2026-07-31/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "SignalReportSourcePort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:load' of SignalReportSourcePort",
+      "declaration_hash": "b4f84af0654cdbb29595f15886f7d96d42b6b9b9f7cadc38c4e95a3196ed291d",
+      "spec_refs": [
+        {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "IN-04"
+        },
+        {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "CN-01"
+        },
+        {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "AC-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "SystemSignalReportSourceAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::signal_report::SignalReportSourcePort"
+      },
+      "target_entry": {
+        "file_path": "track/items/signal-report-command-2026-07-31/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "SystemSignalReportSourceAdapter"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::signal_report::SignalReportSourcePort' of SystemSignalReportSourceAdapter",
+      "declaration_hash": "ceb9f93ae749312cdbc365668c11abb445676d5c65dfb033bc4ee612dc440073",
+      "spec_refs": [
+        {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "IN-04"
+        },
+        {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "CN-01"
+        },
+        {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "AC-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::signal::execute",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/signal-report-command-2026-07-31/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::signal::execute"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::signal::execute",
+      "declaration_hash": "558cfc4fcb883d0eec6074e63e75dc6c6d35a6b7af3067c7ca1aefa085adda8b",
+      "spec_refs": [
+        {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "AC-01"
+        }
+      ]
+    }
+  ]
+}

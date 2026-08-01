@@ -1,0 +1,1513 @@
+{
+  "track_id": "signal-report-command-2026-07-31",
+  "entries": [
+    {
+      "edge_id": {
+        "entry_key": "SignalReportInteractor",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "GO-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "7f344e84f4136c4f5ffb80d3e8d67972a3c55869cfcd95f3b16ec06fb4cf9230",
+        "declaration_hash": "f60567e6b8226ba78468b269d0c8452c3f7c8840d063eb4986f8490c9c1b19ee",
+        "anchor_text_hash": "58738475f1f701537f0cde2212eefb1637eaafa6f10e261cf5b6a97653478a15"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(output.occurrences.len(), 4);\n        assert_eq!(\n            *source.loaded_chains.lock().unwrap(),\n            [\n                SignalReportChain::AdrUser,\n                SignalReportChain::SpecAdr,\n                SignalReportChain::CatalogSpec,\n                SignalReportChain::ImplCatalog,\n            ]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::signal_report::tests",
+          "test_name": "test_report_all_chains_and_levels_returns_occurrences"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportInteractor",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "7f344e84f4136c4f5ffb80d3e8d67972a3c55869cfcd95f3b16ec06fb4cf9230",
+        "declaration_hash": "f60567e6b8226ba78468b269d0c8452c3f7c8840d063eb4986f8490c9c1b19ee",
+        "anchor_text_hash": "2699a99dc0e6aa19d5e25cb6808bfa86e9d8718ec9ddefa2891028db6a3b62b8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(output.occurrences.len(), 4);\nassert_eq!(\n    *source.loaded_chains.lock().unwrap(),\n    [\n        SignalReportChain::AdrUser,\n        SignalReportChain::SpecAdr,\n        SignalReportChain::CatalogSpec,\n        SignalReportChain::ImplCatalog,\n    ]\n);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::signal_report::tests",
+          "test_name": "test_report_all_chains_and_levels_returns_occurrences"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportService",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "GO-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:report"
+      },
+      "key": {
+        "bound_tests_set_hash": "7f344e84f4136c4f5ffb80d3e8d67972a3c55869cfcd95f3b16ec06fb4cf9230",
+        "declaration_hash": "71de95e6d1016d7608f7ef53c5691f5463c0322b5c2881e770291d235891c62e",
+        "anchor_text_hash": "58738475f1f701537f0cde2212eefb1637eaafa6f10e261cf5b6a97653478a15"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(output.occurrences.len(), 4);\n        assert_eq!(\n            *source.loaded_chains.lock().unwrap(),\n            [\n                SignalReportChain::AdrUser,\n                SignalReportChain::SpecAdr,\n                SignalReportChain::CatalogSpec,\n                SignalReportChain::ImplCatalog,\n            ]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::signal_report::tests",
+          "test_name": "test_report_all_chains_and_levels_returns_occurrences"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportService",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:report"
+      },
+      "key": {
+        "bound_tests_set_hash": "7f344e84f4136c4f5ffb80d3e8d67972a3c55869cfcd95f3b16ec06fb4cf9230",
+        "declaration_hash": "71de95e6d1016d7608f7ef53c5691f5463c0322b5c2881e770291d235891c62e",
+        "anchor_text_hash": "2699a99dc0e6aa19d5e25cb6808bfa86e9d8718ec9ddefa2891028db6a3b62b8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let output = interactor\n            .report(SignalReportQuery {\n                chain: SignalReportChainSelection::All,\n                levels: SignalReportLevelSelection::YellowAndRed,\n            })\n            .unwrap();\n\n        assert_eq!(output.occurrences.len(), 4);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::signal_report::tests",
+          "test_name": "test_report_all_chains_and_levels_returns_occurrences"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportChainSelection",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportChainSelection",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "b54b70ccba513af647c170c2686e9d93cce5698179aa4f0249004915f3466873",
+        "declaration_hash": "b947be17b5e0188b2b3c061f00104bcf2915598ac1800d1b8d5309183d5f3745",
+        "anchor_text_hash": "91b94a71556bf1763775647e4999e68ff0fc894a046fb09453701532050280e9"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "chain: SignalReportChainSelection::One(SignalReportChain::SpecAdr),\n                levels: SignalReportLevelSelection::RedOnly,"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::signal_report::tests",
+          "test_name": "test_report_propagates_typed_query_selections"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportEntryId",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportEntryId",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "0a61bf069cf2dd476038bd3d4cd49c04e5d5a90c4bb3b1ef841ca122e6cb3a4a",
+        "declaration_hash": "bf3517a571d9d61660035549e076a11dcd004c309dc8958913cc737526c905a3",
+        "anchor_text_hash": "c213b677768d6b2584c3d63de41fa5b00600beed27d08adcea157ddb2107d851"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(output.occurrences, vec![expected]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::signal_report::tests",
+          "test_name": "test_report_preserves_entry_id_and_reference_in_occurrence_output"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportEntryId",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportEntryId",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "0a61bf069cf2dd476038bd3d4cd49c04e5d5a90c4bb3b1ef841ca122e6cb3a4a",
+        "declaration_hash": "bf3517a571d9d61660035549e076a11dcd004c309dc8958913cc737526c905a3",
+        "anchor_text_hash": "4be465a5a98f6d97a4f29c3ae254fec040c63d259333d40200bca7a3acd48a94"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "expected.entry_id = SignalReportEntryId::new(NonEmptyString::try_new(\"catalogue-entry-42\").unwrap());\n        expected.reference = SignalReportReference::new(\n            NonEmptyString::try_new(\"track/items/example/spec.json#IN-02\").unwrap(),\n        );\n        assert_eq!(output.occurrences, vec![expected]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::signal_report::tests",
+          "test_name": "test_report_preserves_entry_id_and_reference_in_occurrence_output"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportLevel",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportLevel",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "4fdf131bf41c7019e66f29dafaebf712271972bf9c6deb86285e30cde53b7807",
+        "declaration_hash": "483552942cb563a94d6f5860e126501e9184bde47200ea483b406493e149eec4",
+        "anchor_text_hash": "7fd97f560a673264f2c315399fda35b4cd638562bfae79ddb61f9018eb735715"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            yellow_output.occurrences.as_slice(),\n            [SignalReportOccurrence { level: SignalReportLevel::Yellow, .. }]\n        ));\n        assert!(matches!(\n            red_output.occurrences.as_slice(),\n            [SignalReportOccurrence { level: SignalReportLevel::Red, .. }]\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::signal_report::tests",
+          "test_name": "test_report_filters_each_signal_report_level"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportQuery",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportQuery",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "b54b70ccba513af647c170c2686e9d93cce5698179aa4f0249004915f3466873",
+        "declaration_hash": "f11ff2b602935898e9aab186dcd106e335a8ad8d58308f598be79884f5aef6f2",
+        "anchor_text_hash": "91b94a71556bf1763775647e4999e68ff0fc894a046fb09453701532050280e9"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "chain: SignalReportChain::SpecAdr,\n                level: SignalReportLevel::Red,\n                ..\n            }]\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::signal_report::tests",
+          "test_name": "test_report_propagates_typed_query_selections"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportReference",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportReference",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "0a61bf069cf2dd476038bd3d4cd49c04e5d5a90c4bb3b1ef841ca122e6cb3a4a",
+        "declaration_hash": "d116f77a9942f010df83cdce338a9b1a7c7973c002ebec1bf8102d6e6683c652",
+        "anchor_text_hash": "4be465a5a98f6d97a4f29c3ae254fec040c63d259333d40200bca7a3acd48a94"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "expected.reference = SignalReportReference::new(\n            NonEmptyString::try_new(\"track/items/example/spec.json#IN-02\").unwrap(),\n        );\n...\nassert_eq!(output.occurrences, vec![expected]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::signal_report::tests",
+          "test_name": "test_report_preserves_entry_id_and_reference_in_occurrence_output"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportSourcePort",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportSourcePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load"
+      },
+      "key": {
+        "bound_tests_set_hash": "f1b715f614d5ac72afcecb7ac1288083c70008d7f30a628506001f8e38993760",
+        "declaration_hash": "b4f84af0654cdbb29595f15886f7d96d42b6b9b9f7cadc38c4e95a3196ed291d",
+        "anchor_text_hash": "05468ddacc756be4757924603e10be69c08a9255aa70f9b8532c2b3ec6c11b5d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"public port must read the persisted catalogue signal artifact\" ... \"public port must derive the ADR-user chain at report time\" ... \"report loading must neither alter inputs nor create derived occurrence, signal, or aggregate artifacts\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_source_port_load_reads_persisted_artifact_occurrences"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_source_port_load_derives_nonpersisted_chain_occurrences"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_source_port_load_is_read_only_across_all_chains"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportSourcePort",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportSourcePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load"
+      },
+      "key": {
+        "bound_tests_set_hash": "f1b715f614d5ac72afcecb7ac1288083c70008d7f30a628506001f8e38993760",
+        "declaration_hash": "b4f84af0654cdbb29595f15886f7d96d42b6b9b9f7cadc38c4e95a3196ed291d",
+        "anchor_text_hash": "f597b4515c60e8b8a68d66fbdd45ec775b0e4962442225ed266047ffd4dfe0c4"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"report loading must neither alter inputs nor create derived occurrence, signal, or aggregate artifacts\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_source_port_load_reads_persisted_artifact_occurrences"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_source_port_load_derives_nonpersisted_chain_occurrences"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_source_port_load_is_read_only_across_all_chains"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportSourcePort",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportSourcePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load"
+      },
+      "key": {
+        "bound_tests_set_hash": "f1b715f614d5ac72afcecb7ac1288083c70008d7f30a628506001f8e38993760",
+        "declaration_hash": "b4f84af0654cdbb29595f15886f7d96d42b6b9b9f7cadc38c4e95a3196ed291d",
+        "anchor_text_hash": "ae7bc09087175d27a40d420a8df4890f6508ad839a2b4cb42dbd88a05528f3bb"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"report loading must neither alter inputs nor create derived occurrence, signal, or aggregate artifacts\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_source_port_load_reads_persisted_artifact_occurrences"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_source_port_load_derives_nonpersisted_chain_occurrences"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_source_port_load_is_read_only_across_all_chains"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SystemSignalReportSourceAdapter",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SystemSignalReportSourceAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::signal_report::SignalReportSourcePort"
+      },
+      "key": {
+        "bound_tests_set_hash": "f4013fb44efb7a4f49f942517e57d08434e2e156d2640733d99326519bacb09a",
+        "declaration_hash": "ceb9f93ae749312cdbc365668c11abb445676d5c65dfb033bc4ee612dc440073",
+        "anchor_text_hash": "05468ddacc756be4757924603e10be69c08a9255aa70f9b8532c2b3ec6c11b5d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "SignalReportSourcePort::load(&adapter, SignalReportChain::AdrUser)"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_source_port_load_reads_persisted_artifact_occurrences"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_source_port_load_derives_nonpersisted_chain_occurrences"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_source_port_load_is_read_only_across_all_chains"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_adapter_rejects_stale_catalogue_declaration_hash"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_adapter_rejects_missing_extra_or_mismatched_catalogue_signal_coverage"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_adapter_rejects_stale_catalogue_entry_hash"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_adapter_reports_both_impl_catalogue_item_mismatches"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_adapter_preserves_duplicate_catalogue_entry_contexts"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_adapter_same_name_distinct_kind_preserves_impl_occurrence_identity"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_adapter_rejects_missing_or_phantom_impl_catalogue_identity"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_adapter_reports_unique_unknown_impl_occurrence"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_adapter_rejects_unsafe_impl_report_line_text"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_adapter_rejects_stale_impl_source_and_feature_inputs"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_relative_path_outside_root_reports_selected_non_adr_chain"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_relative_non_utf8_path_reports_selected_non_adr_chain"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SystemSignalReportSourceAdapter",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SystemSignalReportSourceAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::signal_report::SignalReportSourcePort"
+      },
+      "key": {
+        "bound_tests_set_hash": "f4013fb44efb7a4f49f942517e57d08434e2e156d2640733d99326519bacb09a",
+        "declaration_hash": "ceb9f93ae749312cdbc365668c11abb445676d5c65dfb033bc4ee612dc440073",
+        "anchor_text_hash": "f597b4515c60e8b8a68d66fbdd45ec775b0e4962442225ed266047ffd4dfe0c4"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"report loading must neither alter inputs nor create derived occurrence, signal, or aggregate artifacts\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_source_port_load_reads_persisted_artifact_occurrences"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_source_port_load_derives_nonpersisted_chain_occurrences"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_source_port_load_is_read_only_across_all_chains"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_adapter_rejects_stale_catalogue_declaration_hash"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_adapter_rejects_missing_extra_or_mismatched_catalogue_signal_coverage"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_adapter_rejects_stale_catalogue_entry_hash"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_adapter_reports_both_impl_catalogue_item_mismatches"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_adapter_preserves_duplicate_catalogue_entry_contexts"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_adapter_same_name_distinct_kind_preserves_impl_occurrence_identity"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_adapter_rejects_missing_or_phantom_impl_catalogue_identity"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_adapter_reports_unique_unknown_impl_occurrence"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_adapter_rejects_unsafe_impl_report_line_text"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_adapter_rejects_stale_impl_source_and_feature_inputs"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_relative_path_outside_root_reports_selected_non_adr_chain"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_relative_non_utf8_path_reports_selected_non_adr_chain"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SystemSignalReportSourceAdapter",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SystemSignalReportSourceAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::signal_report::SignalReportSourcePort"
+      },
+      "key": {
+        "bound_tests_set_hash": "f4013fb44efb7a4f49f942517e57d08434e2e156d2640733d99326519bacb09a",
+        "declaration_hash": "ceb9f93ae749312cdbc365668c11abb445676d5c65dfb033bc4ee612dc440073",
+        "anchor_text_hash": "ae7bc09087175d27a40d420a8df4890f6508ad839a2b4cb42dbd88a05528f3bb"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            snapshot_tree(fixture.path()),\n            before,\n            \"report loading must neither alter inputs nor create derived occurrence, signal, or aggregate artifacts\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_source_port_load_reads_persisted_artifact_occurrences"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_source_port_load_derives_nonpersisted_chain_occurrences"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_source_port_load_is_read_only_across_all_chains"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_adapter_rejects_stale_catalogue_declaration_hash"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_adapter_rejects_missing_extra_or_mismatched_catalogue_signal_coverage"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_adapter_rejects_stale_catalogue_entry_hash"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_adapter_reports_both_impl_catalogue_item_mismatches"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_adapter_preserves_duplicate_catalogue_entry_contexts"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_adapter_same_name_distinct_kind_preserves_impl_occurrence_identity"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_adapter_rejects_missing_or_phantom_impl_catalogue_identity"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_adapter_reports_unique_unknown_impl_occurrence"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_adapter_rejects_unsafe_impl_report_line_text"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_adapter_rejects_stale_impl_source_and_feature_inputs"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_relative_path_outside_root_reports_selected_non_adr_chain"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_relative_non_utf8_path_reports_selected_non_adr_chain"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportChainFilter",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportChainFilter",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "832c560ff15b7238dfc48e4f16960c5b553e049a5acad45192bdbef786f4aed4",
+        "declaration_hash": "9494f2ff665b00b9a74c28b09a715f16986df0145cbfaeb31bc05752ee30406d",
+        "anchor_text_hash": "7fd97f560a673264f2c315399fda35b4cd638562bfae79ddb61f9018eb735715"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(query.chain, expected_chain);\n            assert_eq!(query.levels, SignalReportLevelSelection::YellowAndRed);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::signal_report::tests",
+          "test_name": "test_signal_report_input_each_chain_filter_converts_to_expected_selection"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportChainFilter",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportChainFilter",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "832c560ff15b7238dfc48e4f16960c5b553e049a5acad45192bdbef786f4aed4",
+        "declaration_hash": "9494f2ff665b00b9a74c28b09a715f16986df0145cbfaeb31bc05752ee30406d",
+        "anchor_text_hash": "91b94a71556bf1763775647e4999e68ff0fc894a046fb09453701532050280e9"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(query.chain, expected_chain);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::signal_report::tests",
+          "test_name": "test_signal_report_input_each_chain_filter_converts_to_expected_selection"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportInput",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportInput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "0f811abd7f61661fca0a551c0d2d2476b7643306a82b405ede962677a093ad96",
+        "declaration_hash": "422bd688090f30ba08286313ba0228e6eaeae141a09dce157c5bd5abb0a2d019",
+        "anchor_text_hash": "7fd97f560a673264f2c315399fda35b4cd638562bfae79ddb61f9018eb735715"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(query.chain, expected_chain);\n            assert_eq!(query.levels, SignalReportLevelSelection::YellowAndRed);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::signal_report::tests",
+          "test_name": "test_signal_report_input_each_chain_filter_converts_to_expected_selection"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::signal_report::tests",
+          "test_name": "test_signal_report_input_each_level_filter_converts_to_expected_selection"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportInput",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportInput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "0f811abd7f61661fca0a551c0d2d2476b7643306a82b405ede962677a093ad96",
+        "declaration_hash": "422bd688090f30ba08286313ba0228e6eaeae141a09dce157c5bd5abb0a2d019",
+        "anchor_text_hash": "91b94a71556bf1763775647e4999e68ff0fc894a046fb09453701532050280e9"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(query.chain, expected_chain);\n            assert_eq!(query.levels, SignalReportLevelSelection::YellowAndRed);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::signal_report::tests",
+          "test_name": "test_signal_report_input_each_chain_filter_converts_to_expected_selection"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::signal_report::tests",
+          "test_name": "test_signal_report_input_each_level_filter_converts_to_expected_selection"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportLevelFilter",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportLevelFilter",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "5931b0f80d3c71a60e1660b9ac59e34d802a2c503c9b97ec5f567e6f54042c7d",
+        "declaration_hash": "0cf84ecd314fa6cef3efb98f0f04a83c3f3f2c9d9dd82f16a714921ac378b82d",
+        "anchor_text_hash": "7fd97f560a673264f2c315399fda35b4cd638562bfae79ddb61f9018eb735715"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(query.levels, expected_levels);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::signal_report::tests",
+          "test_name": "test_signal_report_input_each_level_filter_converts_to_expected_selection"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportLevelFilter",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportLevelFilter",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "5931b0f80d3c71a60e1660b9ac59e34d802a2c503c9b97ec5f567e6f54042c7d",
+        "declaration_hash": "0cf84ecd314fa6cef3efb98f0f04a83c3f3f2c9d9dd82f16a714921ac378b82d",
+        "anchor_text_hash": "91b94a71556bf1763775647e4999e68ff0fc894a046fb09453701532050280e9"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(query.levels, expected_levels);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::signal_report::tests",
+          "test_name": "test_signal_report_input_each_level_filter_converts_to_expected_selection"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportDriver",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "GO-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportDriver",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:GO-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "2b80c4e00fc78b2891b83a8c7e9a19b6c22cf85a9ca35fdcc24ae839f55cd114",
+        "declaration_hash": "ee1acf0f143bbc5d8ba6a8e31a6d75c37ff324218441552016240903017e02ba",
+        "anchor_text_hash": "58738475f1f701537f0cde2212eefb1637eaafa6f10e261cf5b6a97653478a15"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let outcome = driver.handle(SignalReportInput {\n            chain: SignalReportChainFilter::All,\n            levels: SignalReportLevelFilter::YellowAndRed,\n        });\n\n        assert_eq!(outcome.exit_code, 0);\n        assert_eq!(outcome.stderr, None);\n        assert_eq!(\n            outcome.stdout.as_deref(),\n            Some(\n                \"signal report: 4 occurrence(s)\\n\\\n                 chain=catalog_spec level=red entry_id=CatalogEntry reference=spec.json#IN-02 reason=missing reference location=track/items/example/cli_driver-types.json\\n\\\n                 chain=adr_user level=yellow entry_id=ADR-01 reference=adr.md#D1 reason=needs evidence location=knowledge/adr/example.md\\n\\\n                 chain=spec_adr level=red entry_id=IN-02 reference=adr.md#D1 reason=unresolved ADR reference location=track/items/example/spec.json\\n\\\n                 chain=impl_catalog level=yellow entry_id=SignalReportDriver reference=cli_driver-types.json#AC-02 reason=implementation reference pending review location=apps/cli-driver/src/signal_report.rs\"\n            )\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::signal_report::tests",
+          "test_name": "test_signal_report_driver_renders_complete_occurrences_in_service_order"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportDriver",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportDriver",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "df44eb3a4d6121ad1c8830d24c8d7dc2e19a91ec65f81c6420b89bb229a4df25",
+        "declaration_hash": "ee1acf0f143bbc5d8ba6a8e31a6d75c37ff324218441552016240903017e02ba",
+        "anchor_text_hash": "2699a99dc0e6aa19d5e25cb6808bfa86e9d8718ec9ddefa2891028db6a3b62b8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome.stdout.as_deref(), Some(\n                \"signal report: 4 occurrence(s)\\n\\\n                 chain=catalog_spec level=red entry_id=CatalogEntry reference=spec.json#IN-02 reason=missing reference location=track/items/example/cli_driver-types.json\\n\\\n                 chain=adr_user level=yellow entry_id=ADR-01 reference=adr.md#D1 reason=needs evidence location=knowledge/adr/example.md\\n\\\n                 chain=spec_adr level=red entry_id=IN-02 reference=adr.md#D1 reason=unresolved ADR reference location=track/items/example/spec.json\\n\\\n                 chain=impl_catalog level=yellow entry_id=SignalReportDriver reference=cli_driver-types.json#AC-02 reason=implementation reference pending review location=apps/cli-driver/src/signal_report.rs\"\n            ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::signal_report::tests",
+          "test_name": "test_signal_report_driver_renders_complete_occurrences_in_service_order"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::signal_report::tests",
+          "test_name": "test_signal_report_driver_renders_empty_success_output"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportDriver",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportDriver",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "2b80c4e00fc78b2891b83a8c7e9a19b6c22cf85a9ca35fdcc24ae839f55cd114",
+        "declaration_hash": "ee1acf0f143bbc5d8ba6a8e31a6d75c37ff324218441552016240903017e02ba",
+        "anchor_text_hash": "4be465a5a98f6d97a4f29c3ae254fec040c63d259333d40200bca7a3acd48a94"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"chain=catalog_spec level=red entry_id=CatalogEntry reference=spec.json#IN-02 reason=missing reference location=track/items/example/cli_driver-types.json\\n                 chain=adr_user level=yellow entry_id=ADR-01 reference=adr.md#D1 reason=needs evidence location=knowledge/adr/example.md\\n                 chain=spec_adr level=red entry_id=IN-02 reference=adr.md#D1 reason=unresolved ADR reference location=track/items/example/spec.json\\n                 chain=impl_catalog level=yellow entry_id=SignalReportDriver reference=cli_driver-types.json#AC-02 reason=implementation reference pending review location=apps/cli-driver/src/signal_report.rs\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::signal_report::tests",
+          "test_name": "test_signal_report_driver_renders_complete_occurrences_in_service_order"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "GO-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:GO-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "ad64e05eccc92509fabecd9f5d5fb488b7ef6d60e3c759f123d633a63e335d96",
+        "declaration_hash": "82d8dee0c1b513b6aabdeb9f1ef07e25236dbbf025b8cb343e5a5a5ede3d88c8",
+        "anchor_text_hash": "58738475f1f701537f0cde2212eefb1637eaafa6f10e261cf5b6a97653478a15"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let _driver = root.signal_report_driver();"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::signal::tests",
+          "test_name": "test_signal_composition_root_constructs_signal_report_driver_without_dispatch"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::signal::tests",
+          "test_name": "test_signal_composition_root_signal_report_driver_renders_yellow_and_red_block_causes"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "b47413925eb7f3532a9c7dfa2fd65605f94f774ff0f77ad92e112e4a20594842",
+        "declaration_hash": "82d8dee0c1b513b6aabdeb9f1ef07e25236dbbf025b8cb343e5a5a5ede3d88c8",
+        "anchor_text_hash": "f597b4515c60e8b8a68d66fbdd45ec775b0e4962442225ed266047ffd4dfe0c4"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(!source.contains(\".handle(\"), \"signal composition must not dispatch a driver\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::signal::tests",
+          "test_name": "test_signal_report_driver_factory_is_wiring_only"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::signal::execute",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::signal::execute",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "8382e01f4f8f939581f47dbfa144803672dc9603d281b776c13289828f05a158",
+        "declaration_hash": "558cfc4fcb883d0eec6074e63e75dc6c6d35a6b7af3067c7ca1aefa085adda8b",
+        "anchor_text_hash": "635fec09d775717b958a536e2f0879d492b3e0c3428e319145357568235a879c"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let exit = execute(SignalCommand::Report(SignalReportArgs {\n            chain: SignalReportChainArg::All,\n            levels: SignalReportOnlyArg::YellowAndRed,\n        }));\n\n        assert_eq!(exit, ExitCode::SUCCESS);\n        assert_eq!(\n            service.queries(),\n            vec![SignalReportQuery {\n                chain: usecase::signal_report::SignalReportChainSelection::All,\n                levels: usecase::signal_report::SignalReportLevelSelection::YellowAndRed,\n            }]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::signal::tests",
+          "test_name": "test_signal_report_execute_report_branch_dispatches_default_query_once"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::signal::tests",
+          "test_name": "test_signal_report_execute_report_branch_propagates_driver_failure_exit_code"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::signal_report::tests",
+          "test_name": "test_signal_report_driver_renders_complete_occurrences_in_service_order"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_source_port_load_reads_persisted_artifact_occurrences"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_source_port_load_derives_nonpersisted_chain_occurrences"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_source_port_load_is_read_only_across_all_chains"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::signal::execute",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::signal::execute",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "8382e01f4f8f939581f47dbfa144803672dc9603d281b776c13289828f05a158",
+        "declaration_hash": "558cfc4fcb883d0eec6074e63e75dc6c6d35a6b7af3067c7ca1aefa085adda8b",
+        "anchor_text_hash": "2699a99dc0e6aa19d5e25cb6808bfa86e9d8718ec9ddefa2891028db6a3b62b8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let exit = execute(SignalCommand::Report(SignalReportArgs {\n    chain: SignalReportChainArg::All,\n    levels: SignalReportOnlyArg::YellowAndRed,\n}));\n\nassert_eq!(exit, ExitCode::SUCCESS);\nassert_eq!(\n    service.queries(),\n    vec![SignalReportQuery {\n        chain: usecase::signal_report::SignalReportChainSelection::All,\n        levels: usecase::signal_report::SignalReportLevelSelection::YellowAndRed,\n    }]\n);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::signal::tests",
+          "test_name": "test_signal_report_execute_report_branch_dispatches_default_query_once"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::signal::tests",
+          "test_name": "test_signal_report_execute_report_branch_propagates_driver_failure_exit_code"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::signal_report::tests",
+          "test_name": "test_signal_report_driver_renders_complete_occurrences_in_service_order"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_source_port_load_reads_persisted_artifact_occurrences"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_source_port_load_derives_nonpersisted_chain_occurrences"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_source_port_load_is_read_only_across_all_chains"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCommand",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "8b1a3c9988b798d20d31d18f353b4c69006686f56fe873994d596efcb9972a27",
+        "declaration_hash": "51b2694a996d0156c8f0b700c274b6a02d3c36d766f5eb1789f4499a7f1c4f14",
+        "anchor_text_hash": "635fec09d775717b958a536e2f0879d492b3e0c3428e319145357568235a879c"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "SignalCommand::Report(SignalReportArgs {\n                chain: SignalReportChainArg::CatalogSpec,\n                levels: SignalReportOnlyArg::RedOnly,\n            })"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::signal::tests",
+          "test_name": "test_signal_report_command_shape_contains_typed_args"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCommand",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "8b1a3c9988b798d20d31d18f353b4c69006686f56fe873994d596efcb9972a27",
+        "declaration_hash": "51b2694a996d0156c8f0b700c274b6a02d3c36d766f5eb1789f4499a7f1c4f14",
+        "anchor_text_hash": "2699a99dc0e6aa19d5e25cb6808bfa86e9d8718ec9ddefa2891028db6a3b62b8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            command,\n            SignalCommand::Report(SignalReportArgs {\n                chain: SignalReportChainArg::CatalogSpec,\n                levels: SignalReportOnlyArg::RedOnly,\n            })\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::signal::tests",
+          "test_name": "test_signal_report_command_shape_contains_typed_args"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCommand",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "5c26549680bf16b25cee271ad9b5f37e8114bf767cef8047c64ed13b2f779f63",
+        "declaration_hash": "51b2694a996d0156c8f0b700c274b6a02d3c36d766f5eb1789f4499a7f1c4f14",
+        "anchor_text_hash": "91b94a71556bf1763775647e4999e68ff0fc894a046fb09453701532050280e9"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "match cli.cmd {\n                SignalCommand::Report(args) => assert_eq!(args.chain, expected),\n                other => panic!(\"expected Report, got {other:?}\"),\n            }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::signal::tests",
+          "test_name": "test_signal_report_each_chain_spelling_parses_to_its_typed_selector"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportArgs",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportArgs",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "321ac32cbbac2449a8929d1d2c7b971e1f95c189dcd627ce80688cb894043169",
+        "declaration_hash": "654cac04e86f5fe5f4e7de168fd4fae5929551fcf5ed53fcf66f5e3df4dda61b",
+        "anchor_text_hash": "7fd97f560a673264f2c315399fda35b4cd638562bfae79ddb61f9018eb735715"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let cli = TestCli::try_parse_from([\"sotp\", \"report\", \"--chain\", value]).unwrap();\n            match cli.cmd {\n                SignalCommand::Report(args) => assert_eq!(args.chain, expected),\n\nlet cli = TestCli::try_parse_from([\"sotp\", \"report\", \"--only\", value]).unwrap();\n            match cli.cmd {\n                SignalCommand::Report(args) => assert_eq!(args.levels, expected),"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::signal::tests",
+          "test_name": "test_signal_report_bare_command_defaults_to_all_chains_and_levels"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::signal::tests",
+          "test_name": "test_signal_report_each_chain_spelling_parses_to_its_typed_selector"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::signal::tests",
+          "test_name": "test_signal_report_each_only_spelling_parses_to_its_typed_selector"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportArgs",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportArgs",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "321ac32cbbac2449a8929d1d2c7b971e1f95c189dcd627ce80688cb894043169",
+        "declaration_hash": "654cac04e86f5fe5f4e7de168fd4fae5929551fcf5ed53fcf66f5e3df4dda61b",
+        "anchor_text_hash": "91b94a71556bf1763775647e4999e68ff0fc894a046fb09453701532050280e9"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let cli = TestCli::try_parse_from([\"sotp\", \"report\", \"--chain\", value]).unwrap();\n            match cli.cmd {\n                SignalCommand::Report(args) => assert_eq!(args.chain, expected),"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::signal::tests",
+          "test_name": "test_signal_report_bare_command_defaults_to_all_chains_and_levels"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::signal::tests",
+          "test_name": "test_signal_report_each_chain_spelling_parses_to_its_typed_selector"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::signal::tests",
+          "test_name": "test_signal_report_each_only_spelling_parses_to_its_typed_selector"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportChainArg",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportChainArg",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "5c26549680bf16b25cee271ad9b5f37e8114bf767cef8047c64ed13b2f779f63",
+        "declaration_hash": "9c55bda344eeef4b2c594884e7e89dede1cc1d5207bd81eb2009253a392bed28",
+        "anchor_text_hash": "7fd97f560a673264f2c315399fda35b4cd638562bfae79ddb61f9018eb735715"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let cases = [\n            (\"all\", SignalReportChainArg::All),\n            (\"adr_user\", SignalReportChainArg::AdrUser),\n            (\"spec_adr\", SignalReportChainArg::SpecAdr),\n            (\"catalog_spec\", SignalReportChainArg::CatalogSpec),\n            (\"impl_catalog\", SignalReportChainArg::ImplCatalog),\n        ];\n\n        for (value, expected) in cases {\n            let cli = TestCli::try_parse_from([\"sotp\", \"report\", \"--chain\", value]).unwrap();\n            match cli.cmd {\n                SignalCommand::Report(args) => assert_eq!(args.chain, expected),\n                other => panic!(\"expected Report, got {other:?}\"),\n            }\n        }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::signal::tests",
+          "test_name": "test_signal_report_each_chain_spelling_parses_to_its_typed_selector"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportChainArg",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportChainArg",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "5c26549680bf16b25cee271ad9b5f37e8114bf767cef8047c64ed13b2f779f63",
+        "declaration_hash": "9c55bda344eeef4b2c594884e7e89dede1cc1d5207bd81eb2009253a392bed28",
+        "anchor_text_hash": "91b94a71556bf1763775647e4999e68ff0fc894a046fb09453701532050280e9"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let cli = TestCli::try_parse_from([\"sotp\", \"report\", \"--chain\", value]).unwrap();\n            match cli.cmd {\n                SignalCommand::Report(args) => assert_eq!(args.chain, expected),"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::signal::tests",
+          "test_name": "test_signal_report_each_chain_spelling_parses_to_its_typed_selector"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportOnlyArg",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportOnlyArg",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "a03a609a3ecee5e0df2878940c234d88609484217a363c29ff3f8880bc5fc691",
+        "declaration_hash": "8ae804fcc97ea4f542e5ddd53e2f5422f3887d7a4e5033accc9254941bef5a41",
+        "anchor_text_hash": "7fd97f560a673264f2c315399fda35b4cd638562bfae79ddb61f9018eb735715"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let cases = [\n            (\"yellow\", SignalReportOnlyArg::YellowOnly),\n            (\"red\", SignalReportOnlyArg::RedOnly),\n            (\"yellow,red\", SignalReportOnlyArg::YellowAndRed),\n        ];\n\n        for (value, expected) in cases {\n            let cli = TestCli::try_parse_from([\"sotp\", \"report\", \"--only\", value]).unwrap();\n            match cli.cmd {\n                SignalCommand::Report(args) => assert_eq!(args.levels, expected),\n                other => panic!(\"expected Report, got {other:?}\"),\n            }\n        }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::signal::tests",
+          "test_name": "test_signal_report_each_only_spelling_parses_to_its_typed_selector"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalReportOnlyArg",
+        "anchor_id": {
+          "file_path": "track/items/signal-report-command-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalReportOnlyArg",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "a03a609a3ecee5e0df2878940c234d88609484217a363c29ff3f8880bc5fc691",
+        "declaration_hash": "8ae804fcc97ea4f542e5ddd53e2f5422f3887d7a4e5033accc9254941bef5a41",
+        "anchor_text_hash": "91b94a71556bf1763775647e4999e68ff0fc894a046fb09453701532050280e9"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let cases = [\n            (\"yellow\", SignalReportOnlyArg::YellowOnly),\n            (\"red\", SignalReportOnlyArg::RedOnly),\n            (\"yellow,red\", SignalReportOnlyArg::YellowAndRed),\n        ];"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::signal::tests",
+          "test_name": "test_signal_report_each_only_spelling_parses_to_its_typed_selector"
+        }
+      ]
+    }
+  ]
+}

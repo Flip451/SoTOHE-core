@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "layer": "infrastructure",
+  "entries": [
+    {
+      "claim_hash": "c351f7cd887a9e0cb4fbf635fa04235b913d4955c185fac9074a337dfb3e4642",
+      "evidence_hash": "850053170a621fdedb58205dc6fe8ff8ffba366394bc5bdc22f6a5f26b28a1f2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "発生単位 signal 成果物がある chain はその成果物を読み、存在しない chain ⓪・①は正規の入力成果物から既存の評価規則で発生単位データをメモリ上に導出する。report は導出した signal または集計値を永続化しない読み取り専用 view とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "SystemSignalReportSourceAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "発生単位 signal 成果物がある chain はその成果物を読み、存在しない chain ⓪・①は正規の入力成果物から既存の評価規則で発生単位データをメモリ上に導出する。report は導出した signal または集計値を永続化しない読み取り専用 view とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c351f7cd887a9e0cb4fbf635fa04235b913d4955c185fac9074a337dfb3e4642",
+      "evidence_hash": "25075c3d63c3af9dcac74d85c23f1b23a11d735f74e8c491d609cf1a55f4372b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "report は診断用の読み取り専用 view であり、実行前後で既存の signal calculation artifacts を変更せず、chain ⓪・①で導出した発生単位データも永続化しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "SystemSignalReportSourceAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "report は診断用の読み取り専用 view であり、実行前後で既存の signal calculation artifacts を変更せず、chain ⓪・①で導出した発生単位データも永続化しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c351f7cd887a9e0cb4fbf635fa04235b913d4955c185fac9074a337dfb3e4642",
+      "evidence_hash": "ce4548c77f72b43a14eb8be6511c43ac05196f65fb7e7cb33592ee393592c024",
+      "verdict": {
+        "kind": "pass",
+        "citation": "report の実行は既存の calculation artifacts を読み取り専用で扱い"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "SystemSignalReportSourceAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "report の実行は既存の calculation artifacts を読み取り専用で扱い、chain ⓪・①で導出した発生単位データを含め、signal または集計値を persist しない。"
+        }
+      }
+    }
+  ]
+}

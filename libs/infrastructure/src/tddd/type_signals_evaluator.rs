@@ -9,7 +9,7 @@ mod build_inputs;
 #[path = "type_signals_evaluator/freshness.rs"]
 mod freshness;
 #[path = "type_signals_evaluator/inputs.rs"]
-mod inputs;
+pub(crate) mod inputs;
 #[path = "type_signals_evaluator/signal_builder.rs"]
 mod signal_builder;
 #[path = "type_signals_evaluator/signal_tags.rs"]
@@ -371,6 +371,7 @@ mod tests {
         std::fs::write(&rustdoc_path, &json).unwrap();
         std::fs::write(track_dir.join("infrastructure-types-baseline.json"), json).unwrap();
         let rules = r#"{
+            "version": 2,
             "layers": [{
                 "crate": "infrastructure",
                 "tddd": {

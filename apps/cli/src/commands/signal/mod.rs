@@ -41,11 +41,17 @@
 use std::path::PathBuf;
 use std::process::ExitCode;
 
+#[cfg(test)]
+use std::cell::RefCell;
+
 use clap::{Args, Subcommand, ValueEnum};
 use cli_composition::{CompositionError, SignalCompositionRoot};
 use cli_driver::signal::SignalGateName;
+use cli_driver::signal_report::{
+    SignalReportChainFilter, SignalReportInput, SignalReportLevelFilter,
+};
 
-use super::outcome_to_exit;
+use super::{driver_outcome_to_exit, outcome_to_exit};
 
 // ── Gate value type ───────────────────────────────────────────────────────────
 
@@ -162,6 +168,51 @@ pub struct SignalCheckArgs {
     pub spec_json: Option<PathBuf>,
 }
 
+/// Selects the signal chain reported by `sotp signal report`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, ValueEnum)]
+pub enum SignalReportChainArg {
+    /// Include occurrences from every signal chain.
+    All,
+    /// Include only ADR-to-user occurrences.
+    #[value(name = "adr_user")]
+    AdrUser,
+    /// Include only specification-to-ADR occurrences.
+    #[value(name = "spec_adr")]
+    SpecAdr,
+    /// Include only catalogue-to-specification occurrences.
+    #[value(name = "catalog_spec")]
+    CatalogSpec,
+    /// Include only implementation-to-catalogue occurrences.
+    #[value(name = "impl_catalog")]
+    ImplCatalog,
+}
+
+/// Selects the signal levels reported by `sotp signal report`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, ValueEnum)]
+pub enum SignalReportOnlyArg {
+    /// Include only yellow occurrences.
+    #[value(name = "yellow")]
+    YellowOnly,
+    /// Include only red occurrences.
+    #[value(name = "red")]
+    RedOnly,
+    /// Include both yellow and red occurrences.
+    #[value(name = "yellow,red")]
+    YellowAndRed,
+}
+
+/// Arguments for the read-only `sotp signal report` command.
+#[derive(Args, Debug)]
+pub struct SignalReportArgs {
+    /// Signal chain to report. Defaults to every chain.
+    #[arg(long, value_enum, default_value_t = SignalReportChainArg::All)]
+    pub chain: SignalReportChainArg,
+
+    /// Signal levels to report. Defaults to both yellow and red.
+    #[arg(long = "only", value_enum, default_value_t = SignalReportOnlyArg::YellowAndRed)]
+    pub levels: SignalReportOnlyArg,
+}
+
 // ── Top-level enum ────────────────────────────────────────────────────────────
 
 /// `sotp signal` subcommand routing.
@@ -185,12 +236,40 @@ pub enum SignalCommand {
     CheckImplCatalog(CheckImplCatalogArgs),
     /// Aggregate gate check: run all 4 chains in declared order.
     Check(SignalCheckArgs),
+    /// Report matching yellow and red signal occurrences without persisting data.
+    Report(SignalReportArgs),
 }
 
 /// Dispatch a [`SignalCommand`] and return an [`ExitCode`].
 pub fn execute(cmd: SignalCommand) -> ExitCode {
     let driver = SignalCompositionRoot::new().signal_driver();
     match cmd {
+        SignalCommand::Report(args) => {
+            let input = SignalReportInput {
+                chain: match args.chain {
+                    SignalReportChainArg::All => SignalReportChainFilter::All,
+                    SignalReportChainArg::AdrUser => SignalReportChainFilter::AdrUser,
+                    SignalReportChainArg::SpecAdr => SignalReportChainFilter::SpecAdr,
+                    SignalReportChainArg::CatalogSpec => SignalReportChainFilter::CatalogSpec,
+                    SignalReportChainArg::ImplCatalog => SignalReportChainFilter::ImplCatalog,
+                },
+                levels: match args.levels {
+                    SignalReportOnlyArg::YellowOnly => SignalReportLevelFilter::YellowOnly,
+                    SignalReportOnlyArg::RedOnly => SignalReportLevelFilter::RedOnly,
+                    SignalReportOnlyArg::YellowAndRed => SignalReportLevelFilter::YellowAndRed,
+                },
+            };
+
+            #[cfg(test)]
+            if let Some(report_driver) =
+                TEST_SIGNAL_REPORT_DRIVER.with(|slot| slot.borrow_mut().take())
+            {
+                return driver_outcome_to_exit(report_driver.handle(input));
+            }
+
+            let report_driver = SignalCompositionRoot::new().signal_report_driver();
+            driver_outcome_to_exit(report_driver.handle(input))
+        }
         SignalCommand::CalcAdrUser(args) => outcome_to_exit(calc_adr_user::run(&driver, args)),
         SignalCommand::CheckAdrUser(args) => outcome_to_exit(check_adr_user::run(&driver, args)),
         SignalCommand::CalcSpecAdr(args) => outcome_to_exit(calc_spec_adr::run(&driver, args)),
@@ -209,6 +288,12 @@ pub fn execute(cmd: SignalCommand) -> ExitCode {
         }
         SignalCommand::Check(args) => outcome_to_exit(run_aggregate_check(&driver, args)),
     }
+}
+
+#[cfg(test)]
+thread_local! {
+    static TEST_SIGNAL_REPORT_DRIVER: RefCell<Option<cli_driver::signal_report::SignalReportDriver>> =
+        const { RefCell::new(None) };
 }
 
 fn run_aggregate_check(
@@ -237,7 +322,11 @@ mod tests {
 
     use clap::Parser;
     use cli_driver::signal::SignalDriver;
+    use cli_driver::signal_report::SignalReportDriver;
     use infrastructure::{signal::SystemSignalGateConfigAdapter, verify::VerifyOutcome};
+    use usecase::signal_report::{
+        SignalReportError, SignalReportOutput, SignalReportQuery, SignalReportService,
+    };
     use usecase::signal_service::{
         ResolvedSignalChainCommand, SignalChainExecutionReport,
         SignalCommand as ServiceSignalCommand, SignalCommandInteractor, SignalCommandOutput,
@@ -380,6 +469,57 @@ mod tests {
     fn recording_driver() -> (SignalDriver, Arc<RecordingSignalService>) {
         let service = Arc::new(RecordingSignalService(Mutex::new(Vec::new())));
         (SignalDriver::new(service.clone()), service)
+    }
+
+    struct RecordingSignalReportService {
+        queries: Mutex<Vec<SignalReportQuery>>,
+        result: Mutex<Option<Result<SignalReportOutput, SignalReportError>>>,
+    }
+
+    impl RecordingSignalReportService {
+        fn queries(&self) -> Vec<SignalReportQuery> {
+            self.queries.lock().unwrap().clone()
+        }
+    }
+
+    impl SignalReportService for RecordingSignalReportService {
+        fn report(
+            &self,
+            query: SignalReportQuery,
+        ) -> Result<SignalReportOutput, SignalReportError> {
+            self.queries.lock().unwrap().push(query);
+            self.result.lock().unwrap().take().unwrap_or({
+                Err(SignalReportError::SourceUnavailable(
+                    usecase::signal_report::SignalReportChain::AdrUser,
+                ))
+            })
+        }
+    }
+
+    fn recording_report_driver() -> (SignalReportDriver, Arc<RecordingSignalReportService>) {
+        let service = Arc::new(RecordingSignalReportService {
+            queries: Mutex::new(Vec::new()),
+            result: Mutex::new(Some(Ok(SignalReportOutput { occurrences: Vec::new() }))),
+        });
+        (SignalReportDriver::new(service.clone()), service)
+    }
+
+    fn failing_report_driver() -> (SignalReportDriver, Arc<RecordingSignalReportService>) {
+        let service = Arc::new(RecordingSignalReportService {
+            queries: Mutex::new(Vec::new()),
+            result: Mutex::new(Some(Err(SignalReportError::SourceUnavailable(
+                usecase::signal_report::SignalReportChain::AdrUser,
+            )))),
+        });
+        (SignalReportDriver::new(service.clone()), service)
+    }
+
+    fn inject_report_driver(driver: SignalReportDriver) {
+        TEST_SIGNAL_REPORT_DRIVER.with(|slot| {
+            let mut slot = slot.borrow_mut();
+            assert!(slot.is_none(), "test report driver must be consumed before reinjection");
+            *slot = Some(driver);
+        });
     }
 
     fn assert_recorded_outcome(outcome: &cli_composition::CommandOutcome) {
@@ -754,6 +894,122 @@ mod tests {
             }
             other => panic!("expected Check, got {other:?}"),
         }
+    }
+
+    // ── Signal report parsing and dispatch ───────────────────────────────────
+
+    #[test]
+    fn test_signal_report_bare_command_defaults_to_all_chains_and_levels() {
+        let cli = TestCli::try_parse_from(["sotp", "report"]).unwrap();
+
+        match cli.cmd {
+            SignalCommand::Report(args) => {
+                assert_eq!(args.chain, SignalReportChainArg::All);
+                assert_eq!(args.levels, SignalReportOnlyArg::YellowAndRed);
+            }
+            other => panic!("expected Report, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_signal_report_each_chain_spelling_parses_to_its_typed_selector() {
+        let cases = [
+            ("all", SignalReportChainArg::All),
+            ("adr_user", SignalReportChainArg::AdrUser),
+            ("spec_adr", SignalReportChainArg::SpecAdr),
+            ("catalog_spec", SignalReportChainArg::CatalogSpec),
+            ("impl_catalog", SignalReportChainArg::ImplCatalog),
+        ];
+
+        for (value, expected) in cases {
+            let cli = TestCli::try_parse_from(["sotp", "report", "--chain", value]).unwrap();
+            match cli.cmd {
+                SignalCommand::Report(args) => assert_eq!(args.chain, expected),
+                other => panic!("expected Report, got {other:?}"),
+            }
+        }
+    }
+
+    #[test]
+    fn test_signal_report_each_only_spelling_parses_to_its_typed_selector() {
+        let cases = [
+            ("yellow", SignalReportOnlyArg::YellowOnly),
+            ("red", SignalReportOnlyArg::RedOnly),
+            ("yellow,red", SignalReportOnlyArg::YellowAndRed),
+        ];
+
+        for (value, expected) in cases {
+            let cli = TestCli::try_parse_from(["sotp", "report", "--only", value]).unwrap();
+            match cli.cmd {
+                SignalCommand::Report(args) => assert_eq!(args.levels, expected),
+                other => panic!("expected Report, got {other:?}"),
+            }
+        }
+    }
+
+    #[test]
+    fn test_signal_report_invalid_filter_values_are_parser_errors() {
+        let invalid_chain = TestCli::try_parse_from(["sotp", "report", "--chain", "unknown_chain"]);
+        let invalid_level = TestCli::try_parse_from(["sotp", "report", "--only", "blue"]);
+
+        assert!(invalid_chain.is_err());
+        assert!(invalid_level.is_err());
+    }
+
+    #[test]
+    fn test_signal_report_command_shape_contains_typed_args() {
+        let command = SignalCommand::Report(SignalReportArgs {
+            chain: SignalReportChainArg::CatalogSpec,
+            levels: SignalReportOnlyArg::RedOnly,
+        });
+
+        assert!(matches!(
+            command,
+            SignalCommand::Report(SignalReportArgs {
+                chain: SignalReportChainArg::CatalogSpec,
+                levels: SignalReportOnlyArg::RedOnly,
+            })
+        ));
+    }
+
+    #[test]
+    fn test_signal_report_execute_report_branch_dispatches_default_query_once() {
+        let (driver, service) = recording_report_driver();
+        inject_report_driver(driver);
+
+        let exit = execute(SignalCommand::Report(SignalReportArgs {
+            chain: SignalReportChainArg::All,
+            levels: SignalReportOnlyArg::YellowAndRed,
+        }));
+
+        assert_eq!(exit, ExitCode::SUCCESS);
+        assert_eq!(
+            service.queries(),
+            vec![SignalReportQuery {
+                chain: usecase::signal_report::SignalReportChainSelection::All,
+                levels: usecase::signal_report::SignalReportLevelSelection::YellowAndRed,
+            }]
+        );
+    }
+
+    #[test]
+    fn test_signal_report_execute_report_branch_propagates_driver_failure_exit_code() {
+        let (driver, service) = failing_report_driver();
+        inject_report_driver(driver);
+
+        let exit = execute(SignalCommand::Report(SignalReportArgs {
+            chain: SignalReportChainArg::All,
+            levels: SignalReportOnlyArg::YellowAndRed,
+        }));
+
+        assert_eq!(exit, ExitCode::FAILURE);
+        assert_eq!(
+            service.queries(),
+            vec![SignalReportQuery {
+                chain: usecase::signal_report::SignalReportChainSelection::All,
+                levels: usecase::signal_report::SignalReportLevelSelection::YellowAndRed,
+            }]
+        );
     }
 
     // ── --strict / --gate mutual exclusion ───────────────────────────────────
