@@ -40,57 +40,63 @@
     {
       "id": "T7",
       "description": "Update `libs/infrastructure/src/signal.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "5ca034ea1a46028e7ed522823a42546b73963106"
     },
     {
       "id": "T8",
       "description": "Update `libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "5ca034ea1a46028e7ed522823a42546b73963106"
     },
     {
       "id": "T9",
       "description": "Update `libs/infrastructure/src/tddd/catalogue_spec_signals_codec.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "5ca034ea1a46028e7ed522823a42546b73963106"
     },
     {
       "id": "T10",
       "description": "Update `libs/infrastructure/src/tddd/semantic_verify_codec.rs::SpecAdrVerifyCacheDocumentCodec::encode`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "5ca034ea1a46028e7ed522823a42546b73963106"
     },
     {
       "id": "T11",
       "description": "Update `libs/infrastructure/src/tddd/semantic_verify_codec.rs::CatalogueSpecVerifyCacheDocumentCodec::encode`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T12",
       "description": "Update `libs/infrastructure/src/tddd/type_signals_codec.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "5ca034ea1a46028e7ed522823a42546b73963106"
     },
     {
       "id": "T13",
       "description": "Update `libs/infrastructure/src/tddd/catalog_gen/fs_access.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "5ca034ea1a46028e7ed522823a42546b73963106"
     },
     {
       "id": "T14",
       "description": "Update `libs/infrastructure/src/adr_baseline.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T15",
       "description": "Update `libs/infrastructure/src/dry_check/store.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T16",
       "description": "Update `libs/infrastructure/src/dry_check/dry_write_driver/manifest.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T17",
       "description": "Update `libs/infrastructure/src/test_obligation/bindings_codec.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T18",
@@ -117,7 +123,7 @@
       "id": "T22",
       "description": "Implement `libs/domain/src/track.rs::TrackStatus::frozen_status` with focused domain tests; update `libs/usecase/src/test_obligation/derive.rs::DeriveTestObligationsInteractor::execute` and its pre-write guard tests; use/verify `libs/infrastructure/src/track/track_status_reader_adapter.rs::FsTrackStatusReaderAdapter` with focused adapter coverage; wire it into `apps/cli-composition/src/test_obligation.rs::TestObligationCompositionRoot::derive_handler` and retain completed-track no-rewrite invocation fixtures. [OS-02; CN-02; AC-04]",
       "status": "done",
-      "commit_hash": null
+      "commit_hash": "5ca034ea1a46028e7ed522823a42546b73963106"
     },
     {
       "id": "T23",

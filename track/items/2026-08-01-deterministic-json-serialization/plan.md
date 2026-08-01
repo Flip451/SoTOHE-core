@@ -5,7 +5,7 @@
 
 GO-01: T1-T29.
 
-## Tasks (14/29 resolved)
+## Tasks (19/29 resolved)
 
 ### core-track-review-codecs — Core track and review codecs
 
@@ -22,27 +22,27 @@ GO-01: T1-T29.
 - [x] **T4**: Update `libs/infrastructure/src/spec/codec.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01] (`7309757b2582e1511500123f1985bf12592ff6c1`)
 - [x] **T5**: Update `libs/infrastructure/src/task_coverage_codec.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01] (`7309757b2582e1511500123f1985bf12592ff6c1`)
 - [x] **T6**: Update `libs/infrastructure/src/schema_export_codec.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01] (`7309757b2582e1511500123f1985bf12592ff6c1`)
-- [x] **T7**: Update `libs/infrastructure/src/signal.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
+- [x] **T7**: Update `libs/infrastructure/src/signal.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01] (`5ca034ea1a46028e7ed522823a42546b73963106`)
 - [ ] **T23**: Update `libs/infrastructure/src/task_contract_codec.rs::encode`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
 
 ### tddd-artifact-codecs — TDDD artifact codecs
 
 > Update TDDD catalogue and signal codecs; add local regressions. [IN-01; IN-02; CN-01; AC-01]
 
-- [x] **T8**: Update `libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
-- [x] **T9**: Update `libs/infrastructure/src/tddd/catalogue_spec_signals_codec.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
-- [x] **T10**: Update `libs/infrastructure/src/tddd/semantic_verify_codec.rs::SpecAdrVerifyCacheDocumentCodec::encode`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
-- [ ] **T11**: Update `libs/infrastructure/src/tddd/semantic_verify_codec.rs::CatalogueSpecVerifyCacheDocumentCodec::encode`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
-- [x] **T12**: Update `libs/infrastructure/src/tddd/type_signals_codec.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
-- [x] **T13**: Update `libs/infrastructure/src/tddd/catalog_gen/fs_access.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
+- [x] **T8**: Update `libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01] (`5ca034ea1a46028e7ed522823a42546b73963106`)
+- [x] **T9**: Update `libs/infrastructure/src/tddd/catalogue_spec_signals_codec.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01] (`5ca034ea1a46028e7ed522823a42546b73963106`)
+- [x] **T10**: Update `libs/infrastructure/src/tddd/semantic_verify_codec.rs::SpecAdrVerifyCacheDocumentCodec::encode`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01] (`5ca034ea1a46028e7ed522823a42546b73963106`)
+- [x] **T11**: Update `libs/infrastructure/src/tddd/semantic_verify_codec.rs::CatalogueSpecVerifyCacheDocumentCodec::encode`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
+- [x] **T12**: Update `libs/infrastructure/src/tddd/type_signals_codec.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01] (`5ca034ea1a46028e7ed522823a42546b73963106`)
+- [x] **T13**: Update `libs/infrastructure/src/tddd/catalog_gen/fs_access.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01] (`5ca034ea1a46028e7ed522823a42546b73963106`)
 
 ### baseline-dry-check-codecs — Baseline and dry-check codecs
 
 > Update ADR-baseline, dry-check, corpus-root, and coverage writers; add local regressions. [IN-01; IN-02; CN-01; AC-01]
 
-- [ ] **T14**: Update `libs/infrastructure/src/adr_baseline.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
-- [ ] **T15**: Update `libs/infrastructure/src/dry_check/store.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
-- [ ] **T16**: Update `libs/infrastructure/src/dry_check/dry_write_driver/manifest.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
+- [x] **T14**: Update `libs/infrastructure/src/adr_baseline.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
+- [x] **T15**: Update `libs/infrastructure/src/dry_check/store.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
+- [x] **T16**: Update `libs/infrastructure/src/dry_check/dry_write_driver/manifest.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
 - [ ] **T24**: Update `libs/infrastructure/src/dry_check/dry_write_driver.rs::FsDryCorpusRootManifestAdapter::write`; add writer-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
 - [ ] **T25**: Update `libs/infrastructure/src/dry_check/coverage.rs::FsDryCheckCoverageAdapter::write_coverage`; add writer-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
 
@@ -50,7 +50,7 @@ GO-01: T1-T29.
 
 > Update test-obligation codecs; add local regressions. [IN-01; IN-02; CN-01; AC-01]
 
-- [ ] **T17**: Update `libs/infrastructure/src/test_obligation/bindings_codec.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
+- [x] **T17**: Update `libs/infrastructure/src/test_obligation/bindings_codec.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
 - [ ] **T18**: Update `libs/infrastructure/src/test_obligation/obligations_codec.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
 - [ ] **T19**: Update `libs/infrastructure/src/test_obligation/waiver_cache_codec.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
 - [ ] **T20**: Update `libs/infrastructure/src/test_obligation/fulfillment_cache_codec/fulfillment_cache_io.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
@@ -69,4 +69,4 @@ GO-01: T1-T29.
 > Extend `test_obligation.rs::TestObligationCompositionRoot::derive_handler` fixtures. [IN-03; OS-02; CN-02; AC-03; AC-04]
 
 - [x] **T21**: Extend `apps/cli-composition/src/test_obligation.rs::TestObligationCompositionRoot::derive_handler` fixtures for two active-branch invocations. [IN-03; CN-02; AC-03] (`7309757b2582e1511500123f1985bf12592ff6c1`)
-- [x] **T22**: Implement `libs/domain/src/track.rs::TrackStatus::frozen_status` with focused domain tests; update `libs/usecase/src/test_obligation/derive.rs::DeriveTestObligationsInteractor::execute` and its pre-write guard tests; use/verify `libs/infrastructure/src/track/track_status_reader_adapter.rs::FsTrackStatusReaderAdapter` with focused adapter coverage; wire it into `apps/cli-composition/src/test_obligation.rs::TestObligationCompositionRoot::derive_handler` and retain completed-track no-rewrite invocation fixtures. [OS-02; CN-02; AC-04]
+- [x] **T22**: Implement `libs/domain/src/track.rs::TrackStatus::frozen_status` with focused domain tests; update `libs/usecase/src/test_obligation/derive.rs::DeriveTestObligationsInteractor::execute` and its pre-write guard tests; use/verify `libs/infrastructure/src/track/track_status_reader_adapter.rs::FsTrackStatusReaderAdapter` with focused adapter coverage; wire it into `apps/cli-composition/src/test_obligation.rs::TestObligationCompositionRoot::derive_handler` and retain completed-track no-rewrite invocation fixtures. [OS-02; CN-02; AC-04] (`5ca034ea1a46028e7ed522823a42546b73963106`)
