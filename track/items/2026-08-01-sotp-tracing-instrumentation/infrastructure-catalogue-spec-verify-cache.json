@@ -1,0 +1,438 @@
+{
+  "schema_version": 1,
+  "layer": "infrastructure",
+  "entries": [
+    {
+      "claim_hash": "6abb1e6c77e1e0eb40f467e68f0f504c8943a229796aa776f949e50b979fad97",
+      "evidence_hash": "86efca5df5f571c38243782ca22c0165c83d4284aa69e57f1179db74520fdc81",
+      "verdict": {
+        "kind": "pass",
+        "citation": "記録ファイルの増大を運用可能に保つため、ローテーションを扱う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "CommandTraceFileSizeLimitBytes"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "記録ファイルの増大を運用可能に保つため、ローテーションを扱う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6abb1e6c77e1e0eb40f467e68f0f504c8943a229796aa776f949e50b979fad97",
+      "evidence_hash": "d75fc8750901c5a9d9d6e937ab0cb870ca5a1bc2055406abeb5027b5c34cb85b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "active 記録ファイルには正の最大バイト数と正の保持ファイル数を設定し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "CommandTraceFileSizeLimitBytes"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "ローカル JSONL の active 記録ファイルには正の最大バイト数と正の保持ファイル数を設定し、次の記録の追記で最大バイト数を超える前に active ファイルをローテーションする。ローテーション済みファイルが保持数を超える場合は最も古いものを削除する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b389bb931c0c44cb6002e6f91bfc092533533045ea18c7e886dad170af2fe46b",
+      "evidence_hash": "86efca5df5f571c38243782ca22c0165c83d4284aa69e57f1179db74520fdc81",
+      "verdict": {
+        "kind": "pass",
+        "citation": "記録ファイルの増大を運用可能に保つため、ローテーションを扱う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "CommandTracePolicyError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "記録ファイルの増大を運用可能に保つため、ローテーションを扱う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b389bb931c0c44cb6002e6f91bfc092533533045ea18c7e886dad170af2fe46b",
+      "evidence_hash": "d75fc8750901c5a9d9d6e937ab0cb870ca5a1bc2055406abeb5027b5c34cb85b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ローカル JSONL の active 記録ファイルには正の最大バイト数と正の保持ファイル数を設定し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "CommandTracePolicyError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "ローカル JSONL の active 記録ファイルには正の最大バイト数と正の保持ファイル数を設定し、次の記録の追記で最大バイト数を超える前に active ファイルをローテーションする。ローテーション済みファイルが保持数を超える場合は最も古いものを削除する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c21b959baf167c6e46d08e77967b2f1d3e626451401e91d7b2046dddb134d168",
+      "evidence_hash": "86efca5df5f571c38243782ca22c0165c83d4284aa69e57f1179db74520fdc81",
+      "verdict": {
+        "kind": "pass",
+        "citation": "記録ファイルの増大を運用可能に保つため、ローテーションを扱う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "CommandTraceRetainedFileCount"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "記録ファイルの増大を運用可能に保つため、ローテーションを扱う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c21b959baf167c6e46d08e77967b2f1d3e626451401e91d7b2046dddb134d168",
+      "evidence_hash": "d75fc8750901c5a9d9d6e937ab0cb870ca5a1bc2055406abeb5027b5c34cb85b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "正の最大バイト数と正の保持ファイル数を設定し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "CommandTraceRetainedFileCount"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "ローカル JSONL の active 記録ファイルには正の最大バイト数と正の保持ファイル数を設定し、次の記録の追記で最大バイト数を超える前に active ファイルをローテーションする。ローテーション済みファイルが保持数を超える場合は最も古いものを削除する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "91743f310ce6057c6bf84af8e825fd606aa5f37ffcfde2bc336508445f4557d6",
+      "evidence_hash": "86efca5df5f571c38243782ca22c0165c83d4284aa69e57f1179db74520fdc81",
+      "verdict": {
+        "kind": "pass",
+        "citation": "記録ファイルの増大を運用可能に保つため、ローテーションを扱う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "CommandTraceRotationPolicy"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "記録ファイルの増大を運用可能に保つため、ローテーションを扱う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "91743f310ce6057c6bf84af8e825fd606aa5f37ffcfde2bc336508445f4557d6",
+      "evidence_hash": "d75fc8750901c5a9d9d6e937ab0cb870ca5a1bc2055406abeb5027b5c34cb85b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ローカル JSONL の active 記録ファイルには正の最大バイト数と正の保持ファイル数を設定し、次の記録の追記で最大バイト数を超える前に active ファイルをローテーションする。ローテーション済みファイルが保持数を超える場合は最も古いものを削除する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "CommandTraceRotationPolicy"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "ローカル JSONL の active 記録ファイルには正の最大バイト数と正の保持ファイル数を設定し、次の記録の追記で最大バイト数を超える前に active ファイルをローテーションする。ローテーション済みファイルが保持数を超える場合は最も古いものを削除する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "91743f310ce6057c6bf84af8e825fd606aa5f37ffcfde2bc336508445f4557d6",
+      "evidence_hash": "5c2e9c7fdae7ee569211fb382a6990040578919fd92a138466b751cb5da1d813",
+      "verdict": {
+        "kind": "pass",
+        "citation": "正の最大バイト数と正の保持ファイル数を設定し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "CommandTraceRotationPolicy"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "正の最大バイト数と正の保持ファイル数を設定し、各記録が最大バイト数以下で累積サイズがその上限を超える複数のコマンド記録を生成すると、上限を超える追記の前に active JSONL ファイルがローテーションされる。ローテーション後は active ファイルが上限を超えず、保持されるローテーション済みファイル数は設定した保持数以下であることを確認できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c1487867b40eb4070a20090dc5d1f5fd1c580687ecf7e37a0574d992b24fe988",
+      "evidence_hash": "f92832f5450d69a09850f4956fad3ba679b857fc835c4266b0c10df3e15394c3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "すべての `sotp` コマンドを共通の entry point で tracing 計装し、コマンド横断で一貫した実行観測を行う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsCommandTraceAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "すべての `sotp` コマンドを共通の entry point で tracing 計装し、コマンド横断で一貫した実行観測を行う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c1487867b40eb4070a20090dc5d1f5fd1c580687ecf7e37a0574d992b24fe988",
+      "evidence_hash": "7d442a8ba6b078174131cac5825c183427295e92bdc20170d3064381163593a3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各コマンド実行について、コマンド identity、所要時間、および exit 結果をローカル JSONL 記録へ残す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsCommandTraceAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "各コマンド実行について、コマンド identity、所要時間、および exit 結果をローカル JSONL 記録へ残す。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c1487867b40eb4070a20090dc5d1f5fd1c580687ecf7e37a0574d992b24fe988",
+      "evidence_hash": "86efca5df5f571c38243782ca22c0165c83d4284aa69e57f1179db74520fdc81",
+      "verdict": {
+        "kind": "pass",
+        "citation": "記録ファイルの増大を運用可能に保つため、ローテーションを扱う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsCommandTraceAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "記録ファイルの増大を運用可能に保つため、ローテーションを扱う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a9a46971c1b3d3046ab048691278a727ecd8f78475f5a0b32cec1c1938d5f4bc",
+      "evidence_hash": "25d5c97dc542d7627efe73da21e8978c7b82e337866c1d1fcb5ca75c2bf4a2b5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存の `sotp telemetry` を、このローカル記録からコマンド横断の利用頻度、所要時間、および失敗率を分析できるように拡張する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "TelemetryReport"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "既存の `sotp telemetry` を、このローカル記録からコマンド横断の利用頻度、所要時間、および失敗率を分析できるように拡張する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a9a46971c1b3d3046ab048691278a727ecd8f78475f5a0b32cec1c1938d5f4bc",
+      "evidence_hash": "ff37151e9ec452725ac4307678171a9e4d8466fb21a821946b439929a12cf635",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp telemetry` はローカル記録を分析し、コマンド横断の実行頻度、所要時間、および失敗率を確認できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "TelemetryReport"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "`sotp telemetry` はローカル記録を分析し、コマンド横断の実行頻度、所要時間、および失敗率を確認できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "94f6be5a8c0d8c1cb7ecd9bf2bd4a5b18f0cc9167c18c412320216f72ba01864",
+      "evidence_hash": "25d5c97dc542d7627efe73da21e8978c7b82e337866c1d1fcb5ca75c2bf4a2b5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存の `sotp telemetry` を、このローカル記録からコマンド横断の利用頻度、所要時間、および失敗率を分析できるように拡張する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "TelemetryReportSnapshot"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "既存の `sotp telemetry` を、このローカル記録からコマンド横断の利用頻度、所要時間、および失敗率を分析できるように拡張する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "94f6be5a8c0d8c1cb7ecd9bf2bd4a5b18f0cc9167c18c412320216f72ba01864",
+      "evidence_hash": "ff37151e9ec452725ac4307678171a9e4d8466fb21a821946b439929a12cf635",
+      "verdict": {
+        "kind": "pass",
+        "citation": "コマンド横断の実行頻度、所要時間、および失敗率を確認できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "TelemetryReportSnapshot"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "`sotp telemetry` はローカル記録を分析し、コマンド横断の実行頻度、所要時間、および失敗率を確認できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b53c7805aee8c1ac9dc70bbb621d1e4dd5638798266be3f30c252916bba9d3dd",
+      "evidence_hash": "25d5c97dc542d7627efe73da21e8978c7b82e337866c1d1fcb5ca75c2bf4a2b5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存の `sotp telemetry` を、このローカル記録からコマンド横断の利用頻度、所要時間、および失敗率を分析できるように拡張する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "TelemetryReportOutput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "既存の `sotp telemetry` を、このローカル記録からコマンド横断の利用頻度、所要時間、および失敗率を分析できるように拡張する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b53c7805aee8c1ac9dc70bbb621d1e4dd5638798266be3f30c252916bba9d3dd",
+      "evidence_hash": "ff37151e9ec452725ac4307678171a9e4d8466fb21a821946b439929a12cf635",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp telemetry` はローカル記録を分析し、コマンド横断の実行頻度、所要時間、および失敗率を確認できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "TelemetryReportOutput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "`sotp telemetry` はローカル記録を分析し、コマンド横断の実行頻度、所要時間、および失敗率を確認できる。"
+        }
+      }
+    }
+  ]
+}

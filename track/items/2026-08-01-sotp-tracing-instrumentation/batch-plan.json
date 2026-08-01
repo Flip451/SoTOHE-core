@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "track_id": "2026-08-01-sotp-tracing-instrumentation",
+  "task_estimates": [
+    {"task_id":"T001","scope_estimates":[{"scope":"usecase","production_lines":300,"test_lines":140}],"oversize_justification":null},
+    {"task_id":"T002","scope_estimates":[{"scope":"usecase","production_lines":230,"test_lines":165}],"oversize_justification":null},
+    {"task_id":"T003","scope_estimates":[{"scope":"usecase","production_lines":250,"test_lines":130}],"oversize_justification":null},
+    {"task_id":"T004","scope_estimates":[{"scope":"infrastructure","production_lines":220,"test_lines":110}],"oversize_justification":null},
+    {"task_id":"T005","scope_estimates":[{"scope":"infrastructure","production_lines":210,"test_lines":170}],"oversize_justification":null},
+    {"task_id":"T006","scope_estimates":[{"scope":"infrastructure","production_lines":160,"test_lines":150}],"oversize_justification":null},
+    {"task_id":"T007","scope_estimates":[{"scope":"cli_driver","production_lines":130,"test_lines":70}],"oversize_justification":null},
+    {"task_id":"T008","scope_estimates":[{"scope":"cli_composition","production_lines":130,"test_lines":70}],"oversize_justification":null},
+    {"task_id":"T009","scope_estimates":[{"scope":"cli_driver","production_lines":60,"test_lines":70},{"scope":"cli","production_lines":90,"test_lines":120}],"oversize_justification":null},
+    {"task_id":"T010","scope_estimates":[{"scope":"cli","production_lines":140,"test_lines":150}],"oversize_justification":null}
+  ],
+  "batches": [
+    {"id":"B1","task_ids":["T001"]}, {"id":"B2","task_ids":["T002"]},
+    {"id":"B3","task_ids":["T003"]}, {"id":"B4","task_ids":["T004"]},
+    {"id":"B5","task_ids":["T005"]}, {"id":"B6","task_ids":["T006"]},
+    {"id":"B7","task_ids":["T007"]}, {"id":"B8","task_ids":["T008"]},
+    {"id":"B9","task_ids":["T009"]}, {"id":"B10","task_ids":["T010"]}
+  ]
+}

@@ -1,0 +1,310 @@
+<!-- Generated contract-map-renderer — DO NOT EDIT DIRECTLY -->
+```mermaid
+---
+config:
+  layout: elk
+---
+flowchart LR
+classDef aggregate_root fill:#ede9fe,stroke:#4c1d95,stroke-width:2px
+classDef app_service fill:#ecfdf5,stroke:#059669,stroke-width:2px
+classDef command fill:#fff7ed,stroke:#c2410c,stroke-width:1px
+classDef composition_root fill:#e0e7ff,stroke:#3730a3,stroke-width:2px
+classDef domain_event fill:#fce7f3,stroke:#9d174d,stroke-width:1px
+classDef domain_service fill:#fee2e2,stroke:#991b1b,stroke-width:1px
+classDef dto fill:#f8fafc,stroke:#64748b,stroke-width:1px
+classDef entity fill:#dbeafe,stroke:#1e40af,stroke-width:2px
+classDef error_type fill:#fef2f2,stroke:#b91c1c,stroke-width:1px,stroke-dasharray:4 2
+classDef event_policy fill:#fef3c7,stroke:#92400e,stroke-width:1px
+classDef factory fill:#e0f2fe,stroke:#0369a1,stroke-width:1px
+classDef free_function fill:#f5f3ff,stroke:#7c3aed,stroke-width:1px
+classDef function_node fill:#f5f3ff,stroke:#a78bfa,stroke-width:1px
+classDef interactor fill:#f0fdfa,stroke:#0d9488,stroke-width:1px
+classDef method_node fill:#f8fafc,stroke:#cbd5e1,stroke-width:1px
+classDef primary_adapter fill:#ecfccb,stroke:#3f6212,stroke-width:1px
+classDef query fill:#f0f9ff,stroke:#0369a1,stroke-width:1px
+classDef repository fill:#f5f3ff,stroke:#6d28d9,stroke-width:1px
+classDef secondary_adapter fill:#fafaf9,stroke:#57534e,stroke-width:1px
+classDef secondary_port fill:#fafaf9,stroke:#78716c,stroke-width:1px,stroke-dasharray:4 2
+classDef specification fill:#fdf4ff,stroke:#6b21a8,stroke-width:1px
+classDef specification_port fill:#fdf4ff,stroke:#9333ea,stroke-width:1px,stroke-dasharray:4 2
+classDef typestate_overlay stroke:#dc2626,stroke-width:3px
+classDef use_case fill:#ecfeff,stroke:#0e7490,stroke-width:1px
+classDef use_case_function fill:#eef2ff,stroke:#4338ca,stroke-width:1px
+classDef value_object fill:#d1fae5,stroke:#065f46,stroke-width:1px
+classDef variant_node fill:#fafaf9,stroke:#d6d3d1,stroke-width:1px
+subgraph domain["domain"]
+  direction TB
+end
+subgraph usecase["usecase"]
+  direction TB
+  subgraph usecase_usecase_module_telemetry["usecase::telemetry"]
+    direction TB
+  subgraph T37_usecase_usecase_CommandDurationMillis["telemetry::command_trace::CommandDurationMillis"]
+    direction TB
+    T37_usecase_usecase_CommandDurationMillis__self[CommandDurationMillis]
+  end
+  subgraph T37_usecase_usecase_CommandExecutionCount["telemetry::command_trace::CommandExecutionCount"]
+    direction TB
+    T37_usecase_usecase_CommandExecutionCount__self[CommandExecutionCount]
+  end
+  subgraph T38_usecase_usecase_CommandExecutionMetric["telemetry::command_trace::CommandExecutionMetric"]
+    direction TB
+    T38_usecase_usecase_CommandExecutionMetric__self[CommandExecutionMetric]
+    T38_usecase_usecase_CommandExecutionMetric_new([new])
+    T38_usecase_usecase_CommandExecutionMetric_failure_rate([failure_rate])
+    T38_usecase_usecase_CommandExecutionMetric_command([command])
+    T38_usecase_usecase_CommandExecutionMetric_executions([executions])
+    T38_usecase_usecase_CommandExecutionMetric_failures([failures])
+    T38_usecase_usecase_CommandExecutionMetric_total_duration([total_duration])
+  end
+  subgraph T38_usecase_usecase_CommandExecutionResult["telemetry::command_trace::CommandExecutionResult"]
+    direction TB
+    T38_usecase_usecase_CommandExecutionResult__self[CommandExecutionResult]
+    T38_usecase_usecase_CommandExecutionResult_Success[Success]
+    T38_usecase_usecase_CommandExecutionResult_Failure[Failure]
+  end
+  subgraph T31_usecase_usecase_CommandExitCode["telemetry::command_trace::CommandExitCode"]
+    direction TB
+    T31_usecase_usecase_CommandExitCode__self[CommandExitCode]
+    T31_usecase_usecase_CommandExitCode_try_new([try_new])
+    T31_usecase_usecase_CommandExitCode_value([value])
+  end
+  subgraph T45_usecase_usecase_CommandFailureRateBasisPoints["telemetry::command_trace::CommandFailureRateBasisPoints"]
+    direction TB
+    T45_usecase_usecase_CommandFailureRateBasisPoints__self[CommandFailureRateBasisPoints]
+    T45_usecase_usecase_CommandFailureRateBasisPoints_try_new([try_new])
+    T45_usecase_usecase_CommandFailureRateBasisPoints_value([value])
+  end
+  subgraph T38_usecase_usecase_CommandTraceInteractor["telemetry::command_trace::CommandTraceInteractor"]
+    direction TB
+    T38_usecase_usecase_CommandTraceInteractor__self[CommandTraceInteractor]
+    T38_usecase_usecase_CommandTraceInteractor_new([new])
+  end
+  subgraph T34_usecase_usecase_CommandTraceRecord["telemetry::command_trace::CommandTraceRecord"]
+    direction TB
+    T34_usecase_usecase_CommandTraceRecord__self[CommandTraceRecord]
+  end
+  subgraph T38_usecase_usecase_CommandTraceValueError["telemetry::command_trace::CommandTraceValueError"]
+    direction TB
+    T38_usecase_usecase_CommandTraceValueError__self[CommandTraceValueError]
+    T38_usecase_usecase_CommandTraceValueError_EmptyCommandIdentity[EmptyCommandIdentity]
+    T38_usecase_usecase_CommandTraceValueError_ZeroExitCode[ZeroExitCode]
+    T38_usecase_usecase_CommandTraceValueError_ZeroExecutions[ZeroExecutions]
+    T38_usecase_usecase_CommandTraceValueError_FailureCountExceedsExecutions[FailureCountExceedsExecutions]
+    T38_usecase_usecase_CommandTraceValueError_FailureRateOutOfRange[FailureRateOutOfRange]
+  end
+  subgraph T38_usecase_usecase_CommandTraceWriteError["telemetry::command_trace::CommandTraceWriteError"]
+    direction TB
+    T38_usecase_usecase_CommandTraceWriteError__self[CommandTraceWriteError]
+    T38_usecase_usecase_CommandTraceWriteError_Unavailable[Unavailable]
+  end
+  subgraph T35_usecase_usecase_SotpCommandIdentity["telemetry::command_trace::SotpCommandIdentity"]
+    direction TB
+    T35_usecase_usecase_SotpCommandIdentity__self[SotpCommandIdentity]
+    T35_usecase_usecase_SotpCommandIdentity_try_new([try_new])
+    T35_usecase_usecase_SotpCommandIdentity_as_str([as_str])
+  end
+  subgraph T37_usecase_usecase_TelemetryReportOutput["telemetry::TelemetryReportOutput"]
+    direction TB
+    T37_usecase_usecase_TelemetryReportOutput__self[TelemetryReportOutput]
+  end
+  subgraph T41_usecase_usecase_TelemetrySkippedLineCount["telemetry::command_trace::TelemetrySkippedLineCount"]
+    direction TB
+    T41_usecase_usecase_TelemetrySkippedLineCount__self[TelemetrySkippedLineCount]
+  end
+  subgraph R35_usecase_usecase_CommandTraceService["telemetry::command_trace::CommandTraceService"]
+    direction TB
+    R35_usecase_usecase_CommandTraceService__self[CommandTraceService]
+    R35_usecase_usecase_CommandTraceService_record([record])
+  end
+  subgraph R38_usecase_usecase_CommandTraceWriterPort["telemetry::command_trace::CommandTraceWriterPort"]
+    direction TB
+    R38_usecase_usecase_CommandTraceWriterPort__self[CommandTraceWriterPort]
+    R38_usecase_usecase_CommandTraceWriterPort_record([record])
+  end
+  end
+end
+subgraph infrastructure["infrastructure"]
+  direction TB
+  subgraph infrastructure_infrastructure_module_telemetry["infrastructure::telemetry"]
+    direction TB
+  subgraph T60_infrastructure_infrastructure_CommandTraceFileSizeLimitBytes["telemetry::command_trace::CommandTraceFileSizeLimitBytes"]
+    direction TB
+    T60_infrastructure_infrastructure_CommandTraceFileSizeLimitBytes__self[CommandTraceFileSizeLimitBytes]
+    T60_infrastructure_infrastructure_CommandTraceFileSizeLimitBytes_try_new([try_new])
+    T60_infrastructure_infrastructure_CommandTraceFileSizeLimitBytes_value([value])
+  end
+  subgraph T53_infrastructure_infrastructure_CommandTracePolicyError["telemetry::command_trace::CommandTracePolicyError"]
+    direction TB
+    T53_infrastructure_infrastructure_CommandTracePolicyError__self[CommandTracePolicyError]
+    T53_infrastructure_infrastructure_CommandTracePolicyError_ZeroFileSizeLimit[ZeroFileSizeLimit]
+    T53_infrastructure_infrastructure_CommandTracePolicyError_ZeroRetainedFileCount[ZeroRetainedFileCount]
+  end
+  subgraph T59_infrastructure_infrastructure_CommandTraceRetainedFileCount["telemetry::command_trace::CommandTraceRetainedFileCount"]
+    direction TB
+    T59_infrastructure_infrastructure_CommandTraceRetainedFileCount__self[CommandTraceRetainedFileCount]
+    T59_infrastructure_infrastructure_CommandTraceRetainedFileCount_try_new([try_new])
+    T59_infrastructure_infrastructure_CommandTraceRetainedFileCount_value([value])
+  end
+  subgraph T56_infrastructure_infrastructure_CommandTraceRotationPolicy["telemetry::command_trace::CommandTraceRotationPolicy"]
+    direction TB
+    T56_infrastructure_infrastructure_CommandTraceRotationPolicy__self[CommandTraceRotationPolicy]
+    T56_infrastructure_infrastructure_CommandTraceRotationPolicy_new([new])
+  end
+  subgraph T51_infrastructure_infrastructure_FsCommandTraceAdapter["telemetry::command_trace::FsCommandTraceAdapter"]
+    direction TB
+    T51_infrastructure_infrastructure_FsCommandTraceAdapter__self[FsCommandTraceAdapter]
+    T51_infrastructure_infrastructure_FsCommandTraceAdapter_new([new])
+  end
+  subgraph T45_infrastructure_infrastructure_TelemetryReport["telemetry::report::TelemetryReport"]
+    direction TB
+    T45_infrastructure_infrastructure_TelemetryReport__self[TelemetryReport]
+    T45_infrastructure_infrastructure_TelemetryReport_new([new])
+    T45_infrastructure_infrastructure_TelemetryReport_aggregate([aggregate])
+  end
+  subgraph T53_infrastructure_infrastructure_TelemetryReportSnapshot["telemetry::report::TelemetryReportSnapshot"]
+    direction TB
+    T53_infrastructure_infrastructure_TelemetryReportSnapshot__self[TelemetryReportSnapshot]
+  end
+  end
+end
+subgraph cli_driver["cli_driver"]
+  direction TB
+  subgraph cli_driver_cli_driver_module_telemetry["cli_driver::telemetry"]
+    direction TB
+  subgraph T40_cli_driver_cli_driver_CommandTraceDriver["telemetry::command_trace::CommandTraceDriver"]
+    direction TB
+    T40_cli_driver_cli_driver_CommandTraceDriver__self[CommandTraceDriver]
+    T40_cli_driver_cli_driver_CommandTraceDriver_new([new])
+    T40_cli_driver_cli_driver_CommandTraceDriver_handle([handle])
+  end
+  end
+end
+subgraph cli_composition["cli_composition"]
+  direction TB
+  subgraph cli_composition_cli_composition_module_telemetry["cli_composition::telemetry"]
+    direction TB
+  subgraph T59_cli_composition_cli_composition_CommandTraceCompositionRoot["telemetry::command_trace::CommandTraceCompositionRoot"]
+    direction TB
+    T59_cli_composition_cli_composition_CommandTraceCompositionRoot__self[CommandTraceCompositionRoot]
+    T59_cli_composition_cli_composition_CommandTraceCompositionRoot_new([new])
+    T59_cli_composition_cli_composition_CommandTraceCompositionRoot_command_trace_driver([command_trace_driver])
+  end
+  end
+end
+subgraph cli["cli"]
+  direction TB
+end
+T38_usecase_usecase_CommandExecutionMetric_new --o T35_usecase_usecase_SotpCommandIdentity__self
+T38_usecase_usecase_CommandExecutionMetric_new --o T37_usecase_usecase_CommandExecutionCount__self
+T38_usecase_usecase_CommandExecutionMetric_new --o T37_usecase_usecase_CommandExecutionCount__self
+T38_usecase_usecase_CommandExecutionMetric_new --o T37_usecase_usecase_CommandDurationMillis__self
+T38_usecase_usecase_CommandExecutionMetric_new --> T38_usecase_usecase_CommandTraceValueError__self
+T38_usecase_usecase_CommandExecutionMetric_new --> T38_usecase_usecase_CommandExecutionMetric__self
+T38_usecase_usecase_CommandExecutionMetric_failure_rate --> T45_usecase_usecase_CommandFailureRateBasisPoints__self
+T38_usecase_usecase_CommandExecutionMetric_command --> T35_usecase_usecase_SotpCommandIdentity__self
+T38_usecase_usecase_CommandExecutionMetric_executions --> T37_usecase_usecase_CommandExecutionCount__self
+T38_usecase_usecase_CommandExecutionMetric_failures --> T37_usecase_usecase_CommandExecutionCount__self
+T38_usecase_usecase_CommandExecutionMetric_total_duration --> T37_usecase_usecase_CommandDurationMillis__self
+T38_usecase_usecase_CommandExecutionResult_Failure --o T31_usecase_usecase_CommandExitCode__self
+T31_usecase_usecase_CommandExitCode_try_new --> T38_usecase_usecase_CommandTraceValueError__self
+T31_usecase_usecase_CommandExitCode_try_new --> T31_usecase_usecase_CommandExitCode__self
+T45_usecase_usecase_CommandFailureRateBasisPoints_try_new --> T38_usecase_usecase_CommandTraceValueError__self
+T45_usecase_usecase_CommandFailureRateBasisPoints_try_new --> T45_usecase_usecase_CommandFailureRateBasisPoints__self
+T38_usecase_usecase_CommandTraceInteractor_new --o R38_usecase_usecase_CommandTraceWriterPort__self
+T38_usecase_usecase_CommandTraceInteractor_new --> T38_usecase_usecase_CommandTraceInteractor__self
+T34_usecase_usecase_CommandTraceRecord__self --o|command| T35_usecase_usecase_SotpCommandIdentity__self
+T34_usecase_usecase_CommandTraceRecord__self --o|duration| T37_usecase_usecase_CommandDurationMillis__self
+T34_usecase_usecase_CommandTraceRecord__self --o|result| T38_usecase_usecase_CommandExecutionResult__self
+T35_usecase_usecase_SotpCommandIdentity_try_new --> T38_usecase_usecase_CommandTraceValueError__self
+T35_usecase_usecase_SotpCommandIdentity_try_new --> T35_usecase_usecase_SotpCommandIdentity__self
+T37_usecase_usecase_TelemetryReportOutput__self --o|skipped_lines| T41_usecase_usecase_TelemetrySkippedLineCount__self
+T37_usecase_usecase_TelemetryReportOutput__self --o|command_metrics| T38_usecase_usecase_CommandExecutionMetric__self
+R35_usecase_usecase_CommandTraceService_record --o T34_usecase_usecase_CommandTraceRecord__self
+R35_usecase_usecase_CommandTraceService_record --> T38_usecase_usecase_CommandTraceWriteError__self
+R38_usecase_usecase_CommandTraceWriterPort_record --o T34_usecase_usecase_CommandTraceRecord__self
+R38_usecase_usecase_CommandTraceWriterPort_record --> T38_usecase_usecase_CommandTraceWriteError__self
+T38_usecase_usecase_CommandTraceInteractor__self -.impl.-> R35_usecase_usecase_CommandTraceService__self
+T60_infrastructure_infrastructure_CommandTraceFileSizeLimitBytes_try_new --> T53_infrastructure_infrastructure_CommandTracePolicyError__self
+T60_infrastructure_infrastructure_CommandTraceFileSizeLimitBytes_try_new --> T60_infrastructure_infrastructure_CommandTraceFileSizeLimitBytes__self
+T59_infrastructure_infrastructure_CommandTraceRetainedFileCount_try_new --> T53_infrastructure_infrastructure_CommandTracePolicyError__self
+T59_infrastructure_infrastructure_CommandTraceRetainedFileCount_try_new --> T59_infrastructure_infrastructure_CommandTraceRetainedFileCount__self
+T56_infrastructure_infrastructure_CommandTraceRotationPolicy_new --o T60_infrastructure_infrastructure_CommandTraceFileSizeLimitBytes__self
+T56_infrastructure_infrastructure_CommandTraceRotationPolicy_new --o T59_infrastructure_infrastructure_CommandTraceRetainedFileCount__self
+T56_infrastructure_infrastructure_CommandTraceRotationPolicy_new --> T56_infrastructure_infrastructure_CommandTraceRotationPolicy__self
+T56_infrastructure_infrastructure_CommandTraceRotationPolicy__self --o|max_file_size| T60_infrastructure_infrastructure_CommandTraceFileSizeLimitBytes__self
+T56_infrastructure_infrastructure_CommandTraceRotationPolicy__self --o|retained_files| T59_infrastructure_infrastructure_CommandTraceRetainedFileCount__self
+T51_infrastructure_infrastructure_FsCommandTraceAdapter_new --o T56_infrastructure_infrastructure_CommandTraceRotationPolicy__self
+T51_infrastructure_infrastructure_FsCommandTraceAdapter_new --> T51_infrastructure_infrastructure_FsCommandTraceAdapter__self
+T45_infrastructure_infrastructure_TelemetryReport_new --> T45_infrastructure_infrastructure_TelemetryReport__self
+T45_infrastructure_infrastructure_TelemetryReport_aggregate --> T53_infrastructure_infrastructure_TelemetryReportSnapshot__self
+T53_infrastructure_infrastructure_TelemetryReportSnapshot__self --o|skipped_lines| T41_usecase_usecase_TelemetrySkippedLineCount__self
+T53_infrastructure_infrastructure_TelemetryReportSnapshot__self --o|command_metrics| T38_usecase_usecase_CommandExecutionMetric__self
+T51_infrastructure_infrastructure_FsCommandTraceAdapter__self -.impl.-> R38_usecase_usecase_CommandTraceWriterPort__self
+T40_cli_driver_cli_driver_CommandTraceDriver_new --o R35_usecase_usecase_CommandTraceService__self
+T40_cli_driver_cli_driver_CommandTraceDriver_new --> T40_cli_driver_cli_driver_CommandTraceDriver__self
+T40_cli_driver_cli_driver_CommandTraceDriver_handle --o T34_usecase_usecase_CommandTraceRecord__self
+T59_cli_composition_cli_composition_CommandTraceCompositionRoot_new --> T59_cli_composition_cli_composition_CommandTraceCompositionRoot__self
+T59_cli_composition_cli_composition_CommandTraceCompositionRoot_command_trace_driver --> T40_cli_driver_cli_driver_CommandTraceDriver__self
+class T37_usecase_usecase_CommandDurationMillis__self value_object
+class T37_usecase_usecase_CommandExecutionCount__self value_object
+class T38_usecase_usecase_CommandExecutionMetric_new method_node
+class T38_usecase_usecase_CommandExecutionMetric_failure_rate method_node
+class T38_usecase_usecase_CommandExecutionMetric_command method_node
+class T38_usecase_usecase_CommandExecutionMetric_executions method_node
+class T38_usecase_usecase_CommandExecutionMetric_failures method_node
+class T38_usecase_usecase_CommandExecutionMetric_total_duration method_node
+class T38_usecase_usecase_CommandExecutionMetric__self dto
+class T38_usecase_usecase_CommandExecutionResult_Success variant_node
+class T38_usecase_usecase_CommandExecutionResult_Failure variant_node
+class T38_usecase_usecase_CommandExecutionResult__self value_object
+class T31_usecase_usecase_CommandExitCode_try_new method_node
+class T31_usecase_usecase_CommandExitCode_value method_node
+class T31_usecase_usecase_CommandExitCode__self value_object
+class T45_usecase_usecase_CommandFailureRateBasisPoints_try_new method_node
+class T45_usecase_usecase_CommandFailureRateBasisPoints_value method_node
+class T45_usecase_usecase_CommandFailureRateBasisPoints__self value_object
+class T38_usecase_usecase_CommandTraceInteractor_new method_node
+class T38_usecase_usecase_CommandTraceInteractor__self interactor
+class T34_usecase_usecase_CommandTraceRecord__self dto
+class T38_usecase_usecase_CommandTraceValueError_EmptyCommandIdentity variant_node
+class T38_usecase_usecase_CommandTraceValueError_ZeroExitCode variant_node
+class T38_usecase_usecase_CommandTraceValueError_ZeroExecutions variant_node
+class T38_usecase_usecase_CommandTraceValueError_FailureCountExceedsExecutions variant_node
+class T38_usecase_usecase_CommandTraceValueError_FailureRateOutOfRange variant_node
+class T38_usecase_usecase_CommandTraceValueError__self error_type
+class T38_usecase_usecase_CommandTraceWriteError_Unavailable variant_node
+class T38_usecase_usecase_CommandTraceWriteError__self error_type
+class T35_usecase_usecase_SotpCommandIdentity_try_new method_node
+class T35_usecase_usecase_SotpCommandIdentity_as_str method_node
+class T35_usecase_usecase_SotpCommandIdentity__self value_object
+class T37_usecase_usecase_TelemetryReportOutput__self dto
+class T41_usecase_usecase_TelemetrySkippedLineCount__self value_object
+class R35_usecase_usecase_CommandTraceService_record method_node
+class R35_usecase_usecase_CommandTraceService__self app_service
+class R38_usecase_usecase_CommandTraceWriterPort_record method_node
+class R38_usecase_usecase_CommandTraceWriterPort__self secondary_port
+class T60_infrastructure_infrastructure_CommandTraceFileSizeLimitBytes_try_new method_node
+class T60_infrastructure_infrastructure_CommandTraceFileSizeLimitBytes_value method_node
+class T60_infrastructure_infrastructure_CommandTraceFileSizeLimitBytes__self dto
+class T53_infrastructure_infrastructure_CommandTracePolicyError_ZeroFileSizeLimit variant_node
+class T53_infrastructure_infrastructure_CommandTracePolicyError_ZeroRetainedFileCount variant_node
+class T53_infrastructure_infrastructure_CommandTracePolicyError__self error_type
+class T59_infrastructure_infrastructure_CommandTraceRetainedFileCount_try_new method_node
+class T59_infrastructure_infrastructure_CommandTraceRetainedFileCount_value method_node
+class T59_infrastructure_infrastructure_CommandTraceRetainedFileCount__self dto
+class T56_infrastructure_infrastructure_CommandTraceRotationPolicy_new method_node
+class T56_infrastructure_infrastructure_CommandTraceRotationPolicy__self dto
+class T51_infrastructure_infrastructure_FsCommandTraceAdapter_new method_node
+class T51_infrastructure_infrastructure_FsCommandTraceAdapter__self secondary_adapter
+class T45_infrastructure_infrastructure_TelemetryReport_new method_node
+class T45_infrastructure_infrastructure_TelemetryReport_aggregate method_node
+class T45_infrastructure_infrastructure_TelemetryReport__self secondary_adapter
+class T53_infrastructure_infrastructure_TelemetryReportSnapshot__self dto
+class T40_cli_driver_cli_driver_CommandTraceDriver_new method_node
+class T40_cli_driver_cli_driver_CommandTraceDriver_handle method_node
+class T40_cli_driver_cli_driver_CommandTraceDriver__self primary_adapter
+class T59_cli_composition_cli_composition_CommandTraceCompositionRoot_new method_node
+class T59_cli_composition_cli_composition_CommandTraceCompositionRoot_command_trace_driver method_node
+class T59_cli_composition_cli_composition_CommandTraceCompositionRoot__self composition_root
+```

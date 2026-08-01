@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "27b26328f2c1d1f055d87f63bdd10c332fbd1636ec7e8745e53d4181e12bf63e",
+  "signals": [
+    {
+      "type_name": "CommandTraceFileSizeLimitBytes",
+      "signal": "blue",
+      "entry_hash": "6abb1e6c77e1e0eb40f467e68f0f504c8943a229796aa776f949e50b979fad97"
+    },
+    {
+      "type_name": "CommandTracePolicyError",
+      "signal": "blue",
+      "entry_hash": "b389bb931c0c44cb6002e6f91bfc092533533045ea18c7e886dad170af2fe46b"
+    },
+    {
+      "type_name": "CommandTraceRetainedFileCount",
+      "signal": "blue",
+      "entry_hash": "c21b959baf167c6e46d08e77967b2f1d3e626451401e91d7b2046dddb134d168"
+    },
+    {
+      "type_name": "CommandTraceRotationPolicy",
+      "signal": "blue",
+      "entry_hash": "91743f310ce6057c6bf84af8e825fd606aa5f37ffcfde2bc336508445f4557d6"
+    },
+    {
+      "type_name": "FsCommandTraceAdapter",
+      "signal": "blue",
+      "entry_hash": "c1487867b40eb4070a20090dc5d1f5fd1c580687ecf7e37a0574d992b24fe988"
+    },
+    {
+      "type_name": "TelemetryReport",
+      "signal": "blue",
+      "entry_hash": "a9a46971c1b3d3046ab048691278a727ecd8f78475f5a0b32cec1c1938d5f4bc"
+    },
+    {
+      "type_name": "TelemetryReportSnapshot",
+      "signal": "blue",
+      "entry_hash": "94f6be5a8c0d8c1cb7ecd9bf2bd4a5b18f0cc9167c18c412320216f72ba01864"
+    },
+    {
+      "type_name": "TelemetryReportOutput",
+      "signal": "blue",
+      "entry_hash": "b53c7805aee8c1ac9dc70bbb621d1e4dd5638798266be3f30c252916bba9d3dd"
+    }
+  ]
+}

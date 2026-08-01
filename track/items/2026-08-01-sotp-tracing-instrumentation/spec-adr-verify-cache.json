@@ -1,0 +1,304 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "2859dee98264fe40cf40d8e85981e0c878e753c539192220e30103561ded1a54",
+      "evidence_hash": "8a936ca4168276fb339a20f460d1b732fb7e12ad4381c0895ccaa101cb72d5a2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実行コマンド・所要時間・exit 結果をローカル jsonl に記録する。既存の `sotp telemetry` 集計をこの記録の分析に拡張する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "全 `sotp` コマンドの実行頻度、所要時間、および失敗率を横断的に観測できるようにし、CI 並列化、ゲート運用コスト、UX 改善の優先度をデータに基づいて判断できるようにする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-sotp-tracing-instrumentation.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "f92832f5450d69a09850f4956fad3ba679b857fc835c4266b0c10df3e15394c3",
+      "evidence_hash": "8a936ca4168276fb339a20f460d1b732fb7e12ad4381c0895ccaa101cb72d5a2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "tracing crate による span / event 計装を全コマンド共通の entry point に入れ"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "すべての `sotp` コマンドを共通の entry point で tracing 計装し、コマンド横断で一貫した実行観測を行う。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-sotp-tracing-instrumentation.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "7d442a8ba6b078174131cac5825c183427295e92bdc20170d3064381163593a3",
+      "evidence_hash": "8a936ca4168276fb339a20f460d1b732fb7e12ad4381c0895ccaa101cb72d5a2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実行コマンド・所要時間・exit 結果をローカル jsonl に記録する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "各コマンド実行について、コマンド identity、所要時間、および exit 結果をローカル JSONL 記録へ残す。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-sotp-tracing-instrumentation.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "25d5c97dc542d7627efe73da21e8978c7b82e337866c1d1fcb5ca75c2bf4a2b5",
+      "evidence_hash": "8a936ca4168276fb339a20f460d1b732fb7e12ad4381c0895ccaa101cb72d5a2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存の `sotp telemetry` 集計をこの記録の分析に拡張する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "既存の `sotp telemetry` を、このローカル記録からコマンド横断の利用頻度、所要時間、および失敗率を分析できるように拡張する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-sotp-tracing-instrumentation.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "86efca5df5f571c38243782ca22c0165c83d4284aa69e57f1179db74520fdc81",
+      "evidence_hash": "8a936ca4168276fb339a20f460d1b732fb7e12ad4381c0895ccaa101cb72d5a2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "記録はローカル完結とし、外部送信は行わない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "記録ファイルの増大を運用可能に保つため、ローテーションを扱う。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-sotp-tracing-instrumentation.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "5c61e7589bd28ddd00da9245d6cbe44a33af241011aadccc40781a058074063f",
+      "evidence_hash": "8a936ca4168276fb339a20f460d1b732fb7e12ad4381c0895ccaa101cb72d5a2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "記録はローカル完結とし、外部送信は行わない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-01",
+          "text_label": "tracing 記録または telemetry 分析結果を外部サービスへ送信することは対象外とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-sotp-tracing-instrumentation.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "5d0085a2db4ce1cd02d3af8692199360a9b9ef157f5ce5f33a291de381561d9d",
+      "evidence_hash": "8a936ca4168276fb339a20f460d1b732fb7e12ad4381c0895ccaa101cb72d5a2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "tracing crate による span / event 計装を全コマンド共通の entry point に入れ"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-02",
+          "text_label": "コマンド内部の詳細な span を追加することは対象外とし、必要性が判明した場合に再評価する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-sotp-tracing-instrumentation.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "b22edeb6768f92aa30adcf65c467e5160aa6c7d87a83390ca689d8b41773de0e",
+      "evidence_hash": "8a936ca4168276fb339a20f460d1b732fb7e12ad4381c0895ccaa101cb72d5a2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "記録はローカル完結とし、外部送信は行わない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "計装記録はローカルで完結させ、外部送信を行わない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-sotp-tracing-instrumentation.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "d75fc8750901c5a9d9d6e937ab0cb870ca5a1bc2055406abeb5027b5c34cb85b",
+      "evidence_hash": "637f151badb5cf6bc21cdcdf1a6a4b8e53d262563d4edfe86f289b94cc601e88",
+      "verdict": {
+        "kind": "pass",
+        "citation": "記録処理には、正の最大バイト数と正のローテーション済みファイル保持数を設定可能にする。各記録の追記前に、active ファイルの現在のバイト数とエンコード後の記録のバイト数の合計を判定する。合計が最大バイト数を超える場合は、追記前に active ファイルをローテーションし、新しい active ファイルへ記録する。保持数はローテーション済みファイルだけを数え、active ファイルは含めない。ローテーション後にその数が設定値を超えた場合は、ローテーション順で最も古いファイルから削除し、設定値以下にする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "ローカル JSONL の active 記録ファイルには正の最大バイト数と正の保持ファイル数を設定し、次の記録の追記で最大バイト数を超える前に active ファイルをローテーションする。ローテーション済みファイルが保持数を超える場合は最も古いものを削除する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-08-01-0902-sotp-tracing-rotation-policy.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "8d323543a9f773f9fc2540483e6c6ae9522db4aa2f1e11b4b3b4d4ad0f37b802",
+      "evidence_hash": "8a936ca4168276fb339a20f460d1b732fb7e12ad4381c0895ccaa101cb72d5a2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実行コマンド・所要時間・exit 結果をローカル jsonl に記録する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "任意の `sotp` コマンドを実行すると、そのコマンド identity、所要時間、および exit 結果を含むローカル JSONL 記録が生成される。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-sotp-tracing-instrumentation.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "ff37151e9ec452725ac4307678171a9e4d8466fb21a821946b439929a12cf635",
+      "evidence_hash": "8a936ca4168276fb339a20f460d1b732fb7e12ad4381c0895ccaa101cb72d5a2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存の `sotp telemetry` 集計をこの記録の分析に拡張する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "`sotp telemetry` はローカル記録を分析し、コマンド横断の実行頻度、所要時間、および失敗率を確認できる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-sotp-tracing-instrumentation.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "1a98f742a7be5c6b11b2a6492e0f93d06fe1b08122b4fd2c8d2ec894fbadabfc",
+      "evidence_hash": "8a936ca4168276fb339a20f460d1b732fb7e12ad4381c0895ccaa101cb72d5a2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "記録はローカル完結とし、外部送信は行わない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "計装と telemetry 分析の実行は、記録または分析結果を外部へ送信しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-sotp-tracing-instrumentation.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "5c2e9c7fdae7ee569211fb382a6990040578919fd92a138466b751cb5da1d813",
+      "evidence_hash": "637f151badb5cf6bc21cdcdf1a6a4b8e53d262563d4edfe86f289b94cc601e88",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各記録の追記前に、active ファイルの現在のバイト数とエンコード後の記録のバイト数の合計を判定する。合計が最大バイト数を超える場合は、追記前に active ファイルをローテーションし、新しい active ファイルへ記録する。各記録のエンコード後サイズが最大バイト数以下である場合、追記後の active ファイルは最大バイト数を超えない。保持数はローテーション済みファイルだけを数え、active ファイルは含めない。ローテーション後にその数が設定値を超えた場合は、ローテーション順で最も古いファイルから削除し、設定値以下にする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "正の最大バイト数と正の保持ファイル数を設定し、各記録が最大バイト数以下で累積サイズがその上限を超える複数のコマンド記録を生成すると、上限を超える追記の前に active JSONL ファイルがローテーションされる。ローテーション後は active ファイルが上限を超えず、保持されるローテーション済みファイル数は設定した保持数以下であることを確認できる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-08-01-0902-sotp-tracing-rotation-policy.md",
+          "decision_id": "D1"
+        }
+      }
+    }
+  ]
+}

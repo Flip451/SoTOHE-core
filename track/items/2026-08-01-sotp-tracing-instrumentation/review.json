@@ -1,6 +1,228 @@
 {
   "schema_version": 2,
   "scopes": {
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::CommandExecutionMetric` permits `executions = 0` and `failures = 0`, but `failure_rate(&self) -> CommandFailureRateBasisPoints` has no error/undefined-case contract. Computing the rate requires division by zero or an undocumented arbitrary result; reject zero executions or model the undefined rate explicitly.",
+              "severity": "P0",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+              "line": 159,
+              "category": "state-shape smell"
+            },
+            {
+              "message": "`CommandTraceWriterPort::record` and the `FsCommandTraceAdapter` are synchronous while performing filesystem I/O, but the catalogue does not acknowledge this sync choice. Document the blocking contract or make the port async before adapters are implemented.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+              "line": 475,
+              "category": "sync/async color mismatch"
+            },
+            {
+              "message": "`infrastructure::CommandTraceFileSizeLimitBytes` is classified as a `ValueObject`, but its documentation establishes only that it is a persistence-adapter rotation threshold. It does not establish ubiquitous-language meaning, stable application-wide semantics, or independence from persistence concerns required for infrastructure ValueObjects.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/infrastructure-types.json",
+              "line": 202,
+              "category": "unsupported semantic placement"
+            },
+            {
+              "message": "`infrastructure::CommandTraceRetainedFileCount` has the same unsupported `ValueObject` placement: its meaning is specifically a local rotation-retention setting, with no documented stable semantic ownership beyond the filesystem adapter.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/infrastructure-types.json",
+              "line": 267,
+              "category": "unsupported semantic placement"
+            }
+          ],
+          "hash": "rvw1:sha256:9fb44e973cb8a6a0bb6d327cf0df17bd40959ef386bc54195732df251fe575a3",
+          "at": "2026-08-01T08:48:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CommandExecutionMetric::new` permits `executions = 0`, while `failure_rate(&self) -> CommandFailureRateBasisPoints` cannot represent the undefined zero-denominator case. Reject zero executions or model the undefined rate explicitly.",
+              "severity": "P0",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+              "line": 154,
+              "category": "state-shape smell"
+            },
+            {
+              "message": "`CommandTraceWriterPort::record` is synchronous despite its documented filesystem-persistence responsibility, and the catalogue does not acknowledge the blocking sync choice. Document the contract or make the port async.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+              "line": 475,
+              "category": "sync/async color mismatch"
+            },
+            {
+              "message": "`CommandTraceFileSizeLimitBytes` is declared as an infrastructure `ValueObject`, but its documentation establishes only a persistence-adapter threshold, not stable ubiquitous-language semantics independent of persistence concerns.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/infrastructure-types.json",
+              "line": 204,
+              "category": "unsupported semantic placement"
+            },
+            {
+              "message": "`CommandTraceRetainedFileCount` has the same unsupported infrastructure `ValueObject` placement: its meaning is only a local filesystem rotation setting, with no documented stable semantic ownership beyond the adapter.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/infrastructure-types.json",
+              "line": 269,
+              "category": "unsupported semantic placement"
+            },
+            {
+              "message": "The shared `CommandTraceValueError` makes `SotpCommandIdentity::try_new`, `CommandFailureRateBasisPoints::try_new`, and `CommandExitCode::try_new` expose unreachable variants, but the catalogue neither documents each method's producible subset nor justifies the breadth.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+              "line": 17,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "`CommandExecutionMetric::new` returns `CommandTraceValueError` even though, with already validated value objects, only `FailureCountExceedsExecutions` is structurally producible; the catalogue does not document that subset.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+              "line": 154,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "`CommandTraceFileSizeLimitBytes::try_new` and `CommandTraceRetainedFileCount::try_new` each return a shared `CommandTracePolicyError` containing the sibling constructor's unreachable variant, without documenting the producible subset.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/infrastructure-types.json",
+              "line": 17,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "`CommandDurationMillis`, `CommandExecutionCount`, and `TelemetrySkippedLineCount` duplicate the same `new(u64) -> Self` and `value(&self) -> u64` API shape in one layer. A shared metric/count trait should own the duplicated signatures.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+              "line": 35,
+              "category": "duplicated method signature across sibling types"
+            },
+            {
+              "message": "The `CommandTraceWriterPort` docs restate upstream persistence behavior and adapter ownership (JSONL encoding, timestamp capture, and rotation) instead of limiting the entry to the changed contract plus an upstream anchor, contrary to `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+              "line": 469,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`FsCommandTraceAdapter` docs restate the upstream JSONL, rotation, local-only, and no-external-transmission behavior rather than referencing it by anchors, contrary to `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/infrastructure-types.json",
+              "line": 338,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`CommandTraceRecord`, `CommandExecutionMetric`, and `CommandTraceWriteError` docs restate upstream behavior and design rationale (typed fields, invariant enforcement, and hidden filesystem diagnostics) instead of using anchor-only contract references, contrary to `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+              "line": 561,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:9fb44e973cb8a6a0bb6d327cf0df17bd40959ef386bc54195732df251fe575a3",
+          "at": "2026-08-01T08:49:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:77997bf741aa88f10028eac9e1feeefa55de182cf4e65b0fb0f9a5cfe90e2bb3",
+          "at": "2026-08-01T09:37:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cli_composition::CommandTraceCompositionRoot::new` returns the workspace-wide `CompositionError`, although its declared construction chain only validates rotation defaults and calls otherwise infallible constructors. The entry neither narrows the error nor documents which subset is producible, forcing callers to handle structurally unreachable variants such as `ConfigLoad`, `Usecase`, and `Infrastructure`.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/cli_composition-types.json",
+              "line": 17,
+              "category": "per-method error imprecision"
+            }
+          ],
+          "hash": "rvw1:sha256:77997bf741aa88f10028eac9e1feeefa55de182cf4e65b0fb0f9a5cfe90e2bb3",
+          "at": "2026-08-01T09:47:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cli_composition::CommandTraceCompositionRoot::new` returns the workspace-wide `CompositionError`, although its declared construction chain only validates rotation defaults and invokes otherwise infallible constructors. This forces callers to handle structurally unreachable variants such as `ConfigLoad`, `Usecase`, and `Infrastructure`; use a precise error type or document the exact producible subset.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/cli_composition-types.json",
+              "line": 17,
+              "category": "per-method error imprecision"
+            }
+          ],
+          "hash": "rvw1:sha256:77997bf741aa88f10028eac9e1feeefa55de182cf4e65b0fb0f9a5cfe90e2bb3",
+          "at": "2026-08-01T09:49:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b561bac991d1e118deaefd1195538fea984c146699dc57d8658fdb27e2a1ff84",
+          "at": "2026-08-01T09:56:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b561bac991d1e118deaefd1195538fea984c146699dc57d8658fdb27e2a1ff84",
+          "at": "2026-08-01T10:00:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dc097807619d8017c66484e7bf74d5cfa8438a8faac17458247eb52752d2700d",
+          "at": "2026-08-01T11:16:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dc097807619d8017c66484e7bf74d5cfa8438a8faac17458247eb52752d2700d",
+          "at": "2026-08-01T11:19:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dc097807619d8017c66484e7bf74d5cfa8438a8faac17458247eb52752d2700d",
+          "at": "2026-08-01T11:21:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dc097807619d8017c66484e7bf74d5cfa8438a8faac17458247eb52752d2700d",
+          "at": "2026-08-01T11:28:38Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8506571ec0dcb04ec4dbcb52a9677844f3d2a365452fbc71e215c4e4da1f2bf3",
+          "at": "2026-08-01T08:46:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8506571ec0dcb04ec4dbcb52a9677844f3d2a365452fbc71e215c4e4da1f2bf3",
+          "at": "2026-08-01T08:49:23Z"
+        }
+      ]
+    },
     "adr": {
       "rounds": [
         {
@@ -30,6 +252,603 @@
           "findings": [],
           "hash": "rvw1:sha256:e5fd22cc4b56991d32e6e4d9dd3fd700b2e2cb7e02af5cd248028423f0163949",
           "at": "2026-08-01T07:53:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:353367f31fdf361c4996447d43a5ecc6a92a21f7c9895a33e17929f420811646",
+          "at": "2026-08-01T09:09:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:353367f31fdf361c4996447d43a5ecc6a92a21f7c9895a33e17929f420811646",
+          "at": "2026-08-01T09:13:10Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001's task description is not executable enough: it names only a generic “typed usecase command-trace value model” rather than a concrete target file or symbol, so the executor must infer the six catalogue entries to implement.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 4,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T003's task description targets generic “usecase telemetry reporting” and does not identify the concrete report symbol/file to extend; the executor must infer the implementation boundary from the anchors and catalogue.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 6,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T005's task description targets generic “infrastructure telemetry reporting” rather than the concrete infrastructure report symbol/file, leaving the implementation boundary to be invented.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 8,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "The T006 description restates upstream behavior/architecture in prose—“so completed command records are submitted without exposing infrastructure to the CLI”—instead of limiting the task text to target, operation, and anchors. This violates the no-upstream-restatement policy.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 9,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The S3 section description restates the upstream constraint “without external transmission” rather than using the OUT-01/CN-01 anchors as the complete specification.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 17,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The S5 section description restates upstream behavior/architecture through “Route completed command traces through the primary adapter” and “complete local-only dependency graph”; the section should contain only target, operation, and anchors.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 19,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:180c137259ac7812bf19483f768adef5017ebe72321088ae656ca54ae56ffb4a",
+          "at": "2026-08-01T08:47:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 names only a generic “typed usecase command-trace value model,” not a concrete target file or symbol; the executor must infer the implementation boundary.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 4,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T003 targets generic “usecase telemetry reporting” rather than a concrete report symbol or file, leaving the implementation boundary to be invented.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 6,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T005 targets generic “infrastructure telemetry reporting” rather than a concrete report symbol or file, leaving the implementation boundary to be invented.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 8,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T004 restates the upstream local-only behavior in “without external transmission”; task text should contain only target, operation, and anchors.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 7,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T006 restates upstream behavior and architecture in “so completed command records are submitted without exposing infrastructure to the CLI.”",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 9,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S1 restates ordering/design rationale in “before adapter or entrypoint integration,” rather than limiting the section description to target, operation, and anchors.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 15,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S3 restates the upstream local-only constraint in “without external transmission.”",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 17,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S5 restates upstream behavior/architecture through “Route completed command traces through the primary adapter” and “complete local-only dependency graph.”",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 19,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:180c137259ac7812bf19483f768adef5017ebe72321088ae656ca54ae56ffb4a",
+          "at": "2026-08-01T08:48:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006 invokes `CommandTraceDriver::handle` from `apps/cli/src/main.rs`, but T007—which creates and wires `CommandTraceCompositionRoot` and its driver—is declared after T006 and depends on it. The consumer is therefore ordered before the composition artifact it needs; T006 must depend on T007 or the tasks must be reordered.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 7,
+              "category": "dependency cycle or wrong ordering"
+            },
+            {
+              "message": "`task-coverage.json` maps IN-03 and AC-02 to T007, but T007's description only adds `CommandTraceCompositionRoot` and its accessors; it does not modify or validate the telemetry reporting/aggregation path. This leaves those mappings implausible and the reporting acceptance coverage dependent on a task that does not perform reporting work.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/task-coverage.json",
+              "line": 4,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:9569558cf55b8412deb9e48305c6bd5335d2a256b0d350365fbaa38f68afd0e3",
+          "at": "2026-08-01T08:52:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-01 and AC-01 are cited by T006/T007, but neither task modifies the common `sotp` entrypoint or invokes the driver during command execution. T006 only adds `CommandTraceDriver`, while T007 only adds the composition root and accessors; no executable task makes every command emit a trace.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 8,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "T007's description cites IN-03 and AC-02, but `task-coverage.json` maps both elements only to T003 and T005. The plan is internally inconsistent: either T007 must explicitly perform reporting work and be mapped, or those citations must be removed from T007.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 8,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:bb2e6486b685efbcba4c97ac99cfc187c2ee2e33e6b5a9befa7575cad5b11602",
+          "at": "2026-08-01T08:55:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T008 identifies only the generic “common sotp command entrypoint”; it does not name a concrete file or symbol, so the executor must infer the integration boundary.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 10,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T007 explicitly cites IN-04 and implements rotation-default validation, but `task-coverage.json` maps IN-04 only to T004. This leaves T007's stated IN-04 work outside the spec-to-task coverage mapping.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/task-coverage.json",
+              "line": 3,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "T008 restates the behavior contract in “so every completed command is traced and recorded without adding internal command spans”; the task text should stop after the target, operation, and anchors.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 10,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S6 restates upstream behavior in “Invoke the already wired driver from the common command entrypoint without adding internal spans.” The section should reference OUT-02 and the relevant anchors without repeating the contract.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 19,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:6b3a7b57e6a2b9d0a15279024d376bd91b59944c78e87e846a094aeacf469085",
+          "at": "2026-08-01T10:06:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 still names only a generic “typed usecase command-trace value model,” not a concrete target file or symbol; the executor must infer the implementation boundary.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 4,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T003 targets generic “usecase telemetry reporting” rather than a concrete report symbol or file, leaving the implementation boundary to be invented.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 6,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T005 targets generic “infrastructure telemetry reporting” rather than a concrete report symbol or file, leaving the implementation boundary to be invented.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 8,
+              "category": "task description non-executable"
+            }
+          ],
+          "hash": "rvw1:sha256:7c4448d980a9f9948eb0683ecf0d0c30fec4469a6d74bdcfaf7ed24ccebd0abd",
+          "at": "2026-08-01T10:09:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 still targets a generic “usecase recording flow” and does not identify the concrete module/file or symbols for the service, writer port, interactor, and error; the executor must infer the implementation boundary.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 5,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T004 targets generic “local filesystem command-trace persistence” and “typed rotation policy” rather than concrete infrastructure symbols or a file, leaving the implementation boundary to be inferred.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 7,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T006 names only a generic “primary command-trace driver” and does not identify the concrete driver symbol/module to implement.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 9,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T007 names only a generic “command-trace composition root” and does not identify the concrete composition-root symbol/module to implement.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 10,
+              "category": "task description non-executable"
+            }
+          ],
+          "hash": "rvw1:sha256:6a27707bafe3c4b665710b3b394d50f407de80711074d09fc7168de27be77d83",
+          "at": "2026-08-01T10:11:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aefe2197dcab1d79ebd763c3127f5e62e878442a9d7e00a834e2d5a2b5f02555",
+          "at": "2026-08-01T10:13:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T005 の AC-02 対応が実行可能な境界になっていません。T003 は集計 DTO を追加し、T005 は infrastructure の `TelemetryReportOutput` を拡張するだけです。既存の集計処理、usecase への変換、CLI 表示を更新・検証するタスクがないため、両タスクを完了しても `sotp telemetry` がコマンド記録を分析・表示しない状態が成立します。必要な集計・変換・表示シンボルと AC-02 の検証をタスク化し、該当 scope estimate も追加してください。",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 8,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "T008 は共通 entry point を担当する唯一のタスクですが、記述には AC-01 の検証ステップがありません。下位の型・adapter・wiring タスクだけでは「任意の `sotp` コマンドで JSONL 記録が生成される」ことを検証できません。`run_cli_with` の成功・失敗経路を通す focused integration/regression test を T008 に明記してください。",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 11,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "AC-04 は T004/T007 に割り当てられていますが、どちらにもローテーション境界と保持上限を検証するステップがありません。Fs adapter の derived contract-conformance obligation は writer-port 適合性であり、AC-04 の追記前ローテーションと保持数制限を保証しません。T004 の実装境界に AC-04 の focused validation を明記してください。",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 7,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "todo の T004 は、独立に検証可能な「基本 JSONL 永続化（IN-02/AC-01）」と「設定検証・ローテーション・保持処理（IN-04/CN-02/AC-04）」を一つに束ね、見積りも infrastructure ceiling と同じ 500 行です。前者と後者を依存関係付きの別タスクへ分割し、それぞれの anchors、契約 attribution、見積り、batch を更新してください。",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 7,
+              "category": "pre-implementation split proposal"
+            }
+          ],
+          "hash": "rvw1:sha256:aefe2197dcab1d79ebd763c3127f5e62e878442a9d7e00a834e2d5a2b5f02555",
+          "at": "2026-08-01T10:21:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 still targets only the generic “typed usecase command-trace value model” rather than a concrete file or symbol, leaving the implementation boundary to be inferred.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 4,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T002 still targets the generic “usecase recording flow” and does not identify the concrete service, writer port, interactor, or error symbols/module to implement.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 5,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T010 restates the upstream behavior contract in “proving arbitrary sotp commands generate local JSONL records without internal command spans”; the task should reference the anchors rather than repeat the expected behavior.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 11,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S5 restates upstream behavior in “verify both completed command outcomes create records without internal spans.” The section should contain the target, operation, and anchors without repeating the contract.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 20,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:6f0ff8c5e4d471132da9bc7132734d85e609a19455f08694450d5b26a9598cb2",
+          "at": "2026-08-01T10:27:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 claims to implement `CommandExecutionCount` and `CommandTraceWriteError`, but task-contract.json attributes those catalogue entries to T003 and T002 respectively. This creates overlapping ownership and an attribution mismatch.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 4,
+              "category": "task-contract attribution mismatch"
+            },
+            {
+              "message": "T005 claims to extend `FsCommandTraceAdapter`, but task-contract.json attributes that catalogue entry only to T004. The rotation-extension work needs a carrier attribution or the task description must stop claiming that catalogue entry is modified.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 8,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:73aa64a0d572e3049005f119551177acf398e2ee2a601d08d27caf7ce3cd23bf",
+          "at": "2026-08-01T10:30:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:465154e43aadd1cac0e105abd76dcdcc0f5289b233e21fe4fd04d7087c6bed92",
+          "at": "2026-08-01T10:33:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T009 は存在しない `commands::telemetry::execute_telemetry` を「Extend」対象にしています。現行の CLI entry point は `apps/cli/src/commands/telemetry.rs::execute` だけなので、executor は既存関数を変更するのか、新しい helper を追加するのかを推測しなければなりません。実在する `commands::telemetry::execute` を指定するか、新規 symbol の追加を明記してください。",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 12,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T009 は `TelemetryDriver::telemetry_report`（cli_driver scope）と telemetry command（cli scope）の両方を変更しますが、見積りは `cli` だけです。このままでは B9 の cli_driver 差分が予算外となり、scope ceiling を意味的に評価できません。T009 に `cli_driver` の production/test estimate を追加してください。",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/batch-plan.json",
+              "line": 13,
+              "category": "unsound batch composition"
+            }
+          ],
+          "hash": "rvw1:sha256:465154e43aadd1cac0e105abd76dcdcc0f5289b233e21fe4fd04d7087c6bed92",
+          "at": "2026-08-01T10:40:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 still targets only the generic “typed usecase command-trace value model” rather than a concrete file or symbol, leaving the implementation boundary to be inferred.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 4,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T002 still targets the generic “usecase recording flow” and does not identify the concrete service, writer port, interactor, or error symbols/module to implement.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 5,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T005 claims to extend `FsCommandTraceAdapter`, but task-contract.json attributes that catalogue entry only to T004. The rotation-extension work needs a carrier attribution or the task description must stop claiming that catalogue entry is modified.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 8,
+              "category": "task-contract attribution mismatch"
+            },
+            {
+              "message": "T010 restates the upstream behavior contract in “proving arbitrary sotp commands generate local JSONL records without internal command spans”; the task should reference the anchors rather than repeat the expected behavior.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 11,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S5 restates upstream behavior in “verify both completed command outcomes create records without internal spans.” The section should contain the target, operation, and anchors without repeating the contract.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 20,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:c3f19fd0c60a47e8212cae76cd0fd12ed4c7fc2a93fed7f2717e2e8e7374fcfe",
+          "at": "2026-08-01T10:45:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7ebf089f3e56726753a15a5d9cf7e80dea25f55a27eb1cce85a76d397fd96a53",
+          "at": "2026-08-01T10:48:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7ebf089f3e56726753a15a5d9cf7e80dea25f55a27eb1cce85a76d397fd96a53",
+          "at": "2026-08-01T10:51:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 still targets only the generic “typed usecase command-trace value model” rather than a concrete file or symbol, leaving the implementation boundary to be inferred.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 4,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T002 still targets the generic “usecase recording flow” and does not identify the concrete service, writer port, interactor, or error symbols/module to implement.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 5,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T005 claims to extend `FsCommandTraceAdapter`, but task-contract.json attributes that catalogue entry only to T004. The rotation-extension work needs a carrier attribution or the task description must stop claiming that catalogue entry is modified.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 8,
+              "category": "task-contract attribution mismatch"
+            },
+            {
+              "message": "T010 restates the upstream behavior contract in “proving arbitrary sotp commands generate local JSONL records without internal command spans”; the task should reference the anchors rather than repeat the expected behavior.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 11,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S5 restates upstream behavior in “verify both completed command outcomes create records without internal spans.” The section should contain the target, operation, and anchors without repeating the contract.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/impl-plan.json",
+              "line": 19,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:3e68d1ead7fe2981390c8b914a62cf936d3531708d6802944ed738f6af04134d",
+          "at": "2026-08-01T11:31:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e5e872436d22854f3c7d884614742b4424822c2cd7941a887426f1ee9c5507c4",
+          "at": "2026-08-01T11:37:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e5e872436d22854f3c7d884614742b4424822c2cd7941a887426f1ee9c5507c4",
+          "at": "2026-08-01T11:40:08Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-02 is untestable: “運用上管理可能” defines no deterministic rotation bound or observable condition, forcing downstream phases to invent the contract.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+              "line": 96,
+              "category": "constraint vague or untestable"
+            },
+            {
+              "message": "AC-04 is non-observable: “運用可能な状態” lacks a measurable file-size, retention, or rotation condition that a deterministic test can verify.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+              "line": 138,
+              "category": "acceptance criterion non-observable"
+            }
+          ],
+          "hash": "rvw1:sha256:4bf46cb46b23513f5de5085bcd94bca41c2c1b2fd4edafc241163fa3419066ea",
+          "at": "2026-08-01T08:45:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-02 is untestable: “運用上管理可能” defines no deterministic rotation bound or observable condition, forcing downstream phases to invent the contract.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+              "line": 96,
+              "category": "constraint vague or untestable"
+            },
+            {
+              "message": "AC-04 is non-observable: “運用可能な状態” lacks a measurable file-size, retention, or rotation condition that a deterministic test can verify.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+              "line": 138,
+              "category": "acceptance criterion non-observable"
+            }
+          ],
+          "hash": "rvw1:sha256:4bf46cb46b23513f5de5085bcd94bca41c2c1b2fd4edafc241163fa3419066ea",
+          "at": "2026-08-01T08:47:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:50e25023da8f4d7de35579201f9bfb28874699a8c10c02afd301f379fd9757a5",
+          "at": "2026-08-01T08:54:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:50e25023da8f4d7de35579201f9bfb28874699a8c10c02afd301f379fd9757a5",
+          "at": "2026-08-01T08:57:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4b9b19dde70a553386199e5ecd3d44d5ea7c86c2898d3207ebd1cf2a86533826",
+          "at": "2026-08-01T09:18:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4b9b19dde70a553386199e5ecd3d44d5ea7c86c2898d3207ebd1cf2a86533826",
+          "at": "2026-08-01T09:20:41Z"
         }
       ]
     }

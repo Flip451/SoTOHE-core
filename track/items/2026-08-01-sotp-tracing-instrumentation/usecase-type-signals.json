@@ -1,0 +1,183 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-08-01T09:30:17Z",
+  "declaration_hash": "40bb75ed278e2602bc0f47a535c626b16e431d2afe3d40ed05b282a38fab81e1",
+  "implementation_input_hash": "40907195913ab44162524c373b308d5b75370aa2c0b9bb065f77a2e9eacd261f",
+  "signals": [
+    {
+      "type_name": "CommandDurationMillis",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "AsRef<u64>",
+        "Clone",
+        "Copy",
+        "Debug",
+        "Eq",
+        "From<u64>",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "CommandExecutionCount",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "AsRef<u64>",
+        "Clone",
+        "Copy",
+        "Debug",
+        "Eq",
+        "From<u64>",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "CommandExecutionMetric",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "CommandExecutionResult",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "CommandExitCode",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Copy",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "CommandFailureRateBasisPoints",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Copy",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "CommandTraceInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "CommandTraceService",
+        "Send",
+        "Sync"
+      ]
+    },
+    {
+      "type_name": "CommandTraceRecord",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "CommandTraceService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "CommandTraceValueError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "CommandTraceWriteError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "CommandTraceWriterPort",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "SotpCommandIdentity",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "Hash",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "TelemetryReportOutput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug"
+      ]
+    },
+    {
+      "type_name": "TelemetrySkippedLineCount",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "AsRef<u64>",
+        "Clone",
+        "Copy",
+        "Debug",
+        "Eq",
+        "From<u64>",
+        "PartialEq"
+      ]
+    }
+  ]
+}

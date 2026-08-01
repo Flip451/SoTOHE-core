@@ -1,0 +1,117 @@
+{
+  "track_id": "2026-08-01-sotp-tracing-instrumentation",
+  "obligations": [
+    {
+      "id": {
+        "entry_key": "CommandTraceInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "CommandTraceInteractor"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      },
+      "brief": "Author a result test covering 'entry' of CommandTraceInteractor",
+      "declaration_hash": "2f4084eee98a5b545eb7e419b3d44b3c3f273950e917e9f37b4fb1890048c595",
+      "spec_refs": [
+        {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-02"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "CommandTraceService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:record"
+      },
+      "target_entry": {
+        "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "CommandTraceService"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      },
+      "brief": "Author a result test covering 'trait_method:record' of CommandTraceService",
+      "declaration_hash": "f1fe6c7ead4bd48ae65a6c9576a3bd27a1c6775f3e6ce7623f980fcf045f8249",
+      "spec_refs": [
+        {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-02"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "CommandTraceWriterPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:record"
+      },
+      "target_entry": {
+        "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "CommandTraceWriterPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:record' of CommandTraceWriterPort",
+      "declaration_hash": "d2ce4c97f53e5858a88f20a6f8ec38c12077b7bfdca8b5849f5fc8b0161f6d6c",
+      "spec_refs": [
+        {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-02"
+        },
+        {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "FsCommandTraceAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::telemetry::CommandTraceWriterPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "FsCommandTraceAdapter"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::telemetry::CommandTraceWriterPort' of FsCommandTraceAdapter",
+      "declaration_hash": "33498fbcc13538a55db88712440ebe352e04e4647522d79c09b044fc96858d99",
+      "spec_refs": [
+        {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-02"
+        },
+        {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-04"
+        }
+      ]
+    }
+  ]
+}

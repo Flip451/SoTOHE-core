@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "40bb75ed278e2602bc0f47a535c626b16e431d2afe3d40ed05b282a38fab81e1",
+  "signals": [
+    {
+      "type_name": "CommandDurationMillis",
+      "signal": "blue",
+      "entry_hash": "c93b41eb522ae6b8eeb5b6601d76fbe9cfe16e9db7aba156c9d13a1bd236d442"
+    },
+    {
+      "type_name": "CommandExecutionCount",
+      "signal": "blue",
+      "entry_hash": "50dba965059d482adf4752a57c6965fb3a7c3626a7e8662e05cd4f6ebfdd40d7"
+    },
+    {
+      "type_name": "CommandExecutionMetric",
+      "signal": "blue",
+      "entry_hash": "cc5465f4ec56114829340b68e35a8b88213d3d1f44d7dbd686196ed518d4f3c3"
+    },
+    {
+      "type_name": "CommandExecutionResult",
+      "signal": "blue",
+      "entry_hash": "7f5037b5046add7b45133c82a0f0b520d49962193f3d9b27274edb94b7cf9960"
+    },
+    {
+      "type_name": "CommandExitCode",
+      "signal": "blue",
+      "entry_hash": "bb410b775cede0ff0e141d2c6f2f5b7847d2709ccfe4b9bf98e471942b759da3"
+    },
+    {
+      "type_name": "CommandFailureRateBasisPoints",
+      "signal": "blue",
+      "entry_hash": "67641ff3b2743864411802e8560e309426d2062ea965536d9d6355cb71ee006e"
+    },
+    {
+      "type_name": "CommandTraceInteractor",
+      "signal": "blue",
+      "entry_hash": "d383519e399e3b89d9842d05adf97f4b5c49daccf8a27fb89f2f9244fdf315d4"
+    },
+    {
+      "type_name": "CommandTraceRecord",
+      "signal": "blue",
+      "entry_hash": "e5c74b5fe1da22ab930042f347cde02811b1e56060117d83394394b0d7a43477"
+    },
+    {
+      "type_name": "CommandTraceValueError",
+      "signal": "blue",
+      "entry_hash": "289aca0c600916241e244e744096045ece4b4a852f088f6edd9b7ba19bc2e03f"
+    },
+    {
+      "type_name": "CommandTraceWriteError",
+      "signal": "blue",
+      "entry_hash": "b764dd76056eb02a19d811504e462f6f549fb1db49cf2a19496fbc344c426c96"
+    },
+    {
+      "type_name": "SotpCommandIdentity",
+      "signal": "blue",
+      "entry_hash": "586ce208678de3f0e15243ddf6093dc98830ae7414c0f24558e4653772e72600"
+    },
+    {
+      "type_name": "TelemetryReportOutput",
+      "signal": "blue",
+      "entry_hash": "abe3c5258bdb33add511f8b359b821274bee3603fbc77092cac14aeb00fdee19"
+    },
+    {
+      "type_name": "TelemetrySkippedLineCount",
+      "signal": "blue",
+      "entry_hash": "7e2086e0d5939d7d0e1de9d69153fa4b717ae04f9c585acdfe98cf9c893e616a"
+    },
+    {
+      "type_name": "CommandTraceService",
+      "signal": "blue",
+      "entry_hash": "fcf6e6daf89d03a0a2968559eea4552fab11047313cf1d007db8744ed5f8e0c1"
+    },
+    {
+      "type_name": "CommandTraceWriterPort",
+      "signal": "blue",
+      "entry_hash": "41f63222592b9c07e1ef1b005fc1dadf1e6b1b6c82c9c134cee474d5f44ff5df"
+    }
+  ]
+}

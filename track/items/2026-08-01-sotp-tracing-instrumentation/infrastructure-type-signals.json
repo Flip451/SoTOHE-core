@@ -1,0 +1,99 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-08-01T11:05:58Z",
+  "declaration_hash": "27b26328f2c1d1f055d87f63bdd10c332fbd1636ec7e8745e53d4181e12bf63e",
+  "implementation_input_hash": "3eab36961524fa3a381513921d06e2ed16e9d3fa15447666747bff170827366c",
+  "signals": [
+    {
+      "type_name": "CommandTraceFileSizeLimitBytes",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Copy",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "CommandTracePolicyError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "CommandTraceRetainedFileCount",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Copy",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "CommandTraceRotationPolicy",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Copy",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "FsCommandTraceAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "Send",
+        "Sync",
+        "usecase::telemetry::CommandTraceWriterPort"
+      ]
+    },
+    {
+      "type_name": "TelemetryReport",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "Debug"
+      ]
+    },
+    {
+      "type_name": "TelemetryReportSnapshot",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug"
+      ]
+    },
+    {
+      "type_name": "TelemetryReportOutput",
+      "kind_tag": "unknown",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "Clone",
+        "Debug"
+      ]
+    }
+  ]
+}

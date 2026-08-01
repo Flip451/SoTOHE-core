@@ -1,0 +1,15 @@
+{
+  "schema_version":1,
+  "track_id":"2026-08-01-sotp-tracing-instrumentation",
+  "entries":{
+    "T001":[{"layer":"usecase","entry_key":"SotpCommandIdentity"},{"layer":"usecase","entry_key":"CommandDurationMillis"},{"layer":"usecase","entry_key":"CommandExitCode"},{"layer":"usecase","entry_key":"CommandExecutionResult"},{"layer":"usecase","entry_key":"CommandTraceRecord"},{"layer":"usecase","entry_key":"CommandTraceValueError"}],
+    "T002":[{"layer":"usecase","entry_key":"CommandTraceService"},{"layer":"usecase","entry_key":"CommandTraceWriterPort"},{"layer":"usecase","entry_key":"CommandTraceInteractor"},{"layer":"usecase","entry_key":"CommandTraceWriteError"}],
+    "T003":[{"layer":"usecase","entry_key":"CommandExecutionCount"},{"layer":"usecase","entry_key":"CommandFailureRateBasisPoints"},{"layer":"usecase","entry_key":"CommandExecutionMetric"},{"layer":"usecase","entry_key":"TelemetrySkippedLineCount"},{"layer":"usecase","entry_key":"TelemetryReportOutput"}],
+    "T004":[{"layer":"infrastructure","entry_key":"FsCommandTraceAdapter"}],
+    "T005":[{"layer":"infrastructure","entry_key":"CommandTraceFileSizeLimitBytes"},{"layer":"infrastructure","entry_key":"CommandTraceRetainedFileCount"},{"layer":"infrastructure","entry_key":"CommandTracePolicyError"},{"layer":"infrastructure","entry_key":"CommandTraceRotationPolicy"},{"layer":"infrastructure","entry_key":"FsCommandTraceAdapter"}],
+    "T006":[{"layer":"infrastructure","entry_key":"TelemetryReportOutput"},{"layer":"infrastructure","entry_key":"TelemetryReport"},{"layer":"infrastructure","entry_key":"TelemetryReportSnapshot"}],
+    "T007":[{"layer":"cli_driver","entry_key":"CommandTraceDriver"}],
+    "T008":[{"layer":"cli_composition","entry_key":"CommandTraceCompositionRoot"}],
+    "T009":[],"T010":[]
+  }
+}

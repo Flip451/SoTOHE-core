@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "0ac9217c63a6e676aebe4d53cde741ec4827ea17bb4f9c858de120474116f006",
+  "signals": [
+    {
+      "type_name": "CommandTraceCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "297e7d00fd85f9bb57909fe2d38b7143b0b6a51274c4d02c478e31107a1f64a2"
+    }
+  ]
+}

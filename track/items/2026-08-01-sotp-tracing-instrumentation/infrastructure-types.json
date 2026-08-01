@@ -1,0 +1,490 @@
+{
+  "crate_name": "infrastructure",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "u64"
+            }
+          ],
+          "returns": "Result<Self, CommandTracePolicyError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "value",
+          "params": [],
+          "receiver": "&self",
+          "returns": "u64"
+        }
+      ],
+      "type_name": "CommandTraceFileSizeLimitBytes"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "u16"
+            }
+          ],
+          "returns": "Result<Self, CommandTracePolicyError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "value",
+          "params": [],
+          "receiver": "&self",
+          "returns": "u16"
+        }
+      ],
+      "type_name": "CommandTraceRetainedFileCount"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "max_file_size",
+              "ty": "CommandTraceFileSizeLimitBytes"
+            },
+            {
+              "name": "retained_files",
+              "ty": "CommandTraceRetainedFileCount"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "CommandTraceRotationPolicy"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "output_path",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "rotation",
+              "ty": "CommandTraceRotationPolicy"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "FsCommandTraceAdapter"
+    }
+  ],
+  "layer": "infrastructure",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "CommandTraceFileSizeLimitBytes",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CommandTraceFileSizeLimitBytes",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "CommandTraceFileSizeLimitBytes",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "CommandTraceFileSizeLimitBytes",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "CommandTraceFileSizeLimitBytes",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "CommandTraceRetainedFileCount",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CommandTraceRetainedFileCount",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "CommandTraceRetainedFileCount",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "CommandTraceRetainedFileCount",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "CommandTraceRetainedFileCount",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "CommandTraceRotationPolicy",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CommandTraceRotationPolicy",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "CommandTraceRotationPolicy",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "CommandTraceRotationPolicy",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "CommandTraceRotationPolicy",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "FsCommandTraceAdapter",
+      "trait_ref": "usecase::telemetry::CommandTraceWriterPort"
+    },
+    {
+      "for_type": "FsCommandTraceAdapter",
+      "trait_ref": "core::marker::Send"
+    },
+    {
+      "for_type": "FsCommandTraceAdapter",
+      "trait_ref": "core::marker::Sync"
+    },
+    {
+      "for_type": "FsCommandTraceAdapter",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CommandTracePolicyError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CommandTracePolicyError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "CommandTracePolicyError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "TelemetryReportSnapshot",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TelemetryReportSnapshot",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "modify",
+      "for_type": "TelemetryReport",
+      "trait_ref": "core::fmt::Debug"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "CommandTraceFileSizeLimitBytes": {
+      "action": "add",
+      "docs": "Adapter-configuration DTO for a positive byte limit; try_new produces only CommandTracePolicyError::ZeroFileSizeLimit.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "telemetry::command_trace",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ]
+    },
+    "CommandTracePolicyError": {
+      "action": "add",
+      "docs": "Rotation-policy constructor errors with explicit owners: CommandTraceFileSizeLimitBytes::try_new produces ZeroFileSizeLimit and CommandTraceRetainedFileCount::try_new produces ZeroRetainedFileCount.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ZeroFileSizeLimit",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ZeroRetainedFileCount",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "telemetry::command_trace",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ]
+    },
+    "CommandTraceRetainedFileCount": {
+      "action": "add",
+      "docs": "Adapter-configuration DTO for a positive retained-file count; try_new produces only CommandTracePolicyError::ZeroRetainedFileCount.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "telemetry::command_trace",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ]
+    },
+    "CommandTraceRotationPolicy": {
+      "action": "add",
+      "docs": "Infrastructure configuration DTO combining typed file-size and retention bounds for deterministic local JSONL rotation.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "max_file_size",
+              "ty": "CommandTraceFileSizeLimitBytes"
+            },
+            {
+              "name": "retained_files",
+              "ty": "CommandTraceRetainedFileCount"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "telemetry::command_trace",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ]
+    },
+    "FsCommandTraceAdapter": {
+      "action": "add",
+      "docs": "Synchronous filesystem implementation of CommandTraceWriterPort.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "telemetry::command_trace",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ]
+    },
+    "TelemetryReport": {
+      "action": "modify",
+      "docs": "Filesystem telemetry report reader whose aggregate method returns the layer-unique TelemetryReportSnapshot read model.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "aggregate",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<TelemetryReportSnapshot, TelemetryReportError>"
+        }
+      ],
+      "module_path": "telemetry::report",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ]
+    },
+    "TelemetryReportOutput": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "telemetry::report",
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ]
+    },
+    "TelemetryReportSnapshot": {
+      "action": "add",
+      "docs": "Infrastructure read-model DTO produced by TelemetryReport::aggregate and converted by FsTelemetryReportAdapter into usecase::telemetry::TelemetryReportOutput.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "phase_durations",
+              "ty": "Vec<PhaseDurationSummary>"
+            },
+            {
+              "name": "errors",
+              "ty": "Vec<TelemetryErrorEntry>"
+            },
+            {
+              "name": "hook_blocks",
+              "ty": "Vec<TelemetryHookBlockEntry>"
+            },
+            {
+              "name": "skipped_lines",
+              "ty": "usecase::telemetry::TelemetrySkippedLineCount"
+            },
+            {
+              "name": "command_metrics",
+              "ty": "Vec<usecase::telemetry::CommandExecutionMetric>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "telemetry::report",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ]
+    }
+  }
+}
