@@ -1,0 +1,774 @@
+{
+  "schema_version": 1,
+  "layer": "usecase",
+  "entries": [
+    {
+      "claim_hash": "9942cccbb975b257b76675f5c10d57198422b55040f790e0a5d71ab5cbbd0d9f",
+      "evidence_hash": "4a9aabc45eb2e4eb545a5469ad85106162bd6d824a37a5fe9d2fc14528d9188d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp signal report` を追加し、`adr_user`、`spec_adr`、`catalog_spec`、`impl_catalog` の 4 chain における Yellow / Red 信号の発生箇所を報告する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SignalReportChain"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "`sotp signal report` を追加し、`adr_user`、`spec_adr`、`catalog_spec`、`impl_catalog` の 4 chain における Yellow / Red 信号の発生箇所を報告する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "9942cccbb975b257b76675f5c10d57198422b55040f790e0a5d71ab5cbbd0d9f",
+      "evidence_hash": "e6dce33c355f043c9b2e0a0089e61df36d731f48ddabe7d3eb022bd9e3495af8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp signal report --chain <id>` は指定した chain の occurrence のみを報告し、Yellow / Red 選択を指定した実行は選択した色の occurrence のみを報告する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SignalReportChain"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "`sotp signal report --chain <id>` は指定した chain の occurrence のみを報告し、Yellow / Red 選択を指定した実行は選択した色の occurrence のみを報告する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "28ac94b7ee0f3a21624d6e192d2f2af857af1ff5bfa26e33c3888f868749e293",
+      "evidence_hash": "1017bb3ec4bdf6d512d78a0d89a3aaf95ad6537953759ad31978d52125f27456",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`--chain <id>`による chain 選択と、Yellow / Red の選択による結果の絞り込みを提供する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SignalReportChainSelection"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "`--chain <id>` による chain 選択と、Yellow / Red の選択による結果の絞り込みを提供する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "28ac94b7ee0f3a21624d6e192d2f2af857af1ff5bfa26e33c3888f868749e293",
+      "evidence_hash": "e6dce33c355f043c9b2e0a0089e61df36d731f48ddabe7d3eb022bd9e3495af8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp signal report --chain <id>` は指定した chain の occurrence のみを報告し、Yellow / Red 選択を指定した実行は選択した色の occurrence のみを報告する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SignalReportChainSelection"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "`sotp signal report --chain <id>` は指定した chain の occurrence のみを報告し、Yellow / Red 選択を指定した実行は選択した色の occurrence のみを報告する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "73262b244d05e754d61cde317e00152d2ce18d0b06b6c349f82ce512d5c0b651",
+      "evidence_hash": "076a6ae15a47d5d61b27fcaf68febe9944608ae7d5e33d9dc897f7d5b988513c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "報告する各 signal occurrence に、entry id、参照文字列、判定理由、および対象ファイル位置を含める。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SignalReportEntryId"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "報告する各 signal occurrence に、entry id、参照文字列、判定理由、および対象ファイル位置を含める。"
+        }
+      }
+    },
+    {
+      "claim_hash": "73262b244d05e754d61cde317e00152d2ce18d0b06b6c349f82ce512d5c0b651",
+      "evidence_hash": "37220e32224f27fcfba0166b9b2d6ae2b6e22b93024535aba6751916d0517c30",
+      "verdict": {
+        "kind": "pass",
+        "citation": "report の各 occurrence には entry id、参照文字列、判定理由、および対象ファイル位置が表示される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SignalReportEntryId"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "report の各 occurrence には entry id、参照文字列、判定理由、および対象ファイル位置が表示される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a3ec1090e4a6482f1e31198893126adb0129ac81a1e4cb3817e799c72e95384f",
+      "evidence_hash": "25075c3d63c3af9dcac74d85c23f1b23a11d735f74e8c491d609cf1a55f4372b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "report は診断用の読み取り専用 view であり、実行前後で既存の signal calculation artifacts を変更せず、chain ⓪・①で導出した発生単位データも永続化しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SignalReportError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "report は診断用の読み取り専用 view であり、実行前後で既存の signal calculation artifacts を変更せず、chain ⓪・①で導出した発生単位データも永続化しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a3ec1090e4a6482f1e31198893126adb0129ac81a1e4cb3817e799c72e95384f",
+      "evidence_hash": "ce4548c77f72b43a14eb8be6511c43ac05196f65fb7e7cb33592ee393592c024",
+      "verdict": {
+        "kind": "pass",
+        "citation": "report の実行は既存の calculation artifacts を読み取り専用で扱い、chain ⓪・①で導出した発生単位データを含め、signal または集計値を persist しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SignalReportError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "report の実行は既存の calculation artifacts を読み取り専用で扱い、chain ⓪・①で導出した発生単位データを含め、signal または集計値を persist しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "7e2c05e2001e0433734540060bd6d17fce2644465a14ed8e961985a6d7f17edf",
+      "evidence_hash": "3efd2b6e00a051c796f0c0505fa40221d21936fe08b9e4dfab9aba9ee502e34e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "4 chain の Yellow / Red の発生箇所を 1 コマンドで横断列挙し、発生単位データが永続化されない chain も含めて、gate が block した原因を手動の JSON 読解なしに診断できるようにする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SignalReportInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "4 chain の Yellow / Red の発生箇所を 1 コマンドで横断列挙し、発生単位データが永続化されない chain も含めて、gate が block した原因を手動の JSON 読解なしに診断できるようにする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "7e2c05e2001e0433734540060bd6d17fce2644465a14ed8e961985a6d7f17edf",
+      "evidence_hash": "55e8e58e0763db0818a133ccf47c4e86cad123b896bc61d5354388b88527cdb1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp signal report` を実行すると、発生単位 signal 成果物がある chain ではその成果物を用い、chain ⓪・①では正規の入力成果物からメモリ上で導出して、4 chain の Yellow / Red occurrence が報告される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SignalReportInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`sotp signal report` を実行すると、発生単位 signal 成果物がある chain ではその成果物を用い、chain ⓪・①では正規の入力成果物からメモリ上で導出して、4 chain の Yellow / Red occurrence が報告される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "84d6b5be020452e94f261a866b890245fa201ea18a68d856aa4457a80818b0a4",
+      "evidence_hash": "1017bb3ec4bdf6d512d78a0d89a3aaf95ad6537953759ad31978d52125f27456",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Yellow / Red の選択による結果の絞り込み"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SignalReportLevel"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "`--chain <id>` による chain 選択と、Yellow / Red の選択による結果の絞り込みを提供する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "84d6b5be020452e94f261a866b890245fa201ea18a68d856aa4457a80818b0a4",
+      "evidence_hash": "e6dce33c355f043c9b2e0a0089e61df36d731f48ddabe7d3eb022bd9e3495af8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Yellow / Red 選択を指定した実行は選択した色の occurrence のみを報告する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SignalReportLevel"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "`sotp signal report --chain <id>` は指定した chain の occurrence のみを報告し、Yellow / Red 選択を指定した実行は選択した色の occurrence のみを報告する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ed51d24c1aa527ee9f190fcebe4a15f4ec7718f7e826fab34596ff78f622d72e",
+      "evidence_hash": "1017bb3ec4bdf6d512d78a0d89a3aaf95ad6537953759ad31978d52125f27456",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Yellow / Red の選択による結果の絞り込みを提供する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SignalReportLevelSelection"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "`--chain <id>` による chain 選択と、Yellow / Red の選択による結果の絞り込みを提供する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ed51d24c1aa527ee9f190fcebe4a15f4ec7718f7e826fab34596ff78f622d72e",
+      "evidence_hash": "e6dce33c355f043c9b2e0a0089e61df36d731f48ddabe7d3eb022bd9e3495af8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Yellow / Red 選択を指定した実行は選択した色の occurrence のみを報告する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SignalReportLevelSelection"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "`sotp signal report --chain <id>` は指定した chain の occurrence のみを報告し、Yellow / Red 選択を指定した実行は選択した色の occurrence のみを報告する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "09e3ef008e16a4136c899c069311d0e2da6f1f7260f6cade351785e09ce99551",
+      "evidence_hash": "076a6ae15a47d5d61b27fcaf68febe9944608ae7d5e33d9dc897f7d5b988513c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "報告する各 signal occurrence に、entry id、参照文字列、判定理由、および対象ファイル位置を含める。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SignalReportLocation"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "報告する各 signal occurrence に、entry id、参照文字列、判定理由、および対象ファイル位置を含める。"
+        }
+      }
+    },
+    {
+      "claim_hash": "09e3ef008e16a4136c899c069311d0e2da6f1f7260f6cade351785e09ce99551",
+      "evidence_hash": "37220e32224f27fcfba0166b9b2d6ae2b6e22b93024535aba6751916d0517c30",
+      "verdict": {
+        "kind": "pass",
+        "citation": "report の各 occurrence には entry id、参照文字列、判定理由、および対象ファイル位置が表示される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SignalReportLocation"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "report の各 occurrence には entry id、参照文字列、判定理由、および対象ファイル位置が表示される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5a445ec2a67b14aba70f2f0546e12c514f6f547ec58e5e5fd884d4bb81c198f2",
+      "evidence_hash": "076a6ae15a47d5d61b27fcaf68febe9944608ae7d5e33d9dc897f7d5b988513c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "報告する各 signal occurrence に、entry id、参照文字列、判定理由、および対象ファイル位置を含める。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SignalReportOccurrence"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "報告する各 signal occurrence に、entry id、参照文字列、判定理由、および対象ファイル位置を含める。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5a445ec2a67b14aba70f2f0546e12c514f6f547ec58e5e5fd884d4bb81c198f2",
+      "evidence_hash": "3ee1a40d72809a038c87c493395dd541b16427f8d063d233fd1a9ce9f0906107",
+      "verdict": {
+        "kind": "pass",
+        "citation": "選択条件に一致する occurrence を、診断に必要な entry id、参照文字列、判定理由、対象ファイル位置とともに欠落なく報告する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SignalReportOccurrence"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "選択条件に一致する occurrence を、診断に必要な entry id、参照文字列、判定理由、対象ファイル位置とともに欠落なく報告する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5a445ec2a67b14aba70f2f0546e12c514f6f547ec58e5e5fd884d4bb81c198f2",
+      "evidence_hash": "37220e32224f27fcfba0166b9b2d6ae2b6e22b93024535aba6751916d0517c30",
+      "verdict": {
+        "kind": "pass",
+        "citation": "report の各 occurrence には entry id、参照文字列、判定理由、および対象ファイル位置が表示される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SignalReportOccurrence"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "report の各 occurrence には entry id、参照文字列、判定理由、および対象ファイル位置が表示される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "1b00308ca86a8a7959edaad9b8472da25cae4eeec16c4f60e457dbe32c728348",
+      "evidence_hash": "3efd2b6e00a051c796f0c0505fa40221d21936fe08b9e4dfab9aba9ee502e34e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "4 chain の Yellow / Red の発生箇所を 1 コマンドで横断列挙し、発生単位データが永続化されない chain も含めて、gate が block した原因を手動の JSON 読解なしに診断できるようにする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SignalReportOutput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "4 chain の Yellow / Red の発生箇所を 1 コマンドで横断列挙し、発生単位データが永続化されない chain も含めて、gate が block した原因を手動の JSON 読解なしに診断できるようにする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "1b00308ca86a8a7959edaad9b8472da25cae4eeec16c4f60e457dbe32c728348",
+      "evidence_hash": "55e8e58e0763db0818a133ccf47c4e86cad123b896bc61d5354388b88527cdb1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "4 chain の Yellow / Red occurrence が報告される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SignalReportOutput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`sotp signal report` を実行すると、発生単位 signal 成果物がある chain ではその成果物を用い、chain ⓪・①では正規の入力成果物からメモリ上で導出して、4 chain の Yellow / Red occurrence が報告される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "29036279a4aadfacc898cf09fafc6275264e60ab96ea1f482a5e86d8c9ab5b88",
+      "evidence_hash": "1017bb3ec4bdf6d512d78a0d89a3aaf95ad6537953759ad31978d52125f27456",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`--chain <id>` による chain 選択と、Yellow / Red の選択による結果の絞り込みを提供する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SignalReportQuery"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "`--chain <id>` による chain 選択と、Yellow / Red の選択による結果の絞り込みを提供する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "29036279a4aadfacc898cf09fafc6275264e60ab96ea1f482a5e86d8c9ab5b88",
+      "evidence_hash": "e6dce33c355f043c9b2e0a0089e61df36d731f48ddabe7d3eb022bd9e3495af8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp signal report --chain <id>` は指定した chain の occurrence のみを報告し、Yellow / Red 選択を指定した実行は選択した色の occurrence のみを報告する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SignalReportQuery"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "`sotp signal report --chain <id>` は指定した chain の occurrence のみを報告し、Yellow / Red 選択を指定した実行は選択した色の occurrence のみを報告する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "77bf23e89a366fe2e11bd040fa4ffe321c9443e5a08a1923d5304ed4275c78f7",
+      "evidence_hash": "076a6ae15a47d5d61b27fcaf68febe9944608ae7d5e33d9dc897f7d5b988513c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "報告する各 signal occurrence に、entry id、参照文字列、判定理由、および対象ファイル位置を含める。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SignalReportReason"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "報告する各 signal occurrence に、entry id、参照文字列、判定理由、および対象ファイル位置を含める。"
+        }
+      }
+    },
+    {
+      "claim_hash": "77bf23e89a366fe2e11bd040fa4ffe321c9443e5a08a1923d5304ed4275c78f7",
+      "evidence_hash": "37220e32224f27fcfba0166b9b2d6ae2b6e22b93024535aba6751916d0517c30",
+      "verdict": {
+        "kind": "pass",
+        "citation": "report の各 occurrence には entry id、参照文字列、判定理由、および対象ファイル位置が表示される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SignalReportReason"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "report の各 occurrence には entry id、参照文字列、判定理由、および対象ファイル位置が表示される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "1f5a40db113f4e98ca3a0229ed6bf92f9857aea2377195adcf25bb6884b25557",
+      "evidence_hash": "076a6ae15a47d5d61b27fcaf68febe9944608ae7d5e33d9dc897f7d5b988513c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "報告する各 signal occurrence に、entry id、参照文字列、判定理由、および対象ファイル位置を含める。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SignalReportReference"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "報告する各 signal occurrence に、entry id、参照文字列、判定理由、および対象ファイル位置を含める。"
+        }
+      }
+    },
+    {
+      "claim_hash": "1f5a40db113f4e98ca3a0229ed6bf92f9857aea2377195adcf25bb6884b25557",
+      "evidence_hash": "37220e32224f27fcfba0166b9b2d6ae2b6e22b93024535aba6751916d0517c30",
+      "verdict": {
+        "kind": "pass",
+        "citation": "report の各 occurrence には entry id、参照文字列、判定理由、および対象ファイル位置が表示される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SignalReportReference"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "report の各 occurrence には entry id、参照文字列、判定理由、および対象ファイル位置が表示される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2c19fe786d6877ed35ffac3f64615dd84ed1d67d7587e07c5d7969b47a752c42",
+      "evidence_hash": "3efd2b6e00a051c796f0c0505fa40221d21936fe08b9e4dfab9aba9ee502e34e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "4 chain の Yellow / Red の発生箇所を 1 コマンドで横断列挙し、発生単位データが永続化されない chain も含めて、gate が block した原因を手動の JSON 読解なしに診断できるようにする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "SignalReportService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "4 chain の Yellow / Red の発生箇所を 1 コマンドで横断列挙し、発生単位データが永続化されない chain も含めて、gate が block した原因を手動の JSON 読解なしに診断できるようにする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2c19fe786d6877ed35ffac3f64615dd84ed1d67d7587e07c5d7969b47a752c42",
+      "evidence_hash": "55e8e58e0763db0818a133ccf47c4e86cad123b896bc61d5354388b88527cdb1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp signal report` を実行すると、発生単位 signal 成果物がある chain ではその成果物を用い、chain ⓪・①では正規の入力成果物からメモリ上で導出して、4 chain の Yellow / Red occurrence が報告される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "SignalReportService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`sotp signal report` を実行すると、発生単位 signal 成果物がある chain ではその成果物を用い、chain ⓪・①では正規の入力成果物からメモリ上で導出して、4 chain の Yellow / Red occurrence が報告される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2adb02105b4bbfa64ef3d0fdba582d777f51cecd505d03aa7610e66264ba7de7",
+      "evidence_hash": "850053170a621fdedb58205dc6fe8ff8ffba366394bc5bdc22f6a5f26b28a1f2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "発生単位 signal 成果物がある chain はその成果物を読み、存在しない chain ⓪・①は正規の入力成果物から既存の評価規則で発生単位データをメモリ上に導出する。report は導出した signal または集計値を永続化しない読み取り専用 view とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "SignalReportSourcePort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "発生単位 signal 成果物がある chain はその成果物を読み、存在しない chain ⓪・①は正規の入力成果物から既存の評価規則で発生単位データをメモリ上に導出する。report は導出した signal または集計値を永続化しない読み取り専用 view とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2adb02105b4bbfa64ef3d0fdba582d777f51cecd505d03aa7610e66264ba7de7",
+      "evidence_hash": "25075c3d63c3af9dcac74d85c23f1b23a11d735f74e8c491d609cf1a55f4372b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "report は診断用の読み取り専用 view であり、実行前後で既存の signal calculation artifacts を変更せず、chain ⓪・①で導出した発生単位データも永続化しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "SignalReportSourcePort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "report は診断用の読み取り専用 view であり、実行前後で既存の signal calculation artifacts を変更せず、chain ⓪・①で導出した発生単位データも永続化しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2adb02105b4bbfa64ef3d0fdba582d777f51cecd505d03aa7610e66264ba7de7",
+      "evidence_hash": "ce4548c77f72b43a14eb8be6511c43ac05196f65fb7e7cb33592ee393592c024",
+      "verdict": {
+        "kind": "pass",
+        "citation": "report の実行は既存の calculation artifacts を読み取り専用で扱い"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "SignalReportSourcePort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "report の実行は既存の calculation artifacts を読み取り専用で扱い、chain ⓪・①で導出した発生単位データを含め、signal または集計値を persist しない。"
+        }
+      }
+    }
+  ]
+}

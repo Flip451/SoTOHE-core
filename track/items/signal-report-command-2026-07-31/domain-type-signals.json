@@ -1,0 +1,20 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-31T13:37:54Z",
+  "declaration_hash": "ff2a8acf5d49f6b49c9b20e8b27a495696d78522c61f7356ef31521061d044db",
+  "implementation_input_hash": "1f19e2c672e17aad8298dc241d8857766ac72280d855012d8a988e5343af79c6",
+  "signals": [
+    {
+      "type_name": "FilePath",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "NonEmptyString",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

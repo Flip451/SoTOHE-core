@@ -1349,6 +1349,7 @@ This section must not make D2 a valid ADR ref.
     }"#;
 
     const ARCHITECTURE_RULES_DOMAIN_TDDD: &str = r#"{
+        "version": 2,
         "layers": [
             {
                 "crate": "domain",
@@ -1362,6 +1363,7 @@ This section must not make D2 a valid ADR ref.
     }"#;
 
     const ARCHITECTURE_RULES_DOMAIN_CUSTOM_TDDD: &str = r#"{
+        "version": 2,
         "layers": [
             {
                 "crate": "domain",
@@ -1375,6 +1377,7 @@ This section must not make D2 a valid ADR ref.
     }"#;
 
     const ARCHITECTURE_RULES_NO_TDDD: &str = r#"{
+        "version": 2,
         "layers": [
             {
                 "crate": "domain",

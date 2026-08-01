@@ -183,7 +183,7 @@ mod tests {
     use crate::verify::tddd_layers::parse_tddd_layers;
 
     fn domain_binding() -> TdddLayerBinding {
-        let json = r#"{"layers":[{"crate":"domain","tddd":{"enabled":true}}]}"#;
+        let json = r#"{"version":2,"layers":[{"crate":"domain","tddd":{"enabled":true}}]}"#;
         parse_tddd_layers(json).unwrap().remove(0)
     }
 

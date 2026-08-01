@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "55ede06c029beea9b0cba2c24959a52be9e83c08652fc94bbb804189290ead8f",
+  "signals": [
+    {
+      "type_name": "SignalCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "544f6fd33cbabc58003f174ca20c2ab20e9cff35510519935b499557aeb1a6bd"
+    }
+  ]
+}

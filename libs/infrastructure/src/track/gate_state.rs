@@ -916,7 +916,7 @@ mod tests {
         // Write minimal architecture-rules.json (no TDDD layers → no Chain-2 pairs).
         std::fs::write(
             root.join("architecture-rules.json"),
-            r#"{"layers":[{"crate":"placeholder-no-tddd"}]}"#,
+            r#"{"version":2,"layers":[{"crate":"placeholder-no-tddd"}]}"#,
         )
         .unwrap();
 

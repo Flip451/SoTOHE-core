@@ -1554,7 +1554,7 @@ const DOMAIN_TYPES_JSON_MINIMAL: &str = r#"{
   "functions": {}
 }"#;
 
-const DOMAIN_ARCH_RULES: &str = r#"{"layers":[{"crate":"domain","tddd":{"enabled":true,"catalogue_file":"domain-types.json"}}]}"#;
+const DOMAIN_ARCH_RULES: &str = r#"{"version":2,"layers":[{"crate":"domain","tddd":{"enabled":true,"catalogue_file":"domain-types.json"}}]}"#;
 
 /// Write a complete `.harness/config/contract-map-style.toml` under `root`.
 ///
@@ -2078,6 +2078,7 @@ const INFRASTRUCTURE_TYPES_JSON_MINIMAL: &str = r#"{
 }"#;
 
 const MULTI_LAYER_ARCH_RULES: &str = r#"{
+      "version": 2,
       "layers": [
         { "crate": "domain", "tddd": { "enabled": true, "catalogue_file": "domain-types.json" } },
         { "crate": "usecase", "tddd": { "enabled": true, "catalogue_file": "usecase-types.json" } },
@@ -2292,6 +2293,7 @@ fn sync_rendered_views_malformed_layer_json_does_not_block_other_layers() {
 //   - stale / malformed fallback to `None` (em-dash fallback, non-fatal)
 
 const MULTI_LAYER_ARCH_RULES_WITH_CAT_SPEC_OPT_IN: &str = r#"{
+      "version": 2,
       "layers": [
         {
           "crate": "domain",
@@ -2305,6 +2307,7 @@ const MULTI_LAYER_ARCH_RULES_WITH_CAT_SPEC_OPT_IN: &str = r#"{
     }"#;
 
 const MULTI_LAYER_ARCH_RULES_CAT_SPEC_OPT_OUT: &str = r#"{
+      "version": 2,
       "layers": [
         {
           "crate": "domain",
@@ -2524,6 +2527,7 @@ fn sync_rendered_views_errors_on_missing_cat_spec_signals_when_opt_in() {
 
 /// Minimal arch rules with only domain layer (sufficient for the contract-map E2E path).
 const ARCH_RULES_DOMAIN_ONLY: &str = r#"{
+      "version": 2,
       "layers": [
         {
           "crate": "domain",
@@ -2901,7 +2905,7 @@ fn sync_rendered_views_branch_guard_fails_closed_for_custom_type_catalogue() {
 
     std::fs::write(
         root.join("architecture-rules.json"),
-        r#"{"layers":[{"crate":"domain","tddd":{"enabled":true,"catalogue_file":"custom.json"}}]}"#,
+        r#"{"version":2,"layers":[{"crate":"domain","tddd":{"enabled":true,"catalogue_file":"custom.json"}}]}"#,
     )
     .unwrap();
     std::fs::write(track_dir.join("custom.json"), "{}").unwrap();

@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "d6523c2a35ce1acd6fdb5f297e749b43d371add54b3c32ce0e8c352c9faa9b35",
+  "signals": [
+    {
+      "type_name": "SystemSignalReportSourceAdapter",
+      "signal": "blue",
+      "entry_hash": "c351f7cd887a9e0cb4fbf635fa04235b913d4955c185fac9074a337dfb3e4642"
+    }
+  ]
+}

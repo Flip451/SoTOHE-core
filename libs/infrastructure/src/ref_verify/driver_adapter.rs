@@ -817,6 +817,7 @@ mod tests {
         std::fs::write(
             project_root.join("architecture-rules.json"),
             r#"{
+              "version": 2,
               "layers": [
                 {
                   "crate": "domain",

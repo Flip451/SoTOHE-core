@@ -804,6 +804,7 @@ mod tests {
         std::fs::write(
             dir.path().join("architecture-rules.json"),
             r#"{
+              "version": 2,
               "layers": [
                 {
                   "crate": "1domain",
@@ -1561,6 +1562,7 @@ mod tests {
         std::fs::write(
             project_root.join("architecture-rules.json"),
             r#"{
+              "version": 2,
               "layers": [
                 {
                   "crate": "domain",
@@ -1634,6 +1636,7 @@ mod tests {
         std::fs::write(track_dir.join("usecase-types.json"), "{}").unwrap();
         let bindings = crate::verify::tddd_layers::parse_tddd_layers(
             r#"{
+              "version": 2,
               "layers": [
                 {
                   "crate": "domain",
