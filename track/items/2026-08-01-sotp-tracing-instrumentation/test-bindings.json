@@ -58,6 +58,35 @@
       "kind": "voluntary_binding",
       "edge_id": {"entry_key": "SotpCommandIdentity", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "IN-02"}},
       "tests": [{"layer": "usecase", "module_path": "usecase::telemetry::command_trace::tests", "test_name": "test_command_trace_record_validated_values_preserves_fields"}]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {"entry_key": "CommandTraceInteractor", "item_identifier": "entry", "obligation_kind": "result"},
+      "tests": [
+        {"layer": "usecase", "module_path": "usecase::telemetry::command_trace::tests", "test_name": "test_command_trace_service_record_success_delegates_validated_record"},
+        {"layer": "usecase", "module_path": "usecase::telemetry::command_trace::tests", "test_name": "test_command_trace_interactor_record_writer_unavailable_propagates_error"}
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {"entry_key": "CommandTraceService", "item_identifier": "trait_method:record", "obligation_kind": "result"},
+      "tests": [
+        {"layer": "usecase", "module_path": "usecase::telemetry::command_trace::tests", "test_name": "test_command_trace_service_record_success_delegates_validated_record"},
+        {"layer": "usecase", "module_path": "usecase::telemetry::command_trace::tests", "test_name": "test_command_trace_interactor_record_writer_unavailable_propagates_error"}
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {"entry_key": "CommandTraceWriterPort", "item_identifier": "trait_method:record", "obligation_kind": "contract"},
+      "tests": [
+        {"layer": "usecase", "module_path": "usecase::telemetry::command_trace::tests", "test_name": "test_command_trace_writer_port_record_success_accepts_completed_record"},
+        {"layer": "usecase", "module_path": "usecase::telemetry::command_trace::tests", "test_name": "test_command_trace_interactor_record_writer_unavailable_propagates_error"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CommandTraceWriteError", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "CN-03"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::telemetry::command_trace::tests", "test_name": "test_command_trace_interactor_record_writer_unavailable_propagates_error"}]
     }
   ]
 }

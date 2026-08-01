@@ -4,12 +4,13 @@
     {
       "id": "T001",
       "description": "Add `libs/usecase/src/telemetry/command_trace.rs` with `SotpCommandIdentity`, `CommandDurationMillis`, `CommandExitCode`, `CommandExecutionResult`, `CommandTraceRecord`, and `CommandTraceValueError`, including their validating constructors and value tests. IN-01, IN-02, CN-01, AC-01, AC-03.",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "9f1fda8a075c52709e99a2bee44e4f698bed3bf2"
     },
     {
       "id": "T002",
-      "description": "Add `CommandTraceService`, `CommandTraceWriterPort`, `CommandTraceInteractor`, and `CommandTraceWriteError` in `libs/usecase/src/telemetry/command_trace.rs`, including recording-flow result and port-contract tests. IN-01, IN-02, CN-01, AC-01, AC-03.",
-      "status": "todo",
+      "description": "Add `CommandTraceService`, `CommandTraceWriterPort`, `CommandTraceInteractor`, and `CommandTraceWriteError` in `libs/usecase/src/telemetry/command_trace.rs`, including recording-flow result and port-contract tests. IN-01, IN-02, CN-01, CN-03, AC-01, AC-03.",
+      "status": "done",
       "depends_on": [
         "T001"
       ]

@@ -209,6 +209,29 @@
       }
     },
     {
+      "claim_hash": "6c9c5f07c9b1cc26e864497729497ffe69e2f6f9a6a728417cc3bfb2c0812297",
+      "evidence_hash": "fd030eadee6eef58e7adb1f10bd4ccecf07f6f25d24f7780e3a38a4b0aafcfe7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "trace 記録処理が失敗した場合は panic せず、失敗を黙って握りつぶさず、型付き `CommandTraceWriteError` として `Result` の error 側から caller へ伝搬する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "コマンド trace の記録に失敗した場合、その失敗で panic せず、また黙って握りつぶさず、typed `CommandTraceWriteError` として `Result` を通じて caller へ伝搬する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-08-01-2356-sotp-tracing-write-failure-policy.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
       "claim_hash": "8d323543a9f773f9fc2540483e6c6ae9522db4aa2f1e11b4b3b4d4ad0f37b802",
       "evidence_hash": "8a936ca4168276fb339a20f460d1b732fb7e12ad4381c0895ccaa101cb72d5a2",
       "verdict": {

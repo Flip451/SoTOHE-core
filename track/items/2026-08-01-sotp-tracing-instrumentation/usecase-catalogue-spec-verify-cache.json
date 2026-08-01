@@ -243,7 +243,7 @@
       }
     },
     {
-      "claim_hash": "d383519e399e3b89d9842d05adf97f4b5c49daccf8a27fb89f2f9244fdf315d4",
+      "claim_hash": "66228f703039718ea4b1acec506220bf04565e27fecde53953e09631c36725bc",
       "evidence_hash": "f92832f5450d69a09850f4956fad3ba679b857fc835c4266b0c10df3e15394c3",
       "verdict": {
         "kind": "pass",
@@ -267,7 +267,7 @@
       }
     },
     {
-      "claim_hash": "d383519e399e3b89d9842d05adf97f4b5c49daccf8a27fb89f2f9244fdf315d4",
+      "claim_hash": "66228f703039718ea4b1acec506220bf04565e27fecde53953e09631c36725bc",
       "evidence_hash": "7d442a8ba6b078174131cac5825c183427295e92bdc20170d3064381163593a3",
       "verdict": {
         "kind": "pass",
@@ -287,6 +287,30 @@
           "section": "in_scope",
           "element_id": "IN-02",
           "text_label": "各コマンド実行について、コマンド identity、所要時間、および exit 結果をローカル JSONL 記録へ残す。"
+        }
+      }
+    },
+    {
+      "claim_hash": "66228f703039718ea4b1acec506220bf04565e27fecde53953e09631c36725bc",
+      "evidence_hash": "6c9c5f07c9b1cc26e864497729497ffe69e2f6f9a6a728417cc3bfb2c0812297",
+      "verdict": {
+        "kind": "pass",
+        "citation": "コマンド trace の記録に失敗した場合、その失敗で panic せず、また黙って握りつぶさず、typed `CommandTraceWriteError` として `Result` を通じて caller へ伝搬する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CommandTraceInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "コマンド trace の記録に失敗した場合、その失敗で panic せず、また黙って握りつぶさず、typed `CommandTraceWriteError` として `Result` を通じて caller へ伝搬する。"
         }
       }
     },
@@ -411,11 +435,11 @@
       }
     },
     {
-      "claim_hash": "b764dd76056eb02a19d811504e462f6f549fb1db49cf2a19496fbc344c426c96",
-      "evidence_hash": "7d442a8ba6b078174131cac5825c183427295e92bdc20170d3064381163593a3",
+      "claim_hash": "f7512640cbb7acce665ba6247bfd7b9bb1c7100299af8e7979d1ea11cc0f309e",
+      "evidence_hash": "6c9c5f07c9b1cc26e864497729497ffe69e2f6f9a6a728417cc3bfb2c0812297",
       "verdict": {
         "kind": "pass",
-        "citation": "各コマンド実行について、コマンド identity、所要時間、および exit 結果をローカル JSONL 記録へ残す。"
+        "citation": "その失敗で panic せず、また黙って握りつぶさず、typed `CommandTraceWriteError` として `Result` を通じて caller へ伝搬する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -428,9 +452,9 @@
       "evidence_origin": {
         "kind": "spec_element",
         "data": {
-          "section": "in_scope",
-          "element_id": "IN-02",
-          "text_label": "各コマンド実行について、コマンド identity、所要時間、および exit 結果をローカル JSONL 記録へ残す。"
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "コマンド trace の記録に失敗した場合、その失敗で panic せず、また黙って握りつぶさず、typed `CommandTraceWriteError` として `Result` を通じて caller へ伝搬する。"
         }
       }
     },
@@ -579,7 +603,7 @@
       }
     },
     {
-      "claim_hash": "fcf6e6daf89d03a0a2968559eea4552fab11047313cf1d007db8744ed5f8e0c1",
+      "claim_hash": "1c4d951b6098a4bcb04e5177dba3a27553af1f155e1a37999b9b840de77a0a1e",
       "evidence_hash": "f92832f5450d69a09850f4956fad3ba679b857fc835c4266b0c10df3e15394c3",
       "verdict": {
         "kind": "pass",
@@ -603,7 +627,7 @@
       }
     },
     {
-      "claim_hash": "fcf6e6daf89d03a0a2968559eea4552fab11047313cf1d007db8744ed5f8e0c1",
+      "claim_hash": "1c4d951b6098a4bcb04e5177dba3a27553af1f155e1a37999b9b840de77a0a1e",
       "evidence_hash": "7d442a8ba6b078174131cac5825c183427295e92bdc20170d3064381163593a3",
       "verdict": {
         "kind": "pass",
@@ -627,7 +651,31 @@
       }
     },
     {
-      "claim_hash": "41f63222592b9c07e1ef1b005fc1dadf1e6b1b6c82c9c134cee474d5f44ff5df",
+      "claim_hash": "1c4d951b6098a4bcb04e5177dba3a27553af1f155e1a37999b9b840de77a0a1e",
+      "evidence_hash": "6c9c5f07c9b1cc26e864497729497ffe69e2f6f9a6a728417cc3bfb2c0812297",
+      "verdict": {
+        "kind": "pass",
+        "citation": "コマンド trace の記録に失敗した場合、その失敗で panic せず、また黙って握りつぶさず、typed `CommandTraceWriteError` として `Result` を通じて caller へ伝搬する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "CommandTraceService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "コマンド trace の記録に失敗した場合、その失敗で panic せず、また黙って握りつぶさず、typed `CommandTraceWriteError` として `Result` を通じて caller へ伝搬する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c3700550162b9a03b0810d3ed7e0181c9c047660b0b0d1d874856d3757a812b9",
       "evidence_hash": "7d442a8ba6b078174131cac5825c183427295e92bdc20170d3064381163593a3",
       "verdict": {
         "kind": "pass",
@@ -651,11 +699,11 @@
       }
     },
     {
-      "claim_hash": "41f63222592b9c07e1ef1b005fc1dadf1e6b1b6c82c9c134cee474d5f44ff5df",
-      "evidence_hash": "86efca5df5f571c38243782ca22c0165c83d4284aa69e57f1179db74520fdc81",
+      "claim_hash": "c3700550162b9a03b0810d3ed7e0181c9c047660b0b0d1d874856d3757a812b9",
+      "evidence_hash": "6c9c5f07c9b1cc26e864497729497ffe69e2f6f9a6a728417cc3bfb2c0812297",
       "verdict": {
         "kind": "pass",
-        "citation": "記録ファイルの増大を運用可能に保つため、ローテーションを扱う。"
+        "citation": "コマンド trace の記録に失敗した場合、その失敗で panic せず、また黙って握りつぶさず、typed `CommandTraceWriteError` として `Result` を通じて caller へ伝搬する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -668,9 +716,9 @@
       "evidence_origin": {
         "kind": "spec_element",
         "data": {
-          "section": "in_scope",
-          "element_id": "IN-04",
-          "text_label": "記録ファイルの増大を運用可能に保つため、ローテーションを扱う。"
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "コマンド trace の記録に失敗した場合、その失敗で panic せず、また黙って握りつぶさず、typed `CommandTraceWriteError` として `Result` を通じて caller へ伝搬する。"
         }
       }
     }

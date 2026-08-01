@@ -360,14 +360,6 @@
       "trait_ref": "CommandTraceService"
     },
     {
-      "for_type": "CommandTraceInteractor",
-      "trait_ref": "core::marker::Send"
-    },
-    {
-      "for_type": "CommandTraceInteractor",
-      "trait_ref": "core::marker::Sync"
-    },
-    {
       "action": "modify",
       "for_type": "TelemetryReportOutput",
       "trait_ref": "core::fmt::Debug"
@@ -439,13 +431,17 @@
           "anchor": "IN-01",
           "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
         },
-        {
-          "anchor": "IN-02",
-          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
-        }
-      ]
-    },
-    "CommandTraceWriterPort": {
+          {
+            "anchor": "IN-02",
+            "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+          },
+          {
+            "anchor": "CN-03",
+            "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+          }
+        ]
+      },
+      "CommandTraceWriterPort": {
       "action": "add",
       "docs": "Synchronous driven port for recording one completed command trace. Blocking persistence is an explicit contract choice; latency-sensitive async callers must isolate the call from their executor.",
       "informal_grounds": [],
@@ -473,16 +469,16 @@
         "Sync"
       ],
       "spec_refs": [
-        {
-          "anchor": "IN-02",
-          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
-        },
-        {
-          "anchor": "IN-04",
-          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
-        }
-      ]
-    }
+          {
+            "anchor": "IN-02",
+            "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+          },
+          {
+            "anchor": "CN-03",
+            "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+          }
+        ]
+      }
   },
   "types": {
     "CommandDurationMillis": {
@@ -657,7 +653,7 @@
         }
       ]
     },
-    "CommandTraceInteractor": {
+      "CommandTraceInteractor": {
       "action": "add",
       "docs": "Usecase interactor that accepts completed-command records from the primary adapter and delegates local persistence through CommandTraceWriterPort.",
       "informal_grounds": [],
@@ -679,12 +675,16 @@
           "anchor": "IN-01",
           "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
         },
-        {
-          "anchor": "IN-02",
-          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
-        }
-      ]
-    },
+          {
+            "anchor": "IN-02",
+            "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+          },
+          {
+            "anchor": "CN-03",
+            "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+          }
+        ]
+      },
     "CommandTraceRecord": {
       "action": "add",
       "docs": "Application-boundary DTO passed to CommandTraceService and CommandTraceWriterPort.",
@@ -785,7 +785,7 @@
         }
       ]
     },
-    "CommandTraceWriteError": {
+      "CommandTraceWriteError": {
       "action": "add",
       "docs": "Failure returned by CommandTraceService::record and CommandTraceWriterPort::record; persistence adapters produce Unavailable when recording cannot complete.",
       "informal_grounds": [],
@@ -805,12 +805,12 @@
       "role": {
         "ErrorType": {}
       },
-      "spec_refs": [
-        {
-          "anchor": "IN-02",
-          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
-        }
-      ]
+        "spec_refs": [
+          {
+            "anchor": "CN-03",
+            "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+          }
+        ]
     },
     "SotpCommandIdentity": {
       "action": "add",

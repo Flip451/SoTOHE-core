@@ -157,6 +157,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [cargo make ラッパー層の解体 — bin/sotp 直叩きへの一本化](2026-06-05-1535-cargo-make-teardown.md) | Proposed | 2026-06-05 |
 | [track ワークフロー telemetry の導入 — tracing + JSONL による事後観測](2026-06-10-1129-track-workflow-telemetry.md) | Proposed | 2026-06-10 |
 | [sotp tracing JSONL のサイズローテーションと保持上限を定める](2026-08-01-0902-sotp-tracing-rotation-policy.md) | Proposed | 2026-08-01 |
+| [sotp tracing の書き込み失敗を型付き Result で caller へ伝搬する](2026-08-01-2356-sotp-tracing-write-failure-policy.md) | Proposed | 2026-08-01 |
 | [ref-verify のスコープ解決を artifact 存在ベースに一本化する — --context / --layer の削除と Phase 0 コミットゲート誤爆の解消](2026-06-10-1335-ref-verify-existence-based-scope-resolution.md) | Proposed | 2026-06-10 |
 | [SoT 本体への参照 hash 埋め込みを廃止し、新鮮度判定を verify-cache の実行時突合に一元化する — spec_refs[].hash の撤去](2026-06-11-1018-spec-ref-embedded-hash-removal.md) | Proposed | 2026-06-11 |
 | [feature バッチ消化への既定反転 — per-layer 並列レビューを始動させる](2026-06-22-1327-feature-batch-default-inversion.md) | Accepted | 2026-06-22 |

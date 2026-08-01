@@ -22,25 +22,25 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | CommandTraceValueError | error_type | add | EmptyCommandIdentity, ZeroExitCode, ZeroExecutions, FailureCountExceedsExecutions, FailureRateOutOfRange | 🔵 | 🔵 |
-| CommandTraceWriteError | error_type | add | Unavailable | 🟡 | 🔵 |
+| CommandTraceWriteError | error_type | add | Unavailable | 🔵 | 🔵 |
 
 ## Secondary Ports
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CommandTraceWriterPort | secondary_port | add | fn record(&self, record: CommandTraceRecord) -> Result<(), CommandTraceWriteError> | 🟡 | 🔵 |
+| CommandTraceWriterPort | secondary_port | add | fn record(&self, record: CommandTraceRecord) -> Result<(), CommandTraceWriteError> | 🔵 | 🔵 |
 
 ## Application Services
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CommandTraceService | application_service | add | fn record(&self, record: CommandTraceRecord) -> Result<(), CommandTraceWriteError> | 🟡 | 🔵 |
+| CommandTraceService | application_service | add | fn record(&self, record: CommandTraceRecord) -> Result<(), CommandTraceWriteError> | 🔵 | 🔵 |
 
 ## Interactors
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CommandTraceInteractor | interactor | add | — | 🟡 | 🔵 |
+| CommandTraceInteractor | interactor | add | — | 🔵 | 🔵 |
 
 ## DTOs
 

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "f5437e949541cff2845aab3485c0cd389ab5d7ebd7748077908e4a0641819874",
+  "catalogue_declaration_hash": "c502dd227bc9f1b7dff2df15254299b55526212662670edea332d3a2a6158499",
   "signals": [
     {
       "type_name": "CommandDurationMillis",
@@ -35,7 +35,7 @@
     {
       "type_name": "CommandTraceInteractor",
       "signal": "blue",
-      "entry_hash": "d383519e399e3b89d9842d05adf97f4b5c49daccf8a27fb89f2f9244fdf315d4"
+      "entry_hash": "66228f703039718ea4b1acec506220bf04565e27fecde53953e09631c36725bc"
     },
     {
       "type_name": "CommandTraceRecord",
@@ -50,7 +50,7 @@
     {
       "type_name": "CommandTraceWriteError",
       "signal": "blue",
-      "entry_hash": "b764dd76056eb02a19d811504e462f6f549fb1db49cf2a19496fbc344c426c96"
+      "entry_hash": "f7512640cbb7acce665ba6247bfd7b9bb1c7100299af8e7979d1ea11cc0f309e"
     },
     {
       "type_name": "SotpCommandIdentity",
@@ -70,12 +70,12 @@
     {
       "type_name": "CommandTraceService",
       "signal": "blue",
-      "entry_hash": "fcf6e6daf89d03a0a2968559eea4552fab11047313cf1d007db8744ed5f8e0c1"
+      "entry_hash": "1c4d951b6098a4bcb04e5177dba3a27553af1f155e1a37999b9b840de77a0a1e"
     },
     {
       "type_name": "CommandTraceWriterPort",
       "signal": "blue",
-      "entry_hash": "41f63222592b9c07e1ef1b005fc1dadf1e6b1b6c82c9c134cee474d5f44ff5df"
+      "entry_hash": "c3700550162b9a03b0810d3ed7e0181c9c047660b0b0d1d874856d3757a812b9"
     }
   ]
 }

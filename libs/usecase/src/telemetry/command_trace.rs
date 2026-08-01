@@ -1,5 +1,7 @@
 //! Typed values for a completed `sotp` command trace.
 
+use std::sync::Arc;
+
 use thiserror::Error;
 
 /// Validation errors for command-trace values.
@@ -106,12 +108,85 @@ pub struct CommandTraceRecord {
     pub result: CommandExecutionResult,
 }
 
+/// Error returned when a completed command trace cannot be recorded.
+#[derive(Debug, Error)]
+pub enum CommandTraceWriteError {
+    /// The trace writer could not complete the recording operation.
+    #[error("command trace writer unavailable")]
+    Unavailable,
+}
+
+/// Primary application boundary for recording one completed command execution.
+pub trait CommandTraceService: Send + Sync {
+    /// Records a completed command execution.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`CommandTraceWriteError`] when the injected trace writer cannot
+    /// complete the recording operation.
+    fn record(&self, record: CommandTraceRecord) -> Result<(), CommandTraceWriteError>;
+}
+
+/// Secondary port for recording one completed command trace.
+pub trait CommandTraceWriterPort: Send + Sync {
+    /// Records a completed command trace through the configured persistence boundary.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`CommandTraceWriteError`] when recording cannot complete.
+    fn record(&self, record: CommandTraceRecord) -> Result<(), CommandTraceWriteError>;
+}
+
+/// Interactor implementing [`CommandTraceService`] through an injected writer port.
+pub struct CommandTraceInteractor {
+    writer: Arc<dyn CommandTraceWriterPort>,
+}
+
+impl CommandTraceInteractor {
+    /// Creates an interactor that records traces through `writer`.
+    #[must_use]
+    pub fn new(writer: Arc<dyn CommandTraceWriterPort>) -> Self {
+        Self { writer }
+    }
+}
+
+impl CommandTraceService for CommandTraceInteractor {
+    fn record(&self, record: CommandTraceRecord) -> Result<(), CommandTraceWriteError> {
+        self.writer.record(record)
+    }
+}
+
 #[cfg(test)]
 mod tests {
+    use std::sync::{Arc, Mutex};
+
     use super::{
-        CommandDurationMillis, CommandExecutionResult, CommandExitCode, CommandTraceRecord,
-        CommandTraceValueError, SotpCommandIdentity,
+        CommandDurationMillis, CommandExecutionResult, CommandExitCode, CommandTraceInteractor,
+        CommandTraceRecord, CommandTraceService, CommandTraceValueError, CommandTraceWriteError,
+        CommandTraceWriterPort, SotpCommandIdentity,
     };
+
+    #[derive(Default)]
+    struct RecordingWriter {
+        records: Mutex<Vec<CommandTraceRecord>>,
+    }
+
+    impl CommandTraceWriterPort for RecordingWriter {
+        fn record(&self, record: CommandTraceRecord) -> Result<(), CommandTraceWriteError> {
+            self.records
+                .lock()
+                .map(|mut records| records.push(record))
+                .map_err(|_| CommandTraceWriteError::Unavailable)
+        }
+    }
+
+    struct UnavailableWriter;
+
+    impl CommandTraceWriterPort for UnavailableWriter {
+        fn record(&self, _: CommandTraceRecord) -> Result<(), CommandTraceWriteError> {
+            Err(CommandTraceWriteError::Unavailable)
+        }
+    }
 
     fn identity(value: &str) -> Result<SotpCommandIdentity, CommandTraceValueError> {
         SotpCommandIdentity::try_new(value.to_owned())
@@ -179,6 +254,68 @@ mod tests {
         assert_eq!(record.command.as_str(), "telemetry");
         assert_eq!(*record.duration.as_ref(), 36);
         assert_eq!(record.result, CommandExecutionResult::Success);
+        Ok(())
+    }
+
+    #[test]
+    fn test_command_trace_service_record_success_delegates_validated_record()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let writer = Arc::new(RecordingWriter::default());
+        let interactor = CommandTraceInteractor::new(writer.clone());
+        let service: &dyn CommandTraceService = &interactor;
+        let record = CommandTraceRecord {
+            command: identity("track status")?,
+            duration: CommandDurationMillis::from(125_u64),
+            result: CommandExecutionResult::Success,
+        };
+        let expected = record.clone();
+
+        assert!(service.record(record).is_ok());
+
+        let records = writer
+            .records
+            .lock()
+            .map_err(|_| std::io::Error::other("recording writer lock poisoned"))?;
+        assert_eq!(records.as_slice(), &[expected]);
+        Ok(())
+    }
+
+    #[test]
+    fn test_command_trace_writer_port_record_success_accepts_completed_record()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let writer = Arc::new(RecordingWriter::default());
+        let port: &dyn CommandTraceWriterPort = writer.as_ref();
+        let record = CommandTraceRecord {
+            command: identity("telemetry")?,
+            duration: CommandDurationMillis::from(42_u64),
+            result: CommandExecutionResult::Failure(exit_code(1)?),
+        };
+        let expected = record.clone();
+
+        assert!(port.record(record).is_ok());
+
+        let records = writer
+            .records
+            .lock()
+            .map_err(|_| std::io::Error::other("recording writer lock poisoned"))?;
+        assert_eq!(records.as_slice(), &[expected]);
+        Ok(())
+    }
+
+    #[test]
+    fn test_command_trace_interactor_record_writer_unavailable_propagates_error()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let interactor = CommandTraceInteractor::new(Arc::new(UnavailableWriter));
+        let service: &dyn CommandTraceService = &interactor;
+        let record = CommandTraceRecord {
+            command: identity("telemetry")?,
+            duration: CommandDurationMillis::from(42_u64),
+            result: CommandExecutionResult::Failure(exit_code(1)?),
+        };
+
+        let result = service.record(record);
+
+        assert!(matches!(result, Err(CommandTraceWriteError::Unavailable)));
         Ok(())
     }
 }

@@ -17,7 +17,7 @@
         "role": "Interactor"
       },
       "brief": "Author a result test covering 'entry' of CommandTraceInteractor",
-      "declaration_hash": "2f4084eee98a5b545eb7e419b3d44b3c3f273950e917e9f37b4fb1890048c595",
+      "declaration_hash": "ab2ebf55caa98915b1a81a50ffab6368059e3550746403fc3b811206dd13b49a",
       "spec_refs": [
         {
           "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
@@ -26,6 +26,10 @@
         {
           "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
           "element_id": "IN-02"
+        },
+        {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "CN-03"
         }
       ]
     },
@@ -45,7 +49,7 @@
         "role": "ApplicationService"
       },
       "brief": "Author a result test covering 'trait_method:record' of CommandTraceService",
-      "declaration_hash": "f1fe6c7ead4bd48ae65a6c9576a3bd27a1c6775f3e6ce7623f980fcf045f8249",
+      "declaration_hash": "9bb50f34d827d84fdc36f613d914eea263549a3db4a5218f6abbc344c20522e8",
       "spec_refs": [
         {
           "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
@@ -54,6 +58,10 @@
         {
           "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
           "element_id": "IN-02"
+        },
+        {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "CN-03"
         }
       ]
     },
@@ -73,7 +81,7 @@
         "role": "SecondaryPort"
       },
       "brief": "Author a contract test covering 'trait_method:record' of CommandTraceWriterPort",
-      "declaration_hash": "d2ce4c97f53e5858a88f20a6f8ec38c12077b7bfdca8b5849f5fc8b0161f6d6c",
+      "declaration_hash": "4796f1f4dd920c3b6b4aa05f474f5e8a5fb701bbfc6e4ce35559c86ebae87abc",
       "spec_refs": [
         {
           "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
@@ -81,7 +89,7 @@
         },
         {
           "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
-          "element_id": "IN-04"
+          "element_id": "CN-03"
         }
       ]
     },
@@ -101,7 +109,7 @@
         "role": "SecondaryPort"
       },
       "brief": "Author a contract_conformance test covering 'trait_impl:usecase::telemetry::CommandTraceWriterPort' of FsCommandTraceAdapter",
-      "declaration_hash": "33498fbcc13538a55db88712440ebe352e04e4647522d79c09b044fc96858d99",
+      "declaration_hash": "4f4d77a71a47303c588031d4df15f553a8ca860fec520d2b5329258ff663bf75",
       "spec_refs": [
         {
           "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
@@ -109,7 +117,7 @@
         },
         {
           "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
-          "element_id": "IN-04"
+          "element_id": "CN-03"
         }
       ]
     }

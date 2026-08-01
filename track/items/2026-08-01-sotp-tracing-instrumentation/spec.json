@@ -100,6 +100,26 @@
           "anchor": "D1"
         }
       ]
+    },
+    {
+      "id": "CN-03",
+      "text": "コマンド trace の記録に失敗した場合、その失敗で panic せず、また黙って握りつぶさず、typed `CommandTraceWriteError` として `Result` を通じて caller へ伝搬する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-08-01-2356-sotp-tracing-write-failure-policy.md",
+          "anchor": "D1"
+        }
+      ],
+      "convention_refs": [
+        {
+          "file": "knowledge/conventions/coding-principles.md",
+          "anchor": "Error Handling: Result and ? Operator"
+        },
+        {
+          "file": "knowledge/conventions/coding-principles.md",
+          "anchor": "No Panics in Library Code"
+        }
+      ]
     }
   ],
   "acceptance_criteria": [
@@ -155,7 +175,7 @@
     }
   ],
   "signals": {
-    "blue": 13,
+    "blue": 14,
     "yellow": 0,
     "red": 0
   }
