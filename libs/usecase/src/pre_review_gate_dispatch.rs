@@ -6,10 +6,15 @@
 
 use std::collections::{HashMap, HashSet};
 use std::path::Path;
+use std::path::PathBuf;
+use std::sync::Arc;
 
 use domain::review_v2::ScopeName;
+use domain::task_contract::PreReviewGateOutcome;
 use domain::{FreeText, TrackId};
 use thiserror::Error;
+
+use crate::pre_review_gate::{PreReviewGateCommand, PreReviewGateError, PreReviewGateService};
 
 /// Application-workflow vocabulary of pre-review gates that may be assigned
 /// to a resolved review scope.
@@ -156,19 +161,128 @@ pub trait PreReviewGateConfigLoaderPort: Send + Sync {
     ) -> Result<PreReviewGateMatrix, PreReviewGateConfigLoadError>;
 }
 
+/// Command carrying the resolved review scope and track location for
+/// pre-review-gate dispatch.
+#[derive(Debug, Clone)]
+pub struct PreReviewGateDispatchCommand {
+    /// Active track whose pre-review gate policy is loaded.
+    pub track_id: TrackId,
+    /// Scope resolved by local review before dispatch begins.
+    pub scope: ScopeName,
+    /// Directory containing the active track's items.
+    pub items_dir: PathBuf,
+}
+
+/// Dispatch result that distinguishes a non-applicable gate from an executed
+/// task-contract liveness outcome.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum PreReviewGateDispatchOutcome {
+    /// No pre-review gate applies to the resolved scope.
+    NotApplicable,
+    /// The existing task-contract liveness gate was run unchanged.
+    TaskContract(PreReviewGateOutcome),
+}
+
+/// Failure while loading applicability policy, resolving a configured scope,
+/// or executing an applicable pre-review gate.
+#[derive(Debug, Error)]
+pub enum PreReviewGateDispatchError {
+    /// The declared pre-review-gate matrix could not be loaded.
+    #[error("pre-review gate configuration error: {0}")]
+    Config(#[from] PreReviewGateConfigLoadError),
+    /// The existing task-contract liveness gate could not execute.
+    #[error("task-contract pre-review gate error: {0}")]
+    TaskContract(#[from] PreReviewGateError),
+    /// The resolved review scope has no matrix entry.
+    #[error("pre-review gate scope lookup error: {0}")]
+    Lookup(#[from] PreReviewGateLookupError),
+}
+
+/// Application service that resolves scope applicability and dispatches only
+/// the configured pre-review gates.
+pub trait PreReviewGateDispatchService: Send + Sync {
+    /// Dispatch applicable pre-review gates for one already-resolved scope.
+    ///
+    /// # Errors
+    ///
+    /// Returns a typed loading, lookup, or task-contract execution error.
+    fn dispatch(
+        &self,
+        cmd: PreReviewGateDispatchCommand,
+    ) -> Result<PreReviewGateDispatchOutcome, PreReviewGateDispatchError>;
+}
+
+/// Interactor that combines matrix loading with the existing task-contract
+/// liveness gate.
+pub struct PreReviewGateDispatchInteractor {
+    config_loader: Arc<dyn PreReviewGateConfigLoaderPort>,
+    task_contract_gate: Arc<dyn PreReviewGateService>,
+}
+
+impl PreReviewGateDispatchInteractor {
+    /// Constructs a dispatcher from its configuration and liveness-gate ports.
+    #[must_use]
+    pub fn new(
+        config_loader: Arc<dyn PreReviewGateConfigLoaderPort>,
+        task_contract_gate: Arc<dyn PreReviewGateService>,
+    ) -> Self {
+        Self { config_loader, task_contract_gate }
+    }
+}
+
+impl PreReviewGateDispatchService for PreReviewGateDispatchInteractor {
+    fn dispatch(
+        &self,
+        cmd: PreReviewGateDispatchCommand,
+    ) -> Result<PreReviewGateDispatchOutcome, PreReviewGateDispatchError> {
+        let PreReviewGateDispatchCommand { track_id, scope, items_dir } = cmd;
+        let matrix = self.config_loader.load(&items_dir, &track_id)?;
+        let applicable_gates = matrix.gates_for(&scope)?;
+
+        let mut task_contract_outcome = None;
+        for gate in applicable_gates {
+            match gate {
+                PreReviewGateKind::TaskContractLiveness => {
+                    task_contract_outcome =
+                        Some(self.task_contract_gate.check(PreReviewGateCommand {
+                            track_id: track_id.clone(),
+                            layer: None,
+                        })?);
+                }
+            }
+        }
+
+        Ok(task_contract_outcome.map_or(
+            PreReviewGateDispatchOutcome::NotApplicable,
+            PreReviewGateDispatchOutcome::TaskContract,
+        ))
+    }
+}
+
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::expect_used)]
 mod tests {
     use std::collections::HashSet;
-    use std::path::Path;
+    use std::path::{Path, PathBuf};
+    use std::sync::{Arc, Mutex};
 
-    use domain::TrackId;
     use domain::review_v2::{MainScopeName, ScopeName};
+    use domain::task_contract::{ContractedEntryRef, PreReviewGateViolation};
+    use domain::tddd::LayerId;
+    use domain::tddd::semantic_verify::CatalogueEntryKey;
+    use domain::{ConfidenceSignal, FreeText, TrackId};
 
     use super::{
-        PreReviewGateConfigLoaderPort, PreReviewGateKind, PreReviewGateLookupError,
+        PreReviewGateConfigLoadError, PreReviewGateConfigLoaderPort, PreReviewGateDispatchCommand,
+        PreReviewGateDispatchError, PreReviewGateDispatchInteractor, PreReviewGateDispatchOutcome,
+        PreReviewGateDispatchService, PreReviewGateKind, PreReviewGateLookupError,
         PreReviewGateMatrix, PreReviewGateMatrixError,
     };
+    use crate::pre_review_gate::{PreReviewGateCommand, PreReviewGateError, PreReviewGateService};
+
+    type ConfigCalls = Arc<Mutex<Vec<(PathBuf, TrackId)>>>;
+    type TaskContractCalls = Arc<Mutex<Vec<PreReviewGateCommand>>>;
+    type DispatchFixture = (PreReviewGateDispatchInteractor, ConfigCalls, TaskContractCalls);
 
     fn scope(name: &str) -> ScopeName {
         ScopeName::Main(MainScopeName::new(name).unwrap())
@@ -196,6 +310,88 @@ mod tests {
             )
             .map_err(super::PreReviewGateConfigLoadError::InvalidMatrix)
         }
+    }
+
+    struct RecordingConfigLoader {
+        response: Mutex<Option<Result<PreReviewGateMatrix, PreReviewGateConfigLoadError>>>,
+        calls: ConfigCalls,
+    }
+
+    impl PreReviewGateConfigLoaderPort for RecordingConfigLoader {
+        fn load(
+            &self,
+            items_dir: &Path,
+            track_id: &TrackId,
+        ) -> Result<PreReviewGateMatrix, PreReviewGateConfigLoadError> {
+            self.calls.lock().unwrap().push((items_dir.to_path_buf(), track_id.clone()));
+            self.response.lock().unwrap().take().expect("config loader response must be configured")
+        }
+    }
+
+    struct RecordingTaskContractGate {
+        response:
+            Mutex<Option<Result<domain::task_contract::PreReviewGateOutcome, PreReviewGateError>>>,
+        calls: TaskContractCalls,
+    }
+
+    impl PreReviewGateService for RecordingTaskContractGate {
+        fn check(
+            &self,
+            cmd: PreReviewGateCommand,
+        ) -> Result<domain::task_contract::PreReviewGateOutcome, PreReviewGateError> {
+            self.calls.lock().unwrap().push(cmd);
+            self.response
+                .lock()
+                .unwrap()
+                .take()
+                .expect("task-contract gate response must be configured")
+        }
+    }
+
+    fn matrix(entries: Vec<(ScopeName, Vec<PreReviewGateKind>)>) -> PreReviewGateMatrix {
+        let known_scopes = entries.iter().map(|(scope, _)| scope.clone()).collect();
+        PreReviewGateMatrix::try_new(known_scopes, entries).unwrap()
+    }
+
+    fn dispatcher(
+        config_result: Result<PreReviewGateMatrix, PreReviewGateConfigLoadError>,
+        gate_result: Result<domain::task_contract::PreReviewGateOutcome, PreReviewGateError>,
+    ) -> DispatchFixture {
+        let config_calls = Arc::new(Mutex::new(Vec::new()));
+        let gate_calls = Arc::new(Mutex::new(Vec::new()));
+        let config_loader = Arc::new(RecordingConfigLoader {
+            response: Mutex::new(Some(config_result)),
+            calls: Arc::clone(&config_calls),
+        });
+        let task_contract_gate = Arc::new(RecordingTaskContractGate {
+            response: Mutex::new(Some(gate_result)),
+            calls: Arc::clone(&gate_calls),
+        });
+
+        (
+            PreReviewGateDispatchInteractor::new(config_loader, task_contract_gate),
+            config_calls,
+            gate_calls,
+        )
+    }
+
+    fn dispatch_command(scope_name: &str) -> PreReviewGateDispatchCommand {
+        PreReviewGateDispatchCommand {
+            track_id: TrackId::try_new("scope-policy-test").unwrap(),
+            scope: scope(scope_name),
+            items_dir: PathBuf::from("track/items"),
+        }
+    }
+
+    fn non_blue_outcome() -> domain::task_contract::PreReviewGateOutcome {
+        let entry = ContractedEntryRef::new(
+            LayerId::try_new("usecase").unwrap(),
+            CatalogueEntryKey::try_new("PreReviewGateDispatchInteractor".to_owned()).unwrap(),
+        );
+        domain::task_contract::PreReviewGateOutcome::blocked(vec![
+            PreReviewGateViolation::NonBlueSignal { entry, signal: ConfidenceSignal::Yellow },
+        ])
+        .unwrap()
     }
 
     #[test]
@@ -359,5 +555,119 @@ mod tests {
             matrix.gates_for(&scope("implementation")).unwrap_err(),
             PreReviewGateLookupError::UnknownScope(scope("implementation"))
         );
+    }
+
+    #[test]
+    fn test_pre_review_gate_dispatch_empty_scope_gates_returns_not_applicable_without_task_contract_call()
+     {
+        let (interactor, config_calls, gate_calls) = dispatcher(
+            Ok(matrix(vec![(scope("planning"), vec![])])),
+            Ok(domain::task_contract::PreReviewGateOutcome::Passed),
+        );
+
+        let result = interactor.dispatch(dispatch_command("planning")).unwrap();
+
+        assert_eq!(result, PreReviewGateDispatchOutcome::NotApplicable);
+        assert_eq!(
+            config_calls.lock().unwrap().as_slice(),
+            &[(PathBuf::from("track/items"), TrackId::try_new("scope-policy-test").unwrap())]
+        );
+        assert!(gate_calls.lock().unwrap().is_empty());
+    }
+
+    #[test]
+    fn test_pre_review_gate_dispatch_applicable_task_contract_passed_forwards_all_layers_command() {
+        let (interactor, _config_calls, gate_calls) = dispatcher(
+            Ok(matrix(vec![(
+                scope("implementation"),
+                vec![PreReviewGateKind::TaskContractLiveness],
+            )])),
+            Ok(domain::task_contract::PreReviewGateOutcome::Passed),
+        );
+
+        let result = interactor.dispatch(dispatch_command("implementation")).unwrap();
+
+        assert_eq!(
+            result,
+            PreReviewGateDispatchOutcome::TaskContract(
+                domain::task_contract::PreReviewGateOutcome::Passed
+            )
+        );
+        assert_eq!(
+            gate_calls.lock().unwrap().as_slice(),
+            &[PreReviewGateCommand {
+                track_id: TrackId::try_new("scope-policy-test").unwrap(),
+                layer: None,
+            }]
+        );
+    }
+
+    #[test]
+    fn test_pre_review_gate_dispatch_applicable_task_contract_non_blue_blocked_preserves_outcome() {
+        let blocked = non_blue_outcome();
+        let (interactor, _config_calls, _gate_calls) = dispatcher(
+            Ok(matrix(vec![(
+                scope("implementation"),
+                vec![PreReviewGateKind::TaskContractLiveness],
+            )])),
+            Ok(blocked.clone()),
+        );
+
+        let result = interactor.dispatch(dispatch_command("implementation")).unwrap();
+
+        assert_eq!(result, PreReviewGateDispatchOutcome::TaskContract(blocked));
+    }
+
+    #[test]
+    fn test_pre_review_gate_dispatch_config_load_failure_returns_config_error_without_task_contract_call()
+     {
+        let (interactor, _config_calls, gate_calls) = dispatcher(
+            Err(PreReviewGateConfigLoadError::ReadFailed {
+                message: FreeText::new("configuration unavailable"),
+            }),
+            Ok(domain::task_contract::PreReviewGateOutcome::Passed),
+        );
+
+        let error = interactor.dispatch(dispatch_command("implementation")).unwrap_err();
+
+        assert!(matches!(error, PreReviewGateDispatchError::Config(_)));
+        assert!(gate_calls.lock().unwrap().is_empty());
+    }
+
+    #[test]
+    fn test_pre_review_gate_dispatch_matrix_lookup_failure_returns_lookup_error_without_task_contract_call()
+     {
+        let (interactor, _config_calls, gate_calls) = dispatcher(
+            Ok(matrix(vec![(scope("planning"), vec![])])),
+            Ok(domain::task_contract::PreReviewGateOutcome::Passed),
+        );
+
+        let error = interactor.dispatch(dispatch_command("implementation")).unwrap_err();
+
+        assert!(matches!(
+            error,
+            PreReviewGateDispatchError::Lookup(PreReviewGateLookupError::UnknownScope(
+                unknown_scope
+            )) if unknown_scope == scope("implementation")
+        ));
+        assert!(gate_calls.lock().unwrap().is_empty());
+    }
+
+    #[test]
+    fn test_pre_review_gate_dispatch_task_contract_failure_returns_task_contract_error() {
+        let (interactor, _config_calls, gate_calls) = dispatcher(
+            Ok(matrix(vec![(
+                scope("implementation"),
+                vec![PreReviewGateKind::TaskContractLiveness],
+            )])),
+            Err(PreReviewGateError::TaskContractReadFailed {
+                message: FreeText::new("task contract unavailable"),
+            }),
+        );
+
+        let error = interactor.dispatch(dispatch_command("implementation")).unwrap_err();
+
+        assert!(matches!(error, PreReviewGateDispatchError::TaskContract(_)));
+        assert_eq!(gate_calls.lock().unwrap().len(), 1);
     }
 }

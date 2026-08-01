@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "be395d1a4375b30449b235b82d3c1ba1adb7b6fd50cf1313687d771aed4ed62e",
+  "catalogue_declaration_hash": "c3348b0ca6063b6cfe2c0ae4d49a97c08b9b5db106de137bdade74660ffa939f",
   "signals": [
     {
       "type_name": "PreReviewGateConfigLoadError",

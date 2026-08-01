@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-31T21:17:57Z",
-  "declaration_hash": "be395d1a4375b30449b235b82d3c1ba1adb7b6fd50cf1313687d771aed4ed62e",
-  "implementation_input_hash": "48ae71478e48fce2afa8a85cb87f4efd02734300e3a35cafe4aee4a50c200159",
+  "generated_at": "2026-08-01T00:46:03Z",
+  "declaration_hash": "c3348b0ca6063b6cfe2c0ae4d49a97c08b9b5db106de137bdade74660ffa939f",
+  "implementation_input_hash": "1a2b5daec22bd309b3da648d39bea64a477db5e0eeeabedff9cf2cc3a6ba1a24",
   "signals": [
     {
       "type_name": "PreReviewGateConfigLoadError",
@@ -24,9 +24,9 @@
     {
       "type_name": "PreReviewGateDispatchCommand",
       "kind_tag": "command",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug"
       ]
@@ -34,9 +34,9 @@
     {
       "type_name": "PreReviewGateDispatchError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Debug",
         "Display",
         "Error",
@@ -48,20 +48,18 @@
     {
       "type_name": "PreReviewGateDispatchInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
-        "PreReviewGateDispatchService",
-        "Send",
-        "Sync"
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "PreReviewGateDispatchService"
       ]
     },
     {
       "type_name": "PreReviewGateDispatchOutcome",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -71,8 +69,8 @@
     {
       "type_name": "PreReviewGateDispatchService",
       "kind_tag": "application_service",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "PreReviewGateKind",

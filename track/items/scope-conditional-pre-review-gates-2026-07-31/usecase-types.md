@@ -4,7 +4,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| PreReviewGateDispatchOutcome | enum | add | NotApplicable, TaskContract | 🟡 | 🔵 |
+| PreReviewGateDispatchOutcome | enum | add | NotApplicable, TaskContract | 🔵 | 🔵 |
 | PreReviewGateKind | enum | add | TaskContractLiveness | 🔵 | 🔵 |
 
 ## Value Objects
@@ -18,7 +18,7 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | PreReviewGateConfigLoadError | error_type | add | ReadFailed, InvalidMatrix | 🔵 | 🔵 |
-| PreReviewGateDispatchError | error_type | add | Config, TaskContract, Lookup | 🟡 | 🔵 |
+| PreReviewGateDispatchError | error_type | add | Config, TaskContract, Lookup | 🔵 | 🔵 |
 | PreReviewGateLookupError | error_type | add | UnknownScope | 🔵 | 🔵 |
 | PreReviewGateMatrixError | error_type | add | MissingScope, UnknownScope, DuplicateScope, DuplicateGate | 🔵 | 🔵 |
 
@@ -32,17 +32,17 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| PreReviewGateDispatchService | application_service | add | fn dispatch(&self, cmd: PreReviewGateDispatchCommand) -> Result<PreReviewGateDispatchOutcome, PreReviewGateDispatchError> | 🟡 | 🔵 |
+| PreReviewGateDispatchService | application_service | add | fn dispatch(&self, cmd: PreReviewGateDispatchCommand) -> Result<PreReviewGateDispatchOutcome, PreReviewGateDispatchError> | 🔵 | 🔵 |
 
 ## Interactors
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| PreReviewGateDispatchInteractor | interactor | add | — | 🟡 | 🔵 |
+| PreReviewGateDispatchInteractor | interactor | add | — | 🔵 | 🔵 |
 
 ## Commands
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| PreReviewGateDispatchCommand | command | add | — | 🟡 | 🔵 |
+| PreReviewGateDispatchCommand | command | add | — | 🔵 | 🔵 |
 

@@ -6,7 +6,7 @@
 GO-01 → T001、T002、T003。
 GO-02 → T004、T005、T006。
 
-## Tasks (3/6 resolved)
+## Tasks (4/6 resolved)
 
 ### S1 — 適用ポリシーと設定境界
 
@@ -14,13 +14,13 @@ GO-02 → T004、T005、T006。
 
 - [x] **T001**: `libs/usecase/src/pre_review_gate_dispatch.rs` に `PreReviewGateKind`、`PreReviewGateMatrix`、matrix / lookup / load error、`PreReviewGateConfigLoaderPort` を追加し、`libs/usecase/src/lib.rs` から公開する。matrix validation と lookup の unit tests を追加する。IN-01、CN-01、AC-01。 (`94600fc2fb39340e10fbffad046570612bd458cb`)
 - [x] **T002**: `libs/infrastructure/src/pre_review_gate_config.rs` に `FsPreReviewGateConfigLoader` を実装し、infrastructure module に登録する。loader port の conformance / decode tests を追加する。IN-01、CN-01、AC-01。 (`35a4fd6ff771e6aaf5f179d7d24a1866e192a511`)
-- [x] **T003**: `.harness/config/pre-review-gates.json` に scope × gate declaration を追加し、`libs/infrastructure/src/pre_review_gate_config.rs` に declaration fixture validation を追加する。IN-01、OS-03、CN-01、AC-01。
+- [x] **T003**: `.harness/config/pre-review-gates.json` に scope × gate declaration を追加し、`libs/infrastructure/src/pre_review_gate_config.rs` に declaration fixture validation を追加する。IN-01、OS-03、CN-01、AC-01。 (`bc598f770db5f6d9bf2630c8312a5727ee1612bc`)
 
 ### S2 — dispatch と composition 接続
 
 > `libs/usecase/src/pre_review_gate_dispatch.rs` の T004 を完了してから、`apps/cli-composition/src/review_v2/mod.rs` の T005 を更新する。IN-02、IN-03、IN-04、CN-02、CN-03、AC-02、AC-03、AC-04。
 
-- [ ] **T004**: `libs/usecase/src/pre_review_gate_dispatch.rs` に `PreReviewGateDispatchService`、`PreReviewGateDispatchCommand`、`PreReviewGateDispatchError`、`PreReviewGateDispatchInteractor`、`PreReviewGateDispatchOutcome` を実装する。scope lookup、`NotApplicable`、`TaskContractLiveness` の全 path と result / error tests を追加する。IN-02、IN-03、IN-04、OS-01、OS-02、CN-02、CN-03、AC-02、AC-03、AC-04。
+- [x] **T004**: `libs/usecase/src/pre_review_gate_dispatch.rs` に `PreReviewGateDispatchService`、`PreReviewGateDispatchCommand`、`PreReviewGateDispatchError`、`PreReviewGateDispatchInteractor`、`PreReviewGateDispatchOutcome` を実装する。scope lookup、`NotApplicable`、`TaskContractLiveness` の全 path と result / error tests を追加する。IN-02、IN-03、IN-04、OS-01、OS-02、CN-02、CN-03、AC-02、AC-03、AC-04。
 - [ ] **T005**: `apps/cli-composition/src/review_v2/mod.rs` の `ReviewCompositionRoot::review_run_local` に T002 の loader と T004 の dispatcher を配線し、local-review integration tests を追加する。IN-02、IN-03、IN-04、OS-01、OS-02、CN-02、CN-03、AC-02、AC-03、AC-04。
 
 ### S3 — Makefile wrapper

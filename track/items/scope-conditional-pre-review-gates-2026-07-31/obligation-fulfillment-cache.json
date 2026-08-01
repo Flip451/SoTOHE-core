@@ -981,6 +981,1137 @@
           "test_name": "test_pre_review_gate_matrix_missing_types_scope_rejects_incomplete_declaration"
         }
       ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewGateDispatchInteractor",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "GO-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewGateDispatchInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "6457d243ba9be8d916842285c4e17abfa7480ce14c7cab3a6dcd25e5ee5cdb81",
+        "declaration_hash": "1707a68e4ea804bf943e3604774cd858ed60ed8aeee2dd0c759067cedaeb3dfd",
+        "anchor_text_hash": "6a302dcda042eff421b16ebeac59563a1a7b86e0d9bcbbcf4a3c2880e056c59c"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let result = interactor.dispatch(dispatch_command(\"implementation\")).unwrap();\n\n        assert_eq!(\n            result,\n            PreReviewGateDispatchOutcome::TaskContract(\n                domain::task_contract::PreReviewGateOutcome::Passed\n            )\n        );\n        assert_eq!(\n            gate_calls.lock().unwrap().as_slice(),\n            &[PreReviewGateCommand {\n                track_id: TrackId::try_new(\"scope-policy-test\").unwrap(),\n                layer: None,\n            }]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_empty_scope_gates_returns_not_applicable_without_task_contract_call"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_passed_forwards_all_layers_command"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_non_blue_blocked_preserves_outcome"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewGateDispatchInteractor",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewGateDispatchInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "6457d243ba9be8d916842285c4e17abfa7480ce14c7cab3a6dcd25e5ee5cdb81",
+        "declaration_hash": "1707a68e4ea804bf943e3604774cd858ed60ed8aeee2dd0c759067cedaeb3dfd",
+        "anchor_text_hash": "397ee6d550574aa944a2403615def3c203010e0eefb47ea88aeb3b945efdc318"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(result, PreReviewGateDispatchOutcome::NotApplicable);\n        assert_eq!(\n            config_calls.lock().unwrap().as_slice(),\n            &[(PathBuf::from(\"track/items\"), TrackId::try_new(\"scope-policy-test\").unwrap())]\n        );\n        assert!(gate_calls.lock().unwrap().is_empty());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_empty_scope_gates_returns_not_applicable_without_task_contract_call"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_passed_forwards_all_layers_command"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_non_blue_blocked_preserves_outcome"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewGateDispatchInteractor",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewGateDispatchInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "6457d243ba9be8d916842285c4e17abfa7480ce14c7cab3a6dcd25e5ee5cdb81",
+        "declaration_hash": "1707a68e4ea804bf943e3604774cd858ed60ed8aeee2dd0c759067cedaeb3dfd",
+        "anchor_text_hash": "e8df3289c04de0f9084a0143b1be4574aababf21f5341e05563d9670194cb295"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(gate_calls.lock().unwrap().as_slice(), &[PreReviewGateCommand { track_id: TrackId::try_new(\"scope-policy-test\").unwrap(), layer: None, }]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_empty_scope_gates_returns_not_applicable_without_task_contract_call"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_passed_forwards_all_layers_command"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_non_blue_blocked_preserves_outcome"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewGateDispatchInteractor",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewGateDispatchInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "6457d243ba9be8d916842285c4e17abfa7480ce14c7cab3a6dcd25e5ee5cdb81",
+        "declaration_hash": "1707a68e4ea804bf943e3604774cd858ed60ed8aeee2dd0c759067cedaeb3dfd",
+        "anchor_text_hash": "de2e1a3ec81ba0198d48636cf46f897a1959ce13e02b3695cad078a410a28e82"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "`assert_eq!(result, PreReviewGateDispatchOutcome::NotApplicable);` ... `assert!(gate_calls.lock().unwrap().is_empty());` ... `assert_eq!(result, PreReviewGateDispatchOutcome::TaskContract( domain::task_contract::PreReviewGateOutcome::Passed ));` ... `assert_eq!( gate_calls.lock().unwrap().as_slice(), &[PreReviewGateCommand { track_id: TrackId::try_new(\"scope-policy-test\").unwrap(), layer: None }] );`"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_empty_scope_gates_returns_not_applicable_without_task_contract_call"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_passed_forwards_all_layers_command"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_non_blue_blocked_preserves_outcome"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewGateDispatchInteractor",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewGateDispatchInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "6457d243ba9be8d916842285c4e17abfa7480ce14c7cab3a6dcd25e5ee5cdb81",
+        "declaration_hash": "1707a68e4ea804bf943e3604774cd858ed60ed8aeee2dd0c759067cedaeb3dfd",
+        "anchor_text_hash": "70a6859e873105361af9401c68ff735eb2746c998e05d6fc0131fbb595a21ac2"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(result, PreReviewGateDispatchOutcome::NotApplicable); ... assert_eq!(result, PreReviewGateDispatchOutcome::TaskContract(domain::task_contract::PreReviewGateOutcome::Passed))"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_empty_scope_gates_returns_not_applicable_without_task_contract_call"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_passed_forwards_all_layers_command"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_non_blue_blocked_preserves_outcome"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewGateDispatchInteractor",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewGateDispatchInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "6457d243ba9be8d916842285c4e17abfa7480ce14c7cab3a6dcd25e5ee5cdb81",
+        "declaration_hash": "1707a68e4ea804bf943e3604774cd858ed60ed8aeee2dd0c759067cedaeb3dfd",
+        "anchor_text_hash": "f962577b78f33ebc9ae7a9eff93c4ed6d1d2f5d0874a3b6cb705eb6c03e9d922"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let result = interactor.dispatch(dispatch_command(\"planning\")).unwrap();\n\n        assert_eq!(result, PreReviewGateDispatchOutcome::NotApplicable);\n        assert!(gate_calls.lock().unwrap().is_empty());\n\nlet result = interactor.dispatch(dispatch_command(\"implementation\")).unwrap();\n\n        assert_eq!(\n            result,\n            PreReviewGateDispatchOutcome::TaskContract(\n                domain::task_contract::PreReviewGateOutcome::Passed\n            )\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_empty_scope_gates_returns_not_applicable_without_task_contract_call"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_passed_forwards_all_layers_command"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_non_blue_blocked_preserves_outcome"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewGateDispatchInteractor",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewGateDispatchInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "6457d243ba9be8d916842285c4e17abfa7480ce14c7cab3a6dcd25e5ee5cdb81",
+        "declaration_hash": "1707a68e4ea804bf943e3604774cd858ed60ed8aeee2dd0c759067cedaeb3dfd",
+        "anchor_text_hash": "59431c2eda7c11f10d0e3a509188cae2cb0da6e762742b3f562daf9dcae0d765"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(result, PreReviewGateDispatchOutcome::NotApplicable);\nassert!(gate_calls.lock().unwrap().is_empty());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_empty_scope_gates_returns_not_applicable_without_task_contract_call"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_passed_forwards_all_layers_command"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_non_blue_blocked_preserves_outcome"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewGateDispatchInteractor",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewGateDispatchInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "6457d243ba9be8d916842285c4e17abfa7480ce14c7cab3a6dcd25e5ee5cdb81",
+        "declaration_hash": "1707a68e4ea804bf943e3604774cd858ed60ed8aeee2dd0c759067cedaeb3dfd",
+        "anchor_text_hash": "7d1e7adeab70b35b1695eeb589524281614aac71378a20396afe722459d6e660"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            result,\n            PreReviewGateDispatchOutcome::TaskContract(\n                domain::task_contract::PreReviewGateOutcome::Passed\n            )\n        );\n        assert_eq!(\n            gate_calls.lock().unwrap().as_slice(),\n            &[PreReviewGateCommand {\n                track_id: TrackId::try_new(\"scope-policy-test\").unwrap(),\n                layer: None,\n            }]\n        );\n\n        let result = interactor.dispatch(dispatch_command(\"implementation\")).unwrap();\n\n        assert_eq!(result, PreReviewGateDispatchOutcome::TaskContract(blocked));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_empty_scope_gates_returns_not_applicable_without_task_contract_call"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_passed_forwards_all_layers_command"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_non_blue_blocked_preserves_outcome"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewGateDispatchInteractor",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewGateDispatchInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "6457d243ba9be8d916842285c4e17abfa7480ce14c7cab3a6dcd25e5ee5cdb81",
+        "declaration_hash": "1707a68e4ea804bf943e3604774cd858ed60ed8aeee2dd0c759067cedaeb3dfd",
+        "anchor_text_hash": "08f3ac81524ea5cd2aa6d19f2264026803386f963aba31f5a619918fb64dfb93"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let result = interactor.dispatch(dispatch_command(\"implementation\")).unwrap();\n\n        assert_eq!(\n            result,\n            PreReviewGateDispatchOutcome::TaskContract(\n                domain::task_contract::PreReviewGateOutcome::Passed\n            )\n        );\n        assert_eq!(\n            gate_calls.lock().unwrap().as_slice(),\n            &[PreReviewGateCommand {\n                track_id: TrackId::try_new(\"scope-policy-test\").unwrap(),\n                layer: None,\n            }]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_empty_scope_gates_returns_not_applicable_without_task_contract_call"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_passed_forwards_all_layers_command"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_non_blue_blocked_preserves_outcome"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewGateDispatchService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "GO-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewGateDispatchService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:dispatch"
+      },
+      "key": {
+        "bound_tests_set_hash": "6457d243ba9be8d916842285c4e17abfa7480ce14c7cab3a6dcd25e5ee5cdb81",
+        "declaration_hash": "bca81852fc49617b3ce207f796736eb9896849dde9fb2d340b9b8da73642daff",
+        "anchor_text_hash": "6a302dcda042eff421b16ebeac59563a1a7b86e0d9bcbbcf4a3c2880e056c59c"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let result = interactor.dispatch(dispatch_command(\"planning\")).unwrap();\n\nassert_eq!(result, PreReviewGateDispatchOutcome::NotApplicable);\nassert!(gate_calls.lock().unwrap().is_empty());\n\nlet result = interactor.dispatch(dispatch_command(\"implementation\")).unwrap();\n\nassert_eq!(\n    result,\n    PreReviewGateDispatchOutcome::TaskContract(\n        domain::task_contract::PreReviewGateOutcome::Passed\n    )\n);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_empty_scope_gates_returns_not_applicable_without_task_contract_call"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_passed_forwards_all_layers_command"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_non_blue_blocked_preserves_outcome"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewGateDispatchService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewGateDispatchService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:dispatch"
+      },
+      "key": {
+        "bound_tests_set_hash": "6457d243ba9be8d916842285c4e17abfa7480ce14c7cab3a6dcd25e5ee5cdb81",
+        "declaration_hash": "bca81852fc49617b3ce207f796736eb9896849dde9fb2d340b9b8da73642daff",
+        "anchor_text_hash": "397ee6d550574aa944a2403615def3c203010e0eefb47ea88aeb3b945efdc318"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(result, PreReviewGateDispatchOutcome::NotApplicable);\n        assert_eq!(\n            config_calls.lock().unwrap().as_slice(),\n            &[(PathBuf::from(\"track/items\"), TrackId::try_new(\"scope-policy-test\").unwrap())]\n        );\n        assert!(gate_calls.lock().unwrap().is_empty());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_empty_scope_gates_returns_not_applicable_without_task_contract_call"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_passed_forwards_all_layers_command"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_non_blue_blocked_preserves_outcome"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewGateDispatchService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewGateDispatchService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:dispatch"
+      },
+      "key": {
+        "bound_tests_set_hash": "6457d243ba9be8d916842285c4e17abfa7480ce14c7cab3a6dcd25e5ee5cdb81",
+        "declaration_hash": "bca81852fc49617b3ce207f796736eb9896849dde9fb2d340b9b8da73642daff",
+        "anchor_text_hash": "e8df3289c04de0f9084a0143b1be4574aababf21f5341e05563d9670194cb295"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let result = interactor.dispatch(dispatch_command(\"implementation\")).unwrap();\n\n        assert_eq!(\n            result,\n            PreReviewGateDispatchOutcome::TaskContract(\n                domain::task_contract::PreReviewGateOutcome::Passed\n            )\n        );\n        assert_eq!(\n            gate_calls.lock().unwrap().as_slice(),\n            &[PreReviewGateCommand {\n                track_id: TrackId::try_new(\"scope-policy-test\").unwrap(),\n                layer: None,\n            }]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_empty_scope_gates_returns_not_applicable_without_task_contract_call"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_passed_forwards_all_layers_command"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_non_blue_blocked_preserves_outcome"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewGateDispatchService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewGateDispatchService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:dispatch"
+      },
+      "key": {
+        "bound_tests_set_hash": "6457d243ba9be8d916842285c4e17abfa7480ce14c7cab3a6dcd25e5ee5cdb81",
+        "declaration_hash": "bca81852fc49617b3ce207f796736eb9896849dde9fb2d340b9b8da73642daff",
+        "anchor_text_hash": "de2e1a3ec81ba0198d48636cf46f897a1959ce13e02b3695cad078a410a28e82"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "`assert_eq!(result, PreReviewGateDispatchOutcome::NotApplicable); ... assert!(gate_calls.lock().unwrap().is_empty());` and `assert_eq!(gate_calls.lock().unwrap().as_slice(), &[PreReviewGateCommand { ... }]);`"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_empty_scope_gates_returns_not_applicable_without_task_contract_call"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_passed_forwards_all_layers_command"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_non_blue_blocked_preserves_outcome"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewGateDispatchService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewGateDispatchService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:dispatch"
+      },
+      "key": {
+        "bound_tests_set_hash": "6457d243ba9be8d916842285c4e17abfa7480ce14c7cab3a6dcd25e5ee5cdb81",
+        "declaration_hash": "bca81852fc49617b3ce207f796736eb9896849dde9fb2d340b9b8da73642daff",
+        "anchor_text_hash": "f962577b78f33ebc9ae7a9eff93c4ed6d1d2f5d0874a3b6cb705eb6c03e9d922"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(result, PreReviewGateDispatchOutcome::NotApplicable); ... assert_eq!(result, PreReviewGateDispatchOutcome::TaskContract("
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_empty_scope_gates_returns_not_applicable_without_task_contract_call"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_passed_forwards_all_layers_command"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_non_blue_blocked_preserves_outcome"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewGateDispatchService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewGateDispatchService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:dispatch"
+      },
+      "key": {
+        "bound_tests_set_hash": "6457d243ba9be8d916842285c4e17abfa7480ce14c7cab3a6dcd25e5ee5cdb81",
+        "declaration_hash": "bca81852fc49617b3ce207f796736eb9896849dde9fb2d340b9b8da73642daff",
+        "anchor_text_hash": "59431c2eda7c11f10d0e3a509188cae2cb0da6e762742b3f562daf9dcae0d765"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(result, PreReviewGateDispatchOutcome::NotApplicable);\nassert!(gate_calls.lock().unwrap().is_empty());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_empty_scope_gates_returns_not_applicable_without_task_contract_call"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_passed_forwards_all_layers_command"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_non_blue_blocked_preserves_outcome"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewGateDispatchService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewGateDispatchService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:dispatch"
+      },
+      "key": {
+        "bound_tests_set_hash": "6457d243ba9be8d916842285c4e17abfa7480ce14c7cab3a6dcd25e5ee5cdb81",
+        "declaration_hash": "bca81852fc49617b3ce207f796736eb9896849dde9fb2d340b9b8da73642daff",
+        "anchor_text_hash": "7d1e7adeab70b35b1695eeb589524281614aac71378a20396afe722459d6e660"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"assert_eq!(\\n            result,\\n            PreReviewGateDispatchOutcome::TaskContract(\\n                domain::task_contract::PreReviewGateOutcome::Passed\\n            )\\n        );\\n        assert_eq!(\\n            gate_calls.lock().unwrap().as_slice(),\\n            &[PreReviewGateCommand {\\n                track_id: TrackId::try_new(\\\"scope-policy-test\\\").unwrap(),\\n                layer: None,\\n            }]\\n        );\" and \"assert_eq!(result, PreReviewGateDispatchOutcome::TaskContract(blocked));\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_empty_scope_gates_returns_not_applicable_without_task_contract_call"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_passed_forwards_all_layers_command"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_non_blue_blocked_preserves_outcome"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewGateDispatchService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewGateDispatchService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:dispatch"
+      },
+      "key": {
+        "bound_tests_set_hash": "6457d243ba9be8d916842285c4e17abfa7480ce14c7cab3a6dcd25e5ee5cdb81",
+        "declaration_hash": "bca81852fc49617b3ce207f796736eb9896849dde9fb2d340b9b8da73642daff",
+        "anchor_text_hash": "08f3ac81524ea5cd2aa6d19f2264026803386f963aba31f5a619918fb64dfb93"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let result = interactor.dispatch(dispatch_command(\"implementation\")).unwrap();\n\n        assert_eq!(\n            result,\n            PreReviewGateDispatchOutcome::TaskContract(\n                domain::task_contract::PreReviewGateOutcome::Passed\n            )\n        );\n        assert_eq!(\n            gate_calls.lock().unwrap().as_slice(),\n            &[PreReviewGateCommand {\n                track_id: TrackId::try_new(\"scope-policy-test\").unwrap(),\n                layer: None,\n            }]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_empty_scope_gates_returns_not_applicable_without_task_contract_call"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_passed_forwards_all_layers_command"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_non_blue_blocked_preserves_outcome"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewGateDispatchCommand",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "GO-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewGateDispatchCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:GO-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "c15321b54e2b3e2ae2c3728aefcb43d4553c276c3b6631896f8b67c85ac5bca7",
+        "declaration_hash": "a99e2d0633fa90b15977b244833aa76a2df6a86e6701070597588b9486c1ee73",
+        "anchor_text_hash": "6a302dcda042eff421b16ebeac59563a1a7b86e0d9bcbbcf4a3c2880e056c59c"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let result = interactor.dispatch(dispatch_command(\"implementation\")).unwrap();\n\n        assert_eq!(\n            result,\n            PreReviewGateDispatchOutcome::TaskContract(\n                domain::task_contract::PreReviewGateOutcome::Passed\n            )\n        );\n        assert_eq!(\n            gate_calls.lock().unwrap().as_slice(),\n            &[PreReviewGateCommand {\n                track_id: TrackId::try_new(\"scope-policy-test\").unwrap(),\n                layer: None,\n            }]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_passed_forwards_all_layers_command"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewGateDispatchCommand",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewGateDispatchCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "c15321b54e2b3e2ae2c3728aefcb43d4553c276c3b6631896f8b67c85ac5bca7",
+        "declaration_hash": "a99e2d0633fa90b15977b244833aa76a2df6a86e6701070597588b9486c1ee73",
+        "anchor_text_hash": "de2e1a3ec81ba0198d48636cf46f897a1959ce13e02b3695cad078a410a28e82"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let result = interactor.dispatch(dispatch_command(\"implementation\")).unwrap();\n\nassert_eq!(\n    result,\n    PreReviewGateDispatchOutcome::TaskContract(\n        domain::task_contract::PreReviewGateOutcome::Passed\n    )\n);\nassert_eq!(\n    gate_calls.lock().unwrap().as_slice(),\n    &[PreReviewGateCommand {\n        track_id: TrackId::try_new(\"scope-policy-test\").unwrap(),\n        layer: None,\n    }]\n);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_passed_forwards_all_layers_command"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewGateDispatchCommand",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewGateDispatchCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "c15321b54e2b3e2ae2c3728aefcb43d4553c276c3b6631896f8b67c85ac5bca7",
+        "declaration_hash": "a99e2d0633fa90b15977b244833aa76a2df6a86e6701070597588b9486c1ee73",
+        "anchor_text_hash": "08f3ac81524ea5cd2aa6d19f2264026803386f963aba31f5a619918fb64dfb93"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let result = interactor.dispatch(dispatch_command(\"implementation\")).unwrap();\n\n        assert_eq!(\n            result,\n            PreReviewGateDispatchOutcome::TaskContract(\n                domain::task_contract::PreReviewGateOutcome::Passed\n            )\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_passed_forwards_all_layers_command"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewGateDispatchError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "GO-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewGateDispatchError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:GO-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "d9db7e241a3640a0453c8cd4a1891fa5b1c8b88ef742c85541211e22c5190320",
+        "declaration_hash": "66830f0f41c1e4b2b68a52ac3e851fad24dce21182efa7fab72e16f981fa65f7",
+        "anchor_text_hash": "6a302dcda042eff421b16ebeac59563a1a7b86e0d9bcbbcf4a3c2880e056c59c"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(error, PreReviewGateDispatchError::Config(_)));\n        assert!(gate_calls.lock().unwrap().is_empty());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_config_load_failure_returns_config_error_without_task_contract_call"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewGateDispatchError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewGateDispatchError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "7a28e2ec2852ebdf6c139b3ddb8b33741956b5c1b23fa0214e7d2c015b2e9eb2",
+        "declaration_hash": "66830f0f41c1e4b2b68a52ac3e851fad24dce21182efa7fab72e16f981fa65f7",
+        "anchor_text_hash": "e8df3289c04de0f9084a0143b1be4574aababf21f5341e05563d9670194cb295"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let error = interactor.dispatch(dispatch_command(\"implementation\")).unwrap_err();\n\n        assert!(matches!(error, PreReviewGateDispatchError::TaskContract(_)));\n        assert_eq!(gate_calls.lock().unwrap().len(), 1);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_task_contract_failure_returns_task_contract_error"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewGateDispatchError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewGateDispatchError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "d94f426070b89ecd7781b09803e9a8f593a8cfc6bb79180ba175b49b48540acb",
+        "declaration_hash": "66830f0f41c1e4b2b68a52ac3e851fad24dce21182efa7fab72e16f981fa65f7",
+        "anchor_text_hash": "de2e1a3ec81ba0198d48636cf46f897a1959ce13e02b3695cad078a410a28e82"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "        let error = interactor.dispatch(dispatch_command(\"implementation\")).unwrap_err();\n\n        assert!(matches!(\n            error,\n            PreReviewGateDispatchError::Lookup(PreReviewGateLookupError::UnknownScope(\n                unknown_scope\n            )) if unknown_scope == scope(\"implementation\")\n        ));\n        assert!(gate_calls.lock().unwrap().is_empty());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_matrix_lookup_failure_returns_lookup_error_without_task_contract_call"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewGateDispatchError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewGateDispatchError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "7a28e2ec2852ebdf6c139b3ddb8b33741956b5c1b23fa0214e7d2c015b2e9eb2",
+        "declaration_hash": "66830f0f41c1e4b2b68a52ac3e851fad24dce21182efa7fab72e16f981fa65f7",
+        "anchor_text_hash": "7d1e7adeab70b35b1695eeb589524281614aac71378a20396afe722459d6e660"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(error, PreReviewGateDispatchError::TaskContract(_)));\n        assert_eq!(gate_calls.lock().unwrap().len(), 1);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_task_contract_failure_returns_task_contract_error"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewGateDispatchError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewGateDispatchError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "d94f426070b89ecd7781b09803e9a8f593a8cfc6bb79180ba175b49b48540acb",
+        "declaration_hash": "66830f0f41c1e4b2b68a52ac3e851fad24dce21182efa7fab72e16f981fa65f7",
+        "anchor_text_hash": "08f3ac81524ea5cd2aa6d19f2264026803386f963aba31f5a619918fb64dfb93"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            error,\n            PreReviewGateDispatchError::Lookup(PreReviewGateLookupError::UnknownScope(\n                unknown_scope\n            )) if unknown_scope == scope(\"implementation\")\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_matrix_lookup_failure_returns_lookup_error_without_task_contract_call"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewGateDispatchOutcome",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "GO-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewGateDispatchOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:GO-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "c15321b54e2b3e2ae2c3728aefcb43d4553c276c3b6631896f8b67c85ac5bca7",
+        "declaration_hash": "73411acdad81aec126bae6423e7195586e980eda03c9a7d4881fd736443b1ff7",
+        "anchor_text_hash": "6a302dcda042eff421b16ebeac59563a1a7b86e0d9bcbbcf4a3c2880e056c59c"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            result,\n            PreReviewGateDispatchOutcome::TaskContract(\n                domain::task_contract::PreReviewGateOutcome::Passed\n            )\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_passed_forwards_all_layers_command"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewGateDispatchOutcome",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewGateDispatchOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "1d071e6f4cb414a0c17af431d105738b302226d992f95d1f2fd74923c741b2c5",
+        "declaration_hash": "73411acdad81aec126bae6423e7195586e980eda03c9a7d4881fd736443b1ff7",
+        "anchor_text_hash": "397ee6d550574aa944a2403615def3c203010e0eefb47ea88aeb3b945efdc318"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(result, PreReviewGateDispatchOutcome::NotApplicable);\n        assert!(gate_calls.lock().unwrap().is_empty());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_empty_scope_gates_returns_not_applicable_without_task_contract_call"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewGateDispatchOutcome",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewGateDispatchOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "f097820148eb86127ba4d9ddf2584065b3aa3d0addfa3e8e7d4291ccb61d35de",
+        "declaration_hash": "73411acdad81aec126bae6423e7195586e980eda03c9a7d4881fd736443b1ff7",
+        "anchor_text_hash": "e8df3289c04de0f9084a0143b1be4574aababf21f5341e05563d9670194cb295"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(result, PreReviewGateDispatchOutcome::TaskContract(blocked));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_non_blue_blocked_preserves_outcome"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewGateDispatchOutcome",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewGateDispatchOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "1d071e6f4cb414a0c17af431d105738b302226d992f95d1f2fd74923c741b2c5",
+        "declaration_hash": "73411acdad81aec126bae6423e7195586e980eda03c9a7d4881fd736443b1ff7",
+        "anchor_text_hash": "59431c2eda7c11f10d0e3a509188cae2cb0da6e762742b3f562daf9dcae0d765"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(result, PreReviewGateDispatchOutcome::NotApplicable);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_empty_scope_gates_returns_not_applicable_without_task_contract_call"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewGateDispatchOutcome",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewGateDispatchOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "f097820148eb86127ba4d9ddf2584065b3aa3d0addfa3e8e7d4291ccb61d35de",
+        "declaration_hash": "73411acdad81aec126bae6423e7195586e980eda03c9a7d4881fd736443b1ff7",
+        "anchor_text_hash": "7d1e7adeab70b35b1695eeb589524281614aac71378a20396afe722459d6e660"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let result = interactor.dispatch(dispatch_command(\"implementation\")).unwrap();\n\n        assert_eq!(result, PreReviewGateDispatchOutcome::TaskContract(blocked));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_non_blue_blocked_preserves_outcome"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewGateDispatchOutcome",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewGateDispatchOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "c15321b54e2b3e2ae2c3728aefcb43d4553c276c3b6631896f8b67c85ac5bca7",
+        "declaration_hash": "73411acdad81aec126bae6423e7195586e980eda03c9a7d4881fd736443b1ff7",
+        "anchor_text_hash": "08f3ac81524ea5cd2aa6d19f2264026803386f963aba31f5a619918fb64dfb93"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let result = interactor.dispatch(dispatch_command(\"implementation\")).unwrap();\n\n        assert_eq!(\n            result,\n            PreReviewGateDispatchOutcome::TaskContract(\n                domain::task_contract::PreReviewGateOutcome::Passed\n            )\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_gate_dispatch::tests",
+          "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_passed_forwards_all_layers_command"
+        }
+      ]
     }
   ]
 }

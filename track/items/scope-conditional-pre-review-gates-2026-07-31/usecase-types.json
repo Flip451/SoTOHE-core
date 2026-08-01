@@ -191,14 +191,6 @@
       "trait_ref": "PreReviewGateDispatchService"
     },
     {
-      "for_type": "PreReviewGateDispatchInteractor",
-      "trait_ref": "core::marker::Send"
-    },
-    {
-      "for_type": "PreReviewGateDispatchInteractor",
-      "trait_ref": "core::marker::Sync"
-    },
-    {
       "for_type": "PreReviewGateLookupError",
       "trait_ref": "core::fmt::Debug"
     },

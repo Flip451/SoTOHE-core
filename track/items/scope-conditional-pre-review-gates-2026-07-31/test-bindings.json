@@ -170,6 +170,112 @@
       "kind": "voluntary_binding",
       "edge_id": {"entry_key": "PreReviewGateMatrixError", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "AC-01"}},
       "tests": [{"layer": "usecase", "module_path": "usecase::pre_review_gate_dispatch::tests", "test_name": "test_pre_review_gate_matrix_missing_types_scope_rejects_incomplete_declaration"}]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "PreReviewGateDispatchInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "tests": [
+        {"layer": "usecase", "module_path": "usecase::pre_review_gate_dispatch::tests", "test_name": "test_pre_review_gate_dispatch_empty_scope_gates_returns_not_applicable_without_task_contract_call"},
+        {"layer": "usecase", "module_path": "usecase::pre_review_gate_dispatch::tests", "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_passed_forwards_all_layers_command"},
+        {"layer": "usecase", "module_path": "usecase::pre_review_gate_dispatch::tests", "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_non_blue_blocked_preserves_outcome"}
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "PreReviewGateDispatchService",
+        "item_identifier": "trait_method:dispatch",
+        "obligation_kind": "result"
+      },
+      "tests": [
+        {"layer": "usecase", "module_path": "usecase::pre_review_gate_dispatch::tests", "test_name": "test_pre_review_gate_dispatch_empty_scope_gates_returns_not_applicable_without_task_contract_call"},
+        {"layer": "usecase", "module_path": "usecase::pre_review_gate_dispatch::tests", "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_passed_forwards_all_layers_command"},
+        {"layer": "usecase", "module_path": "usecase::pre_review_gate_dispatch::tests", "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_non_blue_blocked_preserves_outcome"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "PreReviewGateDispatchCommand", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "GO-02"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::pre_review_gate_dispatch::tests", "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_passed_forwards_all_layers_command"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "PreReviewGateDispatchCommand", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "IN-04"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::pre_review_gate_dispatch::tests", "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_passed_forwards_all_layers_command"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "PreReviewGateDispatchCommand", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "AC-04"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::pre_review_gate_dispatch::tests", "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_passed_forwards_all_layers_command"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "PreReviewGateDispatchError", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "GO-02"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::pre_review_gate_dispatch::tests", "test_name": "test_pre_review_gate_dispatch_config_load_failure_returns_config_error_without_task_contract_call"}]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "PreReviewGateDispatchError", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "IN-02"}},
+      "reason": "PreReviewGateDispatchError only classifies failures after dispatch begins. IN-02's independently testable promise is the positive NotApplicable path that avoids downstream liveness and task-contract artifacts; no error-enum behavior can establish that planning review may start without them."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "PreReviewGateDispatchError", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "IN-03"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::pre_review_gate_dispatch::tests", "test_name": "test_pre_review_gate_dispatch_task_contract_failure_returns_task_contract_error"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "PreReviewGateDispatchError", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "IN-04"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::pre_review_gate_dispatch::tests", "test_name": "test_pre_review_gate_dispatch_matrix_lookup_failure_returns_lookup_error_without_task_contract_call"}]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "PreReviewGateDispatchError", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "AC-02"}},
+      "reason": "PreReviewGateDispatchError represents load, lookup, and execution failures, while AC-02 is a successful planning-review admission claim. The error enum has no independently testable behavior that can prove the absence of downstream liveness or task-contract prerequisites."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "PreReviewGateDispatchError", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "AC-03"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::pre_review_gate_dispatch::tests", "test_name": "test_pre_review_gate_dispatch_task_contract_failure_returns_task_contract_error"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "PreReviewGateDispatchError", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "AC-04"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::pre_review_gate_dispatch::tests", "test_name": "test_pre_review_gate_dispatch_matrix_lookup_failure_returns_lookup_error_without_task_contract_call"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "PreReviewGateDispatchOutcome", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "GO-02"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::pre_review_gate_dispatch::tests", "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_passed_forwards_all_layers_command"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "PreReviewGateDispatchOutcome", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "IN-02"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::pre_review_gate_dispatch::tests", "test_name": "test_pre_review_gate_dispatch_empty_scope_gates_returns_not_applicable_without_task_contract_call"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "PreReviewGateDispatchOutcome", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "IN-03"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::pre_review_gate_dispatch::tests", "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_non_blue_blocked_preserves_outcome"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "PreReviewGateDispatchOutcome", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "AC-02"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::pre_review_gate_dispatch::tests", "test_name": "test_pre_review_gate_dispatch_empty_scope_gates_returns_not_applicable_without_task_contract_call"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "PreReviewGateDispatchOutcome", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "AC-03"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::pre_review_gate_dispatch::tests", "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_non_blue_blocked_preserves_outcome"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "PreReviewGateDispatchOutcome", "anchor_id": {"file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json", "element_id": "AC-04"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::pre_review_gate_dispatch::tests", "test_name": "test_pre_review_gate_dispatch_applicable_task_contract_passed_forwards_all_layers_command"}]
     }
   ]
 }

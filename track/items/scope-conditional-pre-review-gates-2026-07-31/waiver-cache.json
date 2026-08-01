@@ -96,6 +96,54 @@
         "citation": "pre-review gate applicability は review scope × gate の config マトリクスとして表現し、特定 scope 向けの ad-hoc な例外分岐で表現しない。"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewGateDispatchError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewGateDispatchError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "waived_reason_hash": "d7ce604209084636869fce214a5231f7f6a38f18dcded812e60d4d2421610150",
+        "declaration_hash": "66830f0f41c1e4b2b68a52ac3e851fad24dce21182efa7fab72e16f981fa65f7",
+        "anchor_text_hash": "397ee6d550574aa944a2403615def3c203010e0eefb47ea88aeb3b945efdc318"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "「planning scope の local review は、下流 chain ③ に由来する liveness state または task-contract 成果物の存在・整合を前提としない。」"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewGateDispatchError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewGateDispatchError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "waived_reason_hash": "26eea5f4ff82e677c1224c4ad22f697f6be7345fabb8e506bc93f4946bba689f",
+        "declaration_hash": "66830f0f41c1e4b2b68a52ac3e851fad24dce21182efa7fab72e16f981fa65f7",
+        "anchor_text_hash": "59431c2eda7c11f10d0e3a509188cae2cb0da6e762742b3f562daf9dcae0d765"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     }
   ]
 }

@@ -20,6 +20,7 @@
       "id": "T003",
       "description": "`.harness/config/pre-review-gates.json` に scope × gate declaration を追加し、`libs/infrastructure/src/pre_review_gate_config.rs` に declaration fixture validation を追加する。IN-01、OS-03、CN-01、AC-01。",
       "status": "done",
+      "commit_hash": "bc598f770db5f6d9bf2630c8312a5727ee1612bc",
       "depends_on": [
         "T002"
       ]
@@ -27,7 +28,7 @@
     {
       "id": "T004",
       "description": "`libs/usecase/src/pre_review_gate_dispatch.rs` に `PreReviewGateDispatchService`、`PreReviewGateDispatchCommand`、`PreReviewGateDispatchError`、`PreReviewGateDispatchInteractor`、`PreReviewGateDispatchOutcome` を実装する。scope lookup、`NotApplicable`、`TaskContractLiveness` の全 path と result / error tests を追加する。IN-02、IN-03、IN-04、OS-01、OS-02、CN-02、CN-03、AC-02、AC-03、AC-04。",
-      "status": "todo",
+      "status": "done",
       "depends_on": [
         "T001"
       ]
