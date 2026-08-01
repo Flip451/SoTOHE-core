@@ -32,6 +32,472 @@
           "at": "2026-08-01T04:47:50Z"
         }
       ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Task T1 is non-executable: it names no target file or symbol and cites no AC/IN/CN/spec anchor.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/impl-plan.json",
+              "line": 6,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "Task T2 is non-executable: it names no target file or symbol and cites no AC/IN/CN/spec anchor.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/impl-plan.json",
+              "line": 11,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "Task T3 is non-executable: it names no target file or symbol and cites no AC/IN/CN/spec anchor.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/impl-plan.json",
+              "line": 16,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "Task T4 is non-executable: it names no target file or symbol and cites no AC/IN/CN/spec anchor.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/impl-plan.json",
+              "line": 21,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "Task T1 restates the upstream behavior contract in prose (\"Route every ... preserving each artifact's logical content\") instead of using only target + operation + anchor cite, contrary to .harness/policies/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Task T2 restates the upstream behavior contract in prose (\"byte-identical repeated writes ... review.json\") instead of using only target + operation + anchor cite, contrary to .harness/policies/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/impl-plan.json",
+              "line": 11,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Task T3 restates the upstream migration behavior contract in prose (active-track normalization and completed-track rewrite prevention) instead of using only target + operation + anchor cite, contrary to .harness/policies/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/impl-plan.json",
+              "line": 16,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Task T4 restates the upstream performance-boundary contract in prose instead of using only target + operation + anchor cite, contrary to .harness/policies/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/impl-plan.json",
+              "line": 21,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section deterministic-write-paths restates upstream behavior (deterministic serialization, unchanged logical content, and review.json byte stability) instead of using target + operation + anchor cite, contrary to .harness/policies/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/impl-plan.json",
+              "line": 31,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section migration-and-operational-boundaries restates upstream behavior (active-track normalization, completed-track immutability, and performance reassessment) instead of using target + operation + anchor cite, contrary to .harness/policies/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/impl-plan.json",
+              "line": 43,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:ba6eda732176e5cfebc392cd38160a8260499cd2860ab613b6fb6fee03b66790",
+          "at": "2026-08-01T05:14:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T4’s task description and its plan section cite OS-01/CN-01, while task-coverage.json attributes T4 only to CN-03. CN-03 is not plausibly traced to the described T4 work, and OS-01 ownership is inconsistent across the plan and coverage artifacts.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/task-coverage.json",
+              "line": 25,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:5232ae2fb4f6a63efc931ab2931fb96a72fff58372e6b7ad35a8d5dbe000104a",
+          "at": "2026-08-01T05:17:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T1’s batch estimate assigns scope `cli`, but the described target is `libs/infrastructure/src/track/fs_store.rs`; the estimate is routed to the wrong review scope.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/batch-plan.json",
+              "line": 9,
+              "category": "unsound batch composition"
+            },
+            {
+              "message": "T2’s batch estimate assigns only scope `cli`, but the described targets include `apps/cli-composition/src/review_v2/run.rs` and JSON artifact codec helpers; the estimate omits `cli_composition` and infrastructure work.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/batch-plan.json",
+              "line": 18,
+              "category": "unsound batch composition"
+            },
+            {
+              "message": "T3’s batch estimate assigns scope `cli_driver`, but the described target is `libs/infrastructure/src/track/render/sync.rs`; the estimate is routed to the wrong review scope.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/batch-plan.json",
+              "line": 27,
+              "category": "unsound batch composition"
+            },
+            {
+              "message": "T4’s batch estimate assigns scope `cli`, but the described target is `libs/infrastructure/src/track/fs_store.rs`; the estimate is routed to the wrong review scope.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/batch-plan.json",
+              "line": 36,
+              "category": "unsound batch composition"
+            }
+          ],
+          "hash": "rvw1:sha256:f1a39d1aef543b24ceec3ae8cd96c4dd39828bfe2623bd1e063528a45ab13154",
+          "at": "2026-08-01T05:21:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:501d9881c68112af1679de71b52b8228689d3819779d997977152115984f2f85",
+          "at": "2026-08-01T05:29:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan` omits `summary`, so GO-01 has no goal-to-task traceability. Add a summary entry mapping GO-01 to the task or tasks that deliver it; GO traceability belongs here rather than in task-coverage.json.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/impl-plan.json",
+              "line": 29,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "CN-03 is absent from the `constraints` map, leaving an enforced spec constraint with no task attribution.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/task-coverage.json",
+              "line": 25,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "T1 targets `libs/infrastructure/src/track/fs_store.rs::FsStore`, but that symbol does not exist (the implementation is `FsTrackStore`), while “JSON artifact codec write helpers” supplies no files or symbols. The executor would have to invent the task boundary.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/impl-plan.json",
+              "line": 6,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T2 names `run.rs` but leaves its other target as the unidentified “JSON artifact codec write helpers.” Because AC-01 spans every JSON write path, the executor cannot determine which codec tests belong to this task without inventing the boundary.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/impl-plan.json",
+              "line": 12,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T4 references the nonexistent `FsStore` symbol and leaves the operation undecided as “benchmark or regression harness.” Those alternatives have different targets and validation semantics, so T4 is not executable as written.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/impl-plan.json",
+              "line": 24,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T4's serializer-performance harness is attributed only to OS-01 and CN-01, neither of which authorizes performance work; CN-03 instead says performance reassessment is a separate future ADR decision. T4 therefore has no plausible spec mapping.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/impl-plan.json",
+              "line": 24,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "B-01 contains T1's deterministic-write implementation with zero test lines, while the repeat-write validation for that implementation is deferred to T2 in B-02. This makes the producer batch complete before its sole AC-01 regression validation; compose the implementation and its validation into the same verifiable batch or give T1 its own validation.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/batch-plan.json",
+              "line": 53,
+              "category": "unsound batch composition"
+            }
+          ],
+          "hash": "rvw1:sha256:501d9881c68112af1679de71b52b8228689d3819779d997977152115984f2f85",
+          "at": "2026-08-01T05:35:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T1 bundles independently verifiable units: `codec.rs::encode`, `impl_plan_codec.rs::encode`, and the remaining artifact-writer call sites, each with its own regression. Split these before implementation.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/impl-plan.json",
+              "line": 6,
+              "category": "pre-implementation split proposal"
+            },
+            {
+              "message": "T1 restates upstream behavior and policy in prose instead of retaining only target + operation + anchor, contrary to `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T2 restates the byte-stability behavior contract instead of retaining only target + operation + anchor, contrary to `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/impl-plan.json",
+              "line": 11,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T3 restates the active-track normalization and completed-track rewrite behavior contract instead of retaining only target + operation + anchor, contrary to `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/impl-plan.json",
+              "line": 16,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section `deterministic-write-paths` restates deterministic serialization and byte-stability behavior instead of retaining only target + operation + anchor.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/impl-plan.json",
+              "line": 31,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section `migration-and-operational-boundaries` restates lifecycle normalization and completed-track rewrite behavior instead of retaining only target + operation + anchor.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/impl-plan.json",
+              "line": 42,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:84e759b194ec78308a5818094eac55a6bb3d0d722e4fdc78a53def4b37a4599c",
+          "at": "2026-08-01T05:42:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T4 bundles four independently verifiable codec units (`spec/codec.rs`, `task_coverage_codec.rs`, `schema_export_codec.rs`, and `signal.rs`), each with its own regression. Split them before implementation under IN-01/IN-02/CN-01/AC-01.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/impl-plan.json",
+              "line": 30,
+              "category": "pre-implementation split proposal"
+            },
+            {
+              "message": "T5 bundles five independently verifiable TDDD/catalogue codec units, each with its own regression. Split these units before implementation under IN-01/IN-02/CN-01/AC-01.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/impl-plan.json",
+              "line": 35,
+              "category": "pre-implementation split proposal"
+            },
+            {
+              "message": "T6 bundles three independently verifiable artifact codec units (`adr_baseline.rs`, `dry_check/store.rs`, and `dry_check/dry_write_driver/manifest.rs`), each with its own regression. Split them before implementation under IN-01/IN-02/CN-01/AC-01.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/impl-plan.json",
+              "line": 40,
+              "category": "pre-implementation split proposal"
+            },
+            {
+              "message": "T7 bundles four independently verifiable test-obligation codec units, each with its own regression. Split these units before implementation under IN-01/IN-02/CN-01/AC-01.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/impl-plan.json",
+              "line": 45,
+              "category": "pre-implementation split proposal"
+            },
+            {
+              "message": "T8 bundles two independently verifiable lifecycle behaviors—active-track one-time normalization and completed-track non-rewrite—covered by AC-03 and AC-04. Split them before implementation.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/impl-plan.json",
+              "line": 50,
+              "category": "pre-implementation split proposal"
+            }
+          ],
+          "hash": "rvw1:sha256:ac1f4e59a85108038aa30e7294c60e372fcdc469b8802a2447522c878159555d",
+          "at": "2026-08-01T05:47:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7823a0c2ad728b74a2f74bf562340b4640fa415ab57d9b03b94b49a5d78c8e2c",
+          "at": "2026-08-01T05:53:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T10 still bundles two independently verifiable JSON writers in one todo task: `SpecAdrVerifyCacheDocumentCodec::encode` for `spec-adr-verify-cache.json` and `CatalogueSpecVerifyCacheDocumentCodec::encode` for `<layer>-catalogue-spec-verify-cache.json`. Each has its own artifact and regression boundary under IN-01/IN-02/CN-01/AC-01, so split T10 into those two units before implementation.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/impl-plan.json",
+              "line": 13,
+              "category": "pre-implementation split proposal"
+            },
+            {
+              "message": "The summary claim `GO-01: T1-T21.` and the IN-01/AC-01 mappings omit `libs/infrastructure/src/task_contract_codec.rs::encode`, which is explicitly the serialization path used to write `task-contract.json`. No current task targets that sotp JSON artifact-generation path.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/impl-plan.json",
+              "line": 27,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "Section `baseline-dry-check-codecs` omits `libs/infrastructure/src/dry_check/dry_write_driver.rs::FsDryCorpusRootManifestAdapter::write`, the concrete serializer and writer for `dry-check-corpus-root.json`. T15 targets the separate semantic-index manifest, so it does not cover this IN-01/IN-02/AC-01 write path.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/impl-plan.json",
+              "line": 32,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "Section `baseline-dry-check-codecs` also omits `libs/infrastructure/src/dry_check/coverage.rs::FsDryCheckCoverageAdapter::write_coverage`, which independently serializes and writes `dry-check-coverage.json`. Neither T14 nor T15 targets this artifact path, leaving IN-01/IN-02/AC-01 coverage incomplete.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/impl-plan.json",
+              "line": 32,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "The summary claim `GO-01: T1-T21.` omits `libs/infrastructure/src/provider_session.rs::FsProviderSessionCacheAdapter::save`, which serializes and persists JSON entries under the track's `.provider-sessions` cache. No task supplies deterministic serialization or repeat-write validation for this sotp-generated JSON path.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/impl-plan.json",
+              "line": 27,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "The summary claim `GO-01: T1-T21.` omits both telemetry JSONL writers: `libs/infrastructure/src/telemetry/writer.rs::build_line` and `libs/infrastructure/src/telemetry/archived_track.rs::FsArchivedTrackTelemetryAdapter::emit`. These persist JSON records generated by sotp, but no task maps their independently testable serialization paths to IN-01/IN-02/AC-01.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/impl-plan.json",
+              "line": 27,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "The summary claim `GO-01: T1-T21.` omits `libs/infrastructure/src/pr/poll.rs::save_trigger_state`, which serializes and writes `tmp/pr-review-state/<track-id>.json`. This is another concrete sotp JSON write path with no task or AC-01 repeat-write validation.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/impl-plan.json",
+              "line": 27,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:7823a0c2ad728b74a2f74bf562340b4640fa415ab57d9b03b94b49a5d78c8e2c",
+          "at": "2026-08-01T06:02:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2bab7c7ea11ba116ac397a602870a64c606c2da32c5d64f41cd4966f97efd06",
+          "at": "2026-08-01T06:07:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-03 and AC-03 are mapped solely to T21, but T21 targets `sync_rendered_views`, which reads JSON inputs and writes rendered Markdown views rather than regenerating JSON artifacts. Its fixture therefore cannot verify the required first order-only rewrite followed by byte-identical regeneration. Replace or supplement T21 with an integration task exercising an actual active-track JSON writer twice.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/task-coverage.json",
+              "line": 6,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "AC-04 is mapped solely to T22, but `sync_rendered_views` does not regenerate or rewrite JSON, so asserting that completed-track JSON remains unchanged through this path is vacuous. T22 must exercise a lifecycle operation capable of invoking the affected JSON writers and verify that completed-track artifacts are not rewritten.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/task-coverage.json",
+              "line": 16,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:f2bab7c7ea11ba116ac397a602870a64c606c2da32c5d64f41cd4966f97efd06",
+          "at": "2026-08-01T06:16:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:054cccc75568aabab4e1dc412444cd1eb2d1f053db9c046502a0ef176f1ff102",
+          "at": "2026-08-01T06:21:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:054cccc75568aabab4e1dc412444cd1eb2d1f053db9c046502a0ef176f1ff102",
+          "at": "2026-08-01T06:26:23Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3cd699674791ac96bd8c93c63574dad3a0276c5fa341b62aa99acb642ff69f81",
+          "at": "2026-08-01T05:13:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3cd699674791ac96bd8c93c63574dad3a0276c5fa341b62aa99acb642ff69f81",
+          "at": "2026-08-01T05:25:02Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-03 is vague and untestable: “performance becomes material” and “substantially larger” have no measurable threshold, so downstream phases cannot derive when reassessment is required.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/spec.json",
+              "line": 96,
+              "category": "constraint vague or untestable"
+            }
+          ],
+          "hash": "rvw1:sha256:9d0e94da9d413c623a3c4c5ddcbff2fb68e6bfa62d7e7831c6e4801f4cce57ed",
+          "at": "2026-08-01T05:13:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:650f10a114bfffa16d46e1e779854e06f614290e10b89340b7bcd51ca220748d",
+          "at": "2026-08-01T05:15:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:650f10a114bfffa16d46e1e779854e06f614290e10b89340b7bcd51ca220748d",
+          "at": "2026-08-01T05:25:26Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4dec35b2ce6cd412c928fba53eb0401fb60a3d8719b866e113f75b084704c4c7",
+          "at": "2026-08-01T05:14:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4dec35b2ce6cd412c928fba53eb0401fb60a3d8719b866e113f75b084704c4c7",
+          "at": "2026-08-01T05:26:25Z"
+        }
+      ]
     }
   }
 }
