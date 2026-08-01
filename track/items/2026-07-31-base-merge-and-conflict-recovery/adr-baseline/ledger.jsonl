@@ -1,0 +1,2 @@
+{"source":"2026-07-29-0839-base-merge-and-conflict-recovery.md","hash":"b15eb7666128903522e1f9ee198e57e8ab05a8811ae01727c1f782f268dabdd8","kind":"init","timestamp":"2026-07-31T22:45:02Z"}
+{"source":"2026-07-29-0839-base-merge-and-conflict-recovery.md","hash":"e5fd67c20de46f244e1f3ee0dcae905684acb6df02f8dbfe93aa7499b4d69725","kind":"escalation","reason":"review-refinement: Phase 0裁定後、D1〜D4の本文と既存provenanceを保持したまま境界承認groundingをfront matterへ追記した。adr-diagnoserは全決定についてdecision-preservedと判定した。","timestamp":"2026-08-01T00:22:12Z"}
