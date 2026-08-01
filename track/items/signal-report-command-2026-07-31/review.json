@@ -1,50 +1,174 @@
 {
   "schema_version": 2,
   "scopes": {
-    "cli_driver": {
+    "adr": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:65568efaf17d359f05157e201dccc53a82e0bb528a8bc7056207cd5c29bef9c3",
-          "at": "2026-07-31T21:02:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:65568efaf17d359f05157e201dccc53a82e0bb528a8bc7056207cd5c29bef9c3",
-          "at": "2026-07-31T21:05:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dfdf14fcec1535e720044508f2a3a360b526d1c13485128e02c853a0b77cce73",
-          "at": "2026-07-31T21:39:28Z"
+          "hash": "rvw1:sha256:f3300d882f7f8e7a3746dc1556723c5d61465e4921ce03560f01e7a3df39cf48",
+          "at": "2026-07-31T11:29:28Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The public `handle` error path is tested only with `SourceUnavailable`; `InvalidOccurrence` has distinct user-visible rendering but no test. A regression in that match arm would pass this scope. Add a test asserting exit code 1, empty stdout, and bounded stderr for `SignalReportError::InvalidOccurrence`.",
+              "message": "D1 requires `adr_user` to be included while forbidding signal recalculation and limiting the view to persisted `calc-*` artifacts. Chain ⓪'s `calc-adr-user` performs a live scan and persists no signal document, so the command cannot enumerate all four chains under the recorded boundary. This incompatibility must be resolved before downstream behavior can be derived.",
               "severity": "P1",
-              "file": "apps/cli-driver/src/signal_report.rs",
-              "line": 339,
-              "category": "test_coverage"
+              "file": "knowledge/adr/2026-07-29-0839-signal-report-command.md",
+              "line": 18,
+              "category": "inconsistent decisions within the same ADR"
             }
           ],
-          "hash": "rvw1:sha256:dfdf14fcec1535e720044508f2a3a360b526d1c13485128e02c853a0b77cce73",
-          "at": "2026-07-31T21:49:32Z"
+          "hash": "rvw1:sha256:f3300d882f7f8e7a3746dc1556723c5d61465e4921ce03560f01e7a3df39cf48",
+          "at": "2026-07-31T11:32:25Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e43ef7b32e93c170d057f892897cb51278f5c7942e15f92f85390c5230e1c33d",
-          "at": "2026-07-31T21:53:28Z"
+          "hash": "rvw1:sha256:f3300d882f7f8e7a3746dc1556723c5d61465e4921ce03560f01e7a3df39cf48",
+          "at": "2026-07-31T11:42:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6ba9a8c8b276d76b47425d2580babc14a1dbc6add90e9cdb70c2b909a2fbfd01",
+          "at": "2026-07-31T12:40:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6ba9a8c8b276d76b47425d2580babc14a1dbc6add90e9cdb70c2b909a2fbfd01",
+          "at": "2026-07-31T12:42:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:18e287538db3e7cbc650bde69b36adcbd84d3905aa0e4abaf1f5e9d137c0fcc0",
+          "at": "2026-07-31T19:13:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:18e287538db3e7cbc650bde69b36adcbd84d3905aa0e4abaf1f5e9d137c0fcc0",
+          "at": "2026-07-31T19:17:12Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b6ef392c142af817f0e614fbb49672d0e56dd2526ef8c02e3238a5804df8bf4d",
+          "at": "2026-07-31T18:59:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ref_verify_run`, `ref_verify_check_approved`, and `ref_verify_results` execute application flow by calling `RefVerifyDriver::handle` and returning its `CommandOutcome`. Composition must stop at `ref_verify_driver`; the CLI layer should invoke the returned driver.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/ref_verify.rs",
+              "line": 98,
+              "category": "invoke leak"
+            },
+            {
+              "message": "`track_type_signals` invokes `TypeSignalsInteractor::run` and converts its result into a command outcome. Move request execution to `cli_driver`; this root should only construct and return the wired primary adapter.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 72,
+              "category": "invoke leak"
+            },
+            {
+              "message": "`track_type_graph` constructs a user-facing command-removal message inside the composition root. Deprecation rendering belongs in `cli_driver`, with composition limited to wiring.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 100,
+              "category": "render leak"
+            },
+            {
+              "message": "`track_baseline_graph` invokes `RenderBaselineGraph::execute` and then formats the user-facing success message. Both execution and rendering must be handled by a wired primary adapter in `cli_driver`.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 150,
+              "category": "invoke leak / render leak"
+            },
+            {
+              "message": "`track_contract_map` calls `ContractMapDriver::handle` from the composition entry point. Return the fully wired driver instead and let `apps/cli` invoke it.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 207,
+              "category": "invoke leak"
+            },
+            {
+              "message": "`track_catalogue_spec_signals` implements the application workflow in composition: it validates filesystem state, selects layers, deletes stale artifacts, and invokes `refresh_one_layer`. Move this orchestration behind a use-case/driver boundary and retain only collaborator construction here.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 216,
+              "category": "application-logic leak"
+            },
+            {
+              "message": "`track_spec_element_hash` directly invokes the infrastructure hash operation and serializes its result for display. Execution and JSON rendering belong behind a `cli_driver` primary adapter.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 378,
+              "category": "invoke leak / render leak"
+            },
+            {
+              "message": "`track_baseline_capture` invokes `BaselineCaptureInteractor::run` from the composition root. Expose a wired driver and perform the request invocation in `apps/cli`.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 441,
+              "category": "invoke leak"
+            },
+            {
+              "message": "`track_lint` invokes `RunCatalogueLint::execute` and formats violations, counts, and user-facing errors locally. Move execution and presentation into `cli_driver`, leaving this method as pure wiring.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 488,
+              "category": "invoke leak / render leak"
+            },
+            {
+              "message": "`track_catalogue_impl_signals` invokes `CatalogueImplSignalsInteractor::run` and maps its report into CLI output. The composition root must instead return a wired primary adapter without executing it.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 571,
+              "category": "invoke leak"
+            }
+          ],
+          "hash": "rvw1:sha256:b6ef392c142af817f0e614fbb49672d0e56dd2526ef8c02e3238a5804df8bf4d",
+          "at": "2026-07-31T19:22:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b6ef392c142af817f0e614fbb49672d0e56dd2526ef8c02e3238a5804df8bf4d",
+          "at": "2026-07-31T20:29:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a7a3d3f3da673f93c92941488f56ab4f72a3380ccc1241bf3ed70775bcf40210",
+          "at": "2026-07-31T22:35:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a7a3d3f3da673f93c92941488f56ab4f72a3380ccc1241bf3ed70775bcf40210",
+          "at": "2026-07-31T22:39:19Z"
         }
       ]
     },
@@ -562,276 +686,67 @@
           "findings": [],
           "hash": "rvw1:sha256:c732816deca02a8bf951ae5865623618143c45b8e81cd0ec568595133128cae1",
           "at": "2026-08-01T00:07:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T008 は `apps/cli/src/commands/signal/mod.rs` の `execute` 追加だけを記述していますが、task-contract.json では cli_driver の `SignalDriver` も帰属させています。T008 の説明に `SignalDriver` の対象ファイル・操作を明記するか、帰属を実際に変更するタスクへ移してください。",
+              "severity": "P1",
+              "file": "track/items/signal-report-command-2026-07-31/impl-plan.json",
+              "line": 62,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:1c5e299ad4bd58deb100ee553bd0dd669e0865ca92a17c68b33491980d252b28",
+          "at": "2026-08-01T00:15:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d70de76fb2c83d384818b382bcac611bc6a7958981c9fb5eb5b6082823b2991",
+          "at": "2026-08-01T00:22:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d70de76fb2c83d384818b382bcac611bc6a7958981c9fb5eb5b6082823b2991",
+          "at": "2026-08-01T00:26:44Z"
         }
       ]
     },
-    "cli_composition": {
+    "cli": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b6ef392c142af817f0e614fbb49672d0e56dd2526ef8c02e3238a5804df8bf4d",
-          "at": "2026-07-31T18:59:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`ref_verify_run`, `ref_verify_check_approved`, and `ref_verify_results` execute application flow by calling `RefVerifyDriver::handle` and returning its `CommandOutcome`. Composition must stop at `ref_verify_driver`; the CLI layer should invoke the returned driver.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/ref_verify.rs",
-              "line": 98,
-              "category": "invoke leak"
-            },
-            {
-              "message": "`track_type_signals` invokes `TypeSignalsInteractor::run` and converts its result into a command outcome. Move request execution to `cli_driver`; this root should only construct and return the wired primary adapter.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/tddd.rs",
-              "line": 72,
-              "category": "invoke leak"
-            },
-            {
-              "message": "`track_type_graph` constructs a user-facing command-removal message inside the composition root. Deprecation rendering belongs in `cli_driver`, with composition limited to wiring.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/tddd.rs",
-              "line": 100,
-              "category": "render leak"
-            },
-            {
-              "message": "`track_baseline_graph` invokes `RenderBaselineGraph::execute` and then formats the user-facing success message. Both execution and rendering must be handled by a wired primary adapter in `cli_driver`.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/tddd.rs",
-              "line": 150,
-              "category": "invoke leak / render leak"
-            },
-            {
-              "message": "`track_contract_map` calls `ContractMapDriver::handle` from the composition entry point. Return the fully wired driver instead and let `apps/cli` invoke it.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/tddd.rs",
-              "line": 207,
-              "category": "invoke leak"
-            },
-            {
-              "message": "`track_catalogue_spec_signals` implements the application workflow in composition: it validates filesystem state, selects layers, deletes stale artifacts, and invokes `refresh_one_layer`. Move this orchestration behind a use-case/driver boundary and retain only collaborator construction here.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/tddd.rs",
-              "line": 216,
-              "category": "application-logic leak"
-            },
-            {
-              "message": "`track_spec_element_hash` directly invokes the infrastructure hash operation and serializes its result for display. Execution and JSON rendering belong behind a `cli_driver` primary adapter.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/tddd.rs",
-              "line": 378,
-              "category": "invoke leak / render leak"
-            },
-            {
-              "message": "`track_baseline_capture` invokes `BaselineCaptureInteractor::run` from the composition root. Expose a wired driver and perform the request invocation in `apps/cli`.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/tddd.rs",
-              "line": 441,
-              "category": "invoke leak"
-            },
-            {
-              "message": "`track_lint` invokes `RunCatalogueLint::execute` and formats violations, counts, and user-facing errors locally. Move execution and presentation into `cli_driver`, leaving this method as pure wiring.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/tddd.rs",
-              "line": 488,
-              "category": "invoke leak / render leak"
-            },
-            {
-              "message": "`track_catalogue_impl_signals` invokes `CatalogueImplSignalsInteractor::run` and maps its report into CLI output. The composition root must instead return a wired primary adapter without executing it.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/tddd.rs",
-              "line": 571,
-              "category": "invoke leak"
-            }
-          ],
-          "hash": "rvw1:sha256:b6ef392c142af817f0e614fbb49672d0e56dd2526ef8c02e3238a5804df8bf4d",
-          "at": "2026-07-31T19:22:01Z"
+          "hash": "rvw1:sha256:0e6438fbe7b445d29dfe318ee778afd871c063eed23d7876227e3cb0d6d11749",
+          "at": "2026-07-31T18:59:05Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b6ef392c142af817f0e614fbb49672d0e56dd2526ef8c02e3238a5804df8bf4d",
-          "at": "2026-07-31T20:29:58Z"
+          "hash": "rvw1:sha256:0e6438fbe7b445d29dfe318ee778afd871c063eed23d7876227e3cb0d6d11749",
+          "at": "2026-07-31T19:19:02Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a7a3d3f3da673f93c92941488f56ab4f72a3380ccc1241bf3ed70775bcf40210",
-          "at": "2026-07-31T22:35:22Z"
+          "hash": "rvw1:sha256:7c0fe5d512d41b371d176b2d113c9d5c9df0dbcf7bbb9afb3072bc4c85ff167e",
+          "at": "2026-07-31T23:58:58Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a7a3d3f3da673f93c92941488f56ab4f72a3380ccc1241bf3ed70775bcf40210",
-          "at": "2026-07-31T22:39:19Z"
-        }
-      ]
-    },
-    "types": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Mirror-chain divergence: cli_driver::SignalReportLevelFilter is documented as mapping exhaustively into usecase::SignalReportLevelSelection, but its variants are Yellow/Red/YellowAndRed while the usecase selection uses YellowOnly/RedOnly/YellowAndRed. No documented language-level reason explains the renamed variants, so the conversion mirror is not structurally aligned.",
-              "severity": "P1",
-              "file": "track/items/signal-report-command-2026-07-31/cli_driver-types.json",
-              "line": 278,
-              "category": "mirror chain divergence"
-            },
-            {
-              "message": "The docs for infrastructure::SystemSignalReportSourceAdapter and usecase::SignalReportSourcePort restate the upstream derivation, persistence, filtering, and read-only behavior contracts in prose instead of only naming the changed surface and citing IN-04/CN-01/AC-04. This violates the no-upstream-restatement policy.",
-              "severity": "P1",
-              "file": "track/items/signal-report-command-2026-07-31/infrastructure-types.json",
-              "line": 30,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "Multiple CLI, composition, driver, and usecase entries restate upstream command behavior, defaults, conversion, rendering, CQRS, and validation contracts in their docs rather than using anchor-only references. Affected entries include cli::SignalReportArgs, cli::SignalReportChainArg, cli::SignalReportOnlyArg, cli_composition::SignalCompositionRoot, cli_driver::SignalReportChainFilter, cli_driver::SignalReportDriver, cli_driver::SignalReportInput, cli_driver::SignalReportLevelFilter, usecase::SignalReportService, usecase::SignalReportInteractor, and the SignalReport* value-object/report DTO entries.",
-              "severity": "P1",
-              "file": "track/items/signal-report-command-2026-07-31/usecase-types.json",
-              "line": 334,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:d5324b1c7a0adaedc507e046a7051cf59b21637dc3d07a369d2b8232c7301961",
-          "at": "2026-07-31T13:28:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Mirror-chain field divergence: cli::SignalReportArgs declares the level selector as `only`, cli_driver::SignalReportInput declares it as `level`, and usecase::SignalReportQuery declares it as `levels`. These are parallel conversion payloads, but the catalogues provide no documented language-level constraint or explicit mapping rationale for the inconsistent field names.",
-              "severity": "P1",
-              "file": "track/items/signal-report-command-2026-07-31/cli-types.json",
-              "line": 242,
-              "category": "mirror chain divergence"
-            }
-          ],
-          "hash": "rvw1:sha256:e091e1e24f8cf61cfa9c6037655cac7611a6bae33a59b6feb4dc3d131f3f09c7",
-          "at": "2026-07-31T13:50:04Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:96a44f0049de2d32b38c8aedb58045270119c02a44eccdae9ecf7c7d1083ed62",
-          "at": "2026-07-31T14:01:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`usecase::SignalReportSourcePort::load` is synchronous despite loading persisted signal artifacts and canonical input files, but the entry docs do not acknowledge the blocking execution choice. Document the intentional synchronous CLI boundary or make the port asynchronous.",
-              "severity": "P1",
-              "file": "track/items/signal-report-command-2026-07-31/usecase-types.json",
-              "line": 370,
-              "category": "API shape / sync-async color mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:96a44f0049de2d32b38c8aedb58045270119c02a44eccdae9ecf7c7d1083ed62",
-          "at": "2026-07-31T14:09:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Upstream-restatement remains in usecase::SignalReportService, usecase::SignalReportInteractor, and usecase::SignalReportQuery: their docs repeat the CQRS rationale that the collaborator/read model/error surface differs from the existing command path and that no consistency boundary is shared. Per `.harness/policies/no-upstream-restatement.md`, these entries should cite GO-01/AC-01/IN-03/AC-03 without restating the upstream design rationale.",
-              "severity": "P1",
-              "file": "track/items/signal-report-command-2026-07-31/usecase-types.json",
-              "line": 334,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:a2a60b818d916e6eaf977a05349275cd96dc6c4964a36a01d76fd25e2afa242f",
-          "at": "2026-07-31T14:21:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:69f2e13004da8127e6a2ec66cef0792c70f175ca11ead39caf4b2fbddff51746",
-          "at": "2026-07-31T14:31:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:69f2e13004da8127e6a2ec66cef0792c70f175ca11ead39caf4b2fbddff51746",
-          "at": "2026-07-31T14:35:47Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f3300d882f7f8e7a3746dc1556723c5d61465e4921ce03560f01e7a3df39cf48",
-          "at": "2026-07-31T11:29:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D1 requires `adr_user` to be included while forbidding signal recalculation and limiting the view to persisted `calc-*` artifacts. Chain ⓪'s `calc-adr-user` performs a live scan and persists no signal document, so the command cannot enumerate all four chains under the recorded boundary. This incompatibility must be resolved before downstream behavior can be derived.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-29-0839-signal-report-command.md",
-              "line": 18,
-              "category": "inconsistent decisions within the same ADR"
-            }
-          ],
-          "hash": "rvw1:sha256:f3300d882f7f8e7a3746dc1556723c5d61465e4921ce03560f01e7a3df39cf48",
-          "at": "2026-07-31T11:32:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f3300d882f7f8e7a3746dc1556723c5d61465e4921ce03560f01e7a3df39cf48",
-          "at": "2026-07-31T11:42:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6ba9a8c8b276d76b47425d2580babc14a1dbc6add90e9cdb70c2b909a2fbfd01",
-          "at": "2026-07-31T12:40:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6ba9a8c8b276d76b47425d2580babc14a1dbc6add90e9cdb70c2b909a2fbfd01",
-          "at": "2026-07-31T12:42:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:18e287538db3e7cbc650bde69b36adcbd84d3905aa0e4abaf1f5e9d137c0fcc0",
-          "at": "2026-07-31T19:13:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:18e287538db3e7cbc650bde69b36adcbd84d3905aa0e4abaf1f5e9d137c0fcc0",
-          "at": "2026-07-31T19:17:12Z"
+          "hash": "rvw1:sha256:7c0fe5d512d41b371d176b2d113c9d5c9df0dbcf7bbb9afb3072bc4c85ff167e",
+          "at": "2026-08-01T00:05:24Z"
         }
       ]
     },
@@ -850,6 +765,115 @@
           "findings": [],
           "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
           "at": "2026-07-31T11:49:20Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ebb6b1a74f3f76a0e993151410d1e37d9f97e3ec9efa20c637548086c536c469",
+          "at": "2026-07-31T13:26:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ebb6b1a74f3f76a0e993151410d1e37d9f97e3ec9efa20c637548086c536c469",
+          "at": "2026-07-31T14:41:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ebb6b1a74f3f76a0e993151410d1e37d9f97e3ec9efa20c637548086c536c469",
+          "at": "2026-07-31T15:16:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ebb6b1a74f3f76a0e993151410d1e37d9f97e3ec9efa20c637548086c536c469",
+          "at": "2026-07-31T15:17:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8611b31187c795fdce80aa23d57ffeadd45989b890dbd5e962a33a7c2c8d0ce2",
+          "at": "2026-07-31T16:59:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8611b31187c795fdce80aa23d57ffeadd45989b890dbd5e962a33a7c2c8d0ce2",
+          "at": "2026-07-31T17:25:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8611b31187c795fdce80aa23d57ffeadd45989b890dbd5e962a33a7c2c8d0ce2",
+          "at": "2026-07-31T17:28:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d01f366dd26bb96539672e8a6a9b22b76e36fcc263a80a68b42d220eee69e3e6",
+          "at": "2026-07-31T21:04:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d01f366dd26bb96539672e8a6a9b22b76e36fcc263a80a68b42d220eee69e3e6",
+          "at": "2026-07-31T21:21:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:54393ff227807208d0bc6f2cde4ae897d0990fd6849533085009cecb72e03ee7",
+          "at": "2026-07-31T21:46:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:54393ff227807208d0bc6f2cde4ae897d0990fd6849533085009cecb72e03ee7",
+          "at": "2026-07-31T22:00:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2623d28cc4f0d91ccaeced9ddec2e403c4f63b592da5913b2957570205fd0ca",
+          "at": "2026-07-31T22:37:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2623d28cc4f0d91ccaeced9ddec2e403c4f63b592da5913b2957570205fd0ca",
+          "at": "2026-07-31T23:17:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:37f718f74542a9c7f9c6e9f2e81213d1e1fb8f0aba1764f502dc8238453bc66a",
+          "at": "2026-08-01T00:01:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:37f718f74542a9c7f9c6e9f2e81213d1e1fb8f0aba1764f502dc8238453bc66a",
+          "at": "2026-08-01T00:11:10Z"
         }
       ]
     },
@@ -1090,147 +1114,6 @@
         }
       ]
     },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ebb6b1a74f3f76a0e993151410d1e37d9f97e3ec9efa20c637548086c536c469",
-          "at": "2026-07-31T13:26:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ebb6b1a74f3f76a0e993151410d1e37d9f97e3ec9efa20c637548086c536c469",
-          "at": "2026-07-31T14:41:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ebb6b1a74f3f76a0e993151410d1e37d9f97e3ec9efa20c637548086c536c469",
-          "at": "2026-07-31T15:16:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ebb6b1a74f3f76a0e993151410d1e37d9f97e3ec9efa20c637548086c536c469",
-          "at": "2026-07-31T15:17:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8611b31187c795fdce80aa23d57ffeadd45989b890dbd5e962a33a7c2c8d0ce2",
-          "at": "2026-07-31T16:59:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8611b31187c795fdce80aa23d57ffeadd45989b890dbd5e962a33a7c2c8d0ce2",
-          "at": "2026-07-31T17:25:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8611b31187c795fdce80aa23d57ffeadd45989b890dbd5e962a33a7c2c8d0ce2",
-          "at": "2026-07-31T17:28:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d01f366dd26bb96539672e8a6a9b22b76e36fcc263a80a68b42d220eee69e3e6",
-          "at": "2026-07-31T21:04:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d01f366dd26bb96539672e8a6a9b22b76e36fcc263a80a68b42d220eee69e3e6",
-          "at": "2026-07-31T21:21:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:54393ff227807208d0bc6f2cde4ae897d0990fd6849533085009cecb72e03ee7",
-          "at": "2026-07-31T21:46:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:54393ff227807208d0bc6f2cde4ae897d0990fd6849533085009cecb72e03ee7",
-          "at": "2026-07-31T22:00:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f2623d28cc4f0d91ccaeced9ddec2e403c4f63b592da5913b2957570205fd0ca",
-          "at": "2026-07-31T22:37:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f2623d28cc4f0d91ccaeced9ddec2e403c4f63b592da5913b2957570205fd0ca",
-          "at": "2026-07-31T23:17:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:37f718f74542a9c7f9c6e9f2e81213d1e1fb8f0aba1764f502dc8238453bc66a",
-          "at": "2026-08-01T00:01:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:37f718f74542a9c7f9c6e9f2e81213d1e1fb8f0aba1764f502dc8238453bc66a",
-          "at": "2026-08-01T00:11:10Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0e6438fbe7b445d29dfe318ee778afd871c063eed23d7876227e3cb0d6d11749",
-          "at": "2026-07-31T18:59:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0e6438fbe7b445d29dfe318ee778afd871c063eed23d7876227e3cb0d6d11749",
-          "at": "2026-07-31T19:19:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7c0fe5d512d41b371d176b2d113c9d5c9df0dbcf7bbb9afb3072bc4c85ff167e",
-          "at": "2026-07-31T23:58:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7c0fe5d512d41b371d176b2d113c9d5c9df0dbcf7bbb9afb3072bc4c85ff167e",
-          "at": "2026-08-01T00:05:24Z"
-        }
-      ]
-    },
     "spec": {
       "rounds": [
         {
@@ -1246,6 +1129,152 @@
           "findings": [],
           "hash": "rvw1:sha256:4f7c4098aaaaf40e9be2bd227012f39cfc11039a57d6e9e673888c4a842a53ba",
           "at": "2026-07-31T12:51:56Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Mirror-chain divergence: cli_driver::SignalReportLevelFilter is documented as mapping exhaustively into usecase::SignalReportLevelSelection, but its variants are Yellow/Red/YellowAndRed while the usecase selection uses YellowOnly/RedOnly/YellowAndRed. No documented language-level reason explains the renamed variants, so the conversion mirror is not structurally aligned.",
+              "severity": "P1",
+              "file": "track/items/signal-report-command-2026-07-31/cli_driver-types.json",
+              "line": 278,
+              "category": "mirror chain divergence"
+            },
+            {
+              "message": "The docs for infrastructure::SystemSignalReportSourceAdapter and usecase::SignalReportSourcePort restate the upstream derivation, persistence, filtering, and read-only behavior contracts in prose instead of only naming the changed surface and citing IN-04/CN-01/AC-04. This violates the no-upstream-restatement policy.",
+              "severity": "P1",
+              "file": "track/items/signal-report-command-2026-07-31/infrastructure-types.json",
+              "line": 30,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Multiple CLI, composition, driver, and usecase entries restate upstream command behavior, defaults, conversion, rendering, CQRS, and validation contracts in their docs rather than using anchor-only references. Affected entries include cli::SignalReportArgs, cli::SignalReportChainArg, cli::SignalReportOnlyArg, cli_composition::SignalCompositionRoot, cli_driver::SignalReportChainFilter, cli_driver::SignalReportDriver, cli_driver::SignalReportInput, cli_driver::SignalReportLevelFilter, usecase::SignalReportService, usecase::SignalReportInteractor, and the SignalReport* value-object/report DTO entries.",
+              "severity": "P1",
+              "file": "track/items/signal-report-command-2026-07-31/usecase-types.json",
+              "line": 334,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:d5324b1c7a0adaedc507e046a7051cf59b21637dc3d07a369d2b8232c7301961",
+          "at": "2026-07-31T13:28:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Mirror-chain field divergence: cli::SignalReportArgs declares the level selector as `only`, cli_driver::SignalReportInput declares it as `level`, and usecase::SignalReportQuery declares it as `levels`. These are parallel conversion payloads, but the catalogues provide no documented language-level constraint or explicit mapping rationale for the inconsistent field names.",
+              "severity": "P1",
+              "file": "track/items/signal-report-command-2026-07-31/cli-types.json",
+              "line": 242,
+              "category": "mirror chain divergence"
+            }
+          ],
+          "hash": "rvw1:sha256:e091e1e24f8cf61cfa9c6037655cac7611a6bae33a59b6feb4dc3d131f3f09c7",
+          "at": "2026-07-31T13:50:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:96a44f0049de2d32b38c8aedb58045270119c02a44eccdae9ecf7c7d1083ed62",
+          "at": "2026-07-31T14:01:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::SignalReportSourcePort::load` is synchronous despite loading persisted signal artifacts and canonical input files, but the entry docs do not acknowledge the blocking execution choice. Document the intentional synchronous CLI boundary or make the port asynchronous.",
+              "severity": "P1",
+              "file": "track/items/signal-report-command-2026-07-31/usecase-types.json",
+              "line": 370,
+              "category": "API shape / sync-async color mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:96a44f0049de2d32b38c8aedb58045270119c02a44eccdae9ecf7c7d1083ed62",
+          "at": "2026-07-31T14:09:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Upstream-restatement remains in usecase::SignalReportService, usecase::SignalReportInteractor, and usecase::SignalReportQuery: their docs repeat the CQRS rationale that the collaborator/read model/error surface differs from the existing command path and that no consistency boundary is shared. Per `.harness/policies/no-upstream-restatement.md`, these entries should cite GO-01/AC-01/IN-03/AC-03 without restating the upstream design rationale.",
+              "severity": "P1",
+              "file": "track/items/signal-report-command-2026-07-31/usecase-types.json",
+              "line": 334,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:a2a60b818d916e6eaf977a05349275cd96dc6c4964a36a01d76fd25e2afa242f",
+          "at": "2026-07-31T14:21:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69f2e13004da8127e6a2ec66cef0792c70f175ca11ead39caf4b2fbddff51746",
+          "at": "2026-07-31T14:31:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69f2e13004da8127e6a2ec66cef0792c70f175ca11ead39caf4b2fbddff51746",
+          "at": "2026-07-31T14:35:47Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:65568efaf17d359f05157e201dccc53a82e0bb528a8bc7056207cd5c29bef9c3",
+          "at": "2026-07-31T21:02:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:65568efaf17d359f05157e201dccc53a82e0bb528a8bc7056207cd5c29bef9c3",
+          "at": "2026-07-31T21:05:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dfdf14fcec1535e720044508f2a3a360b526d1c13485128e02c853a0b77cce73",
+          "at": "2026-07-31T21:39:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The public `handle` error path is tested only with `SourceUnavailable`; `InvalidOccurrence` has distinct user-visible rendering but no test. A regression in that match arm would pass this scope. Add a test asserting exit code 1, empty stdout, and bounded stderr for `SignalReportError::InvalidOccurrence`.",
+              "severity": "P1",
+              "file": "apps/cli-driver/src/signal_report.rs",
+              "line": 339,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:dfdf14fcec1535e720044508f2a3a360b526d1c13485128e02c853a0b77cce73",
+          "at": "2026-07-31T21:49:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e43ef7b32e93c170d057f892897cb51278f5c7942e15f92f85390c5230e1c33d",
+          "at": "2026-07-31T21:53:28Z"
         }
       ]
     },

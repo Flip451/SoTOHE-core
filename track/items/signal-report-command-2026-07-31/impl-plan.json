@@ -37,7 +37,7 @@
     },
     {
       "id": "T006",
-      "description": "After T001, T002, and T004, implement and independently verify `SignalCompositionRoot::signal_report_driver` wiring in `apps/cli-composition/`, before CLI report dispatch consumes it. CN-01, AC-01, AC-04.",
+      "description": "After T001, T002, and T004, preserve and confirm the existing `SignalDriver` reference edge while adding and independently verifying `SignalCompositionRoot::signal_report_driver` wiring in `apps/cli-composition/`, before CLI report dispatch consumes it. CN-01, AC-01, AC-04.",
       "status": "done",
       "commit_hash": "cc5ef158545673e58f2ead2999f6e41a637d1a74",
       "depends_on": [
@@ -50,6 +50,7 @@
       "id": "T005",
       "description": "After T003, T004, and T006, add the parsing and command shape that makes `sotp signal report` parseable in `apps/cli/src/commands/signal/mod.rs`: `SignalReportChainArg`, `SignalReportOnlyArg`, `SignalReportArgs`, and `SignalCommand::Report`; add same-module parsing tests. IN-01, IN-03, AC-03.",
       "status": "done",
+      "commit_hash": "965b32d453149168757fbca0b858d4448592293c",
       "depends_on": [
         "T003",
         "T004",
@@ -60,6 +61,7 @@
       "id": "T008",
       "description": "After T005, T004, and T006, add the signal-report branch of `execute` in `apps/cli/src/commands/signal/mod.rs`, constructing and using the composition-root report driver while propagating output and exit status; add focused dispatch tests. IN-01, AC-01.",
       "status": "done",
+      "commit_hash": "965b32d453149168757fbca0b858d4448592293c",
       "depends_on": [
         "T005",
         "T004",
@@ -70,6 +72,7 @@
       "id": "T007",
       "description": "After T008, add `sotp track resolve` regression tests in `apps/cli/src/commands/track/resolve.rs`. OUT-01, AC-05.",
       "status": "done",
+      "commit_hash": "965b32d453149168757fbca0b858d4448592293c",
       "depends_on": [
         "T008"
       ]
