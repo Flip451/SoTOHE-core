@@ -1,4 +1,33 @@
 {
   "track_id": "2026-08-01-deterministic-json-serialization",
-  "obligations": []
+  "obligations": [
+    {
+      "id": {
+        "entry_key": "DeriveTestObligationsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/2026-08-01-deterministic-json-serialization/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "DeriveTestObligationsInteractor"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      },
+      "brief": "Author a result test covering 'entry' of DeriveTestObligationsInteractor",
+      "declaration_hash": "d71954c18c465cf91e80dc9d6c1c5680e2417c7c117f505505a91af3584c65e8",
+      "spec_refs": [
+        {
+          "file_path": "track/items/2026-08-01-deterministic-json-serialization/spec.json",
+          "element_id": "CN-02"
+        },
+        {
+          "file_path": "track/items/2026-08-01-deterministic-json-serialization/spec.json",
+          "element_id": "AC-04"
+        }
+      ]
+    }
+  ]
 }

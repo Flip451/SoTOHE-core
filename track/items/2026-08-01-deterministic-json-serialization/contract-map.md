@@ -34,9 +34,58 @@ classDef value_object fill:#d1fae5,stroke:#065f46,stroke-width:1px
 classDef variant_node fill:#fafaf9,stroke:#d6d3d1,stroke-width:1px
 subgraph domain["domain"]
   direction TB
+  subgraph domain_domain_module_tddd["domain::tddd"]
+    direction TB
+  subgraph T35_domain_domain_ObligationDeriveError["tddd::test_obligation::errors::ObligationDeriveError"]
+    direction TB
+    T35_domain_domain_ObligationDeriveError__self[ObligationDeriveError]
+    T35_domain_domain_ObligationDeriveError_RulesLoad[RulesLoad]
+    T35_domain_domain_ObligationDeriveError_TrackNotActive[TrackNotActive]
+    T35_domain_domain_ObligationDeriveError_TrackFrozen[TrackFrozen]
+    T35_domain_domain_ObligationDeriveError_TrackStatusRead[TrackStatusRead]
+    T35_domain_domain_ObligationDeriveError_CatalogueLoad[CatalogueLoad]
+    T35_domain_domain_ObligationDeriveError_SpecLoad[SpecLoad]
+    T35_domain_domain_ObligationDeriveError_InvalidCatalogueState[InvalidCatalogueState]
+    T35_domain_domain_ObligationDeriveError_ArtifactWrite[ArtifactWrite]
+  end
+  subgraph T40_domain_domain_TrackStatusReadFailureKind["tddd::test_obligation::errors::TrackStatusReadFailureKind"]
+    direction TB
+    T40_domain_domain_TrackStatusReadFailureKind__self[TrackStatusReadFailureKind]
+    T40_domain_domain_TrackStatusReadFailureKind_Unavailable[Unavailable]
+  end
+  end
+  subgraph domain_domain_module_track["domain::track"]
+    direction TB
+  subgraph T31_domain_domain_FrozenTrackStatus["track::FrozenTrackStatus"]
+    direction TB
+    T31_domain_domain_FrozenTrackStatus__self[FrozenTrackStatus]
+    T31_domain_domain_FrozenTrackStatus_Done[Done]
+    T31_domain_domain_FrozenTrackStatus_Archived[Archived]
+  end
+  subgraph T25_domain_domain_TrackStatus["track::TrackStatus"]
+    direction TB
+    T25_domain_domain_TrackStatus__self[TrackStatus]
+    T25_domain_domain_TrackStatus_Planned[Planned]
+    T25_domain_domain_TrackStatus_InProgress[InProgress]
+    T25_domain_domain_TrackStatus_Done[Done]
+    T25_domain_domain_TrackStatus_Blocked[Blocked]
+    T25_domain_domain_TrackStatus_Cancelled[Cancelled]
+    T25_domain_domain_TrackStatus_Archived[Archived]
+    T25_domain_domain_TrackStatus_is_active([is_active])
+    T25_domain_domain_TrackStatus_frozen_status([frozen_status])
+  end
+  end
 end
 subgraph usecase["usecase"]
   direction TB
+  subgraph usecase_usecase_module_test_obligation["usecase::test_obligation"]
+    direction TB
+  subgraph T47_usecase_usecase_DeriveTestObligationsInteractor["test_obligation::derive::DeriveTestObligationsInteractor"]
+    direction TB
+    T47_usecase_usecase_DeriveTestObligationsInteractor__self[DeriveTestObligationsInteractor]
+    T47_usecase_usecase_DeriveTestObligationsInteractor_new([new])
+  end
+  end
 end
 subgraph infrastructure["infrastructure"]
   direction TB
@@ -50,4 +99,33 @@ end
 subgraph cli["cli"]
   direction TB
 end
+T35_domain_domain_ObligationDeriveError_TrackFrozen --o|status| T31_domain_domain_FrozenTrackStatus__self
+T35_domain_domain_ObligationDeriveError_TrackStatusRead --o T40_domain_domain_TrackStatusReadFailureKind__self
+T25_domain_domain_TrackStatus_frozen_status --> T31_domain_domain_FrozenTrackStatus__self
+T47_usecase_usecase_DeriveTestObligationsInteractor_new --> T47_usecase_usecase_DeriveTestObligationsInteractor__self
+class T35_domain_domain_ObligationDeriveError_RulesLoad variant_node
+class T35_domain_domain_ObligationDeriveError_TrackNotActive variant_node
+class T35_domain_domain_ObligationDeriveError_TrackFrozen variant_node
+class T35_domain_domain_ObligationDeriveError_TrackStatusRead variant_node
+class T35_domain_domain_ObligationDeriveError_CatalogueLoad variant_node
+class T35_domain_domain_ObligationDeriveError_SpecLoad variant_node
+class T35_domain_domain_ObligationDeriveError_InvalidCatalogueState variant_node
+class T35_domain_domain_ObligationDeriveError_ArtifactWrite variant_node
+class T35_domain_domain_ObligationDeriveError__self error_type
+class T40_domain_domain_TrackStatusReadFailureKind_Unavailable variant_node
+class T40_domain_domain_TrackStatusReadFailureKind__self value_object
+class T31_domain_domain_FrozenTrackStatus_Done variant_node
+class T31_domain_domain_FrozenTrackStatus_Archived variant_node
+class T31_domain_domain_FrozenTrackStatus__self value_object
+class T25_domain_domain_TrackStatus_Planned variant_node
+class T25_domain_domain_TrackStatus_InProgress variant_node
+class T25_domain_domain_TrackStatus_Done variant_node
+class T25_domain_domain_TrackStatus_Blocked variant_node
+class T25_domain_domain_TrackStatus_Cancelled variant_node
+class T25_domain_domain_TrackStatus_Archived variant_node
+class T25_domain_domain_TrackStatus_is_active method_node
+class T25_domain_domain_TrackStatus_frozen_status method_node
+class T25_domain_domain_TrackStatus__self value_object
+class T47_usecase_usecase_DeriveTestObligationsInteractor_new method_node
+class T47_usecase_usecase_DeriveTestObligationsInteractor__self interactor
 ```

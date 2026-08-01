@@ -10,47 +10,52 @@
     {
       "id": "T2",
       "description": "Update `libs/infrastructure/src/impl_plan_codec.rs::encode`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "7309757b2582e1511500123f1985bf12592ff6c1"
     },
     {
       "id": "T3",
       "description": "Update `libs/infrastructure/src/review_v2/persistence/mod.rs::write_atomic`; add fast- and final-round fixtures in `apps/cli-composition/src/review_v2/run.rs`. [IN-01; IN-02; CN-01; AC-01; AC-02]",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "7309757b2582e1511500123f1985bf12592ff6c1"
     },
     {
       "id": "T4",
       "description": "Update `libs/infrastructure/src/spec/codec.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "7309757b2582e1511500123f1985bf12592ff6c1"
     },
     {
       "id": "T5",
       "description": "Update `libs/infrastructure/src/task_coverage_codec.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "7309757b2582e1511500123f1985bf12592ff6c1"
     },
     {
       "id": "T6",
       "description": "Update `libs/infrastructure/src/schema_export_codec.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "7309757b2582e1511500123f1985bf12592ff6c1"
     },
     {
       "id": "T7",
       "description": "Update `libs/infrastructure/src/signal.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T8",
       "description": "Update `libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T9",
       "description": "Update `libs/infrastructure/src/tddd/catalogue_spec_signals_codec.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T10",
       "description": "Update `libs/infrastructure/src/tddd/semantic_verify_codec.rs::SpecAdrVerifyCacheDocumentCodec::encode`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T11",
@@ -60,12 +65,12 @@
     {
       "id": "T12",
       "description": "Update `libs/infrastructure/src/tddd/type_signals_codec.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T13",
       "description": "Update `libs/infrastructure/src/tddd/catalog_gen/fs_access.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T14",
@@ -105,12 +110,14 @@
     {
       "id": "T21",
       "description": "Extend `apps/cli-composition/src/test_obligation.rs::TestObligationCompositionRoot::derive_handler` fixtures for two active-branch invocations. [IN-03; CN-02; AC-03]",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "7309757b2582e1511500123f1985bf12592ff6c1"
     },
     {
       "id": "T22",
-      "description": "Extend `apps/cli-composition/src/test_obligation.rs::TestObligationCompositionRoot::derive_handler` fixtures for a completed-track invocation. [OS-02; CN-02; AC-04]",
-      "status": "todo"
+      "description": "Implement `libs/domain/src/track.rs::TrackStatus::frozen_status` with focused domain tests; update `libs/usecase/src/test_obligation/derive.rs::DeriveTestObligationsInteractor::execute` and its pre-write guard tests; use/verify `libs/infrastructure/src/track/track_status_reader_adapter.rs::FsTrackStatusReaderAdapter` with focused adapter coverage; wire it into `apps/cli-composition/src/test_obligation.rs::TestObligationCompositionRoot::derive_handler` and retain completed-track no-rewrite invocation fixtures. [OS-02; CN-02; AC-04]",
+      "status": "done",
+      "commit_hash": null
     },
     {
       "id": "T23",

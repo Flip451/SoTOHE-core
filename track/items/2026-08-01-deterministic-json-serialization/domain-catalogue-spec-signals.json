@@ -1,5 +1,26 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "88ac5c2327865f7319bfcd0e301acf990bd6ca0f1172e4571712967562f3a242",
-  "signals": []
+  "catalogue_declaration_hash": "e163670b519417017c71623f824cdb40ff3e2200cb9312d63211bc00eff76c37",
+  "signals": [
+    {
+      "type_name": "FrozenTrackStatus",
+      "signal": "blue",
+      "entry_hash": "2f2f6e2e70c5b56b6ef2755e7e4fcbe079e5c367aeb6a1824b113f68f1f87364"
+    },
+    {
+      "type_name": "ObligationDeriveError",
+      "signal": "blue",
+      "entry_hash": "963353c2a69224dd4178125d856368877e0548dbb2fc14f046fca63eafb61aa0"
+    },
+    {
+      "type_name": "TrackStatus",
+      "signal": "blue",
+      "entry_hash": "887e681cd2ed035282b4ca4a49e286f3f262970ed5c5a8e3c31056b780960280"
+    },
+    {
+      "type_name": "TrackStatusReadFailureKind",
+      "signal": "blue",
+      "entry_hash": "7f6ad2425923da276b1fee4fe9929c9f4873687ac9d72d244f926fc703b33f64"
+    }
+  ]
 }

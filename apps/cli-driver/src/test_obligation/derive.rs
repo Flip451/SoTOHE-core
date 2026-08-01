@@ -99,6 +99,8 @@ impl TestObligationDeriveHandler {
 mod tests {
     use std::sync::Mutex;
 
+    use usecase::test_obligation::errors::{ObligationDeriveError, TrackStatusReadFailureKind};
+
     use super::*;
 
     struct StubService {
@@ -163,5 +165,31 @@ mod tests {
             ),
         );
         assert_eq!(captured, expected);
+    }
+
+    #[test]
+    fn test_derive_handler_renders_redacted_track_status_read_failure() {
+        struct FailingStatusReadService;
+
+        impl DeriveTestObligationsApplicationService for FailingStatusReadService {
+            fn execute(
+                &self,
+                _cmd: &DeriveTestObligationsCommand,
+            ) -> Result<(), ObligationDeriveError> {
+                Err(ObligationDeriveError::TrackStatusRead(TrackStatusReadFailureKind::Unavailable))
+            }
+        }
+
+        let handler = TestObligationDeriveHandler::new(
+            Arc::new(FailingStatusReadService),
+            PathBuf::from("/repo"),
+        );
+
+        let outcome = handler.handle(TestObligationDeriveInput::new(None, branch()));
+        let stderr = outcome.stderr.unwrap();
+
+        assert_ne!(outcome.exit_code, 0);
+        assert!(stderr.contains("TrackStatusRead(Unavailable)"));
+        assert!(!stderr.contains("/private/track/items/metadata.json"));
     }
 }

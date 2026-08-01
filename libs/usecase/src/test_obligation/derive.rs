@@ -13,11 +13,13 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use domain::SpecRef;
-use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::CatalogueDocumentLoaderPort;
+use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::{
+    CatalogueDocumentLoaderPort, TrackStatusReaderPort,
+};
 use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, FunctionRole, ItemAction};
 use domain::tddd::catalogue_v2::{CatalogueDocument, TraitRefScope};
 use domain::tddd::semantic_verify::{CatalogueEntryKey, CatalogueEntryRef, CatalogueSectionKey};
-use domain::tddd::test_obligation::errors::ObligationDeriveError;
+use domain::tddd::test_obligation::errors::{ObligationDeriveError, TrackStatusReadFailureKind};
 use domain::tddd::test_obligation::hashes::DeclarationHash;
 use domain::tddd::test_obligation::ids::{
     DiagnosticMessage, TestObligationAnchorId, TestObligationBrief, TestObligationId,
@@ -74,6 +76,8 @@ pub struct DeriveTestObligationsInteractor {
     obligations_port: Arc<dyn ObligationsArtifactPort + Send + Sync>,
     spec_reader: Arc<dyn SpecDocumentLoaderPort + Send + Sync>,
     catalogue_reader: Arc<dyn CatalogueDocumentLoaderPort + Send + Sync>,
+    track_status_reader: Arc<dyn TrackStatusReaderPort + Send + Sync>,
+    items_dir: PathBuf,
     projector: RoleObligationItemsProjector,
 }
 
@@ -85,9 +89,19 @@ impl DeriveTestObligationsInteractor {
         obligations_port: Arc<dyn ObligationsArtifactPort + Send + Sync>,
         spec_reader: Arc<dyn SpecDocumentLoaderPort + Send + Sync>,
         catalogue_reader: Arc<dyn CatalogueDocumentLoaderPort + Send + Sync>,
+        track_status_reader: Arc<dyn TrackStatusReaderPort + Send + Sync>,
+        items_dir: PathBuf,
         projector: RoleObligationItemsProjector,
     ) -> Self {
-        Self { rules_loader, obligations_port, spec_reader, catalogue_reader, projector }
+        Self {
+            rules_loader,
+            obligations_port,
+            spec_reader,
+            catalogue_reader,
+            track_status_reader,
+            items_dir,
+            projector,
+        }
     }
 }
 
@@ -98,6 +112,15 @@ impl DeriveTestObligationsApplicationService for DeriveTestObligationsInteractor
             return Err(ObligationDeriveError::TrackNotActive {
                 branch: diag(input.current_branch()),
             });
+        }
+        let track_status = self
+            .track_status_reader
+            .read_status(&self.items_dir, input.track_id().as_ref())
+            .map_err(|_| {
+                ObligationDeriveError::TrackStatusRead(TrackStatusReadFailureKind::Unavailable)
+            })?;
+        if let Some(status) = track_status.frozen_status() {
+            return Err(ObligationDeriveError::TrackFrozen { status });
         }
 
         let rules = self.rules_loader.load().map_err(ObligationDeriveError::RulesLoad)?;

@@ -1,4 +1,53 @@
 {
   "track_id": "2026-08-01-deterministic-json-serialization",
-  "entries": []
+  "entries": [
+    {
+      "edge_id": {
+        "entry_key": "TrackStatusReadFailureKind",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-deterministic-json-serialization/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TrackStatusReadFailureKind",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-02"
+      },
+      "key": {
+        "waived_reason_hash": "174b4f79cdd39640b0e1f3b46f6556c09716105ca536049dbfc2ceb0ea48f238",
+        "declaration_hash": "7bd360d633f4f669b69c42a35b553a986bbb85e8a732131d982882dc694cfb66",
+        "anchor_text_hash": "16bf8ac3f5c6b353c7dd3534b78f23c80b306bbc0a7f371d7dbd8d85fddd9644"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TypeEntry { action: Add, role: ValueObject { invariants: [] }, kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"Unavailable\")), payload: Unit }] }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TrackStatusReadFailureKind",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-deterministic-json-serialization/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TrackStatusReadFailureKind",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-04"
+      },
+      "key": {
+        "waived_reason_hash": "633844750e060d2e0e040bd8472e012178aecc1e99f47e200cd82b9d7c0431d2",
+        "declaration_hash": "7bd360d633f4f669b69c42a35b553a986bbb85e8a732131d982882dc694cfb66",
+        "anchor_text_hash": "aff4cdf339643ab72d4f95266c10dd9332776bff099fc1684190cecc40a0b079"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"methods: []\"; \"The implementation does not regenerate or rewrite JSON artifacts for completed tracks solely to normalize key order.\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    }
+  ]
 }

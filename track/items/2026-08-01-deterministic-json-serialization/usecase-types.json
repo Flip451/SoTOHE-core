@@ -4,5 +4,78 @@
   "layer": "usecase",
   "schema_version": 5,
   "traits": {},
-  "types": {}
+  "types": {
+    "DeriveTestObligationsInteractor": {
+      "action": "modify",
+      "docs": "Owns pre-write guard orchestration for test-obligation artifact derivation. OS-02; CN-02; AC-04.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "rules_loader",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::TestObligationRulesLoaderPort + Send + Sync>"
+            },
+            {
+              "name": "obligations_port",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::ObligationsArtifactPort + Send + Sync>"
+            },
+            {
+              "name": "spec_reader",
+              "ty": "std::sync::Arc<dyn domain::spec_document_loader_port::SpecDocumentLoaderPort + Send + Sync>"
+            },
+            {
+              "name": "catalogue_reader",
+              "ty": "std::sync::Arc<dyn domain::tddd::catalogue_v2::catalogue_impl_signals_ports::CatalogueDocumentLoaderPort + Send + Sync>"
+            },
+            {
+              "name": "track_status_reader",
+              "ty": "std::sync::Arc<dyn domain::tddd::catalogue_v2::catalogue_impl_signals_ports::TrackStatusReaderPort + Send + Sync>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "projector",
+              "ty": "domain::tddd::test_obligation::projection::RoleObligationItemsProjector"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation::derive",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-08-01-deterministic-json-serialization/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-01-deterministic-json-serialization/spec.json"
+        }
+      ]
+    }
+  },
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "DeriveTestObligationsInteractor",
+      "trait_ref": "DeriveTestObligationsApplicationService"
+    }
+  ]
 }

@@ -8,7 +8,8 @@ use std::sync::{Arc, Mutex};
 
 use domain::tddd::LayerId;
 use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::{
-    CatalogueDocumentLoaderError, CatalogueDocumentLoaderPort,
+    CatalogueDocumentLoaderError, CatalogueDocumentLoaderPort, TrackStatusReadError,
+    TrackStatusReaderPort,
 };
 use domain::tddd::catalogue_v2::roles::{
     ContractRole, DataRole, FunctionRole, InvariantDecl, InvariantPredicate, ItemAction,
@@ -18,7 +19,9 @@ use domain::tddd::catalogue_v2::{
     ModulePath, SelfReceiver, StructKind, StructShape, TraitEntry, TraitImplDeclV2, TraitName,
     TypeEntry, TypeKindV2, TypeName, TypeRef,
 };
-use domain::tddd::test_obligation::errors::{ArtifactCodecError, TestObligationRulesLoadError};
+use domain::tddd::test_obligation::errors::{
+    ArtifactCodecError, TestObligationRulesLoadError, TrackStatusReadFailureKind,
+};
 use domain::tddd::test_obligation::ids::DiagnosticMessage;
 use domain::tddd::test_obligation::obligations::ObligationsDocument;
 use domain::tddd::test_obligation::ports::{
@@ -31,7 +34,10 @@ use domain::tddd::test_obligation::rules::{
 use domain::tddd::test_obligation::vocab::{
     TargetEntryRoleKind, TestObligationKind, TestObligationPatternKind, TestObligationPerAxis,
 };
-use domain::{SpecDocument, SpecDocumentLoadError, SpecElementId, SpecRef, SpecScope, TrackId};
+use domain::{
+    FrozenTrackStatus, SpecDocument, SpecDocumentLoadError, SpecElementId, SpecRef, SpecScope,
+    TrackId, TrackStatus,
+};
 
 use domain::SpecDocumentLoaderPort;
 
@@ -87,6 +93,20 @@ impl SpecDocumentLoaderPort for StubSpec {
             None,
         )
         .unwrap())
+    }
+}
+
+struct StubTrackStatus {
+    result: Result<TrackStatus, TrackStatusReadError>,
+}
+
+impl TrackStatusReaderPort for StubTrackStatus {
+    fn read_status(
+        &self,
+        _items_dir: &Path,
+        _track_id: &str,
+    ) -> Result<TrackStatus, TrackStatusReadError> {
+        self.result.clone()
     }
 }
 
@@ -354,6 +374,14 @@ fn interactor_with_catalogues(
     rules: TestObligationRulesDocument,
     catalogues: Vec<(PathBuf, CatalogueDocument)>,
 ) -> (DeriveTestObligationsInteractor, Arc<RecordingObligations>) {
+    interactor_with_catalogues_and_status(rules, catalogues, Ok(TrackStatus::InProgress))
+}
+
+fn interactor_with_catalogues_and_status(
+    rules: TestObligationRulesDocument,
+    catalogues: Vec<(PathBuf, CatalogueDocument)>,
+    track_status: Result<TrackStatus, TrackStatusReadError>,
+) -> (DeriveTestObligationsInteractor, Arc<RecordingObligations>) {
     let docs: HashMap<PathBuf, CatalogueDocument> = catalogues.into_iter().collect();
     let obligations = Arc::new(RecordingObligations::default());
     let interactor = DeriveTestObligationsInteractor::new(
@@ -361,6 +389,8 @@ fn interactor_with_catalogues(
         Arc::clone(&obligations) as Arc<dyn ObligationsArtifactPort + Send + Sync>,
         Arc::new(StubSpec),
         Arc::new(StubCatalogue { docs }),
+        Arc::new(StubTrackStatus { result: track_status }),
+        PathBuf::from("track/items"),
         RoleObligationItemsProjector::new(),
     );
     (interactor, obligations)
@@ -973,4 +1003,80 @@ fn test_non_active_branch_is_rejected() {
         result,
         Err(domain::tddd::test_obligation::errors::ObligationDeriveError::TrackNotActive { .. })
     ));
+}
+
+#[test]
+fn test_frozen_track_is_rejected_before_obligation_artifact_write() {
+    let path = PathBuf::from("domain-types.json");
+    let entry = value_object_entry(ItemAction::Add, vec![invariant("positive")]);
+    let (interactor, sink) = interactor_with_catalogues_and_status(
+        rules_doc(),
+        vec![(path.clone(), catalogue_with_type("Money", entry))],
+        Ok(TrackStatus::Done),
+    );
+
+    let result = interactor.execute(&command(vec![path]));
+
+    assert!(matches!(
+        result,
+        Err(domain::tddd::test_obligation::errors::ObligationDeriveError::TrackFrozen {
+            status: FrozenTrackStatus::Done
+        })
+    ));
+    assert!(
+        sink.saved.lock().unwrap().is_none(),
+        "a frozen track must be rejected before its obligations artifact is written"
+    );
+}
+
+#[test]
+fn test_archived_track_is_rejected_before_obligation_artifact_write() {
+    let path = PathBuf::from("domain-types.json");
+    let entry = value_object_entry(ItemAction::Add, vec![invariant("positive")]);
+    let (interactor, sink) = interactor_with_catalogues_and_status(
+        rules_doc(),
+        vec![(path.clone(), catalogue_with_type("Money", entry))],
+        Ok(TrackStatus::Archived),
+    );
+
+    let result = interactor.execute(&command(vec![path]));
+
+    assert!(matches!(
+        result,
+        Err(domain::tddd::test_obligation::errors::ObligationDeriveError::TrackFrozen {
+            status: FrozenTrackStatus::Archived
+        })
+    ));
+    assert!(
+        sink.saved.lock().unwrap().is_none(),
+        "an archived track must be rejected before its obligations artifact is written"
+    );
+}
+
+#[test]
+fn test_track_status_read_failure_prevents_obligation_artifact_write() {
+    let path = PathBuf::from("domain-types.json");
+    let entry = value_object_entry(ItemAction::Add, vec![invariant("positive")]);
+    let (interactor, sink) = interactor_with_catalogues_and_status(
+        rules_doc(),
+        vec![(path.clone(), catalogue_with_type("Money", entry))],
+        Err(TrackStatusReadError("cannot read /private/track/items/metadata.json".to_owned())),
+    );
+
+    let result = interactor.execute(&command(vec![path]));
+
+    assert!(matches!(
+        result,
+        Err(domain::tddd::test_obligation::errors::ObligationDeriveError::TrackStatusRead(
+            TrackStatusReadFailureKind::Unavailable
+        ))
+    ));
+    assert!(
+        !format!("{result:?}").contains("/private/track/items/metadata.json"),
+        "raw track-status read details must not escape the usecase boundary"
+    );
+    assert!(
+        sink.saved.lock().unwrap().is_none(),
+        "a status-read failure must prevent the obligations artifact write"
+    );
 }

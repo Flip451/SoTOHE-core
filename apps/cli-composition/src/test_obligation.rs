@@ -33,6 +33,7 @@ use infrastructure::test_obligation::waiver_escalation_driver::WaiverEscalationD
 use infrastructure::test_obligation::waiver_verifier::{
     FailingWaiverVerifier, WaiverVerifierAdapter, waiver_verifier_fingerprint,
 };
+use infrastructure::track::track_status_reader_adapter::FsTrackStatusReaderAdapter;
 use usecase::pre_review_gate::{ImplPlanReaderPort, TaskContractReaderPort};
 use usecase::semantic_verdict_core::driver::SemanticEscalationDriverPort;
 use usecase::semantic_verdict_core::probe::SemanticCalibrationProbeConfig;
@@ -108,6 +109,8 @@ impl TestObligationCompositionRoot {
             self.obligations_codec(),
             self.spec_loader(),
             self.catalogue_loader(),
+            Arc::new(FsTrackStatusReaderAdapter::new()),
+            self.items_dir(),
             RoleObligationItemsProjector::new(),
         ));
         cli_driver::test_obligation::derive::TestObligationDeriveHandler::new(
@@ -341,8 +344,10 @@ mod tests {
     use cli_driver::test_obligation::check::TestObligationCheckInput;
     use cli_driver::test_obligation::derive::TestObligationDeriveInput;
     use cli_driver::test_obligation::results::TestObligationResultsInput;
-    use domain::ModelTier;
+    use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::TrackStatusReaderPort;
+    use domain::{ModelTier, TrackStatus};
     use infrastructure::agent_profiles::{ResolvedExecution, RoundType};
+    use infrastructure::track::track_status_reader_adapter::FsTrackStatusReaderAdapter;
     use usecase::dry_write_driver::CapabilityName;
 
     use super::*;
@@ -551,9 +556,35 @@ mod tests {
                 "cli_driver-types.json",
                 "cli_composition-types.json",
                 "cli-types.json",
+                "metadata.json",
+                "impl-plan.json",
             ] {
                 std::fs::copy(source_track.join(artifact), target_track.join(artifact)).unwrap();
             }
+
+            // Keep this fixture active even after the source track is fully completed.
+            let impl_plan_path = target_track.join("impl-plan.json");
+            let mut impl_plan: serde_json::Value =
+                serde_json::from_str(&std::fs::read_to_string(&impl_plan_path).unwrap()).unwrap();
+            let task = impl_plan
+                .get_mut("tasks")
+                .and_then(serde_json::Value::as_array_mut)
+                .unwrap()
+                .iter_mut()
+                .find(|task| task.get("id").and_then(serde_json::Value::as_str) == Some("T29"))
+                .unwrap();
+            let task_fields = task.as_object_mut().unwrap();
+            task_fields.insert("status".to_owned(), serde_json::json!("todo"));
+            task_fields.remove("commit_hash");
+            std::fs::write(&impl_plan_path, serde_json::to_string_pretty(&impl_plan).unwrap())
+                .unwrap();
+            assert_eq!(
+                FsTrackStatusReaderAdapter::new()
+                    .read_status(&workspace_root.join("track/items"), TRACK_ID)
+                    .unwrap(),
+                TrackStatus::InProgress,
+                "the repeated-derive fixture must remain deterministically active"
+            );
 
             let root = TestObligationCompositionRoot::new(workspace_root.to_path_buf(), rules_path);
             let input =
@@ -565,6 +596,78 @@ mod tests {
             let second = std::fs::read(target_track.join("obligations.json")).unwrap();
 
             assert_eq!(first, second, "active-track derive must not churn JSON bytes");
+        });
+    }
+
+    #[test]
+    fn test_derive_handler_completed_track_invocation_preserves_existing_artifact_bytes() {
+        const COMPLETED_TRACK_ID: &str = "test-obligation-fulfillment-gate-2026-07-07";
+
+        let _guard = crate::test_support::process_env_lock().lock().unwrap();
+        let workspace = tempfile::tempdir().unwrap();
+        crate::test_support::seed_repo(workspace.path(), &format!("track/{COMPLETED_TRACK_ID}"));
+        crate::test_support::run_in_dir(workspace.path(), || {
+            let workspace_root = workspace.path();
+            let source_root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
+            let source_completed_track = source_root.join("track/items").join(COMPLETED_TRACK_ID);
+            let completed_track = workspace_root.join("track/items").join(COMPLETED_TRACK_ID);
+            let obligations_path = completed_track.join("obligations.json");
+            let rules_path = workspace_root.join(TEST_OBLIGATION_RULES_PATH);
+
+            std::fs::create_dir_all(rules_path.parent().unwrap()).unwrap();
+            std::fs::create_dir_all(&completed_track).unwrap();
+            std::fs::copy(source_root.join(TEST_OBLIGATION_RULES_PATH), &rules_path).unwrap();
+            for artifact in [
+                "spec.json",
+                "domain-types.json",
+                "usecase-types.json",
+                "infrastructure-types.json",
+                "cli_driver-types.json",
+                "cli_composition-types.json",
+                "cli-types.json",
+                "metadata.json",
+                "impl-plan.json",
+                "obligations.json",
+            ] {
+                std::fs::copy(
+                    source_completed_track.join(artifact),
+                    completed_track.join(artifact),
+                )
+                .unwrap();
+            }
+            assert_eq!(
+                FsTrackStatusReaderAdapter::new()
+                    .read_status(&workspace_root.join("track/items"), COMPLETED_TRACK_ID)
+                    .unwrap(),
+                TrackStatus::Done,
+                "the preserved artifact must belong to a completed track"
+            );
+            let expected = std::fs::read(&obligations_path).unwrap();
+
+            let root = TestObligationCompositionRoot::new(workspace_root.to_path_buf(), rules_path);
+            let input = TestObligationDeriveInput::try_from_raw(
+                Some(COMPLETED_TRACK_ID.to_owned()),
+                format!("track/{COMPLETED_TRACK_ID}"),
+            )
+            .unwrap();
+
+            let first = root.derive_handler().handle(input.clone());
+            assert_ne!(first.exit_code, 0, "completed tracks must not be derived");
+            let first_bytes = std::fs::read(&obligations_path).unwrap();
+            assert_eq!(first_bytes, expected, "completed-track artifacts must remain unchanged");
+
+            let second = root.derive_handler().handle(input);
+            assert_ne!(second.exit_code, 0, "completed tracks must remain rejected");
+            assert_eq!(
+                (first.exit_code, first.stdout, first.stderr),
+                (second.exit_code, second.stdout, second.stderr),
+                "completed-track rejection must be deterministic"
+            );
+            assert_eq!(
+                std::fs::read(&obligations_path).unwrap(),
+                first_bytes,
+                "repeated completed-track derives must preserve deterministic artifact bytes"
+            );
         });
     }
 

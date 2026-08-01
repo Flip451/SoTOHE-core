@@ -1,4 +1,246 @@
 {
-  "records": [],
+  "records": [
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "DeriveTestObligationsInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_frozen_track_is_rejected_before_obligation_artifact_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_track_status_read_failure_prevents_obligation_artifact_write"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ObligationDeriveError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-deterministic-json-serialization/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_frozen_track_is_rejected_before_obligation_artifact_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_track_status_read_failure_prevents_obligation_artifact_write"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ObligationDeriveError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-deterministic-json-serialization/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_frozen_track_is_rejected_before_obligation_artifact_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_track_status_read_failure_prevents_obligation_artifact_write"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "FrozenTrackStatus",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-deterministic-json-serialization/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::track::tests",
+          "test_name": "test_track_status_frozen_status_returns_terminal_variant_for_terminal_statuses"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::track::tests",
+          "test_name": "test_track_status_frozen_status_returns_none_for_active_statuses"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_frozen_track_is_rejected_before_obligation_artifact_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_archived_track_is_rejected_before_obligation_artifact_write"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "FrozenTrackStatus",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-deterministic-json-serialization/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::track::tests",
+          "test_name": "test_track_status_frozen_status_returns_terminal_variant_for_terminal_statuses"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::track::tests",
+          "test_name": "test_track_status_frozen_status_returns_none_for_active_statuses"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_frozen_track_is_rejected_before_obligation_artifact_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_archived_track_is_rejected_before_obligation_artifact_write"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TrackStatus",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-deterministic-json-serialization/spec.json",
+          "element_id": "OS-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::track::tests",
+          "test_name": "test_track_status_frozen_status_returns_terminal_variant_for_terminal_statuses"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::track::tests",
+          "test_name": "test_track_status_frozen_status_returns_none_for_active_statuses"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_frozen_track_is_rejected_before_obligation_artifact_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_archived_track_is_rejected_before_obligation_artifact_write"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TrackStatus",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-deterministic-json-serialization/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::track::tests",
+          "test_name": "test_track_status_frozen_status_returns_terminal_variant_for_terminal_statuses"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::track::tests",
+          "test_name": "test_track_status_frozen_status_returns_none_for_active_statuses"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_frozen_track_is_rejected_before_obligation_artifact_write"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TrackStatus",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-deterministic-json-serialization/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::track::tests",
+          "test_name": "test_track_status_frozen_status_returns_terminal_variant_for_terminal_statuses"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::track::tests",
+          "test_name": "test_track_status_frozen_status_returns_none_for_active_statuses"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_frozen_track_is_rejected_before_obligation_artifact_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_archived_track_is_rejected_before_obligation_artifact_write"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "TrackStatusReadFailureKind",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-deterministic-json-serialization/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "reason": "TrackStatusReadFailureKind is passive, redacted failure vocabulary: it neither regenerates artifacts nor decides whether a track is active. CN-02's migration key-order and completed-track preservation behavior has no independently testable intersection with this enum entry."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "TrackStatusReadFailureKind",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-deterministic-json-serialization/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "reason": "TrackStatusReadFailureKind is passive, redacted failure vocabulary: it neither reads a completed status nor writes an artifact. AC-04's completed-track no-rewrite behavior has no independently testable intersection with this enum entry."
+    }
+  ],
   "track_id": "2026-08-01-deterministic-json-serialization"
 }

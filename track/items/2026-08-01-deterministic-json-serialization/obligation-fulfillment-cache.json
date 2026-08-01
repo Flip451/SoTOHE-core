@@ -1,4 +1,374 @@
 {
   "track_id": "2026-08-01-deterministic-json-serialization",
-  "entries": []
+  "entries": [
+    {
+      "edge_id": {
+        "entry_key": "DeriveTestObligationsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-deterministic-json-serialization/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "DeriveTestObligationsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "a374909455b9aa2357e46ca4df70c051b6c8e7434ffb8161fffba3bd9005ffd8",
+        "declaration_hash": "d71954c18c465cf91e80dc9d6c1c5680e2417c7c117f505505a91af3584c65e8",
+        "anchor_text_hash": "16bf8ac3f5c6b353c7dd3534b78f23c80b306bbc0a7f371d7dbd8d85fddd9644"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(\n        sink.saved.lock().unwrap().is_none(),\n        \"a frozen track must be rejected before its obligations artifact is written\"\n    );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_frozen_track_is_rejected_before_obligation_artifact_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_track_status_read_failure_prevents_obligation_artifact_write"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "DeriveTestObligationsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-deterministic-json-serialization/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "DeriveTestObligationsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "a374909455b9aa2357e46ca4df70c051b6c8e7434ffb8161fffba3bd9005ffd8",
+        "declaration_hash": "d71954c18c465cf91e80dc9d6c1c5680e2417c7c117f505505a91af3584c65e8",
+        "anchor_text_hash": "aff4cdf339643ab72d4f95266c10dd9332776bff099fc1684190cecc40a0b079"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"a frozen track must be rejected before its obligations artifact is written\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_frozen_track_is_rejected_before_obligation_artifact_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_track_status_read_failure_prevents_obligation_artifact_write"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationDeriveError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-deterministic-json-serialization/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ObligationDeriveError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "a374909455b9aa2357e46ca4df70c051b6c8e7434ffb8161fffba3bd9005ffd8",
+        "declaration_hash": "b5f73c3113efce2f7b32d3acc764769ca53aa742346722011560e42685b92c9b",
+        "anchor_text_hash": "16bf8ac3f5c6b353c7dd3534b78f23c80b306bbc0a7f371d7dbd8d85fddd9644"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"sink.saved.lock().unwrap().is_none(),\\n        \\\"a frozen track must be rejected before its obligations artifact is written\\\"\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_frozen_track_is_rejected_before_obligation_artifact_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_track_status_read_failure_prevents_obligation_artifact_write"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationDeriveError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-deterministic-json-serialization/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ObligationDeriveError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "a374909455b9aa2357e46ca4df70c051b6c8e7434ffb8161fffba3bd9005ffd8",
+        "declaration_hash": "b5f73c3113efce2f7b32d3acc764769ca53aa742346722011560e42685b92c9b",
+        "anchor_text_hash": "aff4cdf339643ab72d4f95266c10dd9332776bff099fc1684190cecc40a0b079"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"sink.saved.lock().unwrap().is_none(),\\n        \\\"a frozen track must be rejected before its obligations artifact is written\\\"\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_frozen_track_is_rejected_before_obligation_artifact_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_track_status_read_failure_prevents_obligation_artifact_write"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "FrozenTrackStatus",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-deterministic-json-serialization/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FrozenTrackStatus",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "e74c1fe081e0926dac5c5077a6185c3033c008e368b330cd48eb5e34958beb04",
+        "declaration_hash": "56659d4458512e6db165a42fd45ec65c45d17772bd4e979f5f683015b894f8dc",
+        "anchor_text_hash": "16bf8ac3f5c6b353c7dd3534b78f23c80b306bbc0a7f371d7dbd8d85fddd9644"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(\n        sink.saved.lock().unwrap().is_none(),\n        \"a frozen track must be rejected before its obligations artifact is written\"\n    );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::track::tests",
+          "test_name": "test_track_status_frozen_status_returns_terminal_variant_for_terminal_statuses"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::track::tests",
+          "test_name": "test_track_status_frozen_status_returns_none_for_active_statuses"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_frozen_track_is_rejected_before_obligation_artifact_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_archived_track_is_rejected_before_obligation_artifact_write"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "FrozenTrackStatus",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-deterministic-json-serialization/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FrozenTrackStatus",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "e74c1fe081e0926dac5c5077a6185c3033c008e368b330cd48eb5e34958beb04",
+        "declaration_hash": "56659d4458512e6db165a42fd45ec65c45d17772bd4e979f5f683015b894f8dc",
+        "anchor_text_hash": "aff4cdf339643ab72d4f95266c10dd9332776bff099fc1684190cecc40a0b079"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(\n        sink.saved.lock().unwrap().is_none(),\n        \"a frozen track must be rejected before its obligations artifact is written\"\n    );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::track::tests",
+          "test_name": "test_track_status_frozen_status_returns_terminal_variant_for_terminal_statuses"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::track::tests",
+          "test_name": "test_track_status_frozen_status_returns_none_for_active_statuses"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_frozen_track_is_rejected_before_obligation_artifact_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_archived_track_is_rejected_before_obligation_artifact_write"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TrackStatus",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-deterministic-json-serialization/spec.json",
+          "element_id": "OS-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TrackStatus",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:OS-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "e74c1fe081e0926dac5c5077a6185c3033c008e368b330cd48eb5e34958beb04",
+        "declaration_hash": "39a3d9a6bb4aba9fa36277db99e68bccb3d48a7a55e83f34a32e06040e400a53",
+        "anchor_text_hash": "3c4703689c11674db6386192bb7a63ea90eff6732f6316156e05bf257d433318"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(TrackStatus::Done.frozen_status(), Some(FrozenTrackStatus::Done));\n        assert_eq!(TrackStatus::Archived.frozen_status(), Some(FrozenTrackStatus::Archived));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::track::tests",
+          "test_name": "test_track_status_frozen_status_returns_terminal_variant_for_terminal_statuses"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::track::tests",
+          "test_name": "test_track_status_frozen_status_returns_none_for_active_statuses"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_frozen_track_is_rejected_before_obligation_artifact_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_archived_track_is_rejected_before_obligation_artifact_write"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TrackStatus",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-deterministic-json-serialization/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TrackStatus",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "5ac7613d52e72190db4a9c8db18968b551d60a0b36cc10d1647c1c0861a7a11c",
+        "declaration_hash": "39a3d9a6bb4aba9fa36277db99e68bccb3d48a7a55e83f34a32e06040e400a53",
+        "anchor_text_hash": "16bf8ac3f5c6b353c7dd3534b78f23c80b306bbc0a7f371d7dbd8d85fddd9644"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(TrackStatus::Done.frozen_status(), Some(FrozenTrackStatus::Done));\n        assert_eq!(TrackStatus::Archived.frozen_status(), Some(FrozenTrackStatus::Archived));\n\n        assert!(matches!(\n        result,\n        Err(domain::tddd::test_obligation::errors::ObligationDeriveError::TrackFrozen {\n            status: FrozenTrackStatus::Done\n        })\n    ));\n    assert!(\n        sink.saved.lock().unwrap().is_none(),\n        \"a frozen track must be rejected before its obligations artifact is written\"\n    );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::track::tests",
+          "test_name": "test_track_status_frozen_status_returns_terminal_variant_for_terminal_statuses"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::track::tests",
+          "test_name": "test_track_status_frozen_status_returns_none_for_active_statuses"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_frozen_track_is_rejected_before_obligation_artifact_write"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TrackStatus",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-deterministic-json-serialization/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TrackStatus",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "e74c1fe081e0926dac5c5077a6185c3033c008e368b330cd48eb5e34958beb04",
+        "declaration_hash": "39a3d9a6bb4aba9fa36277db99e68bccb3d48a7a55e83f34a32e06040e400a53",
+        "anchor_text_hash": "aff4cdf339643ab72d4f95266c10dd9332776bff099fc1684190cecc40a0b079"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(sink.saved.lock().unwrap().is_none(), \"a frozen track must be rejected before its obligations artifact is written\")"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::track::tests",
+          "test_name": "test_track_status_frozen_status_returns_terminal_variant_for_terminal_statuses"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::track::tests",
+          "test_name": "test_track_status_frozen_status_returns_none_for_active_statuses"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_frozen_track_is_rejected_before_obligation_artifact_write"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_archived_track_is_rejected_before_obligation_artifact_write"
+        }
+      ]
+    }
+  ]
 }

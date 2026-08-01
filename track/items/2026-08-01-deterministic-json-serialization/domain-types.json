@@ -3,6 +3,338 @@
   "functions": {},
   "layer": "domain",
   "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "ObligationDeriveError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "TrackStatus",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "TrackStatus",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "TrackStatus",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "action": "reference",
+      "for_type": "TrackStatus",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "TrackStatus",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "TrackStatus",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "FrozenTrackStatus",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "FrozenTrackStatus",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "FrozenTrackStatus",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "FrozenTrackStatus",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "FrozenTrackStatus",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "TrackStatusReadFailureKind",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TrackStatusReadFailureKind",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "TrackStatusReadFailureKind",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "TrackStatusReadFailureKind",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TrackStatusReadFailureKind",
+      "trait_ref": "core::cmp::Eq"
+    }
+  ],
   "traits": {},
-  "types": {}
+  "types": {
+    "FrozenTrackStatus": {
+      "action": "add",
+      "docs": "Frozen-only track-status value; the finite enum excludes active states, and no existing domain type narrows TrackStatus to this invariant.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Done",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Archived",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "track",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-08-01-deterministic-json-serialization/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-01-deterministic-json-serialization/spec.json"
+        }
+      ]
+    },
+    "ObligationDeriveError": {
+      "action": "modify",
+      "docs": "Errors produced while deriving test-obligation artifacts.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "RulesLoad",
+            "payload": {
+              "fields": [
+                "TestObligationRulesLoadError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "TrackNotActive",
+            "payload": {
+              "fields": [
+                {
+                  "name": "branch",
+                  "ty": "DiagnosticMessage"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "TrackFrozen",
+            "payload": {
+              "fields": [
+                {
+                  "name": "status",
+                  "ty": "FrozenTrackStatus"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "TrackStatusRead",
+            "payload": {
+              "fields": [
+                "TrackStatusReadFailureKind"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "CatalogueLoad",
+            "payload": {
+              "fields": [
+                "CatalogueDocumentLoaderError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SpecLoad",
+            "payload": {
+              "fields": [
+                "SpecDocumentLoadError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidCatalogueState",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "ArtifactWrite",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::test_obligation::errors",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-08-01-deterministic-json-serialization/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-01-deterministic-json-serialization/spec.json"
+        }
+      ]
+    },
+    "TrackStatus": {
+      "action": "modify",
+      "docs": "Derived track-lifecycle value and domain owner of the exhaustive active/frozen classification; its side-effect-free methods preserve one classification vocabulary across application operations.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Planned",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "InProgress",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Done",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Blocked",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Cancelled",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Archived",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "is_active",
+          "params": [],
+          "receiver": "self",
+          "returns": "bool"
+        },
+        {
+          "docs": "Owns frozen-status classification for the completed-track write guard. OS-02; CN-02; AC-04.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "frozen_status",
+          "params": [],
+          "receiver": "self",
+          "returns": "Option<FrozenTrackStatus>"
+        }
+      ],
+      "module_path": "track",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "OS-02",
+          "file": "track/items/2026-08-01-deterministic-json-serialization/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-08-01-deterministic-json-serialization/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-01-deterministic-json-serialization/spec.json"
+        }
+      ]
+    },
+    "TrackStatusReadFailureKind": {
+      "action": "add",
+      "docs": "Stable public category for track-status read failures; unrestricted TrackStatusReadError detail is excluded, and no existing categorical domain type fits this boundary.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Unavailable",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::test_obligation::errors",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-08-01-deterministic-json-serialization/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-01-deterministic-json-serialization/spec.json"
+        }
+      ]
+    }
+  }
 }
