@@ -1,0 +1,205 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-08-01T02:12:40Z",
+  "declaration_hash": "fb7e43ae20ff63f7c72afe6fc0326a004f3e102548ed2220ae8abbfb58d154a2",
+  "implementation_input_hash": "944480e64a282c30d32e03d9cef6134638a05e92db8964dc2392ae654ede9ff7",
+  "signals": [
+    {
+      "type_name": "BaseMergeAttemptOutcome",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Copy",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "BaseMergeCleanupPort",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "BaseMergeCommand",
+      "kind_tag": "command",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "BaseMergeContextError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "BaseMergeContextPort",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "BaseMergeError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "BaseMergeGitError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "BaseMergeGitPort",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "BaseMergeInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "BaseMergeService"
+      ]
+    },
+    {
+      "type_name": "BaseMergeOutcome",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Copy",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "BaseMergeService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "GitStashCommand",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Copy",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "GitStashError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "GitStashInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "GitStashService"
+      ]
+    },
+    {
+      "type_name": "GitStashPort",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "GitStashService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "PostMergeCleanupStage",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Copy",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "TypeSignalsError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "TypeSignalsExecutionError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "TypeSignalsExecutorPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TypeSignalsInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

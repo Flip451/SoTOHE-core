@@ -1,0 +1,625 @@
+{
+  "track_id": "2026-07-31-base-merge-and-conflict-recovery",
+  "obligations": [
+    {
+      "id": {
+        "entry_key": "domain::branch_strategy::derive_base_merge_direction",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
+        "section_key": "functions",
+        "entry_key": "domain::branch_strategy::derive_base_merge_direction"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of domain::branch_strategy::derive_base_merge_direction",
+      "declaration_hash": "35411e6bbb2d58342dfef60cbcece5ec81c4da0f1c0433a85137f772de0b81de",
+      "spec_refs": [
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-01"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-01"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-02"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
+        "section_key": "functions",
+        "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of domain::tddd::type_signals_doc::decide_type_signals_reuse",
+      "declaration_hash": "b2ccdd2bd98674ad862fd2e8917e22786c91d54571f4b3872cc3be7370398514",
+      "spec_refs": [
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-03"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-07"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "BaseMergeInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "BaseMergeInteractor"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      },
+      "brief": "Author a result test covering 'entry' of BaseMergeInteractor",
+      "declaration_hash": "ce1a7ca347da2c4054bf94a0b0faa6940155c77ebb55bba0f780d688d4d8aa98",
+      "spec_refs": [
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-02"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-03"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-01"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-02"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-01"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-02"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-03"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "GitStashInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "GitStashInteractor"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      },
+      "brief": "Author a result test covering 'entry' of GitStashInteractor",
+      "declaration_hash": "e562e4becadd7ea28f4b37b5b8370a2d74020cbd4a5d1b2b1c04ed20f3e9ac93",
+      "spec_refs": [
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-04"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-06"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:regenerate_views"
+      },
+      "target_entry": {
+        "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "BaseMergeCleanupPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:regenerate_views' of BaseMergeCleanupPort",
+      "declaration_hash": "34ccb97304ed062a94f4c8c25c873065e436f7bcde243154df70ede1cd5a2532",
+      "spec_refs": [
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-02"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-02"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-03"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:recapture_baselines"
+      },
+      "target_entry": {
+        "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "BaseMergeCleanupPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:recapture_baselines' of BaseMergeCleanupPort",
+      "declaration_hash": "34ccb97304ed062a94f4c8c25c873065e436f7bcde243154df70ede1cd5a2532",
+      "spec_refs": [
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-02"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-02"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-03"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:record_sync_base_stamp"
+      },
+      "target_entry": {
+        "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "BaseMergeCleanupPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:record_sync_base_stamp' of BaseMergeCleanupPort",
+      "declaration_hash": "34ccb97304ed062a94f4c8c25c873065e436f7bcde243154df70ede1cd5a2532",
+      "spec_refs": [
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-02"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-02"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-03"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "BaseMergeContextPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load_direction"
+      },
+      "target_entry": {
+        "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "BaseMergeContextPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:load_direction' of BaseMergeContextPort",
+      "declaration_hash": "20cbfb1b4e37361954305e0df7d3a2766b5b5df1a2ff18d2d674462285fbb8e3",
+      "spec_refs": [
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-01"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-01"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-02"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "BaseMergeGitPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:merge_base"
+      },
+      "target_entry": {
+        "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "BaseMergeGitPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:merge_base' of BaseMergeGitPort",
+      "declaration_hash": "318479435b77df5c4e0a4171903380853bd56d6b14317305f862ce59fc6c1636",
+      "spec_refs": [
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-01"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-01"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-02"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "BaseMergeService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:execute"
+      },
+      "target_entry": {
+        "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "BaseMergeService"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      },
+      "brief": "Author a result test covering 'trait_method:execute' of BaseMergeService",
+      "declaration_hash": "238b8c7004943fac290b01ed0f77637bdaa947bd23e04fed73f5d2742a14d132",
+      "spec_refs": [
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-02"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-03"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-01"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-02"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-01"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-02"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-03"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "GitStashPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:execute"
+      },
+      "target_entry": {
+        "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "GitStashPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:execute' of GitStashPort",
+      "declaration_hash": "8eede41fe72ae42889292a3e7b09335f2a9b7c21cd37730092649b10dda2b974",
+      "spec_refs": [
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-04"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-06"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "GitStashService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:execute"
+      },
+      "target_entry": {
+        "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "GitStashService"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      },
+      "brief": "Author a result test covering 'trait_method:execute' of GitStashService",
+      "declaration_hash": "8207b19f5741c65fa30a5198cddf17539cbd6ad9ee5fe5272474462e83149f35",
+      "spec_refs": [
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-04"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-06"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "infrastructure::tddd::type_signals_codec::baseline_hash",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+        "section_key": "functions",
+        "entry_key": "infrastructure::tddd::type_signals_codec::baseline_hash"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of infrastructure::tddd::type_signals_codec::baseline_hash",
+      "declaration_hash": "03c3049369b5929ad9d84ec2ec49ed15fc79935300a5d9dae3c6f57392c91274",
+      "spec_refs": [
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-03"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-07"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "FsBaseMergeContextAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::base_merge::BaseMergeContextPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "FsBaseMergeContextAdapter"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::base_merge::BaseMergeContextPort' of FsBaseMergeContextAdapter",
+      "declaration_hash": "22d216f4e70222ce549db0307438f0af4268786cb17aa00a135c0ffb1a8f1ac2",
+      "spec_refs": [
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-01"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-01"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-02"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "FsBaseMergeGitAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::base_merge::BaseMergeGitPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "FsBaseMergeGitAdapter"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::base_merge::BaseMergeGitPort' of FsBaseMergeGitAdapter",
+      "declaration_hash": "b139ae71b826be52073a96f0e76c6309314a5e1ecebc0a66bea9c6ea954c1a4e",
+      "spec_refs": [
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-01"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-01"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-02"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "FsBaseMergeCleanupAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::base_merge::BaseMergeCleanupPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "FsBaseMergeCleanupAdapter"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::base_merge::BaseMergeCleanupPort' of FsBaseMergeCleanupAdapter",
+      "declaration_hash": "2f6075a148b1bf9f0eb45df3ca5af0462c4f55fea33b0dfe9e7a352240f66ca0",
+      "spec_refs": [
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-02"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-02"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-03"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "FsGitStashAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::git_stash::GitStashPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "FsGitStashAdapter"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::git_stash::GitStashPort' of FsGitStashAdapter",
+      "declaration_hash": "b3579f9ab6ff77820ccb62e5cba63340d45a9afff6067c287937c488d8aea82b",
+      "spec_refs": [
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-04"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-06"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-08-01T02:12:41Z",
+  "declaration_hash": "6a0d7d1bb14f8247fe50f5fc3066ff2a0775acc1c118f4430059195e797b0efb",
+  "implementation_input_hash": "ebc0c71312207b18f846f9a628a516e3db4c5c6fcb5c21b07bdea63c02f9ed8e",
+  "signals": [
+    {
+      "type_name": "BaseMergeInput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "GitDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "GitStashInput",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Copy",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "TrackDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "yellow",
+      "found_type": true
+    }
+  ]
+}

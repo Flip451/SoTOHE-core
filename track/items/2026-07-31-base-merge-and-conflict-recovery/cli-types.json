@@ -1,0 +1,489 @@
+{
+  "crate_name": "cli",
+  "functions": {
+    "cli::commands::git::execute": {
+      "action": "reference",
+      "docs": "Baseline function signature for git-command dispatch through the composition root.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "cmd",
+          "ty": "GitCommand"
+        }
+      ],
+      "returns": "std::process::ExitCode",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    }
+  },
+  "layer": "cli",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "modify",
+      "for_type": "GitCommand",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "GitCommand",
+      "trait_ref": "clap::FromArgMatches"
+    },
+    {
+      "action": "modify",
+      "for_type": "GitCommand",
+      "trait_ref": "clap::Subcommand"
+    },
+    {
+      "action": "modify",
+      "for_type": "TrackCommand",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "TrackCommand",
+      "trait_ref": "clap::FromArgMatches"
+    },
+    {
+      "action": "modify",
+      "for_type": "TrackCommand",
+      "trait_ref": "clap::Subcommand"
+    },
+    {
+      "for_type": "GitStashAction",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "GitStashAction",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "GitStashAction",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "GitStashAction",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "GitStashAction",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "GitStashAction",
+      "trait_ref": "clap::FromArgMatches"
+    },
+    {
+      "for_type": "GitStashAction",
+      "trait_ref": "clap::Subcommand"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "GitCommand": {
+      "action": "modify",
+      "docs": "CLI command surface for guarded local git workflows.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "AddAll",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "AddFromFile",
+            "payload": {
+              "fields": [
+                "FileArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "CommitFromFile",
+            "payload": {
+              "fields": [
+                "CommitFromFileArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "NoteFromFile",
+            "payload": {
+              "fields": [
+                "FileArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Sync",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Unstage",
+            "payload": {
+              "fields": [
+                "UnstageArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Stash",
+            "payload": {
+              "fields": [
+                "GitStashAction"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "commands::git",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
+    "GitStashAction": {
+      "action": "add",
+      "docs": "Finite CLI action set for guarded stash creation and restoration.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Push",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Pop",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "commands::git",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
+    "TrackCommand": {
+      "action": "modify",
+      "docs": "CLI enum for track subcommands, including a unit MergeBase variant; pre-existing String payloads remain parsing-boundary text.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Archive",
+            "payload": {
+              "fields": [
+                "std::path::PathBuf",
+                "Option<String>"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Transition",
+            "payload": {
+              "fields": [
+                "std::path::PathBuf",
+                "Option<String>",
+                "String",
+                "String",
+                "Option<String>"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Branch",
+            "payload": {
+              "fields": [
+                "BranchAction"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Resolve",
+            "payload": {
+              "fields": [
+                "ResolveArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Views",
+            "payload": {
+              "fields": [
+                "ViewAction"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "AddTask",
+            "payload": {
+              "fields": [
+                "std::path::PathBuf",
+                "Option<String>",
+                "String",
+                "Option<String>",
+                "Option<String>"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SetOverride",
+            "payload": {
+              "fields": [
+                "std::path::PathBuf",
+                "Option<String>",
+                "String",
+                "String"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "ClearOverride",
+            "payload": {
+              "fields": [
+                "std::path::PathBuf",
+                "Option<String>"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "NextTask",
+            "payload": {
+              "fields": [
+                "std::path::PathBuf",
+                "Option<String>"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "TaskCounts",
+            "payload": {
+              "fields": [
+                "std::path::PathBuf",
+                "Option<String>"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "TypeGraph",
+            "payload": {
+              "fields": [
+                "std::path::PathBuf",
+                "Option<String>",
+                "std::path::PathBuf",
+                "Option<String>",
+                "usize",
+                "String"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "BaselineGraph",
+            "payload": {
+              "fields": [
+                "std::path::PathBuf",
+                "Option<String>",
+                "std::path::PathBuf",
+                "Option<String>"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "ContractMap",
+            "payload": {
+              "fields": [
+                "std::path::PathBuf",
+                "Option<String>",
+                "std::path::PathBuf",
+                "Option<String>"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SpecElementHash",
+            "payload": {
+              "fields": [
+                "std::path::PathBuf",
+                "Option<String>",
+                "Option<String>"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "BaselineCapture",
+            "payload": {
+              "fields": [
+                "Option<String>",
+                "std::path::PathBuf",
+                "Option<std::path::PathBuf>",
+                "Option<String>"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "FixpointResolve",
+            "payload": {
+              "fields": [
+                "FixpointResolveArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SetCommitHash",
+            "payload": {
+              "fields": [
+                "SetCommitHashArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Lint",
+            "payload": {
+              "fields": [
+                "Option<String>",
+                "String",
+                "std::path::PathBuf",
+                "Option<std::path::PathBuf>"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "CatalogueImplSignals",
+            "payload": {
+              "fields": [
+                "Option<String>",
+                "std::path::PathBuf",
+                "Option<String>"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SwitchBase",
+            "payload": {
+              "fields": [
+                "std::path::PathBuf"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "MergeBase",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "items_dir",
+          "params": [],
+          "receiver": "&self",
+          "returns": "std::path::PathBuf"
+        }
+      ],
+      "module_path": "commands::track",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    }
+  }
+}

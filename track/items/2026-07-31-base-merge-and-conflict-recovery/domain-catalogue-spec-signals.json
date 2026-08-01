@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "361f9d570bc63d660f166eb799df5457c88fbb4fa22e663ef9c53f25ebd83944",
+  "signals": [
+    {
+      "type_name": "BaseBranchName",
+      "signal": "blue",
+      "entry_hash": "4fd601aff3e48ee3f1a97404f1ba35cf126d12eebea4d065bc36c5b6a363a709"
+    },
+    {
+      "type_name": "BaseMergeDirection",
+      "signal": "blue",
+      "entry_hash": "c7e5afadc8d0834d5db8a1797aaae156409c2946a084bcceac4df171e6f00982"
+    },
+    {
+      "type_name": "BaseMergeDirectionError",
+      "signal": "blue",
+      "entry_hash": "558edc00d0640da2362445836b9b4a48d085c2ea69b191c1347cdc85c71efa8b"
+    },
+    {
+      "type_name": "BaselineHash",
+      "signal": "blue",
+      "entry_hash": "1f086893c905a07613ed6b7e6d0a30b076be3436c8ca2c8b025043337c7820ca"
+    },
+    {
+      "type_name": "TrackMetadata",
+      "signal": "blue",
+      "entry_hash": "7e183ebf4eb0bb250a83af8a24df57e7220eafb68a731f57952dc8433015fff4"
+    },
+    {
+      "type_name": "TypeSignalsCacheKey",
+      "signal": "blue",
+      "entry_hash": "13b7b5ef8ee7294b22f6e8883b8951c5a564c6575616f339f3491079dddbbddc"
+    },
+    {
+      "type_name": "TypeSignalsDocument",
+      "signal": "blue",
+      "entry_hash": "2b80b3073b2c3770f99aca9497ac4f5faaf533a660a2ebab05e5dcb22693bb0b"
+    },
+    {
+      "type_name": "domain::branch_strategy::derive_base_merge_direction",
+      "signal": "blue",
+      "entry_hash": "21012cd1c70914ca63dba959733997161fd8a515af57dca7611af7ff392abab0"
+    },
+    {
+      "type_name": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
+      "signal": "blue",
+      "entry_hash": "8513c3b301ed41b219c18693f08372a250be9b60b595a3d5a3ccaeb98d97dc13"
+    }
+  ]
+}

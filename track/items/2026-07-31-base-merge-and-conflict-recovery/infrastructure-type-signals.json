@@ -1,0 +1,68 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-08-01T02:12:41Z",
+  "declaration_hash": "4b6a8589a1f307c44b2748d99e57ccfa2fa77ed8087517f975084246017fc097",
+  "implementation_input_hash": "a64622563158087d7d16ee6e0095f45cd7068061a517232564ccc5b374e766d0",
+  "signals": [
+    {
+      "type_name": "FsBaseMergeCleanupAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "usecase::base_merge::BaseMergeCleanupPort"
+      ]
+    },
+    {
+      "type_name": "FsBaseMergeContextAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "usecase::base_merge::BaseMergeContextPort"
+      ]
+    },
+    {
+      "type_name": "FsBaseMergeGitAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "usecase::base_merge::BaseMergeGitPort"
+      ]
+    },
+    {
+      "type_name": "FsGitStashAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "usecase::git_stash::GitStashPort"
+      ]
+    },
+    {
+      "type_name": "infrastructure::tddd::type_signals_codec::baseline_hash",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "TypeSignalsExecutorAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::tddd::type_signals_codec::decode",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::tddd::type_signals_codec::encode",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

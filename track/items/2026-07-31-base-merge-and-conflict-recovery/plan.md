@@ -1,4 +1,33 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # Base Merge and Conflict Recovery
 
-> **Note**: `impl-plan.json` not yet generated. Run `/track:impl-plan` to generate the implementation plan.
+## Summary
+
+GO-01 → T001–T004.
+GO-02 → T005–T009.
+
+## Tasks (0/9 resolved)
+
+### S1 — Guarded base merge
+
+> Modify `libs/domain/src/branch_strategy.rs`, `libs/usecase/src/base_merge.rs`, `libs/infrastructure/src/base_merge.rs`, and the named track CLI surfaces in T004. D1; IN-01; AC-01; AC-02; AC-03; AC-04.
+
+- [ ] **T001**: Add `BaseBranchName`, `BaseMergeDirection`, `BaseMergeDirectionError`, and `derive_base_merge_direction` in `libs/domain/src/branch_strategy.rs`, updating `TrackMetadata` in `libs/domain/src/track.rs`; add regression coverage. D1; IN-01; OS-01; CN-01; AC-01; AC-02.
+- [ ] **T002**: Add `libs/usecase/src/base_merge.rs` with `BaseMergeContextPort`, `BaseMergeGitPort`, `BaseMergeCleanupPort`, `BaseMergeService`, `BaseMergeInteractor`, command, outcomes, and errors; export it from `libs/usecase/src/lib.rs` and add regression coverage. D1; IN-01; IN-02; OS-01; CN-01; CN-02; AC-01; AC-02; AC-03; AC-04.
+- [ ] **T003**: Add `FsBaseMergeContextAdapter`, `FsBaseMergeGitAdapter`, and `FsBaseMergeCleanupAdapter` in `libs/infrastructure/src/base_merge.rs`; export the module from `libs/infrastructure/src/lib.rs` and add adapter regression coverage. D1; IN-01; IN-02; OS-01; CN-01; CN-02; AC-01; AC-02; AC-03; AC-04.
+- [ ] **T004**: Add `BaseMergeInput` and `TrackDriver` handling in `apps/cli-driver/src/track.rs`, the `TrackCommand` variant and `execute` dispatch in `apps/cli/src/commands/track/{mod.rs,dispatch.rs}`, and `TrackCompositionRoot::track_driver` wiring in `apps/cli-composition/src/track/composition_root.rs`; add command regression coverage. D1; IN-01; OS-01; CN-01; AC-01; AC-02; AC-03; AC-04.
+
+### S2 — Conflict recovery and guarded stash
+
+> Add `.harness/workflows/track/recover.md`, its named Claude/Codex adapters, `libs/usecase/src/git_stash.rs`, and the named stash adapters in T006. D2; D3; IN-03; IN-04; AC-05; AC-06.
+
+- [ ] **T005**: Add `.harness/workflows/track/recover.md`, `.claude/commands/track/recover.md`, and `.agents/skills/track-recover/SKILL.md` for the `recover` command surface; add workflow/adapter conformance coverage. D2; IN-03; OS-02; CN-02; AC-04; AC-05.
+- [ ] **T006**: Add `libs/usecase/src/git_stash.rs` with `GitStashPort`, `GitStashService`, `GitStashInteractor`, command, and error; add `FsGitStashAdapter` in `libs/infrastructure/src/git_cli/stash_adapter.rs`, wire `GitDriver` and `GitStashInput` in `apps/cli-driver/src/git.rs`, and add `GitCommand`, `GitStashAction`, and `execute` integration in `apps/cli/src/commands/git.rs` with composition wiring in `apps/cli-composition/src/git.rs`; add regression coverage. D3; IN-04; AC-06.
+
+### S3 — Baseline-hash-aware type signals
+
+> Modify `libs/domain/src/tddd/type_signals_doc.rs`, `libs/usecase/src/type_signals/{service.rs,ports.rs,interactor.rs}`, and `libs/infrastructure/src/tddd/{type_signals_executor_adapter.rs,type_signals_codec.rs}`. D4; IN-05; AC-07; AC-08; AC-09.
+
+- [ ] **T007**: Modify `BaselineHash`, `TypeSignalsCacheKey`, `TypeSignalsDocument`, and `decide_type_signals_reuse` in `libs/domain/src/tddd/type_signals_doc.rs`; add regression coverage. D4; IN-05; OS-03; CN-03; CN-04; AC-07; AC-08; AC-09.
+- [ ] **T008**: Modify `TypeSignalsError` in `libs/usecase/src/type_signals/service.rs`, `TypeSignalsExecutionError` and `TypeSignalsExecutorPort` in `ports.rs`, and `TypeSignalsInteractor` in `interactor.rs`; add regression coverage in `interactor/tests.rs`. D4; IN-05; OS-03; CN-03; CN-04; AC-07; AC-08; AC-09.
+- [ ] **T009**: Modify `TypeSignalsExecutorAdapter` in `libs/infrastructure/src/tddd/type_signals_executor_adapter.rs` and `baseline_hash`, `decode`, and `encode` in `type_signals_codec.rs`; add adapter/codec regression coverage. D4; IN-05; OS-03; CN-03; CN-04; AC-07; AC-08; AC-09.

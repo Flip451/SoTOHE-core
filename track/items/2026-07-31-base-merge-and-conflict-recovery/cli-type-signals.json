@@ -1,0 +1,51 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-08-01T02:15:51Z",
+  "declaration_hash": "58e4ac326319f7ff2161bc452992d088c01d3284f2bdffb66e010bd894789e1b",
+  "implementation_input_hash": "d3ca37b6553dbd94396946ab5ae76a9a2a74ff16f8153de3f96e907c5ede560a",
+  "signals": [
+    {
+      "type_name": "GitCommand",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "Debug",
+        "FromArgMatches",
+        "Subcommand"
+      ]
+    },
+    {
+      "type_name": "GitStashAction",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Copy",
+        "Debug",
+        "Eq",
+        "FromArgMatches",
+        "PartialEq",
+        "Subcommand"
+      ]
+    },
+    {
+      "type_name": "TrackCommand",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "Debug",
+        "FromArgMatches",
+        "Subcommand"
+      ]
+    },
+    {
+      "type_name": "cli::commands::git::execute",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

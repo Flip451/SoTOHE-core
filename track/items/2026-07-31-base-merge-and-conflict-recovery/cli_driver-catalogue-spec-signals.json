@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "6a0d7d1bb14f8247fe50f5fc3066ff2a0775acc1c118f4430059195e797b0efb",
+  "signals": [
+    {
+      "type_name": "BaseMergeInput",
+      "signal": "blue",
+      "entry_hash": "57b51725c7224efcbbe84c085ffabaca24841c64633398d2b17abb88e18dfb07"
+    },
+    {
+      "type_name": "GitDriver",
+      "signal": "blue",
+      "entry_hash": "f836173f7a16637101aa891199637ac946ac63c1f1e28d8bc10c20c2c647b11e"
+    },
+    {
+      "type_name": "GitStashInput",
+      "signal": "blue",
+      "entry_hash": "41b5aef01374a2569c432a68bd6cb831c6b4f1a32b52503b933a16bc17575431"
+    },
+    {
+      "type_name": "TrackDriver",
+      "signal": "blue",
+      "entry_hash": "68228b87d7f6ca2aa2ed4e94c92e5c8897f3f1d3b8db7d81c9e23580114f39e8"
+    }
+  ]
+}

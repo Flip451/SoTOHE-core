@@ -1,0 +1,101 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-08-01T02:15:50Z",
+  "declaration_hash": "361f9d570bc63d660f166eb799df5457c88fbb4fa22e663ef9c53f25ebd83944",
+  "implementation_input_hash": "1f19e2c672e17aad8298dc241d8857766ac72280d855012d8a988e5343af79c6",
+  "signals": [
+    {
+      "type_name": "BaseBranchName",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "Hash",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "BaseMergeDirection",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "BaseMergeDirectionError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error",
+        "From<RefValidationError>"
+      ]
+    },
+    {
+      "type_name": "BaselineHash",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "Hash",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "TypeSignalsCacheKey",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "Hash",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "TypeSignalsDocument",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "domain::branch_strategy::derive_base_merge_direction",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "TrackMetadata",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

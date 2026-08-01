@@ -1,38 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cb666be156be4e5a74c73e23d8220f63bb3db8b8a08be26761cbad58085b2412",
-          "at": "2026-07-31T22:47:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cb666be156be4e5a74c73e23d8220f63bb3db8b8a08be26761cbad58085b2412",
-          "at": "2026-07-31T22:50:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ccf80b721d965f8205f7454dbcd27c4ea12d2cfc166dd951f73cef9c2c11ea89",
-          "at": "2026-08-01T00:18:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ccf80b721d965f8205f7454dbcd27c4ea12d2cfc166dd951f73cef9c2c11ea89",
-          "at": "2026-08-01T00:21:10Z"
-        }
-      ]
-    },
     "spec": {
       "rounds": [
         {
@@ -85,6 +53,537 @@
           "findings": [],
           "hash": "rvw1:sha256:e5eb0df80593d31f3aabfdebd7984bbd743c1e8d5ed5d06b057148c3620c400d",
           "at": "2026-08-01T00:46:48Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cb666be156be4e5a74c73e23d8220f63bb3db8b8a08be26761cbad58085b2412",
+          "at": "2026-07-31T22:47:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cb666be156be4e5a74c73e23d8220f63bb3db8b8a08be26761cbad58085b2412",
+          "at": "2026-07-31T22:50:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ccf80b721d965f8205f7454dbcd27c4ea12d2cfc166dd951f73cef9c2c11ea89",
+          "at": "2026-08-01T00:18:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ccf80b721d965f8205f7454dbcd27c4ea12d2cfc166dd951f73cef9c2c11ea89",
+          "at": "2026-08-01T00:21:10Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 description names only a layer-level target, not a file or symbol; an executor must invent the implementation boundary.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 6,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T002 description does not identify target files or symbols; its implementation boundary is left to the executor.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 12,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T003 description does not identify target files or symbols for the filesystem adapters.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 19,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T004 description names command surfaces but no target file or symbol, leaving the CLI implementation boundary unspecified.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 26,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T005 description names workflow/adapters generically but does not identify the target files or symbols.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 33,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T006 description names layers and surfaces but no target files or symbols for the stash implementation.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 40,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T007 description does not identify the target file or symbol for cache identity and reuse changes.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 46,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T008 description does not identify the target file or symbol for the fail-closed reevaluation changes.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 52,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T009 description does not identify the target file or symbol for baseline hashing and cache persistence.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 59,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T001 restates the behavior contract that only the recorded base branch may flow into the active track branch; retain the operation target and anchor instead, per .harness/policies/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T003 restates clean-merge post-processing and conflict handoff behavior in prose; this is upstream behavior-contract text prohibited by .harness/policies/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 19,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T005 restates the provider-adapter behavior limitation in prose; cite OS-02/AC-05 without duplicating that contract, per .harness/policies/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 33,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T006 restates AC-06's artifact-preservation and branch-mutation contract in prose; this violates .harness/policies/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 40,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T007 restates mismatch-safe cache behavior in prose; retain the target operation and anchors without duplicating the upstream contract.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 46,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T008 restates the fail-closed behavior contract in prose; this is prohibited upstream restatement under .harness/policies/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 52,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T009 restates malformed/stale-cache reevaluation and atomic replacement behavior in prose; cite the anchors instead, per .harness/policies/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 59,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:c7828c74e28ec1f5b75565e55aa9ba32cee365e86ab6fde26bf32bdb0156c2bd",
+          "at": "2026-08-01T04:03:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b79132a630b24a2365f0233f4f2f1a142dbf3a95482a51b9db9a85a4729aba0e",
+          "at": "2026-08-01T04:11:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b79132a630b24a2365f0233f4f2f1a142dbf3a95482a51b9db9a85a4729aba0e",
+          "at": "2026-08-01T04:16:23Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fb2f7e429b2d3257d2accfc1dc2b5a2aae2990a6b625404fb70ef0e21ee8d4e8",
+          "at": "2026-08-01T01:29:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fb2f7e429b2d3257d2accfc1dc2b5a2aae2990a6b625404fb70ef0e21ee8d4e8",
+          "at": "2026-08-01T01:33:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fb2f7e429b2d3257d2accfc1dc2b5a2aae2990a6b625404fb70ef0e21ee8d4e8",
+          "at": "2026-08-01T01:46:40Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`BaseMergeError::SourceMismatch` declares a `requested` branch, but `BaseMergeCommand` contains only `workspace_root` and the context port derives the source from the authoritative snapshot. No declared caller possesses a caller-selected branch to populate `requested`, making this error variant dead/unconstructible. Use a mismatch error whose payload reflects data available at the guard failure point.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 656,
+              "category": "unconstructible error variant (dead vocabulary)"
+            }
+          ],
+          "hash": "rvw1:sha256:3a7c5b368c4ed8cc2e625e11737b695017783ab49f0670c51d35be7e8765ec4e",
+          "at": "2026-08-01T01:30:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`BaseMergeError::SourceMismatch` declares a `requested` branch, but `BaseMergeCommand` contains only `workspace_root` and the context port derives the source from the authoritative snapshot. No declared caller possesses a caller-selected branch to populate `requested`, making this error variant dead/unconstructible.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 656,
+              "category": "unconstructible error variant (dead vocabulary)"
+            }
+          ],
+          "hash": "rvw1:sha256:3a7c5b368c4ed8cc2e625e11737b695017783ab49f0670c51d35be7e8765ec4e",
+          "at": "2026-08-01T01:32:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ead187584a8b75e79490878a59a571a75b860e5c460854f349e87590b2ddc7f0",
+          "at": "2026-08-01T01:46:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cli::commands::git::execute` is declared `action: modify`, but its parameter and return signature are identical to the rustdoc baseline. The planned dispatch-body change is not a type-contract structural delta; declare it as `reference` or omit it.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/cli-types.json",
+              "line": 5,
+              "category": "SoT integrity / action incoherence"
+            },
+            {
+              "message": "`infrastructure::tddd::type_signals_codec::decode` retains the baseline `fn(&str) -> Result<TypeSignalsDocument, TypeSignalsCodecError>` signature, so `action: modify` falsely claims a structural API change. Use `reference` or omit this body-only change.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+              "line": 33,
+              "category": "SoT integrity / action incoherence"
+            },
+            {
+              "message": "`infrastructure::tddd::type_signals_codec::encode` retains its complete baseline signature. Its serialization behavior changes, but its type contract does not, so `action: modify` should be `reference` or omitted.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+              "line": 61,
+              "category": "SoT integrity / action incoherence"
+            },
+            {
+              "message": "`infrastructure::TypeSignalsExecutorAdapter` declares `action: modify` while preserving the baseline public shape and zero-argument `new()`. The executor algorithm changes only in method bodies; the entry should be a reference if it is needed for edge exposure.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+              "line": 313,
+              "category": "SoT integrity / action incoherence"
+            },
+            {
+              "message": "`usecase::TypeSignalsInteractor` declares `action: modify`, but its stripped struct shape and three-parameter `new()` signature are baseline-identical. Error mapping changes are implementation behavior, not a structural type modification; use `reference` or omit the entry.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 1192,
+              "category": "SoT integrity / action incoherence"
+            },
+            {
+              "message": "`domain::BaseMergeDirection::new` accepts independent `TrackId`, `TrackBranch`, and `BaseBranchName` values and infallibly returns `Self`. It therefore admits a branch naming another track and an arbitrary validated git ref as the source, despite the entry claiming the guarded direction is unrepresentable. Derive the values from authoritative track metadata or use a fallible constructor that validates the cross-field relationship.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
+              "line": 68,
+              "category": "API shape / state-shape smell"
+            },
+            {
+              "message": "`usecase::BaseMergeOutcome` is returned both by `BaseMergeGitPort` before cleanup and by `BaseMergeService` after cleanup. Consequently `Clean` means both “merge clean, cleanup pending” and “whole operation completed,” so an interactor can omit mandatory cleanup while still satisfying its return type. Separate the merge-attempt state from the service-completion state.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 365,
+              "category": "API shape / state-shape smell"
+            },
+            {
+              "message": "`usecase::GitStashError::ForbiddenRefUpdate(GitRefUpdateScope)` admits `ForbiddenRefUpdate(StashRef)`, even though `GitRefUpdateScope::StashRef` is explicitly the permitted update required by stash operations. Model only the forbidden branch-ref state in this error.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 925,
+              "category": "API shape / state-shape smell"
+            },
+            {
+              "message": "Every `usecase::BaseMergeCleanupPort` method returns the full `BaseMergeError`. Cleanup adapters can therefore emit unrelated `Context`, `ActiveTrackMismatch`, or `Git` variants, and can label `regenerate_views` as a `Baseline` failure. Declare a cleanup-specific error or document/enforce the exact per-method variant and stage subsets.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 241,
+              "category": "API shape / per-method error imprecision"
+            },
+            {
+              "message": "`usecase::BaseMergeContextPort::load_direction` returns `BaseMergeError`, although this operation cannot structurally produce `Git` or `PostMergeCleanup`. The entry neither lists its producible subset nor justifies the shared error breadth.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 318,
+              "category": "API shape / per-method error imprecision"
+            },
+            {
+              "message": "`usecase::BaseMergeGitPort::merge_base` returns `BaseMergeError`, exposing callers to `Context` and `PostMergeCleanup` variants that this git-only operation cannot produce. Narrow the error type or document the exact producible subset.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 365,
+              "category": "API shape / per-method error imprecision"
+            },
+            {
+              "message": "`usecase::BaseMergeCleanupPort` performs filesystem/process cleanup through three fully synchronous methods, but its entry does not acknowledge or justify the blocking choice. Record why synchronous execution is deliberate for this CLI boundary.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 228,
+              "category": "API shape / sync-async color mismatch"
+            },
+            {
+              "message": "`usecase::BaseMergeContextPort` loads active-track and snapshot state through a synchronous I/O-shaped method without acknowledging the blocking choice. The catalogue must establish why this port is deliberately synchronous.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 309,
+              "category": "API shape / sync-async color mismatch"
+            },
+            {
+              "message": "`usecase::BaseMergeGitPort` shells out to git conceptually but declares a synchronous method without documenting why blocking is intentional. This leaves the port's async color unsupported.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 352,
+              "category": "API shape / sync-async color mismatch"
+            },
+            {
+              "message": "`usecase::GitStashPort` represents git subprocess I/O but declares synchronous execution without acknowledging the choice. Document the deliberate blocking CLI boundary or change the port color.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 466,
+              "category": "API shape / sync-async color mismatch"
+            },
+            {
+              "message": "`cli::TrackCommand` restates the upstream constraint that merge-base accepts no caller-selected source. Keep the docs to the structural command-surface description and rely on the existing spec references, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/cli-types.json",
+              "line": 214,
+              "category": "SoT integrity / upstream restatement"
+            },
+            {
+              "message": "`cli_driver::BaseMergeInput` restates that the source is derived from the authoritative snapshot rather than accepted as text. That behavior belongs to IN-01/CN-01; retain only the input-shape description and its `spec_refs`, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/cli_driver-types.json",
+              "line": 156,
+              "category": "SoT integrity / upstream restatement"
+            },
+            {
+              "message": "`domain::tddd::type_signals_doc::decide_type_signals_reuse` repeats CN-03/AC-07's exact three-hash reuse rule in prose. Reference the anchors without reproducing the behavior, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
+              "line": 6,
+              "category": "SoT integrity / upstream restatement"
+            },
+            {
+              "message": "`domain::BaseMergeDirection` repeats the upstream design rationale that the type makes reverse direction unrepresentable. Keep only a structural type identifier and the existing anchors, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
+              "line": 327,
+              "category": "SoT integrity / upstream restatement"
+            },
+            {
+              "message": "`domain::TypeSignalsDocument` restates the three-current-hash reuse condition from CN-03/AC-07. Remove the behavioral sentence and rely on `spec_refs`, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
+              "line": 431,
+              "category": "SoT integrity / upstream restatement"
+            },
+            {
+              "message": "`infrastructure::tddd::type_signals_codec::baseline_hash` repeats D4/IN-05's required ordering that the actual baseline is hashed before reuse is considered. Reduce the docs to the function's structural purpose and rely on the anchors, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+              "line": 6,
+              "category": "SoT integrity / upstream restatement"
+            },
+            {
+              "message": "`infrastructure::tddd::type_signals_codec::decode` restates CN-04/AC-08 by specifying that every decode failure becomes a cache miss. Keep that contract upstream and rely on `spec_refs`, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+              "line": 34,
+              "category": "SoT integrity / upstream restatement"
+            },
+            {
+              "message": "`infrastructure::tddd::type_signals_codec::encode` repeats the upstream atomic-write-after-success rule, which is not part of the encoder's structural signature. Remove the behavioral restatement and rely on CN-04/AC-08/AC-09 references, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+              "line": 62,
+              "category": "SoT integrity / upstream restatement"
+            },
+            {
+              "message": "`infrastructure::FsBaseMergeContextAdapter` restates the active-track-only and recorded-base-source behavior from IN-01/CN-01. Keep only the adapter identity and anchor references, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+              "line": 216,
+              "category": "SoT integrity / upstream restatement"
+            },
+            {
+              "message": "`infrastructure::FsGitStashAdapter` reproduces AC-06's untracked-artifact, permitted-stash-ref, and unchanged-branch-ref behavior in prose. Rely on the existing anchors instead, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+              "line": 288,
+              "category": "SoT integrity / upstream restatement"
+            },
+            {
+              "message": "`infrastructure::TypeSignalsExecutorAdapter` restates the complete D4 cache algorithm—baseline read, decode miss, reevaluation, and atomic replacement. Keep the docs structural and rely on the existing spec anchors, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+              "line": 314,
+              "category": "SoT integrity / upstream restatement"
+            },
+            {
+              "message": "`usecase::BaseMergeCleanupPort` repeats the ordered-cleanup and sole-sequencing-owner behavior from IN-02/CN-02/AC-03. Preserve only type-design rationale such as sync color or error subsets and rely on `spec_refs` for behavior, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 223,
+              "category": "SoT integrity / upstream restatement"
+            },
+            {
+              "message": "`usecase::BaseMergeService` reproduces the upstream guard, conflict-handoff, and clean-only cleanup sequence. Replace the behavioral summary with a structural application-boundary description and rely on its anchors, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 398,
+              "category": "SoT integrity / upstream restatement"
+            },
+            {
+              "message": "`usecase::GitStashPort` repeats AC-06's untracked handling and exact allowed/forbidden ref-update rules. Keep those semantics in the spec and rely on `spec_refs`, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 461,
+              "category": "SoT integrity / upstream restatement"
+            },
+            {
+              "message": "`usecase::GitStashService` restates the no-history-change and no-active-branch-change contract from AC-06. Retain only its application-boundary identity and anchors, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 496,
+              "category": "SoT integrity / upstream restatement"
+            },
+            {
+              "message": "`usecase::BaseMergeError` repeats the fail-closed guard and caller-source prohibition from IN-01/CN-01/AC-02. Limit the docs to error-type classification and rely on `spec_refs`, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 641,
+              "category": "SoT integrity / upstream restatement"
+            },
+            {
+              "message": "`usecase::BaseMergeInteractor` restates the full merge/conflict/cleanup orchestration sequence from the spec. Keep only structural interactor information and rely on the existing anchors, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 740,
+              "category": "SoT integrity / upstream restatement"
+            },
+            {
+              "message": "`usecase::BaseMergeOutcome` repeats the upstream meanings of clean and conflicted outcomes, including recovery handoff. Reference AC-03/AC-04 instead of reproducing that behavior in prose, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 796,
+              "category": "SoT integrity / upstream restatement"
+            },
+            {
+              "message": "`usecase::GitRefUpdateScope` restates AC-06's forbidden branch-ref versus permitted stash-ref rule. Keep only a short structural identifier and rely on the anchors, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 845,
+              "category": "SoT integrity / upstream restatement"
+            },
+            {
+              "message": "`usecase::GitStashCommand` repeats the push-includes-untracked and pop-restores behavior from AC-06. Remove the behavioral restatement and rely on `spec_refs`, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 882,
+              "category": "SoT integrity / upstream restatement"
+            },
+            {
+              "message": "`usecase::GitStashInteractor` repeats the upstream prohibition on branch-history mutation. Keep the docs structural and rely on IN-04/AC-06, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 962,
+              "category": "SoT integrity / upstream restatement"
+            },
+            {
+              "message": "`usecase::TypeSignalsError` restates CN-04/AC-09's failure classification and fail-closed behavior. Keep only error-shape/type-design information and rely on the anchors, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 1041,
+              "category": "SoT integrity / upstream restatement"
+            },
+            {
+              "message": "`usecase::TypeSignalsExecutionError` repeats the upstream distinction between decode misses and authoritative/evaluation/write failures. Remove the behavioral restatement and rely on CN-04/AC-08/AC-09 references, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 1143,
+              "category": "SoT integrity / upstream restatement"
+            },
+            {
+              "message": "`usecase::TypeSignalsInteractor` restates the entire cache-miss and error-mapping behavior from CN-03/CN-04/AC-07–AC-09. Keep the docs to structural interactor identity and rely on `spec_refs`, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 1193,
+              "category": "SoT integrity / upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:ead187584a8b75e79490878a59a571a75b860e5c460854f349e87590b2ddc7f0",
+          "at": "2026-08-01T02:00:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:868b02811ba071057f0fd845c28ed64b9e4508b3d1ea006c7f2e8af750b4073f",
+          "at": "2026-08-01T02:24:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:868b02811ba071057f0fd845c28ed64b9e4508b3d1ea006c7f2e8af750b4073f",
+          "at": "2026-08-01T02:30:03Z"
         }
       ]
     }

@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "58e4ac326319f7ff2161bc452992d088c01d3284f2bdffb66e010bd894789e1b",
+  "signals": [
+    {
+      "type_name": "GitCommand",
+      "signal": "blue",
+      "entry_hash": "2cf06929fb2a8e12108637fc37af5575450b8a7d8ef4a73c638127b8f3e8aa04"
+    },
+    {
+      "type_name": "GitStashAction",
+      "signal": "blue",
+      "entry_hash": "98fa6a91a5462515be0d008404d0d6aa94b9686af5e26009699b10432aacfa49"
+    },
+    {
+      "type_name": "TrackCommand",
+      "signal": "blue",
+      "entry_hash": "9712431c2566e83b8e5fae9483cb45198630538d3e7956af1f9295cf7d9b3abe"
+    },
+    {
+      "type_name": "cli::commands::git::execute",
+      "signal": "blue",
+      "entry_hash": "7472049fdbc011ec18d4d6053f18b94eb2c47e81739d8b4199441b92ac470a41"
+    }
+  ]
+}
