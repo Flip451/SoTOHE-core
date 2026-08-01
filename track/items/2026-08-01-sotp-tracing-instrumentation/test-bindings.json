@@ -14,7 +14,7 @@
     {
       "kind": "waiver",
       "edge_id": {"entry_key": "CommandExecutionResult", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "AC-01"}},
-      "reason": "CommandExecutionResult only represents an in-memory completed-command outcome and neither executes a command nor persists JSONL. Local record writing is owned by the later T004 adapter work, while cross-command invocation is exercised by T010 entrypoint integration."
+      "reason": "CommandExecutionResult only represents an in-memory completed-command outcome and neither executes a command nor persists JSONL. Local record writing is owned by the later T005 adapter work, while cross-command invocation is exercised by T010 entrypoint integration."
     },
     {
       "kind": "voluntary_binding",
@@ -37,7 +37,7 @@
     {
       "kind": "waiver",
       "edge_id": {"entry_key": "CommandTraceRecord", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "AC-01"}},
-      "reason": "CommandTraceRecord only holds validated in-memory values and has no JSONL serialization or persistence behavior. Local record writing is owned by the later T004 adapter work."
+      "reason": "CommandTraceRecord only holds validated in-memory values and has no file path, I/O dependency, or operation that can create JSONL. It therefore cannot itself generate the local record required by AC-01."
     },
     {
       "kind": "waiver",
@@ -47,7 +47,7 @@
     {
       "kind": "waiver",
       "edge_id": {"entry_key": "CommandTraceValueError", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "IN-02"}},
-      "reason": "CommandTraceValueError only represents in-memory validation failures and has no JSONL serialization or persistence behavior. Local record writing is owned by the later T004 adapter work."
+      "reason": "CommandTraceValueError only represents in-memory validation failures and has no JSONL serialization or persistence behavior. Local record writing is owned by the later T005 adapter work."
     },
     {
       "kind": "waiver",
@@ -135,6 +135,69 @@
       "kind": "voluntary_binding",
       "edge_id": {"entry_key": "TelemetryReportOutput", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "AC-02"}},
       "tests": [{"layer": "usecase", "module_path": "usecase::telemetry::aggregate_interactor_tests", "test_name": "test_telemetry_aggregate_interactor_report_typed_metrics_preserves_values"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CommandTraceFileSizeLimitBytes", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "IN-04"}},
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::telemetry::command_trace::tests", "test_name": "test_command_trace_file_size_limit_bytes_zero_returns_zero_file_size_limit"},
+        {"layer": "infrastructure", "module_path": "infrastructure::telemetry::command_trace::tests", "test_name": "test_command_trace_file_size_limit_bytes_positive_value_round_trips"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CommandTraceFileSizeLimitBytes", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "CN-02"}},
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::telemetry::command_trace::tests", "test_name": "test_command_trace_file_size_limit_bytes_zero_returns_zero_file_size_limit"},
+        {"layer": "infrastructure", "module_path": "infrastructure::telemetry::command_trace::tests", "test_name": "test_command_trace_file_size_limit_bytes_positive_value_round_trips"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CommandTracePolicyError", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "IN-04"}},
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::telemetry::command_trace::tests", "test_name": "test_command_trace_file_size_limit_bytes_zero_returns_zero_file_size_limit"},
+        {"layer": "infrastructure", "module_path": "infrastructure::telemetry::command_trace::tests", "test_name": "test_command_trace_retained_file_count_zero_returns_zero_retained_file_count"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CommandTracePolicyError", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "CN-02"}},
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::telemetry::command_trace::tests", "test_name": "test_command_trace_file_size_limit_bytes_zero_returns_zero_file_size_limit"},
+        {"layer": "infrastructure", "module_path": "infrastructure::telemetry::command_trace::tests", "test_name": "test_command_trace_retained_file_count_zero_returns_zero_retained_file_count"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CommandTraceRetainedFileCount", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "IN-04"}},
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::telemetry::command_trace::tests", "test_name": "test_command_trace_retained_file_count_zero_returns_zero_retained_file_count"},
+        {"layer": "infrastructure", "module_path": "infrastructure::telemetry::command_trace::tests", "test_name": "test_command_trace_retained_file_count_positive_value_round_trips"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CommandTraceRetainedFileCount", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "CN-02"}},
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::telemetry::command_trace::tests", "test_name": "test_command_trace_retained_file_count_zero_returns_zero_retained_file_count"},
+        {"layer": "infrastructure", "module_path": "infrastructure::telemetry::command_trace::tests", "test_name": "test_command_trace_retained_file_count_positive_value_round_trips"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CommandTraceRotationPolicy", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "IN-04"}},
+      "tests": [{"layer": "infrastructure", "module_path": "infrastructure::telemetry::command_trace::tests", "test_name": "test_command_trace_rotation_policy_valid_values_constructs_policy"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CommandTraceRotationPolicy", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "CN-02"}},
+      "tests": [{"layer": "infrastructure", "module_path": "infrastructure::telemetry::command_trace::tests", "test_name": "test_command_trace_rotation_policy_valid_values_constructs_policy"}]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "CommandTraceRotationPolicy", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "AC-04"}},
+      "reason": "CommandTraceRotationPolicy only combines already-validated configuration bounds; it does not append records, rotate files, or delete retained files. Those filesystem behaviors are owned by the later T005 FsCommandTraceAdapter implementation."
     }
   ]
 }

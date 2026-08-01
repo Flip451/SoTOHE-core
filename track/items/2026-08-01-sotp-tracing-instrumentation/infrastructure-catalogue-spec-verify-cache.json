@@ -3,7 +3,7 @@
   "layer": "infrastructure",
   "entries": [
     {
-      "claim_hash": "6abb1e6c77e1e0eb40f467e68f0f504c8943a229796aa776f949e50b979fad97",
+      "claim_hash": "eb85d37805cfae1ec5cfb6c3a65625207de9c254c4b264d5a1455fd44bc5c13f",
       "evidence_hash": "86efca5df5f571c38243782ca22c0165c83d4284aa69e57f1179db74520fdc81",
       "verdict": {
         "kind": "pass",
@@ -27,11 +27,11 @@
       }
     },
     {
-      "claim_hash": "6abb1e6c77e1e0eb40f467e68f0f504c8943a229796aa776f949e50b979fad97",
+      "claim_hash": "eb85d37805cfae1ec5cfb6c3a65625207de9c254c4b264d5a1455fd44bc5c13f",
       "evidence_hash": "d75fc8750901c5a9d9d6e937ab0cb870ca5a1bc2055406abeb5027b5c34cb85b",
       "verdict": {
         "kind": "pass",
-        "citation": "active 記録ファイルには正の最大バイト数と正の保持ファイル数を設定し"
+        "citation": "ローカル JSONL の active 記録ファイルには正の最大バイト数と正の保持ファイル数を設定し"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -99,7 +99,7 @@
       }
     },
     {
-      "claim_hash": "c21b959baf167c6e46d08e77967b2f1d3e626451401e91d7b2046dddb134d168",
+      "claim_hash": "a24b71152bb8d41caaf928fbb4ffa38b8aeb07f4253f7ea3e2d01257d07955fd",
       "evidence_hash": "86efca5df5f571c38243782ca22c0165c83d4284aa69e57f1179db74520fdc81",
       "verdict": {
         "kind": "pass",
@@ -123,7 +123,7 @@
       }
     },
     {
-      "claim_hash": "c21b959baf167c6e46d08e77967b2f1d3e626451401e91d7b2046dddb134d168",
+      "claim_hash": "a24b71152bb8d41caaf928fbb4ffa38b8aeb07f4253f7ea3e2d01257d07955fd",
       "evidence_hash": "d75fc8750901c5a9d9d6e937ab0cb870ca5a1bc2055406abeb5027b5c34cb85b",
       "verdict": {
         "kind": "pass",
@@ -339,7 +339,7 @@
       }
     },
     {
-      "claim_hash": "94f6be5a8c0d8c1cb7ecd9bf2bd4a5b18f0cc9167c18c412320216f72ba01864",
+      "claim_hash": "2d92d898031ef3d8bdb61e762c6e7ca0b99788bf3c408337181e60693d6514fe",
       "evidence_hash": "25d5c97dc542d7627efe73da21e8978c7b82e337866c1d1fcb5ca75c2bf4a2b5",
       "verdict": {
         "kind": "pass",
@@ -363,11 +363,11 @@
       }
     },
     {
-      "claim_hash": "94f6be5a8c0d8c1cb7ecd9bf2bd4a5b18f0cc9167c18c412320216f72ba01864",
+      "claim_hash": "2d92d898031ef3d8bdb61e762c6e7ca0b99788bf3c408337181e60693d6514fe",
       "evidence_hash": "ff37151e9ec452725ac4307678171a9e4d8466fb21a821946b439929a12cf635",
       "verdict": {
         "kind": "pass",
-        "citation": "コマンド横断の実行頻度、所要時間、および失敗率を確認できる。"
+        "citation": "`sotp telemetry` はローカル記録を分析し、コマンド横断の実行頻度、所要時間、および失敗率を確認できる。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",

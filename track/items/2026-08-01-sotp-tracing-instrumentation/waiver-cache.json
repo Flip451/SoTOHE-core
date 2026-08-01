@@ -15,7 +15,7 @@
         "item_identifier": "voluntary:AC-01"
       },
       "key": {
-        "waived_reason_hash": "764f3398cffc762fb5cae8873f639e173340b47898d7e8d920a56d31a2d1648f",
+        "waived_reason_hash": "10f00d27f8377bbfd7d1ce54c6f987e07c8824a35ff754cd80ca3e0c74db0624",
         "declaration_hash": "d55cf73f9815e43106b3cca3c7db027f3f5ba7b65f9f3a1e639d6b33d429eb23",
         "anchor_text_hash": "20dde4425f6215906fc5e8b5e58462b7a85b79d7bcea0971fd911e457a3a9113"
       },
@@ -63,7 +63,7 @@
         "item_identifier": "voluntary:AC-01"
       },
       "key": {
-        "waived_reason_hash": "7c058c4cf0539c0dc8954d4762dfb43e23519c3fb7e1591eb05765312c9a7b24",
+        "waived_reason_hash": "eefbeb9d84c9a73360edfef516a1dbf72c6356f888bd44d50c1daa18e48de308",
         "declaration_hash": "201629ff14ada99e7fa65067742e6edd162b6b64421a693ab976517ba5da709e",
         "anchor_text_hash": "20dde4425f6215906fc5e8b5e58462b7a85b79d7bcea0971fd911e457a3a9113"
       },
@@ -111,13 +111,13 @@
         "item_identifier": "voluntary:IN-02"
       },
       "key": {
-        "waived_reason_hash": "0ae3493fc0ea13bf34f844e7b0bdaacb564c2f47e781835cb60aea1df0771b61",
+        "waived_reason_hash": "618d89a9a9d76aa914afafc7ff05ddfd1bdbdb4dc471d5059c9a8c645261013f",
         "declaration_hash": "0bd0d8a1b5164dec8fb189873706bbb06e71becc898836bce90aa6c63233387a",
         "anchor_text_hash": "886b259b72d31a9481887873baede5471f2b81415aad543979b98bd24b8f0528"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "CommandTraceValueError only represents in-memory validation failures and has no JSONL serialization or persistence behavior."
+        "citation": "各コマンド実行について、コマンド identity、所要時間、および exit 結果をローカル JSONL 記録へ残す。"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -142,6 +142,30 @@
       "verdict": {
         "kind": "waived",
         "citation": "Validated non-empty command identity; try_new produces only CommandTraceValueError::EmptyCommandIdentity."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandTraceRotationPolicy",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandTraceRotationPolicy",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-04"
+      },
+      "key": {
+        "waived_reason_hash": "ec1b1db0e887fe59b9abf87844a8e18766a821da0cc8469b3e93c103ce3dbca5",
+        "declaration_hash": "1fb80c2d715ec35ae270a805aad9cbaaa5d93cbaa3b0f03b802ae1b7755b5b65",
+        "anchor_text_hash": "c23a6ca2aa516ed711334c89a5848811c8c331d58dad36565b3cd68387a1535f"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Infrastructure configuration DTO combining typed file-size and retention bounds for deterministic local JSONL rotation."
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     }

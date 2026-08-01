@@ -160,15 +160,7 @@
     },
     {
       "for_type": "FsCommandTraceAdapter",
-      "trait_ref": "usecase::telemetry::CommandTraceWriterPort"
-    },
-    {
-      "for_type": "FsCommandTraceAdapter",
-      "trait_ref": "core::marker::Send"
-    },
-    {
-      "for_type": "FsCommandTraceAdapter",
-      "trait_ref": "core::marker::Sync"
+      "trait_ref": "usecase::telemetry::command_trace::CommandTraceWriterPort"
     },
     {
       "for_type": "FsCommandTraceAdapter",
@@ -211,7 +203,7 @@
         "shape": {
           "fields": [],
           "has_stripped_fields": true,
-          "kind": "plain"
+          "kind": "tuple"
         }
       },
       "methods": [],
@@ -276,7 +268,7 @@
         "shape": {
           "fields": [],
           "has_stripped_fields": true,
-          "kind": "plain"
+          "kind": "tuple"
         }
       },
       "methods": [],
@@ -459,11 +451,11 @@
             },
             {
               "name": "skipped_lines",
-              "ty": "usecase::telemetry::TelemetrySkippedLineCount"
+              "ty": "usecase::telemetry::command_trace::TelemetrySkippedLineCount"
             },
             {
               "name": "command_metrics",
-              "ty": "Vec<usecase::telemetry::CommandExecutionMetric>"
+              "ty": "Vec<usecase::telemetry::command_trace::CommandExecutionMetric>"
             }
           ],
           "has_stripped_fields": false,

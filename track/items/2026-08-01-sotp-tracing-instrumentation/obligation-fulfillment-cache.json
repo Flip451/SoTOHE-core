@@ -691,6 +691,284 @@
           "test_name": "test_telemetry_aggregate_interactor_report_typed_metrics_preserves_values"
         }
       ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandTraceFileSizeLimitBytes",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandTraceFileSizeLimitBytes",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "57107a7ac456c20d3b950b4d2dff0f37406ee2c783172e78d15844526b183d7f",
+        "declaration_hash": "df2676d7385617baadfd7752562d2c1361c29fc913929d731ab338996167d4d8",
+        "anchor_text_hash": "7616d596773f8086b87aba449dfacee4aa3448d3d0a9c3495e3cb2f8e22cd85f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            CommandTraceFileSizeLimitBytes::try_new(0),\n            Err(CommandTracePolicyError::ZeroFileSizeLimit)\n        ));\nassert_eq!(valid_file_size_limit()?.value(), 4_096);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::command_trace::tests",
+          "test_name": "test_command_trace_file_size_limit_bytes_zero_returns_zero_file_size_limit"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::command_trace::tests",
+          "test_name": "test_command_trace_file_size_limit_bytes_positive_value_round_trips"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandTraceFileSizeLimitBytes",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandTraceFileSizeLimitBytes",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "57107a7ac456c20d3b950b4d2dff0f37406ee2c783172e78d15844526b183d7f",
+        "declaration_hash": "df2676d7385617baadfd7752562d2c1361c29fc913929d731ab338996167d4d8",
+        "anchor_text_hash": "bc2476ee3f7d044f3e1504db4b8c1eb39e3c0ca2f71e79f722de18f831a4101e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n    CommandTraceFileSizeLimitBytes::try_new(0),\n    Err(CommandTracePolicyError::ZeroFileSizeLimit)\n));\nassert_eq!(valid_file_size_limit()?.value(), 4_096);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::command_trace::tests",
+          "test_name": "test_command_trace_file_size_limit_bytes_zero_returns_zero_file_size_limit"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::command_trace::tests",
+          "test_name": "test_command_trace_file_size_limit_bytes_positive_value_round_trips"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandTracePolicyError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandTracePolicyError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "01d7e7f757be2b31fe453e65056b2596989930a2c003e54bab0a90d040b6ccfe",
+        "declaration_hash": "0a4fbda021073cc2de3f4b33f0abef5f5436dcde4d72142dc8912498297c9254",
+        "anchor_text_hash": "7616d596773f8086b87aba449dfacee4aa3448d3d0a9c3495e3cb2f8e22cd85f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            CommandTraceFileSizeLimitBytes::try_new(0),\n            Err(CommandTracePolicyError::ZeroFileSizeLimit)\n        ));\n\nassert!(matches!(\n            CommandTraceRetainedFileCount::try_new(0),\n            Err(CommandTracePolicyError::ZeroRetainedFileCount)\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::command_trace::tests",
+          "test_name": "test_command_trace_file_size_limit_bytes_zero_returns_zero_file_size_limit"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::command_trace::tests",
+          "test_name": "test_command_trace_retained_file_count_zero_returns_zero_retained_file_count"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandTracePolicyError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandTracePolicyError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "01d7e7f757be2b31fe453e65056b2596989930a2c003e54bab0a90d040b6ccfe",
+        "declaration_hash": "0a4fbda021073cc2de3f4b33f0abef5f5436dcde4d72142dc8912498297c9254",
+        "anchor_text_hash": "bc2476ee3f7d044f3e1504db4b8c1eb39e3c0ca2f71e79f722de18f831a4101e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "Err(CommandTracePolicyError::ZeroFileSizeLimit)\nErr(CommandTracePolicyError::ZeroRetainedFileCount)"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::command_trace::tests",
+          "test_name": "test_command_trace_file_size_limit_bytes_zero_returns_zero_file_size_limit"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::command_trace::tests",
+          "test_name": "test_command_trace_retained_file_count_zero_returns_zero_retained_file_count"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandTraceRetainedFileCount",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandTraceRetainedFileCount",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "7c5a47fade043cc74cca440d35371c2c9947166dbf4dabc3565adfe1e05c6192",
+        "declaration_hash": "98c7e4c601565ca6a4fcef603f51c1c1b77166aef91b67769c8e9df6c2c288b4",
+        "anchor_text_hash": "7616d596773f8086b87aba449dfacee4aa3448d3d0a9c3495e3cb2f8e22cd85f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            CommandTraceRetainedFileCount::try_new(0),\n            Err(CommandTracePolicyError::ZeroRetainedFileCount)\n        ));\nassert_eq!(valid_retained_file_count()?.value(), 3);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::command_trace::tests",
+          "test_name": "test_command_trace_retained_file_count_zero_returns_zero_retained_file_count"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::command_trace::tests",
+          "test_name": "test_command_trace_retained_file_count_positive_value_round_trips"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandTraceRetainedFileCount",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandTraceRetainedFileCount",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "7c5a47fade043cc74cca440d35371c2c9947166dbf4dabc3565adfe1e05c6192",
+        "declaration_hash": "98c7e4c601565ca6a4fcef603f51c1c1b77166aef91b67769c8e9df6c2c288b4",
+        "anchor_text_hash": "bc2476ee3f7d044f3e1504db4b8c1eb39e3c0ca2f71e79f722de18f831a4101e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            CommandTraceRetainedFileCount::try_new(0),\n            Err(CommandTracePolicyError::ZeroRetainedFileCount)\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::command_trace::tests",
+          "test_name": "test_command_trace_retained_file_count_zero_returns_zero_retained_file_count"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::command_trace::tests",
+          "test_name": "test_command_trace_retained_file_count_positive_value_round_trips"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandTraceRotationPolicy",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandTraceRotationPolicy",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "1d1b1aa44e34e0b367ece6f2930b235668580350aab2fbc98c8628d1a8777a0c",
+        "declaration_hash": "1fb80c2d715ec35ae270a805aad9cbaaa5d93cbaa3b0f03b802ae1b7755b5b65",
+        "anchor_text_hash": "7616d596773f8086b87aba449dfacee4aa3448d3d0a9c3495e3cb2f8e22cd85f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(policy.max_file_size, max_file_size);\n        assert_eq!(policy.retained_files, retained_files);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::command_trace::tests",
+          "test_name": "test_command_trace_rotation_policy_valid_values_constructs_policy"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandTraceRotationPolicy",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandTraceRotationPolicy",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "1d1b1aa44e34e0b367ece6f2930b235668580350aab2fbc98c8628d1a8777a0c",
+        "declaration_hash": "1fb80c2d715ec35ae270a805aad9cbaaa5d93cbaa3b0f03b802ae1b7755b5b65",
+        "anchor_text_hash": "bc2476ee3f7d044f3e1504db4b8c1eb39e3c0ca2f71e79f722de18f831a4101e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(policy.max_file_size, max_file_size);\n        assert_eq!(policy.retained_files, retained_files);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::command_trace::tests",
+          "test_name": "test_command_trace_rotation_policy_valid_values_constructs_policy"
+        }
+      ]
     }
   ]
 }

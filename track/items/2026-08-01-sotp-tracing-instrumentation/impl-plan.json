@@ -20,23 +20,22 @@
       "id": "T003",
       "description": "Extend `TelemetryAggregateInteractor` and the usecase telemetry output with typed per-command execution metrics, bounded failure-rate data, and fail-open malformed- and unknown-schema-record skipped-count accounting, with focused aggregation-conversion tests. IN-03, CN-01, CN-04, AC-02, AC-03.",
       "status": "done",
+      "commit_hash": "88362dca5c29c4038c95d8d9ad2657a677e7f186",
       "depends_on": [
         "T001"
       ]
     },
     {
       "id": "T004",
-      "description": "Implement the `FsCommandTraceAdapter` basic local JSONL persistence boundary and its record-format success/failure tests before adding rotation behavior. IN-02, OUT-01, CN-01, AC-01, AC-03.",
-      "status": "todo",
-      "depends_on": [
-        "T002"
-      ]
+      "description": "Implement validated rotation-policy construction only: `CommandTraceFileSizeLimitBytes`, `CommandTraceRetainedFileCount`, `CommandTracePolicyError`, and `CommandTraceRotationPolicy`, with positive-bound and policy-construction tests. IN-04, CN-02.",
+      "status": "done"
     },
     {
       "id": "T005",
-      "description": "Add the typed rotation policy and extend `FsCommandTraceAdapter` with pre-append size rotation and oldest-first retained-file deletion; add focused AC-04 tests that prove active-file bounds and retained-file limits. IN-02, IN-04, OUT-01, CN-01, CN-02, AC-01, AC-03, AC-04.",
+      "description": "Complete the terminal `FsCommandTraceAdapter` as the local JSONL `CommandTraceWriterPort` implementation, building on the uncommitted append-only adapter: typed write-failure propagation, JSONL persistence, pre-append rotation, and oldest-first retention, with record-format, write-failure, AC-01, and AC-04 tests. IN-02, IN-04, OUT-01, CN-01, CN-02, CN-03, AC-01, AC-03, AC-04.",
       "status": "todo",
       "depends_on": [
+        "T002",
         "T004"
       ]
     },
@@ -51,7 +50,7 @@
     },
     {
       "id": "T007",
-      "description": "Implement the primary `CommandTraceDriver` that submits a typed completed-command record to the usecase service and maps the result to the existing command outcome. IN-01, IN-02, CN-01, AC-01, AC-03.",
+      "description": "Implement the primary `CommandTraceDriver` that submits a typed completed-command record to the usecase service and maps the result to the existing command outcome. IN-01, IN-02, CN-01, CN-03, AC-01, AC-03.",
       "status": "todo",
       "depends_on": [
         "T002"
@@ -59,7 +58,7 @@
     },
     {
       "id": "T008",
-      "description": "Implement `CommandTraceCompositionRoot` to validate rotation defaults and wire the filesystem adapter, usecase flow, and primary driver before any entrypoint invokes it. IN-02, IN-04, OUT-01, CN-01, CN-02, AC-01, AC-03, AC-04.",
+      "description": "Implement `CommandTraceCompositionRoot` to validate rotation defaults and wire the complete filesystem adapter, usecase flow, and primary driver before any entrypoint invokes it. IN-02, IN-04, OUT-01, CN-01, CN-02, CN-03, AC-01, AC-03, AC-04.",
       "status": "todo",
       "depends_on": [
         "T005",
@@ -76,7 +75,7 @@
     },
     {
       "id": "T010",
-      "description": "Update `apps/cli/src/main.rs::run_cli_with` to construct and invoke `CommandTraceCompositionRoot::command_trace_driver`; add focused `run_cli_with` success and failure regression tests. IN-01, IN-02, OUT-02, CN-01, AC-01, AC-03.",
+      "description": "Update `apps/cli/src/main.rs::run_cli_with` to construct and invoke `CommandTraceCompositionRoot::command_trace_driver`; add focused `run_cli_with` success and failure regression tests. IN-01, IN-02, OUT-02, CN-01, CN-03, AC-01, AC-03.",
       "status": "todo",
       "depends_on": [
         "T008"
@@ -92,7 +91,7 @@
         "id": "S1",
         "title": "Typed command-trace application model",
         "description": [
-          "Establish validated values, the recording usecase boundary, and typed aggregation output. IN-01, IN-02, IN-03, CN-01, AC-01, AC-02."
+          "Establish validated values, the recording usecase boundary, and typed aggregation output. IN-01, IN-02, IN-03, CN-01, CN-03, AC-01, AC-02."
         ],
         "task_ids": [
           "T001",
@@ -102,20 +101,29 @@
       },
       {
         "id": "S2",
-        "title": "Local JSONL persistence and rotation",
+        "title": "Typed local trace-rotation policy",
         "description": [
-          "First persist command traces locally, then add pre-append rotation and bounded retention with focused AC-04 verification. IN-02, IN-04, OUT-01, CN-01, CN-02, AC-01, AC-03, AC-04."
+          "Construct and validate the positive filesystem rotation bounds before adapter work. IN-04, CN-02."
         ],
         "task_ids": [
-          "T004",
-          "T005"
+          "T004"
         ]
       },
       {
         "id": "S3",
+        "title": "Atomic local JSONL persistence and rotation",
+        "description": [
+          "Complete the terminal filesystem writer contract using the validated policy: local persistence, typed failures, pre-append rotation, bounded retention, and focused verification. IN-02, IN-04, OUT-01, CN-01, CN-02, CN-03, AC-01, AC-03, AC-04."
+        ],
+        "task_ids": [
+          "T005"
+        ]
+      },
+      {
+        "id": "S4",
         "title": "Telemetry aggregation and display",
         "description": [
-          "Replace the infrastructure report DTO with its snapshot model, convert persisted command records through the existing aggregation path, and render the resulting metrics through the telemetry command. IN-03, OUT-01, CN-01, AC-02, AC-03."
+          "Replace the infrastructure report DTO with its snapshot model, convert persisted command records through the existing aggregation path, and render the resulting metrics through the telemetry command. IN-03, OUT-01, CN-01, CN-04, AC-02, AC-03."
         ],
         "task_ids": [
           "T006",
@@ -123,10 +131,10 @@
         ]
       },
       {
-        "id": "S4",
+        "id": "S5",
         "title": "Tracing composition",
         "description": [
-          "Build the primary driver and wire the complete local tracing dependency graph before entrypoint use. IN-01, IN-02, IN-04, OUT-01, CN-01, CN-02, AC-01, AC-03, AC-04."
+          "Build the primary driver and wire the complete local tracing dependency graph before entrypoint use. IN-01, IN-02, IN-04, OUT-01, CN-01, CN-02, CN-03, AC-01, AC-03, AC-04."
         ],
         "task_ids": [
           "T007",
@@ -134,10 +142,10 @@
         ]
       },
       {
-        "id": "S5",
+        "id": "S6",
         "title": "Cross-command entrypoint integration",
         "description": [
-          "`apps/cli/src/main.rs::run_cli_with`: construct and invoke `CommandTraceCompositionRoot::command_trace_driver`; add success/failure regression tests. IN-01, IN-02, OUT-02, CN-01, AC-01, AC-03."
+          "`apps/cli/src/main.rs::run_cli_with`: construct and invoke `CommandTraceCompositionRoot::command_trace_driver`; add success/failure regression tests. IN-01, IN-02, OUT-02, CN-01, CN-03, AC-01, AC-03."
         ],
         "task_ids": [
           "T010"

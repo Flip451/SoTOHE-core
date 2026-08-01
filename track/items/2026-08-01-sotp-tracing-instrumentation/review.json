@@ -1,160 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "cli_driver": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8272034d5c8b9580f1065ec48f2c25641df48fa4acf1b2b5a9f16fc95ac0ff8e",
-          "at": "2026-08-01T16:26:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8272034d5c8b9580f1065ec48f2c25641df48fa4acf1b2b5a9f16fc95ac0ff8e",
-          "at": "2026-08-01T16:29:20Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8506571ec0dcb04ec4dbcb52a9677844f3d2a365452fbc71e215c4e4da1f2bf3",
-          "at": "2026-08-01T08:46:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8506571ec0dcb04ec4dbcb52a9677844f3d2a365452fbc71e215c4e4da1f2bf3",
-          "at": "2026-08-01T08:49:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This binding overclaims AC-01: the referenced test only constructs an in-memory failure result and asserts its exit code; it does not execute a command or verify local JSONL recording. Remove the AC-01 binding or bind it to an entrypoint/persistence integration test.",
-              "severity": "P1",
-              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
-              "line": 16,
-              "category": "test-obligation-evidence"
-            },
-            {
-              "message": "This binding overclaims IN-01: the referenced test only constructs a CommandTraceRecord and checks fields; it does not prove common-entrypoint instrumentation across `sotp` commands. Remove the IN-01 binding or bind it to the later entrypoint integration evidence.",
-              "severity": "P1",
-              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
-              "line": 29,
-              "category": "test-obligation-evidence"
-            },
-            {
-              "message": "This binding overclaims AC-01: the referenced test only validates fields on an in-memory CommandTraceRecord and does not verify that executing a command generates a local JSONL record. Remove the AC-01 binding or replace it with end-to-end recording evidence.",
-              "severity": "P1",
-              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
-              "line": 39,
-              "category": "test-obligation-evidence"
-            }
-          ],
-          "hash": "rvw1:sha256:970c2057079fb215e801c8e4ad3e932909f57647c3be773bf0435076f3d34b32",
-          "at": "2026-08-01T12:38:05Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:27f6c5ad4be8d2d9cb477a40b26d266330c97aa98f51e96ea2a4b45cbc87e5cf",
-          "at": "2026-08-01T12:41:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1a317cc34f0e7858375a7c77e18ac8ab7f5c9f02e16c84cbcbbede2c0e87dae3",
-          "at": "2026-08-01T12:44:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The current binding set lacks fresh verifier coverage. `bin/sotp test-obligation results` reports `stale=4 verdict_absent=3` for completed tasks, and `test-obligation check` exits 1 with declaration drift. The three newly converted waivers—including this AC-01 record—have no matching waiver verdicts. Re-run host evaluation and require a fresh successful check before accepting this artifact.",
-              "severity": "P1",
-              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
-              "line": 14,
-              "category": "test-obligation-freshness"
-            }
-          ],
-          "hash": "rvw1:sha256:1a317cc34f0e7858375a7c77e18ac8ab7f5c9f02e16c84cbcbbede2c0e87dae3",
-          "at": "2026-08-01T12:50:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1a317cc34f0e7858375a7c77e18ac8ab7f5c9f02e16c84cbcbbede2c0e87dae3",
-          "at": "2026-08-01T12:55:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1a317cc34f0e7858375a7c77e18ac8ab7f5c9f02e16c84cbcbbede2c0e87dae3",
-          "at": "2026-08-01T12:58:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:02eaabfd9816f5f6dbd4c661e3ea0289abf07b11abc4893178e3407c2cf44e7a",
-          "at": "2026-08-01T14:38:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:02eaabfd9816f5f6dbd4c661e3ea0289abf07b11abc4893178e3407c2cf44e7a",
-          "at": "2026-08-01T14:45:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e314640844447b5698c9126b1eacb48a338b6f871a277cd0c22e6fe90c31c27d",
-          "at": "2026-08-01T16:26:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e314640844447b5698c9126b1eacb48a338b6f871a277cd0c22e6fe90c31c27d",
-          "at": "2026-08-01T16:30:31Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cfe10841f39fd8c83bfed833ce4db7f427bcafba659e3399e6f78fa12a93e668",
-          "at": "2026-08-01T16:26:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cfe10841f39fd8c83bfed833ce4db7f427bcafba659e3399e6f78fa12a93e668",
-          "at": "2026-08-01T16:29:23Z"
-        }
-      ]
-    },
     "spec": {
       "rounds": [
         {
@@ -273,63 +119,282 @@
         }
       ]
     },
-    "adr": {
+    "other": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e5fd22cc4b56991d32e6e4d9dd3fd700b2e2cb7e02af5cd248028423f0163949",
-          "at": "2026-08-01T07:02:22Z"
+          "hash": "rvw1:sha256:8506571ec0dcb04ec4dbcb52a9677844f3d2a365452fbc71e215c4e4da1f2bf3",
+          "at": "2026-08-01T08:46:05Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e5fd22cc4b56991d32e6e4d9dd3fd700b2e2cb7e02af5cd248028423f0163949",
-          "at": "2026-08-01T07:05:04Z"
+          "hash": "rvw1:sha256:8506571ec0dcb04ec4dbcb52a9677844f3d2a365452fbc71e215c4e4da1f2bf3",
+          "at": "2026-08-01T08:49:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This binding overclaims AC-01: the referenced test only constructs an in-memory failure result and asserts its exit code; it does not execute a command or verify local JSONL recording. Remove the AC-01 binding or bind it to an entrypoint/persistence integration test.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
+              "line": 16,
+              "category": "test-obligation-evidence"
+            },
+            {
+              "message": "This binding overclaims IN-01: the referenced test only constructs a CommandTraceRecord and checks fields; it does not prove common-entrypoint instrumentation across `sotp` commands. Remove the IN-01 binding or bind it to the later entrypoint integration evidence.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
+              "line": 29,
+              "category": "test-obligation-evidence"
+            },
+            {
+              "message": "This binding overclaims AC-01: the referenced test only validates fields on an in-memory CommandTraceRecord and does not verify that executing a command generates a local JSONL record. Remove the AC-01 binding or replace it with end-to-end recording evidence.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
+              "line": 39,
+              "category": "test-obligation-evidence"
+            }
+          ],
+          "hash": "rvw1:sha256:970c2057079fb215e801c8e4ad3e932909f57647c3be773bf0435076f3d34b32",
+          "at": "2026-08-01T12:38:05Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e5fd22cc4b56991d32e6e4d9dd3fd700b2e2cb7e02af5cd248028423f0163949",
-          "at": "2026-08-01T07:50:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e5fd22cc4b56991d32e6e4d9dd3fd700b2e2cb7e02af5cd248028423f0163949",
-          "at": "2026-08-01T07:53:28Z"
+          "hash": "rvw1:sha256:27f6c5ad4be8d2d9cb477a40b26d266330c97aa98f51e96ea2a4b45cbc87e5cf",
+          "at": "2026-08-01T12:41:23Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:353367f31fdf361c4996447d43a5ecc6a92a21f7c9895a33e17929f420811646",
-          "at": "2026-08-01T09:09:43Z"
+          "hash": "rvw1:sha256:1a317cc34f0e7858375a7c77e18ac8ab7f5c9f02e16c84cbcbbede2c0e87dae3",
+          "at": "2026-08-01T12:44:09Z"
         },
         {
           "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:353367f31fdf361c4996447d43a5ecc6a92a21f7c9895a33e17929f420811646",
-          "at": "2026-08-01T09:13:10Z"
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The current binding set lacks fresh verifier coverage. `bin/sotp test-obligation results` reports `stale=4 verdict_absent=3` for completed tasks, and `test-obligation check` exits 1 with declaration drift. The three newly converted waivers—including this AC-01 record—have no matching waiver verdicts. Re-run host evaluation and require a fresh successful check before accepting this artifact.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
+              "line": 14,
+              "category": "test-obligation-freshness"
+            }
+          ],
+          "hash": "rvw1:sha256:1a317cc34f0e7858375a7c77e18ac8ab7f5c9f02e16c84cbcbbede2c0e87dae3",
+          "at": "2026-08-01T12:50:39Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:34fa4360038f5a946d0779f1f5ceb1115dda5abfacb303ad871ab4e67d00bfc3",
-          "at": "2026-08-01T15:10:20Z"
+          "hash": "rvw1:sha256:1a317cc34f0e7858375a7c77e18ac8ab7f5c9f02e16c84cbcbbede2c0e87dae3",
+          "at": "2026-08-01T12:55:03Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:34fa4360038f5a946d0779f1f5ceb1115dda5abfacb303ad871ab4e67d00bfc3",
-          "at": "2026-08-01T15:12:47Z"
+          "hash": "rvw1:sha256:1a317cc34f0e7858375a7c77e18ac8ab7f5c9f02e16c84cbcbbede2c0e87dae3",
+          "at": "2026-08-01T12:58:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:02eaabfd9816f5f6dbd4c661e3ea0289abf07b11abc4893178e3407c2cf44e7a",
+          "at": "2026-08-01T14:38:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:02eaabfd9816f5f6dbd4c661e3ea0289abf07b11abc4893178e3407c2cf44e7a",
+          "at": "2026-08-01T14:45:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e314640844447b5698c9126b1eacb48a338b6f871a277cd0c22e6fe90c31c27d",
+          "at": "2026-08-01T16:26:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e314640844447b5698c9126b1eacb48a338b6f871a277cd0c22e6fe90c31c27d",
+          "at": "2026-08-01T16:30:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The added T004 bindings do not currently satisfy the required obligation gate: `test-obligation check` reports declaration drift for `CommandTraceFileSizeLimitBytes` and `CommandTraceRetainedFileCount` on IN-04/CN-02, so the expected pass/resolved_edges=36 result is not met. Refresh the frozen verdict through the supported workflow after aligning declarations; do not hand-edit the cache.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
+              "line": 141,
+              "category": "test-obligation"
+            }
+          ],
+          "hash": "rvw1:sha256:9dee50c8d8acef44c91493dfd9b273e8d97b38c89efe4a20a93d023565b7b20b",
+          "at": "2026-08-01T19:40:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9dee50c8d8acef44c91493dfd9b273e8d97b38c89efe4a20a93d023565b7b20b",
+          "at": "2026-08-01T19:47:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9dee50c8d8acef44c91493dfd9b273e8d97b38c89efe4a20a93d023565b7b20b",
+          "at": "2026-08-01T19:51:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "After the Phase 2/3 re-entry, T004 owns only rotation-policy construction and T005 owns JSONL persistence, but this waiver and the related reasons on lines 40 and 50 still assign local record writing to T004. Update all three ownership references to T005 so the binding artifact is consistent with the current implementation plan.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
+              "line": 17,
+              "category": "cross-commit-consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:9dee50c8d8acef44c91493dfd9b273e8d97b38c89efe4a20a93d023565b7b20b",
+          "at": "2026-08-01T20:01:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8f7c15d0b15fe9ec29fce043d6150ef8f3988afb94e62c016cae905983584703",
+          "at": "2026-08-01T20:07:00Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8272034d5c8b9580f1065ec48f2c25641df48fa4acf1b2b5a9f16fc95ac0ff8e",
+          "at": "2026-08-01T16:26:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8272034d5c8b9580f1065ec48f2c25641df48fa4acf1b2b5a9f16fc95ac0ff8e",
+          "at": "2026-08-01T16:29:20Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cfe10841f39fd8c83bfed833ce4db7f427bcafba659e3399e6f78fa12a93e668",
+          "at": "2026-08-01T16:26:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cfe10841f39fd8c83bfed833ce4db7f427bcafba659e3399e6f78fa12a93e668",
+          "at": "2026-08-01T16:29:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cf160760957dc194b47528f2bcdbf377584ce5783010e6be52b5199143fb42db",
+          "at": "2026-08-01T19:40:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cf160760957dc194b47528f2bcdbf377584ce5783010e6be52b5199143fb42db",
+          "at": "2026-08-01T19:45:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cf160760957dc194b47528f2bcdbf377584ce5783010e6be52b5199143fb42db",
+          "at": "2026-08-01T19:50:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cf160760957dc194b47528f2bcdbf377584ce5783010e6be52b5199143fb42db",
+          "at": "2026-08-01T19:57:29Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b14186c030944ee1b6beba5d3b5605033ffa35b8f6dbe6c7785b0891593e2e28",
+          "at": "2026-08-01T12:38:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b14186c030944ee1b6beba5d3b5605033ffa35b8f6dbe6c7785b0891593e2e28",
+          "at": "2026-08-01T12:48:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7cc05756992e09db4c2fec3de56aa5a10e4c255383dd5b6b8652d26a53d6395c",
+          "at": "2026-08-01T14:38:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7cc05756992e09db4c2fec3de56aa5a10e4c255383dd5b6b8652d26a53d6395c",
+          "at": "2026-08-01T14:44:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dd8809d397a718881ba3b9d2385393c9a9376dae0e45f79f3d0a06ea29f47942",
+          "at": "2026-08-01T16:26:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dd8809d397a718881ba3b9d2385393c9a9376dae0e45f79f3d0a06ea29f47942",
+          "at": "2026-08-01T16:30:53Z"
         }
       ]
     },
@@ -894,52 +959,77 @@
           "findings": [],
           "hash": "rvw1:sha256:702a4b11e38462e0e061eb4db3275ffc63dd4848c26655dda8a0cefd147181ce",
           "at": "2026-08-01T16:30:14Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b14186c030944ee1b6beba5d3b5605033ffa35b8f6dbe6c7785b0891593e2e28",
-          "at": "2026-08-01T12:38:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b14186c030944ee1b6beba5d3b5605033ffa35b8f6dbe6c7785b0891593e2e28",
-          "at": "2026-08-01T12:48:02Z"
         },
         {
           "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7cc05756992e09db4c2fec3de56aa5a10e4c255383dd5b6b8652d26a53d6395c",
-          "at": "2026-08-01T14:38:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7cc05756992e09db4c2fec3de56aa5a10e4c255383dd5b6b8652d26a53d6395c",
-          "at": "2026-08-01T14:44:56Z"
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004’s indivisibility justification is insufficient: the task bundles independently verifiable typed rotation-policy validation with JSONL persistence and rotation/retention behavior. Split policy construction/validation (IN-04, CN-02) from the adapter persistence/rotation implementation (IN-02, CN-02, CN-03, AC-01, AC-04), or justify why those units cannot be independently started and verified.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/batch-plan.json",
+              "line": 8,
+              "category": "implausible indivisibility justification"
+            }
+          ],
+          "hash": "rvw1:sha256:057e90fa869b4405995a6d7a7db42c75eb09119337492fdbcf0d094afaa7f197",
+          "at": "2026-08-01T18:40:36Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:dd8809d397a718881ba3b9d2385393c9a9376dae0e45f79f3d0a06ea29f47942",
-          "at": "2026-08-01T16:26:21Z"
+          "hash": "rvw1:sha256:a0d4478bd6b0a32485058f842709a47074af5d5ff46fa5511d2756b9a0bdfe8d",
+          "at": "2026-08-01T18:50:14Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:dd8809d397a718881ba3b9d2385393c9a9376dae0e45f79f3d0a06ea29f47942",
-          "at": "2026-08-01T16:30:53Z"
+          "hash": "rvw1:sha256:a0d4478bd6b0a32485058f842709a47074af5d5ff46fa5511d2756b9a0bdfe8d",
+          "at": "2026-08-01T18:56:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:47cb53e16cc356435172748acd324b82bd00352a1a064503554118acb19f4645",
+          "at": "2026-08-01T19:29:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:47cb53e16cc356435172748acd324b82bd00352a1a064503554118acb19f4645",
+          "at": "2026-08-01T19:32:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:709735f91ed789d44aaefcf14a307f8347608002b227ee9b1f4f1cc9cdf86c6b",
+          "at": "2026-08-01T19:39:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:709735f91ed789d44aaefcf14a307f8347608002b227ee9b1f4f1cc9cdf86c6b",
+          "at": "2026-08-01T19:45:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:709735f91ed789d44aaefcf14a307f8347608002b227ee9b1f4f1cc9cdf86c6b",
+          "at": "2026-08-01T19:48:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:709735f91ed789d44aaefcf14a307f8347608002b227ee9b1f4f1cc9cdf86c6b",
+          "at": "2026-08-01T19:54:41Z"
         }
       ]
     },
@@ -1222,6 +1312,116 @@
           "findings": [],
           "hash": "rvw1:sha256:2c0731e4ed44596408b94616ea9dced4978ef4feb94de2b73b90d07b00113453",
           "at": "2026-08-01T17:11:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:af8148886b90ba06d04820931a4690d2b897667986acb0cce4876ecc725bdb6d",
+          "at": "2026-08-01T18:06:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`infrastructure::TelemetryReportSnapshot` declares `skipped_lines` and `command_metrics` using `usecase::telemetry::{TelemetrySkippedLineCount, CommandExecutionMetric}`, but both types are defined under the public `usecase::telemetry::command_trace` module and are only privately imported into `telemetry`. These cross-crate TypeRefs therefore name inaccessible paths and make the terminal T006 source shape unimplementable as declared. Use `usecase::telemetry::command_trace::TelemetrySkippedLineCount` and `usecase::telemetry::command_trace::CommandExecutionMetric`.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/infrastructure-types.json",
+              "line": 454,
+              "category": "SoT integrity / cross-crate TypeRef"
+            }
+          ],
+          "hash": "rvw1:sha256:af8148886b90ba06d04820931a4690d2b897667986acb0cce4876ecc725bdb6d",
+          "at": "2026-08-01T18:13:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2096bc637fe011e4b83a09baa1857d11984b794fc26a7bc73108f015aa5d1df5",
+          "at": "2026-08-01T18:27:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2096bc637fe011e4b83a09baa1857d11984b794fc26a7bc73108f015aa5d1df5",
+          "at": "2026-08-01T18:29:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7d06cedf34291eab2d42ef27ff75687de8b2b33f622d0ac6d7e196972d1f0708",
+          "at": "2026-08-01T19:24:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7d06cedf34291eab2d42ef27ff75687de8b2b33f622d0ac6d7e196972d1f0708",
+          "at": "2026-08-01T19:26:24Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e5fd22cc4b56991d32e6e4d9dd3fd700b2e2cb7e02af5cd248028423f0163949",
+          "at": "2026-08-01T07:02:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e5fd22cc4b56991d32e6e4d9dd3fd700b2e2cb7e02af5cd248028423f0163949",
+          "at": "2026-08-01T07:05:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e5fd22cc4b56991d32e6e4d9dd3fd700b2e2cb7e02af5cd248028423f0163949",
+          "at": "2026-08-01T07:50:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e5fd22cc4b56991d32e6e4d9dd3fd700b2e2cb7e02af5cd248028423f0163949",
+          "at": "2026-08-01T07:53:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:353367f31fdf361c4996447d43a5ecc6a92a21f7c9895a33e17929f420811646",
+          "at": "2026-08-01T09:09:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:353367f31fdf361c4996447d43a5ecc6a92a21f7c9895a33e17929f420811646",
+          "at": "2026-08-01T09:13:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:34fa4360038f5a946d0779f1f5ceb1115dda5abfacb303ad871ab4e67d00bfc3",
+          "at": "2026-08-01T15:10:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:34fa4360038f5a946d0779f1f5ceb1115dda5abfacb303ad871ab4e67d00bfc3",
+          "at": "2026-08-01T15:12:47Z"
         }
       ]
     }

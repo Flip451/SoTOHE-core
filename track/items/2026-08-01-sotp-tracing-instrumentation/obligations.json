@@ -89,7 +89,7 @@
       "id": {
         "entry_key": "FsCommandTraceAdapter",
         "obligation_kind": "contract_conformance",
-        "item_identifier": "trait_impl:usecase::telemetry::CommandTraceWriterPort"
+        "item_identifier": "trait_impl:usecase::telemetry::command_trace::CommandTraceWriterPort"
       },
       "target_entry": {
         "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/infrastructure-types.json",
@@ -100,8 +100,8 @@
         "kind": "trait_impl",
         "role": "SecondaryPort"
       },
-      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::telemetry::CommandTraceWriterPort' of FsCommandTraceAdapter",
-      "declaration_hash": "4f4d77a71a47303c588031d4df15f553a8ca860fec520d2b5329258ff663bf75",
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::telemetry::command_trace::CommandTraceWriterPort' of FsCommandTraceAdapter",
+      "declaration_hash": "4d9cc002fc78db493d5785a4027d64e0ae3500b271613f2bb07e9b20f47f1f24",
       "spec_refs": [
         {
           "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
