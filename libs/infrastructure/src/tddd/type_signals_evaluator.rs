@@ -371,6 +371,7 @@ mod tests {
         std::fs::write(&rustdoc_path, &json).unwrap();
         std::fs::write(track_dir.join("infrastructure-types-baseline.json"), json).unwrap();
         let rules = r#"{
+            "version": 2,
             "layers": [{
                 "crate": "infrastructure",
                 "tddd": {

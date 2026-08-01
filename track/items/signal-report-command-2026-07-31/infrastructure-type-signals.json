@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-01T01:46:26Z",
+  "generated_at": "2026-08-01T02:20:09Z",
   "declaration_hash": "d6523c2a35ce1acd6fdb5f297e749b43d371add54b3c32ce0e8c352c9faa9b35",
-  "implementation_input_hash": "272dc52eb18f75b8d7e426f24621932e861fdee8c737b72f2c5cbc8c254f4fb5",
+  "implementation_input_hash": "6e038cd85fab3a6d31d24634fada92ab1883d96d37ec708e6feeb4a1d94a30fd",
   "signals": [
     {
       "type_name": "SystemSignalReportSourceAdapter",
