@@ -147,25 +147,25 @@
     },
     {
       "edge_id": {
-        "entry_key": "CommandTraceRotationPolicy",
+        "entry_key": "FsCommandTraceAdapter",
         "anchor_id": {
           "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
-          "element_id": "AC-04"
+          "element_id": "IN-01"
         }
       },
       "obligation_id": {
-        "entry_key": "CommandTraceRotationPolicy",
+        "entry_key": "FsCommandTraceAdapter",
         "obligation_kind": "logic",
-        "item_identifier": "voluntary:AC-04"
+        "item_identifier": "voluntary:IN-01"
       },
       "key": {
-        "waived_reason_hash": "ec1b1db0e887fe59b9abf87844a8e18766a821da0cc8469b3e93c103ce3dbca5",
-        "declaration_hash": "1fb80c2d715ec35ae270a805aad9cbaaa5d93cbaa3b0f03b802ae1b7755b5b65",
-        "anchor_text_hash": "c23a6ca2aa516ed711334c89a5848811c8c331d58dad36565b3cd68387a1535f"
+        "waived_reason_hash": "0352cc06b0059ab2044f9ab704a2baeba3465f79fd40452637430a8b5530373d",
+        "declaration_hash": "31455b74abd62c3d0e32565385b1351b1eae9fb53859d84424442f8da6081c9c",
+        "anchor_text_hash": "e8372367836888c48ae6c6884d835ad2cb235a64da700bb711dbd7fc03b9273c"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "Infrastructure configuration DTO combining typed file-size and retention bounds for deterministic local JSONL rotation."
+        "citation": "\"Synchronous filesystem implementation of CommandTraceWriterPort.\""
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     }

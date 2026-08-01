@@ -195,9 +195,33 @@
       "tests": [{"layer": "infrastructure", "module_path": "infrastructure::telemetry::command_trace::tests", "test_name": "test_command_trace_rotation_policy_valid_values_constructs_policy"}]
     },
     {
-      "kind": "waiver",
+      "kind": "voluntary_binding",
       "edge_id": {"entry_key": "CommandTraceRotationPolicy", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "AC-04"}},
-      "reason": "CommandTraceRotationPolicy only combines already-validated configuration bounds; it does not append records, rotate files, or delete retained files. Those filesystem behaviors are owned by the later T005 FsCommandTraceAdapter implementation."
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::telemetry::command_trace::tests", "test_name": "test_fs_command_trace_adapter_record_over_limit_rotates_before_append"},
+        {"layer": "infrastructure", "module_path": "infrastructure::telemetry::command_trace::tests", "test_name": "test_fs_command_trace_adapter_record_excess_rotations_delete_oldest_file_first"}
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {"entry_key": "FsCommandTraceAdapter", "item_identifier": "trait_impl:usecase::telemetry::command_trace::CommandTraceWriterPort", "obligation_kind": "contract_conformance"},
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::telemetry::command_trace::tests", "test_name": "test_fs_command_trace_adapter_record_success_appends_valid_jsonl_records"},
+        {"layer": "infrastructure", "module_path": "infrastructure::telemetry::command_trace::tests", "test_name": "test_fs_command_trace_adapter_record_file_parent_returns_unavailable_error"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "FsCommandTraceAdapter", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "IN-04"}},
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::telemetry::command_trace::tests", "test_name": "test_fs_command_trace_adapter_record_over_limit_rotates_before_append"},
+        {"layer": "infrastructure", "module_path": "infrastructure::telemetry::command_trace::tests", "test_name": "test_fs_command_trace_adapter_record_excess_rotations_delete_oldest_file_first"}
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "FsCommandTraceAdapter", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "IN-01"}},
+      "reason": "FsCommandTraceAdapter persists one completed record passed through its secondary port but does not dispatch a command or instrument the common entrypoint. Cross-command tracing is exercised by the later T010 entrypoint integration work."
     }
   ]
 }

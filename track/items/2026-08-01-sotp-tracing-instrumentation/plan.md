@@ -5,7 +5,7 @@
 
 GO-01 → T001, T002, T003, T004, T005, T006, T007, T008, T009, T010.
 
-## Tasks (4/10 resolved)
+## Tasks (5/10 resolved)
 
 ### S1 — Typed command-trace application model
 
@@ -19,13 +19,13 @@ GO-01 → T001, T002, T003, T004, T005, T006, T007, T008, T009, T010.
 
 > Construct and validate the positive filesystem rotation bounds before adapter work. IN-04, CN-02.
 
-- [x] **T004**: Implement validated rotation-policy construction only: `CommandTraceFileSizeLimitBytes`, `CommandTraceRetainedFileCount`, `CommandTracePolicyError`, and `CommandTraceRotationPolicy`, with positive-bound and policy-construction tests. IN-04, CN-02.
+- [x] **T004**: Implement validated rotation-policy construction only: `CommandTraceFileSizeLimitBytes`, `CommandTraceRetainedFileCount`, `CommandTracePolicyError`, and `CommandTraceRotationPolicy`, with positive-bound and policy-construction tests. IN-04, CN-02. (`1402599b252c80d0a20221852e0f8498d1f1fc88`)
 
 ### S3 — Atomic local JSONL persistence and rotation
 
 > Complete the terminal filesystem writer contract using the validated policy: local persistence, typed failures, pre-append rotation, bounded retention, and focused verification. IN-02, IN-04, OUT-01, CN-01, CN-02, CN-03, AC-01, AC-03, AC-04.
 
-- [ ] **T005**: Complete the terminal `FsCommandTraceAdapter` as the local JSONL `CommandTraceWriterPort` implementation, building on the uncommitted append-only adapter: typed write-failure propagation, JSONL persistence, pre-append rotation, and oldest-first retention, with record-format, write-failure, AC-01, and AC-04 tests. IN-02, IN-04, OUT-01, CN-01, CN-02, CN-03, AC-01, AC-03, AC-04.
+- [x] **T005**: Complete the terminal `FsCommandTraceAdapter` as the local JSONL `CommandTraceWriterPort` implementation, building on the uncommitted append-only adapter: typed write-failure propagation, JSONL persistence, pre-append rotation, and oldest-first retention, with record-format, write-failure, AC-01, and AC-04 tests. IN-02, IN-04, OUT-01, CN-01, CN-02, CN-03, AC-01, AC-03, AC-04.
 
 ### S4 — Telemetry aggregation and display
 

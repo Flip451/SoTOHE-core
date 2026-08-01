@@ -28,12 +28,13 @@
     {
       "id": "T004",
       "description": "Implement validated rotation-policy construction only: `CommandTraceFileSizeLimitBytes`, `CommandTraceRetainedFileCount`, `CommandTracePolicyError`, and `CommandTraceRotationPolicy`, with positive-bound and policy-construction tests. IN-04, CN-02.",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "1402599b252c80d0a20221852e0f8498d1f1fc88"
     },
     {
       "id": "T005",
       "description": "Complete the terminal `FsCommandTraceAdapter` as the local JSONL `CommandTraceWriterPort` implementation, building on the uncommitted append-only adapter: typed write-failure propagation, JSONL persistence, pre-append rotation, and oldest-first retention, with record-format, write-failure, AC-01, and AC-04 tests. IN-02, IN-04, OUT-01, CN-01, CN-02, CN-03, AC-01, AC-03, AC-04.",
-      "status": "todo",
+      "status": "done",
       "depends_on": [
         "T002",
         "T004"

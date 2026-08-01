@@ -969,6 +969,150 @@
           "test_name": "test_command_trace_rotation_policy_valid_values_constructs_policy"
         }
       ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandTraceRotationPolicy",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandTraceRotationPolicy",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "05aad3fb4afac3906f40df15248fc58ea814e8f0c91dc12f5a6e861f3c246ac5",
+        "declaration_hash": "1fb80c2d715ec35ae270a805aad9cbaaa5d93cbaa3b0f03b802ae1b7755b5b65",
+        "anchor_text_hash": "c23a6ca2aa516ed711334c89a5848811c8c331d58dad36565b3cd68387a1535f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(fs::metadata(&output_path).expect(\"active file metadata\").len() <= max_file_size); ... assert!(active.contains(\"command-02\")); ... assert!(rotated.contains(\"command-01\")); ... assert!(!rotated_path(&output_path, 3).exists());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::command_trace::tests",
+          "test_name": "test_fs_command_trace_adapter_record_over_limit_rotates_before_append"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::command_trace::tests",
+          "test_name": "test_fs_command_trace_adapter_record_excess_rotations_delete_oldest_file_first"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsCommandTraceAdapter",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsCommandTraceAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::telemetry::command_trace::CommandTraceWriterPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "2ed33fdf74895002a56559fea9df4864b1bf43fab4cd94321630b9579c834f52",
+        "declaration_hash": "4d9cc002fc78db493d5785a4027d64e0ae3500b271613f2bb07e9b20f47f1f24",
+        "anchor_text_hash": "886b259b72d31a9481887873baede5471f2b81415aad543979b98bd24b8f0528"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(first.get(\"command\").and_then(serde_json::Value::as_str), Some(\"track plan\"));\nassert_eq!(first.get(\"duration_ms\").and_then(serde_json::Value::as_u64), Some(127));\nassert_eq!(first_result.get(\"status\").and_then(serde_json::Value::as_str), Some(\"success\"));\nassert_eq!(second.get(\"command\").and_then(serde_json::Value::as_str), Some(\"track review\"));\nassert_eq!(second.get(\"duration_ms\").and_then(serde_json::Value::as_u64), Some(127));\nassert_eq!(second_result.get(\"status\").and_then(serde_json::Value::as_str), Some(\"failure\"));\nassert_eq!(second_result.get(\"exit_code\").and_then(serde_json::Value::as_i64), Some(17));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::command_trace::tests",
+          "test_name": "test_fs_command_trace_adapter_record_success_appends_valid_jsonl_records"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::command_trace::tests",
+          "test_name": "test_fs_command_trace_adapter_record_file_parent_returns_unavailable_error"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsCommandTraceAdapter",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsCommandTraceAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::telemetry::command_trace::CommandTraceWriterPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "2ed33fdf74895002a56559fea9df4864b1bf43fab4cd94321630b9579c834f52",
+        "declaration_hash": "4d9cc002fc78db493d5785a4027d64e0ae3500b271613f2bb07e9b20f47f1f24",
+        "anchor_text_hash": "44c1bb4fc84130623b84d4576e0f44e5b1b59cd4365e7982fd95a2661b517f29"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(result, Err(CommandTraceWriteError::Unavailable)));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::command_trace::tests",
+          "test_name": "test_fs_command_trace_adapter_record_success_appends_valid_jsonl_records"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::command_trace::tests",
+          "test_name": "test_fs_command_trace_adapter_record_file_parent_returns_unavailable_error"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsCommandTraceAdapter",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsCommandTraceAdapter",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "05aad3fb4afac3906f40df15248fc58ea814e8f0c91dc12f5a6e861f3c246ac5",
+        "declaration_hash": "31455b74abd62c3d0e32565385b1351b1eae9fb53859d84424442f8da6081c9c",
+        "anchor_text_hash": "7616d596773f8086b87aba449dfacee4aa3448d3d0a9c3495e3cb2f8e22cd85f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(fs::metadata(&output_path).expect(\"active file metadata\").len() <= max_file_size); ... assert!(active.contains(\"command-02\")); assert!(rotated.contains(\"command-01\")); ... assert!(fs::read_to_string(rotated_path(&output_path, 1)) .expect(\"newest rotated file reads\") .contains(\"command-03\")); assert!(fs::read_to_string(rotated_path(&output_path, 2)) .expect(\"oldest retained file reads\") .contains(\"command-02\")); assert!(!rotated_path(&output_path, 3).exists());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::command_trace::tests",
+          "test_name": "test_fs_command_trace_adapter_record_over_limit_rotates_before_append"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::command_trace::tests",
+          "test_name": "test_fs_command_trace_adapter_record_excess_rotations_delete_oldest_file_first"
+        }
+      ]
     }
   ]
 }
