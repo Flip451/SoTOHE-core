@@ -106,17 +106,20 @@
     {
       "id": "T18",
       "description": "Update `libs/infrastructure/src/test_obligation/obligations_codec.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "768d65c819d7a5966a8f8bccd38a91221da94146"
     },
     {
       "id": "T19",
       "description": "Update `libs/infrastructure/src/test_obligation/waiver_cache_codec.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "768d65c819d7a5966a8f8bccd38a91221da94146"
     },
     {
       "id": "T20",
       "description": "Update `libs/infrastructure/src/test_obligation/fulfillment_cache_codec/fulfillment_cache_io.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "768d65c819d7a5966a8f8bccd38a91221da94146"
     },
     {
       "id": "T21",
@@ -133,37 +136,39 @@
     {
       "id": "T23",
       "description": "Update `libs/infrastructure/src/task_contract_codec.rs::encode`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "768d65c819d7a5966a8f8bccd38a91221da94146"
     },
     {
       "id": "T24",
       "description": "Update `libs/infrastructure/src/dry_check/dry_write_driver.rs::FsDryCorpusRootManifestAdapter::write`; add writer-local serialization regression. [IN-01; IN-02; CN-01; AC-01]",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "768d65c819d7a5966a8f8bccd38a91221da94146"
     },
     {
       "id": "T25",
       "description": "Update `libs/infrastructure/src/dry_check/coverage.rs::FsDryCheckCoverageAdapter::write_coverage`; add writer-local serialization regression. [IN-01; IN-02; CN-01; AC-01]",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T26",
       "description": "Update `libs/infrastructure/src/provider_session.rs::FsProviderSessionCacheAdapter::save`; add writer-local serialization regression. [IN-01; IN-02; CN-01; AC-01]",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T27",
       "description": "Update `libs/infrastructure/src/telemetry/writer.rs::build_line`; add writer-local serialization regression. [IN-01; IN-02; CN-01; AC-01]",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T28",
       "description": "Update `libs/infrastructure/src/telemetry/archived_track.rs::FsArchivedTrackTelemetryAdapter::emit`; add writer-local serialization regression. [IN-01; IN-02; CN-01; AC-01]",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T29",
       "description": "Update `libs/infrastructure/src/pr/poll.rs::save_trigger_state`; add writer-local serialization regression. [IN-01; IN-02; CN-01; AC-01]",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "plan": {

@@ -5,7 +5,7 @@
 
 GO-01: T1-T29.
 
-## Tasks (24/29 resolved)
+## Tasks (29/29 resolved)
 
 ### core-track-review-codecs — Core track and review codecs
 
@@ -23,7 +23,7 @@ GO-01: T1-T29.
 - [x] **T5**: Update `libs/infrastructure/src/task_coverage_codec.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01] (`7309757b2582e1511500123f1985bf12592ff6c1`)
 - [x] **T6**: Update `libs/infrastructure/src/schema_export_codec.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01] (`7309757b2582e1511500123f1985bf12592ff6c1`)
 - [x] **T7**: Update `libs/infrastructure/src/signal.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01] (`5ca034ea1a46028e7ed522823a42546b73963106`)
-- [x] **T23**: Update `libs/infrastructure/src/task_contract_codec.rs::encode`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
+- [x] **T23**: Update `libs/infrastructure/src/task_contract_codec.rs::encode`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01] (`768d65c819d7a5966a8f8bccd38a91221da94146`)
 
 ### tddd-artifact-codecs — TDDD artifact codecs
 
@@ -43,26 +43,26 @@ GO-01: T1-T29.
 - [x] **T14**: Update `libs/infrastructure/src/adr_baseline.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01] (`940c6788dae096b8d43b7ffa6629a4ee2b3b273d`)
 - [x] **T15**: Update `libs/infrastructure/src/dry_check/store.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01] (`940c6788dae096b8d43b7ffa6629a4ee2b3b273d`)
 - [x] **T16**: Update `libs/infrastructure/src/dry_check/dry_write_driver/manifest.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01] (`940c6788dae096b8d43b7ffa6629a4ee2b3b273d`)
-- [x] **T24**: Update `libs/infrastructure/src/dry_check/dry_write_driver.rs::FsDryCorpusRootManifestAdapter::write`; add writer-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
-- [ ] **T25**: Update `libs/infrastructure/src/dry_check/coverage.rs::FsDryCheckCoverageAdapter::write_coverage`; add writer-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
+- [x] **T24**: Update `libs/infrastructure/src/dry_check/dry_write_driver.rs::FsDryCorpusRootManifestAdapter::write`; add writer-local serialization regression. [IN-01; IN-02; CN-01; AC-01] (`768d65c819d7a5966a8f8bccd38a91221da94146`)
+- [x] **T25**: Update `libs/infrastructure/src/dry_check/coverage.rs::FsDryCheckCoverageAdapter::write_coverage`; add writer-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
 
 ### test-obligation-codecs — Test-obligation codecs
 
 > Update test-obligation codecs; add local regressions. [IN-01; IN-02; CN-01; AC-01]
 
 - [x] **T17**: Update `libs/infrastructure/src/test_obligation/bindings_codec.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01] (`940c6788dae096b8d43b7ffa6629a4ee2b3b273d`)
-- [x] **T18**: Update `libs/infrastructure/src/test_obligation/obligations_codec.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
-- [x] **T19**: Update `libs/infrastructure/src/test_obligation/waiver_cache_codec.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
-- [x] **T20**: Update `libs/infrastructure/src/test_obligation/fulfillment_cache_codec/fulfillment_cache_io.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
+- [x] **T18**: Update `libs/infrastructure/src/test_obligation/obligations_codec.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01] (`768d65c819d7a5966a8f8bccd38a91221da94146`)
+- [x] **T19**: Update `libs/infrastructure/src/test_obligation/waiver_cache_codec.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01] (`768d65c819d7a5966a8f8bccd38a91221da94146`)
+- [x] **T20**: Update `libs/infrastructure/src/test_obligation/fulfillment_cache_codec/fulfillment_cache_io.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01] (`768d65c819d7a5966a8f8bccd38a91221da94146`)
 
 ### operational-cache-telemetry-writers — Operational cache and telemetry writers
 
 > Update provider-session, telemetry, archived-track telemetry, and PR trigger-state writers; add local regressions. [IN-01; IN-02; CN-01; AC-01]
 
-- [ ] **T26**: Update `libs/infrastructure/src/provider_session.rs::FsProviderSessionCacheAdapter::save`; add writer-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
-- [ ] **T27**: Update `libs/infrastructure/src/telemetry/writer.rs::build_line`; add writer-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
-- [ ] **T28**: Update `libs/infrastructure/src/telemetry/archived_track.rs::FsArchivedTrackTelemetryAdapter::emit`; add writer-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
-- [ ] **T29**: Update `libs/infrastructure/src/pr/poll.rs::save_trigger_state`; add writer-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
+- [x] **T26**: Update `libs/infrastructure/src/provider_session.rs::FsProviderSessionCacheAdapter::save`; add writer-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
+- [x] **T27**: Update `libs/infrastructure/src/telemetry/writer.rs::build_line`; add writer-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
+- [x] **T28**: Update `libs/infrastructure/src/telemetry/archived_track.rs::FsArchivedTrackTelemetryAdapter::emit`; add writer-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
+- [x] **T29**: Update `libs/infrastructure/src/pr/poll.rs::save_trigger_state`; add writer-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
 
 ### track-lifecycle-fixtures — Track lifecycle fixtures
 
