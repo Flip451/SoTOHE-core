@@ -239,6 +239,31 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::signal_report::tests",
           "test_name": "test_signal_report_source_port_load_is_read_only_across_all_chains"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_adapter_rejects_stale_catalogue_declaration_hash"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_adapter_rejects_missing_extra_or_mismatched_catalogue_signal_coverage"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_adapter_rejects_stale_catalogue_entry_hash"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_adapter_reports_both_impl_catalogue_item_mismatches"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_adapter_preserves_duplicate_catalogue_entry_contexts"
         }
       ]
     },
