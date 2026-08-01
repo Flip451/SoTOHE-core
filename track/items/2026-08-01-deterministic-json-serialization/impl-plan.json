@@ -4,7 +4,8 @@
     {
       "id": "T1",
       "description": "Update `libs/infrastructure/src/track/codec.rs::encode`; add codec-local serialization regression. [IN-01; IN-02; OS-01; CN-01; CN-03; AC-01]",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "74197666e0b75a3199712b42f791c0ae3ee2d6a9"
     },
     {
       "id": "T2",

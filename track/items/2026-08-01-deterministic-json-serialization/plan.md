@@ -11,7 +11,7 @@ GO-01: T1-T29.
 
 > Update track, impl-plan, and review persistence writers; add local regressions. [IN-01; IN-02; OS-01; CN-01; CN-03; AC-01; AC-02]
 
-- [x] **T1**: Update `libs/infrastructure/src/track/codec.rs::encode`; add codec-local serialization regression. [IN-01; IN-02; OS-01; CN-01; CN-03; AC-01]
+- [x] **T1**: Update `libs/infrastructure/src/track/codec.rs::encode`; add codec-local serialization regression. [IN-01; IN-02; OS-01; CN-01; CN-03; AC-01] (`74197666e0b75a3199712b42f791c0ae3ee2d6a9`)
 - [ ] **T2**: Update `libs/infrastructure/src/impl_plan_codec.rs::encode`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
 - [ ] **T3**: Update `libs/infrastructure/src/review_v2/persistence/mod.rs::write_atomic`; add fast- and final-round fixtures in `apps/cli-composition/src/review_v2/run.rs`. [IN-01; IN-02; CN-01; AC-01; AC-02]
 

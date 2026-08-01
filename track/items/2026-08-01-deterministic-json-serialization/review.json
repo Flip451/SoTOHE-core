@@ -1,6 +1,139 @@
 {
   "schema_version": 2,
   "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:860d7738e9dd8d32339a2adfc1caa731073e65a830206a7445d59c09e41f2fba",
+          "at": "2026-08-01T04:31:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:860d7738e9dd8d32339a2adfc1caa731073e65a830206a7445d59c09e41f2fba",
+          "at": "2026-08-01T04:34:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9208ee3b0168c2a1bde20d6a2a90dcc219e23b222b06802ccb47ce8ee888bd62",
+          "at": "2026-08-01T04:44:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9208ee3b0168c2a1bde20d6a2a90dcc219e23b222b06802ccb47ce8ee888bd62",
+          "at": "2026-08-01T04:47:50Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8e933242abf043664e6fe6a004f2acaef6aa00cdd557840dc55f49eac083fcb8",
+          "at": "2026-08-01T06:49:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8e933242abf043664e6fe6a004f2acaef6aa00cdd557840dc55f49eac083fcb8",
+          "at": "2026-08-01T06:55:21Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-03 is vague and untestable: “performance becomes material” and “substantially larger” have no measurable threshold, so downstream phases cannot derive when reassessment is required.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/spec.json",
+              "line": 96,
+              "category": "constraint vague or untestable"
+            }
+          ],
+          "hash": "rvw1:sha256:9d0e94da9d413c623a3c4c5ddcbff2fb68e6bfa62d7e7831c6e4801f4cce57ed",
+          "at": "2026-08-01T05:13:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:650f10a114bfffa16d46e1e779854e06f614290e10b89340b7bcd51ca220748d",
+          "at": "2026-08-01T05:15:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:650f10a114bfffa16d46e1e779854e06f614290e10b89340b7bcd51ca220748d",
+          "at": "2026-08-01T05:25:26Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4dec35b2ce6cd412c928fba53eb0401fb60a3d8719b866e113f75b084704c4c7",
+          "at": "2026-08-01T05:14:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4dec35b2ce6cd412c928fba53eb0401fb60a3d8719b866e113f75b084704c4c7",
+          "at": "2026-08-01T05:26:25Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3cd699674791ac96bd8c93c63574dad3a0276c5fa341b62aa99acb642ff69f81",
+          "at": "2026-08-01T05:13:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3cd699674791ac96bd8c93c63574dad3a0276c5fa341b62aa99acb642ff69f81",
+          "at": "2026-08-01T05:25:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b665d7e3cfe103badf0a5c106ac0eb4e01c7398f97a248a3b55df0b1ecc56feb",
+          "at": "2026-08-01T06:49:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b665d7e3cfe103badf0a5c106ac0eb4e01c7398f97a248a3b55df0b1ecc56feb",
+          "at": "2026-08-01T06:53:28Z"
+        }
+      ]
+    },
     "impl-plan": {
       "rounds": [
         {
@@ -409,139 +542,20 @@
           "findings": [],
           "hash": "rvw1:sha256:f5d88d12421edbc1ad2fd1d54e9b168b3d37b3ba96d23841f2ffea9da0b535b3",
           "at": "2026-08-01T06:54:25Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8e933242abf043664e6fe6a004f2acaef6aa00cdd557840dc55f49eac083fcb8",
-          "at": "2026-08-01T06:49:25Z"
+          "hash": "rvw1:sha256:d72b5fdcc2d200ba30274c0e770cf5009429d13996e2fc2fad8512c21555e90e",
+          "at": "2026-08-01T07:05:10Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8e933242abf043664e6fe6a004f2acaef6aa00cdd557840dc55f49eac083fcb8",
-          "at": "2026-08-01T06:55:21Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:860d7738e9dd8d32339a2adfc1caa731073e65a830206a7445d59c09e41f2fba",
-          "at": "2026-08-01T04:31:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:860d7738e9dd8d32339a2adfc1caa731073e65a830206a7445d59c09e41f2fba",
-          "at": "2026-08-01T04:34:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9208ee3b0168c2a1bde20d6a2a90dcc219e23b222b06802ccb47ce8ee888bd62",
-          "at": "2026-08-01T04:44:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9208ee3b0168c2a1bde20d6a2a90dcc219e23b222b06802ccb47ce8ee888bd62",
-          "at": "2026-08-01T04:47:50Z"
-        }
-      ]
-    },
-    "types": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4dec35b2ce6cd412c928fba53eb0401fb60a3d8719b866e113f75b084704c4c7",
-          "at": "2026-08-01T05:14:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4dec35b2ce6cd412c928fba53eb0401fb60a3d8719b866e113f75b084704c4c7",
-          "at": "2026-08-01T05:26:25Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "CN-03 is vague and untestable: “performance becomes material” and “substantially larger” have no measurable threshold, so downstream phases cannot derive when reassessment is required.",
-              "severity": "P1",
-              "file": "track/items/2026-08-01-deterministic-json-serialization/spec.json",
-              "line": 96,
-              "category": "constraint vague or untestable"
-            }
-          ],
-          "hash": "rvw1:sha256:9d0e94da9d413c623a3c4c5ddcbff2fb68e6bfa62d7e7831c6e4801f4cce57ed",
-          "at": "2026-08-01T05:13:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:650f10a114bfffa16d46e1e779854e06f614290e10b89340b7bcd51ca220748d",
-          "at": "2026-08-01T05:15:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:650f10a114bfffa16d46e1e779854e06f614290e10b89340b7bcd51ca220748d",
-          "at": "2026-08-01T05:25:26Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3cd699674791ac96bd8c93c63574dad3a0276c5fa341b62aa99acb642ff69f81",
-          "at": "2026-08-01T05:13:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3cd699674791ac96bd8c93c63574dad3a0276c5fa341b62aa99acb642ff69f81",
-          "at": "2026-08-01T05:25:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b665d7e3cfe103badf0a5c106ac0eb4e01c7398f97a248a3b55df0b1ecc56feb",
-          "at": "2026-08-01T06:49:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b665d7e3cfe103badf0a5c106ac0eb4e01c7398f97a248a3b55df0b1ecc56feb",
-          "at": "2026-08-01T06:53:28Z"
+          "hash": "rvw1:sha256:d72b5fdcc2d200ba30274c0e770cf5009429d13996e2fc2fad8512c21555e90e",
+          "at": "2026-08-01T07:11:15Z"
         }
       ]
     }
