@@ -143,8 +143,26 @@ impl TrackCompositionRoot {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used)]
 mod tests {
+    use std::path::Path;
+    use std::process::Command;
+
     use super::switch_base_error_to_outcome;
+
+    fn write_branch_strategy_config(root: &Path) {
+        let config_dir = root.join(".harness").join("config");
+        std::fs::create_dir_all(&config_dir).unwrap();
+        std::fs::write(
+            config_dir.join("branch-strategy.json"),
+            r#"{
+  "base_branch": "main",
+  "merge_target": "main",
+  "merge_method": "merge"
+}"#,
+        )
+        .unwrap();
+    }
 
     #[test]
     fn test_switch_base_error_to_outcome_checkout_failure_preserves_legacy_result()
@@ -189,5 +207,71 @@ mod tests {
 
         assert_eq!(error.to_string(), "git workflow unavailable: unexpected sync failure");
         Ok(())
+    }
+
+    #[test]
+    fn test_track_branch_create_date_prefixed_ids_create_sorted_track_branches() {
+        let root = tempfile::tempdir().unwrap();
+        crate::test_support::seed_repo(root.path(), "main");
+        write_branch_strategy_config(root.path());
+        let items_dir = root.path().join("track").join("items");
+        let composition = crate::TrackCompositionRoot::new();
+
+        for track_id in ["2026-07-31-later-track", "2026-07-01-earlier-track"] {
+            let outcome =
+                composition.track_branch_create(items_dir.clone(), track_id.to_owned()).unwrap();
+            assert_eq!(outcome.exit_code, 0);
+
+            let status = Command::new("git")
+                .args(["switch", "main"])
+                .current_dir(root.path())
+                .status()
+                .unwrap();
+            assert!(status.success(), "must return fixture to the configured base branch");
+        }
+
+        let output = Command::new("git")
+            .args(["branch", "--list", "--sort=refname", "--format=%(refname:short)", "track/*"])
+            .current_dir(root.path())
+            .output()
+            .unwrap();
+        assert!(output.status.success());
+        let listed_branches = String::from_utf8(output.stdout)
+            .unwrap()
+            .lines()
+            .map(str::to_owned)
+            .collect::<Vec<_>>();
+
+        assert_eq!(
+            listed_branches,
+            ["track/2026-07-01-earlier-track", "track/2026-07-31-later-track",],
+            "ascending branch listing must put the earlier date first"
+        );
+    }
+
+    #[test]
+    fn test_track_branch_create_suffix_form_id_preserves_branch_name() {
+        let root = tempfile::tempdir().unwrap();
+        crate::test_support::seed_repo(root.path(), "main");
+        write_branch_strategy_config(root.path());
+        let items_dir = root.path().join("track").join("items");
+        let track_id = "legacy-suffix-track-2026-07-31";
+
+        let outcome = crate::TrackCompositionRoot::new()
+            .track_branch_create(items_dir, track_id.to_owned())
+            .unwrap();
+
+        assert_eq!(outcome.exit_code, 0);
+        let branch = Command::new("git")
+            .args(["branch", "--show-current"])
+            .current_dir(root.path())
+            .output()
+            .unwrap();
+        assert!(branch.status.success());
+        assert_eq!(
+            String::from_utf8(branch.stdout).unwrap().trim(),
+            format!("track/{track_id}"),
+            "a suffix-form ID must remain unchanged in its track branch"
+        );
     }
 }

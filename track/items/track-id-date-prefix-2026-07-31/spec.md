@@ -1,0 +1,41 @@
+<!-- Generated from spec.json — DO NOT EDIT DIRECTLY -->
+---
+version: "1.0"
+signals: { blue: 11, yellow: 0, red: 0 }
+---
+
+# 新規 track ID の日付プレフィックス形式
+
+## Goal
+
+- [GO-01] 新規に生成する track ID を `<YYYY-MM-DD>-<slug>` の日付プレフィックス形式へ統一し、track 一覧と branch 一覧で時系列の並び順を得ながら、既存 track を継続して利用可能にする。 [adr: knowledge/adr/2026-07-29-0839-track-id-date-prefix.md#D1]
+
+## Scope
+
+### In Scope
+- [IN-01] 新規 track の ID 生成を、日付と slug を `<YYYY-MM-DD>-<slug>` の順で連結する形式へ変更する。 [adr: knowledge/adr/2026-07-29-0839-track-id-date-prefix.md#D1] [tasks: T001]
+- [IN-02] 新規 ID が数字で始まる場合も、そこから導出される `track/<id>` branch と `track/items/<id>/` の配置を一貫して作成・利用できるようにする。 [adr: knowledge/adr/2026-07-29-0839-track-id-date-prefix.md#D1] [tasks: T002]
+- [IN-03] branch に束縛された track 解決が、日付プレフィックス形式の新規 ID を有効な不透明識別子として解決できるようにする。 [adr: knowledge/adr/2026-07-29-0839-track-id-date-prefix.md#D1] [tasks: T002]
+
+### Out of Scope
+- [OUT-01] 既存 track ID、既存 branch 名、または既存 `track/items/<id>/` 配置の改名・移行は行わない。 [adr: knowledge/adr/2026-07-29-0839-track-id-date-prefix.md#D1] [tasks: T003]
+
+## Constraints
+- [CN-01] この命名形式の変更は新規 track の ID 生成にのみ適用し、既存 ID を変更しない。 [adr: knowledge/adr/2026-07-29-0839-track-id-date-prefix.md#D1] [tasks: T001]
+- [CN-02] 新旧形式が混在する間も、track ID を扱う branch 名、item-directory 配置、および branch-bound 解決は、ID の先頭文字種や日付位置に依存して動作を失わない。 [adr: knowledge/adr/2026-07-29-0839-track-id-date-prefix.md#D1] [tasks: T002, T003]
+
+## Acceptance Criteria
+- [ ] [AC-01] 2026-07-31 に slug `example-track` で新規 track を生成すると、その ID は `2026-07-31-example-track` となり、旧来の `<slug>-<date>` 形式にならない。 [adr: knowledge/adr/2026-07-29-0839-track-id-date-prefix.md#D1] [tasks: T001]
+- [ ] [AC-02] 日付プレフィックスの新規 ID を生成した後、その track は対応する `track/<id>` branch、`track/items/<id>/` 配置、および branch-bound track 解決を通じて利用できる。 [adr: knowledge/adr/2026-07-29-0839-track-id-date-prefix.md#D1] [tasks: T002]
+- [ ] [AC-03] 既存のサフィックス形式 track ID と、それに対応する branch、item-directory、branch-bound 解決の識別子は変更されず、引き続き利用できる。 [adr: knowledge/adr/2026-07-29-0839-track-id-date-prefix.md#D1] [tasks: T003]
+- [ ] [AC-04] 異なる日付に生成した二つの新規 track ID を昇順に一覧表示すると、先の日付の track とその `track/<id>` branch が後の日付のものより先に表示される。 [adr: knowledge/adr/2026-07-29-0839-track-id-date-prefix.md#D1] [tasks: T002]
+
+## Related Conventions (Required Reading)
+- knowledge/conventions/coding-principles.md#Rules
+- knowledge/conventions/prefer-type-safe-abstractions.md#Rule
+
+## Signal Summary
+
+### Stage 1: Spec Signals
+🔵 11  🟡 0  🔴 0
+

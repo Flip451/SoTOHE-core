@@ -22,6 +22,92 @@ jobs:
       - name: Derive sccache host directory
         run: echo "SCCACHE_HOST_DIR=$HOME/.cache/sccache" >> "$GITHUB_ENV"
 
+      - name: Determine remote strict-gate policy and verify regression matrix
+        # Keep the branch recreation and the strict gate driven by one decision.
+        # A non-track PR deliberately receives `run_gate=true` without a local
+        # track branch, causing the existing ci-track gate to fail closed.
+        id: remote_strict_gate_policy
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          HEAD_REF: ${{ github.head_ref }}
+          BASE_REF: ${{ github.base_ref }}
+          HEAD_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          readonly STRICT_SIGNAL_GATE="merge"
+
+          policy_for() {
+            local event_name="$1"
+            local head_ref="$2"
+            local base_ref="$3"
+            local head_repository="$4"
+            local repository="$5"
+
+            if [[ "$event_name" != "pull_request" ]]; then
+              printf 'skip\tfalse\tfalse\n'
+            elif [[ "$head_ref" == "develop" && "$base_ref" == "main" && "$head_repository" == "$repository" ]]; then
+              printf 'release\tfalse\tfalse\n'
+            elif [[ "$head_ref" == track/* ]]; then
+              printf 'track\ttrue\ttrue\n'
+            else
+              printf 'unresolved\tfalse\ttrue\n'
+            fi
+          }
+
+          assert_policy_case() {
+            local name="$1"
+            local expected="$2"
+            shift 2
+            local actual
+            actual="$(policy_for "$@")"
+            if [[ "$actual" != "$expected" ]]; then
+              printf 'remote strict-gate regression failed: %s\nexpected: %s\nactual: %s\n' "$name" "$expected" "$actual" >&2
+              exit 1
+            fi
+          }
+
+          assert_strict_merge_gate() {
+            if [[ "$STRICT_SIGNAL_GATE" != "merge" ]]; then
+              printf 'remote strict-gate regression failed: expected aggregate gate merge, got %s\n' "$STRICT_SIGNAL_GATE" >&2
+              exit 1
+            fi
+          }
+
+          # Regression cases: only an in-repository develop → main release PR
+          # may skip. Fork and non-track PR shapes must still invoke the strict
+          # gate, with the latter failing closed when no track can be resolved.
+          # The only acceptable aggregate signal-gate strictness is `merge`;
+          # `commit` checks are retained by ci-track-container but are not a
+          # substitute for the remote merge decision.
+          assert_strict_merge_gate
+          assert_policy_case "push skips the PR-only gate" $'skip\tfalse\tfalse' "push" "" "" "" "owner/repo"
+          assert_policy_case "in-repository release PR skips the gate" $'release\tfalse\tfalse' "pull_request" "develop" "main" "owner/repo" "owner/repo"
+          assert_policy_case "fork release-shaped PR runs the gate" $'unresolved\tfalse\ttrue' "pull_request" "develop" "main" "fork/repo" "owner/repo"
+          assert_policy_case "non-track PR fails closed through the gate" $'unresolved\tfalse\ttrue' "pull_request" "feature/without-track" "develop" "owner/repo" "owner/repo"
+          assert_policy_case "track PR recreates its branch and runs the gate" $'track\ttrue\ttrue' "pull_request" "track/example-2026-07-31" "develop" "owner/repo" "owner/repo"
+
+          policy="$(policy_for "$EVENT_NAME" "$HEAD_REF" "$BASE_REF" "$HEAD_REPOSITORY" "$REPOSITORY")"
+          IFS=$'\t' read -r mode recreate_track_branch run_track_gate <<< "$policy"
+
+          {
+            echo "mode=$mode"
+            echo "recreate_track_branch=$recreate_track_branch"
+            echo "run_track_gate=$run_track_gate"
+            echo "strict_signal_gate=$STRICT_SIGNAL_GATE"
+          } >> "$GITHUB_OUTPUT"
+
+          {
+            echo "### Remote strict-gate evidence"
+            echo
+            echo "| CI run shape | Policy mode | Recreate local track branch | Run strict track-aware gate | Aggregate signal gate |"
+            echo "| --- | --- | --- | --- | --- |"
+            printf '| event=%s; head=%s; base=%s; head-repository=%s | %s | %s | %s | `%s` |\n' "$EVENT_NAME" "$HEAD_REF" "$BASE_REF" "$HEAD_REPOSITORY" "$mode" "$recreate_track_branch" "$run_track_gate" "$STRICT_SIGNAL_GATE"
+            echo
+            echo "Regression matrix passed: strict aggregate merge gate, push, in-repository release PR, fork release-shaped PR, non-track PR, and track PR."
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Recreate local track branch on PR merge ref
         # default の merge ref (detached HEAD) を維持しつつ、local branch 名を
         # PR の source branch (`track/<id>`) として再作成する。これで
@@ -29,11 +115,10 @@ jobs:
         # な CLI subcommand (signal check-spec-adr 等) の auto-resolve が機能する。
         # merge ref 上で CI が動くこと自体は変えないため、対象ブランチ (main /
         # develop) の最新と PR の統合状態に対する検証は従来通り保たれる。
-        # The track-aware gate below runs for every PR except the explicit
-        # develop → main release shape. This recreation is deliberately narrower:
-        # only track/* heads acquire an active-track context; other non-release
-        # PRs reach the gate without one and fail closed.
-        if: github.event_name == 'pull_request' && startsWith(github.head_ref, 'track/')
+        # The policy step is the single source for this condition. It only sets
+        # this output for track/* PR heads; all other non-release PRs continue
+        # to the strict gate without a track context and fail closed.
+        if: steps.remote_strict_gate_policy.outputs.recreate_track_branch == 'true'
         run: git checkout -B "$GITHUB_HEAD_REF"
 
       - name: Configure git hooks path
@@ -118,15 +203,23 @@ jobs:
 
       - name: Run CI suite (track-aware gates)
         # track-aware gates (spec/catalogue/impl signal chains) require a
-        # track/<id> branch context. The recreation step above supplies that
-        # context only for track/* heads. This gate's condition is deliberately
-        # broader: it skips only this repository's own develop → main release PR
-        # (the head-repo identity check excludes fork branches merely named
-        # "develop"); every other PR, including a non-track head without context,
-        # runs the gate and fails closed. Push (main / develop) runs are outside
-        # this PR-only gate.
-        if: github.event_name == 'pull_request' && !(github.head_ref == 'develop' && github.base_ref == 'main' && github.event.pull_request.head.repo.full_name == github.repository)
+        # track/<id> branch context. This suite retains its commit-level track
+        # contract, baseline, and obligation checks; the following aggregate
+        # signal step is the strict merge decision. The policy matrix skips only
+        # the explicit in-repository develop → main release PR. Every other PR,
+        # including a fork release-shaped or non-track head, runs both gates; an
+        # unresolved track context therefore fails closed rather than succeeding
+        # or gracefully skipping.
+        if: steps.remote_strict_gate_policy.outputs.run_track_gate == 'true'
         run: docker exec -e CARGO_INCREMENTAL=0 -e CARGO_HOME=/usr/local/cargo -e CARGO_TARGET_DIR=/cargo-target ci-runner cargo make ci-track-container
+
+      - name: Run strict merge signal gate
+        # The policy step binds this to the regression-checked `merge` value.
+        # Run the existing aggregate `sotp signal check` CLI through Cargo so a
+        # fresh checkout does not depend on the ignored local bin/sotp binary;
+        # do not duplicate individual chain checks in workflow YAML.
+        if: steps.remote_strict_gate_policy.outputs.run_track_gate == 'true'
+        run: docker exec -e CARGO_INCREMENTAL=0 -e CARGO_HOME=/usr/local/cargo -e CARGO_TARGET_DIR=/cargo-target ci-runner cargo run --quiet -p cli -- signal check --gate "${{ steps.remote_strict_gate_policy.outputs.strict_signal_gate }}"
 
       - name: Show sccache stats
         if: always()

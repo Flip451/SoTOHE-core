@@ -2,6 +2,8 @@
 
 const RETIRED_PLANNER_TOKENS: &[&str] = &["plan codex-local", "PlanCodexLocal"];
 const RETIRED_SIGNAL_EXECUTION_TOKENS: &[&str] = &["SignalServiceImpl", "signal::shim"];
+const TRACK_INIT_WORKFLOW: &str =
+    include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/../../.harness/workflows/track/init.md"));
 
 const LIVE_OPERATIONAL_SURFACES: &[(&str, &str)] = &[
     (
@@ -155,6 +157,22 @@ fn expected_dispatch_markers(path: &str) -> &[&str] {
         ".codex/rules/default.rules" => &["[\"bin/sotp\", \"capability\", \"exec\"]"],
         _ => &["capability exec"],
     }
+}
+
+#[test]
+fn test_track_init_workflow_date_prefix_derivation_uses_date_before_slug() {
+    assert!(
+        TRACK_INIT_WORKFLOW.contains("<YYYY-MM-DD>-<feature-slug>"),
+        "track init workflow must specify the date-prefixed track ID format"
+    );
+    assert!(
+        TRACK_INIT_WORKFLOW.contains("derives `2026-07-31-example-track`"),
+        "track init workflow must derive the expected ID for the example date and slug"
+    );
+    assert!(
+        !TRACK_INIT_WORKFLOW.contains("kebab-case ASCII + date suffix `YYYY-MM-DD`"),
+        "track init workflow must not retain the former slug-date derivation"
+    );
 }
 
 #[test]
