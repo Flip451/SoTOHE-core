@@ -1,4 +1,509 @@
 {
   "track_id": "2026-07-31-base-merge-and-conflict-recovery",
-  "entries": []
+  "entries": [
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeGitPort",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeGitPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:merge_base"
+      },
+      "key": {
+        "waived_reason_hash": "c1693f47bc315a8c7387bd2e8ad75a35c663cc39bea2b0c623a04ac74de6f35a",
+        "declaration_hash": "318479435b77df5c4e0a4171903380853bd56d6b14317305f862ce59fc6c1636",
+        "anchor_text_hash": "bbbb8b0ae8e121225a1f2c7388f5aa303e348da890d769ed1323f1fac625ca34"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"its method exposes a pre-cleanup attempt result and git-specific error\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeGitPort",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeGitPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:merge_base"
+      },
+      "key": {
+        "waived_reason_hash": "c4e4f2d31ba9f4a24dc802174bbb0ec8fa068f0eaa38655b1d2ba7b2d7964db1",
+        "declaration_hash": "318479435b77df5c4e0a4171903380853bd56d6b14317305f862ce59fc6c1636",
+        "anchor_text_hash": "f18c851ca6bcb1742ea5111e940f5b4d764e8a3f5972d5c76b358096ed16f950"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "ParamDeclaration { name: ParamName(Identifier(\"direction\")), ty: TypeRef(\"&domain::branch_strategy::BaseMergeDirection\") }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeAttemptOutcome",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeAttemptOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "waived_reason_hash": "77237bb9946dc49c0b28d128466995676f4e69b601c7e33ebf0407b55de3bd27",
+        "declaration_hash": "b38d307274bbfd116b5559961b73e2fffd1b0fa8f0954747c3f4b6dd086a572d",
+        "anchor_text_hash": "008a36faed29453afb25460ea4db3d92210eddc427c7d565839f29f1cce2e93e"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"variants: [VariantDecl { name: VariantName(Identifier(\"Clean\")), payload: Unit }, VariantDecl { name: VariantName(Identifier(\"Conflicted\")), payload: Unit }]\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeCommand",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "waived_reason_hash": "c22d020b7703c6850681097f64dee95faa11b1c639ca0000870b12081a0e0167",
+        "declaration_hash": "ef86d037bef5e1e1f95b7a0a7a9ddb2bad24200d1d3489e4df6415c1e5bf7488",
+        "anchor_text_hash": "008a36faed29453afb25460ea4db3d92210eddc427c7d565839f29f1cce2e93e"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Application command carrying workspace_root; PathBuf is a technical filesystem anchor with no domain value semantics."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeCommand",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "waived_reason_hash": "03eaef84f6f47274d9e554dcb23a6a33d256b2fb5dee7c2fbafeb8b627f4278e",
+        "declaration_hash": "ef86d037bef5e1e1f95b7a0a7a9ddb2bad24200d1d3489e4df6415c1e5bf7488",
+        "anchor_text_hash": "bbbb8b0ae8e121225a1f2c7388f5aa303e348da890d769ed1323f1fac625ca34"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Application command carrying workspace_root; PathBuf is a technical filesystem anchor with no domain value semantics."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeCommand",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "waived_reason_hash": "475c99fec1c1afadcea3aaca796101b604fb62e3d41c83b2b32515d74844e5ff",
+        "declaration_hash": "ef86d037bef5e1e1f95b7a0a7a9ddb2bad24200d1d3489e4df6415c1e5bf7488",
+        "anchor_text_hash": "f18c851ca6bcb1742ea5111e940f5b4d764e8a3f5972d5c76b358096ed16f950"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "PathBuf is a technical filesystem anchor with no domain value semantics."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeError",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "waived_reason_hash": "e93900cb50b7586b8b1d5cb59c8e70e5933359b376f758818181e8abae005fc8",
+        "declaration_hash": "cb48773054e03a0c20760b73d7fb15e4915cf4944c48f31713418934d9b0773a",
+        "anchor_text_hash": "40f4d9f0d37fa58dfb35671b5faada2feea33e0d3a44c57a471647c25bc0d4f5"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Application error union for context, active-track identity mismatch, git execution, and staged cleanup failures."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeError",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-04"
+      },
+      "key": {
+        "waived_reason_hash": "c18a578e29299335039b40b3c25142adfa4016e3d539e78d5f718bdf54a20e2f",
+        "declaration_hash": "cb48773054e03a0c20760b73d7fb15e4915cf4944c48f31713418934d9b0773a",
+        "anchor_text_hash": "c43a9f220f2dfd90a0f665bb2a4988ca8cba389c771d7c50aba2afc25f49bfad"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Application error union for context, active-track identity mismatch, git execution, and staged cleanup failures."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeGitError",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeGitError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "waived_reason_hash": "808d6cb66fce6109e55596fb700d296cd14d4b5e588feefae19bbb05c0032049",
+        "declaration_hash": "1fa1982e64b9150eaff67bda63fcd06cbe3086c44e4047508ea858c61016fae3",
+        "anchor_text_hash": "008a36faed29453afb25460ea4db3d92210eddc427c7d565839f29f1cce2e93e"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Git-process failure carrying opaque adapter diagnostics."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeGitError",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeGitError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "waived_reason_hash": "983a0f27ec8dfc2ada5840af9094467f5755fcb62c4c3235bbbdc8ea0105ecc9",
+        "declaration_hash": "1fa1982e64b9150eaff67bda63fcd06cbe3086c44e4047508ea858c61016fae3",
+        "anchor_text_hash": "bbbb8b0ae8e121225a1f2c7388f5aa303e348da890d769ed1323f1fac625ca34"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TypeEntry { action: Add, role: ErrorType, kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"Execution\")), payload: Tuple([TypeRef(\"DiagnosticText\")]) }] }, methods: [], generics: [], where_predicates: [], module_path: ModulePath([Identifier(\"base_merge\")]), docs: Some(DocString(\"Git-process failure carrying opaque adapter diagnostics.\")), spec_refs: [SpecRef { file: \"track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json\", anchor: SpecElementId(\"IN-01\") }, SpecRef { file: \"track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json\", anchor: SpecElementId(\"CN-01\") }, SpecRef { file: \"track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json\", anchor: SpecElementId(\"AC-01\") }, SpecRef { file: \"track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json\", anchor: SpecElementId(\"AC-02\") }, SpecRef { file: \"track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json\", anchor: SpecElementId(\"AC-04\") }], informal_grounds: [] }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeGitError",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeGitError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "waived_reason_hash": "12209c4a2a90f034c70c0760a594870fadb05c1398c7e01c82a05b01f42c0caf",
+        "declaration_hash": "1fa1982e64b9150eaff67bda63fcd06cbe3086c44e4047508ea858c61016fae3",
+        "anchor_text_hash": "40f4d9f0d37fa58dfb35671b5faada2feea33e0d3a44c57a471647c25bc0d4f5"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"Git-process failure carrying opaque adapter diagnostics.\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeGitError",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeGitError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "waived_reason_hash": "a056a73bceecde91d6ecaff22381dd4c09bd9313c66189df67526943f3a3a05f",
+        "declaration_hash": "1fa1982e64b9150eaff67bda63fcd06cbe3086c44e4047508ea858c61016fae3",
+        "anchor_text_hash": "f18c851ca6bcb1742ea5111e940f5b4d764e8a3f5972d5c76b358096ed16f950"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "A reverse-direction merge, an invalid current branch, or a source that differs from the snapshot base branch is rejected without performing the merge."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeGitError",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeGitError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-04"
+      },
+      "key": {
+        "waived_reason_hash": "6588159324fb7ab2bd190af6e3a0542f0c3af39166867239a9839aba922d30cb",
+        "declaration_hash": "1fa1982e64b9150eaff67bda63fcd06cbe3086c44e4047508ea858c61016fae3",
+        "anchor_text_hash": "c43a9f220f2dfd90a0f665bb2a4988ca8cba389c771d7c50aba2afc25f49bfad"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Git-process failure carrying opaque adapter diagnostics."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeInteractor",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "waived_reason_hash": "9b72a894e173475ffbbde2edd1bbc62743e80a238b26286de648fee9c6ec5a1f",
+        "declaration_hash": "ce1a7ca347da2c4054bf94a0b0faa6940155c77ebb55bba0f780d688d4d8aa98",
+        "anchor_text_hash": "04ee06225d2dde855bd2ce4384bd448922a1ef5d7cb6550b5f702ec87f32e137"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TypeEntry { action: Add, role: Interactor, kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: [],"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeInteractor",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "waived_reason_hash": "6ef534796618f6601b3ed3fdce4c46a531f01e1c8b26cb24e429821fb2f9ecb4",
+        "declaration_hash": "ce1a7ca347da2c4054bf94a0b0faa6940155c77ebb55bba0f780d688d4d8aa98",
+        "anchor_text_hash": "b6d58ef2fbe2a0ba0cceb148bcb9928018225a258fdaf1340e4abd3be561262e"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeService",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:execute"
+      },
+      "key": {
+        "waived_reason_hash": "c69c80cad896a6e574ac66351de55e503b0aeb05c97264ca1601a80e441dfe2b",
+        "declaration_hash": "238b8c7004943fac290b01ed0f77637bdaa947bd23e04fed73f5d2742a14d132",
+        "anchor_text_hash": "b6d58ef2fbe2a0ba0cceb148bcb9928018225a258fdaf1340e4abd3be561262e"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Application-service boundary for BaseMergeCommand and final BaseMergeOutcome values."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeService",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:execute"
+      },
+      "key": {
+        "waived_reason_hash": "06dcfa0f3c0e7756dda79cc3cbc6896e5e3138503e4fe90e3f40c4e80e7c97d1",
+        "declaration_hash": "238b8c7004943fac290b01ed0f77637bdaa947bd23e04fed73f5d2742a14d132",
+        "anchor_text_hash": "04ee06225d2dde855bd2ce4384bd448922a1ef5d7cb6550b5f702ec87f32e137"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Application-service boundary for BaseMergeCommand and final BaseMergeOutcome values."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeService",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:execute"
+      },
+      "key": {
+        "waived_reason_hash": "6fd29fb7daf6bde7c3fd2d5b06d09bb5fcf04f5d358b1a4338139e1f6b3ede18",
+        "declaration_hash": "238b8c7004943fac290b01ed0f77637bdaa947bd23e04fed73f5d2742a14d132",
+        "anchor_text_hash": "c43a9f220f2dfd90a0f665bb2a4988ca8cba389c771d7c50aba2afc25f49bfad"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"its declared command, result, and error surface has no conflict-editing, review, guarded-commit, or post-conflict recovery-cleanup operation\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeOutcome",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "waived_reason_hash": "5e884b84d54500bce9728aa6108e34f4a95d4ab5cf97fd6445e41a3c1f8fbdb8",
+        "declaration_hash": "fb7b3c8ae9f2a2112fdb296cb20b02615f0e7056ae982ec77340d6fd29b125a0",
+        "anchor_text_hash": "008a36faed29453afb25460ea4db3d92210eddc427c7d565839f29f1cce2e93e"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TypeEntry { action: Add, role: ValueObject { invariants: [] }, kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"Completed\")), payload: Unit }, VariantDecl { name: VariantName(Identifier(\"Conflicted\")), payload: Unit }]"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeOutcome",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-04"
+      },
+      "key": {
+        "waived_reason_hash": "0ac972a755997168d93738fface37db91ae30eceb16e0657e082c2434b31e6e6",
+        "declaration_hash": "fb7b3c8ae9f2a2112fdb296cb20b02615f0e7056ae982ec77340d6fd29b125a0",
+        "anchor_text_hash": "c43a9f220f2dfd90a0f665bb2a4988ca8cba389c771d7c50aba2afc25f49bfad"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"BaseMergeOutcome has no operation or state for executing or completing the downstream conflict-recovery workflow\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PostMergeCleanupStage",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PostMergeCleanupStage",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-04"
+      },
+      "key": {
+        "waived_reason_hash": "b8476b139cdab1cae3793361d47c2ef258d176dca2a9b50c86e15e6c4c54716c",
+        "declaration_hash": "9ef7862dc37e8dc92f9a453da391ca5103350e6a1f5b6d38a42296c600f50186",
+        "anchor_text_hash": "c43a9f220f2dfd90a0f665bb2a4988ca8cba389c771d7c50aba2afc25f49bfad"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Finite stage identifier with Views, Baseline, and SyncBaseStamp variants."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    }
+  ]
 }

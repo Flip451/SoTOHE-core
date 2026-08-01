@@ -12,6 +12,7 @@ pub use domain::{NonEmptyString, Timestamp, TrackId, ValidationError};
 
 pub mod adr_baseline;
 pub mod arch;
+pub mod base_merge;
 pub mod baseline_capture;
 pub mod baseline_graph_workflow;
 pub mod batch_plan;

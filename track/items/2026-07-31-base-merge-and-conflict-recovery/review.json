@@ -1,357 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4876ba1335b4aabaffe489b2eb447c815ca5d90938fd3fc8b06499b992ddab44",
-          "at": "2026-08-01T09:11:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The cache-hit path does not revalidate its input snapshot. Catalogue and baseline bytes are read before the potentially slow toolchain/source hash; if either changes during hashing, `current_key` can still match the old cache and this early return accepts stale signals. Re-read and compare all three authoritative inputs before returning `SkipEvaluation`.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
-              "line": 181,
-              "category": "cache_freshness"
-            },
-            {
-              "message": "`ReevaluateWithoutExtraction` trusts any valid JSON at the shared Cargo rustdoc output path. That file is not bound to the recorded implementation hash or feature selection and may have been overwritten by another rustdoc or baseline-capture run. Source revalidation cannot prove the loaded JSON came from those sources, so incorrect signals can be persisted under a current three-hash key. Re-extract or validate a keyed rustdoc artifact before reuse.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
-              "line": 183,
-              "category": "io_boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:4876ba1335b4aabaffe489b2eb447c815ca5d90938fd3fc8b06499b992ddab44",
-          "at": "2026-08-01T09:24:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Revalidation checks the catalogue before the potentially slow second implementation/toolchain hash. If the catalogue changes while `hash_workspace_inputs` runs, its old declaration hash has already been accepted and no later catalogue read occurs, so a cache hit can return success—or evaluation can persist signals—using stale catalogue data. Compute the implementation hash before re-reading catalogue and baseline, or compare against a stable second full cache key.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/inputs.rs",
-              "line": 94,
-              "category": "cache_freshness"
-            }
-          ],
-          "hash": "rvw1:sha256:5b62c9c40aa3c35f8facba170b283a5746fb437bde807617470e00df344da37a",
-          "at": "2026-08-01T09:41:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The evaluator erases its failure stage into a string-only `EvaluateSignalsError`, so this adapter reconstructs `TypeSignalsExecutionError` by matching message prefixes. Errors outside the hard-coded prefixes are silently misclassified as `AuthoritativeInput`; for example, the evaluator creates `cannot create timestamp` as an evaluation error, but this branch maps it to `AuthoritativeInput`. Preserve the stage in a typed error and match its variants directly.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_signals_executor_adapter.rs",
-              "line": 227,
-              "category": "error_classification"
-            }
-          ],
-          "hash": "rvw1:sha256:f25ee3287a51103a2974fafa9fc5c41bd218a3716bced8ccb1282d83726c16d3",
-          "at": "2026-08-01T09:52:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2345460ac1f9a1faf2b3ac12867fbc334277f1bc51b394b88cefc9b74d6c780f",
-          "at": "2026-08-01T11:45:03Z"
-        }
-      ]
-    },
-    "impl-plan": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T001 description names only a layer-level target, not a file or symbol; an executor must invent the implementation boundary.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
-              "line": 6,
-              "category": "task description non-executable"
-            },
-            {
-              "message": "T002 description does not identify target files or symbols; its implementation boundary is left to the executor.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
-              "line": 12,
-              "category": "task description non-executable"
-            },
-            {
-              "message": "T003 description does not identify target files or symbols for the filesystem adapters.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
-              "line": 19,
-              "category": "task description non-executable"
-            },
-            {
-              "message": "T004 description names command surfaces but no target file or symbol, leaving the CLI implementation boundary unspecified.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
-              "line": 26,
-              "category": "task description non-executable"
-            },
-            {
-              "message": "T005 description names workflow/adapters generically but does not identify the target files or symbols.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
-              "line": 33,
-              "category": "task description non-executable"
-            },
-            {
-              "message": "T006 description names layers and surfaces but no target files or symbols for the stash implementation.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
-              "line": 40,
-              "category": "task description non-executable"
-            },
-            {
-              "message": "T007 description does not identify the target file or symbol for cache identity and reuse changes.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
-              "line": 46,
-              "category": "task description non-executable"
-            },
-            {
-              "message": "T008 description does not identify the target file or symbol for the fail-closed reevaluation changes.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
-              "line": 52,
-              "category": "task description non-executable"
-            },
-            {
-              "message": "T009 description does not identify the target file or symbol for baseline hashing and cache persistence.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
-              "line": 59,
-              "category": "task description non-executable"
-            },
-            {
-              "message": "T001 restates the behavior contract that only the recorded base branch may flow into the active track branch; retain the operation target and anchor instead, per .harness/policies/no-upstream-restatement.md.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
-              "line": 6,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T003 restates clean-merge post-processing and conflict handoff behavior in prose; this is upstream behavior-contract text prohibited by .harness/policies/no-upstream-restatement.md.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
-              "line": 19,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T005 restates the provider-adapter behavior limitation in prose; cite OS-02/AC-05 without duplicating that contract, per .harness/policies/no-upstream-restatement.md.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
-              "line": 33,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T006 restates AC-06's artifact-preservation and branch-mutation contract in prose; this violates .harness/policies/no-upstream-restatement.md.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
-              "line": 40,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T007 restates mismatch-safe cache behavior in prose; retain the target operation and anchors without duplicating the upstream contract.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
-              "line": 46,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T008 restates the fail-closed behavior contract in prose; this is prohibited upstream restatement under .harness/policies/no-upstream-restatement.md.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
-              "line": 52,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T009 restates malformed/stale-cache reevaluation and atomic replacement behavior in prose; cite the anchors instead, per .harness/policies/no-upstream-restatement.md.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
-              "line": 59,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:c7828c74e28ec1f5b75565e55aa9ba32cee365e86ab6fde26bf32bdb0156c2bd",
-          "at": "2026-08-01T04:03:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b79132a630b24a2365f0233f4f2f1a142dbf3a95482a51b9db9a85a4729aba0e",
-          "at": "2026-08-01T04:11:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b79132a630b24a2365f0233f4f2f1a142dbf3a95482a51b9db9a85a4729aba0e",
-          "at": "2026-08-01T04:16:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T008 の説明に「actual baseline hash flows through the port and participates in the three-hash reuse decision」という挙動契約の再記述がある。変更対象・操作・アンカーだけに留め、詳細な挙動は AC-07〜AC-09 に委ねるべき。See `.harness/policies/no-upstream-restatement.md`.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
-              "line": 53,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T009 の説明に「read and hash the actual baseline, persist all three hashes, and treat missing, malformed, or schema-incompatible cache data as a miss」という挙動契約の再記述がある。変更対象・操作・アンカーだけに留めるべき。See `.harness/policies/no-upstream-restatement.md`.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
-              "line": 61,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:4931d545aff53ee77e28657e1732dcd56e5e52ad8ed92d0ec8cb6d851e5ec1d1",
-          "at": "2026-08-01T04:52:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cd95bb0e2490d91fe99e1857842f1be4aa0ca25b91de731317650c812148d4d0",
-          "at": "2026-08-01T05:06:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cd95bb0e2490d91fe99e1857842f1be4aa0ca25b91de731317650c812148d4d0",
-          "at": "2026-08-01T05:11:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0f8832f649239c83573f57ebb2e10f027b92e5659f7c31c4e7172ad29f36a5bb",
-          "at": "2026-08-01T07:20:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0f8832f649239c83573f57ebb2e10f027b92e5659f7c31c4e7172ad29f36a5bb",
-          "at": "2026-08-01T07:23:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2a14c04114070e835837e299d580a0c5aae00ddb89760dc803dbaed5675c7c4e",
-          "at": "2026-08-01T09:10:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2a14c04114070e835837e299d580a0c5aae00ddb89760dc803dbaed5675c7c4e",
-          "at": "2026-08-01T09:14:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T009 の説明に「so the adapter maps authoritative-input, evaluation, and cache-write error variants directly」という上流の挙動契約の再記述がある。変更対象・操作・アンカーだけに留め、詳細な挙動は AC-07〜AC-09 に委ねるべき。See `.harness/policies/no-upstream-restatement.md`.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
-              "line": 61,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:f1d8cea458f52cd1b67d8c05ccfa67bf251ff6b20f45913076dfd2ffe87d05f2",
-          "at": "2026-08-01T11:14:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:04a9de89b4882e627b4fce69519854e5b3c4cddb5637bab93b6f3458ad7aec40",
-          "at": "2026-08-01T11:34:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:04a9de89b4882e627b4fce69519854e5b3c4cddb5637bab93b6f3458ad7aec40",
-          "at": "2026-08-01T11:37:13Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cb666be156be4e5a74c73e23d8220f63bb3db8b8a08be26761cbad58085b2412",
-          "at": "2026-07-31T22:47:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cb666be156be4e5a74c73e23d8220f63bb3db8b8a08be26761cbad58085b2412",
-          "at": "2026-07-31T22:50:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ccf80b721d965f8205f7454dbcd27c4ea12d2cfc166dd951f73cef9c2c11ea89",
-          "at": "2026-08-01T00:18:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ccf80b721d965f8205f7454dbcd27c4ea12d2cfc166dd951f73cef9c2c11ea89",
-          "at": "2026-08-01T00:21:10Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1c15e00c9d57e3d1b6b7837e096db6b13217224842f46c7318b0141748f9dffc",
-          "at": "2026-08-01T09:10:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1c15e00c9d57e3d1b6b7837e096db6b13217224842f46c7318b0141748f9dffc",
-          "at": "2026-08-01T09:15:53Z"
-        }
-      ]
-    },
     "types": {
       "rounds": [
         {
@@ -753,21 +402,35 @@
         }
       ]
     },
-    "usecase": {
+    "adr": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8b7712d82979fe1cad57a7b3105cc648792eccc4e61e1213f18065a7ff7c7db6",
-          "at": "2026-08-01T09:11:10Z"
+          "hash": "rvw1:sha256:cb666be156be4e5a74c73e23d8220f63bb3db8b8a08be26761cbad58085b2412",
+          "at": "2026-07-31T22:47:46Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8b7712d82979fe1cad57a7b3105cc648792eccc4e61e1213f18065a7ff7c7db6",
-          "at": "2026-08-01T09:18:01Z"
+          "hash": "rvw1:sha256:cb666be156be4e5a74c73e23d8220f63bb3db8b8a08be26761cbad58085b2412",
+          "at": "2026-07-31T22:50:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ccf80b721d965f8205f7454dbcd27c4ea12d2cfc166dd951f73cef9c2c11ea89",
+          "at": "2026-08-01T00:18:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ccf80b721d965f8205f7454dbcd27c4ea12d2cfc166dd951f73cef9c2c11ea89",
+          "at": "2026-08-01T00:21:10Z"
         }
       ]
     },
@@ -873,6 +536,92 @@
           "findings": [],
           "hash": "rvw1:sha256:3444e758e644324cee7351fae50bb0a8341a93a6c8937e6fd351020996eb118e",
           "at": "2026-08-01T12:01:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The BaseMergeInteractor fulfillment record includes `test_derive_base_merge_direction_active_track_uses_snapshot_base_branch`, which only exercises the domain constructor and never invokes BaseMergeInteractor. It is not direct evidence for this declaration.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 35,
+              "category": "test-obligation binding"
+            },
+            {
+              "message": "The BaseMergeGitPort fulfillment record lists the snapshot-source, reverse-direction, and non-track rejection tests, but each test returns from context validation before calling `BaseMergeGitPort::merge_base` and asserts that Git was not called. These tests do not directly exercise the bound trait method.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 40,
+              "category": "test-obligation binding"
+            },
+            {
+              "message": "The BaseMergeContextError AC-01 binding includes `test_derive_base_merge_direction_active_track_uses_snapshot_base_branch`, which exercises only domain direction derivation and cannot produce or inspect BaseMergeContextError. It is invalid direct evidence for this declaration/anchor intersection.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 63,
+              "category": "test-obligation binding"
+            }
+          ],
+          "hash": "rvw1:sha256:87f4e88d520018e67df9cbc5acfa1cdfcd16d4ea6715e6549d9ef5eb098fa9cd",
+          "at": "2026-08-01T14:01:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a9881690f8c17d162245e3165a4e94d63b242d37f12913317f432c09a355195",
+          "at": "2026-08-01T14:16:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The conflict-recovery waivers for BaseMergeInteractor and BaseMergeService (IN-03/CN-02/AC-04) hide an expressible T002 behavior: `execute` returns the typed `Conflicted` outcome and skips clean-merge cleanup. The fulfillment records already reference the test that proves this handoff. Resolve these edges with that test; only the downstream edit/review/commit workflow belongs elsewhere.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 42,
+              "category": "waiver_validity"
+            },
+            {
+              "message": "The guard waivers on the Interactor, ContextPort, and Service treat rejection as unexpressible because the command lacks raw source/direction fields. Their entry-local contract is nevertheless testable: context loading returns an authoritative direction or rejection, the interactor/service must avoid Git on rejection, and the clean path forwards the snapshot source and active-track target. The fulfillment records already list tests for those behaviors, so these waivers suppress T002 evidence.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 43,
+              "category": "waiver_validity"
+            },
+            {
+              "message": "The BaseMergeCommand × AC-02 binding is substitution evidence. `test_base_merge_execute_active_track_mismatch_returns_typed_error` uses a context double that ignores `workspace_root`, so it returns the same mismatch for any command and does not exercise the command declaration. Either bind a test proving the command's workspace selects the rejected context or waive this edge consistently with the adjacent CN-01 record.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 61,
+              "category": "binding_semantics"
+            },
+            {
+              "message": "The CN-01/AC-02 bindings for BaseMergeContextError and BaseMergeError cover only ActiveTrackMismatch, while both anchors also require source-mismatch, reverse-direction, and non-track rejection. Focused tests for those branches exist but are absent from these four records, so each voluntary binding resolves a multi-branch edge with only partial evidence.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 63,
+              "category": "test_coverage"
+            },
+            {
+              "message": "The cleanup/context port fulfillments do not verify their declared arguments. Every context double ignores `workspace_root`, and RecordingCleanup ignores both `workspace_root` and `track_id`; consequently the interactor could pass the wrong workspace or active-track id and all bound tests would still pass. Add recording assertions before claiming these method-contract obligations are fulfilled.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 36,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:6a9881690f8c17d162245e3165a4e94d63b242d37f12913317f432c09a355195",
+          "at": "2026-08-01T14:38:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:75c63bcea506d9e6f5ff828f6c62d1f03c9e624907b268aa3c3a6f9576cdfcf4",
+          "at": "2026-08-01T15:56:25Z"
         }
       ]
     },
@@ -931,6 +680,24 @@
         }
       ]
     },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1c15e00c9d57e3d1b6b7837e096db6b13217224842f46c7318b0141748f9dffc",
+          "at": "2026-08-01T09:10:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1c15e00c9d57e3d1b6b7837e096db6b13217224842f46c7318b0141748f9dffc",
+          "at": "2026-08-01T09:15:53Z"
+        }
+      ]
+    },
     "domain": {
       "rounds": [
         {
@@ -976,6 +743,360 @@
           "findings": [],
           "hash": "rvw1:sha256:f4c5ceaf26616b5f9b7e182a23b788d2ca96c327cac272552ae124437b194a30",
           "at": "2026-08-01T09:36:03Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4876ba1335b4aabaffe489b2eb447c815ca5d90938fd3fc8b06499b992ddab44",
+          "at": "2026-08-01T09:11:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The cache-hit path does not revalidate its input snapshot. Catalogue and baseline bytes are read before the potentially slow toolchain/source hash; if either changes during hashing, `current_key` can still match the old cache and this early return accepts stale signals. Re-read and compare all three authoritative inputs before returning `SkipEvaluation`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 181,
+              "category": "cache_freshness"
+            },
+            {
+              "message": "`ReevaluateWithoutExtraction` trusts any valid JSON at the shared Cargo rustdoc output path. That file is not bound to the recorded implementation hash or feature selection and may have been overwritten by another rustdoc or baseline-capture run. Source revalidation cannot prove the loaded JSON came from those sources, so incorrect signals can be persisted under a current three-hash key. Re-extract or validate a keyed rustdoc artifact before reuse.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 183,
+              "category": "io_boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:4876ba1335b4aabaffe489b2eb447c815ca5d90938fd3fc8b06499b992ddab44",
+          "at": "2026-08-01T09:24:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Revalidation checks the catalogue before the potentially slow second implementation/toolchain hash. If the catalogue changes while `hash_workspace_inputs` runs, its old declaration hash has already been accepted and no later catalogue read occurs, so a cache hit can return success—or evaluation can persist signals—using stale catalogue data. Compute the implementation hash before re-reading catalogue and baseline, or compare against a stable second full cache key.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/inputs.rs",
+              "line": 94,
+              "category": "cache_freshness"
+            }
+          ],
+          "hash": "rvw1:sha256:5b62c9c40aa3c35f8facba170b283a5746fb437bde807617470e00df344da37a",
+          "at": "2026-08-01T09:41:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The evaluator erases its failure stage into a string-only `EvaluateSignalsError`, so this adapter reconstructs `TypeSignalsExecutionError` by matching message prefixes. Errors outside the hard-coded prefixes are silently misclassified as `AuthoritativeInput`; for example, the evaluator creates `cannot create timestamp` as an evaluation error, but this branch maps it to `AuthoritativeInput`. Preserve the stage in a typed error and match its variants directly.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_executor_adapter.rs",
+              "line": 227,
+              "category": "error_classification"
+            }
+          ],
+          "hash": "rvw1:sha256:f25ee3287a51103a2974fafa9fc5c41bd218a3716bced8ccb1282d83726c16d3",
+          "at": "2026-08-01T09:52:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2345460ac1f9a1faf2b3ac12867fbc334277f1bc51b394b88cefc9b74d6c780f",
+          "at": "2026-08-01T11:45:03Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8b7712d82979fe1cad57a7b3105cc648792eccc4e61e1213f18065a7ff7c7db6",
+          "at": "2026-08-01T09:11:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8b7712d82979fe1cad57a7b3105cc648792eccc4e61e1213f18065a7ff7c7db6",
+          "at": "2026-08-01T09:18:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:be220219084742fef91ed9e0b68b678bed8be47abc05c5131b77820a844cf857",
+          "at": "2026-08-01T13:57:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:be220219084742fef91ed9e0b68b678bed8be47abc05c5131b77820a844cf857",
+          "at": "2026-08-01T14:20:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7d09579432c3c1bfdb61df153b7f5d087fb4f8cb616dd78ac94b41aa493f739e",
+          "at": "2026-08-01T15:49:37Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 description names only a layer-level target, not a file or symbol; an executor must invent the implementation boundary.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 6,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T002 description does not identify target files or symbols; its implementation boundary is left to the executor.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 12,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T003 description does not identify target files or symbols for the filesystem adapters.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 19,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T004 description names command surfaces but no target file or symbol, leaving the CLI implementation boundary unspecified.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 26,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T005 description names workflow/adapters generically but does not identify the target files or symbols.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 33,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T006 description names layers and surfaces but no target files or symbols for the stash implementation.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 40,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T007 description does not identify the target file or symbol for cache identity and reuse changes.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 46,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T008 description does not identify the target file or symbol for the fail-closed reevaluation changes.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 52,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T009 description does not identify the target file or symbol for baseline hashing and cache persistence.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 59,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T001 restates the behavior contract that only the recorded base branch may flow into the active track branch; retain the operation target and anchor instead, per .harness/policies/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T003 restates clean-merge post-processing and conflict handoff behavior in prose; this is upstream behavior-contract text prohibited by .harness/policies/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 19,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T005 restates the provider-adapter behavior limitation in prose; cite OS-02/AC-05 without duplicating that contract, per .harness/policies/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 33,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T006 restates AC-06's artifact-preservation and branch-mutation contract in prose; this violates .harness/policies/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 40,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T007 restates mismatch-safe cache behavior in prose; retain the target operation and anchors without duplicating the upstream contract.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 46,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T008 restates the fail-closed behavior contract in prose; this is prohibited upstream restatement under .harness/policies/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 52,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T009 restates malformed/stale-cache reevaluation and atomic replacement behavior in prose; cite the anchors instead, per .harness/policies/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 59,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:c7828c74e28ec1f5b75565e55aa9ba32cee365e86ab6fde26bf32bdb0156c2bd",
+          "at": "2026-08-01T04:03:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b79132a630b24a2365f0233f4f2f1a142dbf3a95482a51b9db9a85a4729aba0e",
+          "at": "2026-08-01T04:11:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b79132a630b24a2365f0233f4f2f1a142dbf3a95482a51b9db9a85a4729aba0e",
+          "at": "2026-08-01T04:16:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T008 の説明に「actual baseline hash flows through the port and participates in the three-hash reuse decision」という挙動契約の再記述がある。変更対象・操作・アンカーだけに留め、詳細な挙動は AC-07〜AC-09 に委ねるべき。See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 53,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T009 の説明に「read and hash the actual baseline, persist all three hashes, and treat missing, malformed, or schema-incompatible cache data as a miss」という挙動契約の再記述がある。変更対象・操作・アンカーだけに留めるべき。See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 61,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:4931d545aff53ee77e28657e1732dcd56e5e52ad8ed92d0ec8cb6d851e5ec1d1",
+          "at": "2026-08-01T04:52:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cd95bb0e2490d91fe99e1857842f1be4aa0ca25b91de731317650c812148d4d0",
+          "at": "2026-08-01T05:06:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cd95bb0e2490d91fe99e1857842f1be4aa0ca25b91de731317650c812148d4d0",
+          "at": "2026-08-01T05:11:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0f8832f649239c83573f57ebb2e10f027b92e5659f7c31c4e7172ad29f36a5bb",
+          "at": "2026-08-01T07:20:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0f8832f649239c83573f57ebb2e10f027b92e5659f7c31c4e7172ad29f36a5bb",
+          "at": "2026-08-01T07:23:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2a14c04114070e835837e299d580a0c5aae00ddb89760dc803dbaed5675c7c4e",
+          "at": "2026-08-01T09:10:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2a14c04114070e835837e299d580a0c5aae00ddb89760dc803dbaed5675c7c4e",
+          "at": "2026-08-01T09:14:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T009 の説明に「so the adapter maps authoritative-input, evaluation, and cache-write error variants directly」という上流の挙動契約の再記述がある。変更対象・操作・アンカーだけに留め、詳細な挙動は AC-07〜AC-09 に委ねるべき。See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 61,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:f1d8cea458f52cd1b67d8c05ccfa67bf251ff6b20f45913076dfd2ffe87d05f2",
+          "at": "2026-08-01T11:14:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:04a9de89b4882e627b4fce69519854e5b3c4cddb5637bab93b6f3458ad7aec40",
+          "at": "2026-08-01T11:34:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:04a9de89b4882e627b4fce69519854e5b3c4cddb5637bab93b6f3458ad7aec40",
+          "at": "2026-08-01T11:37:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69fc55c506663ae7b8514c30a95f9441a2a8d9f7875f0f946719b459bbc5a505",
+          "at": "2026-08-01T13:58:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69fc55c506663ae7b8514c30a95f9441a2a8d9f7875f0f946719b459bbc5a505",
+          "at": "2026-08-01T14:24:36Z"
         }
       ]
     }

@@ -4,12 +4,13 @@
     {
       "id": "T001",
       "description": "Add `BaseBranchName`, `BaseMergeDirection`, `BaseMergeDirectionError`, and `derive_base_merge_direction` in `libs/domain/src/branch_strategy.rs`, updating `TrackMetadata` in `libs/domain/src/track.rs`; add regression coverage. D1; IN-01.",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "daf758c60802d14be799f267826bec46a2cd8782"
     },
     {
       "id": "T002",
       "description": "Add `libs/usecase/src/base_merge.rs` with `BaseMergeContextPort`, `BaseMergeGitPort`, `BaseMergeCleanupPort`, `BaseMergeService`, `BaseMergeInteractor`, command, outcomes, and errors; export it from `libs/usecase/src/lib.rs` and add regression coverage. D1; IN-01; IN-02; OS-01; CN-01; CN-02; AC-01; AC-02; AC-03; AC-04.",
-      "status": "todo",
+      "status": "done",
       "depends_on": [
         "T001"
       ]
@@ -46,12 +47,14 @@
     {
       "id": "T007",
       "description": "At the domain boundary, modify `BaselineHash`, `TypeSignalsCacheKey`, `TypeSignalsDocument`, and `decide_type_signals_reuse` in `libs/domain/src/tddd/type_signals_doc.rs`; migrate every domain-local constructor and caller to supply and compare the three-hash cache key, with regression coverage. T008 owns the usecase port/service/interactor migrations and T009 owns the infrastructure adapter/codec migrations. D4; IN-05; OS-03; CN-03; CN-04; AC-07; AC-08; AC-09.",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "daf758c60802d14be799f267826bec46a2cd8782"
     },
     {
       "id": "T008",
       "description": "At the usecase boundary, modify `TypeSignalsError` in `libs/usecase/src/type_signals/service.rs`, `TypeSignalsExecutionError` and `TypeSignalsExecutorPort` in `ports.rs`, and `TypeSignalsInteractor` in `interactor.rs`; migrate every usecase constructor and caller, with regression coverage in `interactor/tests.rs`. T007 owns domain constructors and T009 owns adapter/codec callers. D4; IN-05; OS-03; CN-03; CN-04; AC-07; AC-08; AC-09.",
       "status": "done",
+      "commit_hash": "daf758c60802d14be799f267826bec46a2cd8782",
       "depends_on": [
         "T007"
       ]
@@ -60,6 +63,7 @@
       "id": "T009",
       "description": "At the infrastructure boundary, modify `EvaluateSignalsError` and preserve the public `execute_type_signals_for_layer` evaluator entrypoint in `type_signals_evaluator.rs`, and modify `TypeSignalsExecutorAdapter` in `libs/infrastructure/src/tddd/type_signals_executor_adapter.rs` and `baseline_hash`, `decode`, and `encode` in `type_signals_codec.rs`; migrate every adapter and codec constructor/caller, with evaluator/adapter/codec regression coverage. T007 owns domain constructors and T008 owns usecase port/interactor callers. D4; IN-05; OS-03; CN-03; CN-04; AC-07; AC-08; AC-09.",
       "status": "done",
+      "commit_hash": "daf758c60802d14be799f267826bec46a2cd8782",
       "depends_on": [
         "T008"
       ]

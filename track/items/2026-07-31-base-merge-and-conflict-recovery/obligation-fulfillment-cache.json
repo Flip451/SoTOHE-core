@@ -1235,6 +1235,2217 @@
           "test_name": "test_execute_type_signals_evaluation_failure_fails_closed_without_replacing_cache"
         }
       ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeInteractor",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "b895f280a978b9ab3e985d2d490478342a3b7d0b51bde3a6afa6ccf8fa862588",
+        "declaration_hash": "ce1a7ca347da2c4054bf94a0b0faa6940155c77ebb55bba0f780d688d4d8aa98",
+        "anchor_text_hash": "008a36faed29453afb25460ea4db3d92210eddc427c7d565839f29f1cce2e93e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(calls.as_slice(), &[MergeCall { workspace_root: PathBuf::from(\"/workspace\"), source: fixture.snapshot_base, target: fixture.active_track, }]);\nassert!(matches!(error, BaseMergeError::ActiveTrackMismatch { current, expected } if current.as_ref() == \"track/other-track\" && expected.as_ref() == \"track/merge-track\"));\nassert!(matches!(error, BaseMergeError::Context(detail) if detail.as_str() == \"requested source 'release' differs from snapshot base 'snapshot-base'\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_passes_snapshot_direction_and_workspace_to_git_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_skips_clean_merge_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_active_track_mismatch_returns_typed_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_snapshot_source_mismatch_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_reverse_direction_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_non_track_context_rejection_skips_git_and_cleanup"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeInteractor",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "b895f280a978b9ab3e985d2d490478342a3b7d0b51bde3a6afa6ccf8fa862588",
+        "declaration_hash": "ce1a7ca347da2c4054bf94a0b0faa6940155c77ebb55bba0f780d688d4d8aa98",
+        "anchor_text_hash": "faccdc25f9a6af64510b808437bacec156e573f583b39ed276942f16ecbfde45"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(*cleanup_calls.lock().unwrap(), vec![cleanup_call(\"views\"), cleanup_call(\"baseline\"), cleanup_call(\"sync-base-stamp\")]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_passes_snapshot_direction_and_workspace_to_git_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_skips_clean_merge_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_active_track_mismatch_returns_typed_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_snapshot_source_mismatch_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_reverse_direction_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_non_track_context_rejection_skips_git_and_cleanup"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeInteractor",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "b895f280a978b9ab3e985d2d490478342a3b7d0b51bde3a6afa6ccf8fa862588",
+        "declaration_hash": "ce1a7ca347da2c4054bf94a0b0faa6940155c77ebb55bba0f780d688d4d8aa98",
+        "anchor_text_hash": "bbbb8b0ae8e121225a1f2c7388f5aa303e348da890d769ed1323f1fac625ca34"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(error, BaseMergeError::Context(detail)\n            if detail.as_str() == \"reverse-direction merge context is rejected\"));\n\n        assert!(matches!(error, BaseMergeError::Context(detail)\n            if detail.as_str() == \"non-track current branch context is rejected\"));\n\n        assert!(matches!(error, BaseMergeError::Context(detail)\n            if detail.as_str() == \"requested source 'release' differs from snapshot base 'snapshot-base'\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_passes_snapshot_direction_and_workspace_to_git_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_skips_clean_merge_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_active_track_mismatch_returns_typed_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_snapshot_source_mismatch_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_reverse_direction_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_non_track_context_rejection_skips_git_and_cleanup"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeInteractor",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "b895f280a978b9ab3e985d2d490478342a3b7d0b51bde3a6afa6ccf8fa862588",
+        "declaration_hash": "ce1a7ca347da2c4054bf94a0b0faa6940155c77ebb55bba0f780d688d4d8aa98",
+        "anchor_text_hash": "40f4d9f0d37fa58dfb35671b5faada2feea33e0d3a44c57a471647c25bc0d4f5"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(calls.as_slice(), &[MergeCall { workspace_root: PathBuf::from(\"/workspace\"), source: fixture.snapshot_base, target: fixture.active_track, }]); ... assert!(matches!(error, BaseMergeError::ActiveTrackMismatch { current, expected } if current.as_ref() == \"track/other-track\" && expected.as_ref() == \"track/merge-track\")); ... assert!(matches!(error, BaseMergeError::Context(detail) if detail.as_str() == \"requested source 'release' differs from snapshot base 'snapshot-base'\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_passes_snapshot_direction_and_workspace_to_git_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_skips_clean_merge_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_active_track_mismatch_returns_typed_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_snapshot_source_mismatch_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_reverse_direction_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_non_track_context_rejection_skips_git_and_cleanup"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeInteractor",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "b895f280a978b9ab3e985d2d490478342a3b7d0b51bde3a6afa6ccf8fa862588",
+        "declaration_hash": "ce1a7ca347da2c4054bf94a0b0faa6940155c77ebb55bba0f780d688d4d8aa98",
+        "anchor_text_hash": "f18c851ca6bcb1742ea5111e940f5b4d764e8a3f5972d5c76b358096ed16f950"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(error, BaseMergeError::ActiveTrackMismatch { current, expected }\n            if current.as_ref() == \"track/other-track\" && expected.as_ref() == \"track/merge-track\"));\n        assert!(git_calls.lock().unwrap().is_empty());\n        assert!(cleanup_calls.lock().unwrap().is_empty());\n\n        assert!(matches!(error, BaseMergeError::Context(detail)\n            if detail.as_str() == \"requested source 'release' differs from snapshot base 'snapshot-base'\"));\n        assert!(git_calls.lock().unwrap().is_empty());\n        assert!(cleanup_calls.lock().unwrap().is_empty());\n\n        assert!(matches!(error, BaseMergeError::Context(detail)\n            if detail.as_str() == \"reverse-direction merge context is rejected\"));\n        assert!(git_calls.lock().unwrap().is_empty());\n        assert!(cleanup_calls.lock().unwrap().is_empty());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_passes_snapshot_direction_and_workspace_to_git_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_skips_clean_merge_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_active_track_mismatch_returns_typed_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_snapshot_source_mismatch_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_reverse_direction_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_non_track_context_rejection_skips_git_and_cleanup"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeInteractor",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "b895f280a978b9ab3e985d2d490478342a3b7d0b51bde3a6afa6ccf8fa862588",
+        "declaration_hash": "ce1a7ca347da2c4054bf94a0b0faa6940155c77ebb55bba0f780d688d4d8aa98",
+        "anchor_text_hash": "9d5a4298baa42b49b45a5a9da45315f51ffcc13965f34e221571350322dbc2ce"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome, BaseMergeOutcome::Completed);\n        let calls = git_calls.lock().unwrap();\n        assert_eq!(\n            *cleanup_calls.lock().unwrap(),\n            vec![cleanup_call(\"views\"), cleanup_call(\"baseline\"), cleanup_call(\"sync-base-stamp\")]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_passes_snapshot_direction_and_workspace_to_git_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_skips_clean_merge_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_active_track_mismatch_returns_typed_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_snapshot_source_mismatch_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_reverse_direction_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_non_track_context_rejection_skips_git_and_cleanup"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeInteractor",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "b895f280a978b9ab3e985d2d490478342a3b7d0b51bde3a6afa6ccf8fa862588",
+        "declaration_hash": "ce1a7ca347da2c4054bf94a0b0faa6940155c77ebb55bba0f780d688d4d8aa98",
+        "anchor_text_hash": "c43a9f220f2dfd90a0f665bb2a4988ca8cba389c771d7c50aba2afc25f49bfad"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome, BaseMergeOutcome::Conflicted);\n        assert_eq!(git_calls.lock().unwrap().len(), 1);\n        assert!(cleanup_calls.lock().unwrap().is_empty());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_passes_snapshot_direction_and_workspace_to_git_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_skips_clean_merge_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_active_track_mismatch_returns_typed_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_snapshot_source_mismatch_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_reverse_direction_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_non_track_context_rejection_skips_git_and_cleanup"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:regenerate_views"
+      },
+      "key": {
+        "bound_tests_set_hash": "ffd384b102d7683f6e01565a5805eb407594d29dec0bc46f86e5911d7ea57625",
+        "declaration_hash": "34ccb97304ed062a94f4c8c25c873065e436f7bcde243154df70ede1cd5a2532",
+        "anchor_text_hash": "faccdc25f9a6af64510b808437bacec156e573f583b39ed276942f16ecbfde45"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            *cleanup_calls.lock().unwrap(),\n            vec![cleanup_call(\"views\"), cleanup_call(\"baseline\"), cleanup_call(\"sync-base-stamp\")]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_passes_snapshot_direction_and_workspace_to_git_port"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:regenerate_views"
+      },
+      "key": {
+        "bound_tests_set_hash": "ffd384b102d7683f6e01565a5805eb407594d29dec0bc46f86e5911d7ea57625",
+        "declaration_hash": "34ccb97304ed062a94f4c8c25c873065e436f7bcde243154df70ede1cd5a2532",
+        "anchor_text_hash": "b6d58ef2fbe2a0ba0cceb148bcb9928018225a258fdaf1340e4abd3be561262e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            *cleanup_calls.lock().unwrap(),\n            vec![cleanup_call(\"views\"), cleanup_call(\"baseline\"), cleanup_call(\"sync-base-stamp\")]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_passes_snapshot_direction_and_workspace_to_git_port"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:regenerate_views"
+      },
+      "key": {
+        "bound_tests_set_hash": "ffd384b102d7683f6e01565a5805eb407594d29dec0bc46f86e5911d7ea57625",
+        "declaration_hash": "34ccb97304ed062a94f4c8c25c873065e436f7bcde243154df70ede1cd5a2532",
+        "anchor_text_hash": "9d5a4298baa42b49b45a5a9da45315f51ffcc13965f34e221571350322dbc2ce"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(*cleanup_calls.lock().unwrap(), vec![cleanup_call(\"views\"), cleanup_call(\"baseline\"), cleanup_call(\"sync-base-stamp\")]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_passes_snapshot_direction_and_workspace_to_git_port"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:regenerate_views"
+      },
+      "key": {
+        "bound_tests_set_hash": "ffd384b102d7683f6e01565a5805eb407594d29dec0bc46f86e5911d7ea57625",
+        "declaration_hash": "34ccb97304ed062a94f4c8c25c873065e436f7bcde243154df70ede1cd5a2532",
+        "anchor_text_hash": "c43a9f220f2dfd90a0f665bb2a4988ca8cba389c771d7c50aba2afc25f49bfad"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            *cleanup_calls.lock().unwrap(),\n            vec![cleanup_call(\"views\"), cleanup_call(\"baseline\"), cleanup_call(\"sync-base-stamp\")]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_passes_snapshot_direction_and_workspace_to_git_port"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:recapture_baselines"
+      },
+      "key": {
+        "bound_tests_set_hash": "ffd384b102d7683f6e01565a5805eb407594d29dec0bc46f86e5911d7ea57625",
+        "declaration_hash": "34ccb97304ed062a94f4c8c25c873065e436f7bcde243154df70ede1cd5a2532",
+        "anchor_text_hash": "faccdc25f9a6af64510b808437bacec156e573f583b39ed276942f16ecbfde45"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            *cleanup_calls.lock().unwrap(),\n            vec![cleanup_call(\"views\"), cleanup_call(\"baseline\"), cleanup_call(\"sync-base-stamp\")]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_passes_snapshot_direction_and_workspace_to_git_port"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:recapture_baselines"
+      },
+      "key": {
+        "bound_tests_set_hash": "ffd384b102d7683f6e01565a5805eb407594d29dec0bc46f86e5911d7ea57625",
+        "declaration_hash": "34ccb97304ed062a94f4c8c25c873065e436f7bcde243154df70ede1cd5a2532",
+        "anchor_text_hash": "b6d58ef2fbe2a0ba0cceb148bcb9928018225a258fdaf1340e4abd3be561262e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            *cleanup_calls.lock().unwrap(),\n            vec![cleanup_call(\"views\"), cleanup_call(\"baseline\"), cleanup_call(\"sync-base-stamp\")]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_passes_snapshot_direction_and_workspace_to_git_port"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:recapture_baselines"
+      },
+      "key": {
+        "bound_tests_set_hash": "ffd384b102d7683f6e01565a5805eb407594d29dec0bc46f86e5911d7ea57625",
+        "declaration_hash": "34ccb97304ed062a94f4c8c25c873065e436f7bcde243154df70ede1cd5a2532",
+        "anchor_text_hash": "9d5a4298baa42b49b45a5a9da45315f51ffcc13965f34e221571350322dbc2ce"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            *cleanup_calls.lock().unwrap(),\n            vec![cleanup_call(\"views\"), cleanup_call(\"baseline\"), cleanup_call(\"sync-base-stamp\")]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_passes_snapshot_direction_and_workspace_to_git_port"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:recapture_baselines"
+      },
+      "key": {
+        "bound_tests_set_hash": "ffd384b102d7683f6e01565a5805eb407594d29dec0bc46f86e5911d7ea57625",
+        "declaration_hash": "34ccb97304ed062a94f4c8c25c873065e436f7bcde243154df70ede1cd5a2532",
+        "anchor_text_hash": "c43a9f220f2dfd90a0f665bb2a4988ca8cba389c771d7c50aba2afc25f49bfad"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            *cleanup_calls.lock().unwrap(),\n            vec![cleanup_call(\"views\"), cleanup_call(\"baseline\"), cleanup_call(\"sync-base-stamp\")]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_passes_snapshot_direction_and_workspace_to_git_port"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:record_sync_base_stamp"
+      },
+      "key": {
+        "bound_tests_set_hash": "ffd384b102d7683f6e01565a5805eb407594d29dec0bc46f86e5911d7ea57625",
+        "declaration_hash": "34ccb97304ed062a94f4c8c25c873065e436f7bcde243154df70ede1cd5a2532",
+        "anchor_text_hash": "faccdc25f9a6af64510b808437bacec156e573f583b39ed276942f16ecbfde45"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            *cleanup_calls.lock().unwrap(),\n            vec![cleanup_call(\"views\"), cleanup_call(\"baseline\"), cleanup_call(\"sync-base-stamp\")]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_passes_snapshot_direction_and_workspace_to_git_port"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:record_sync_base_stamp"
+      },
+      "key": {
+        "bound_tests_set_hash": "ffd384b102d7683f6e01565a5805eb407594d29dec0bc46f86e5911d7ea57625",
+        "declaration_hash": "34ccb97304ed062a94f4c8c25c873065e436f7bcde243154df70ede1cd5a2532",
+        "anchor_text_hash": "b6d58ef2fbe2a0ba0cceb148bcb9928018225a258fdaf1340e4abd3be561262e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            *cleanup_calls.lock().unwrap(),\n            vec![cleanup_call(\"views\"), cleanup_call(\"baseline\"), cleanup_call(\"sync-base-stamp\")]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_passes_snapshot_direction_and_workspace_to_git_port"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:record_sync_base_stamp"
+      },
+      "key": {
+        "bound_tests_set_hash": "ffd384b102d7683f6e01565a5805eb407594d29dec0bc46f86e5911d7ea57625",
+        "declaration_hash": "34ccb97304ed062a94f4c8c25c873065e436f7bcde243154df70ede1cd5a2532",
+        "anchor_text_hash": "9d5a4298baa42b49b45a5a9da45315f51ffcc13965f34e221571350322dbc2ce"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            *cleanup_calls.lock().unwrap(),\n            vec![cleanup_call(\"views\"), cleanup_call(\"baseline\"), cleanup_call(\"sync-base-stamp\")]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_passes_snapshot_direction_and_workspace_to_git_port"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:record_sync_base_stamp"
+      },
+      "key": {
+        "bound_tests_set_hash": "ffd384b102d7683f6e01565a5805eb407594d29dec0bc46f86e5911d7ea57625",
+        "declaration_hash": "34ccb97304ed062a94f4c8c25c873065e436f7bcde243154df70ede1cd5a2532",
+        "anchor_text_hash": "c43a9f220f2dfd90a0f665bb2a4988ca8cba389c771d7c50aba2afc25f49bfad"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            *cleanup_calls.lock().unwrap(),\n            vec![cleanup_call(\"views\"), cleanup_call(\"baseline\"), cleanup_call(\"sync-base-stamp\")]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_passes_snapshot_direction_and_workspace_to_git_port"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeContextPort",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeContextPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load_direction"
+      },
+      "key": {
+        "bound_tests_set_hash": "cc292d01779409e477dc6b548233e63c23b67a0cc5913b26cb22b5255ff5b97f",
+        "declaration_hash": "20cbfb1b4e37361954305e0df7d3a2766b5b5df1a2ff18d2d674462285fbb8e3",
+        "anchor_text_hash": "008a36faed29453afb25460ea4db3d92210eddc427c7d565839f29f1cce2e93e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "calls.as_slice(),\n            &[MergeCall {\n                workspace_root: PathBuf::from(\"/workspace\"),\n                source: fixture.snapshot_base,\n                target: fixture.active_track,\n            }]"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_passes_snapshot_direction_and_workspace_to_git_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_unavailable_context_returns_context_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_active_track_mismatch_returns_typed_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_snapshot_source_mismatch_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_reverse_direction_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_non_track_context_rejection_skips_git_and_cleanup"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeContextPort",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeContextPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load_direction"
+      },
+      "key": {
+        "bound_tests_set_hash": "cc292d01779409e477dc6b548233e63c23b67a0cc5913b26cb22b5255ff5b97f",
+        "declaration_hash": "20cbfb1b4e37361954305e0df7d3a2766b5b5df1a2ff18d2d674462285fbb8e3",
+        "anchor_text_hash": "bbbb8b0ae8e121225a1f2c7388f5aa303e348da890d769ed1323f1fac625ca34"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(error, BaseMergeError::Context(detail)\n            if detail.as_str() == \"requested source 'release' differs from snapshot base 'snapshot-base'\"));\n\n        assert!(matches!(error, BaseMergeError::Context(detail)\n            if detail.as_str() == \"reverse-direction merge context is rejected\"));\n\n        assert!(matches!(error, BaseMergeError::Context(detail)\n            if detail.as_str() == \"non-track current branch context is rejected\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_passes_snapshot_direction_and_workspace_to_git_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_unavailable_context_returns_context_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_active_track_mismatch_returns_typed_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_snapshot_source_mismatch_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_reverse_direction_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_non_track_context_rejection_skips_git_and_cleanup"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeContextPort",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeContextPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load_direction"
+      },
+      "key": {
+        "bound_tests_set_hash": "cc292d01779409e477dc6b548233e63c23b67a0cc5913b26cb22b5255ff5b97f",
+        "declaration_hash": "20cbfb1b4e37361954305e0df7d3a2766b5b5df1a2ff18d2d674462285fbb8e3",
+        "anchor_text_hash": "40f4d9f0d37fa58dfb35671b5faada2feea33e0d3a44c57a471647c25bc0d4f5"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            calls.as_slice(),\n            &[MergeCall {\n                workspace_root: PathBuf::from(\"/workspace\"),\n                source: fixture.snapshot_base,\n                target: fixture.active_track,\n            }]\n        ); ... assert!(matches!(error, BaseMergeError::ActiveTrackMismatch { current, expected }\n            if current.as_ref() == \"track/other-track\" && expected.as_ref() == \"track/merge-track\")); ... assert!(matches!(error, BaseMergeError::Context(detail)\n            if detail.as_str() == \"requested source 'release' differs from snapshot base 'snapshot-base'\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_passes_snapshot_direction_and_workspace_to_git_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_unavailable_context_returns_context_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_active_track_mismatch_returns_typed_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_snapshot_source_mismatch_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_reverse_direction_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_non_track_context_rejection_skips_git_and_cleanup"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeContextPort",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeContextPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load_direction"
+      },
+      "key": {
+        "bound_tests_set_hash": "cc292d01779409e477dc6b548233e63c23b67a0cc5913b26cb22b5255ff5b97f",
+        "declaration_hash": "20cbfb1b4e37361954305e0df7d3a2766b5b5df1a2ff18d2d674462285fbb8e3",
+        "anchor_text_hash": "f18c851ca6bcb1742ea5111e940f5b4d764e8a3f5972d5c76b358096ed16f950"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(error, BaseMergeError::Context(detail)\n            if detail.as_str() == \"requested source 'release' differs from snapshot base 'snapshot-base'\"));\n        assert!(git_calls.lock().unwrap().is_empty());\n        assert!(matches!(error, BaseMergeError::Context(detail)\n            if detail.as_str() == \"reverse-direction merge context is rejected\"));\n        assert!(git_calls.lock().unwrap().is_empty());\n        assert!(matches!(error, BaseMergeError::ActiveTrackMismatch { current, expected }\n            if current.as_ref() == \"track/other-track\" && expected.as_ref() == \"track/merge-track\"));\n        assert!(git_calls.lock().unwrap().is_empty());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_passes_snapshot_direction_and_workspace_to_git_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_unavailable_context_returns_context_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_active_track_mismatch_returns_typed_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_snapshot_source_mismatch_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_reverse_direction_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_non_track_context_rejection_skips_git_and_cleanup"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeGitPort",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeGitPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:merge_base"
+      },
+      "key": {
+        "bound_tests_set_hash": "6060ee5cb9c8b3724b51fb5c899e8f6d0a4e6405aefa76459354765664c3b8b9",
+        "declaration_hash": "318479435b77df5c4e0a4171903380853bd56d6b14317305f862ce59fc6c1636",
+        "anchor_text_hash": "008a36faed29453afb25460ea4db3d92210eddc427c7d565839f29f1cce2e93e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            calls.as_slice(),\n            &[MergeCall {\n                workspace_root: PathBuf::from(\"/workspace\"),\n                source: fixture.snapshot_base,\n                target: fixture.active_track,\n            }]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_passes_snapshot_direction_and_workspace_to_git_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_skips_clean_merge_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_git_failure_returns_git_error"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeGitPort",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeGitPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:merge_base"
+      },
+      "key": {
+        "bound_tests_set_hash": "6060ee5cb9c8b3724b51fb5c899e8f6d0a4e6405aefa76459354765664c3b8b9",
+        "declaration_hash": "318479435b77df5c4e0a4171903380853bd56d6b14317305f862ce59fc6c1636",
+        "anchor_text_hash": "40f4d9f0d37fa58dfb35671b5faada2feea33e0d3a44c57a471647c25bc0d4f5"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            calls.as_slice(),\n            &[MergeCall {\n                workspace_root: PathBuf::from(\"/workspace\"),\n                source: fixture.snapshot_base,\n                target: fixture.active_track,\n            }]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_passes_snapshot_direction_and_workspace_to_git_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_skips_clean_merge_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_git_failure_returns_git_error"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeGitPort",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeGitPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:merge_base"
+      },
+      "key": {
+        "bound_tests_set_hash": "6060ee5cb9c8b3724b51fb5c899e8f6d0a4e6405aefa76459354765664c3b8b9",
+        "declaration_hash": "318479435b77df5c4e0a4171903380853bd56d6b14317305f862ce59fc6c1636",
+        "anchor_text_hash": "c43a9f220f2dfd90a0f665bb2a4988ca8cba389c771d7c50aba2afc25f49bfad"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome, BaseMergeOutcome::Conflicted);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_passes_snapshot_direction_and_workspace_to_git_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_skips_clean_merge_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_git_failure_returns_git_error"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeService",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:execute"
+      },
+      "key": {
+        "bound_tests_set_hash": "82355458fb776380c4c1bc8a0613446aaa4c4cbc758a9ae9bfa29667a96fbac2",
+        "declaration_hash": "238b8c7004943fac290b01ed0f77637bdaa947bd23e04fed73f5d2742a14d132",
+        "anchor_text_hash": "008a36faed29453afb25460ea4db3d92210eddc427c7d565839f29f1cce2e93e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(calls.as_slice(), &[MergeCall { workspace_root: PathBuf::from(\"/workspace\"), source: fixture.snapshot_base, target: fixture.active_track, }]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_passes_snapshot_direction_and_workspace_to_git_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_skips_clean_merge_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_unavailable_context_returns_context_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_active_track_mismatch_returns_typed_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_snapshot_source_mismatch_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_reverse_direction_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_non_track_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_git_failure_returns_git_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_cleanup_failure_preserves_each_failed_stage"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeService",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:execute"
+      },
+      "key": {
+        "bound_tests_set_hash": "82355458fb776380c4c1bc8a0613446aaa4c4cbc758a9ae9bfa29667a96fbac2",
+        "declaration_hash": "238b8c7004943fac290b01ed0f77637bdaa947bd23e04fed73f5d2742a14d132",
+        "anchor_text_hash": "faccdc25f9a6af64510b808437bacec156e573f583b39ed276942f16ecbfde45"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(*cleanup_calls.lock().unwrap(), vec![cleanup_call(\"views\"), cleanup_call(\"baseline\"), cleanup_call(\"sync-base-stamp\")]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_passes_snapshot_direction_and_workspace_to_git_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_skips_clean_merge_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_unavailable_context_returns_context_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_active_track_mismatch_returns_typed_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_snapshot_source_mismatch_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_reverse_direction_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_non_track_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_git_failure_returns_git_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_cleanup_failure_preserves_each_failed_stage"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeService",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:execute"
+      },
+      "key": {
+        "bound_tests_set_hash": "82355458fb776380c4c1bc8a0613446aaa4c4cbc758a9ae9bfa29667a96fbac2",
+        "declaration_hash": "238b8c7004943fac290b01ed0f77637bdaa947bd23e04fed73f5d2742a14d132",
+        "anchor_text_hash": "bbbb8b0ae8e121225a1f2c7388f5aa303e348da890d769ed1323f1fac625ca34"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(error, BaseMergeError::Context(detail)\n            if detail.as_str() == \"reverse-direction merge context is rejected\"));\n\nassert!(matches!(error, BaseMergeError::Context(detail)\n            if detail.as_str() == \"non-track current branch context is rejected\"));\n\nassert!(matches!(error, BaseMergeError::Context(detail)\n            if detail.as_str() == \"requested source 'release' differs from snapshot base 'snapshot-base'\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_passes_snapshot_direction_and_workspace_to_git_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_skips_clean_merge_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_unavailable_context_returns_context_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_active_track_mismatch_returns_typed_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_snapshot_source_mismatch_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_reverse_direction_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_non_track_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_git_failure_returns_git_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_cleanup_failure_preserves_each_failed_stage"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeService",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:execute"
+      },
+      "key": {
+        "bound_tests_set_hash": "82355458fb776380c4c1bc8a0613446aaa4c4cbc758a9ae9bfa29667a96fbac2",
+        "declaration_hash": "238b8c7004943fac290b01ed0f77637bdaa947bd23e04fed73f5d2742a14d132",
+        "anchor_text_hash": "40f4d9f0d37fa58dfb35671b5faada2feea33e0d3a44c57a471647c25bc0d4f5"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(calls.as_slice(), &[MergeCall { workspace_root: PathBuf::from(\"/workspace\"), source: fixture.snapshot_base, target: fixture.active_track }]); ... assert!(matches!(error, BaseMergeError::ActiveTrackMismatch { current, expected } ...)); ... assert!(matches!(error, BaseMergeError::Context(detail) if detail.as_str() == \"requested source 'release' differs from snapshot base 'snapshot-base'\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_passes_snapshot_direction_and_workspace_to_git_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_skips_clean_merge_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_unavailable_context_returns_context_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_active_track_mismatch_returns_typed_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_snapshot_source_mismatch_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_reverse_direction_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_non_track_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_git_failure_returns_git_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_cleanup_failure_preserves_each_failed_stage"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeService",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:execute"
+      },
+      "key": {
+        "bound_tests_set_hash": "82355458fb776380c4c1bc8a0613446aaa4c4cbc758a9ae9bfa29667a96fbac2",
+        "declaration_hash": "238b8c7004943fac290b01ed0f77637bdaa947bd23e04fed73f5d2742a14d132",
+        "anchor_text_hash": "f18c851ca6bcb1742ea5111e940f5b4d764e8a3f5972d5c76b358096ed16f950"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(error, BaseMergeError::Context(detail)\n            if detail.as_str() == \"reverse-direction merge context is rejected\"));\n        assert!(git_calls.lock().unwrap().is_empty());\n        assert!(cleanup_calls.lock().unwrap().is_empty());\n\nassert!(matches!(error, BaseMergeError::Context(detail)\n            if detail.as_str() == \"non-track current branch context is rejected\"));\n        assert!(git_calls.lock().unwrap().is_empty());\n        assert!(cleanup_calls.lock().unwrap().is_empty());\n\nassert!(matches!(error, BaseMergeError::Context(detail)\n            if detail.as_str() == \"requested source 'release' differs from snapshot base 'snapshot-base'\"));\n        assert!(git_calls.lock().unwrap().is_empty());\n        assert!(cleanup_calls.lock().unwrap().is_empty());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_passes_snapshot_direction_and_workspace_to_git_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_skips_clean_merge_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_unavailable_context_returns_context_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_active_track_mismatch_returns_typed_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_snapshot_source_mismatch_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_reverse_direction_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_non_track_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_git_failure_returns_git_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_cleanup_failure_preserves_each_failed_stage"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeService",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:execute"
+      },
+      "key": {
+        "bound_tests_set_hash": "82355458fb776380c4c1bc8a0613446aaa4c4cbc758a9ae9bfa29667a96fbac2",
+        "declaration_hash": "238b8c7004943fac290b01ed0f77637bdaa947bd23e04fed73f5d2742a14d132",
+        "anchor_text_hash": "9d5a4298baa42b49b45a5a9da45315f51ffcc13965f34e221571350322dbc2ce"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome, BaseMergeOutcome::Completed);\n        assert_eq!(\n            *cleanup_calls.lock().unwrap(),\n            vec![cleanup_call(\"views\"), cleanup_call(\"baseline\"), cleanup_call(\"sync-base-stamp\")]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_passes_snapshot_direction_and_workspace_to_git_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_skips_clean_merge_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_unavailable_context_returns_context_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_active_track_mismatch_returns_typed_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_snapshot_source_mismatch_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_reverse_direction_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_non_track_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_git_failure_returns_git_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_cleanup_failure_preserves_each_failed_stage"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeAttemptOutcome",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeAttemptOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "ffd384b102d7683f6e01565a5805eb407594d29dec0bc46f86e5911d7ea57625",
+        "declaration_hash": "b38d307274bbfd116b5559961b73e2fffd1b0fa8f0954747c3f4b6dd086a572d",
+        "anchor_text_hash": "9d5a4298baa42b49b45a5a9da45315f51ffcc13965f34e221571350322dbc2ce"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(*cleanup_calls.lock().unwrap(), vec![cleanup_call(\"views\"), cleanup_call(\"baseline\"), cleanup_call(\"sync-base-stamp\")]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_passes_snapshot_direction_and_workspace_to_git_port"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeAttemptOutcome",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeAttemptOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "1e86a21d753f8e59975164816b046b8705e7c8d93775bf30233a1eb20e9d88a2",
+        "declaration_hash": "b38d307274bbfd116b5559961b73e2fffd1b0fa8f0954747c3f4b6dd086a572d",
+        "anchor_text_hash": "c43a9f220f2dfd90a0f665bb2a4988ca8cba389c771d7c50aba2afc25f49bfad"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome, BaseMergeOutcome::Conflicted);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_skips_clean_merge_cleanup"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeCommand",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "ffd384b102d7683f6e01565a5805eb407594d29dec0bc46f86e5911d7ea57625",
+        "declaration_hash": "ef86d037bef5e1e1f95b7a0a7a9ddb2bad24200d1d3489e4df6415c1e5bf7488",
+        "anchor_text_hash": "40f4d9f0d37fa58dfb35671b5faada2feea33e0d3a44c57a471647c25bc0d4f5"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(*context_workspaces.lock().unwrap(), vec![PathBuf::from(\"/workspace\")]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_passes_snapshot_direction_and_workspace_to_git_port"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeContextError",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeContextError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "ce97b698be9383db38b69934a6a0fc1a590de6c0ccd070aaada79da8cc7a6ea7",
+        "declaration_hash": "5a9e63116597c24b39f7815a673026cd9e015ddffc66d34b1baf84c6a7276d1e",
+        "anchor_text_hash": "008a36faed29453afb25460ea4db3d92210eddc427c7d565839f29f1cce2e93e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(error, BaseMergeError::ActiveTrackMismatch { current, expected }\n            if current.as_ref() == \"track/other-track\" && expected.as_ref() == \"track/merge-track\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_unavailable_context_returns_context_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_active_track_mismatch_returns_typed_error"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeContextError",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeContextError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "08040a15aeed3836989bf5d46fe953b8b1434c14679d3c0b50cd937b60d344b2",
+        "declaration_hash": "5a9e63116597c24b39f7815a673026cd9e015ddffc66d34b1baf84c6a7276d1e",
+        "anchor_text_hash": "bbbb8b0ae8e121225a1f2c7388f5aa303e348da890d769ed1323f1fac625ca34"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(error, BaseMergeError::ActiveTrackMismatch { current, expected }\n            if current.as_ref() == \"track/other-track\" && expected.as_ref() == \"track/merge-track\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_active_track_mismatch_returns_typed_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_snapshot_source_mismatch_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_reverse_direction_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_non_track_context_rejection_skips_git_and_cleanup"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeContextError",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeContextError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "5cdec57c4b98a41a45e8bd49931929a17b5ce1e7d1be557ac3c00c5509eabd1c",
+        "declaration_hash": "5a9e63116597c24b39f7815a673026cd9e015ddffc66d34b1baf84c6a7276d1e",
+        "anchor_text_hash": "40f4d9f0d37fa58dfb35671b5faada2feea33e0d3a44c57a471647c25bc0d4f5"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(error, BaseMergeError::ActiveTrackMismatch { current, expected }\n            if current.as_ref() == \"track/other-track\" && expected.as_ref() == \"track/merge-track\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_active_track_mismatch_returns_typed_error"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeContextError",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeContextError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "08040a15aeed3836989bf5d46fe953b8b1434c14679d3c0b50cd937b60d344b2",
+        "declaration_hash": "5a9e63116597c24b39f7815a673026cd9e015ddffc66d34b1baf84c6a7276d1e",
+        "anchor_text_hash": "f18c851ca6bcb1742ea5111e940f5b4d764e8a3f5972d5c76b358096ed16f950"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(error, BaseMergeError::ActiveTrackMismatch { current, expected }\n            if current.as_ref() == \"track/other-track\" && expected.as_ref() == \"track/merge-track\"));\n        assert!(git_calls.lock().unwrap().is_empty());\n        assert!(cleanup_calls.lock().unwrap().is_empty());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_active_track_mismatch_returns_typed_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_snapshot_source_mismatch_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_reverse_direction_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_non_track_context_rejection_skips_git_and_cleanup"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeError",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "c715c54d38e7d22386cd21a1d177ff8dab5175d2126b5590d1d1f2f0dac555d0",
+        "declaration_hash": "cb48773054e03a0c20760b73d7fb15e4915cf4944c48f31713418934d9b0773a",
+        "anchor_text_hash": "008a36faed29453afb25460ea4db3d92210eddc427c7d565839f29f1cce2e93e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(error, BaseMergeError::ActiveTrackMismatch { current, expected }\n            if current.as_ref() == \"track/other-track\" && expected.as_ref() == \"track/merge-track\"));\n        assert!(git_calls.lock().unwrap().is_empty());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_active_track_mismatch_returns_typed_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_git_failure_returns_git_error"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeError",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "178b4ab384b0a2ae84509b60cb256128e2e6d03a1e3a3038c3fee75f5c583104",
+        "declaration_hash": "cb48773054e03a0c20760b73d7fb15e4915cf4944c48f31713418934d9b0773a",
+        "anchor_text_hash": "faccdc25f9a6af64510b808437bacec156e573f583b39ed276942f16ecbfde45"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(*cleanup_calls.lock().unwrap(), vec![cleanup_call(\"views\"), cleanup_call(\"baseline\"), cleanup_call(\"sync-base-stamp\")]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_passes_snapshot_direction_and_workspace_to_git_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_cleanup_failure_preserves_each_failed_stage"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeError",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "08040a15aeed3836989bf5d46fe953b8b1434c14679d3c0b50cd937b60d344b2",
+        "declaration_hash": "cb48773054e03a0c20760b73d7fb15e4915cf4944c48f31713418934d9b0773a",
+        "anchor_text_hash": "bbbb8b0ae8e121225a1f2c7388f5aa303e348da890d769ed1323f1fac625ca34"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(error, BaseMergeError::Context(detail)\n            if detail.as_str() == \"requested source 'release' differs from snapshot base 'snapshot-base'\"));\n\n        assert!(matches!(error, BaseMergeError::Context(detail)\n            if detail.as_str() == \"reverse-direction merge context is rejected\"));\n\n        assert!(matches!(error, BaseMergeError::Context(detail)\n            if detail.as_str() == \"non-track current branch context is rejected\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_active_track_mismatch_returns_typed_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_snapshot_source_mismatch_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_reverse_direction_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_non_track_context_rejection_skips_git_and_cleanup"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeError",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "93f520f6ad97ecb3aec4017b18984d7c3b64289308ab7d086ac03723004f5f98",
+        "declaration_hash": "cb48773054e03a0c20760b73d7fb15e4915cf4944c48f31713418934d9b0773a",
+        "anchor_text_hash": "b6d58ef2fbe2a0ba0cceb148bcb9928018225a258fdaf1340e4abd3be561262e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(error, BaseMergeError::PostMergeCleanup { stage, detail }\n                if stage == failure && detail.as_str() == \"cleanup failed\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_cleanup_failure_preserves_each_failed_stage"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeError",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "08040a15aeed3836989bf5d46fe953b8b1434c14679d3c0b50cd937b60d344b2",
+        "declaration_hash": "cb48773054e03a0c20760b73d7fb15e4915cf4944c48f31713418934d9b0773a",
+        "anchor_text_hash": "f18c851ca6bcb1742ea5111e940f5b4d764e8a3f5972d5c76b358096ed16f950"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(error, BaseMergeError::ActiveTrackMismatch { current, expected }\n            if current.as_ref() == \"track/other-track\" && expected.as_ref() == \"track/merge-track\"));\n        assert!(git_calls.lock().unwrap().is_empty());\n        assert!(cleanup_calls.lock().unwrap().is_empty());\n\n        assert!(matches!(error, BaseMergeError::Context(detail)\n            if detail.as_str() == \"requested source 'release' differs from snapshot base 'snapshot-base'\"));\n        assert!(git_calls.lock().unwrap().is_empty());\n        assert!(cleanup_calls.lock().unwrap().is_empty());\n\n        assert!(matches!(error, BaseMergeError::Context(detail)\n            if detail.as_str() == \"reverse-direction merge context is rejected\"));\n        assert!(git_calls.lock().unwrap().is_empty());\n        assert!(cleanup_calls.lock().unwrap().is_empty());\n\n        assert!(matches!(error, BaseMergeError::Context(detail)\n            if detail.as_str() == \"non-track current branch context is rejected\"));\n        assert!(git_calls.lock().unwrap().is_empty());\n        assert!(cleanup_calls.lock().unwrap().is_empty());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_active_track_mismatch_returns_typed_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_snapshot_source_mismatch_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_reverse_direction_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_non_track_context_rejection_skips_git_and_cleanup"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeError",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "178b4ab384b0a2ae84509b60cb256128e2e6d03a1e3a3038c3fee75f5c583104",
+        "declaration_hash": "cb48773054e03a0c20760b73d7fb15e4915cf4944c48f31713418934d9b0773a",
+        "anchor_text_hash": "9d5a4298baa42b49b45a5a9da45315f51ffcc13965f34e221571350322dbc2ce"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(*cleanup_calls.lock().unwrap(), vec![cleanup_call(\"views\"), cleanup_call(\"baseline\"), cleanup_call(\"sync-base-stamp\")]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_passes_snapshot_direction_and_workspace_to_git_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_cleanup_failure_preserves_each_failed_stage"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeOutcome",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "ffd384b102d7683f6e01565a5805eb407594d29dec0bc46f86e5911d7ea57625",
+        "declaration_hash": "fb7b3c8ae9f2a2112fdb296cb20b02615f0e7056ae982ec77340d6fd29b125a0",
+        "anchor_text_hash": "faccdc25f9a6af64510b808437bacec156e573f583b39ed276942f16ecbfde45"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(*cleanup_calls.lock().unwrap(), vec![cleanup_call(\"views\"), cleanup_call(\"baseline\"), cleanup_call(\"sync-base-stamp\")]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_passes_snapshot_direction_and_workspace_to_git_port"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeOutcome",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "1e86a21d753f8e59975164816b046b8705e7c8d93775bf30233a1eb20e9d88a2",
+        "declaration_hash": "fb7b3c8ae9f2a2112fdb296cb20b02615f0e7056ae982ec77340d6fd29b125a0",
+        "anchor_text_hash": "04ee06225d2dde855bd2ce4384bd448922a1ef5d7cb6550b5f702ec87f32e137"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome, BaseMergeOutcome::Conflicted);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_skips_clean_merge_cleanup"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeOutcome",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "ffd384b102d7683f6e01565a5805eb407594d29dec0bc46f86e5911d7ea57625",
+        "declaration_hash": "fb7b3c8ae9f2a2112fdb296cb20b02615f0e7056ae982ec77340d6fd29b125a0",
+        "anchor_text_hash": "9d5a4298baa42b49b45a5a9da45315f51ffcc13965f34e221571350322dbc2ce"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(*cleanup_calls.lock().unwrap(), vec![cleanup_call(\"views\"), cleanup_call(\"baseline\"), cleanup_call(\"sync-base-stamp\")]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_passes_snapshot_direction_and_workspace_to_git_port"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PostMergeCleanupStage",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PostMergeCleanupStage",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "178b4ab384b0a2ae84509b60cb256128e2e6d03a1e3a3038c3fee75f5c583104",
+        "declaration_hash": "9ef7862dc37e8dc92f9a453da391ca5103350e6a1f5b6d38a42296c600f50186",
+        "anchor_text_hash": "faccdc25f9a6af64510b808437bacec156e573f583b39ed276942f16ecbfde45"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            *cleanup_calls.lock().unwrap(),\n            vec![cleanup_call(\"views\"), cleanup_call(\"baseline\"), cleanup_call(\"sync-base-stamp\")]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_passes_snapshot_direction_and_workspace_to_git_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_cleanup_failure_preserves_each_failed_stage"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PostMergeCleanupStage",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PostMergeCleanupStage",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "93f520f6ad97ecb3aec4017b18984d7c3b64289308ab7d086ac03723004f5f98",
+        "declaration_hash": "9ef7862dc37e8dc92f9a453da391ca5103350e6a1f5b6d38a42296c600f50186",
+        "anchor_text_hash": "b6d58ef2fbe2a0ba0cceb148bcb9928018225a258fdaf1340e4abd3be561262e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "for (failure, expected_calls) in [\n            (PostMergeCleanupStage::Views, vec![cleanup_call(\"views\")]),\n            (\n                PostMergeCleanupStage::Baseline,\n                vec![cleanup_call(\"views\"), cleanup_call(\"baseline\")],\n            ),\n            (\n                PostMergeCleanupStage::SyncBaseStamp,\n                vec![\n                    cleanup_call(\"views\"),\n                    cleanup_call(\"baseline\"),\n                    cleanup_call(\"sync-base-stamp\"),\n                ],\n            ),\n        ] { ... assert_eq!(*cleanup_calls.lock().unwrap(), expected_calls); }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_cleanup_failure_preserves_each_failed_stage"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PostMergeCleanupStage",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PostMergeCleanupStage",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "ffd384b102d7683f6e01565a5805eb407594d29dec0bc46f86e5911d7ea57625",
+        "declaration_hash": "9ef7862dc37e8dc92f9a453da391ca5103350e6a1f5b6d38a42296c600f50186",
+        "anchor_text_hash": "9d5a4298baa42b49b45a5a9da45315f51ffcc13965f34e221571350322dbc2ce"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "*cleanup_calls.lock().unwrap(),\n            vec![cleanup_call(\"views\"), cleanup_call(\"baseline\"), cleanup_call(\"sync-base-stamp\")]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_passes_snapshot_direction_and_workspace_to_git_port"
+        }
+      ]
     }
   ]
 }
