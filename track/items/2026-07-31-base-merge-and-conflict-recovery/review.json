@@ -1,90 +1,73 @@
 {
   "schema_version": 2,
   "scopes": {
-    "spec": {
+    "infrastructure": {
       "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-06’s requirement that stash-pop “preserves the repository safety gates required for the restored worktree” does not identify which gates or observable checks establish compliance, leaving Phase 2/3 to invent the contract.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
-              "line": 216,
-              "category": "acceptance criterion non-observable"
-            }
-          ],
-          "hash": "rvw1:sha256:d96c31dd688b8f7469f29f89ae0ebed068607ac107d385a51d8c936213fb97af",
-          "at": "2026-08-01T00:35:56Z"
-        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d251b85b52d7071a8df8efebfa87e9383814697636ed8cdda82bb4009dfa5cee",
-          "at": "2026-08-01T00:38:08Z"
+          "hash": "rvw1:sha256:4876ba1335b4aabaffe489b2eb447c815ca5d90938fd3fc8b06499b992ddab44",
+          "at": "2026-08-01T09:11:25Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "AC-06 contradicts IN-04 as written: a real `git stash` records stash commit objects and updates `refs/stash`, while a successful pop updates that ref again. Therefore stash/stash-pop cannot satisfy the blanket requirement to create no commit and update no ref. Clarify that branch history and branch refs must remain unchanged while permitting the stash-internal objects/ref required by D3.",
+              "message": "The cache-hit path does not revalidate its input snapshot. Catalogue and baseline bytes are read before the potentially slow toolchain/source hash; if either changes during hashing, `current_key` can still match the old cache and this early return accepts stale signals. Re-read and compare all three authoritative inputs before returning `SkipEvaluation`.",
               "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
-              "line": 216,
-              "category": "scope / acceptance_criteria contradiction"
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 181,
+              "category": "cache_freshness"
+            },
+            {
+              "message": "`ReevaluateWithoutExtraction` trusts any valid JSON at the shared Cargo rustdoc output path. That file is not bound to the recorded implementation hash or feature selection and may have been overwritten by another rustdoc or baseline-capture run. Source revalidation cannot prove the loaded JSON came from those sources, so incorrect signals can be persisted under a current three-hash key. Re-extract or validate a keyed rustdoc artifact before reuse.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 183,
+              "category": "io_boundary"
             }
           ],
-          "hash": "rvw1:sha256:d251b85b52d7071a8df8efebfa87e9383814697636ed8cdda82bb4009dfa5cee",
-          "at": "2026-08-01T00:41:51Z"
+          "hash": "rvw1:sha256:4876ba1335b4aabaffe489b2eb447c815ca5d90938fd3fc8b06499b992ddab44",
+          "at": "2026-08-01T09:24:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Revalidation checks the catalogue before the potentially slow second implementation/toolchain hash. If the catalogue changes while `hash_workspace_inputs` runs, its old declaration hash has already been accepted and no later catalogue read occurs, so a cache hit can return success—or evaluation can persist signals—using stale catalogue data. Compute the implementation hash before re-reading catalogue and baseline, or compare against a stable second full cache key.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/inputs.rs",
+              "line": 94,
+              "category": "cache_freshness"
+            }
+          ],
+          "hash": "rvw1:sha256:5b62c9c40aa3c35f8facba170b283a5746fb437bde807617470e00df344da37a",
+          "at": "2026-08-01T09:41:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The evaluator erases its failure stage into a string-only `EvaluateSignalsError`, so this adapter reconstructs `TypeSignalsExecutionError` by matching message prefixes. Errors outside the hard-coded prefixes are silently misclassified as `AuthoritativeInput`; for example, the evaluator creates `cannot create timestamp` as an evaluation error, but this branch maps it to `AuthoritativeInput`. Preserve the stage in a typed error and match its variants directly.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_executor_adapter.rs",
+              "line": 227,
+              "category": "error_classification"
+            }
+          ],
+          "hash": "rvw1:sha256:f25ee3287a51103a2974fafa9fc5c41bd218a3716bced8ccb1282d83726c16d3",
+          "at": "2026-08-01T09:52:16Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:99c34a083854c412260ecb88e8accdc3d671a36c78ab490dbb61a65cd3647484",
-          "at": "2026-08-01T00:44:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e5eb0df80593d31f3aabfdebd7984bbd743c1e8d5ed5d06b057148c3620c400d",
-          "at": "2026-08-01T00:46:48Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cb666be156be4e5a74c73e23d8220f63bb3db8b8a08be26761cbad58085b2412",
-          "at": "2026-07-31T22:47:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cb666be156be4e5a74c73e23d8220f63bb3db8b8a08be26761cbad58085b2412",
-          "at": "2026-07-31T22:50:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ccf80b721d965f8205f7454dbcd27c4ea12d2cfc166dd951f73cef9c2c11ea89",
-          "at": "2026-08-01T00:18:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ccf80b721d965f8205f7454dbcd27c4ea12d2cfc166dd951f73cef9c2c11ea89",
-          "at": "2026-08-01T00:21:10Z"
+          "hash": "rvw1:sha256:2345460ac1f9a1faf2b3ac12867fbc334277f1bc51b394b88cefc9b74d6c780f",
+          "at": "2026-08-01T11:45:03Z"
         }
       ]
     },
@@ -223,31 +206,149 @@
           "findings": [],
           "hash": "rvw1:sha256:b79132a630b24a2365f0233f4f2f1a142dbf3a95482a51b9db9a85a4729aba0e",
           "at": "2026-08-01T04:16:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T008 の説明に「actual baseline hash flows through the port and participates in the three-hash reuse decision」という挙動契約の再記述がある。変更対象・操作・アンカーだけに留め、詳細な挙動は AC-07〜AC-09 に委ねるべき。See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 53,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T009 の説明に「read and hash the actual baseline, persist all three hashes, and treat missing, malformed, or schema-incompatible cache data as a miss」という挙動契約の再記述がある。変更対象・操作・アンカーだけに留めるべき。See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 61,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:4931d545aff53ee77e28657e1732dcd56e5e52ad8ed92d0ec8cb6d851e5ec1d1",
+          "at": "2026-08-01T04:52:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cd95bb0e2490d91fe99e1857842f1be4aa0ca25b91de731317650c812148d4d0",
+          "at": "2026-08-01T05:06:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cd95bb0e2490d91fe99e1857842f1be4aa0ca25b91de731317650c812148d4d0",
+          "at": "2026-08-01T05:11:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0f8832f649239c83573f57ebb2e10f027b92e5659f7c31c4e7172ad29f36a5bb",
+          "at": "2026-08-01T07:20:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0f8832f649239c83573f57ebb2e10f027b92e5659f7c31c4e7172ad29f36a5bb",
+          "at": "2026-08-01T07:23:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2a14c04114070e835837e299d580a0c5aae00ddb89760dc803dbaed5675c7c4e",
+          "at": "2026-08-01T09:10:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2a14c04114070e835837e299d580a0c5aae00ddb89760dc803dbaed5675c7c4e",
+          "at": "2026-08-01T09:14:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T009 の説明に「so the adapter maps authoritative-input, evaluation, and cache-write error variants directly」という上流の挙動契約の再記述がある。変更対象・操作・アンカーだけに留め、詳細な挙動は AC-07〜AC-09 に委ねるべき。See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 61,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:f1d8cea458f52cd1b67d8c05ccfa67bf251ff6b20f45913076dfd2ffe87d05f2",
+          "at": "2026-08-01T11:14:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:04a9de89b4882e627b4fce69519854e5b3c4cddb5637bab93b6f3458ad7aec40",
+          "at": "2026-08-01T11:34:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:04a9de89b4882e627b4fce69519854e5b3c4cddb5637bab93b6f3458ad7aec40",
+          "at": "2026-08-01T11:37:13Z"
         }
       ]
     },
-    "other": {
+    "adr": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:fb2f7e429b2d3257d2accfc1dc2b5a2aae2990a6b625404fb70ef0e21ee8d4e8",
-          "at": "2026-08-01T01:29:26Z"
+          "hash": "rvw1:sha256:cb666be156be4e5a74c73e23d8220f63bb3db8b8a08be26761cbad58085b2412",
+          "at": "2026-07-31T22:47:46Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:fb2f7e429b2d3257d2accfc1dc2b5a2aae2990a6b625404fb70ef0e21ee8d4e8",
-          "at": "2026-08-01T01:33:00Z"
+          "hash": "rvw1:sha256:cb666be156be4e5a74c73e23d8220f63bb3db8b8a08be26761cbad58085b2412",
+          "at": "2026-07-31T22:50:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ccf80b721d965f8205f7454dbcd27c4ea12d2cfc166dd951f73cef9c2c11ea89",
+          "at": "2026-08-01T00:18:19Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:fb2f7e429b2d3257d2accfc1dc2b5a2aae2990a6b625404fb70ef0e21ee8d4e8",
-          "at": "2026-08-01T01:46:40Z"
+          "hash": "rvw1:sha256:ccf80b721d965f8205f7454dbcd27c4ea12d2cfc166dd951f73cef9c2c11ea89",
+          "at": "2026-08-01T00:21:10Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1c15e00c9d57e3d1b6b7837e096db6b13217224842f46c7318b0141748f9dffc",
+          "at": "2026-08-01T09:10:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1c15e00c9d57e3d1b6b7837e096db6b13217224842f46c7318b0141748f9dffc",
+          "at": "2026-08-01T09:15:53Z"
         }
       ]
     },
@@ -584,6 +685,297 @@
           "findings": [],
           "hash": "rvw1:sha256:868b02811ba071057f0fd845c28ed64b9e4508b3d1ea006c7f2e8af750b4073f",
           "at": "2026-08-01T02:30:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::TypeSignalsError` includes `BranchTrackMismatch`, `LayerBindingsLoad`, `NoLayers`, and `FeatureDeclaration`, but its only `spec_refs[]` are CN-04/AC-08/AC-09, which describe cache miss/self-healing and cache failure stages. Those anchors do not ground the request-guard, layer-binding, or feature-declaration variants; add the relevant type-signals operation anchors or split the error contracts.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 1312,
+              "category": "SoT integrity / spec_refs off-topic"
+            }
+          ],
+          "hash": "rvw1:sha256:f92172a7ce98519e9fdfe8c7879cc496511a092d1bfdb7b74587bbeed40f7bba",
+          "at": "2026-08-01T06:44:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:feb73ef6647d976e0ccc43ed7d7e8303c374bd1c2ddf04d73dbca1cfd92eb4e4",
+          "at": "2026-08-01T07:04:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:feb73ef6647d976e0ccc43ed7d7e8303c374bd1c2ddf04d73dbca1cfd92eb4e4",
+          "at": "2026-08-01T07:14:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer` documents itself as a “fail-closed” evaluator, restating the upstream failure behavior from CN-04/AC-09. Keep the docs structural and rely on the existing anchors, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+              "line": 94,
+              "category": "SoT integrity / upstream restatement"
+            },
+            {
+              "message": "`infrastructure::EvaluateSignalsError` documents the upstream fail-closed behavior in addition to its structural stage variants. Remove “fail-closed” from the docs and rely on CN-04/AC-09, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+              "line": 236,
+              "category": "SoT integrity / upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:c64d2084f90fca67259dadaf79df4a215160e2cc86495bfd2e84aba83e18ba54",
+          "at": "2026-08-01T10:51:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cc0862c3f9893800971dc4879716c5c48afabcce048f78aa0d6b3382bec6cb0f",
+          "at": "2026-08-01T11:07:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cc0862c3f9893800971dc4879716c5c48afabcce048f78aa0d6b3382bec6cb0f",
+          "at": "2026-08-01T11:12:33Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8b7712d82979fe1cad57a7b3105cc648792eccc4e61e1213f18065a7ff7c7db6",
+          "at": "2026-08-01T09:11:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8b7712d82979fe1cad57a7b3105cc648792eccc4e61e1213f18065a7ff7c7db6",
+          "at": "2026-08-01T09:18:01Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fb2f7e429b2d3257d2accfc1dc2b5a2aae2990a6b625404fb70ef0e21ee8d4e8",
+          "at": "2026-08-01T01:29:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fb2f7e429b2d3257d2accfc1dc2b5a2aae2990a6b625404fb70ef0e21ee8d4e8",
+          "at": "2026-08-01T01:33:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fb2f7e429b2d3257d2accfc1dc2b5a2aae2990a6b625404fb70ef0e21ee8d4e8",
+          "at": "2026-08-01T01:46:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aef4333465fe0f58ae747a50e27ac879b6eede43bb7ba4a4e74ea5f966f39272",
+          "at": "2026-08-01T09:10:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The TypeSignalsError → IN-05 record binds an invalid-layer diagnostic test, while none of its tests exercises the active-track-only guard or BranchTrackMismatch. Bind the existing active-track mismatch/track-ID propagation test so this edge proves IN-05's active-track restriction.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 23,
+              "category": "test coverage / weak edge binding"
+            },
+            {
+              "message": "The TypeSignalsError → AC-07 record covers isolated hash mismatches but omits the all-three-hashes-match cache-hit test required by the briefing's multi-test contract. Its malformed-cache test concerns AC-08 and cannot prove the successful reuse case for AC-07.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 25,
+              "category": "test coverage / incomplete edge evidence"
+            }
+          ],
+          "hash": "rvw1:sha256:aef4333465fe0f58ae747a50e27ac879b6eede43bb7ba4a4e74ea5f966f39272",
+          "at": "2026-08-01T09:17:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The updated TypeSignalsError → IN-05 and → AC-07 binding sets have not been re-evaluated by the host. `bin/sotp test-obligation check` fails with `TestChanged` drift for both edges, so the briefing’s frozen pass=32 verdict no longer covers the current file. Run the host-owned evaluation before treating this scope as green.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 23,
+              "category": "test-obligation gate / stale verdict"
+            }
+          ],
+          "hash": "rvw1:sha256:d7b0a439adde308b33de185e23412f08ebe5ea8f41d9ceb015add01cdd6a39c2",
+          "at": "2026-08-01T09:21:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d7b0a439adde308b33de185e23412f08ebe5ea8f41d9ceb015add01cdd6a39c2",
+          "at": "2026-08-01T09:49:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The bindings file omits the three newly derived voluntary edges for `EvaluateSignalsError` at spec anchors `IN-05`, `CN-04`, and `AC-09`. `bin/sotp test-obligation check --track-id 2026-07-31-base-merge-and-conflict-recovery` fails with exactly these unresolved edges. Add focused infrastructure tests, such as `test_map_evaluation_error_each_stage_preserves_execution_error_category` and the evaluator failure/cache-write tests, while preserving the existing records.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 31,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:d7b0a439adde308b33de185e23412f08ebe5ea8f41d9ceb015add01cdd6a39c2",
+          "at": "2026-08-01T11:52:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3444e758e644324cee7351fae50bb0a8341a93a6c8937e6fd351020996eb118e",
+          "at": "2026-08-01T11:56:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3444e758e644324cee7351fae50bb0a8341a93a6c8937e6fd351020996eb118e",
+          "at": "2026-08-01T12:01:16Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-06’s requirement that stash-pop “preserves the repository safety gates required for the restored worktree” does not identify which gates or observable checks establish compliance, leaving Phase 2/3 to invent the contract.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+              "line": 216,
+              "category": "acceptance criterion non-observable"
+            }
+          ],
+          "hash": "rvw1:sha256:d96c31dd688b8f7469f29f89ae0ebed068607ac107d385a51d8c936213fb97af",
+          "at": "2026-08-01T00:35:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d251b85b52d7071a8df8efebfa87e9383814697636ed8cdda82bb4009dfa5cee",
+          "at": "2026-08-01T00:38:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-06 contradicts IN-04 as written: a real `git stash` records stash commit objects and updates `refs/stash`, while a successful pop updates that ref again. Therefore stash/stash-pop cannot satisfy the blanket requirement to create no commit and update no ref. Clarify that branch history and branch refs must remain unchanged while permitting the stash-internal objects/ref required by D3.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+              "line": 216,
+              "category": "scope / acceptance_criteria contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d251b85b52d7071a8df8efebfa87e9383814697636ed8cdda82bb4009dfa5cee",
+          "at": "2026-08-01T00:41:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:99c34a083854c412260ecb88e8accdc3d671a36c78ab490dbb61a65cd3647484",
+          "at": "2026-08-01T00:44:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e5eb0df80593d31f3aabfdebd7984bbd743c1e8d5ed5d06b057148c3620c400d",
+          "at": "2026-08-01T00:46:48Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:21d211a08a8555004b6af5c4656cb2965942d73459c890f7e6d3d31bacc20f2a",
+          "at": "2026-08-01T09:10:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`BaseBranchName::try_new` does not enforce a merge-safe branch name. `validate_branch_ref` accepts option-like values such as `--abort` and other strings Git rejects as branch names. Since the snapshot stores only a `NonEmptyString`, such a value can become `BaseMergeDirection::source` and may be interpreted by the git adapter as an option instead of a merge source, defeating the direction guard. Add branch-name-specific validation and regression coverage for option-like/invalid refs.",
+              "severity": "P0",
+              "file": "libs/domain/src/branch_strategy.rs",
+              "line": 18,
+              "category": "broken invariant in newtype constructor"
+            }
+          ],
+          "hash": "rvw1:sha256:21d211a08a8555004b6af5c4656cb2965942d73459c890f7e6d3d31bacc20f2a",
+          "at": "2026-08-01T09:19:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `.lock` restriction is applied only to the end of the complete branch string. Git rejects any path component ending in `.lock`, so `BaseBranchName::try_new(\"feature.lock/topic\".into())` still succeeds even though it is not a valid branch reference. This leaves an invalid merge source representable. Validate `.lock` per slash-delimited component and add a nested-component regression test.",
+              "severity": "P1",
+              "file": "libs/domain/src/branch_strategy.rs",
+              "line": 45,
+              "category": "broken invariant in newtype constructor"
+            }
+          ],
+          "hash": "rvw1:sha256:b678bb6f4f5d863ac55516ab48d9536d488abc93acf9d12ab0a1dba74acf1da6",
+          "at": "2026-08-01T09:30:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f4c5ceaf26616b5f9b7e182a23b788d2ca96c327cac272552ae124437b194a30",
+          "at": "2026-08-01T09:36:03Z"
         }
       ]
     }

@@ -72,12 +72,10 @@
     }
   ],
   "batches": [
-    {"id": "B1", "task_ids": ["T001", "T007"]},
+    {"id": "B1", "task_ids": ["T001", "T007", "T008", "T009"]},
     {"id": "B2", "task_ids": ["T002"]},
     {"id": "B3", "task_ids": ["T003"]},
     {"id": "B4", "task_ids": ["T004", "T005"]},
-    {"id": "B5", "task_ids": ["T006"]},
-    {"id": "B6", "task_ids": ["T008"]},
-    {"id": "B7", "task_ids": ["T009"]}
+    {"id": "B5", "task_ids": ["T006"]}
   ]
 }

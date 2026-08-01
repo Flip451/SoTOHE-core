@@ -1155,7 +1155,7 @@
       }
     },
     {
-      "claim_hash": "58269bb98204fdf78f3215a44e3266048b8f66b6b92f5472cf17b0745f8979b5",
+      "claim_hash": "473e9d8da4e5c2fe2375324424da3dd4e41ac8af5140cd76b5ee4c8a088b9346",
       "evidence_hash": "2c9b19622c3a0e2132e20416f8a2daea82bc3ee0d9fb04093e62f80c1db9eb47",
       "verdict": {
         "kind": "pass",
@@ -1179,7 +1179,7 @@
       }
     },
     {
-      "claim_hash": "58269bb98204fdf78f3215a44e3266048b8f66b6b92f5472cf17b0745f8979b5",
+      "claim_hash": "473e9d8da4e5c2fe2375324424da3dd4e41ac8af5140cd76b5ee4c8a088b9346",
       "evidence_hash": "6db977ec88a955486c701792d79190a537792e0c8f40534a9f7c5006d4f1a05e",
       "verdict": {
         "kind": "pass",
@@ -1203,7 +1203,7 @@
       }
     },
     {
-      "claim_hash": "58269bb98204fdf78f3215a44e3266048b8f66b6b92f5472cf17b0745f8979b5",
+      "claim_hash": "473e9d8da4e5c2fe2375324424da3dd4e41ac8af5140cd76b5ee4c8a088b9346",
       "evidence_hash": "d508f9ad6e631d86ac123e28064377878b68c60a1c537d96963226b756b08915",
       "verdict": {
         "kind": "pass",
@@ -1223,6 +1223,78 @@
           "section": "acceptance_criteria",
           "element_id": "AC-09",
           "text_label": "Missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures fail closed; inactive and archived tracks are untouched, and manual type-signals deletion is not part of ordinary baseline recapture."
+        }
+      }
+    },
+    {
+      "claim_hash": "473e9d8da4e5c2fe2375324424da3dd4e41ac8af5140cd76b5ee4c8a088b9346",
+      "evidence_hash": "817b72909e99cba8c63ea6783688c285d7a31b1b957ac27e383020deabd3d2e4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "For the currently active track only, evaluate and self-heal type-signals cache entries using catalogue declaration, implementation input, and actual baseline hashes."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "For the currently active track only, evaluate and self-heal type-signals cache entries using catalogue declaration, implementation input, and actual baseline hashes."
+        }
+      }
+    },
+    {
+      "claim_hash": "473e9d8da4e5c2fe2375324424da3dd4e41ac8af5140cd76b5ee4c8a088b9346",
+      "evidence_hash": "be0e4f36c9a55e0674c479938e51a0160b52d5398c63aa8438a14586d168f92f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "A type-signals cache may be reused only when its catalogue declaration hash, implementation input hash, and actual baseline hash all equal the current authoritative values."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "A type-signals cache may be reused only when its catalogue declaration hash, implementation input hash, and actual baseline hash all equal the current authoritative values."
+        }
+      }
+    },
+    {
+      "claim_hash": "473e9d8da4e5c2fe2375324424da3dd4e41ac8af5140cd76b5ee4c8a088b9346",
+      "evidence_hash": "7b54404cb71772b0ba0fb9dba8a139fb332f9fbbfd5df060512546c80aa23e09",
+      "verdict": {
+        "kind": "pass",
+        "citation": "For the active track, a type-signals cache is reused only when all three current hashes—catalogue declaration, implementation input, and actual baseline—match the cache record."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "For the active track, a type-signals cache is reused only when all three current hashes—catalogue declaration, implementation input, and actual baseline—match the cache record."
         }
       }
     },

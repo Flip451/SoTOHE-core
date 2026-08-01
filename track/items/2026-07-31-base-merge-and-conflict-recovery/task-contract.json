@@ -63,7 +63,9 @@
       {"layer": "infrastructure", "entry_key": "TypeSignalsExecutorAdapter"},
       {"layer": "infrastructure", "entry_key": "infrastructure::tddd::type_signals_codec::baseline_hash"},
       {"layer": "infrastructure", "entry_key": "infrastructure::tddd::type_signals_codec::decode"},
-      {"layer": "infrastructure", "entry_key": "infrastructure::tddd::type_signals_codec::encode"}
+      {"layer": "infrastructure", "entry_key": "infrastructure::tddd::type_signals_codec::encode"},
+      {"layer": "infrastructure", "entry_key": "EvaluateSignalsError"},
+      {"layer": "infrastructure", "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"}
     ]
   }
 }

@@ -17,23 +17,11 @@
         "role": "FreeFunction"
       },
       "brief": "Author a logic test covering 'entry' of domain::branch_strategy::derive_base_merge_direction",
-      "declaration_hash": "35411e6bbb2d58342dfef60cbcece5ec81c4da0f1c0433a85137f772de0b81de",
+      "declaration_hash": "a3b85632a47014de4a6f3a405fa22738decefa179788913a575aa2dec176187f",
       "spec_refs": [
         {
           "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
           "element_id": "IN-01"
-        },
-        {
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
-          "element_id": "CN-01"
-        },
-        {
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
-          "element_id": "AC-01"
-        },
-        {
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
-          "element_id": "AC-02"
         }
       ]
     },

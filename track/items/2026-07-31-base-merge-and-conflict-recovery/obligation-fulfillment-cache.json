@@ -1,4 +1,1240 @@
 {
   "track_id": "2026-07-31-base-merge-and-conflict-recovery",
-  "entries": []
+  "entries": [
+    {
+      "edge_id": {
+        "entry_key": "domain::branch_strategy::derive_base_merge_direction",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "domain::branch_strategy::derive_base_merge_direction",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "b2afb521dfad659789b385cfb832d20343328474c3a08d577075237de33217ea",
+        "declaration_hash": "a3b85632a47014de4a6f3a405fa22738decefa179788913a575aa2dec176187f",
+        "anchor_text_hash": "008a36faed29453afb25460ea4db3d92210eddc427c7d565839f29f1cce2e93e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(direction.active_track().as_ref(), \"track/merge-track\");\n        assert_eq!(direction.source().as_str(), \"develop\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::branch_strategy::tests",
+          "test_name": "test_derive_base_merge_direction_active_track_uses_snapshot_base_branch"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "6e6d5802f8f3c7639734d01db5c180140a9f4fa6b3362115c875ff5c450a024e",
+        "declaration_hash": "b2ccdd2bd98674ad862fd2e8917e22786c91d54571f4b3872cc3be7370398514",
+        "anchor_text_hash": "fdca1bf655872309a62567be020ac1100e025ab3ea83bef136db30c5e1205c0d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            decide_type_signals_reuse(&cache_key(A, A, A), &cache_key(A, A, A),),\n            TypeSignalsReuseDecision::SkipEvaluation\n        );\n\n        assert_eq!(\n            decide_type_signals_reuse(&cache_key(A, A, A), &cache_key(B, A, A),),\n            TypeSignalsReuseDecision::ReevaluateWithoutExtraction\n        );\n        assert_eq!(\n            decide_type_signals_reuse(&cache_key(A, A, A), &cache_key(A, B, A),),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        assert_eq!(\n            decide_type_signals_reuse(&cache_key(A, A, A), &cache_key(A, A, B)),\n            TypeSignalsReuseDecision::ReevaluateWithoutExtraction\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_all_three_matching_hashes_skips_evaluation"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_each_isolated_hash_mismatch_reevaluates"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "6e6d5802f8f3c7639734d01db5c180140a9f4fa6b3362115c875ff5c450a024e",
+        "declaration_hash": "b2ccdd2bd98674ad862fd2e8917e22786c91d54571f4b3872cc3be7370398514",
+        "anchor_text_hash": "75f0cef67c551e8ce8d38fa4beb359efc7cced7ad4bb66d779e23f4be88ffbda"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            decide_type_signals_reuse(&cache_key(A, A, A), &cache_key(A, A, A),),\n            TypeSignalsReuseDecision::SkipEvaluation\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_all_three_matching_hashes_skips_evaluation"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_each_isolated_hash_mismatch_reevaluates"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "6e6d5802f8f3c7639734d01db5c180140a9f4fa6b3362115c875ff5c450a024e",
+        "declaration_hash": "b2ccdd2bd98674ad862fd2e8917e22786c91d54571f4b3872cc3be7370398514",
+        "anchor_text_hash": "3746c0d566b99fa3932615c96f7ac5f40a30c5bfb61f5d75b0f0daf622ebed8d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            decide_type_signals_reuse(&cache_key(A, A, A), &cache_key(A, A, A),),\n            TypeSignalsReuseDecision::SkipEvaluation\n        );\n        assert_eq!(\n            decide_type_signals_reuse(&cache_key(A, A, A), &cache_key(B, A, A),),\n            TypeSignalsReuseDecision::ReevaluateWithoutExtraction\n        );\n        assert_eq!(\n            decide_type_signals_reuse(&cache_key(A, A, A), &cache_key(A, B, A),),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        assert_eq!(\n            decide_type_signals_reuse(&cache_key(A, A, A), &cache_key(A, A, B)),\n            TypeSignalsReuseDecision::ReevaluateWithoutExtraction\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_all_three_matching_hashes_skips_evaluation"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_each_isolated_hash_mismatch_reevaluates"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_codec::baseline_hash",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_codec::baseline_hash",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "c5a66e10cc2cd11693657f75506315cb30bb19dac20947b6667e9eff5a002cf0",
+        "declaration_hash": "03c3049369b5929ad9d84ec2ec49ed15fc79935300a5d9dae3c6f57392c91274",
+        "anchor_text_hash": "fdca1bf655872309a62567be020ac1100e025ab3ea83bef136db30c5e1205c0d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            baseline_hash(b\"baseline A\").as_digest().as_str(),\n            \"7061fe86b948cf084b16235a204ce4a357f6b38f637f28edad27213428fda3d6\"\n        );\n        assert_ne!(baseline_hash(b\"baseline A\"), baseline_hash(b\"baseline B\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "test_name": "test_baseline_hash_changes_when_baseline_bytes_change"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_codec::baseline_hash",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_codec::baseline_hash",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "c5a66e10cc2cd11693657f75506315cb30bb19dac20947b6667e9eff5a002cf0",
+        "declaration_hash": "03c3049369b5929ad9d84ec2ec49ed15fc79935300a5d9dae3c6f57392c91274",
+        "anchor_text_hash": "75f0cef67c551e8ce8d38fa4beb359efc7cced7ad4bb66d779e23f4be88ffbda"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            baseline_hash(b\"baseline A\").as_digest().as_str(),\n            \"7061fe86b948cf084b16235a204ce4a357f6b38f637f28edad27213428fda3d6\"\n        );\n        assert_ne!(baseline_hash(b\"baseline A\"), baseline_hash(b\"baseline B\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "test_name": "test_baseline_hash_changes_when_baseline_bytes_change"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_codec::baseline_hash",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_codec::baseline_hash",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "c5a66e10cc2cd11693657f75506315cb30bb19dac20947b6667e9eff5a002cf0",
+        "declaration_hash": "03c3049369b5929ad9d84ec2ec49ed15fc79935300a5d9dae3c6f57392c91274",
+        "anchor_text_hash": "3746c0d566b99fa3932615c96f7ac5f40a30c5bfb61f5d75b0f0daf622ebed8d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            baseline_hash(b\"baseline A\").as_digest().as_str(),\n            \"7061fe86b948cf084b16235a204ce4a357f6b38f637f28edad27213428fda3d6\"\n        );\n        assert_ne!(baseline_hash(b\"baseline A\"), baseline_hash(b\"baseline B\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "test_name": "test_baseline_hash_changes_when_baseline_bytes_change"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseBranchName",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseBranchName",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "b2afb521dfad659789b385cfb832d20343328474c3a08d577075237de33217ea",
+        "declaration_hash": "46897f16e4e0c5ceb6a129e0701a43cf5d646631212b275c8a0b6794f17f609e",
+        "anchor_text_hash": "008a36faed29453afb25460ea4db3d92210eddc427c7d565839f29f1cce2e93e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(direction.source().as_str(), \"develop\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::branch_strategy::tests",
+          "test_name": "test_derive_base_merge_direction_active_track_uses_snapshot_base_branch"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeDirection",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeDirection",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "b2afb521dfad659789b385cfb832d20343328474c3a08d577075237de33217ea",
+        "declaration_hash": "e0371a9e9c0250d5cbfcd9161523c3193b45608ed8813aac587be5d74cf4dbfa",
+        "anchor_text_hash": "008a36faed29453afb25460ea4db3d92210eddc427c7d565839f29f1cce2e93e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(direction.track_id().as_ref(), \"merge-track\");\n        assert_eq!(direction.active_track().as_ref(), \"track/merge-track\");\n        assert_eq!(direction.source().as_str(), \"develop\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::branch_strategy::tests",
+          "test_name": "test_derive_base_merge_direction_active_track_uses_snapshot_base_branch"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeDirectionError",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeDirectionError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "b17bd51cf87ed336a1d3bf3749ca74d893ee90c2c2f71ae41de470b114e1c6c9",
+        "declaration_hash": "8c9119e2087c9bec586862a74bbf2f796cf0f21774136996de09be70fdcccbd8",
+        "anchor_text_hash": "008a36faed29453afb25460ea4db3d92210eddc427c7d565839f29f1cce2e93e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            derive_base_merge_direction(&track),\n            Err(BaseMergeDirectionError::InactiveTrack)\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::branch_strategy::tests",
+          "test_name": "test_derive_base_merge_direction_inactive_track_returns_error"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaselineHash",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaselineHash",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "3ec518726cb2291eac87dd39a4d47cf6ced9717d0acccfafbeac4b4bd04438a3",
+        "declaration_hash": "f9f3e6dd2a935d1fcada0a8d0ed1767bb65dc59775491a52671d55b68179f21a",
+        "anchor_text_hash": "fdca1bf655872309a62567be020ac1100e025ab3ea83bef136db30c5e1205c0d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "for mismatch in [\"declaration\", \"implementation\", \"baseline\"] { ... assert_eq!(replacement.cache_key(), current_document(workspace.path(), &items_dir, &track_id).cache_key(), \"{mismatch} replacement must use all current authoritative hashes\"); }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_each_hash_mismatch_is_a_cache_miss"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaselineHash",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaselineHash",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "ba8424417223a574d9b8707d34caf42d4df012ae2b148d5fdcd0cc1c110ee7bc",
+        "declaration_hash": "f9f3e6dd2a935d1fcada0a8d0ed1767bb65dc59775491a52671d55b68179f21a",
+        "anchor_text_hash": "75f0cef67c551e8ce8d38fa4beb359efc7cced7ad4bb66d779e23f4be88ffbda"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            decide_type_signals_reuse(&cache_key(A, A, A), &cache_key(A, A, B)),\n            TypeSignalsReuseDecision::ReevaluateWithoutExtraction\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_each_isolated_hash_mismatch_reevaluates"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaselineHash",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaselineHash",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "6e6d5802f8f3c7639734d01db5c180140a9f4fa6b3362115c875ff5c450a024e",
+        "declaration_hash": "f9f3e6dd2a935d1fcada0a8d0ed1767bb65dc59775491a52671d55b68179f21a",
+        "anchor_text_hash": "3746c0d566b99fa3932615c96f7ac5f40a30c5bfb61f5d75b0f0daf622ebed8d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            decide_type_signals_reuse(&cache_key(A, A, A), &cache_key(A, A, A),),\n            TypeSignalsReuseDecision::SkipEvaluation\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_all_three_matching_hashes_skips_evaluation"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_each_isolated_hash_mismatch_reevaluates"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsCacheKey",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsCacheKey",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "3ec518726cb2291eac87dd39a4d47cf6ced9717d0acccfafbeac4b4bd04438a3",
+        "declaration_hash": "a87f06fe69f5d648976d386e6ed1adcd2a75cf31c0923616c862b6f82f24fc4e",
+        "anchor_text_hash": "fdca1bf655872309a62567be020ac1100e025ab3ea83bef136db30c5e1205c0d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n                replacement.cache_key(),\n                current_document(workspace.path(), &items_dir, &track_id).cache_key(),\n                \"{mismatch} replacement must use all current authoritative hashes\"\n            );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_each_hash_mismatch_is_a_cache_miss"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsCacheKey",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsCacheKey",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "ba8424417223a574d9b8707d34caf42d4df012ae2b148d5fdcd0cc1c110ee7bc",
+        "declaration_hash": "a87f06fe69f5d648976d386e6ed1adcd2a75cf31c0923616c862b6f82f24fc4e",
+        "anchor_text_hash": "75f0cef67c551e8ce8d38fa4beb359efc7cced7ad4bb66d779e23f4be88ffbda"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            decide_type_signals_reuse(&cache_key(A, A, A), &cache_key(B, A, A),),\n            TypeSignalsReuseDecision::ReevaluateWithoutExtraction\n        );\n        assert_eq!(\n            decide_type_signals_reuse(&cache_key(A, A, A), &cache_key(A, B, A),),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        assert_eq!(\n            decide_type_signals_reuse(&cache_key(A, A, A), &cache_key(A, A, B)),\n            TypeSignalsReuseDecision::ReevaluateWithoutExtraction\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_each_isolated_hash_mismatch_reevaluates"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsCacheKey",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsCacheKey",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "6fb6cefc62245578ab32a59f2ca6747650a9ea669d8f3e59fb420b3c28cbd6bf",
+        "declaration_hash": "a87f06fe69f5d648976d386e6ed1adcd2a75cf31c0923616c862b6f82f24fc4e",
+        "anchor_text_hash": "3746c0d566b99fa3932615c96f7ac5f40a30c5bfb61f5d75b0f0daf622ebed8d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(replacement.cache_key(), current_document(workspace.path(), &items_dir, &track_id).cache_key(), \"{mismatch} replacement must use all current authoritative hashes\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_all_three_hash_cache_hit_skips_evaluation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_each_hash_mismatch_is_a_cache_miss"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsCacheKey",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsCacheKey",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-08"
+      },
+      "key": {
+        "bound_tests_set_hash": "2b4e489df4e60cba56b1e25d475558244f7d345ace9e69bfdb0b6eeab1f6f752",
+        "declaration_hash": "a87f06fe69f5d648976d386e6ed1adcd2a75cf31c0923616c862b6f82f24fc4e",
+        "anchor_text_hash": "19af9d1eb20047dbb4cf5665ff817edef2e04aba6c1572041627f518e9ef24e2"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n                type_signals_codec::decode(&std::fs::read_to_string(&path).unwrap())\n                    .unwrap()\n                    .cache_key(),\n                current_document(workspace.path(), &items_dir, &track_id).cache_key()\n            );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_missing_malformed_or_schema_incompatible_cache_replaces_it"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsDocument",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsDocument",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "534d751169eaadac13d4dd8ebf7c9e2556aad78f8238b9f21f1feaecf848e6a2",
+        "declaration_hash": "1f9e2b50209bf94d49e711d393427c2f5c78fd9b6517236ee7485b2870048535",
+        "anchor_text_hash": "fdca1bf655872309a62567be020ac1100e025ab3ea83bef136db30c5e1205c0d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            persisted.cache_key(),\n            expected.cache_key(),\n            \"the replacement must persist all three current authoritative hashes\"\n        );\n        assert_eq!(\n            persisted.signals(),\n            expected.signals(),\n            \"the replacement must persist the evaluator's expected signal set\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_successful_replacement_uses_atomic_write_path"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsDocument",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsDocument",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "3ec518726cb2291eac87dd39a4d47cf6ced9717d0acccfafbeac4b4bd04438a3",
+        "declaration_hash": "1f9e2b50209bf94d49e711d393427c2f5c78fd9b6517236ee7485b2870048535",
+        "anchor_text_hash": "75f0cef67c551e8ce8d38fa4beb359efc7cced7ad4bb66d779e23f4be88ffbda"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n                observer.launches(),\n                1,\n                \"{mismatch} mismatch must obtain a fresh rustdoc artifact\"\n            );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_each_hash_mismatch_is_a_cache_miss"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsDocument",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsDocument",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "b57a1430c50fa3acb1080ac2537413ba248a590587b7ba925a3c82f67e0116da",
+        "declaration_hash": "1f9e2b50209bf94d49e711d393427c2f5c78fd9b6517236ee7485b2870048535",
+        "anchor_text_hash": "7e4f50cdd2968fd792a5c1265b3cab88c52ff34cb17ba9ad002ecf1a390030ad"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(error.to_string().contains(\"cannot decode rustdoc JSON\"));\n        assert_eq!(std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(), original);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_evaluation_failure_fails_closed_without_replacing_cache"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsDocument",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsDocument",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "6fb6cefc62245578ab32a59f2ca6747650a9ea669d8f3e59fb420b3c28cbd6bf",
+        "declaration_hash": "1f9e2b50209bf94d49e711d393427c2f5c78fd9b6517236ee7485b2870048535",
+        "anchor_text_hash": "3746c0d566b99fa3932615c96f7ac5f40a30c5bfb61f5d75b0f0daf622ebed8d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(observer.launches(), 0, \"a full three-hash cache hit must not extract rustdoc\"); ... for mismatch in [\"declaration\", \"implementation\", \"baseline\"] { ... assert_eq!(observer.launches(), 1, \"{mismatch} mismatch must obtain a fresh rustdoc artifact\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_all_three_hash_cache_hit_skips_evaluation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_each_hash_mismatch_is_a_cache_miss"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsDocument",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsDocument",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-08"
+      },
+      "key": {
+        "bound_tests_set_hash": "2b4e489df4e60cba56b1e25d475558244f7d345ace9e69bfdb0b6eeab1f6f752",
+        "declaration_hash": "1f9e2b50209bf94d49e711d393427c2f5c78fd9b6517236ee7485b2870048535",
+        "anchor_text_hash": "19af9d1eb20047dbb4cf5665ff817edef2e04aba6c1572041627f518e9ef24e2"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "type_signals_codec::decode(&std::fs::read_to_string(&path).unwrap())\n                    .unwrap()\n                    .cache_key(),\n                current_document(workspace.path(), &items_dir, &track_id).cache_key()"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_missing_malformed_or_schema_incompatible_cache_replaces_it"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsDocument",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsDocument",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-09"
+      },
+      "key": {
+        "bound_tests_set_hash": "b57a1430c50fa3acb1080ac2537413ba248a590587b7ba925a3c82f67e0116da",
+        "declaration_hash": "1f9e2b50209bf94d49e711d393427c2f5c78fd9b6517236ee7485b2870048535",
+        "anchor_text_hash": "6027f88f426f0193c163ab4b11dd5a32d9d26a6f717523c31400399888322000"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "std::fs::write(&rustdoc_path, \"{ malformed rustdoc }\").unwrap();\n        let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);\n\n        let error =\n            execute_with_observer(&items_dir, &track_id, workspace.path(), &binding, &observer)\n                .unwrap_err();\n        assert!(error.to_string().contains(\"cannot decode rustdoc JSON\"));\n        assert_eq!(std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(), original);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_evaluation_failure_fails_closed_without_replacing_cache"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "e021369a63b250c5a724f28ac2162a74364699bb7652034c46ba06483a5d90c5",
+        "declaration_hash": "8292f1795f766348e5c840b8b6850108751299b3103bcc4bb9d3bc57f83c4ade",
+        "anchor_text_hash": "fdca1bf655872309a62567be020ac1100e025ab3ea83bef136db30c5e1205c0d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"{mismatch} mismatch must evaluate rather than reuse the old cache\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::type_signals::interactor::tests",
+          "test_name": "test_run_with_invalid_layer_binding_preserves_diagnostic_text"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::type_signals::interactor::tests",
+          "test_name": "test_run_propagates_track_id_to_every_layer_and_rejects_mismatched_active_track"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "test_name": "test_decode_rejects_each_typed_codec_error_variant"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_each_hash_mismatch_is_a_cache_miss"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_successful_replacement_uses_atomic_write_path"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "124c62b97c62f12b9fd1c9bace31468d0a11881c3928268e1dc0bfecc138f79c",
+        "declaration_hash": "8292f1795f766348e5c840b8b6850108751299b3103bcc4bb9d3bc57f83c4ade",
+        "anchor_text_hash": "75f0cef67c551e8ce8d38fa4beb359efc7cced7ad4bb66d779e23f4be88ffbda"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"a full three-hash cache hit must not extract rustdoc\"; \"{mismatch} mismatch must evaluate rather than reuse the old cache\"; \"{mismatch} replacement must use all current authoritative hashes\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_codec::tests",
+          "test_name": "test_decode_rejects_each_typed_codec_error_variant"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_all_three_hash_cache_hit_skips_evaluation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_each_hash_mismatch_is_a_cache_miss"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_missing_malformed_or_schema_incompatible_cache_replaces_it"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "642e76ece6f8eacf5494dd757af1141febb885420a9f0422eb103db8ea4964d5",
+        "declaration_hash": "8292f1795f766348e5c840b8b6850108751299b3103bcc4bb9d3bc57f83c4ade",
+        "anchor_text_hash": "3746c0d566b99fa3932615c96f7ac5f40a30c5bfb61f5d75b0f0daf622ebed8d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"a full three-hash cache hit must not extract rustdoc\"; \"{mismatch} mismatch must evaluate rather than reuse the old cache\"; \"{mismatch} replacement must use all current authoritative hashes\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_all_three_hash_cache_hit_skips_evaluation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_each_hash_mismatch_is_a_cache_miss"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_missing_malformed_or_schema_incompatible_cache_replaces_it"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "f9f3a493f69fd633e89147936d940e35bbda268309612a25f61e85b9a124a180",
+        "declaration_hash": "8292f1795f766348e5c840b8b6850108751299b3103bcc4bb9d3bc57f83c4ade",
+        "anchor_text_hash": "7e4f50cdd2968fd792a5c1265b3cab88c52ff34cb17ba9ad002ecf1a390030ad"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(err, TypeSignalsError::EvaluationFailed { ref layer_id, ref reason }\n            if layer_id.as_ref() == \"domain\" && reason.as_str() == \"evaluation failed: nightly not installed\"),\n        \"evaluation failure must return EvaluationFailed, got: {err:?}\"\n    );\n\n    assert!(matches!(\n        authoritative.run(valid_request(tmp.path())),\n        Err(TypeSignalsError::AuthoritativeInputFailed { .. })\n    ));\n    assert!(matches!(\n        cache_write.run(valid_request(tmp.path())),\n        Err(TypeSignalsError::CacheWriteFailed { .. })\n    ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::type_signals::interactor::tests",
+          "test_name": "test_run_maps_evaluation_executor_failure_to_evaluation_failed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::type_signals::interactor::tests",
+          "test_name": "test_run_maps_authoritative_and_cache_write_executor_failures"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-08"
+      },
+      "key": {
+        "bound_tests_set_hash": "48e955a2001affcda912b0d3c82bbb2287aa622e97a7169c6dab5e72543fb075",
+        "declaration_hash": "8292f1795f766348e5c840b8b6850108751299b3103bcc4bb9d3bc57f83c4ade",
+        "anchor_text_hash": "19af9d1eb20047dbb4cf5665ff817edef2e04aba6c1572041627f518e9ef24e2"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"{invalid_cache} cache must be reevaluated\" ... \"the replacement must persist all three current authoritative hashes\" ... \"the atomic writer must leave no temporary replacement file\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::type_signals::interactor::tests",
+          "test_name": "test_run_maps_authoritative_and_cache_write_executor_failures"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_missing_malformed_or_schema_incompatible_cache_replaces_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_successful_replacement_uses_atomic_write_path"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-09"
+      },
+      "key": {
+        "bound_tests_set_hash": "f9f3a493f69fd633e89147936d940e35bbda268309612a25f61e85b9a124a180",
+        "declaration_hash": "8292f1795f766348e5c840b8b6850108751299b3103bcc4bb9d3bc57f83c4ade",
+        "anchor_text_hash": "6027f88f426f0193c163ab4b11dd5a32d9d26a6f717523c31400399888322000"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(err, TypeSignalsError::EvaluationFailed { ref layer_id, ref reason }\n            if layer_id.as_ref() == \"domain\" && reason.as_str() == \"evaluation failed: nightly not installed) ... assert!(matches!(\n        authoritative.run(valid_request(tmp.path())),\n        Err(TypeSignalsError::AuthoritativeInputFailed { .. })\n    )); ... assert!(matches!(\n        cache_write.run(valid_request(tmp.path())),\n        Err(TypeSignalsError::CacheWriteFailed { .. })\n    ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::type_signals::interactor::tests",
+          "test_name": "test_run_maps_evaluation_executor_failure_to_evaluation_failed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::type_signals::interactor::tests",
+          "test_name": "test_run_maps_authoritative_and_cache_write_executor_failures"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsExecutionError",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsExecutionError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "f9f3a493f69fd633e89147936d940e35bbda268309612a25f61e85b9a124a180",
+        "declaration_hash": "64db5db490030dd2b49e1a3307a84dbaf9f478536078ff9f34d4f0b132dd24ab",
+        "anchor_text_hash": "7e4f50cdd2968fd792a5c1265b3cab88c52ff34cb17ba9ad002ecf1a390030ad"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(err, TypeSignalsError::EvaluationFailed { ref layer_id, ref reason } if layer_id.as_ref() == \"domain\" && reason.as_str() == \"evaluation failed: nightly not installed\"), \"evaluation failure must return EvaluationFailed, got: {err:?}\");\n\nassert!(matches!(authoritative.run(valid_request(tmp.path())), Err(TypeSignalsError::AuthoritativeInputFailed { .. })));\nassert!(matches!(cache_write.run(valid_request(tmp.path())), Err(TypeSignalsError::CacheWriteFailed { .. })));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::type_signals::interactor::tests",
+          "test_name": "test_run_maps_evaluation_executor_failure_to_evaluation_failed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::type_signals::interactor::tests",
+          "test_name": "test_run_maps_authoritative_and_cache_write_executor_failures"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsExecutionError",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsExecutionError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-08"
+      },
+      "key": {
+        "bound_tests_set_hash": "48e955a2001affcda912b0d3c82bbb2287aa622e97a7169c6dab5e72543fb075",
+        "declaration_hash": "64db5db490030dd2b49e1a3307a84dbaf9f478536078ff9f34d4f0b132dd24ab",
+        "anchor_text_hash": "19af9d1eb20047dbb4cf5665ff817edef2e04aba6c1572041627f518e9ef24e2"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(observer.launches(), 1, \"{invalid_cache} cache must reextract rustdoc\"); ... assert_eq!(persisted.cache_key(), expected.cache_key(), \"the replacement must persist all three current authoritative hashes\"); ... assert_eq!(persisted.signals(), expected.signals(), \"the replacement must persist the evaluator's expected signal set\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::type_signals::interactor::tests",
+          "test_name": "test_run_maps_authoritative_and_cache_write_executor_failures"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_missing_malformed_or_schema_incompatible_cache_replaces_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_successful_replacement_uses_atomic_write_path"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsExecutionError",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsExecutionError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-09"
+      },
+      "key": {
+        "bound_tests_set_hash": "f9f3a493f69fd633e89147936d940e35bbda268309612a25f61e85b9a124a180",
+        "declaration_hash": "64db5db490030dd2b49e1a3307a84dbaf9f478536078ff9f34d4f0b132dd24ab",
+        "anchor_text_hash": "6027f88f426f0193c163ab4b11dd5a32d9d26a6f717523c31400399888322000"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(err, TypeSignalsError::EvaluationFailed { ref layer_id, ref reason }\n            if layer_id.as_ref() == \"domain\" && reason.as_str() == \"evaluation failed: nightly not installed\"),\n        \"evaluation failure must return EvaluationFailed, got: {err:?}\"\n    );\n\n    assert!(matches!(\n        authoritative.run(valid_request(tmp.path())),\n        Err(TypeSignalsError::AuthoritativeInputFailed { .. })\n    ));\n    assert!(matches!(\n        cache_write.run(valid_request(tmp.path())),\n        Err(TypeSignalsError::CacheWriteFailed { .. })\n    ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::type_signals::interactor::tests",
+          "test_name": "test_run_maps_evaluation_executor_failure_to_evaluation_failed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::type_signals::interactor::tests",
+          "test_name": "test_run_maps_authoritative_and_cache_write_executor_failures"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "EvaluateSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "EvaluateSignalsError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "406e2340e3a7ceb926dadbdb8e01b6941d486c3d95642b0313ced3963fa1eedf",
+        "declaration_hash": "f89e62b3e70731b4ac3d656f752256657439de957ef590ab98d995b5594d771a",
+        "anchor_text_hash": "fdca1bf655872309a62567be020ac1100e025ab3ea83bef136db30c5e1205c0d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let cases = [\n            (\n                EvaluateSignalsError::AuthoritativeInput(domain::FreeText::new(\n                    \"missing Cargo.lock\",\n                )),\n                \"AuthoritativeInput\",\n            ),\n            (\n                EvaluateSignalsError::Evaluation(domain::FreeText::new(\"cannot create timestamp\")),\n                \"Evaluation\",\n            ),\n            (\n                EvaluateSignalsError::CacheWrite(domain::FreeText::new(\n                    \"cannot write type signals\",\n                )),\n                \"CacheWrite\",\n            ),\n        ];"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_executor_adapter::tests",
+          "test_name": "test_map_evaluation_error_each_stage_preserves_execution_error_category"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_each_hash_mismatch_is_a_cache_miss"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_successful_replacement_uses_atomic_write_path"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "EvaluateSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "EvaluateSignalsError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "8f50b2cb3813c9c0bbe2017f81a7e41e26804ef34a35df5084008ded2aba62c9",
+        "declaration_hash": "f89e62b3e70731b4ac3d656f752256657439de957ef590ab98d995b5594d771a",
+        "anchor_text_hash": "7e4f50cdd2968fd792a5c1265b3cab88c52ff34cb17ba9ad002ecf1a390030ad"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let cases = [\n            (\n                EvaluateSignalsError::AuthoritativeInput(domain::FreeText::new(\n                    \"missing Cargo.lock\",\n                )),\n                \"AuthoritativeInput\",\n            ),\n            (\n                EvaluateSignalsError::Evaluation(domain::FreeText::new(\"cannot create timestamp\")),\n                \"Evaluation\",\n            ),\n            (\n                EvaluateSignalsError::CacheWrite(domain::FreeText::new(\n                    \"cannot write type signals\",\n                )),\n                \"CacheWrite\",\n            ),\n        ];\n\n        for (evaluator_error, expected_stage) in cases {\n            let execution_error = TypeSignalsExecutorAdapter::map_evaluation_error(evaluator_error);\n            assert!(\n                matches!(\n                    (expected_stage, &execution_error),\n                    (\"AuthoritativeInput\", TypeSignalsExecutionError::AuthoritativeInput(_))\n                        | (\"Evaluation\", TypeSignalsExecutionError::Evaluation(_))\n                        | (\"CacheWrite\", TypeSignalsExecutionError::CacheWrite(_))\n                ),\n                \"expected {expected_stage} error stage, got {execution_error:?}\"\n            );\n        }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_executor_adapter::tests",
+          "test_name": "test_map_evaluation_error_each_stage_preserves_execution_error_category"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_missing_malformed_or_schema_incompatible_cache_replaces_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_evaluation_failure_fails_closed_without_replacing_cache"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_successful_replacement_uses_atomic_write_path"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "EvaluateSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "EvaluateSignalsError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-09"
+      },
+      "key": {
+        "bound_tests_set_hash": "5d05bf4682bde242f0b6650805e9f8016ba46e78dd9109db6dea7db402c3cf8c",
+        "declaration_hash": "f89e62b3e70731b4ac3d656f752256657439de957ef590ab98d995b5594d771a",
+        "anchor_text_hash": "6027f88f426f0193c163ab4b11dd5a32d9d26a6f717523c31400399888322000"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"AuthoritativeInput\", TypeSignalsExecutionError::AuthoritativeInput(_)) | (\"Evaluation\", TypeSignalsExecutionError::Evaluation(_)) | (\"CacheWrite\", TypeSignalsExecutionError::CacheWrite(_)\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_executor_adapter::tests",
+          "test_name": "test_map_evaluation_error_each_stage_preserves_execution_error_category"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_cache_hit_input_mutation_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_evaluation_failure_fails_closed_without_replacing_cache"
+        }
+      ]
+    }
+  ]
 }

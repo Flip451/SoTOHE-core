@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "fb7e43ae20ff63f7c72afe6fc0326a004f3e102548ed2220ae8abbfb58d154a2",
+  "catalogue_declaration_hash": "d8b23fdf6bfb8ed851029e967d18168f2688ee481525b168f19e792722b641f3",
   "signals": [
     {
       "type_name": "BaseMergeAttemptOutcome",
@@ -60,7 +60,7 @@
     {
       "type_name": "TypeSignalsError",
       "signal": "blue",
-      "entry_hash": "58269bb98204fdf78f3215a44e3266048b8f66b6b92f5472cf17b0745f8979b5"
+      "entry_hash": "473e9d8da4e5c2fe2375324424da3dd4e41ac8af5140cd76b5ee4c8a088b9346"
     },
     {
       "type_name": "TypeSignalsExecutionError",

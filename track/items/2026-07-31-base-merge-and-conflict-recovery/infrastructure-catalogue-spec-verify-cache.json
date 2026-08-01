@@ -3,6 +3,78 @@
   "layer": "infrastructure",
   "entries": [
     {
+      "claim_hash": "abb3a2aeb883ad5defb7133cb00229a66a3adea8e009177b4d3491f27a88cf61",
+      "evidence_hash": "817b72909e99cba8c63ea6783688c285d7a31b1b957ac27e383020deabd3d2e4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "For the currently active track only, evaluate and self-heal type-signals cache entries using catalogue declaration, implementation input, and actual baseline hashes."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "EvaluateSignalsError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "For the currently active track only, evaluate and self-heal type-signals cache entries using catalogue declaration, implementation input, and actual baseline hashes."
+        }
+      }
+    },
+    {
+      "claim_hash": "abb3a2aeb883ad5defb7133cb00229a66a3adea8e009177b4d3491f27a88cf61",
+      "evidence_hash": "2c9b19622c3a0e2132e20416f8a2daea82bc3ee0d9fb04093e62f80c1db9eb47",
+      "verdict": {
+        "kind": "pass",
+        "citation": "missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures must fail closed."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "EvaluateSignalsError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "Cache misses caused by hash mismatch or any cache decode failure must reevaluate and atomically overwrite only after success; missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures must fail closed."
+        }
+      }
+    },
+    {
+      "claim_hash": "abb3a2aeb883ad5defb7133cb00229a66a3adea8e009177b4d3491f27a88cf61",
+      "evidence_hash": "d508f9ad6e631d86ac123e28064377878b68c60a1c537d96963226b756b08915",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures fail closed"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "EvaluateSignalsError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "Missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures fail closed; inactive and archived tracks are untouched, and manual type-signals deletion is not part of ordinary baseline recapture."
+        }
+      }
+    },
+    {
       "claim_hash": "24b89d60d56c6869b61c2c1e2f5e75d8d3aefcb225d6d786f0ab1d1b68aa6b7b",
       "evidence_hash": "b22837e4e8db0d1daed1a472908e64e7690ef1c152e9cd17985411dec3dadfbb",
       "verdict": {
@@ -735,6 +807,78 @@
           "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
           "section_key": "functions",
           "entry_key": "infrastructure::tddd::type_signals_codec::encode"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "Missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures fail closed; inactive and archived tracks are untouched, and manual type-signals deletion is not part of ordinary baseline recapture."
+        }
+      }
+    },
+    {
+      "claim_hash": "4f27d6b97bc22e8eae0aa09f4a6e4f20f4cbb3226badfd965a3c32671511a552",
+      "evidence_hash": "817b72909e99cba8c63ea6783688c285d7a31b1b957ac27e383020deabd3d2e4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "For the currently active track only, evaluate and self-heal type-signals cache entries using catalogue declaration, implementation input, and actual baseline hashes."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "For the currently active track only, evaluate and self-heal type-signals cache entries using catalogue declaration, implementation input, and actual baseline hashes."
+        }
+      }
+    },
+    {
+      "claim_hash": "4f27d6b97bc22e8eae0aa09f4a6e4f20f4cbb3226badfd965a3c32671511a552",
+      "evidence_hash": "2c9b19622c3a0e2132e20416f8a2daea82bc3ee0d9fb04093e62f80c1db9eb47",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Cache misses caused by hash mismatch or any cache decode failure must reevaluate and atomically overwrite only after success; missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures must fail closed."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "Cache misses caused by hash mismatch or any cache decode failure must reevaluate and atomically overwrite only after success; missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures must fail closed."
+        }
+      }
+    },
+    {
+      "claim_hash": "4f27d6b97bc22e8eae0aa09f4a6e4f20f4cbb3226badfd965a3c32671511a552",
+      "evidence_hash": "d508f9ad6e631d86ac123e28064377878b68c60a1c537d96963226b756b08915",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures fail closed; inactive and archived tracks are untouched, and manual type-signals deletion is not part of ordinary baseline recapture."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
         }
       },
       "evidence_origin": {

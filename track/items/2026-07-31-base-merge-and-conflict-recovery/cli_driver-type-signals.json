@@ -1,8 +1,9 @@
 {
-  "schema_version": 3,
-  "generated_at": "2026-08-01T02:12:41Z",
+  "schema_version": 4,
+  "generated_at": "2026-08-01T12:12:58Z",
   "declaration_hash": "6a0d7d1bb14f8247fe50f5fc3066ff2a0775acc1c118f4430059195e797b0efb",
   "implementation_input_hash": "ebc0c71312207b18f846f9a628a516e3db4c5c6fcb5c21b07bdea63c02f9ed8e",
+  "baseline_hash": "1ed9aa28dd241bacf4b2773c9a0563343fed5ddf01dfa2d8c15bca1794581dc5",
   "signals": [
     {
       "type_name": "BaseMergeInput",

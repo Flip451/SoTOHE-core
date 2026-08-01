@@ -50,7 +50,10 @@ pub use adr_decision::{
     DecisionGrounds, DeprecatedDecision, ImplementedDecision, ProposedDecision, SupersededDecision,
     evaluate_adr_decision,
 };
-pub use branch_strategy::{BranchStrategySnapshot, MergeMethod};
+pub use branch_strategy::{
+    BaseBranchName, BaseMergeDirection, BaseMergeDirectionError, BranchStrategySnapshot,
+    MergeMethod, derive_base_merge_direction,
+};
 pub use chain::{
     ChainGateEntry, ChainId, ChainIdentity, GateKind, PersistedSoTChainGate, SignalGateMatrix,
     Strictness, check_catalogue_spec_signals,
@@ -116,9 +119,10 @@ pub use tddd::semantic_verify::{
     SemanticVerifyEntry, SpecAdrVerifyCacheDocument,
 };
 pub use tddd::type_signals_doc::{
-    CatalogueDeclarationHash, ImplementationInputHash, Sha256Digest, Sha256DigestError,
-    TYPE_SIGNALS_SCHEMA_VERSION, TypeSignalsDocument, TypeSignalsLoadResult,
-    TypeSignalsReuseDecision, TypeSignalsSchemaVersion, TypeSignalsSchemaVersionError,
+    BaselineHash, CatalogueDeclarationHash, ImplementationInputHash, Sha256Digest,
+    Sha256DigestError, TYPE_SIGNALS_SCHEMA_VERSION, TypeSignalsCacheKey, TypeSignalsDocument,
+    TypeSignalsLoadResult, TypeSignalsReuseDecision, TypeSignalsSchemaVersion,
+    TypeSignalsSchemaVersionError,
 };
 pub use template_export::{
     TemplateBoundaryManifest, TemplateBoundaryManifestError, TemplatePathClassification,

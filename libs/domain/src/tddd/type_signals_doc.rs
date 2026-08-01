@@ -9,7 +9,7 @@ use crate::tddd::catalogue::TypeSignal;
 use crate::{ContentHash, Timestamp};
 
 /// Schema version for `<layer>-type-signals.json` documents.
-pub const TYPE_SIGNALS_SCHEMA_VERSION: u32 = 3;
+pub const TYPE_SIGNALS_SCHEMA_VERSION: u32 = 4;
 
 /// A validated lowercase SHA-256 hexadecimal digest.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -89,6 +89,45 @@ digest_identity!(
     ImplementationInputHash,
     "Identity of one layer's source contents, lockfile dependency resolution, and toolchain identity."
 );
+digest_identity!(BaselineHash, "Identity of the actual rustdoc baseline bytes.");
+
+/// Complete identity of the inputs that govern a type-signals cache entry.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct TypeSignalsCacheKey {
+    declaration_hash: CatalogueDeclarationHash,
+    implementation_input_hash: ImplementationInputHash,
+    baseline_hash: BaselineHash,
+}
+
+impl TypeSignalsCacheKey {
+    /// Creates an identity from all authoritative type-signals inputs.
+    #[must_use]
+    pub fn new(
+        declaration_hash: CatalogueDeclarationHash,
+        implementation_input_hash: ImplementationInputHash,
+        baseline_hash: BaselineHash,
+    ) -> Self {
+        Self { declaration_hash, implementation_input_hash, baseline_hash }
+    }
+
+    /// Returns the catalogue declaration identity.
+    #[must_use]
+    pub fn declaration_hash(&self) -> &CatalogueDeclarationHash {
+        &self.declaration_hash
+    }
+
+    /// Returns the implementation-input identity.
+    #[must_use]
+    pub fn implementation_input_hash(&self) -> &ImplementationInputHash {
+        &self.implementation_input_hash
+    }
+
+    /// Returns the baseline identity.
+    #[must_use]
+    pub fn baseline_hash(&self) -> &BaselineHash {
+        &self.baseline_hash
+    }
+}
 
 /// A non-zero persisted type-signals schema version.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -132,8 +171,7 @@ impl TypeSignalsSchemaVersion {
 pub struct TypeSignalsDocument {
     schema_version: TypeSignalsSchemaVersion,
     generated_at: Timestamp,
-    declaration_hash: CatalogueDeclarationHash,
-    implementation_input_hash: ImplementationInputHash,
+    cache_key: TypeSignalsCacheKey,
     signals: Vec<TypeSignal>,
 }
 
@@ -142,15 +180,13 @@ impl TypeSignalsDocument {
     #[must_use]
     pub fn new(
         generated_at: Timestamp,
-        declaration_hash: CatalogueDeclarationHash,
-        implementation_input_hash: ImplementationInputHash,
+        cache_key: TypeSignalsCacheKey,
         signals: Vec<TypeSignal>,
     ) -> Self {
         Self {
             schema_version: TypeSignalsSchemaVersion { value: TYPE_SIGNALS_SCHEMA_VERSION },
             generated_at,
-            declaration_hash,
-            implementation_input_hash,
+            cache_key,
             signals,
         }
     }
@@ -160,11 +196,10 @@ impl TypeSignalsDocument {
     pub fn with_schema_version(
         schema_version: TypeSignalsSchemaVersion,
         generated_at: Timestamp,
-        declaration_hash: CatalogueDeclarationHash,
-        implementation_input_hash: ImplementationInputHash,
+        cache_key: TypeSignalsCacheKey,
         signals: Vec<TypeSignal>,
     ) -> Self {
-        Self { schema_version, generated_at, declaration_hash, implementation_input_hash, signals }
+        Self { schema_version, generated_at, cache_key, signals }
     }
 
     #[must_use]
@@ -176,12 +211,8 @@ impl TypeSignalsDocument {
         &self.generated_at
     }
     #[must_use]
-    pub fn declaration_hash(&self) -> &CatalogueDeclarationHash {
-        &self.declaration_hash
-    }
-    #[must_use]
-    pub fn implementation_input_hash(&self) -> &ImplementationInputHash {
-        &self.implementation_input_hash
+    pub fn cache_key(&self) -> &TypeSignalsCacheKey {
+        &self.cache_key
     }
     #[must_use]
     pub fn signals(&self) -> &[TypeSignal] {
@@ -236,17 +267,12 @@ pub enum TypeSignalsReuseDecision {
 /// Selects the fail-closed reuse path for one layer.
 #[must_use]
 pub fn decide_type_signals_reuse(
-    recorded_declaration_hash: &CatalogueDeclarationHash,
-    recorded_implementation_input_hash: &ImplementationInputHash,
-    current_declaration_hash: &CatalogueDeclarationHash,
-    current_implementation_input_hash: Option<&ImplementationInputHash>,
+    recorded_key: &TypeSignalsCacheKey,
+    current_key: &TypeSignalsCacheKey,
 ) -> TypeSignalsReuseDecision {
-    let Some(current_implementation_input_hash) = current_implementation_input_hash else {
-        return TypeSignalsReuseDecision::ReextractAndEvaluate;
-    };
-    if current_implementation_input_hash != recorded_implementation_input_hash {
+    if current_key.implementation_input_hash() != recorded_key.implementation_input_hash() {
         TypeSignalsReuseDecision::ReextractAndEvaluate
-    } else if current_declaration_hash == recorded_declaration_hash {
+    } else if current_key == recorded_key {
         TypeSignalsReuseDecision::SkipEvaluation
     } else {
         TypeSignalsReuseDecision::ReevaluateWithoutExtraction
@@ -271,6 +297,20 @@ mod tests {
     fn implementation(value: &str) -> ImplementationInputHash {
         ImplementationInputHash::new(digest(value))
     }
+    fn baseline(value: &str) -> BaselineHash {
+        BaselineHash::new(digest(value))
+    }
+    fn cache_key(
+        declaration_value: &str,
+        implementation_value: &str,
+        baseline_value: &str,
+    ) -> TypeSignalsCacheKey {
+        TypeSignalsCacheKey::new(
+            declaration(declaration_value),
+            implementation(implementation_value),
+            baseline(baseline_value),
+        )
+    }
     fn timestamp() -> Timestamp {
         Timestamp::new("2026-07-14T00:00:00Z").unwrap()
     }
@@ -279,8 +319,7 @@ mod tests {
     fn test_document_retains_only_required_freshness_inputs() {
         let document = TypeSignalsDocument::new(
             timestamp(),
-            declaration(A),
-            implementation(B),
+            cache_key(A, B, A),
             vec![TypeSignal::new(
                 "Example",
                 "value_object",
@@ -293,8 +332,9 @@ mod tests {
         );
 
         assert_eq!(document.schema_version().value(), TYPE_SIGNALS_SCHEMA_VERSION);
-        assert_eq!(document.declaration_hash().as_digest().as_str(), A);
-        assert_eq!(document.implementation_input_hash().as_digest().as_str(), B);
+        assert_eq!(document.cache_key().declaration_hash().as_digest().as_str(), A);
+        assert_eq!(document.cache_key().implementation_input_hash().as_digest().as_str(), B);
+        assert_eq!(document.cache_key().baseline_hash().as_digest().as_str(), A);
     }
 
     #[test]
@@ -309,57 +349,26 @@ mod tests {
     }
 
     #[test]
-    fn test_decide_type_signals_reuse_matching_hashes_skips_evaluation() {
+    fn test_decide_type_signals_reuse_all_three_matching_hashes_skips_evaluation() {
         assert_eq!(
-            decide_type_signals_reuse(
-                &declaration(A),
-                &implementation(A),
-                &declaration(A),
-                Some(&implementation(A))
-            ),
+            decide_type_signals_reuse(&cache_key(A, A, A), &cache_key(A, A, A),),
             TypeSignalsReuseDecision::SkipEvaluation
         );
     }
 
     #[test]
-    fn test_decide_type_signals_reuse_catalogue_only_change_reevaluates_without_extraction() {
+    fn test_decide_type_signals_reuse_each_isolated_hash_mismatch_reevaluates() {
         assert_eq!(
-            decide_type_signals_reuse(
-                &declaration(A),
-                &implementation(A),
-                &declaration(B),
-                Some(&implementation(A))
-            ),
+            decide_type_signals_reuse(&cache_key(A, A, A), &cache_key(B, A, A),),
             TypeSignalsReuseDecision::ReevaluateWithoutExtraction
         );
-    }
-
-    #[test]
-    fn test_decide_type_signals_reuse_full_freshness_decision_table() {
-        // Implementation mismatches always re-extract, regardless of whether
-        // the declaration matches. A declaration mismatch alone is deliberately
-        // cheaper: it re-evaluates the existing rustdoc output.
         assert_eq!(
-            decide_type_signals_reuse(
-                &declaration(A),
-                &implementation(A),
-                &declaration(A),
-                Some(&implementation(B))
-            ),
+            decide_type_signals_reuse(&cache_key(A, A, A), &cache_key(A, B, A),),
             TypeSignalsReuseDecision::ReextractAndEvaluate
         );
         assert_eq!(
-            decide_type_signals_reuse(
-                &declaration(A),
-                &implementation(A),
-                &declaration(B),
-                Some(&implementation(B))
-            ),
-            TypeSignalsReuseDecision::ReextractAndEvaluate
-        );
-        assert_eq!(
-            decide_type_signals_reuse(&declaration(A), &implementation(A), &declaration(A), None),
-            TypeSignalsReuseDecision::ReextractAndEvaluate
+            decide_type_signals_reuse(&cache_key(A, A, A), &cache_key(A, A, B)),
+            TypeSignalsReuseDecision::ReevaluateWithoutExtraction
         );
     }
 }

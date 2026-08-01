@@ -18,18 +18,6 @@
         {
           "anchor": "IN-01",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "CN-01",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "AC-01",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "AC-02",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         }
       ]
     },
@@ -355,18 +343,6 @@
         {
           "anchor": "IN-01",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "CN-01",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "AC-01",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "AC-02",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         }
       ]
     },
@@ -390,18 +366,6 @@
       "spec_refs": [
         {
           "anchor": "IN-01",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "CN-01",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "AC-01",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "AC-02",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         }
       ]
@@ -438,18 +402,6 @@
       "spec_refs": [
         {
           "anchor": "IN-01",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "CN-01",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "AC-01",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "AC-02",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         }
       ]

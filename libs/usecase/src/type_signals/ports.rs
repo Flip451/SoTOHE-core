@@ -7,13 +7,26 @@ use domain::TrackId;
 use domain::tddd::CargoFeatureName;
 use domain::tddd::catalogue_v2::TdddLayerBinding;
 
-/// Opaque diagnostic returned by the infrastructure evaluator adapter.
+use crate::git_workflow::DiagnosticText;
+
+/// Failure stage reported by the infrastructure evaluator adapter.
 #[derive(Debug, Clone)]
-pub struct TypeSignalsExecutionError(pub String);
+pub enum TypeSignalsExecutionError {
+    /// A required authoritative input could not be loaded or validated.
+    AuthoritativeInput(DiagnosticText),
+    /// Signal evaluation could not complete.
+    Evaluation(DiagnosticText),
+    /// The refreshed cache could not be persisted.
+    CacheWrite(DiagnosticText),
+}
 
 impl fmt::Display for TypeSignalsExecutionError {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-        formatter.write_str(&self.0)
+        match self {
+            Self::AuthoritativeInput(reason)
+            | Self::Evaluation(reason)
+            | Self::CacheWrite(reason) => formatter.write_str(reason.as_str()),
+        }
     }
 }
 

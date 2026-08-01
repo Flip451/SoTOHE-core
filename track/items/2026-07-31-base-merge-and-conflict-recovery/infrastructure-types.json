@@ -88,6 +88,50 @@
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         }
       ]
+    },
+    "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer": {
+      "action": "reference",
+      "docs": "Baseline-public entrypoint for per-layer type-signal evaluation.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "items_dir",
+          "ty": "&std::path::Path"
+        },
+        {
+          "name": "track_id",
+          "ty": "&domain::TrackId"
+        },
+        {
+          "name": "workspace_root",
+          "ty": "&std::path::Path"
+        },
+        {
+          "name": "binding",
+          "ty": "&TdddLayerBinding"
+        },
+        {
+          "name": "features",
+          "ty": "&[domain::tddd::CargoFeatureName]"
+        }
+      ],
+      "returns": "Result<std::process::ExitCode, EvaluateSignalsError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
     }
   },
   "inherent_impls": [
@@ -173,10 +217,76 @@
       "action": "reference",
       "for_type": "TypeSignalsExecutorAdapter",
       "trait_ref": "usecase::type_signals::ports::TypeSignalsExecutorPort"
+    },
+    {
+      "action": "reference",
+      "for_type": "EvaluateSignalsError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "EvaluateSignalsError",
+      "trait_ref": "core::fmt::Display"
     }
   ],
   "traits": {},
   "types": {
+    "EvaluateSignalsError": {
+      "action": "modify",
+      "docs": "Stage-classified evaluator error carrying domain::FreeText diagnostic payloads.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "AuthoritativeInput",
+            "payload": {
+              "fields": [
+                "domain::FreeText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Evaluation",
+            "payload": {
+              "fields": [
+                "domain::FreeText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "CacheWrite",
+            "payload": {
+              "fields": [
+                "domain::FreeText"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::type_signals_evaluator",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
     "FsBaseMergeCleanupAdapter": {
       "action": "add",
       "docs": "Unit secondary adapter implementing BaseMergeCleanupPort with blocking CLI-process and filesystem operations.",

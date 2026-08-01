@@ -1,8 +1,9 @@
 {
-  "schema_version": 3,
-  "generated_at": "2026-08-01T02:12:40Z",
-  "declaration_hash": "fb7e43ae20ff63f7c72afe6fc0326a004f3e102548ed2220ae8abbfb58d154a2",
-  "implementation_input_hash": "944480e64a282c30d32e03d9cef6134638a05e92db8964dc2392ae654ede9ff7",
+  "schema_version": 4,
+  "generated_at": "2026-08-01T12:12:52Z",
+  "declaration_hash": "d8b23fdf6bfb8ed851029e967d18168f2688ee481525b168f19e792722b641f3",
+  "implementation_input_hash": "96095b75b36f4177726e0b66fea0677d2b55501a1cfbb7b2e455c17baa4751f1",
+  "baseline_hash": "b6ea45923fb0c899652e55346695062b570c173e489820e030c671f46b17c41b",
   "signals": [
     {
       "type_name": "BaseMergeAttemptOutcome",
@@ -169,7 +170,7 @@
     {
       "type_name": "TypeSignalsError",
       "kind_tag": "error_type",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "Debug",
@@ -180,7 +181,7 @@
     {
       "type_name": "TypeSignalsExecutionError",
       "kind_tag": "error_type",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "Clone",

@@ -1,7 +1,12 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "4b6a8589a1f307c44b2748d99e57ccfa2fa77ed8087517f975084246017fc097",
+  "catalogue_declaration_hash": "f0777e79409294121e0b23e6868138f9ac15f743bf831370927a0eaf6da06026",
   "signals": [
+    {
+      "type_name": "EvaluateSignalsError",
+      "signal": "blue",
+      "entry_hash": "abb3a2aeb883ad5defb7133cb00229a66a3adea8e009177b4d3491f27a88cf61"
+    },
     {
       "type_name": "FsBaseMergeCleanupAdapter",
       "signal": "blue",
@@ -41,6 +46,11 @@
       "type_name": "infrastructure::tddd::type_signals_codec::encode",
       "signal": "blue",
       "entry_hash": "33d8d2f6a5b643acc5cdebf91b24513d99116d407af5fea72e891bf55aa077bd"
+    },
+    {
+      "type_name": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+      "signal": "blue",
+      "entry_hash": "4f27d6b97bc22e8eae0aa09f4a6e4f20f4cbb3226badfd965a3c32671511a552"
     }
   ]
 }

@@ -356,7 +356,7 @@ pub fn sync_rendered_views(
                                             let current = type_signals_codec::declaration_hash(
                                                 catalogue_content.as_bytes(),
                                             );
-                                            if *sd.declaration_hash() == current {
+                                            if *sd.cache_key().declaration_hash() == current {
                                                 Some(sd.signals().to_vec())
                                             } else {
                                                 eprintln!(

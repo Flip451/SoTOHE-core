@@ -17,8 +17,8 @@
 | BaseMergeError | error_type | add | Context, ActiveTrackMismatch, Git, PostMergeCleanup | 🟡 | 🔵 |
 | BaseMergeGitError | error_type | add | Execution | 🟡 | 🔵 |
 | GitStashError | error_type | add | ForbiddenBranchRefUpdate, Unavailable | 🟡 | 🔵 |
-| TypeSignalsError | error_type | modify | BranchTrackMismatch, LayerBindingsLoad, NoLayers, FeatureDeclaration, AuthoritativeInputFailed, EvaluationFailed, CacheWriteFailed, InconsistentRequest | 🟡 | 🔵 |
-| TypeSignalsExecutionError | error_type | modify | AuthoritativeInput, Evaluation, CacheWrite | 🟡 | 🔵 |
+| TypeSignalsError | error_type | modify | BranchTrackMismatch, LayerBindingsLoad, NoLayers, FeatureDeclaration, AuthoritativeInputFailed, EvaluationFailed, CacheWriteFailed, InconsistentRequest | 🔵 | 🔵 |
+| TypeSignalsExecutionError | error_type | modify | AuthoritativeInput, Evaluation, CacheWrite | 🔵 | 🔵 |
 
 ## Secondary Ports
 

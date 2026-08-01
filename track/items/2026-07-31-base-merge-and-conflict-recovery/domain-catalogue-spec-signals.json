@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "361f9d570bc63d660f166eb799df5457c88fbb4fa22e663ef9c53f25ebd83944",
+  "catalogue_declaration_hash": "7d521a29c61391b6626242bb8575260ae91c5ed070190ab650364aeb0a90e465",
   "signals": [
     {
       "type_name": "BaseBranchName",
       "signal": "blue",
-      "entry_hash": "4fd601aff3e48ee3f1a97404f1ba35cf126d12eebea4d065bc36c5b6a363a709"
+      "entry_hash": "fb50a6e9a66a01083f12a2b8dd001796e7e6d55c73a30bad46c045e51ea0bf69"
     },
     {
       "type_name": "BaseMergeDirection",
       "signal": "blue",
-      "entry_hash": "c7e5afadc8d0834d5db8a1797aaae156409c2946a084bcceac4df171e6f00982"
+      "entry_hash": "6fd74c0707d2fe272c8773b6ea81badcbfb1ab2bfb40bd88da96446114f0defb"
     },
     {
       "type_name": "BaseMergeDirectionError",
       "signal": "blue",
-      "entry_hash": "558edc00d0640da2362445836b9b4a48d085c2ea69b191c1347cdc85c71efa8b"
+      "entry_hash": "7e829ee2faee43537b8b6d5ba45a92c2d67da8355d0a396b297322a131099c64"
     },
     {
       "type_name": "BaselineHash",
@@ -40,7 +40,7 @@
     {
       "type_name": "domain::branch_strategy::derive_base_merge_direction",
       "signal": "blue",
-      "entry_hash": "21012cd1c70914ca63dba959733997161fd8a515af57dca7611af7ff392abab0"
+      "entry_hash": "6ec3bf9d294130b8e18f49d306c8d6fee85f07efa817e8a14b2c9c2db938eaad"
     },
     {
       "type_name": "domain::tddd::type_signals_doc::decide_type_signals_reuse",

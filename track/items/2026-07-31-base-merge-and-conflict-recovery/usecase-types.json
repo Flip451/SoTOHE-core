@@ -248,6 +248,7 @@
       "informal_grounds": [],
       "methods": [
         {
+          "docs": "Blocking CLI-boundary operation whose error is only this method's opaque diagnostic detail.",
           "has_default_impl": false,
           "is_async": false,
           "name": "regenerate_views",
@@ -262,10 +263,10 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<(), DiagnosticText>",
-          "docs": "Blocking CLI-boundary operation whose error is only this method's opaque diagnostic detail."
+          "returns": "Result<(), DiagnosticText>"
         },
         {
+          "docs": "Blocking CLI-boundary operation whose error is only this method's opaque diagnostic detail.",
           "has_default_impl": false,
           "is_async": false,
           "name": "recapture_baselines",
@@ -280,10 +281,10 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<(), DiagnosticText>",
-          "docs": "Blocking CLI-boundary operation whose error is only this method's opaque diagnostic detail."
+          "returns": "Result<(), DiagnosticText>"
         },
         {
+          "docs": "Blocking CLI-boundary operation whose error is only this method's opaque diagnostic detail.",
           "has_default_impl": false,
           "is_async": false,
           "name": "record_sync_base_stamp",
@@ -298,8 +299,7 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<(), DiagnosticText>",
-          "docs": "Blocking CLI-boundary operation whose error is only this method's opaque diagnostic detail."
+          "returns": "Result<(), DiagnosticText>"
         }
       ],
       "module_path": "base_merge",
@@ -335,6 +335,7 @@
       "informal_grounds": [],
       "methods": [
         {
+          "docs": "Blocking CLI-boundary context load with an exact context-error vocabulary.",
           "has_default_impl": false,
           "is_async": false,
           "name": "load_direction",
@@ -345,8 +346,7 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<domain::branch_strategy::BaseMergeDirection, BaseMergeContextError>",
-          "docs": "Blocking CLI-boundary context load with an exact context-error vocabulary."
+          "returns": "Result<domain::branch_strategy::BaseMergeDirection, BaseMergeContextError>"
         }
       ],
       "module_path": "base_merge",
@@ -382,6 +382,7 @@
       "informal_grounds": [],
       "methods": [
         {
+          "docs": "Blocking CLI-boundary git invocation with an exact git-error vocabulary.",
           "has_default_impl": false,
           "is_async": false,
           "name": "merge_base",
@@ -396,8 +397,7 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<BaseMergeAttemptOutcome, BaseMergeGitError>",
-          "docs": "Blocking CLI-boundary git invocation with an exact git-error vocabulary."
+          "returns": "Result<BaseMergeAttemptOutcome, BaseMergeGitError>"
         }
       ],
       "module_path": "base_merge",
@@ -503,6 +503,7 @@
       "informal_grounds": [],
       "methods": [
         {
+          "docs": "Blocking CLI-boundary stash invocation over a finite command and error vocabulary.",
           "has_default_impl": false,
           "is_async": false,
           "name": "execute",
@@ -513,8 +514,7 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<(), GitStashError>",
-          "docs": "Blocking CLI-boundary stash invocation over a finite command and error vocabulary."
+          "returns": "Result<(), GitStashError>"
         }
       ],
       "module_path": "git_stash",
@@ -1203,19 +1203,28 @@
             "name": "BranchTrackMismatch",
             "payload": {
               "fields": [
-                "domain::branch_strategy::TrackBranch",
-                "domain::ids::TrackId"
+                {
+                  "name": "branch",
+                  "ty": "domain::branch_strategy::TrackBranch"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "domain::ids::TrackId"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "LayerBindingsLoad",
             "payload": {
               "fields": [
-                "DiagnosticText"
+                {
+                  "name": "reason",
+                  "ty": "DiagnosticText"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
@@ -1237,39 +1246,60 @@
             "name": "AuthoritativeInputFailed",
             "payload": {
               "fields": [
-                "domain::ids::LayerId",
-                "DiagnosticText"
+                {
+                  "name": "layer_id",
+                  "ty": "domain::ids::LayerId"
+                },
+                {
+                  "name": "reason",
+                  "ty": "DiagnosticText"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "EvaluationFailed",
             "payload": {
               "fields": [
-                "domain::ids::LayerId",
-                "DiagnosticText"
+                {
+                  "name": "layer_id",
+                  "ty": "domain::ids::LayerId"
+                },
+                {
+                  "name": "reason",
+                  "ty": "DiagnosticText"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "CacheWriteFailed",
             "payload": {
               "fields": [
-                "domain::ids::LayerId",
-                "DiagnosticText"
+                {
+                  "name": "layer_id",
+                  "ty": "domain::ids::LayerId"
+                },
+                {
+                  "name": "reason",
+                  "ty": "DiagnosticText"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "InconsistentRequest",
             "payload": {
               "fields": [
-                "DiagnosticText"
+                {
+                  "name": "reason",
+                  "ty": "DiagnosticText"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           }
         ]
@@ -1290,6 +1320,18 @@
         },
         {
           "anchor": "AC-09",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-07",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         }
       ]
