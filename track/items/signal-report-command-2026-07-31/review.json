@@ -1,184 +1,149 @@
 {
   "schema_version": 2,
   "scopes": {
-    "other": {
+    "usecase": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ebb6b1a74f3f76a0e993151410d1e37d9f97e3ec9efa20c637548086c536c469",
-          "at": "2026-07-31T13:26:31Z"
+          "hash": "rvw1:sha256:5a83f3b5a812e150ac96f6d9a2cec69d7322c78d4260fd8e6927329d8624f4f5",
+          "at": "2026-07-31T16:59:07Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ebb6b1a74f3f76a0e993151410d1e37d9f97e3ec9efa20c637548086c536c469",
-          "at": "2026-07-31T14:41:27Z"
-        },
+          "hash": "rvw1:sha256:5a83f3b5a812e150ac96f6d9a2cec69d7322c78d4260fd8e6927329d8624f4f5",
+          "at": "2026-07-31T17:28:19Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ebb6b1a74f3f76a0e993151410d1e37d9f97e3ec9efa20c637548086c536c469",
-          "at": "2026-07-31T15:16:27Z"
+          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
+          "at": "2026-07-31T11:44:52Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ebb6b1a74f3f76a0e993151410d1e37d9f97e3ec9efa20c637548086c536c469",
-          "at": "2026-07-31T15:17:21Z"
-        },
+          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
+          "at": "2026-07-31T11:49:20Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8611b31187c795fdce80aa23d57ffeadd45989b890dbd5e962a33a7c2c8d0ce2",
-          "at": "2026-07-31T16:59:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8611b31187c795fdce80aa23d57ffeadd45989b890dbd5e962a33a7c2c8d0ce2",
-          "at": "2026-07-31T17:25:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8611b31187c795fdce80aa23d57ffeadd45989b890dbd5e962a33a7c2c8d0ce2",
-          "at": "2026-07-31T17:28:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d01f366dd26bb96539672e8a6a9b22b76e36fcc263a80a68b42d220eee69e3e6",
-          "at": "2026-07-31T21:04:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d01f366dd26bb96539672e8a6a9b22b76e36fcc263a80a68b42d220eee69e3e6",
-          "at": "2026-07-31T21:21:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:54393ff227807208d0bc6f2cde4ae897d0990fd6849533085009cecb72e03ee7",
-          "at": "2026-07-31T21:46:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:54393ff227807208d0bc6f2cde4ae897d0990fd6849533085009cecb72e03ee7",
-          "at": "2026-07-31T22:00:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f2623d28cc4f0d91ccaeced9ddec2e403c4f63b592da5913b2957570205fd0ca",
-          "at": "2026-07-31T22:37:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f2623d28cc4f0d91ccaeced9ddec2e403c4f63b592da5913b2957570205fd0ca",
-          "at": "2026-07-31T23:17:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:37f718f74542a9c7f9c6e9f2e81213d1e1fb8f0aba1764f502dc8238453bc66a",
-          "at": "2026-08-01T00:01:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:37f718f74542a9c7f9c6e9f2e81213d1e1fb8f0aba1764f502dc8238453bc66a",
-          "at": "2026-08-01T00:11:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9d0129a489161245344a91a177652b3910d6ab11ea3d8d6b9c9f02601928d83f",
-          "at": "2026-08-01T01:01:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9d0129a489161245344a91a177652b3910d6ab11ea3d8d6b9c9f02601928d83f",
-          "at": "2026-08-01T01:21:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The newly added binding leaves the obligation state inconsistent: `bin/sotp test-obligation check --track-id signal-report-command-2026-07-31` fails with `TestChanged` drift for the SignalReportSourcePort IN-04/CN-01/AC-04 edges. Regenerate the orchestrator-owned fulfillment cache after this binding/test change.",
-              "severity": "P1",
-              "file": "track/items/signal-report-command-2026-07-31/test-bindings.json",
-              "line": 241,
-              "category": "test-obligation"
-            }
-          ],
-          "hash": "rvw1:sha256:6607b4f93739d757bd408ae5d861006ddad54f4ef5506ae7d9cb1f3300505a3c",
-          "at": "2026-08-01T01:37:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6607b4f93739d757bd408ae5d861006ddad54f4ef5506ae7d9cb1f3300505a3c",
-          "at": "2026-08-01T01:39:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6607b4f93739d757bd408ae5d861006ddad54f4ef5506ae7d9cb1f3300505a3c",
-          "at": "2026-08-01T01:51:22Z"
+          "hash": "rvw1:sha256:b6ef392c142af817f0e614fbb49672d0e56dd2526ef8c02e3238a5804df8bf4d",
+          "at": "2026-07-31T18:59:59Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "These five newly added tests exercise `SystemSignalReportSourceAdapter` helpers and belong to T002, but they are attached to T001's `SignalReportSourcePort::load` contract fulfillment. The T002 `contract_conformance` record below still contains only the original three tests, contradicting the briefing and misattributing the new regression coverage. Move these bindings to the `SystemSignalReportSourceAdapter` fulfillment record.",
+              "message": "`ref_verify_run`, `ref_verify_check_approved`, and `ref_verify_results` execute application flow by calling `RefVerifyDriver::handle` and returning its `CommandOutcome`. Composition must stop at `ref_verify_driver`; the CLI layer should invoke the returned driver.",
               "severity": "P1",
-              "file": "track/items/signal-report-command-2026-07-31/test-bindings.json",
-              "line": 218,
-              "category": "test_coverage"
+              "file": "apps/cli-composition/src/ref_verify.rs",
+              "line": 98,
+              "category": "invoke leak"
+            },
+            {
+              "message": "`track_type_signals` invokes `TypeSignalsInteractor::run` and converts its result into a command outcome. Move request execution to `cli_driver`; this root should only construct and return the wired primary adapter.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 72,
+              "category": "invoke leak"
+            },
+            {
+              "message": "`track_type_graph` constructs a user-facing command-removal message inside the composition root. Deprecation rendering belongs in `cli_driver`, with composition limited to wiring.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 100,
+              "category": "render leak"
+            },
+            {
+              "message": "`track_baseline_graph` invokes `RenderBaselineGraph::execute` and then formats the user-facing success message. Both execution and rendering must be handled by a wired primary adapter in `cli_driver`.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 150,
+              "category": "invoke leak / render leak"
+            },
+            {
+              "message": "`track_contract_map` calls `ContractMapDriver::handle` from the composition entry point. Return the fully wired driver instead and let `apps/cli` invoke it.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 207,
+              "category": "invoke leak"
+            },
+            {
+              "message": "`track_catalogue_spec_signals` implements the application workflow in composition: it validates filesystem state, selects layers, deletes stale artifacts, and invokes `refresh_one_layer`. Move this orchestration behind a use-case/driver boundary and retain only collaborator construction here.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 216,
+              "category": "application-logic leak"
+            },
+            {
+              "message": "`track_spec_element_hash` directly invokes the infrastructure hash operation and serializes its result for display. Execution and JSON rendering belong behind a `cli_driver` primary adapter.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 378,
+              "category": "invoke leak / render leak"
+            },
+            {
+              "message": "`track_baseline_capture` invokes `BaselineCaptureInteractor::run` from the composition root. Expose a wired driver and perform the request invocation in `apps/cli`.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 441,
+              "category": "invoke leak"
+            },
+            {
+              "message": "`track_lint` invokes `RunCatalogueLint::execute` and formats violations, counts, and user-facing errors locally. Move execution and presentation into `cli_driver`, leaving this method as pure wiring.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 488,
+              "category": "invoke leak / render leak"
+            },
+            {
+              "message": "`track_catalogue_impl_signals` invokes `CatalogueImplSignalsInteractor::run` and maps its report into CLI output. The composition root must instead return a wired primary adapter without executing it.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 571,
+              "category": "invoke leak"
             }
           ],
-          "hash": "rvw1:sha256:6607b4f93739d757bd408ae5d861006ddad54f4ef5506ae7d9cb1f3300505a3c",
-          "at": "2026-08-01T01:55:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4ca1149e3451c85f37a16efe8fca2bd96cc6b452c9b90ed41cffb37b0f38729f",
-          "at": "2026-08-01T02:00:14Z"
+          "hash": "rvw1:sha256:b6ef392c142af817f0e614fbb49672d0e56dd2526ef8c02e3238a5804df8bf4d",
+          "at": "2026-07-31T19:22:01Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4ca1149e3451c85f37a16efe8fca2bd96cc6b452c9b90ed41cffb37b0f38729f",
-          "at": "2026-08-01T02:01:24Z"
+          "hash": "rvw1:sha256:b6ef392c142af817f0e614fbb49672d0e56dd2526ef8c02e3238a5804df8bf4d",
+          "at": "2026-07-31T20:29:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a7a3d3f3da673f93c92941488f56ab4f72a3380ccc1241bf3ed70775bcf40210",
+          "at": "2026-07-31T22:35:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a7a3d3f3da673f93c92941488f56ab4f72a3380ccc1241bf3ed70775bcf40210",
+          "at": "2026-07-31T22:39:19Z"
         }
       ]
     },
@@ -510,6 +475,306 @@
           "findings": [],
           "hash": "rvw1:sha256:ae8c00c8d4173b71222ba53e267f0264c52da50ce776ad6ef1611767c0041013",
           "at": "2026-08-01T02:24:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:24e96cad50fc4ea30a4f29b22e5f2a9e8e1738dbc7381abbebf87a16b112d52c",
+          "at": "2026-08-01T02:48:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Chain ③ drops the decoded catalogue and validates only its byte hash. Because that hash does not cover `signals`, a schema-valid artifact can omit expected rows or supply arbitrary `kind_tag`/`type_name` pairs while retaining the current hash; the new `SharedName` test even accepts rows absent from the catalogue. This can create phantom occurrences or hide real ones. Cross-check canonical row identities and coverage against the decoded catalogue before rendering, failing with `SourceUnavailable(ImplCatalog)` on mismatch.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/signal_report/mod.rs",
+              "line": 260,
+              "category": "adapter correctness"
+            },
+            {
+              "message": "Chain ② formats `entry_id` from the non-unique bare `type_name`, discarding the section-qualified `entry.section_key`. A legal catalogue containing a type and trait with the same name therefore emits identical entry IDs; if their grounding is also identical, the rendered occurrences are indistinguishable. Use the section-qualified catalogue identity in the occurrence ID.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/signal_report/mod.rs",
+              "line": 225,
+              "category": "adapter correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:24e96cad50fc4ea30a4f29b22e5f2a9e8e1738dbc7381abbebf87a16b112d52c",
+          "at": "2026-08-01T02:55:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:63b2eb75b3f45375e119b4e6d822c1972fc326a542147495d8acb0110ffb7929",
+          "at": "2026-08-01T03:05:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Do not suppress `unknown` Chain ③ signals. The canonical evaluator assigns `kind_tag = \"unknown\"` to implementation-only rows such as `CMinusSUnionD`, which can be Red, and `check_type_signals` counts every Red/Yellow row when deciding the gate. Skipping these rows can therefore make `signal report --chain impl_catalog` omit the cause of a blocked gate, violating the complete-occurrence contract. The coverage validator already ensures unknown identities are unique and do not overlap canonical names, so render them with their `unknown` identity instead.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/signal_report/mod.rs",
+              "line": 273,
+              "category": "adapter correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:63b2eb75b3f45375e119b4e6d822c1972fc326a542147495d8acb0110ffb7929",
+          "at": "2026-08-01T03:08:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b62d2e0ce0dcf1eb88ee91ab24bbecce566bb0a1a7efff06e84bcfd938d90e4a",
+          "at": "2026-08-01T03:15:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Validate persisted signal text before placing it in line-oriented occurrences. `type_signals_codec` accepts `type_name`, `missing_items`, and `extra_items` as raw strings, while this coverage check only constrains canonical identities and unknown-name uniqueness. A schema-valid current-hash artifact can therefore use an unknown name or mismatch item containing newlines/terminal controls; those bytes are interpolated verbatim into `entry_id`, `reference`, or `reason`, and `NonEmptyString` only trims boundaries. Reject control characters and enforce the evaluator’s identifier/path grammar before rendering to prevent forged or malformed report lines.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/signal_report/mod.rs",
+              "line": 321,
+              "category": "input validation"
+            }
+          ],
+          "hash": "rvw1:sha256:b62d2e0ce0dcf1eb88ee91ab24bbecce566bb0a1a7efff06e84bcfd938d90e4a",
+          "at": "2026-08-01T03:19:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:de5a477385352294a6092538338579acfe0e79bce50194990f471f7bb40c052a",
+          "at": "2026-08-01T03:26:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:de5a477385352294a6092538338579acfe0e79bce50194990f471f7bb40c052a",
+          "at": "2026-08-01T03:29:37Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ebb6b1a74f3f76a0e993151410d1e37d9f97e3ec9efa20c637548086c536c469",
+          "at": "2026-07-31T13:26:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ebb6b1a74f3f76a0e993151410d1e37d9f97e3ec9efa20c637548086c536c469",
+          "at": "2026-07-31T14:41:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ebb6b1a74f3f76a0e993151410d1e37d9f97e3ec9efa20c637548086c536c469",
+          "at": "2026-07-31T15:16:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ebb6b1a74f3f76a0e993151410d1e37d9f97e3ec9efa20c637548086c536c469",
+          "at": "2026-07-31T15:17:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8611b31187c795fdce80aa23d57ffeadd45989b890dbd5e962a33a7c2c8d0ce2",
+          "at": "2026-07-31T16:59:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8611b31187c795fdce80aa23d57ffeadd45989b890dbd5e962a33a7c2c8d0ce2",
+          "at": "2026-07-31T17:25:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8611b31187c795fdce80aa23d57ffeadd45989b890dbd5e962a33a7c2c8d0ce2",
+          "at": "2026-07-31T17:28:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d01f366dd26bb96539672e8a6a9b22b76e36fcc263a80a68b42d220eee69e3e6",
+          "at": "2026-07-31T21:04:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d01f366dd26bb96539672e8a6a9b22b76e36fcc263a80a68b42d220eee69e3e6",
+          "at": "2026-07-31T21:21:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:54393ff227807208d0bc6f2cde4ae897d0990fd6849533085009cecb72e03ee7",
+          "at": "2026-07-31T21:46:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:54393ff227807208d0bc6f2cde4ae897d0990fd6849533085009cecb72e03ee7",
+          "at": "2026-07-31T22:00:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2623d28cc4f0d91ccaeced9ddec2e403c4f63b592da5913b2957570205fd0ca",
+          "at": "2026-07-31T22:37:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2623d28cc4f0d91ccaeced9ddec2e403c4f63b592da5913b2957570205fd0ca",
+          "at": "2026-07-31T23:17:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:37f718f74542a9c7f9c6e9f2e81213d1e1fb8f0aba1764f502dc8238453bc66a",
+          "at": "2026-08-01T00:01:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:37f718f74542a9c7f9c6e9f2e81213d1e1fb8f0aba1764f502dc8238453bc66a",
+          "at": "2026-08-01T00:11:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9d0129a489161245344a91a177652b3910d6ab11ea3d8d6b9c9f02601928d83f",
+          "at": "2026-08-01T01:01:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9d0129a489161245344a91a177652b3910d6ab11ea3d8d6b9c9f02601928d83f",
+          "at": "2026-08-01T01:21:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The newly added binding leaves the obligation state inconsistent: `bin/sotp test-obligation check --track-id signal-report-command-2026-07-31` fails with `TestChanged` drift for the SignalReportSourcePort IN-04/CN-01/AC-04 edges. Regenerate the orchestrator-owned fulfillment cache after this binding/test change.",
+              "severity": "P1",
+              "file": "track/items/signal-report-command-2026-07-31/test-bindings.json",
+              "line": 241,
+              "category": "test-obligation"
+            }
+          ],
+          "hash": "rvw1:sha256:6607b4f93739d757bd408ae5d861006ddad54f4ef5506ae7d9cb1f3300505a3c",
+          "at": "2026-08-01T01:37:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6607b4f93739d757bd408ae5d861006ddad54f4ef5506ae7d9cb1f3300505a3c",
+          "at": "2026-08-01T01:39:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6607b4f93739d757bd408ae5d861006ddad54f4ef5506ae7d9cb1f3300505a3c",
+          "at": "2026-08-01T01:51:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "These five newly added tests exercise `SystemSignalReportSourceAdapter` helpers and belong to T002, but they are attached to T001's `SignalReportSourcePort::load` contract fulfillment. The T002 `contract_conformance` record below still contains only the original three tests, contradicting the briefing and misattributing the new regression coverage. Move these bindings to the `SystemSignalReportSourceAdapter` fulfillment record.",
+              "severity": "P1",
+              "file": "track/items/signal-report-command-2026-07-31/test-bindings.json",
+              "line": 218,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:6607b4f93739d757bd408ae5d861006ddad54f4ef5506ae7d9cb1f3300505a3c",
+          "at": "2026-08-01T01:55:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4ca1149e3451c85f37a16efe8fca2bd96cc6b452c9b90ed41cffb37b0f38729f",
+          "at": "2026-08-01T02:00:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4ca1149e3451c85f37a16efe8fca2bd96cc6b452c9b90ed41cffb37b0f38729f",
+          "at": "2026-08-01T02:01:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bae5a5274974d00f9a74c48d58828d654cf4ed869b482b3b0bf61b298354605c",
+          "at": "2026-08-01T03:30:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bae5a5274974d00f9a74c48d58828d654cf4ed869b482b3b0bf61b298354605c",
+          "at": "2026-08-01T03:33:14Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4f7c4098aaaaf40e9be2bd227012f39cfc11039a57d6e9e673888c4a842a53ba",
+          "at": "2026-07-31T12:48:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4f7c4098aaaaf40e9be2bd227012f39cfc11039a57d6e9e673888c4a842a53ba",
+          "at": "2026-07-31T12:51:56Z"
         }
       ]
     },
@@ -612,160 +877,35 @@
         }
       ]
     },
-    "cli_composition": {
+    "cli": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b6ef392c142af817f0e614fbb49672d0e56dd2526ef8c02e3238a5804df8bf4d",
-          "at": "2026-07-31T18:59:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`ref_verify_run`, `ref_verify_check_approved`, and `ref_verify_results` execute application flow by calling `RefVerifyDriver::handle` and returning its `CommandOutcome`. Composition must stop at `ref_verify_driver`; the CLI layer should invoke the returned driver.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/ref_verify.rs",
-              "line": 98,
-              "category": "invoke leak"
-            },
-            {
-              "message": "`track_type_signals` invokes `TypeSignalsInteractor::run` and converts its result into a command outcome. Move request execution to `cli_driver`; this root should only construct and return the wired primary adapter.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/tddd.rs",
-              "line": 72,
-              "category": "invoke leak"
-            },
-            {
-              "message": "`track_type_graph` constructs a user-facing command-removal message inside the composition root. Deprecation rendering belongs in `cli_driver`, with composition limited to wiring.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/tddd.rs",
-              "line": 100,
-              "category": "render leak"
-            },
-            {
-              "message": "`track_baseline_graph` invokes `RenderBaselineGraph::execute` and then formats the user-facing success message. Both execution and rendering must be handled by a wired primary adapter in `cli_driver`.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/tddd.rs",
-              "line": 150,
-              "category": "invoke leak / render leak"
-            },
-            {
-              "message": "`track_contract_map` calls `ContractMapDriver::handle` from the composition entry point. Return the fully wired driver instead and let `apps/cli` invoke it.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/tddd.rs",
-              "line": 207,
-              "category": "invoke leak"
-            },
-            {
-              "message": "`track_catalogue_spec_signals` implements the application workflow in composition: it validates filesystem state, selects layers, deletes stale artifacts, and invokes `refresh_one_layer`. Move this orchestration behind a use-case/driver boundary and retain only collaborator construction here.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/tddd.rs",
-              "line": 216,
-              "category": "application-logic leak"
-            },
-            {
-              "message": "`track_spec_element_hash` directly invokes the infrastructure hash operation and serializes its result for display. Execution and JSON rendering belong behind a `cli_driver` primary adapter.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/tddd.rs",
-              "line": 378,
-              "category": "invoke leak / render leak"
-            },
-            {
-              "message": "`track_baseline_capture` invokes `BaselineCaptureInteractor::run` from the composition root. Expose a wired driver and perform the request invocation in `apps/cli`.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/tddd.rs",
-              "line": 441,
-              "category": "invoke leak"
-            },
-            {
-              "message": "`track_lint` invokes `RunCatalogueLint::execute` and formats violations, counts, and user-facing errors locally. Move execution and presentation into `cli_driver`, leaving this method as pure wiring.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/tddd.rs",
-              "line": 488,
-              "category": "invoke leak / render leak"
-            },
-            {
-              "message": "`track_catalogue_impl_signals` invokes `CatalogueImplSignalsInteractor::run` and maps its report into CLI output. The composition root must instead return a wired primary adapter without executing it.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/tddd.rs",
-              "line": 571,
-              "category": "invoke leak"
-            }
-          ],
-          "hash": "rvw1:sha256:b6ef392c142af817f0e614fbb49672d0e56dd2526ef8c02e3238a5804df8bf4d",
-          "at": "2026-07-31T19:22:01Z"
+          "hash": "rvw1:sha256:0e6438fbe7b445d29dfe318ee778afd871c063eed23d7876227e3cb0d6d11749",
+          "at": "2026-07-31T18:59:05Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b6ef392c142af817f0e614fbb49672d0e56dd2526ef8c02e3238a5804df8bf4d",
-          "at": "2026-07-31T20:29:58Z"
+          "hash": "rvw1:sha256:0e6438fbe7b445d29dfe318ee778afd871c063eed23d7876227e3cb0d6d11749",
+          "at": "2026-07-31T19:19:02Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a7a3d3f3da673f93c92941488f56ab4f72a3380ccc1241bf3ed70775bcf40210",
-          "at": "2026-07-31T22:35:22Z"
+          "hash": "rvw1:sha256:7c0fe5d512d41b371d176b2d113c9d5c9df0dbcf7bbb9afb3072bc4c85ff167e",
+          "at": "2026-07-31T23:58:58Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a7a3d3f3da673f93c92941488f56ab4f72a3380ccc1241bf3ed70775bcf40210",
-          "at": "2026-07-31T22:39:19Z"
-        }
-      ]
-    },
-    "cli_driver": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:65568efaf17d359f05157e201dccc53a82e0bb528a8bc7056207cd5c29bef9c3",
-          "at": "2026-07-31T21:02:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:65568efaf17d359f05157e201dccc53a82e0bb528a8bc7056207cd5c29bef9c3",
-          "at": "2026-07-31T21:05:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dfdf14fcec1535e720044508f2a3a360b526d1c13485128e02c853a0b77cce73",
-          "at": "2026-07-31T21:39:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The public `handle` error path is tested only with `SourceUnavailable`; `InvalidOccurrence` has distinct user-visible rendering but no test. A regression in that match arm would pass this scope. Add a test asserting exit code 1, empty stdout, and bounded stderr for `SignalReportError::InvalidOccurrence`.",
-              "severity": "P1",
-              "file": "apps/cli-driver/src/signal_report.rs",
-              "line": 339,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:dfdf14fcec1535e720044508f2a3a360b526d1c13485128e02c853a0b77cce73",
-          "at": "2026-07-31T21:49:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e43ef7b32e93c170d057f892897cb51278f5c7942e15f92f85390c5230e1c33d",
-          "at": "2026-07-31T21:53:28Z"
+          "hash": "rvw1:sha256:7c0fe5d512d41b371d176b2d113c9d5c9df0dbcf7bbb9afb3072bc4c85ff167e",
+          "at": "2026-08-01T00:05:24Z"
         }
       ]
     },
@@ -1315,21 +1455,50 @@
         }
       ]
     },
-    "harness-policy": {
+    "cli_driver": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
-          "at": "2026-07-31T11:44:52Z"
+          "hash": "rvw1:sha256:65568efaf17d359f05157e201dccc53a82e0bb528a8bc7056207cd5c29bef9c3",
+          "at": "2026-07-31T21:02:02Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
-          "at": "2026-07-31T11:49:20Z"
+          "hash": "rvw1:sha256:65568efaf17d359f05157e201dccc53a82e0bb528a8bc7056207cd5c29bef9c3",
+          "at": "2026-07-31T21:05:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dfdf14fcec1535e720044508f2a3a360b526d1c13485128e02c853a0b77cce73",
+          "at": "2026-07-31T21:39:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The public `handle` error path is tested only with `SourceUnavailable`; `InvalidOccurrence` has distinct user-visible rendering but no test. A regression in that match arm would pass this scope. Add a test asserting exit code 1, empty stdout, and bounded stderr for `SignalReportError::InvalidOccurrence`.",
+              "severity": "P1",
+              "file": "apps/cli-driver/src/signal_report.rs",
+              "line": 339,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:dfdf14fcec1535e720044508f2a3a360b526d1c13485128e02c853a0b77cce73",
+          "at": "2026-07-31T21:49:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e43ef7b32e93c170d057f892897cb51278f5c7942e15f92f85390c5230e1c33d",
+          "at": "2026-07-31T21:53:28Z"
         }
       ]
     },
@@ -1391,74 +1560,6 @@
           "findings": [],
           "hash": "rvw1:sha256:18e287538db3e7cbc650bde69b36adcbd84d3905aa0e4abaf1f5e9d137c0fcc0",
           "at": "2026-07-31T19:17:12Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0e6438fbe7b445d29dfe318ee778afd871c063eed23d7876227e3cb0d6d11749",
-          "at": "2026-07-31T18:59:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0e6438fbe7b445d29dfe318ee778afd871c063eed23d7876227e3cb0d6d11749",
-          "at": "2026-07-31T19:19:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7c0fe5d512d41b371d176b2d113c9d5c9df0dbcf7bbb9afb3072bc4c85ff167e",
-          "at": "2026-07-31T23:58:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7c0fe5d512d41b371d176b2d113c9d5c9df0dbcf7bbb9afb3072bc4c85ff167e",
-          "at": "2026-08-01T00:05:24Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5a83f3b5a812e150ac96f6d9a2cec69d7322c78d4260fd8e6927329d8624f4f5",
-          "at": "2026-07-31T16:59:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5a83f3b5a812e150ac96f6d9a2cec69d7322c78d4260fd8e6927329d8624f4f5",
-          "at": "2026-07-31T17:28:19Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4f7c4098aaaaf40e9be2bd227012f39cfc11039a57d6e9e673888c4a842a53ba",
-          "at": "2026-07-31T12:48:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4f7c4098aaaaf40e9be2bd227012f39cfc11039a57d6e9e673888c4a842a53ba",
-          "at": "2026-07-31T12:51:56Z"
         }
       ]
     }

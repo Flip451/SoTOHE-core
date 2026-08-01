@@ -1,5 +1,6 @@
 //! System-backed, read-only source for signal-report occurrences.
 
+use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
 
 use domain::review_v2::types::FilePath;
@@ -104,7 +105,7 @@ impl SystemSignalReportSourceAdapter {
             }
             let document = crate::adr_decision::parse_adr_frontmatter(&text)
                 .map_err(|_| SignalReportError::SourceUnavailable(SignalReportChain::AdrUser))?;
-            let location = relative(root, &path)?;
+            let location = relative(root, &path, SignalReportChain::AdrUser)?;
             for entry in document.decisions() {
                 let grounds = evaluate_adr_decision(entry.clone());
                 let Some((level, reference, reason)) = adr_occurrence(entry, grounds) else {
@@ -131,7 +132,7 @@ impl SystemSignalReportSourceAdapter {
         let document =
             crate::spec::codec::decode(&read_text(root, &path, SignalReportChain::SpecAdr)?)
                 .map_err(|_| SignalReportError::SourceUnavailable(SignalReportChain::SpecAdr))?;
-        let location = relative(root, &path)?;
+        let location = relative(root, &path, SignalReportChain::SpecAdr)?;
         let requirements = document
             .goal()
             .iter()
@@ -222,10 +223,10 @@ impl SystemSignalReportSourceAdapter {
                 occurrences.push(occurrence(
                     SignalReportChain::CatalogSpec,
                     level,
-                    format!("{}:{}", binding.layer_id(), signal.type_name),
+                    format!("{}:{}", binding.layer_id(), entry.section_key),
                     reference,
                     reason,
-                    relative(root, &catalogue_path)?,
+                    relative(root, &catalogue_path, SignalReportChain::CatalogSpec)?,
                 )?);
             }
         }
@@ -257,23 +258,30 @@ impl SystemSignalReportSourceAdapter {
                 SignalReportChain::ImplCatalog,
             )?;
             let catalogue_text = read_text(root, &catalogue_path, SignalReportChain::ImplCatalog)?;
-            CatalogueDocumentCodec::decode(&catalogue_text, binding.layer_id()).map_err(|_| {
-                SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog)
-            })?;
+            let catalogue = CatalogueDocumentCodec::decode(&catalogue_text, binding.layer_id())
+                .map_err(|_| {
+                    SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog)
+                })?;
             if *document.declaration_hash()
                 != type_signals_codec::declaration_hash(catalogue_text.as_bytes())
             {
                 return Err(SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog));
             }
-            let location = relative(root, &signals_path)?;
+            validate_impl_catalog_coverage(&catalogue, &document)?;
+            let location = relative(root, &signals_path, SignalReportChain::ImplCatalog)?;
             for signal in document.signals() {
                 let Some(level) = report_level(signal.signal()) else { continue };
                 let reason = impl_catalog_reason(signal);
                 occurrences.push(occurrence(
                     SignalReportChain::ImplCatalog,
                     level,
-                    format!("{}:{}", binding.layer_id(), signal.type_name()),
-                    format!("{}#{}", binding.catalogue_file(), signal.type_name()),
+                    format!("{}:{}:{}", binding.layer_id(), signal.kind_tag(), signal.type_name()),
+                    format!(
+                        "{}#{}:{}",
+                        binding.catalogue_file(),
+                        signal.kind_tag(),
+                        signal.type_name()
+                    ),
                     reason,
                     location.clone(),
                 )?);
@@ -281,6 +289,75 @@ impl SystemSignalReportSourceAdapter {
         }
         Ok(occurrences)
     }
+}
+
+fn validate_impl_catalog_coverage(
+    catalogue: &domain::tddd::catalogue_v2::CatalogueDocument,
+    document: &domain::TypeSignalsDocument,
+) -> Result<(), SignalReportError> {
+    use crate::tddd::type_signals_evaluator::signal_tags::{
+        contract_role_kind_tag, data_role_kind_tag, function_role_kind_tag,
+    };
+
+    let unavailable = || SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog);
+    let mut expected = BTreeSet::new();
+    for (name, entry) in catalogue.types() {
+        expected.insert((
+            name.as_str().to_owned(),
+            data_role_kind_tag(entry.role(), entry.kind()).to_owned(),
+        ));
+    }
+    for (name, entry) in catalogue.traits() {
+        expected
+            .insert((name.as_str().to_owned(), contract_role_kind_tag(entry.role()).to_owned()));
+    }
+    for (path, entry) in catalogue.functions() {
+        expected.insert((path.to_string(), function_role_kind_tag(entry.role()).to_owned()));
+    }
+
+    let expected_names = expected.iter().map(|(name, _)| name.clone()).collect::<BTreeSet<_>>();
+    let mut unknown_names = BTreeSet::new();
+    for signal in document.signals() {
+        if signal
+            .missing_items()
+            .iter()
+            .chain(signal.extra_items())
+            .any(|item| !is_safe_signal_line_text(item))
+        {
+            return Err(unavailable());
+        }
+        if signal.is_unknown_kind() {
+            if !is_rust_path(signal.type_name())
+                || expected_names.contains(signal.type_name())
+                || !unknown_names.insert(signal.type_name().to_owned())
+            {
+                return Err(unavailable());
+            }
+            continue;
+        }
+        if !expected.remove(&(signal.type_name().to_owned(), signal.kind_tag().to_owned())) {
+            return Err(unavailable());
+        }
+    }
+    if !expected.is_empty() {
+        return Err(unavailable());
+    }
+    Ok(())
+}
+
+fn is_safe_signal_line_text(value: &str) -> bool {
+    !value.is_empty()
+        && value.trim() == value
+        && !value
+            .chars()
+            .any(|character| character.is_control() || matches!(character, '\u{2028}' | '\u{2029}'))
+}
+
+fn is_rust_path(value: &str) -> bool {
+    is_safe_signal_line_text(value)
+        && value.split("::").all(|segment| {
+            domain::tddd::catalogue_v2::identifiers::Identifier::new(segment).is_ok()
+        })
 }
 
 fn validate_catalogue_spec_freshness(
@@ -457,12 +534,16 @@ fn read_text(
     bounded_read_utf8_file(path).map_err(|_| SignalReportError::SourceUnavailable(chain))
 }
 
-fn relative(root: &Path, path: &Path) -> Result<String, SignalReportError> {
+fn relative(
+    root: &Path,
+    path: &Path,
+    chain: SignalReportChain,
+) -> Result<String, SignalReportError> {
     path.strip_prefix(root)
-        .map_err(|_| SignalReportError::SourceUnavailable(SignalReportChain::AdrUser))?
+        .map_err(|_| SignalReportError::SourceUnavailable(chain))?
         .to_str()
         .map(str::to_owned)
-        .ok_or(SignalReportError::SourceUnavailable(SignalReportChain::AdrUser))
+        .ok_or(SignalReportError::SourceUnavailable(chain))
 }
 
 fn occurrence(
@@ -581,7 +662,7 @@ mod tests {
             "implementation_input_hash": "a".repeat(64),
             "signals": [{
                 "type_name": "SystemSignalReportSourceAdapter",
-                "kind_tag": "struct",
+                "kind_tag": "secondary_adapter",
                 "signal": "yellow",
                 "found_type": true,
             }],
@@ -866,12 +947,14 @@ mod tests {
             SystemSignalReportSourceAdapter::read_catalog_spec(root.path(), &track).unwrap();
 
         assert!(occurrences.iter().any(|occurrence| {
-            occurrence.entry_id.to_string() == "infrastructure:SystemSignalReportSourceAdapter"
+            occurrence.entry_id.to_string()
+                == "infrastructure:types:SystemSignalReportSourceAdapter"
                 && occurrence.reference.to_string() == "track/items/report-test/spec.json#IN-04"
                 && occurrence.reason.to_string() == "persisted catalogue-spec signal is non-blue"
         }));
         assert!(occurrences.iter().any(|occurrence| {
-            occurrence.entry_id.to_string() == "infrastructure:SystemSignalReportSourceAdapter"
+            occurrence.entry_id.to_string()
+                == "infrastructure:traits:SystemSignalReportSourceAdapter"
                 && occurrence.reference.to_string() == "no specification reference"
                 && occurrence.reason.to_string()
                     == "catalogue entry has neither specification references nor informal grounds"
@@ -1009,7 +1092,7 @@ mod tests {
             "signals".to_owned(),
             serde_json::json!([{
                 "type_name": "SystemSignalReportSourceAdapter",
-                "kind_tag": "struct",
+                "kind_tag": "secondary_adapter",
                 "signal": "yellow",
                 "found_type": true,
                 "missing_items": ["required_method"],
@@ -1030,6 +1113,226 @@ mod tests {
             [SignalReportOccurrence { reason, .. }]
                 if reason.to_string()
                     == "missing implementation items: required_method; unexpected implementation items: unexpected_method"
+        ));
+    }
+
+    #[test]
+    fn test_signal_report_adapter_same_name_distinct_kind_preserves_impl_occurrence_identity() {
+        let root = tempfile::tempdir().unwrap();
+        let track = TrackId::try_new("report-test").unwrap();
+        let track_dir = root.path().join("track/items/report-test");
+        let catalogue = prepare_catalogue_spec_source_with_catalogue(
+            root.path(),
+            &track_dir,
+            &duplicate_bare_name_catalogue(),
+        );
+        let mut signals: serde_json::Value =
+            serde_json::from_str(&fresh_impl_catalog_signals(&catalogue)).unwrap();
+        signal_document_object(&mut signals).insert(
+            "signals".to_owned(),
+            serde_json::json!([
+                {
+                    "type_name": "SystemSignalReportSourceAdapter",
+                    "kind_tag": "secondary_adapter",
+                    "signal": "yellow",
+                    "found_type": true,
+                },
+                {
+                    "type_name": "SystemSignalReportSourceAdapter",
+                    "kind_tag": "secondary_port",
+                    "signal": "yellow",
+                    "found_type": true,
+                }
+            ]),
+        );
+        fs::write(
+            track_dir.join("infrastructure-type-signals.json"),
+            serde_json::to_string(&signals).unwrap(),
+        )
+        .unwrap();
+
+        let occurrences =
+            SystemSignalReportSourceAdapter::read_impl_catalog(root.path(), &track).unwrap();
+
+        assert!(occurrences.iter().any(|occurrence| {
+            occurrence.entry_id.to_string()
+                == "infrastructure:secondary_adapter:SystemSignalReportSourceAdapter"
+                && occurrence.reference.to_string()
+                    == "infrastructure-types.json#secondary_adapter:SystemSignalReportSourceAdapter"
+        }));
+        assert!(occurrences.iter().any(|occurrence| {
+            occurrence.entry_id.to_string()
+                == "infrastructure:secondary_port:SystemSignalReportSourceAdapter"
+                && occurrence.reference.to_string()
+                    == "infrastructure-types.json#secondary_port:SystemSignalReportSourceAdapter"
+        }));
+    }
+
+    #[test]
+    fn test_signal_report_adapter_rejects_missing_or_phantom_impl_catalogue_identity() {
+        let root = tempfile::tempdir().unwrap();
+        let track = TrackId::try_new("report-test").unwrap();
+        let track_dir = root.path().join("track/items/report-test");
+        let catalogue = prepare_catalogue_spec_source(root.path(), &track_dir);
+        let signals_path = track_dir.join("infrastructure-type-signals.json");
+        let mut signals: serde_json::Value =
+            serde_json::from_str(&fresh_impl_catalog_signals(&catalogue)).unwrap();
+
+        signal_document_object(&mut signals).insert("signals".to_owned(), serde_json::json!([]));
+        fs::write(&signals_path, serde_json::to_string(&signals).unwrap()).unwrap();
+        let missing = SystemSignalReportSourceAdapter::read_impl_catalog(root.path(), &track)
+            .expect_err("missing canonical implementation coverage must fail closed");
+        assert!(matches!(
+            missing,
+            SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog)
+        ));
+
+        signal_document_object(&mut signals).insert(
+            "signals".to_owned(),
+            serde_json::json!([{
+                "type_name": "PhantomAdapter",
+                "kind_tag": "secondary_adapter",
+                "signal": "yellow",
+                "found_type": true,
+            }]),
+        );
+        fs::write(&signals_path, serde_json::to_string(&signals).unwrap()).unwrap();
+        let phantom = SystemSignalReportSourceAdapter::read_impl_catalog(root.path(), &track)
+            .expect_err("a non-catalogue canonical identity must fail closed");
+        assert!(matches!(
+            phantom,
+            SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog)
+        ));
+    }
+
+    #[test]
+    fn test_signal_report_adapter_reports_unique_unknown_impl_occurrence() {
+        let root = tempfile::tempdir().unwrap();
+        let track = TrackId::try_new("report-test").unwrap();
+        let track_dir = root.path().join("track/items/report-test");
+        let catalogue = prepare_catalogue_spec_source(root.path(), &track_dir);
+        let mut signals: serde_json::Value =
+            serde_json::from_str(&fresh_impl_catalog_signals(&catalogue)).unwrap();
+        signal_document_object(&mut signals).insert(
+            "signals".to_owned(),
+            serde_json::json!([
+                {
+                    "type_name": "SystemSignalReportSourceAdapter",
+                    "kind_tag": "secondary_adapter",
+                    "signal": "blue",
+                    "found_type": true,
+                },
+                {
+                    "type_name": "ImplementationOnlyType",
+                    "kind_tag": "unknown",
+                    "signal": "red",
+                    "found_type": true,
+                }
+            ]),
+        );
+        fs::write(
+            track_dir.join("infrastructure-type-signals.json"),
+            serde_json::to_string(&signals).unwrap(),
+        )
+        .unwrap();
+
+        let occurrences =
+            SystemSignalReportSourceAdapter::read_impl_catalog(root.path(), &track).unwrap();
+
+        assert!(matches!(
+            occurrences.as_slice(),
+            [SignalReportOccurrence {
+                chain: SignalReportChain::ImplCatalog,
+                level: SignalReportLevel::Red,
+                entry_id,
+                reference,
+                ..
+            }] if entry_id.to_string() == "infrastructure:unknown:ImplementationOnlyType"
+                && reference.to_string()
+                    == "infrastructure-types.json#unknown:ImplementationOnlyType"
+        ));
+    }
+
+    #[test]
+    fn test_signal_report_adapter_rejects_unsafe_impl_report_line_text() {
+        let root = tempfile::tempdir().unwrap();
+        let track = TrackId::try_new("report-test").unwrap();
+        let track_dir = root.path().join("track/items/report-test");
+        let catalogue = prepare_catalogue_spec_source(root.path(), &track_dir);
+        let signals_path = track_dir.join("infrastructure-type-signals.json");
+        let mut signals: serde_json::Value =
+            serde_json::from_str(&fresh_impl_catalog_signals(&catalogue)).unwrap();
+
+        signal_document_object(&mut signals).insert(
+            "signals".to_owned(),
+            serde_json::json!([
+                {
+                    "type_name": "SystemSignalReportSourceAdapter",
+                    "kind_tag": "secondary_adapter",
+                    "signal": "blue",
+                    "found_type": true,
+                },
+                {
+                    "type_name": "Forged\nOccurrence",
+                    "kind_tag": "unknown",
+                    "signal": "red",
+                    "found_type": true,
+                }
+            ]),
+        );
+        fs::write(&signals_path, serde_json::to_string(&signals).unwrap()).unwrap();
+        let unsafe_name = SystemSignalReportSourceAdapter::read_impl_catalog(root.path(), &track)
+            .expect_err("an unsafe unknown item path must fail closed");
+        assert!(matches!(
+            unsafe_name,
+            SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog)
+        ));
+
+        signal_document_object(&mut signals).insert(
+            "signals".to_owned(),
+            serde_json::json!([{
+                "type_name": "SystemSignalReportSourceAdapter",
+                "kind_tag": "secondary_adapter",
+                "signal": "yellow",
+                "found_type": true,
+                "missing_items": ["forged\u{001b}[31mitem"],
+            }]),
+        );
+        fs::write(&signals_path, serde_json::to_string(&signals).unwrap()).unwrap();
+        let unsafe_reason = SystemSignalReportSourceAdapter::read_impl_catalog(root.path(), &track)
+            .expect_err("an unsafe mismatch item must fail closed");
+        assert!(matches!(
+            unsafe_reason,
+            SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog)
+        ));
+    }
+
+    #[test]
+    fn test_relative_path_outside_root_reports_selected_non_adr_chain() {
+        let root = tempfile::tempdir().unwrap();
+        let outside = root.path().parent().unwrap().join("outside.json");
+
+        let error = relative(root.path(), &outside, SignalReportChain::SpecAdr)
+            .expect_err("an out-of-root path must retain the selected chain");
+
+        assert!(matches!(error, SignalReportError::SourceUnavailable(SignalReportChain::SpecAdr)));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_relative_non_utf8_path_reports_selected_non_adr_chain() {
+        use std::ffi::OsString;
+        use std::os::unix::ffi::OsStringExt;
+
+        let root = tempfile::tempdir().unwrap();
+        let path = root.path().join(OsString::from_vec(vec![0xff]));
+
+        let error = relative(root.path(), &path, SignalReportChain::ImplCatalog)
+            .expect_err("a non-UTF-8 path must retain the selected chain");
+
+        assert!(matches!(
+            error,
+            SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog)
         ));
     }
 
@@ -1120,7 +1423,8 @@ mod tests {
                 reference,
                 reason,
                 location,
-            }] if entry_id.to_string() == "infrastructure:SystemSignalReportSourceAdapter"
+            }] if entry_id.to_string()
+                == "infrastructure:types:SystemSignalReportSourceAdapter"
                 && reference.to_string()
                     == "track/items/signal-report-command-2026-07-31/spec.json#IN-04"
                 && reason.to_string() == "persisted catalogue-spec signal is non-blue"
@@ -1138,8 +1442,10 @@ mod tests {
                 reference,
                 reason,
                 location,
-            }] if entry_id.to_string() == "infrastructure:SystemSignalReportSourceAdapter"
-                && reference.to_string() == "infrastructure-types.json#SystemSignalReportSourceAdapter"
+            }] if entry_id.to_string()
+                == "infrastructure:secondary_adapter:SystemSignalReportSourceAdapter"
+                && reference.to_string()
+                    == "infrastructure-types.json#secondary_adapter:SystemSignalReportSourceAdapter"
                 && reason.to_string() == "implementation does not conform to catalogue declaration"
                 && location.to_string() == "track/items/report-test/infrastructure-type-signals.json"
         ));
