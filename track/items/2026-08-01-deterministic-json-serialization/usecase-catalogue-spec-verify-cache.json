@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "layer": "usecase",
+  "entries": [
+    {
+      "claim_hash": "f80f8e84e281470871b2410b7b16b30145591b079865dddd2d7594cee8cbd604",
+      "evidence_hash": "6d7d4d6b19485275023aee68c576ddac966ede8c295ed8d48ff42cfeb35b8d8a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Migration effects are limited to the key order of regenerated artifacts on active tracks; completed-track artifacts must remain untouched."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-deterministic-json-serialization/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "DeriveTestObligationsInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "Migration effects are limited to the key order of regenerated artifacts on active tracks; completed-track artifacts must remain untouched."
+        }
+      }
+    },
+    {
+      "claim_hash": "f80f8e84e281470871b2410b7b16b30145591b079865dddd2d7594cee8cbd604",
+      "evidence_hash": "cb5cc8d7efdd6fd88c2f8a052d57858178f2ba138443d8e157eb009816eee1f0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "The implementation does not regenerate or rewrite JSON artifacts for completed tracks solely to normalize key order."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-deterministic-json-serialization/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "DeriveTestObligationsInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "The implementation does not regenerate or rewrite JSON artifacts for completed tracks solely to normalize key order."
+        }
+      }
+    }
+  ]
+}

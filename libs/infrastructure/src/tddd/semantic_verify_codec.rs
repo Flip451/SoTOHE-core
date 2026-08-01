@@ -543,7 +543,10 @@ impl SpecAdrVerifyCacheDocumentCodec {
             schema_version: SEMANTIC_VERIFY_CACHE_SCHEMA_VERSION,
             entries: doc.entries.iter().map(entry_to_dto).collect(),
         };
-        Ok(serde_json::to_string_pretty(&dto)?)
+        // Serialize through Value so nested origin and verdict objects use
+        // canonical key order before pretty-printing.
+        let value = serde_json::to_value(&dto)?;
+        Ok(serde_json::to_string_pretty(&value)?)
     }
 
     /// Decode a `spec-adr-verify-cache.json` string into a
@@ -600,7 +603,10 @@ impl CatalogueSpecVerifyCacheDocumentCodec {
             layer: doc.layer.as_ref().to_owned(),
             entries: doc.entries.iter().map(entry_to_dto).collect(),
         };
-        Ok(serde_json::to_string_pretty(&dto)?)
+        // Serialize through Value so nested origin and verdict objects use
+        // canonical key order before pretty-printing.
+        let value = serde_json::to_value(&dto)?;
+        Ok(serde_json::to_string_pretty(&value)?)
     }
 
     /// Decode a `<layer>-catalogue-spec-verify-cache.json` string into a
@@ -768,6 +774,52 @@ mod tests {
         let a = SpecAdrVerifyCacheDocumentCodec::encode(&doc).unwrap();
         let b = SpecAdrVerifyCacheDocumentCodec::encode(&doc).unwrap();
         assert_eq!(a, b, "encode must be deterministic");
+        assert!(
+            a.starts_with("{\n  \"entries\":"),
+            "spec-ADR cache keys must be canonicalized: {a}"
+        );
+        let entry = &a[a.find("\"claim_hash\"").unwrap()..];
+        let claim_hash = entry.find("\"claim_hash\"").unwrap();
+        let claim_origin = entry.find("\"claim_origin\"").unwrap();
+        let evidence_hash = entry.find("\"evidence_hash\"").unwrap();
+        let evidence_origin = entry.find("\"evidence_origin\"").unwrap();
+        let verdict = entry.find("\"verdict\"").unwrap();
+        assert!(
+            claim_hash < claim_origin
+                && claim_origin < evidence_hash
+                && evidence_hash < evidence_origin
+                && evidence_origin < verdict,
+            "cache entry, origin, and verdict keys must be recursively canonicalized: {entry}"
+        );
+
+        let claim_origin_object = &entry[claim_origin..evidence_hash];
+        let claim_data = claim_origin_object.find("\"data\"").unwrap();
+        let claim_kind = claim_origin_object.find("\"kind\"").unwrap();
+        let element_id = claim_origin_object.find("\"element_id\"").unwrap();
+        let section = claim_origin_object.find("\"section\"").unwrap();
+        let text_label = claim_origin_object.find("\"text_label\"").unwrap();
+        assert!(
+            claim_data < claim_kind && element_id < section && section < text_label,
+            "claim origin must use canonical ordering at every nesting level: {claim_origin_object}"
+        );
+
+        let evidence_origin_object = &entry[evidence_origin..verdict];
+        let evidence_data = evidence_origin_object.find("\"data\"").unwrap();
+        let evidence_kind = evidence_origin_object.find("\"kind\"").unwrap();
+        let decision_id = evidence_origin_object.find("\"decision_id\"").unwrap();
+        let file_path = evidence_origin_object.find("\"file_path\"").unwrap();
+        assert!(
+            evidence_data < evidence_kind && decision_id < file_path,
+            "evidence origin must use canonical ordering at every nesting level: {evidence_origin_object}"
+        );
+
+        let verdict_object = &entry[verdict..];
+        let citation = verdict_object.find("\"citation\"").unwrap();
+        let verdict_kind = verdict_object.find("\"kind\"").unwrap();
+        assert!(
+            citation < verdict_kind,
+            "pass verdict must use canonical ordering: {verdict_object}"
+        );
     }
 
     // ── CatalogueSpecVerifyCacheDocumentCodec — encode/decode round-trip ─
@@ -796,6 +848,52 @@ mod tests {
         let a = CatalogueSpecVerifyCacheDocumentCodec::encode(&doc).unwrap();
         let b = CatalogueSpecVerifyCacheDocumentCodec::encode(&doc).unwrap();
         assert_eq!(a, b, "encode must be deterministic");
+        assert!(
+            a.starts_with("{\n  \"entries\":"),
+            "catalogue-spec cache keys must be canonicalized: {a}"
+        );
+        let entry = &a[a.find("\"claim_hash\"").unwrap()..];
+        let claim_hash = entry.find("\"claim_hash\"").unwrap();
+        let claim_origin = entry.find("\"claim_origin\"").unwrap();
+        let evidence_hash = entry.find("\"evidence_hash\"").unwrap();
+        let evidence_origin = entry.find("\"evidence_origin\"").unwrap();
+        let verdict = entry.find("\"verdict\"").unwrap();
+        assert!(
+            claim_hash < claim_origin
+                && claim_origin < evidence_hash
+                && evidence_hash < evidence_origin
+                && evidence_origin < verdict,
+            "cache entry keys must be recursively canonicalized: {entry}"
+        );
+
+        let claim_origin_object = &entry[claim_origin..evidence_hash];
+        let claim_data = claim_origin_object.find("\"data\"").unwrap();
+        let claim_kind = claim_origin_object.find("\"kind\"").unwrap();
+        assert!(
+            claim_data < claim_kind,
+            "claim origin keys must be canonicalized: {claim_origin_object}"
+        );
+        let claim_entry_key = claim_origin_object.find("\"entry_key\"").unwrap();
+        let claim_file_path = claim_origin_object.find("\"file_path\"").unwrap();
+        let claim_section_key = claim_origin_object.find("\"section_key\"").unwrap();
+        assert!(
+            claim_entry_key < claim_file_path && claim_file_path < claim_section_key,
+            "claim origin payload keys must be recursively canonicalized: {claim_origin_object}"
+        );
+        let evidence_origin_object = &entry[evidence_origin..verdict];
+        let evidence_data = evidence_origin_object.find("\"data\"").unwrap();
+        let evidence_kind = evidence_origin_object.find("\"kind\"").unwrap();
+        assert!(
+            evidence_data < evidence_kind,
+            "evidence origin keys must be canonicalized: {evidence_origin_object}"
+        );
+        let evidence_element_id = evidence_origin_object.find("\"element_id\"").unwrap();
+        let evidence_section = evidence_origin_object.find("\"section\"").unwrap();
+        let evidence_text_label = evidence_origin_object.find("\"text_label\"").unwrap();
+        assert!(
+            evidence_element_id < evidence_section && evidence_section < evidence_text_label,
+            "evidence origin payload keys must be recursively canonicalized: {evidence_origin_object}"
+        );
     }
 
     // ── SemanticVerdict kind tags ─────────────────────────────────────────

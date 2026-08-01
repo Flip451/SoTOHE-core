@@ -1,0 +1,46 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-08-01T13:20:05Z",
+  "declaration_hash": "e163670b519417017c71623f824cdb40ff3e2200cb9312d63211bc00eff76c37",
+  "implementation_input_hash": "bef52f26cac3bfa8739758cb8c7df63fd51f3cf631c0e5b183366dfaee4b0f38",
+  "signals": [
+    {
+      "type_name": "FrozenTrackStatus",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Copy",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "ObligationDeriveError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TrackStatus",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TrackStatusReadFailureKind",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Copy",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    }
+  ]
+}

@@ -137,7 +137,10 @@ pub fn encode(
         catalogue_declaration_hash: doc.catalogue_declaration_hash.to_hex(),
         signals: doc.signals.iter().map(signal_to_dto).collect(),
     };
-    Ok(serde_json::to_string_pretty(&dto)?)
+    // Serialize through Value so every object uses canonical key order before
+    // the established pretty-printing boundary.
+    let value = serde_json::to_value(&dto)?;
+    Ok(serde_json::to_string_pretty(&value)?)
 }
 
 // ---------------------------------------------------------------------------
@@ -251,6 +254,18 @@ mod tests {
         let a = encode(&doc).unwrap();
         let b = encode(&doc).unwrap();
         assert_eq!(a, b, "encode() must be deterministic (CN-06 / §D2.2)");
+        assert!(
+            a.starts_with("{\n  \"catalogue_declaration_hash\":"),
+            "catalogue-spec signal keys must be canonicalized: {a}"
+        );
+        assert!(
+            a.contains("\"signals\": [\n    {\n      \"entry_hash\": ")
+                && a.contains("\"signal\": \"blue\",")
+                && a.contains("\"type_name\": \"Foo\"")
+                && a.find("\"entry_hash\"").unwrap() < a.find("\"signal\"").unwrap()
+                && a.find("\"signal\"").unwrap() < a.find("\"type_name\"").unwrap(),
+            "catalogue-spec signal objects must be recursively canonicalized: {a}"
+        );
     }
 
     #[test]

@@ -1,0 +1,14 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-08-01T13:20:06Z",
+  "declaration_hash": "5022c0a3b772ef070ce4194043419dcddd6d8a67696313c33c8ff5915b76341b",
+  "implementation_input_hash": "ebb2b19945188541ec03139ee715c93a49522a8f3e7ef1041368eaf7445a5a8a",
+  "signals": [
+    {
+      "type_name": "DeriveTestObligationsInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

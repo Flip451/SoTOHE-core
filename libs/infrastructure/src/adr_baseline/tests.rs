@@ -145,6 +145,25 @@ fn test_adr_baseline_ledger_codec_round_trips_entry() {
 }
 
 #[test]
+fn test_adr_baseline_ledger_codec_canonicalizes_keys_and_is_byte_stable() {
+    let first = encode_ledger_entry(&entry()).unwrap();
+    let second = encode_ledger_entry(&entry()).unwrap();
+
+    assert_eq!(first, second, "ledger encoding must not churn JSONL bytes");
+    assert_eq!(
+        first,
+        serde_json::to_string(&serde_json::json!({
+            "hash": ContentHash::from_bytes(Sha256::digest(b"contents").into()).to_hex(),
+            "kind": "init",
+            "source": "decision.md",
+            "timestamp": "2026-07-16T00:00:00Z"
+        }))
+        .unwrap(),
+        "ledger fields must use canonical key ordering"
+    );
+}
+
+#[test]
 fn test_adr_baseline_ledger_codec_init_record_omits_reason_key() {
     let encoded = encode_ledger_entry(&entry()).unwrap();
     let record = serde_json::from_str::<serde_json::Value>(&encoded).unwrap();

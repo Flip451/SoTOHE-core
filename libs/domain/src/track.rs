@@ -17,6 +17,15 @@ pub enum TrackStatus {
     Archived,
 }
 
+/// A track status that is terminal for generated-artifact writes.
+///
+/// Unlike [`TrackStatus`], this value cannot represent an active status.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FrozenTrackStatus {
+    Done,
+    Archived,
+}
+
 impl fmt::Display for TrackStatus {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let value = match self {
@@ -43,6 +52,16 @@ impl TrackStatus {
     #[must_use]
     pub fn is_active(self) -> bool {
         matches!(self, Self::Planned | Self::InProgress | Self::Blocked | Self::Cancelled)
+    }
+
+    /// Classifies terminal statuses into their frozen-only representation.
+    #[must_use]
+    pub fn frozen_status(self) -> Option<FrozenTrackStatus> {
+        match self {
+            Self::Done => Some(FrozenTrackStatus::Done),
+            Self::Archived => Some(FrozenTrackStatus::Archived),
+            Self::Planned | Self::InProgress | Self::Blocked | Self::Cancelled => None,
+        }
     }
 }
 
@@ -995,6 +1014,24 @@ mod tests {
     #[test]
     fn test_track_status_archived_is_not_active() {
         assert!(!TrackStatus::Archived.is_active(), "Archived must be frozen (not active)");
+    }
+
+    #[test]
+    fn test_track_status_frozen_status_returns_terminal_variant_for_terminal_statuses() {
+        assert_eq!(TrackStatus::Done.frozen_status(), Some(FrozenTrackStatus::Done));
+        assert_eq!(TrackStatus::Archived.frozen_status(), Some(FrozenTrackStatus::Archived));
+    }
+
+    #[test]
+    fn test_track_status_frozen_status_returns_none_for_active_statuses() {
+        for status in [
+            TrackStatus::Planned,
+            TrackStatus::InProgress,
+            TrackStatus::Blocked,
+            TrackStatus::Cancelled,
+        ] {
+            assert_eq!(status.frozen_status(), None, "{status:?} must remain active");
+        }
     }
 
     // --- Declared task dependencies ---
