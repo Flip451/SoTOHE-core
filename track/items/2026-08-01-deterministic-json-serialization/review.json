@@ -1,6 +1,39 @@
 {
   "schema_version": 2,
   "scopes": {
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-03 is vague and untestable: “performance becomes material” and “substantially larger” have no measurable threshold, so downstream phases cannot derive when reassessment is required.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/spec.json",
+              "line": 96,
+              "category": "constraint vague or untestable"
+            }
+          ],
+          "hash": "rvw1:sha256:9d0e94da9d413c623a3c4c5ddcbff2fb68e6bfa62d7e7831c6e4801f4cce57ed",
+          "at": "2026-08-01T05:13:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:650f10a114bfffa16d46e1e779854e06f614290e10b89340b7bcd51ca220748d",
+          "at": "2026-08-01T05:15:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:650f10a114bfffa16d46e1e779854e06f614290e10b89340b7bcd51ca220748d",
+          "at": "2026-08-01T05:25:26Z"
+        }
+      ]
+    },
     "infrastructure": {
       "rounds": [
         {
@@ -240,6 +273,57 @@
           "findings": [],
           "hash": "rvw1:sha256:50fdebadd544d3d2d766f7c1fbded2dcaa8bab27ae9fb162a0f80dcc8886a09c",
           "at": "2026-08-01T14:17:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Converting the entire cache DTO with `serde_json::to_value` happens before the bounded writer runs, so an oversized fulfillment cache can allocate an unbounded intermediate JSON tree and defeat the documented fixed-memory bound. Canonical ordering must be achieved without bypassing the bounded serialization boundary.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec/fulfillment_cache_io.rs",
+              "line": 58,
+              "category": "bounded-buffer"
+            },
+            {
+              "message": "Converting the entire waiver cache DTO with `serde_json::to_value` happens before the bounded writer runs, so an oversized cache can allocate an unbounded intermediate JSON tree despite the documented fixed-memory guarantee. Preserve canonical ordering without materializing the full value before the size-limited writer.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/test_obligation/waiver_cache_codec.rs",
+              "line": 241,
+              "category": "bounded-buffer"
+            }
+          ],
+          "hash": "rvw1:sha256:fe924df01cf7df89a39371505ca6647878a5c11a505c9c4c5b9b69ffbfc99a37",
+          "at": "2026-08-01T14:44:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8a8151e9c3b562a733a296358af0659c4814f192825b5bfd0f79568e5e3839dc",
+          "at": "2026-08-01T14:49:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new waiver-cache regression does not verify canonical ordering of the populated nested `verdict`; it only asserts ordering within `key`. A regression that stops recursively canonicalizing tagged verdict objects would therefore pass despite B-05's explicit nested-verdict coverage requirement. Assert that the waived verdict emits `citation` before `kind`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/test_obligation/waiver_cache_codec.rs",
+              "line": 605,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:8a8151e9c3b562a733a296358af0659c4814f192825b5bfd0f79568e5e3839dc",
+          "at": "2026-08-01T14:57:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:04b85f81897270ed16b1d76fdaa4cc4dd07c9e8c5a0e50adfbdd41b18a436d6d",
+          "at": "2026-08-01T15:00:16Z"
         }
       ]
     },
@@ -387,88 +471,6 @@
           "findings": [],
           "hash": "rvw1:sha256:459c0089c6af1aadc53a75300cf8fb16860d7de11b24e5a37964ae4a662760dc",
           "at": "2026-08-01T13:27:14Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e5c8488e60a7444907dcf35e21d6b9f13202c0aa3b83e182b6e18bf17429c9a7",
-          "at": "2026-08-01T10:34:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TrackFrozen` carries an unconstrained `TrackStatus`, so public callers can construct contradictory states such as `TrackFrozen { status: TrackStatus::Planned }` even though `Planned`, `InProgress`, `Blocked`, and `Cancelled` are active. Represent only `Done`/`Archived` with a frozen-status type or validated constructor so the error invariant is enforced by the type system.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/test_obligation/errors.rs",
-              "line": 116,
-              "category": "domain-invariant"
-            },
-            {
-              "message": "`TrackStatusRead` exposes `TrackStatusReadError` through the enum's derived `Debug`; that error contains an unrestricted raw string populated with filesystem paths and read/parse details, while the CLI renders `ObligationDeriveError` with `{:?}`. A status-read failure can therefore leak internal paths. Carry a stable categorical/redacted public error and keep the raw source detail behind a non-rendered boundary.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/test_obligation/errors.rs",
-              "line": 119,
-              "category": "error-information-leak"
-            }
-          ],
-          "hash": "rvw1:sha256:e5c8488e60a7444907dcf35e21d6b9f13202c0aa3b83e182b6e18bf17429c9a7",
-          "at": "2026-08-01T10:39:57Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c7602153666c541237e6f4a5b1c7f083ce7e2d348d3a5bb4cc00e557f01b0ab9",
-          "at": "2026-08-01T11:39:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c7602153666c541237e6f4a5b1c7f083ce7e2d348d3a5bb4cc00e557f01b0ab9",
-          "at": "2026-08-01T11:44:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c7602153666c541237e6f4a5b1c7f083ce7e2d348d3a5bb4cc00e557f01b0ab9",
-          "at": "2026-08-01T11:49:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c7602153666c541237e6f4a5b1c7f083ce7e2d348d3a5bb4cc00e557f01b0ab9",
-          "at": "2026-08-01T11:57:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c7602153666c541237e6f4a5b1c7f083ce7e2d348d3a5bb4cc00e557f01b0ab9",
-          "at": "2026-08-01T12:03:15Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7fd5d5204bce60bebd955683b964a72064de417e50bf922c1bf5b1c26e2a5684",
-          "at": "2026-08-01T12:40:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7fd5d5204bce60bebd955683b964a72064de417e50bf922c1bf5b1c26e2a5684",
-          "at": "2026-08-01T12:53:05Z"
         }
       ]
     },
@@ -629,6 +631,159 @@
         }
       ]
     },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69847c32b7e59990c9c77131b2ec3e50989b71497c5587fbf85dff1f1ec6368c",
+          "at": "2026-08-01T10:35:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69847c32b7e59990c9c77131b2ec3e50989b71497c5587fbf85dff1f1ec6368c",
+          "at": "2026-08-01T10:39:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69847c32b7e59990c9c77131b2ec3e50989b71497c5587fbf85dff1f1ec6368c",
+          "at": "2026-08-01T11:39:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69847c32b7e59990c9c77131b2ec3e50989b71497c5587fbf85dff1f1ec6368c",
+          "at": "2026-08-01T11:44:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69847c32b7e59990c9c77131b2ec3e50989b71497c5587fbf85dff1f1ec6368c",
+          "at": "2026-08-01T11:58:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69847c32b7e59990c9c77131b2ec3e50989b71497c5587fbf85dff1f1ec6368c",
+          "at": "2026-08-01T13:01:51Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b3e99198273ec22159243e4ffc25a5dd68cdc00060695239979756fc7a91baf",
+          "at": "2026-08-01T11:47:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b3e99198273ec22159243e4ffc25a5dd68cdc00060695239979756fc7a91baf",
+          "at": "2026-08-01T11:58:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b3e99198273ec22159243e4ffc25a5dd68cdc00060695239979756fc7a91baf",
+          "at": "2026-08-01T13:00:05Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e5c8488e60a7444907dcf35e21d6b9f13202c0aa3b83e182b6e18bf17429c9a7",
+          "at": "2026-08-01T10:34:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TrackFrozen` carries an unconstrained `TrackStatus`, so public callers can construct contradictory states such as `TrackFrozen { status: TrackStatus::Planned }` even though `Planned`, `InProgress`, `Blocked`, and `Cancelled` are active. Represent only `Done`/`Archived` with a frozen-status type or validated constructor so the error invariant is enforced by the type system.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/test_obligation/errors.rs",
+              "line": 116,
+              "category": "domain-invariant"
+            },
+            {
+              "message": "`TrackStatusRead` exposes `TrackStatusReadError` through the enum's derived `Debug`; that error contains an unrestricted raw string populated with filesystem paths and read/parse details, while the CLI renders `ObligationDeriveError` with `{:?}`. A status-read failure can therefore leak internal paths. Carry a stable categorical/redacted public error and keep the raw source detail behind a non-rendered boundary.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/test_obligation/errors.rs",
+              "line": 119,
+              "category": "error-information-leak"
+            }
+          ],
+          "hash": "rvw1:sha256:e5c8488e60a7444907dcf35e21d6b9f13202c0aa3b83e182b6e18bf17429c9a7",
+          "at": "2026-08-01T10:39:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c7602153666c541237e6f4a5b1c7f083ce7e2d348d3a5bb4cc00e557f01b0ab9",
+          "at": "2026-08-01T11:39:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c7602153666c541237e6f4a5b1c7f083ce7e2d348d3a5bb4cc00e557f01b0ab9",
+          "at": "2026-08-01T11:44:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c7602153666c541237e6f4a5b1c7f083ce7e2d348d3a5bb4cc00e557f01b0ab9",
+          "at": "2026-08-01T11:49:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c7602153666c541237e6f4a5b1c7f083ce7e2d348d3a5bb4cc00e557f01b0ab9",
+          "at": "2026-08-01T11:57:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c7602153666c541237e6f4a5b1c7f083ce7e2d348d3a5bb4cc00e557f01b0ab9",
+          "at": "2026-08-01T12:03:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7fd5d5204bce60bebd955683b964a72064de417e50bf922c1bf5b1c26e2a5684",
+          "at": "2026-08-01T12:40:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7fd5d5204bce60bebd955683b964a72064de417e50bf922c1bf5b1c26e2a5684",
+          "at": "2026-08-01T12:53:05Z"
+        }
+      ]
+    },
     "adr": {
       "rounds": [
         {
@@ -784,39 +939,6 @@
           "findings": [],
           "hash": "rvw1:sha256:d087b50362dd465be57399cddde95ea1386f11fa03a5c0a28f3fc2b889d8669b",
           "at": "2026-08-01T13:11:25Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "CN-03 is vague and untestable: “performance becomes material” and “substantially larger” have no measurable threshold, so downstream phases cannot derive when reassessment is required.",
-              "severity": "P1",
-              "file": "track/items/2026-08-01-deterministic-json-serialization/spec.json",
-              "line": 96,
-              "category": "constraint vague or untestable"
-            }
-          ],
-          "hash": "rvw1:sha256:9d0e94da9d413c623a3c4c5ddcbff2fb68e6bfa62d7e7831c6e4801f4cce57ed",
-          "at": "2026-08-01T05:13:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:650f10a114bfffa16d46e1e779854e06f614290e10b89340b7bcd51ca220748d",
-          "at": "2026-08-01T05:15:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:650f10a114bfffa16d46e1e779854e06f614290e10b89340b7bcd51ca220748d",
-          "at": "2026-08-01T05:25:26Z"
         }
       ]
     },
@@ -1486,52 +1608,20 @@
           "findings": [],
           "hash": "rvw1:sha256:d79ab6d254011b0c38e72960b839d7ec88c747c7b3c43b1b1e68543aaba42b26",
           "at": "2026-08-01T14:19:53Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:69847c32b7e59990c9c77131b2ec3e50989b71497c5587fbf85dff1f1ec6368c",
-          "at": "2026-08-01T10:35:02Z"
+          "hash": "rvw1:sha256:ba800af2526131d7742d23bb9f65101419ef753963e2759ee36a2f644fc98dac",
+          "at": "2026-08-01T14:52:23Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:69847c32b7e59990c9c77131b2ec3e50989b71497c5587fbf85dff1f1ec6368c",
-          "at": "2026-08-01T10:39:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:69847c32b7e59990c9c77131b2ec3e50989b71497c5587fbf85dff1f1ec6368c",
-          "at": "2026-08-01T11:39:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:69847c32b7e59990c9c77131b2ec3e50989b71497c5587fbf85dff1f1ec6368c",
-          "at": "2026-08-01T11:44:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:69847c32b7e59990c9c77131b2ec3e50989b71497c5587fbf85dff1f1ec6368c",
-          "at": "2026-08-01T11:58:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:69847c32b7e59990c9c77131b2ec3e50989b71497c5587fbf85dff1f1ec6368c",
-          "at": "2026-08-01T13:01:51Z"
+          "hash": "rvw1:sha256:ba800af2526131d7742d23bb9f65101419ef753963e2759ee36a2f644fc98dac",
+          "at": "2026-08-01T15:02:58Z"
         }
       ]
     },
@@ -1607,31 +1697,6 @@
           "findings": [],
           "hash": "rvw1:sha256:9e5c7b326eeb33ae931bf4974e7c6038addcebf9f81396ef1fc3712a3af8e4ba",
           "at": "2026-08-01T12:54:19Z"
-        }
-      ]
-    },
-    "cli_driver": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6b3e99198273ec22159243e4ffc25a5dd68cdc00060695239979756fc7a91baf",
-          "at": "2026-08-01T11:47:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6b3e99198273ec22159243e4ffc25a5dd68cdc00060695239979756fc7a91baf",
-          "at": "2026-08-01T11:58:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6b3e99198273ec22159243e4ffc25a5dd68cdc00060695239979756fc7a91baf",
-          "at": "2026-08-01T13:00:05Z"
         }
       ]
     }

@@ -450,7 +450,15 @@ impl DryCorpusRootManifestWriterPort for FsDryCorpusRootManifestAdapter {
             workspace_root: workspace_root_for_manifest(workspace_root, repo_root),
         };
         let manifest_path = resolve_manifest_path_under_repo(track_dir, repo_root)?;
-        let content = serde_json::to_vec_pretty(&manifest).map_err(|e| {
+        // Materialize the manifest as a Value so the persisted artifact uses
+        // canonical JSON key order before the atomic write.
+        let value = serde_json::to_value(&manifest).map_err(|e| {
+            DryCorpusRootManifestError::ManifestSerializeFailed {
+                manifest_path: manifest_path.clone(),
+                detail: SerializationFailureDetail::new(e.to_string()),
+            }
+        })?;
+        let content = serde_json::to_vec_pretty(&value).map_err(|e| {
             DryCorpusRootManifestError::ManifestSerializeFailed {
                 manifest_path: manifest_path.clone(),
                 detail: SerializationFailureDetail::new(e.to_string()),
@@ -646,6 +654,28 @@ mod tests {
         let manifest: DryCorpusRootManifestDto = serde_json::from_str(&content).unwrap();
         assert_eq!(manifest.workspace_root, PathBuf::from("apps/cli-composition"));
         assert_eq!(manifest.schema_version, 1);
+    }
+
+    #[test]
+    fn test_fs_dry_corpus_root_manifest_writer_repeated_write_returns_canonical_bytes() {
+        let repo = tempfile::tempdir().unwrap();
+        let repo_root = repo.path().canonicalize().unwrap();
+        let workspace_root = repo_root.join("apps/cli-composition");
+        let track_dir = repo_root.join("track/items/test-track");
+        std::fs::create_dir_all(&workspace_root).unwrap();
+        std::fs::create_dir_all(&track_dir).unwrap();
+        let manifest_path = track_dir.join(DRY_CORPUS_ROOT_MANIFEST_FILE);
+
+        FsDryCorpusRootManifestAdapter.write(&track_dir, &workspace_root, &repo_root).unwrap();
+        let first = std::fs::read(&manifest_path).unwrap();
+        FsDryCorpusRootManifestAdapter.write(&track_dir, &workspace_root, &repo_root).unwrap();
+        let second = std::fs::read(manifest_path).unwrap();
+
+        assert_eq!(first, second);
+        assert!(
+            std::str::from_utf8(&first).unwrap().starts_with("{\n  \"schema_version\":"),
+            "manifest keys must be canonical"
+        );
     }
 
     #[test]
