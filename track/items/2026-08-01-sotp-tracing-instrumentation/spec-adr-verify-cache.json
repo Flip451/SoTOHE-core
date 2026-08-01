@@ -232,6 +232,29 @@
       }
     },
     {
+      "claim_hash": "72c1edd5118982c658d6ab99834bd5ba79a4d5b50570869c9a3f6d00bdc8a395",
+      "evidence_hash": "a83c1ab3493e9e3a8060721ad6a41cdde229b621533c3015fd61c37c6e0a4305",
+      "verdict": {
+        "kind": "pass",
+        "citation": "読み手は破損行・未知 `schema_version` の行を fail せず skip し、skip 件数を報告する"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "`sotp telemetry` は、形式不正な記録および未知の `schema_version` を持つ記録を fail-open で skip し、skip した記録件数を報告する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
       "claim_hash": "8d323543a9f773f9fc2540483e6c6ae9522db4aa2f1e11b4b3b4d4ad0f37b802",
       "evidence_hash": "8a936ca4168276fb339a20f460d1b732fb7e12ad4381c0895ccaa101cb72d5a2",
       "verdict": {

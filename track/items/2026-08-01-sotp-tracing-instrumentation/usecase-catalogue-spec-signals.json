@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "c502dd227bc9f1b7dff2df15254299b55526212662670edea332d3a2a6158499",
+  "catalogue_declaration_hash": "03d224c73d97cf00df1637a98b7ac705f04ba9707c2dc9197aa19e682301d087",
   "signals": [
     {
       "type_name": "CommandDurationMillis",
@@ -10,7 +10,7 @@
     {
       "type_name": "CommandExecutionCount",
       "signal": "blue",
-      "entry_hash": "50dba965059d482adf4752a57c6965fb3a7c3626a7e8662e05cd4f6ebfdd40d7"
+      "entry_hash": "48dffc8f96fd1aaa54729c3b7a8f57cecac977dac11f96fbfa0680dcbbc0d722"
     },
     {
       "type_name": "CommandExecutionMetric",
@@ -30,12 +30,12 @@
     {
       "type_name": "CommandFailureRateBasisPoints",
       "signal": "blue",
-      "entry_hash": "67641ff3b2743864411802e8560e309426d2062ea965536d9d6355cb71ee006e"
+      "entry_hash": "d3f504cc0410f0d3aa9a74be80657735ecaefbb432988400f0563f9ffd0bd259"
     },
     {
       "type_name": "CommandTraceInteractor",
       "signal": "blue",
-      "entry_hash": "66228f703039718ea4b1acec506220bf04565e27fecde53953e09631c36725bc"
+      "entry_hash": "a717f7580f07ce7badb756721c3feb50d14f92c172644efd2a14270038a53762"
     },
     {
       "type_name": "CommandTraceRecord",
@@ -50,7 +50,7 @@
     {
       "type_name": "CommandTraceWriteError",
       "signal": "blue",
-      "entry_hash": "f7512640cbb7acce665ba6247bfd7b9bb1c7100299af8e7979d1ea11cc0f309e"
+      "entry_hash": "dab57c82ff4eb3918372a12f6facb8369c44710ed752119c97352c320a8a1311"
     },
     {
       "type_name": "SotpCommandIdentity",
@@ -60,17 +60,17 @@
     {
       "type_name": "TelemetryReportOutput",
       "signal": "blue",
-      "entry_hash": "abe3c5258bdb33add511f8b359b821274bee3603fbc77092cac14aeb00fdee19"
+      "entry_hash": "3e225f72b306332000b1197464117be3422fd9fd45975c891dbdd3ee92513781"
     },
     {
       "type_name": "TelemetrySkippedLineCount",
       "signal": "blue",
-      "entry_hash": "7e2086e0d5939d7d0e1de9d69153fa4b717ae04f9c585acdfe98cf9c893e616a"
+      "entry_hash": "e452641fc2b6ab10f66fb9b0dd1506ccec147486d6241057c495beffa10fa4cd"
     },
     {
       "type_name": "CommandTraceService",
       "signal": "blue",
-      "entry_hash": "1c4d951b6098a4bcb04e5177dba3a27553af1f155e1a37999b9b840de77a0a1e"
+      "entry_hash": "6253654df178cf74df21a2226fca8822693a4ebc2106b1ccb2933a51c77f89bb"
     },
     {
       "type_name": "CommandTraceWriterPort",

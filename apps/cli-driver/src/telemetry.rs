@@ -159,8 +159,9 @@ fn format_report(track_id: &str, output: &TelemetryReportOutput) -> String {
     }
     lines.push(String::new());
 
-    lines.push(format!("Skipped lines: {}", output.skipped_lines));
-    if output.skipped_lines > 0 {
+    let skipped_lines = output.skipped_lines.as_ref();
+    lines.push(format!("Skipped lines: {skipped_lines}"));
+    if *skipped_lines > 0 {
         lines.push("  (parse failure or unknown schema_version)".to_owned());
     }
     lines.push(String::new());

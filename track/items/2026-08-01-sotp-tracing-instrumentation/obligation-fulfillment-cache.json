@@ -166,42 +166,6 @@
         "entry_key": "CommandTraceInteractor",
         "anchor_id": {
           "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
-          "element_id": "IN-01"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "CommandTraceInteractor",
-        "obligation_kind": "result",
-        "item_identifier": "entry"
-      },
-      "key": {
-        "bound_tests_set_hash": "a43f2e18850a9e06cd2e292253f6ef2f59ba9f9d7acd0ce937a9095bfd68aac6",
-        "declaration_hash": "ab2ebf55caa98915b1a81a50ffab6368059e3550746403fc3b811206dd13b49a",
-        "anchor_text_hash": "e8372367836888c48ae6c6884d835ad2cb235a64da700bb711dbd7fc03b9273c"
-      },
-      "verdict": {
-        "kind": "fulfilled",
-        "citation": "assert!(service.record(record).is_ok());\n\n        let records = writer\n            .records\n            .lock()\n            .map_err(|_| std::io::Error::other(\"recording writer lock poisoned\"))?;\n        assert_eq!(records.as_slice(), &[expected]);"
-      },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
-      "bound_tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::telemetry::command_trace::tests",
-          "test_name": "test_command_trace_service_record_success_delegates_validated_record"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::telemetry::command_trace::tests",
-          "test_name": "test_command_trace_interactor_record_writer_unavailable_propagates_error"
-        }
-      ]
-    },
-    {
-      "edge_id": {
-        "entry_key": "CommandTraceInteractor",
-        "anchor_id": {
-          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
           "element_id": "IN-02"
         }
       },
@@ -212,12 +176,12 @@
       },
       "key": {
         "bound_tests_set_hash": "a43f2e18850a9e06cd2e292253f6ef2f59ba9f9d7acd0ce937a9095bfd68aac6",
-        "declaration_hash": "ab2ebf55caa98915b1a81a50ffab6368059e3550746403fc3b811206dd13b49a",
+        "declaration_hash": "f4737828fba9ac3cd13bd6cb916010ae43314331eeba37243f278c4cd92ea5af",
         "anchor_text_hash": "886b259b72d31a9481887873baede5471f2b81415aad543979b98bd24b8f0528"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(service.record(record).is_ok());\n\n        let records = writer\n            .records\n            .lock()\n            .map_err(|_| std::io::Error::other(\"recording writer lock poisoned\"))?;\n        assert_eq!(records.as_slice(), &[expected]);"
+        "citation": "assert_eq!(records.as_slice(), &[expected]);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -248,48 +212,12 @@
       },
       "key": {
         "bound_tests_set_hash": "a43f2e18850a9e06cd2e292253f6ef2f59ba9f9d7acd0ce937a9095bfd68aac6",
-        "declaration_hash": "ab2ebf55caa98915b1a81a50ffab6368059e3550746403fc3b811206dd13b49a",
+        "declaration_hash": "f4737828fba9ac3cd13bd6cb916010ae43314331eeba37243f278c4cd92ea5af",
         "anchor_text_hash": "44c1bb4fc84130623b84d4576e0f44e5b1b59cd4365e7982fd95a2661b517f29"
       },
       "verdict": {
         "kind": "fulfilled",
         "citation": "assert!(matches!(result, Err(CommandTraceWriteError::Unavailable)));"
-      },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
-      "bound_tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::telemetry::command_trace::tests",
-          "test_name": "test_command_trace_service_record_success_delegates_validated_record"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::telemetry::command_trace::tests",
-          "test_name": "test_command_trace_interactor_record_writer_unavailable_propagates_error"
-        }
-      ]
-    },
-    {
-      "edge_id": {
-        "entry_key": "CommandTraceService",
-        "anchor_id": {
-          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
-          "element_id": "IN-01"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "CommandTraceService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:record"
-      },
-      "key": {
-        "bound_tests_set_hash": "a43f2e18850a9e06cd2e292253f6ef2f59ba9f9d7acd0ce937a9095bfd68aac6",
-        "declaration_hash": "9bb50f34d827d84fdc36f613d914eea263549a3db4a5218f6abbc344c20522e8",
-        "anchor_text_hash": "e8372367836888c48ae6c6884d835ad2cb235a64da700bb711dbd7fc03b9273c"
-      },
-      "verdict": {
-        "kind": "fulfilled",
-        "citation": "assert!(service.record(record).is_ok());\n\nassert_eq!(records.as_slice(), &[expected]);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -320,7 +248,7 @@
       },
       "key": {
         "bound_tests_set_hash": "a43f2e18850a9e06cd2e292253f6ef2f59ba9f9d7acd0ce937a9095bfd68aac6",
-        "declaration_hash": "9bb50f34d827d84fdc36f613d914eea263549a3db4a5218f6abbc344c20522e8",
+        "declaration_hash": "bc1269a038dd12381cb2b39a548e1e10aeb7187ed02cf0b9696874ad350aa647",
         "anchor_text_hash": "886b259b72d31a9481887873baede5471f2b81415aad543979b98bd24b8f0528"
       },
       "verdict": {
@@ -356,12 +284,12 @@
       },
       "key": {
         "bound_tests_set_hash": "a43f2e18850a9e06cd2e292253f6ef2f59ba9f9d7acd0ce937a9095bfd68aac6",
-        "declaration_hash": "9bb50f34d827d84fdc36f613d914eea263549a3db4a5218f6abbc344c20522e8",
+        "declaration_hash": "bc1269a038dd12381cb2b39a548e1e10aeb7187ed02cf0b9696874ad350aa647",
         "anchor_text_hash": "44c1bb4fc84130623b84d4576e0f44e5b1b59cd4365e7982fd95a2661b517f29"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let result = service.record(record);\n\n        assert!(matches!(result, Err(CommandTraceWriteError::Unavailable)));"
+        "citation": "assert!(matches!(result, Err(CommandTraceWriteError::Unavailable)));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -464,7 +392,7 @@
       },
       "key": {
         "bound_tests_set_hash": "b2ba6c3ebbe630ed8ced77050e73005048e71ccef671e78e546a99e8cfd13e72",
-        "declaration_hash": "7e1fd2b6d5683e4a3ced26c29369d652b29854134ccfc53f75d4a74f98a1767b",
+        "declaration_hash": "6afcbd6c8f5838df8057351561613a6fe902e017dd73b0728d2b5e7fcecae5d4",
         "anchor_text_hash": "44c1bb4fc84130623b84d4576e0f44e5b1b59cd4365e7982fd95a2661b517f29"
       },
       "verdict": {
@@ -477,6 +405,290 @@
           "layer": "usecase",
           "module_path": "usecase::telemetry::command_trace::tests",
           "test_name": "test_command_trace_interactor_record_writer_unavailable_propagates_error"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandExecutionCount",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandExecutionCount",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "5287207bcc9cc3b1d9749ca8d89cb1c8cacf77edb50230ba0fd9cc6892fbaf95",
+        "declaration_hash": "2f19098de2f2bda2ab908f1d1367b33cb6aba3d64140b8b1c89f7616e6c03583",
+        "anchor_text_hash": "9aa2ab81cfe9da837ec1df59e054f2d063869ef34a03c3a3356a357fc9fad436"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(*metric.executions().as_ref(), 3);\n        assert_eq!(*metric.failures().as_ref(), 1);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::command_trace::tests",
+          "test_name": "test_command_execution_metric_valid_aggregation_exposes_typed_values"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandExecutionCount",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandExecutionCount",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "5287207bcc9cc3b1d9749ca8d89cb1c8cacf77edb50230ba0fd9cc6892fbaf95",
+        "declaration_hash": "2f19098de2f2bda2ab908f1d1367b33cb6aba3d64140b8b1c89f7616e6c03583",
+        "anchor_text_hash": "4a56d1978d1635e0824090a3dc23d8b1a68442cc68800529fe04faef0373f783"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"assert_eq!(*metric.executions().as_ref(), 3);\\n        assert_eq!(*metric.failures().as_ref(), 1);\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::command_trace::tests",
+          "test_name": "test_command_execution_metric_valid_aggregation_exposes_typed_values"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandFailureRateBasisPoints",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandFailureRateBasisPoints",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "09a3989fdab5226d94b3d1246abb89a3873ca63d4f38b21dcc0a45b8598eb9f2",
+        "declaration_hash": "8c1f4d44541edb04ed9583e1854aa1a9ff85c250c6e314784ca852e3a2196e56",
+        "anchor_text_hash": "9aa2ab81cfe9da837ec1df59e054f2d063869ef34a03c3a3356a357fc9fad436"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(metric.failure_rate().value(), 3_333);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::command_trace::tests",
+          "test_name": "test_command_execution_metric_valid_aggregation_exposes_typed_values"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::command_trace::tests",
+          "test_name": "test_command_failure_rate_basis_points_above_maximum_returns_range_error"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandFailureRateBasisPoints",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandFailureRateBasisPoints",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "5287207bcc9cc3b1d9749ca8d89cb1c8cacf77edb50230ba0fd9cc6892fbaf95",
+        "declaration_hash": "8c1f4d44541edb04ed9583e1854aa1a9ff85c250c6e314784ca852e3a2196e56",
+        "anchor_text_hash": "4a56d1978d1635e0824090a3dc23d8b1a68442cc68800529fe04faef0373f783"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(metric.failure_rate().value(), 3_333);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::command_trace::tests",
+          "test_name": "test_command_execution_metric_valid_aggregation_exposes_typed_values"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandExecutionMetric",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandExecutionMetric",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "5287207bcc9cc3b1d9749ca8d89cb1c8cacf77edb50230ba0fd9cc6892fbaf95",
+        "declaration_hash": "ca0127862cfe8452e58a0427dbcbafd2109b7e706f000cb0918a8e5da9ae211d",
+        "anchor_text_hash": "9aa2ab81cfe9da837ec1df59e054f2d063869ef34a03c3a3356a357fc9fad436"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(metric.command().as_str(), \"telemetry\");\n        assert_eq!(*metric.executions().as_ref(), 3);\n        assert_eq!(*metric.failures().as_ref(), 1);\n        assert_eq!(*metric.total_duration().as_ref(), 540);\n        assert_eq!(metric.failure_rate().value(), 3_333);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::command_trace::tests",
+          "test_name": "test_command_execution_metric_valid_aggregation_exposes_typed_values"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandExecutionMetric",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandExecutionMetric",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "5287207bcc9cc3b1d9749ca8d89cb1c8cacf77edb50230ba0fd9cc6892fbaf95",
+        "declaration_hash": "ca0127862cfe8452e58a0427dbcbafd2109b7e706f000cb0918a8e5da9ae211d",
+        "anchor_text_hash": "4a56d1978d1635e0824090a3dc23d8b1a68442cc68800529fe04faef0373f783"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let metric = CommandExecutionMetric::new(\n            identity(\"telemetry\")?,\n            CommandExecutionCount::from(3),\n            CommandExecutionCount::from(1),\n            CommandDurationMillis::from(540),\n        )?;\n\n        assert_eq!(metric.command().as_str(), \"telemetry\");\n        assert_eq!(*metric.executions().as_ref(), 3);\n        assert_eq!(*metric.failures().as_ref(), 1);\n        assert_eq!(*metric.total_duration().as_ref(), 540);\n        assert_eq!(metric.failure_rate().value(), 3_333);\n        Ok(())"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::command_trace::tests",
+          "test_name": "test_command_execution_metric_valid_aggregation_exposes_typed_values"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TelemetrySkippedLineCount",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TelemetrySkippedLineCount",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "193c7cff180098e2c11fb1da3d56d31ebaceb67c7341cf815f21363f70842b65",
+        "declaration_hash": "e7e487166a4b3633505396897f17e0be5461b15d74c250c1f814babe4b19cc70",
+        "anchor_text_hash": "09206e1e7a070ff894d6aec08359cc87d6e162f063df4b893135fb5e2642b785"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "skipped_lines: TelemetrySkippedLineCount::from(2),\n            command_metrics: vec![metric],\n        };\n        let git = Arc::new(StubGit { repo_root: Some(PathBuf::from(\"/repo\")) });\n        let report = Arc::new(StubReport { result: Mutex::new(Some(Ok(output))) });\n        let factory = Arc::new(StubFactory {\n            built_dir: Mutex::new(None),\n            port: Arc::new(RecordingArchivedPort::default()),\n        });\n        let interactor = facade(git, report, factory);\n\n        let output = interactor.report(\"t\", Path::new(\"track/items\"))?;\n\n        assert_eq!(*output.skipped_lines.as_ref(), 2);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::aggregate_interactor_tests",
+          "test_name": "test_telemetry_aggregate_interactor_report_typed_metrics_preserves_values"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TelemetryReportOutput",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TelemetryReportOutput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "193c7cff180098e2c11fb1da3d56d31ebaceb67c7341cf815f21363f70842b65",
+        "declaration_hash": "42e9e8e401bc6331cf390b3196819b18dcf73dfc4c7e6e112ed3f10905a59157",
+        "anchor_text_hash": "9aa2ab81cfe9da837ec1df59e054f2d063869ef34a03c3a3356a357fc9fad436"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(output.command_metrics.len(), 1);\n        assert_eq!(output.command_metrics.first().map(|metric| *metric.executions().as_ref()),\n            Some(4));\n        assert_eq!(output.command_metrics.first().map(|metric| *metric.total_duration().as_ref()),\n            Some(240));\n        assert_eq!(output.command_metrics.first().map(|metric| metric.failure_rate().value()),\n            Some(2_500));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::aggregate_interactor_tests",
+          "test_name": "test_telemetry_aggregate_interactor_report_typed_metrics_preserves_values"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TelemetryReportOutput",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TelemetryReportOutput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "193c7cff180098e2c11fb1da3d56d31ebaceb67c7341cf815f21363f70842b65",
+        "declaration_hash": "42e9e8e401bc6331cf390b3196819b18dcf73dfc4c7e6e112ed3f10905a59157",
+        "anchor_text_hash": "4a56d1978d1635e0824090a3dc23d8b1a68442cc68800529fe04faef0373f783"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(output.command_metrics.len(), 1);\n        assert_eq!(\n            output.command_metrics.first().map(|metric| *metric.executions().as_ref()),\n            Some(4)\n        );\n        assert_eq!(\n            output.command_metrics.first().map(|metric| *metric.total_duration().as_ref()),\n            Some(240)\n        );\n        assert_eq!(\n            output.command_metrics.first().map(|metric| metric.failure_rate().value()),\n            Some(2_500)\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::aggregate_interactor_tests",
+          "test_name": "test_telemetry_aggregate_interactor_report_typed_metrics_preserves_values"
         }
       ]
     }

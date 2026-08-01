@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-01T14:32:20Z",
-  "declaration_hash": "c502dd227bc9f1b7dff2df15254299b55526212662670edea332d3a2a6158499",
-  "implementation_input_hash": "abcaa8363004a36cb248bace65b4168526d323376f94ae0c645c519dff874521",
+  "generated_at": "2026-08-01T16:54:47Z",
+  "declaration_hash": "03d224c73d97cf00df1637a98b7ac705f04ba9707c2dc9197aa19e682301d087",
+  "implementation_input_hash": "b92ae4f29ae063fd75b3bc6c6ab45be2adff0e827c67b232d720af2f90856a2c",
   "signals": [
     {
       "type_name": "CommandDurationMillis",
@@ -22,9 +22,9 @@
     {
       "type_name": "CommandExecutionCount",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "AsRef<u64>",
         "Clone",
         "Copy",
@@ -37,9 +37,9 @@
     {
       "type_name": "CommandExecutionMetric",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -74,9 +74,9 @@
     {
       "type_name": "CommandFailureRateBasisPoints",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Copy",
         "Debug",
@@ -155,7 +155,7 @@
     {
       "type_name": "TelemetryReportOutput",
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "Clone",
@@ -165,9 +165,9 @@
     {
       "type_name": "TelemetrySkippedLineCount",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "AsRef<u64>",
         "Clone",
         "Copy",

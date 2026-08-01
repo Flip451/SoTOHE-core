@@ -64,6 +64,64 @@ impl AsRef<u64> for CommandDurationMillis {
     }
 }
 
+/// A count of command executions or failed command executions.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct CommandExecutionCount(u64);
+
+impl From<u64> for CommandExecutionCount {
+    fn from(value: u64) -> Self {
+        Self(value)
+    }
+}
+
+impl AsRef<u64> for CommandExecutionCount {
+    fn as_ref(&self) -> &u64 {
+        &self.0
+    }
+}
+
+/// A count of telemetry records skipped during aggregation.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct TelemetrySkippedLineCount(u64);
+
+impl From<u64> for TelemetrySkippedLineCount {
+    fn from(value: u64) -> Self {
+        Self(value)
+    }
+}
+
+impl AsRef<u64> for TelemetrySkippedLineCount {
+    fn as_ref(&self) -> &u64 {
+        &self.0
+    }
+}
+
+/// A validated command failure rate expressed in basis points.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct CommandFailureRateBasisPoints(u16);
+
+impl CommandFailureRateBasisPoints {
+    /// Creates a failure rate within the inclusive 0..=10_000 range.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`CommandTraceValueError::FailureRateOutOfRange`] when `value`
+    /// exceeds 10_000 basis points.
+    pub fn try_new(value: u16) -> Result<Self, CommandTraceValueError> {
+        if value > 10_000 {
+            return Err(CommandTraceValueError::FailureRateOutOfRange);
+        }
+
+        Ok(Self(value))
+    }
+
+    /// Returns the failure rate in basis points.
+    #[must_use]
+    pub fn value(&self) -> u16 {
+        self.0
+    }
+}
+
 /// A validated non-zero exit code for a failed command.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CommandExitCode(i32);
@@ -95,6 +153,76 @@ pub enum CommandExecutionResult {
     Success,
     /// The command failed with a validated non-zero exit code.
     Failure(CommandExitCode),
+}
+
+/// Aggregated execution metrics for one command.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CommandExecutionMetric {
+    command: SotpCommandIdentity,
+    executions: CommandExecutionCount,
+    failures: CommandExecutionCount,
+    total_duration: CommandDurationMillis,
+    failure_rate: CommandFailureRateBasisPoints,
+}
+
+impl CommandExecutionMetric {
+    /// Creates a metric from one command's aggregate values.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`CommandTraceValueError::ZeroExecutions`] when `executions` is
+    /// zero, or [`CommandTraceValueError::FailureCountExceedsExecutions`] when
+    /// `failures` exceeds `executions`.
+    pub fn new(
+        command: SotpCommandIdentity,
+        executions: CommandExecutionCount,
+        failures: CommandExecutionCount,
+        total_duration: CommandDurationMillis,
+    ) -> Result<Self, CommandTraceValueError> {
+        if executions.0 == 0 {
+            return Err(CommandTraceValueError::ZeroExecutions);
+        }
+        if failures.0 > executions.0 {
+            return Err(CommandTraceValueError::FailureCountExceedsExecutions);
+        }
+
+        let basis_points =
+            u16::try_from((u128::from(failures.0) * 10_000) / u128::from(executions.0))
+                .map_err(|_| CommandTraceValueError::FailureRateOutOfRange)?;
+        let failure_rate = CommandFailureRateBasisPoints::try_new(basis_points)?;
+
+        Ok(Self { command, executions, failures, total_duration, failure_rate })
+    }
+
+    /// Returns the command identity.
+    #[must_use]
+    pub fn command(&self) -> &SotpCommandIdentity {
+        &self.command
+    }
+
+    /// Returns the number of executions.
+    #[must_use]
+    pub fn executions(&self) -> CommandExecutionCount {
+        self.executions
+    }
+
+    /// Returns the number of failed executions.
+    #[must_use]
+    pub fn failures(&self) -> CommandExecutionCount {
+        self.failures
+    }
+
+    /// Returns the total execution duration.
+    #[must_use]
+    pub fn total_duration(&self) -> CommandDurationMillis {
+        self.total_duration
+    }
+
+    /// Returns the failure rate in basis points.
+    #[must_use]
+    pub fn failure_rate(&self) -> CommandFailureRateBasisPoints {
+        self.failure_rate
+    }
 }
 
 /// Typed information about one completed command execution.
@@ -161,9 +289,11 @@ mod tests {
     use std::sync::{Arc, Mutex};
 
     use super::{
-        CommandDurationMillis, CommandExecutionResult, CommandExitCode, CommandTraceInteractor,
-        CommandTraceRecord, CommandTraceService, CommandTraceValueError, CommandTraceWriteError,
-        CommandTraceWriterPort, SotpCommandIdentity,
+        CommandDurationMillis, CommandExecutionCount, CommandExecutionMetric,
+        CommandExecutionResult, CommandExitCode, CommandFailureRateBasisPoints,
+        CommandTraceInteractor, CommandTraceRecord, CommandTraceService, CommandTraceValueError,
+        CommandTraceWriteError, CommandTraceWriterPort, SotpCommandIdentity,
+        TelemetrySkippedLineCount,
     };
 
     #[derive(Default)]
@@ -216,6 +346,96 @@ mod tests {
         let duration = CommandDurationMillis::from(275_u64);
 
         assert_eq!(*duration.as_ref(), 275);
+    }
+
+    #[test]
+    fn test_command_execution_count_from_u64_exposes_value() {
+        let count = CommandExecutionCount::from(275_u64);
+
+        assert_eq!(*count.as_ref(), 275);
+    }
+
+    #[test]
+    fn test_telemetry_skipped_line_count_from_u64_exposes_value() {
+        let count = TelemetrySkippedLineCount::from(3_u64);
+
+        assert_eq!(*count.as_ref(), 3);
+    }
+
+    #[test]
+    fn test_command_failure_rate_basis_points_maximum_retains_value()
+    -> Result<(), CommandTraceValueError> {
+        let rate = CommandFailureRateBasisPoints::try_new(10_000)?;
+
+        assert_eq!(rate.value(), 10_000);
+        Ok(())
+    }
+
+    #[test]
+    fn test_command_failure_rate_basis_points_above_maximum_returns_range_error() {
+        let result = CommandFailureRateBasisPoints::try_new(10_001);
+
+        assert!(matches!(result, Err(CommandTraceValueError::FailureRateOutOfRange)));
+    }
+
+    #[test]
+    fn test_command_execution_metric_valid_aggregation_exposes_typed_values()
+    -> Result<(), CommandTraceValueError> {
+        let metric = CommandExecutionMetric::new(
+            identity("telemetry")?,
+            CommandExecutionCount::from(3),
+            CommandExecutionCount::from(1),
+            CommandDurationMillis::from(540),
+        )?;
+
+        assert_eq!(metric.command().as_str(), "telemetry");
+        assert_eq!(*metric.executions().as_ref(), 3);
+        assert_eq!(*metric.failures().as_ref(), 1);
+        assert_eq!(*metric.total_duration().as_ref(), 540);
+        assert_eq!(metric.failure_rate().value(), 3_333);
+        Ok(())
+    }
+
+    #[test]
+    fn test_command_execution_metric_zero_executions_returns_error()
+    -> Result<(), CommandTraceValueError> {
+        let result = CommandExecutionMetric::new(
+            identity("telemetry")?,
+            CommandExecutionCount::from(0),
+            CommandExecutionCount::from(0),
+            CommandDurationMillis::from(0),
+        );
+
+        assert!(matches!(result, Err(CommandTraceValueError::ZeroExecutions)));
+        Ok(())
+    }
+
+    #[test]
+    fn test_command_execution_metric_failures_above_executions_returns_error()
+    -> Result<(), CommandTraceValueError> {
+        let result = CommandExecutionMetric::new(
+            identity("telemetry")?,
+            CommandExecutionCount::from(2),
+            CommandExecutionCount::from(3),
+            CommandDurationMillis::from(0),
+        );
+
+        assert!(matches!(result, Err(CommandTraceValueError::FailureCountExceedsExecutions)));
+        Ok(())
+    }
+
+    #[test]
+    fn test_command_execution_metric_maximum_counts_calculates_bounded_failure_rate()
+    -> Result<(), CommandTraceValueError> {
+        let metric = CommandExecutionMetric::new(
+            identity("telemetry")?,
+            CommandExecutionCount::from(u64::MAX),
+            CommandExecutionCount::from(u64::MAX),
+            CommandDurationMillis::from(u64::MAX),
+        )?;
+
+        assert_eq!(metric.failure_rate().value(), 10_000);
+        Ok(())
     }
 
     #[test]

@@ -120,6 +120,16 @@
           "anchor": "No Panics in Library Code"
         }
       ]
+    },
+    {
+      "id": "CN-04",
+      "text": "`sotp telemetry` は、形式不正な記録および未知の `schema_version` を持つ記録を fail-open で skip し、skip した記録件数を報告する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
+          "anchor": "D6"
+        }
+      ]
     }
   ],
   "acceptance_criteria": [
@@ -175,7 +185,7 @@
     }
   ],
   "signals": {
-    "blue": 14,
+    "blue": 15,
     "yellow": 0,
     "red": 0
   }

@@ -13,7 +13,7 @@ use usecase::telemetry::{
     TelemetryEmitDynamicPort, TelemetryEmitDynamicPortError,
     TelemetryErrorEntry as UsecaseErrorEntry, TelemetryHookBlockEntry as UsecaseHookBlockEntry,
     TelemetryPhaseDuration, TelemetryReportError as UsecaseError, TelemetryReportOutput,
-    TelemetryReportPort,
+    TelemetryReportPort, command_trace::TelemetrySkippedLineCount,
 };
 
 use usecase::{
@@ -101,7 +101,8 @@ impl TelemetryReportPort for FsTelemetryReportAdapter {
             phase_durations,
             errors,
             hook_blocks,
-            skipped_lines: infra_output.skipped_lines as usize,
+            skipped_lines: TelemetrySkippedLineCount::from(u64::from(infra_output.skipped_lines)),
+            command_metrics: Vec::new(),
         })
     }
 }
@@ -447,7 +448,7 @@ mod tests {
         assert!(output.phase_durations.is_empty());
         assert!(output.errors.is_empty());
         assert!(output.hook_blocks.is_empty());
-        assert_eq!(output.skipped_lines, 0);
+        assert_eq!(*output.skipped_lines.as_ref(), 0);
     }
 
     #[test]

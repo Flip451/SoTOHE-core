@@ -87,6 +87,54 @@
       "kind": "voluntary_binding",
       "edge_id": {"entry_key": "CommandTraceWriteError", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "CN-03"}},
       "tests": [{"layer": "usecase", "module_path": "usecase::telemetry::command_trace::tests", "test_name": "test_command_trace_interactor_record_writer_unavailable_propagates_error"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CommandExecutionCount", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "IN-03"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::telemetry::command_trace::tests", "test_name": "test_command_execution_metric_valid_aggregation_exposes_typed_values"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CommandExecutionCount", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "AC-02"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::telemetry::command_trace::tests", "test_name": "test_command_execution_metric_valid_aggregation_exposes_typed_values"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CommandFailureRateBasisPoints", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "IN-03"}},
+      "tests": [
+        {"layer": "usecase", "module_path": "usecase::telemetry::command_trace::tests", "test_name": "test_command_execution_metric_valid_aggregation_exposes_typed_values"},
+        {"layer": "usecase", "module_path": "usecase::telemetry::command_trace::tests", "test_name": "test_command_failure_rate_basis_points_above_maximum_returns_range_error"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CommandFailureRateBasisPoints", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "AC-02"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::telemetry::command_trace::tests", "test_name": "test_command_execution_metric_valid_aggregation_exposes_typed_values"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CommandExecutionMetric", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "IN-03"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::telemetry::command_trace::tests", "test_name": "test_command_execution_metric_valid_aggregation_exposes_typed_values"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CommandExecutionMetric", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "AC-02"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::telemetry::command_trace::tests", "test_name": "test_command_execution_metric_valid_aggregation_exposes_typed_values"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "TelemetrySkippedLineCount", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "CN-04"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::telemetry::aggregate_interactor_tests", "test_name": "test_telemetry_aggregate_interactor_report_typed_metrics_preserves_values"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "TelemetryReportOutput", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "IN-03"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::telemetry::aggregate_interactor_tests", "test_name": "test_telemetry_aggregate_interactor_report_typed_metrics_preserves_values"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "TelemetryReportOutput", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "AC-02"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::telemetry::aggregate_interactor_tests", "test_name": "test_telemetry_aggregate_interactor_report_typed_metrics_preserves_values"}]
     }
   ]
 }

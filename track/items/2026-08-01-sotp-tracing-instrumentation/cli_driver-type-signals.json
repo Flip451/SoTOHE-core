@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-01T08:19:34Z",
+  "generated_at": "2026-08-01T15:38:05Z",
   "declaration_hash": "9f8721a78b818840727d1337d96862fa6a82935f8180b5112169382ec49af0f8",
-  "implementation_input_hash": "d3e581a4e82cfa9f60bdb56a3f0800099eb6e1416a0503475087c5ac09111c14",
+  "implementation_input_hash": "1e74d94a533927f5071760600efbf165c849753e32b79a57ba2327c74adbc912",
   "signals": [
     {
       "type_name": "CommandTraceDriver",

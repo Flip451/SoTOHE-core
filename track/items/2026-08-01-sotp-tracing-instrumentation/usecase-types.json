@@ -401,7 +401,7 @@
   "traits": {
     "CommandTraceService": {
       "action": "add",
-      "docs": "Primary application boundary used by the common sotp entrypoint to record one completed command execution.",
+      "docs": "Application-service boundary for CommandTraceRecord.",
       "informal_grounds": [],
       "methods": [
         {
@@ -427,10 +427,6 @@
         "Sync"
       ],
       "spec_refs": [
-        {
-          "anchor": "IN-01",
-          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
-        },
           {
             "anchor": "IN-02",
             "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
@@ -514,7 +510,7 @@
         "shape": {
           "fields": [],
           "has_stripped_fields": true,
-          "kind": "plain"
+          "kind": "tuple"
         }
       },
       "methods": [],
@@ -634,7 +630,7 @@
         "shape": {
           "fields": [],
           "has_stripped_fields": true,
-          "kind": "plain"
+          "kind": "tuple"
         }
       },
       "methods": [],
@@ -671,10 +667,6 @@
         "Interactor": {}
       },
       "spec_refs": [
-        {
-          "anchor": "IN-01",
-          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
-        },
           {
             "anchor": "IN-02",
             "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
@@ -787,7 +779,7 @@
     },
       "CommandTraceWriteError": {
       "action": "add",
-      "docs": "Failure returned by CommandTraceService::record and CommandTraceWriterPort::record; persistence adapters produce Unavailable when recording cannot complete.",
+      "docs": "Error type owned by CommandTraceService::record and CommandTraceWriterPort::record; writer implementations construct Unavailable.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -842,7 +834,7 @@
     },
     "TelemetryReportOutput": {
       "action": "modify",
-      "docs": "Aggregated telemetry report extended with per-command execution frequency, total duration, and typed failure-rate inputs while preserving existing phase, error, hook, and skipped-line details.",
+      "docs": "Usecase report DTO modified with command_metrics and typed skipped_lines fields.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -898,7 +890,7 @@
         "shape": {
           "fields": [],
           "has_stripped_fields": true,
-          "kind": "plain"
+          "kind": "tuple"
         }
       },
       "methods": [],
@@ -908,11 +900,7 @@
       },
       "spec_refs": [
         {
-          "anchor": "IN-03",
-          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
-        },
-        {
-          "anchor": "AC-02",
+          "anchor": "CN-04",
           "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
         }
       ]

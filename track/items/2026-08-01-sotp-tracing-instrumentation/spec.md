@@ -1,7 +1,7 @@
 <!-- Generated from spec.json — DO NOT EDIT DIRECTLY -->
 ---
 version: "1.0"
-signals: { blue: 14, yellow: 0, red: 0 }
+signals: { blue: 15, yellow: 0, red: 0 }
 ---
 
 # Sotp Tracing Instrumentation
@@ -26,6 +26,7 @@ signals: { blue: 14, yellow: 0, red: 0 }
 - [CN-01] 計装記録はローカルで完結させ、外部送信を行わない。 [adr: knowledge/adr/2026-07-29-0839-sotp-tracing-instrumentation.md#D1] [tasks: T001, T002, T003, T004, T005, T006, T007, T008, T009, T010]
 - [CN-02] ローカル JSONL の active 記録ファイルには正の最大バイト数と正の保持ファイル数を設定し、次の記録の追記で最大バイト数を超える前に active ファイルをローテーションする。ローテーション済みファイルが保持数を超える場合は最も古いものを削除する。 [adr: knowledge/adr/2026-08-01-0902-sotp-tracing-rotation-policy.md#D1] [tasks: T005, T008]
 - [CN-03] コマンド trace の記録に失敗した場合、その失敗で panic せず、また黙って握りつぶさず、typed `CommandTraceWriteError` として `Result` を通じて caller へ伝搬する。 [adr: knowledge/adr/2026-08-01-2356-sotp-tracing-write-failure-policy.md#D1] [conv: knowledge/conventions/coding-principles.md#Error Handling: Result and ? Operator, knowledge/conventions/coding-principles.md#No Panics in Library Code] [tasks: T002]
+- [CN-04] `sotp telemetry` は、形式不正な記録および未知の `schema_version` を持つ記録を fail-open で skip し、skip した記録件数を報告する。 [adr: knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md#D6] [tasks: T003, T006]
 
 ## Acceptance Criteria
 - [ ] [AC-01] 任意の `sotp` コマンドを実行すると、そのコマンド identity、所要時間、および exit 結果を含むローカル JSONL 記録が生成される。 [adr: knowledge/adr/2026-07-29-0839-sotp-tracing-instrumentation.md#D1] [tasks: T001, T002, T004, T005, T007, T008, T010]
@@ -40,5 +41,5 @@ signals: { blue: 14, yellow: 0, red: 0 }
 ## Signal Summary
 
 ### Stage 1: Spec Signals
-🔵 14  🟡 0  🔴 0
+🔵 15  🟡 0  🔴 0
 

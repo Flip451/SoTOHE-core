@@ -17,12 +17,8 @@
         "role": "Interactor"
       },
       "brief": "Author a result test covering 'entry' of CommandTraceInteractor",
-      "declaration_hash": "ab2ebf55caa98915b1a81a50ffab6368059e3550746403fc3b811206dd13b49a",
+      "declaration_hash": "f4737828fba9ac3cd13bd6cb916010ae43314331eeba37243f278c4cd92ea5af",
       "spec_refs": [
-        {
-          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
-          "element_id": "IN-01"
-        },
         {
           "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
           "element_id": "IN-02"
@@ -49,12 +45,8 @@
         "role": "ApplicationService"
       },
       "brief": "Author a result test covering 'trait_method:record' of CommandTraceService",
-      "declaration_hash": "9bb50f34d827d84fdc36f613d914eea263549a3db4a5218f6abbc344c20522e8",
+      "declaration_hash": "bc1269a038dd12381cb2b39a548e1e10aeb7187ed02cf0b9696874ad350aa647",
       "spec_refs": [
-        {
-          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
-          "element_id": "IN-01"
-        },
         {
           "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
           "element_id": "IN-02"

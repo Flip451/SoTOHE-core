@@ -18,6 +18,8 @@ use crate::git_workflow::GitPrimitivePort;
 
 pub mod command_trace;
 
+use command_trace::{CommandExecutionMetric, TelemetrySkippedLineCount};
+
 // ── TelemetryReportPort ───────────────────────────────────────────────────────
 
 /// Report record for a single telemetry phase duration.
@@ -63,7 +65,9 @@ pub struct TelemetryReportOutput {
     /// Hook block entries.
     pub hook_blocks: Vec<TelemetryHookBlockEntry>,
     /// Count of skipped (unparseable) lines.
-    pub skipped_lines: usize,
+    pub skipped_lines: TelemetrySkippedLineCount,
+    /// Per-command execution metrics.
+    pub command_metrics: Vec<CommandExecutionMetric>,
 }
 
 /// Error type for [`TelemetryReportPort`].
@@ -602,7 +606,10 @@ mod aggregate_interactor_tests {
         ArchivedTelemetryFactoryPort, ArchivedTrackTelemetryError, ArchivedTrackTelemetryPort,
         TelemetryAggregateService, TelemetryAggregateServiceError, TelemetryErrorEntry,
         TelemetryHookBlockEntry, TelemetryPhaseDuration, TelemetryReportError,
-        TelemetryReportOutput, TelemetryReportPort,
+        TelemetryReportOutput, TelemetryReportPort, command_trace::TelemetrySkippedLineCount,
+    };
+    use crate::telemetry::command_trace::{
+        CommandDurationMillis, CommandExecutionCount, CommandExecutionMetric, SotpCommandIdentity,
     };
 
     /// Minimal [`GitPrimitivePort`] stub: only `resolve_repo_root` is meaningful;
@@ -771,7 +778,8 @@ mod aggregate_interactor_tests {
             phase_durations: Vec::<TelemetryPhaseDuration>::new(),
             errors: Vec::<TelemetryErrorEntry>::new(),
             hook_blocks: Vec::<TelemetryHookBlockEntry>::new(),
-            skipped_lines: 0,
+            skipped_lines: TelemetrySkippedLineCount::from(0),
+            command_metrics: Vec::new(),
         }
     }
 
@@ -797,7 +805,54 @@ mod aggregate_interactor_tests {
         let interactor = facade(git, report, factory);
 
         let out = interactor.report("t", Path::new("track/items")).unwrap();
-        assert_eq!(out.skipped_lines, 0);
+        assert_eq!(*out.skipped_lines.as_ref(), 0);
+    }
+
+    #[test]
+    fn test_telemetry_aggregate_interactor_report_typed_metrics_preserves_values()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let metric = CommandExecutionMetric::new(
+            SotpCommandIdentity::try_new("telemetry".to_owned())?,
+            CommandExecutionCount::from(4),
+            CommandExecutionCount::from(1),
+            CommandDurationMillis::from(240),
+        )?;
+        let output = TelemetryReportOutput {
+            phase_durations: Vec::new(),
+            errors: Vec::new(),
+            hook_blocks: Vec::new(),
+            skipped_lines: TelemetrySkippedLineCount::from(2),
+            command_metrics: vec![metric],
+        };
+        let git = Arc::new(StubGit { repo_root: Some(PathBuf::from("/repo")) });
+        let report = Arc::new(StubReport { result: Mutex::new(Some(Ok(output))) });
+        let factory = Arc::new(StubFactory {
+            built_dir: Mutex::new(None),
+            port: Arc::new(RecordingArchivedPort::default()),
+        });
+        let interactor = facade(git, report, factory);
+
+        let output = interactor.report("t", Path::new("track/items"))?;
+
+        assert_eq!(*output.skipped_lines.as_ref(), 2);
+        assert_eq!(output.command_metrics.len(), 1);
+        assert_eq!(
+            output.command_metrics.first().map(|metric| metric.command().as_str()),
+            Some("telemetry")
+        );
+        assert_eq!(
+            output.command_metrics.first().map(|metric| *metric.executions().as_ref()),
+            Some(4)
+        );
+        assert_eq!(
+            output.command_metrics.first().map(|metric| *metric.total_duration().as_ref()),
+            Some(240)
+        );
+        assert_eq!(
+            output.command_metrics.first().map(|metric| metric.failure_rate().value()),
+            Some(2_500)
+        );
+        Ok(())
     }
 
     #[test]

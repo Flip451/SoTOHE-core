@@ -11,14 +11,15 @@
       "id": "T002",
       "description": "Add `CommandTraceService`, `CommandTraceWriterPort`, `CommandTraceInteractor`, and `CommandTraceWriteError` in `libs/usecase/src/telemetry/command_trace.rs`, including recording-flow result and port-contract tests. IN-01, IN-02, CN-01, CN-03, AC-01, AC-03.",
       "status": "done",
+      "commit_hash": "f83e49e3be1d5981ba9810f9a69ae308adfc9251",
       "depends_on": [
         "T001"
       ]
     },
     {
       "id": "T003",
-      "description": "Extend `TelemetryAggregateInteractor` and the usecase telemetry output with typed per-command execution metrics, bounded failure-rate data, and malformed-record accounting, with focused aggregation-conversion tests. IN-03, CN-01, AC-02, AC-03.",
-      "status": "todo",
+      "description": "Extend `TelemetryAggregateInteractor` and the usecase telemetry output with typed per-command execution metrics, bounded failure-rate data, and fail-open malformed- and unknown-schema-record skipped-count accounting, with focused aggregation-conversion tests. IN-03, CN-01, CN-04, AC-02, AC-03.",
+      "status": "done",
       "depends_on": [
         "T001"
       ]
@@ -41,7 +42,7 @@
     },
     {
       "id": "T006",
-      "description": "Delete the old infrastructure `TelemetryReportOutput`, modify `TelemetryReport::aggregate`, add the layer-unique `TelemetryReportSnapshot` read model, and update `FsTelemetryReportAdapter` conversion into the usecase output for persisted command metrics, with focused aggregation-path tests. IN-03, OUT-01, CN-01, AC-02, AC-03.",
+      "description": "Delete the old infrastructure `TelemetryReportOutput`, modify `TelemetryReport::aggregate`, add the layer-unique `TelemetryReportSnapshot` read model, and update `FsTelemetryReportAdapter` parser-to-usecase conversion for persisted command metrics and fail-open malformed- and unknown-schema-record skip reporting, with focused aggregation-path tests. IN-03, OUT-01, CN-01, CN-04, AC-02, AC-03.",
       "status": "todo",
       "depends_on": [
         "T003",

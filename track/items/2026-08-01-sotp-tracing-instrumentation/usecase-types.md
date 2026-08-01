@@ -11,11 +11,11 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | CommandDurationMillis | value_object | add | — | 🔵 | 🔵 |
-| CommandExecutionCount | value_object | add | — | 🟡 | 🔵 |
+| CommandExecutionCount | value_object | add | — | 🔵 | 🔵 |
 | CommandExitCode | value_object | add | — | 🔵 | 🔵 |
-| CommandFailureRateBasisPoints | value_object | add | — | 🟡 | 🔵 |
+| CommandFailureRateBasisPoints | value_object | add | — | 🔵 | 🔵 |
 | SotpCommandIdentity | value_object | add | — | 🔵 | 🔵 |
-| TelemetrySkippedLineCount | value_object | add | — | 🟡 | 🔵 |
+| TelemetrySkippedLineCount | value_object | add | — | 🔵 | 🔵 |
 
 ## Error Types
 
@@ -46,7 +46,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CommandExecutionMetric | dto | add | — | 🟡 | 🔵 |
+| CommandExecutionMetric | dto | add | — | 🔵 | 🔵 |
 | CommandTraceRecord | dto | add | — | 🔵 | 🔵 |
-| TelemetryReportOutput | dto | modify | — | 🟡 | 🔵 |
+| TelemetryReportOutput | dto | modify | — | 🔵 | 🔵 |
 

@@ -27,7 +27,7 @@
       }
     },
     {
-      "claim_hash": "50dba965059d482adf4752a57c6965fb3a7c3626a7e8662e05cd4f6ebfdd40d7",
+      "claim_hash": "48dffc8f96fd1aaa54729c3b7a8f57cecac977dac11f96fbfa0680dcbbc0d722",
       "evidence_hash": "25d5c97dc542d7627efe73da21e8978c7b82e337866c1d1fcb5ca75c2bf4a2b5",
       "verdict": {
         "kind": "pass",
@@ -51,7 +51,7 @@
       }
     },
     {
-      "claim_hash": "50dba965059d482adf4752a57c6965fb3a7c3626a7e8662e05cd4f6ebfdd40d7",
+      "claim_hash": "48dffc8f96fd1aaa54729c3b7a8f57cecac977dac11f96fbfa0680dcbbc0d722",
       "evidence_hash": "ff37151e9ec452725ac4307678171a9e4d8466fb21a821946b439929a12cf635",
       "verdict": {
         "kind": "pass",
@@ -195,7 +195,7 @@
       }
     },
     {
-      "claim_hash": "67641ff3b2743864411802e8560e309426d2062ea965536d9d6355cb71ee006e",
+      "claim_hash": "d3f504cc0410f0d3aa9a74be80657735ecaefbb432988400f0563f9ffd0bd259",
       "evidence_hash": "25d5c97dc542d7627efe73da21e8978c7b82e337866c1d1fcb5ca75c2bf4a2b5",
       "verdict": {
         "kind": "pass",
@@ -219,7 +219,7 @@
       }
     },
     {
-      "claim_hash": "67641ff3b2743864411802e8560e309426d2062ea965536d9d6355cb71ee006e",
+      "claim_hash": "d3f504cc0410f0d3aa9a74be80657735ecaefbb432988400f0563f9ffd0bd259",
       "evidence_hash": "ff37151e9ec452725ac4307678171a9e4d8466fb21a821946b439929a12cf635",
       "verdict": {
         "kind": "pass",
@@ -243,31 +243,7 @@
       }
     },
     {
-      "claim_hash": "66228f703039718ea4b1acec506220bf04565e27fecde53953e09631c36725bc",
-      "evidence_hash": "f92832f5450d69a09850f4956fad3ba679b857fc835c4266b0c10df3e15394c3",
-      "verdict": {
-        "kind": "pass",
-        "citation": "すべての `sotp` コマンドを共通の entry point で tracing 計装し、コマンド横断で一貫した実行観測を行う。"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
-          "section_key": "types",
-          "entry_key": "CommandTraceInteractor"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "in_scope",
-          "element_id": "IN-01",
-          "text_label": "すべての `sotp` コマンドを共通の entry point で tracing 計装し、コマンド横断で一貫した実行観測を行う。"
-        }
-      }
-    },
-    {
-      "claim_hash": "66228f703039718ea4b1acec506220bf04565e27fecde53953e09631c36725bc",
+      "claim_hash": "a717f7580f07ce7badb756721c3feb50d14f92c172644efd2a14270038a53762",
       "evidence_hash": "7d442a8ba6b078174131cac5825c183427295e92bdc20170d3064381163593a3",
       "verdict": {
         "kind": "pass",
@@ -291,7 +267,7 @@
       }
     },
     {
-      "claim_hash": "66228f703039718ea4b1acec506220bf04565e27fecde53953e09631c36725bc",
+      "claim_hash": "a717f7580f07ce7badb756721c3feb50d14f92c172644efd2a14270038a53762",
       "evidence_hash": "6c9c5f07c9b1cc26e864497729497ffe69e2f6f9a6a728417cc3bfb2c0812297",
       "verdict": {
         "kind": "pass",
@@ -435,11 +411,11 @@
       }
     },
     {
-      "claim_hash": "f7512640cbb7acce665ba6247bfd7b9bb1c7100299af8e7979d1ea11cc0f309e",
+      "claim_hash": "dab57c82ff4eb3918372a12f6facb8369c44710ed752119c97352c320a8a1311",
       "evidence_hash": "6c9c5f07c9b1cc26e864497729497ffe69e2f6f9a6a728417cc3bfb2c0812297",
       "verdict": {
         "kind": "pass",
-        "citation": "その失敗で panic せず、また黙って握りつぶさず、typed `CommandTraceWriteError` として `Result` を通じて caller へ伝搬する。"
+        "citation": "typed `CommandTraceWriteError` として `Result` を通じて caller へ伝搬する"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -507,7 +483,7 @@
       }
     },
     {
-      "claim_hash": "abe3c5258bdb33add511f8b359b821274bee3603fbc77092cac14aeb00fdee19",
+      "claim_hash": "3e225f72b306332000b1197464117be3422fd9fd45975c891dbdd3ee92513781",
       "evidence_hash": "25d5c97dc542d7627efe73da21e8978c7b82e337866c1d1fcb5ca75c2bf4a2b5",
       "verdict": {
         "kind": "pass",
@@ -531,11 +507,11 @@
       }
     },
     {
-      "claim_hash": "abe3c5258bdb33add511f8b359b821274bee3603fbc77092cac14aeb00fdee19",
+      "claim_hash": "3e225f72b306332000b1197464117be3422fd9fd45975c891dbdd3ee92513781",
       "evidence_hash": "ff37151e9ec452725ac4307678171a9e4d8466fb21a821946b439929a12cf635",
       "verdict": {
         "kind": "pass",
-        "citation": "コマンド横断の実行頻度、所要時間、および失敗率を確認できる。"
+        "citation": "sotp telemetry はローカル記録を分析し、コマンド横断の実行頻度、所要時間、および失敗率を確認できる。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -555,11 +531,11 @@
       }
     },
     {
-      "claim_hash": "7e2086e0d5939d7d0e1de9d69153fa4b717ae04f9c585acdfe98cf9c893e616a",
-      "evidence_hash": "25d5c97dc542d7627efe73da21e8978c7b82e337866c1d1fcb5ca75c2bf4a2b5",
+      "claim_hash": "e452641fc2b6ab10f66fb9b0dd1506ccec147486d6241057c495beffa10fa4cd",
+      "evidence_hash": "72c1edd5118982c658d6ab99834bd5ba79a4d5b50570869c9a3f6d00bdc8a395",
       "verdict": {
         "kind": "pass",
-        "citation": "既存の `sotp telemetry` を、このローカル記録からコマンド横断の利用頻度、所要時間、および失敗率を分析できるように拡張する。"
+        "citation": "skip した記録件数を報告する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -572,62 +548,14 @@
       "evidence_origin": {
         "kind": "spec_element",
         "data": {
-          "section": "in_scope",
-          "element_id": "IN-03",
-          "text_label": "既存の `sotp telemetry` を、このローカル記録からコマンド横断の利用頻度、所要時間、および失敗率を分析できるように拡張する。"
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "`sotp telemetry` は、形式不正な記録および未知の `schema_version` を持つ記録を fail-open で skip し、skip した記録件数を報告する。"
         }
       }
     },
     {
-      "claim_hash": "7e2086e0d5939d7d0e1de9d69153fa4b717ae04f9c585acdfe98cf9c893e616a",
-      "evidence_hash": "ff37151e9ec452725ac4307678171a9e4d8466fb21a821946b439929a12cf635",
-      "verdict": {
-        "kind": "pass",
-        "citation": "`sotp telemetry` はローカル記録を分析し、コマンド横断の実行頻度、所要時間、および失敗率を確認できる。"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
-          "section_key": "types",
-          "entry_key": "TelemetrySkippedLineCount"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "acceptance_criteria",
-          "element_id": "AC-02",
-          "text_label": "`sotp telemetry` はローカル記録を分析し、コマンド横断の実行頻度、所要時間、および失敗率を確認できる。"
-        }
-      }
-    },
-    {
-      "claim_hash": "1c4d951b6098a4bcb04e5177dba3a27553af1f155e1a37999b9b840de77a0a1e",
-      "evidence_hash": "f92832f5450d69a09850f4956fad3ba679b857fc835c4266b0c10df3e15394c3",
-      "verdict": {
-        "kind": "pass",
-        "citation": "すべての `sotp` コマンドを共通の entry point で tracing 計装し、コマンド横断で一貫した実行観測を行う。"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
-          "section_key": "traits",
-          "entry_key": "CommandTraceService"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "in_scope",
-          "element_id": "IN-01",
-          "text_label": "すべての `sotp` コマンドを共通の entry point で tracing 計装し、コマンド横断で一貫した実行観測を行う。"
-        }
-      }
-    },
-    {
-      "claim_hash": "1c4d951b6098a4bcb04e5177dba3a27553af1f155e1a37999b9b840de77a0a1e",
+      "claim_hash": "6253654df178cf74df21a2226fca8822693a4ebc2106b1ccb2933a51c77f89bb",
       "evidence_hash": "7d442a8ba6b078174131cac5825c183427295e92bdc20170d3064381163593a3",
       "verdict": {
         "kind": "pass",
@@ -651,7 +579,7 @@
       }
     },
     {
-      "claim_hash": "1c4d951b6098a4bcb04e5177dba3a27553af1f155e1a37999b9b840de77a0a1e",
+      "claim_hash": "6253654df178cf74df21a2226fca8822693a4ebc2106b1ccb2933a51c77f89bb",
       "evidence_hash": "6c9c5f07c9b1cc26e864497729497ffe69e2f6f9a6a728417cc3bfb2c0812297",
       "verdict": {
         "kind": "pass",
