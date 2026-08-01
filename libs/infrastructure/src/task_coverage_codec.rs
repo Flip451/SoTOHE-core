@@ -158,7 +158,10 @@ fn section_from_dto(
 /// Returns `TaskCoverageCodecError::Json` if serialization fails.
 pub fn encode(doc: &TaskCoverageDocument) -> Result<String, TaskCoverageCodecError> {
     let dto = task_coverage_to_dto(doc);
-    Ok(serde_json::to_string_pretty(&dto)?)
+    // Serialize through Value so all object keys retain canonical order in the
+    // persisted JSON, including each coverage section.
+    let value = serde_json::to_value(&dto)?;
+    Ok(serde_json::to_string_pretty(&value)?)
 }
 
 fn task_coverage_to_dto(doc: &TaskCoverageDocument) -> TaskCoverageDocumentDto {
@@ -343,6 +346,20 @@ mod tests {
         let doc = decode(MINIMAL_JSON).unwrap();
         let json = encode(&doc).unwrap();
         assert!(json.contains('\n'));
+    }
+
+    #[test]
+    fn test_encode_identical_coverage_returns_deterministic_json_bytes() {
+        let doc = decode(FULL_JSON).unwrap();
+
+        let first = encode(&doc).unwrap();
+        let second = encode(&doc).unwrap();
+
+        assert_eq!(first, second);
+        assert!(
+            first.starts_with("{\n  \"acceptance_criteria\":"),
+            "top-level coverage keys must be canonicalized: {first}"
+        );
     }
 
     #[test]

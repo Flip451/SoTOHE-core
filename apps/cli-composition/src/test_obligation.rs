@@ -339,6 +339,7 @@ fn default_probe_config() -> SemanticCalibrationProbeConfig {
 #[allow(clippy::unwrap_used)]
 mod tests {
     use cli_driver::test_obligation::check::TestObligationCheckInput;
+    use cli_driver::test_obligation::derive::TestObligationDeriveInput;
     use cli_driver::test_obligation::results::TestObligationResultsInput;
     use domain::ModelTier;
     use infrastructure::agent_profiles::{ResolvedExecution, RoundType};
@@ -523,6 +524,48 @@ mod tests {
         )
         .unwrap();
         assert_ne!(root.check_handler().handle(invalid_rules_input).exit_code, 0);
+    }
+
+    #[test]
+    fn test_derive_handler_repeated_active_branch_invocations_write_identical_bytes() {
+        const TRACK_ID: &str = "2026-08-01-deterministic-json-serialization";
+
+        let _guard = crate::test_support::process_env_lock().lock().unwrap();
+        let workspace = tempfile::tempdir().unwrap();
+        crate::test_support::seed_repo(workspace.path(), &format!("track/{TRACK_ID}"));
+        crate::test_support::run_in_dir(workspace.path(), || {
+            let workspace_root = workspace.path();
+            let source_root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
+            let source_track = source_root.join("track/items").join(TRACK_ID);
+            let target_track = workspace_root.join("track/items").join(TRACK_ID);
+            let rules_path = workspace_root.join(TEST_OBLIGATION_RULES_PATH);
+
+            std::fs::create_dir_all(rules_path.parent().unwrap()).unwrap();
+            std::fs::create_dir_all(&target_track).unwrap();
+            std::fs::copy(source_root.join(TEST_OBLIGATION_RULES_PATH), &rules_path).unwrap();
+            for artifact in [
+                "spec.json",
+                "domain-types.json",
+                "usecase-types.json",
+                "infrastructure-types.json",
+                "cli_driver-types.json",
+                "cli_composition-types.json",
+                "cli-types.json",
+            ] {
+                std::fs::copy(source_track.join(artifact), target_track.join(artifact)).unwrap();
+            }
+
+            let root = TestObligationCompositionRoot::new(workspace_root.to_path_buf(), rules_path);
+            let input =
+                TestObligationDeriveInput::try_from_raw(None, format!("track/{TRACK_ID}")).unwrap();
+
+            assert_eq!(root.derive_handler().handle(input.clone()).exit_code, 0);
+            let first = std::fs::read(target_track.join("obligations.json")).unwrap();
+            assert_eq!(root.derive_handler().handle(input).exit_code, 0);
+            let second = std::fs::read(target_track.join("obligations.json")).unwrap();
+
+            assert_eq!(first, second, "active-track derive must not churn JSON bytes");
+        });
     }
 
     #[test]

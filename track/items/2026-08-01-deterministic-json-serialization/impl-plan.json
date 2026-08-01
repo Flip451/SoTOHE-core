@@ -10,27 +10,27 @@
     {
       "id": "T2",
       "description": "Update `libs/infrastructure/src/impl_plan_codec.rs::encode`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T3",
       "description": "Update `libs/infrastructure/src/review_v2/persistence/mod.rs::write_atomic`; add fast- and final-round fixtures in `apps/cli-composition/src/review_v2/run.rs`. [IN-01; IN-02; CN-01; AC-01; AC-02]",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T4",
       "description": "Update `libs/infrastructure/src/spec/codec.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T5",
       "description": "Update `libs/infrastructure/src/task_coverage_codec.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T6",
       "description": "Update `libs/infrastructure/src/schema_export_codec.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T7",
@@ -105,7 +105,7 @@
     {
       "id": "T21",
       "description": "Extend `apps/cli-composition/src/test_obligation.rs::TestObligationCompositionRoot::derive_handler` fixtures for two active-branch invocations. [IN-03; CN-02; AC-03]",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T22",

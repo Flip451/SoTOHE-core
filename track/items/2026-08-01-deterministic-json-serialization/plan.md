@@ -5,23 +5,23 @@
 
 GO-01: T1-T29.
 
-## Tasks (1/29 resolved)
+## Tasks (7/29 resolved)
 
 ### core-track-review-codecs — Core track and review codecs
 
 > Update track, impl-plan, and review persistence writers; add local regressions. [IN-01; IN-02; OS-01; CN-01; CN-03; AC-01; AC-02]
 
 - [x] **T1**: Update `libs/infrastructure/src/track/codec.rs::encode`; add codec-local serialization regression. [IN-01; IN-02; OS-01; CN-01; CN-03; AC-01] (`74197666e0b75a3199712b42f791c0ae3ee2d6a9`)
-- [ ] **T2**: Update `libs/infrastructure/src/impl_plan_codec.rs::encode`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
-- [ ] **T3**: Update `libs/infrastructure/src/review_v2/persistence/mod.rs::write_atomic`; add fast- and final-round fixtures in `apps/cli-composition/src/review_v2/run.rs`. [IN-01; IN-02; CN-01; AC-01; AC-02]
+- [x] **T2**: Update `libs/infrastructure/src/impl_plan_codec.rs::encode`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
+- [x] **T3**: Update `libs/infrastructure/src/review_v2/persistence/mod.rs::write_atomic`; add fast- and final-round fixtures in `apps/cli-composition/src/review_v2/run.rs`. [IN-01; IN-02; CN-01; AC-01; AC-02]
 
 ### track-artifact-codecs — Track artifact codecs
 
 > Update spec, task-coverage, schema-export, signal, and task-contract codecs; add local regressions. [IN-01; IN-02; CN-01; AC-01]
 
-- [ ] **T4**: Update `libs/infrastructure/src/spec/codec.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
-- [ ] **T5**: Update `libs/infrastructure/src/task_coverage_codec.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
-- [ ] **T6**: Update `libs/infrastructure/src/schema_export_codec.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
+- [x] **T4**: Update `libs/infrastructure/src/spec/codec.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
+- [x] **T5**: Update `libs/infrastructure/src/task_coverage_codec.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
+- [x] **T6**: Update `libs/infrastructure/src/schema_export_codec.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
 - [ ] **T7**: Update `libs/infrastructure/src/signal.rs`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
 - [ ] **T23**: Update `libs/infrastructure/src/task_contract_codec.rs::encode`; add codec-local serialization regression. [IN-01; IN-02; CN-01; AC-01]
 
@@ -68,5 +68,5 @@ GO-01: T1-T29.
 
 > Extend `test_obligation.rs::TestObligationCompositionRoot::derive_handler` fixtures. [IN-03; OS-02; CN-02; AC-03; AC-04]
 
-- [ ] **T21**: Extend `apps/cli-composition/src/test_obligation.rs::TestObligationCompositionRoot::derive_handler` fixtures for two active-branch invocations. [IN-03; CN-02; AC-03]
+- [x] **T21**: Extend `apps/cli-composition/src/test_obligation.rs::TestObligationCompositionRoot::derive_handler` fixtures for two active-branch invocations. [IN-03; CN-02; AC-03]
 - [ ] **T22**: Extend `apps/cli-composition/src/test_obligation.rs::TestObligationCompositionRoot::derive_handler` fixtures for a completed-track invocation. [OS-02; CN-02; AC-04]

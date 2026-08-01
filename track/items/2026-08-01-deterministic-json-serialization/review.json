@@ -1,35 +1,51 @@
 {
   "schema_version": 2,
   "scopes": {
-    "adr": {
+    "cli_composition": {
       "rounds": [
         {
           "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:860d7738e9dd8d32339a2adfc1caa731073e65a830206a7445d59c09e41f2fba",
-          "at": "2026-08-01T04:31:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:860d7738e9dd8d32339a2adfc1caa731073e65a830206a7445d59c09e41f2fba",
-          "at": "2026-08-01T04:34:20Z"
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new fast/final review tests invoke `run_claude_review_str` only once and assert key-order substrings; they never compare serialized bytes across repeated equivalent invocations, so they do not prove the required deterministic-output behavior for either review round.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/review_v2/run.rs",
+              "line": 733,
+              "category": "test-coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:819ab04e3c486ef48dc213d75cc3868375c53cd56732485c266048502b3db32c",
+          "at": "2026-08-01T07:32:58Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:9208ee3b0168c2a1bde20d6a2a90dcc219e23b222b06802ccb47ce8ee888bd62",
-          "at": "2026-08-01T04:44:25Z"
+          "hash": "rvw1:sha256:2d558d735fafa9275f3b85ecaa90726d7d783257c9510b582433c6832126ef18",
+          "at": "2026-08-01T07:38:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`assert_review_round_writes_canonical_json` mutates the process-wide current directory while holding only this module's `ENV_LOCK`. The new derive fixture mutates it under `crate::test_support::process_env_lock`, so both tests can run concurrently and capture or restore each other's temporary directory, causing nondeterministic failures or execution in the wrong repository. Use the shared process-wide lock or avoid changing CWD.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/review_v2/run.rs",
+              "line": 747,
+              "category": "test_independence"
+            }
+          ],
+          "hash": "rvw1:sha256:2d558d735fafa9275f3b85ecaa90726d7d783257c9510b582433c6832126ef18",
+          "at": "2026-08-01T07:45:21Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:9208ee3b0168c2a1bde20d6a2a90dcc219e23b222b06802ccb47ce8ee888bd62",
-          "at": "2026-08-01T04:47:50Z"
+          "hash": "rvw1:sha256:876463862e530d05c558e3a51f292663d3f7c777f901518673a7664d0519109a",
+          "at": "2026-08-01T07:50:36Z"
         }
       ]
     },
@@ -48,57 +64,35 @@
           "findings": [],
           "hash": "rvw1:sha256:8e933242abf043664e6fe6a004f2acaef6aa00cdd557840dc55f49eac083fcb8",
           "at": "2026-08-01T06:55:21Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
+        },
         {
           "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:636fdc72418438b84af5c9014c2a82aa5f96bde31d683eea768062b4fa3a1f84",
+          "at": "2026-08-01T07:31:49Z"
+        },
+        {
+          "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "CN-03 is vague and untestable: “performance becomes material” and “substantially larger” have no measurable threshold, so downstream phases cannot derive when reassessment is required.",
+              "message": "The new determinism regression uses an empty schema and checks only pretty output beginning with `crate_name`. Both assertions also pass with the pre-change direct DTO serialization because `crate_name` is already the DTO's first field, so the test does not exercise recursive canonical ordering or the compact branch. Use a populated nested DTO whose declaration order differs from lexical order and assert canonical bytes for both `pretty` values.",
               "severity": "P1",
-              "file": "track/items/2026-08-01-deterministic-json-serialization/spec.json",
-              "line": 96,
-              "category": "constraint vague or untestable"
+              "file": "libs/infrastructure/src/schema_export_codec.rs",
+              "line": 430,
+              "category": "test_coverage"
             }
           ],
-          "hash": "rvw1:sha256:9d0e94da9d413c623a3c4c5ddcbff2fb68e6bfa62d7e7831c6e4801f4cce57ed",
-          "at": "2026-08-01T05:13:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:650f10a114bfffa16d46e1e779854e06f614290e10b89340b7bcd51ca220748d",
-          "at": "2026-08-01T05:15:59Z"
+          "hash": "rvw1:sha256:636fdc72418438b84af5c9014c2a82aa5f96bde31d683eea768062b4fa3a1f84",
+          "at": "2026-08-01T07:45:15Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:650f10a114bfffa16d46e1e779854e06f614290e10b89340b7bcd51ca220748d",
-          "at": "2026-08-01T05:25:26Z"
-        }
-      ]
-    },
-    "types": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4dec35b2ce6cd412c928fba53eb0401fb60a3d8719b866e113f75b084704c4c7",
-          "at": "2026-08-01T05:14:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4dec35b2ce6cd412c928fba53eb0401fb60a3d8719b866e113f75b084704c4c7",
-          "at": "2026-08-01T05:26:25Z"
+          "hash": "rvw1:sha256:2fc0c47780eedb9ca7c2f82a2d27183b64dccd6958c6ab93c15b3810abd2d24a",
+          "at": "2026-08-01T07:51:24Z"
         }
       ]
     },
@@ -131,6 +125,24 @@
           "findings": [],
           "hash": "rvw1:sha256:b665d7e3cfe103badf0a5c106ac0eb4e01c7398f97a248a3b55df0b1ecc56feb",
           "at": "2026-08-01T06:53:28Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4dec35b2ce6cd412c928fba53eb0401fb60a3d8719b866e113f75b084704c4c7",
+          "at": "2026-08-01T05:14:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4dec35b2ce6cd412c928fba53eb0401fb60a3d8719b866e113f75b084704c4c7",
+          "at": "2026-08-01T05:26:25Z"
         }
       ]
     },
@@ -556,6 +568,85 @@
           "findings": [],
           "hash": "rvw1:sha256:d72b5fdcc2d200ba30274c0e770cf5009429d13996e2fc2fad8512c21555e90e",
           "at": "2026-08-01T07:11:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:adc646f2d7283c01b4e4fd52205a5854cfbc3b54107391c7a56b234351420e4b",
+          "at": "2026-08-01T07:31:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:adc646f2d7283c01b4e4fd52205a5854cfbc3b54107391c7a56b234351420e4b",
+          "at": "2026-08-01T07:41:05Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-03 is vague and untestable: “performance becomes material” and “substantially larger” have no measurable threshold, so downstream phases cannot derive when reassessment is required.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-deterministic-json-serialization/spec.json",
+              "line": 96,
+              "category": "constraint vague or untestable"
+            }
+          ],
+          "hash": "rvw1:sha256:9d0e94da9d413c623a3c4c5ddcbff2fb68e6bfa62d7e7831c6e4801f4cce57ed",
+          "at": "2026-08-01T05:13:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:650f10a114bfffa16d46e1e779854e06f614290e10b89340b7bcd51ca220748d",
+          "at": "2026-08-01T05:15:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:650f10a114bfffa16d46e1e779854e06f614290e10b89340b7bcd51ca220748d",
+          "at": "2026-08-01T05:25:26Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:860d7738e9dd8d32339a2adfc1caa731073e65a830206a7445d59c09e41f2fba",
+          "at": "2026-08-01T04:31:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:860d7738e9dd8d32339a2adfc1caa731073e65a830206a7445d59c09e41f2fba",
+          "at": "2026-08-01T04:34:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9208ee3b0168c2a1bde20d6a2a90dcc219e23b222b06802ccb47ce8ee888bd62",
+          "at": "2026-08-01T04:44:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9208ee3b0168c2a1bde20d6a2a90dcc219e23b222b06802ccb47ce8ee888bd62",
+          "at": "2026-08-01T04:47:50Z"
         }
       ]
     }

@@ -302,7 +302,10 @@ fn plan_section_from_dto(dto: ImplPlanSectionDto) -> Result<PlanSection, ImplPla
 /// Returns `ImplPlanCodecError::Json` if serialization fails.
 pub fn encode(doc: &ImplPlanDocument) -> Result<String, ImplPlanCodecError> {
     let dto = impl_plan_to_dto(doc);
-    Ok(serde_json::to_string_pretty(&dto)?)
+    // Serialize through Value so every object, including nested plan entries,
+    // is canonicalized before pretty-printing.
+    let value = serde_json::to_value(&dto)?;
+    Ok(serde_json::to_string_pretty(&value)?)
 }
 
 fn impl_plan_to_dto(doc: &ImplPlanDocument) -> ImplPlanDocumentDto {
@@ -575,6 +578,20 @@ mod tests {
         let doc = decode(MINIMAL_JSON).unwrap();
         let json = encode(&doc).unwrap();
         assert!(json.contains('\n'));
+    }
+
+    #[test]
+    fn test_encode_identical_plan_returns_deterministic_json_bytes() {
+        let doc = decode(FULL_JSON).unwrap();
+
+        let first = encode(&doc).unwrap();
+        let second = encode(&doc).unwrap();
+
+        assert_eq!(first, second);
+        assert!(
+            first.contains("\"plan\": {\n    \"sections\": [\n      {\n        \"description\":"),
+            "nested plan object keys must be canonicalized: {first}"
+        );
     }
 
     // --- round-trip tests ---
