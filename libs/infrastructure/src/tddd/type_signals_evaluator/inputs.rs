@@ -41,7 +41,7 @@ pub(super) fn read_utf8_file_limited(
 }
 
 /// Computes the current implementation-side input hash for one layer.
-pub(super) fn hash_workspace_inputs(
+pub(crate) fn hash_workspace_inputs(
     workspace_root: &Path,
     target_crate: &str,
     features: &[CargoFeatureName],

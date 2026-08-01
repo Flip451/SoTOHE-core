@@ -325,13 +325,13 @@
         "item_identifier": "trait_method:load"
       },
       "key": {
-        "bound_tests_set_hash": "7340d0a12f3bb19b4d26f773dc209aad29a079aaa2a49cf740a25c8fbf149f10",
+        "bound_tests_set_hash": "f1b715f614d5ac72afcecb7ac1288083c70008d7f30a628506001f8e38993760",
         "declaration_hash": "b4f84af0654cdbb29595f15886f7d96d42b6b9b9f7cadc38c4e95a3196ed291d",
         "anchor_text_hash": "05468ddacc756be4757924603e10be69c08a9255aa70f9b8532c2b3ec6c11b5d"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let adr_user = SignalReportSourcePort::load(&adapter, SignalReportChain::AdrUser)\n            .expect(\"public port must derive the ADR-user chain at report time\");\n        let spec_adr = SignalReportSourcePort::load(&adapter, SignalReportChain::SpecAdr)\n            .expect(\"public port must derive the spec-ADR chain at report time\");\n        assert_eq!(\n            snapshot_tree(fixture.path()),\n            before,\n            \"report loading must neither alter inputs nor create derived occurrence, signal, or aggregate artifacts\"\n        );"
+        "citation": "\"public port must read the persisted catalogue signal artifact\" ... \"public port must derive the ADR-user chain at report time\" ... \"report loading must neither alter inputs nor create derived occurrence, signal, or aggregate artifacts\""
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -366,7 +366,7 @@
         "item_identifier": "trait_method:load"
       },
       "key": {
-        "bound_tests_set_hash": "7340d0a12f3bb19b4d26f773dc209aad29a079aaa2a49cf740a25c8fbf149f10",
+        "bound_tests_set_hash": "f1b715f614d5ac72afcecb7ac1288083c70008d7f30a628506001f8e38993760",
         "declaration_hash": "b4f84af0654cdbb29595f15886f7d96d42b6b9b9f7cadc38c4e95a3196ed291d",
         "anchor_text_hash": "f597b4515c60e8b8a68d66fbdd45ec775b0e4962442225ed266047ffd4dfe0c4"
       },
@@ -407,7 +407,7 @@
         "item_identifier": "trait_method:load"
       },
       "key": {
-        "bound_tests_set_hash": "7340d0a12f3bb19b4d26f773dc209aad29a079aaa2a49cf740a25c8fbf149f10",
+        "bound_tests_set_hash": "f1b715f614d5ac72afcecb7ac1288083c70008d7f30a628506001f8e38993760",
         "declaration_hash": "b4f84af0654cdbb29595f15886f7d96d42b6b9b9f7cadc38c4e95a3196ed291d",
         "anchor_text_hash": "ae7bc09087175d27a40d420a8df4890f6508ad839a2b4cb42dbd88a05528f3bb"
       },
@@ -448,13 +448,13 @@
         "item_identifier": "trait_impl:usecase::signal_report::SignalReportSourcePort"
       },
       "key": {
-        "bound_tests_set_hash": "4a03fe876da13fe79fd1391a8cab56729332054033ea35409f310e9eac200370",
+        "bound_tests_set_hash": "f4013fb44efb7a4f49f942517e57d08434e2e156d2640733d99326519bacb09a",
         "declaration_hash": "ceb9f93ae749312cdbc365668c11abb445676d5c65dfb033bc4ee612dc440073",
         "anchor_text_hash": "05468ddacc756be4757924603e10be69c08a9255aa70f9b8532c2b3ec6c11b5d"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "\"for chain in [\\n            SignalReportChain::AdrUser,\\n            SignalReportChain::SpecAdr,\\n            SignalReportChain::CatalogSpec,\\n            SignalReportChain::ImplCatalog,\\n        ] {\\n            SignalReportSourcePort::load(&adapter, chain)\\n                .expect(\\\"full public report load must succeed without writing artifacts\\\");\\n        }\\n\\n        assert_eq!(\\n            snapshot_tree(fixture.path()),\\n            before,\\n            \\\"report loading must neither alter inputs nor create derived occurrence, signal, or aggregate artifacts\\\"\\n        );\""
+        "citation": "SignalReportSourcePort::load(&adapter, SignalReportChain::AdrUser)"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -521,6 +521,11 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_adapter_rejects_stale_impl_source_and_feature_inputs"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
           "test_name": "test_relative_path_outside_root_reports_selected_non_adr_chain"
         },
         {
@@ -544,7 +549,7 @@
         "item_identifier": "trait_impl:usecase::signal_report::SignalReportSourcePort"
       },
       "key": {
-        "bound_tests_set_hash": "4a03fe876da13fe79fd1391a8cab56729332054033ea35409f310e9eac200370",
+        "bound_tests_set_hash": "f4013fb44efb7a4f49f942517e57d08434e2e156d2640733d99326519bacb09a",
         "declaration_hash": "ceb9f93ae749312cdbc365668c11abb445676d5c65dfb033bc4ee612dc440073",
         "anchor_text_hash": "f597b4515c60e8b8a68d66fbdd45ec775b0e4962442225ed266047ffd4dfe0c4"
       },
@@ -617,6 +622,11 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_adapter_rejects_stale_impl_source_and_feature_inputs"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
           "test_name": "test_relative_path_outside_root_reports_selected_non_adr_chain"
         },
         {
@@ -640,13 +650,13 @@
         "item_identifier": "trait_impl:usecase::signal_report::SignalReportSourcePort"
       },
       "key": {
-        "bound_tests_set_hash": "4a03fe876da13fe79fd1391a8cab56729332054033ea35409f310e9eac200370",
+        "bound_tests_set_hash": "f4013fb44efb7a4f49f942517e57d08434e2e156d2640733d99326519bacb09a",
         "declaration_hash": "ceb9f93ae749312cdbc365668c11abb445676d5c65dfb033bc4ee612dc440073",
         "anchor_text_hash": "ae7bc09087175d27a40d420a8df4890f6508ad839a2b4cb42dbd88a05528f3bb"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "\"report loading must neither alter inputs nor create derived occurrence, signal, or aggregate artifacts\""
+        "citation": "assert_eq!(\n            snapshot_tree(fixture.path()),\n            before,\n            \"report loading must neither alter inputs nor create derived occurrence, signal, or aggregate artifacts\"\n        );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -709,6 +719,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::signal_report::tests",
           "test_name": "test_signal_report_adapter_rejects_unsafe_impl_report_line_text"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::signal_report::tests",
+          "test_name": "test_signal_report_adapter_rejects_stale_impl_source_and_feature_inputs"
         },
         {
           "layer": "infrastructure",
@@ -1097,13 +1112,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "f6629a173a171c2687e5b25321faba44846975644944c02fd0174133c7f25626",
+        "bound_tests_set_hash": "8382e01f4f8f939581f47dbfa144803672dc9603d281b776c13289828f05a158",
         "declaration_hash": "558cfc4fcb883d0eec6074e63e75dc6c6d35a6b7af3067c7ca1aefa085adda8b",
         "anchor_text_hash": "635fec09d775717b958a536e2f0879d492b3e0c3428e319145357568235a879c"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(\n    outcome.stdout.as_deref(),\n    Some(\n        \"signal report: 4 occurrence(s)\\n\\\\\n         chain=catalog_spec level=red entry_id=CatalogEntry reference=spec.json#IN-02 reason=missing reference location=track/items/example/cli_driver-types.json\\n\\\\\n         chain=adr_user level=yellow entry_id=ADR-01 reference=adr.md#D1 reason=needs evidence location=knowledge/adr/example.md\\n\\\\\n         chain=spec_adr level=red entry_id=IN-02 reference=adr.md#D1 reason=unresolved ADR reference location=track/items/example/spec.json\\n\\\\\n         chain=impl_catalog level=yellow entry_id=SignalReportDriver reference=cli_driver-types.json#AC-02 reason=implementation reference pending review location=apps/cli-driver/src/signal_report.rs\"\n    )\n);"
+        "citation": "let exit = execute(SignalCommand::Report(SignalReportArgs {\n            chain: SignalReportChainArg::All,\n            levels: SignalReportOnlyArg::YellowAndRed,\n        }));\n\n        assert_eq!(exit, ExitCode::SUCCESS);\n        assert_eq!(\n            service.queries(),\n            vec![SignalReportQuery {\n                chain: usecase::signal_report::SignalReportChainSelection::All,\n                levels: usecase::signal_report::SignalReportLevelSelection::YellowAndRed,\n            }]\n        );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -1153,13 +1168,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "f6629a173a171c2687e5b25321faba44846975644944c02fd0174133c7f25626",
+        "bound_tests_set_hash": "8382e01f4f8f939581f47dbfa144803672dc9603d281b776c13289828f05a158",
         "declaration_hash": "558cfc4fcb883d0eec6074e63e75dc6c6d35a6b7af3067c7ca1aefa085adda8b",
         "anchor_text_hash": "2699a99dc0e6aa19d5e25cb6808bfa86e9d8718ec9ddefa2891028db6a3b62b8"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let exit = execute(SignalCommand::Report(SignalReportArgs {\n            chain: SignalReportChainArg::All,\n            levels: SignalReportOnlyArg::YellowAndRed,\n        }));\n\n        assert_eq!(exit, ExitCode::SUCCESS);\n        assert_eq!(\n            service.queries(),\n            vec![SignalReportQuery {\n                chain: usecase::signal_report::SignalReportChainSelection::All,\n                levels: usecase::signal_report::SignalReportLevelSelection::YellowAndRed,\n            }]\n        );"
+        "citation": "let exit = execute(SignalCommand::Report(SignalReportArgs {\n    chain: SignalReportChainArg::All,\n    levels: SignalReportOnlyArg::YellowAndRed,\n}));\n\nassert_eq!(exit, ExitCode::SUCCESS);\nassert_eq!(\n    service.queries(),\n    vec![SignalReportQuery {\n        chain: usecase::signal_report::SignalReportChainSelection::All,\n        levels: usecase::signal_report::SignalReportLevelSelection::YellowAndRed,\n    }]\n);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [

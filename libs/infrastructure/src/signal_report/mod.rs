@@ -4,6 +4,8 @@ use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
 
 use domain::review_v2::types::FilePath;
+use domain::tddd::LayerId;
+use domain::tddd::catalogue_v2::TdddLayerBindingsPort;
 use domain::{
     AdrDecisionCommon, AdrDecisionEntry, ConfidenceSignal, DecisionGrounds, NonEmptyString,
     TrackId, evaluate_adr_decision,
@@ -14,12 +16,14 @@ use usecase::signal_report::{
     SignalReportLocation, SignalReportOccurrence, SignalReportReason, SignalReportReference,
     SignalReportSourcePort,
 };
+use usecase::tddd_feature_declaration::TdddActualFeatureDeclarationPort;
 
 use crate::capability_exec::bounded_read_utf8_file;
 use crate::git_cli::{SystemGitRepo, isolated_bounded_git_output};
 use crate::tddd::{
     catalogue_document_codec::CatalogueDocumentCodec, catalogue_spec_signals_codec,
-    type_signals_codec,
+    feature_declaration_adapter::FsTdddFeatureDeclarationAdapter,
+    tddd_layer_bindings_adapter::FsTdddLayerBindingsAdapter, type_signals_codec,
 };
 use crate::track::symlink_guard::reject_symlinks_below;
 use crate::verify::catalogue_spec_signals::{
@@ -237,12 +241,29 @@ impl SystemSignalReportSourceAdapter {
         root: &Path,
         track_id: &TrackId,
     ) -> Result<Vec<SignalReportOccurrence>, SignalReportError> {
-        let bindings = tddd_layers::load_tddd_layers(&root.join("architecture-rules.json"), root)
-            .map_err(|_| {
-            SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog)
-        })?;
+        let bindings = FsTdddLayerBindingsAdapter::new()
+            .load(root, None)
+            .map_err(|_| SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog))?;
+        let track_dir = root.join("track/items").join(track_id.as_ref());
+        let feature_declaration = FsTdddFeatureDeclarationAdapter::new()
+            .load_for_actual(&track_dir, root, &bindings)
+            .map_err(|_| SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog))?;
         let mut occurrences = Vec::new();
         for binding in bindings {
+            let layer_id = LayerId::try_new(binding.layer_id.clone()).map_err(|_| {
+                SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog)
+            })?;
+            let features = feature_declaration.features_for(&layer_id).map_err(|_| {
+                SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog)
+            })?;
+            let target_crate = match binding.targets.as_slice() {
+                [target] => target.as_str(),
+                _ => {
+                    return Err(SignalReportError::SourceUnavailable(
+                        SignalReportChain::ImplCatalog,
+                    ));
+                }
+            };
             let signals_path =
                 track_file(root, track_id, &binding.signal_file(), SignalReportChain::ImplCatalog)?;
             let document = type_signals_codec::decode(&read_text(
@@ -254,17 +275,29 @@ impl SystemSignalReportSourceAdapter {
             let catalogue_path = track_file(
                 root,
                 track_id,
-                binding.catalogue_file(),
+                &binding.catalogue_file,
                 SignalReportChain::ImplCatalog,
             )?;
             let catalogue_text = read_text(root, &catalogue_path, SignalReportChain::ImplCatalog)?;
-            let catalogue = CatalogueDocumentCodec::decode(&catalogue_text, binding.layer_id())
+            let catalogue = CatalogueDocumentCodec::decode(&catalogue_text, &binding.layer_id)
                 .map_err(|_| {
                     SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog)
                 })?;
             if *document.declaration_hash()
                 != type_signals_codec::declaration_hash(catalogue_text.as_bytes())
             {
+                return Err(SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog));
+            }
+            let implementation_input_hash =
+                crate::tddd::type_signals_evaluator::inputs::hash_workspace_inputs(
+                    root,
+                    target_crate,
+                    features,
+                )
+                .map_err(|_| {
+                    SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog)
+                })?;
+            if *document.implementation_input_hash() != implementation_input_hash {
                 return Err(SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog));
             }
             validate_impl_catalog_coverage(&catalogue, &document)?;
@@ -275,10 +308,10 @@ impl SystemSignalReportSourceAdapter {
                 occurrences.push(occurrence(
                     SignalReportChain::ImplCatalog,
                     level,
-                    format!("{}:{}:{}", binding.layer_id(), signal.kind_tag(), signal.type_name()),
+                    format!("{}:{}:{}", binding.layer_id, signal.kind_tag(), signal.type_name()),
                     format!(
                         "{}#{}:{}",
-                        binding.catalogue_file(),
+                        binding.catalogue_file,
                         signal.kind_tag(),
                         signal.type_name()
                     ),
@@ -554,6 +587,12 @@ fn occurrence(
     reason: String,
     location: String,
 ) -> Result<SignalReportOccurrence, SignalReportError> {
+    if [&entry_id, &reference, &reason, &location]
+        .into_iter()
+        .any(|value| !is_safe_signal_line_text(value))
+    {
+        return Err(SignalReportError::SourceUnavailable(chain));
+    }
     let entry_id = NonEmptyString::try_new(entry_id)
         .map_err(|_| SignalReportError::SourceUnavailable(chain))?;
     let reference = NonEmptyString::try_new(reference)
@@ -585,6 +624,32 @@ mod tests {
     use super::*;
 
     static CWD_LOCK: Mutex<()> = Mutex::new(());
+
+    #[test]
+    fn test_occurrence_control_character_in_rendered_field_returns_source_unavailable() {
+        for fields in [
+            ("entry\n", "reference", "reason", "location.md"),
+            ("entry", "reference\u{1b}", "reason", "location.md"),
+            ("entry", "reference", "reason\r", "location.md"),
+            ("entry", "reference", "reason", "location\t.md"),
+            ("entry\u{2028}", "reference", "reason", "location.md"),
+            ("entry", "reference\u{2029}", "reason", "location.md"),
+        ] {
+            let error = occurrence(
+                SignalReportChain::AdrUser,
+                SignalReportLevel::Yellow,
+                fields.0.to_owned(),
+                fields.1.to_owned(),
+                fields.2.to_owned(),
+                fields.3.to_owned(),
+            )
+            .expect_err("control characters must be rejected before rendering");
+            assert!(matches!(
+                error,
+                SignalReportError::SourceUnavailable(SignalReportChain::AdrUser)
+            ));
+        }
+    }
 
     struct CwdGuard {
         original: PathBuf,
@@ -652,14 +717,21 @@ mod tests {
         .expect("fixture signals must serialize")
     }
 
-    fn fresh_impl_catalog_signals(catalogue_text: &str) -> String {
+    fn fresh_impl_catalog_signals(root: &Path, catalogue_text: &str) -> String {
+        let implementation_input_hash =
+            crate::tddd::type_signals_evaluator::inputs::hash_workspace_inputs(
+                root,
+                "infrastructure",
+                &[],
+            )
+            .expect("fixture implementation inputs must hash");
         serde_json::to_string_pretty(&serde_json::json!({
             "schema_version": 3,
             "generated_at": "2026-07-31T00:00:00Z",
             "declaration_hash": type_signals_codec::declaration_hash(catalogue_text.as_bytes())
                 .as_digest()
                 .as_str(),
-            "implementation_input_hash": "a".repeat(64),
+            "implementation_input_hash": implementation_input_hash.as_digest().as_str(),
             "signals": [{
                 "type_name": "SystemSignalReportSourceAdapter",
                 "kind_tag": "secondary_adapter",
@@ -676,6 +748,24 @@ mod tests {
         catalogue: &str,
     ) -> String {
         fs::create_dir_all(track_dir).expect("track fixture directory must exist");
+        fs::create_dir_all(root.join("libs/infrastructure/src"))
+            .expect("fixture crate source directory must exist");
+        fs::write(
+            root.join("Cargo.toml"),
+            "[workspace]\nmembers = [\"libs/infrastructure\"]\nresolver = \"2\"\n",
+        )
+        .expect("fixture workspace manifest must be written");
+        fs::write(root.join("Cargo.lock"), "version = 4\n")
+            .expect("fixture lockfile must be written");
+        fs::write(root.join(".test-nightly-toolchain-identity"), "rustc fixture-nightly\n")
+            .expect("fixture toolchain identity must be written");
+        fs::write(
+            root.join("libs/infrastructure/Cargo.toml"),
+            "[package]\nname = \"infrastructure\"\nversion = \"0.1.0\"\nedition = \"2024\"\n\n[features]\nfreshness = []\n",
+        )
+        .expect("fixture crate manifest must be written");
+        fs::write(root.join("libs/infrastructure/src/lib.rs"), "pub struct Fixture;\n")
+            .expect("fixture crate source must be written");
         fs::write(
             root.join("architecture-rules.json"),
             r#"{"version":2,"layers":[{"crate":"infrastructure","tddd":{"enabled":true,"catalogue_file":"infrastructure-types.json","catalogue_spec_signal":{"enabled":true}}}]}"#,
@@ -683,6 +773,12 @@ mod tests {
         .expect("architecture rules fixture must be written");
         fs::write(track_dir.join("infrastructure-types.json"), catalogue)
             .expect("catalogue fixture must be written");
+        let feature_declaration =
+            "{\n  \"schema_version\": 1,\n  \"layers\": {\n    \"infrastructure\": []\n  }\n}\n";
+        fs::write(track_dir.join("tddd-features.json"), feature_declaration)
+            .expect("feature declaration fixture must be written");
+        fs::write(track_dir.join("tddd-features-baseline.json"), feature_declaration)
+            .expect("feature declaration baseline fixture must be written");
         catalogue.to_owned()
     }
 
@@ -769,7 +865,7 @@ mod tests {
         .expect("catalogue signals fixture must be written");
         fs::write(
             track_dir.join("infrastructure-type-signals.json"),
-            fresh_impl_catalog_signals(&catalogue),
+            fresh_impl_catalog_signals(root, &catalogue),
         )
         .expect("implementation signals fixture must be written");
         fixture
@@ -1087,7 +1183,7 @@ mod tests {
         let track_dir = root.path().join("track/items/report-test");
         let catalogue = prepare_catalogue_spec_source(root.path(), &track_dir);
         let mut signals: serde_json::Value =
-            serde_json::from_str(&fresh_impl_catalog_signals(&catalogue)).unwrap();
+            serde_json::from_str(&fresh_impl_catalog_signals(root.path(), &catalogue)).unwrap();
         signal_document_object(&mut signals).insert(
             "signals".to_owned(),
             serde_json::json!([{
@@ -1127,7 +1223,7 @@ mod tests {
             &duplicate_bare_name_catalogue(),
         );
         let mut signals: serde_json::Value =
-            serde_json::from_str(&fresh_impl_catalog_signals(&catalogue)).unwrap();
+            serde_json::from_str(&fresh_impl_catalog_signals(root.path(), &catalogue)).unwrap();
         signal_document_object(&mut signals).insert(
             "signals".to_owned(),
             serde_json::json!([
@@ -1176,7 +1272,7 @@ mod tests {
         let catalogue = prepare_catalogue_spec_source(root.path(), &track_dir);
         let signals_path = track_dir.join("infrastructure-type-signals.json");
         let mut signals: serde_json::Value =
-            serde_json::from_str(&fresh_impl_catalog_signals(&catalogue)).unwrap();
+            serde_json::from_str(&fresh_impl_catalog_signals(root.path(), &catalogue)).unwrap();
 
         signal_document_object(&mut signals).insert("signals".to_owned(), serde_json::json!([]));
         fs::write(&signals_path, serde_json::to_string(&signals).unwrap()).unwrap();
@@ -1212,7 +1308,7 @@ mod tests {
         let track_dir = root.path().join("track/items/report-test");
         let catalogue = prepare_catalogue_spec_source(root.path(), &track_dir);
         let mut signals: serde_json::Value =
-            serde_json::from_str(&fresh_impl_catalog_signals(&catalogue)).unwrap();
+            serde_json::from_str(&fresh_impl_catalog_signals(root.path(), &catalogue)).unwrap();
         signal_document_object(&mut signals).insert(
             "signals".to_owned(),
             serde_json::json!([
@@ -1261,7 +1357,7 @@ mod tests {
         let catalogue = prepare_catalogue_spec_source(root.path(), &track_dir);
         let signals_path = track_dir.join("infrastructure-type-signals.json");
         let mut signals: serde_json::Value =
-            serde_json::from_str(&fresh_impl_catalog_signals(&catalogue)).unwrap();
+            serde_json::from_str(&fresh_impl_catalog_signals(root.path(), &catalogue)).unwrap();
 
         signal_document_object(&mut signals).insert(
             "signals".to_owned(),
@@ -1303,6 +1399,37 @@ mod tests {
             .expect_err("an unsafe mismatch item must fail closed");
         assert!(matches!(
             unsafe_reason,
+            SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog)
+        ));
+    }
+
+    #[test]
+    fn test_signal_report_adapter_rejects_stale_impl_source_and_feature_inputs() {
+        let root = tempfile::tempdir().unwrap();
+        let track = TrackId::try_new("report-test").unwrap();
+        let track_dir = root.path().join("track/items/report-test");
+        let catalogue = prepare_catalogue_spec_source(root.path(), &track_dir);
+        let signals_path = track_dir.join("infrastructure-type-signals.json");
+        fs::write(&signals_path, fresh_impl_catalog_signals(root.path(), &catalogue)).unwrap();
+
+        let source_path = root.path().join("libs/infrastructure/src/lib.rs");
+        fs::write(&source_path, "pub struct ChangedFixture;\n").unwrap();
+        let stale_source = SystemSignalReportSourceAdapter::read_impl_catalog(root.path(), &track)
+            .expect_err("changed implementation source must stale the persisted artifact");
+        assert!(matches!(
+            stale_source,
+            SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog)
+        ));
+
+        fs::write(&source_path, "pub struct Fixture;\n").unwrap();
+        let selected_feature = "{\n  \"schema_version\": 1,\n  \"layers\": {\n    \"infrastructure\": [\"freshness\"]\n  }\n}\n";
+        fs::write(track_dir.join("tddd-features.json"), selected_feature).unwrap();
+        fs::write(track_dir.join("tddd-features-baseline.json"), selected_feature).unwrap();
+        let stale_features =
+            SystemSignalReportSourceAdapter::read_impl_catalog(root.path(), &track)
+                .expect_err("changed feature selection must stale the persisted artifact");
+        assert!(matches!(
+            stale_features,
             SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog)
         ));
     }
@@ -1469,7 +1596,8 @@ mod tests {
             fixture.path().join("track/items/report-test/infrastructure-types.json");
         let malformed_catalogue = "{malformed catalogue";
         fs::write(&catalogue_path, malformed_catalogue).unwrap();
-        fs::write(&signals_path, fresh_impl_catalog_signals(malformed_catalogue)).unwrap();
+        fs::write(&signals_path, fresh_impl_catalog_signals(fixture.path(), malformed_catalogue))
+            .unwrap();
 
         let error = SignalReportSourcePort::load(&adapter, SignalReportChain::ImplCatalog)
             .expect_err("a malformed current catalogue must fail closed even with a matching hash");
