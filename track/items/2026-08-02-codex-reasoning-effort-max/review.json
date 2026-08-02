@@ -52,6 +52,42 @@
           "hash": "rvw1:sha256:a96ed62b366ecda100bbc8b2f46aa02042ac55498a6f51aa4ae7343c301da3f2",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T09:25:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b8eedc978fa837f2ab060e0baf120f99ae781eec6f7ac965857157acff0b4c5b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T09:33:07Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "apps/cli-composition/src/review_v2/mod.rs",
+              "line": 1311,
+              "message": "この max テストは既存の `review_run_local` の Claude happy-path テストを Codex に置き換えており、profile 解決後に `review_run_local` の Claude 分岐へ dispatch し、verdict と telemetry を記録する回帰カバレッジが失われています。max の Codex ケースは追加テストにし、従来の Claude ケースも残してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "apps/cli-composition/src/review_v2/mod.rs",
+              "line": 1311,
+              "message": "fast round を実行するテストで final と fast の effort を両方 `max` にしているため、誤って final 側の `reasoning_effort` を選択してもテストが通ります。final 側を `high` など別値にして fast 側だけを `max` にし、round-specific profile 解決から reviewer argv までを検証してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b8eedc978fa837f2ab060e0baf120f99ae781eec6f7ac965857157acff0b4c5b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T09:38:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:63079b39e5b7e3d2dc66403d2566a55bf394c47caa2755debbbef306dfda72f9",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -391,6 +427,20 @@
           "at": "2026-08-02T09:07:38Z",
           "findings": [],
           "hash": "rvw1:sha256:077c02ff815f98ad0d806091cac05c73aa99b87a91099fde077da1ce5b07a7e3",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T09:25:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b28ff204ab265639e91987c7f3fe52136d8ecdf34191aa5f66a93d827ea565f7",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T09:29:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b28ff204ab265639e91987c7f3fe52136d8ecdf34191aa5f66a93d827ea565f7",
           "type": "final",
           "verdict": "zero_findings"
         }

@@ -814,13 +814,9 @@ mod tests {
             r#"{{
   "schema_version": 1,
   "providers": {{
-    "codex": {{
-      "label": "Codex",
-      "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"]
-    }},
     "{provider}": {{
       "label": "Test Provider",
-      "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"]
+      "supported_reasoning_efforts": ["low", "high"]
     }}
   }},
   "capabilities": {{
@@ -849,6 +845,35 @@ mod tests {
         fs::write(config_dir.join("agent-profiles.json"), content).unwrap();
     }
 
+    /// A dedicated reviewer fixture with distinct profile efforts proves that
+    /// fast-round profile resolution forwards its own effort to Codex.
+    fn write_agent_profiles_with_max_fast_reviewer_effort(root: &std::path::Path) {
+        let config_dir = root.join(".harness/config");
+        fs::create_dir_all(&config_dir).unwrap();
+        let content = r#"{
+  "schema_version": 1,
+  "providers": {
+    "codex": {
+      "label": "Codex",
+      "supported_reasoning_efforts": ["high", "max"]
+    }
+  },
+  "capabilities": {
+    "reviewer": {
+      "provider": "codex",
+      "model": "review-final",
+      "fast_provider": "codex",
+      "fast_model": "review-fast",
+      "reasoning_effort": "high",
+      "fast_reasoning_effort": "max",
+      "execution_mode": "typed-pipeline"
+    }
+  }
+}
+"#;
+        fs::write(config_dir.join("agent-profiles.json"), content).unwrap();
+    }
+
     /// Profile whose `review-fix-lead` declares a fast-round override but omits
     /// `fast_reasoning_effort`, so fast-round resolution must fail closed.
     fn write_agent_profiles_missing_review_fix_fast_effort(root: &std::path::Path) {
@@ -859,7 +884,7 @@ mod tests {
   "providers": {
     "codex": {
       "label": "Codex",
-      "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"]
+      "supported_reasoning_efforts": ["high"]
     }
   },
   "capabilities": {
@@ -1328,6 +1353,46 @@ exit 0
 
     #[cfg(unix)]
     #[test]
+    fn test_review_run_local_fast_profile_forwards_max_effort_and_records_verdict_and_telemetry() {
+        let _lock = cwd_lock().lock().unwrap();
+        let repo = setup_review_entrypoint_repo("review-run-local-max-2026");
+        write_agent_profiles_with_max_fast_reviewer_effort(repo._dir.path());
+        let bin_dir = repo.track_dir.join("fake-bin-local-max");
+        let arguments_log = repo.track_dir.join("codex-arguments.log");
+        write_recording_codex_reviewer_bin(&bin_dir, &arguments_log, false);
+        let _path_guard = prepend_path(&bin_dir);
+        let _telemetry_guard = EnvGuard::set("SOTP_TELEMETRY", OsString::from("1"));
+        let _telemetry_dir_guard = EnvGuard::remove("SOTP_TELEMETRY_DIR");
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo._dir.path()).unwrap();
+
+        let outcome = crate::review_v2::ReviewCompositionRoot::new()
+            .review_run_local(crate::review_v2::ReviewRunLocalInput {
+                model: None,
+                timeout_seconds: 10,
+                briefing_file: None,
+                prompt: Some("Review.".to_owned()),
+                track_id: Some(repo.track_id.clone()),
+                round_type: "fast".to_owned(),
+                group: "cli_composition".to_owned(),
+                items_dir: repo.items_dir.clone(),
+            })
+            .unwrap();
+
+        assert_eq!(outcome.exit_code, 0);
+        assert!(outcome.stdout.as_deref().unwrap_or("").contains("zero_findings"));
+        let arguments = fs::read_to_string(&arguments_log).unwrap();
+        assert!(
+            arguments.contains("model_reasoning_effort=\"max\""),
+            "max effort must be forwarded to the reviewer: {arguments}"
+        );
+        let verdict = fs::read_to_string(repo.track_dir.join("review.json")).unwrap();
+        assert!(verdict.contains("zero_findings"), "verdict was not recorded: {verdict}");
+        assert_review_telemetry(&repo.track_dir, "codex", "review-fast", "codex", "fast");
+    }
+
+    #[cfg(unix)]
+    #[test]
     fn review_fix_driver_codex_completed_status_returns_command_outcome() {
         let _lock = cwd_lock().lock().unwrap();
 
@@ -1606,7 +1671,7 @@ exit 0
     }
 
     #[test]
-    fn review_run_local_unsupported_provider_returns_error() {
+    fn test_review_run_local_unsupported_provider_returns_error() {
         let _lock = cwd_lock().lock().unwrap();
         let repo = setup_review_entrypoint_repo("review-run-local-unsupported-2026");
         write_agent_profiles(repo._dir.path(), "gemini");
