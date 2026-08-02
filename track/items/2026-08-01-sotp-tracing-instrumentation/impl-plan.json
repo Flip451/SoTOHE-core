@@ -64,6 +64,7 @@
       "id": "T008",
       "description": "Implement `CommandTraceCompositionRoot` to validate rotation defaults and wire the complete filesystem adapter, usecase flow, and primary driver before any entrypoint invokes it. IN-02, IN-04, OUT-01, CN-01, CN-02, CN-03, AC-01, AC-03, AC-04.",
       "status": "done",
+      "commit_hash": "6bb94f15950ec117fa3339bb25b10a36a673d57f",
       "depends_on": [
         "T005",
         "T007"
@@ -72,7 +73,7 @@
     {
       "id": "T009",
       "description": "Extend `TelemetryDriver::telemetry_report` and `apps/cli/src/commands/telemetry.rs::execute` to render command metrics from the existing aggregation path; add focused AC-02 CLI regression tests for frequency, duration, and failure rate. IN-03, CN-01, AC-02, AC-03.",
-      "status": "todo",
+      "status": "done",
       "depends_on": [
         "T006"
       ]

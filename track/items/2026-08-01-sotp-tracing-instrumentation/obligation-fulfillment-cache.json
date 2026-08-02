@@ -685,13 +685,13 @@
         "item_identifier": "voluntary:AC-02"
       },
       "key": {
-        "bound_tests_set_hash": "193c7cff180098e2c11fb1da3d56d31ebaceb67c7341cf815f21363f70842b65",
+        "bound_tests_set_hash": "e7a202db8824aa2d4b5cf86b3a3b6657f2bd545b34a12c7d3909ae5e1ee5690f",
         "declaration_hash": "42e9e8e401bc6331cf390b3196819b18dcf73dfc4c7e6e112ed3f10905a59157",
         "anchor_text_hash": "4a56d1978d1635e0824090a3dc23d8b1a68442cc68800529fe04faef0373f783"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(output.command_metrics.len(), 1);\n        assert_eq!(\n            output.command_metrics.first().map(|metric| *metric.executions().as_ref()),\n            Some(4)\n        );\n        assert_eq!(\n            output.command_metrics.first().map(|metric| *metric.total_duration().as_ref()),\n            Some(240)\n        );\n        assert_eq!(\n            output.command_metrics.first().map(|metric| metric.failure_rate().value()),\n            Some(2_500)\n        );"
+        "citation": "assert_eq!(output.command_metrics.len(), 1);\nassert_eq!(output.command_metrics.first().map(|metric| *metric.executions().as_ref()),\n    Some(4));\nassert_eq!(output.command_metrics.first().map(|metric| *metric.total_duration().as_ref()),\n    Some(240));\nassert_eq!(output.command_metrics.first().map(|metric| metric.failure_rate().value()),\n    Some(2_500));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -699,6 +699,11 @@
           "layer": "usecase",
           "module_path": "usecase::telemetry::aggregate_interactor_tests",
           "test_name": "test_telemetry_aggregate_interactor_report_typed_metrics_preserves_values"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::telemetry::tests",
+          "test_name": "test_telemetry_report_command_metrics_render_frequency_duration_and_failure_rate"
         }
       ]
     },

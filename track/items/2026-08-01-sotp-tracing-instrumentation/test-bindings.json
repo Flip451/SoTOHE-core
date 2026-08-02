@@ -138,7 +138,10 @@
     {
       "kind": "voluntary_binding",
       "edge_id": {"entry_key": "TelemetryReportOutput", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "AC-02"}},
-      "tests": [{"layer": "usecase", "module_path": "usecase::telemetry::aggregate_interactor_tests", "test_name": "test_telemetry_aggregate_interactor_report_typed_metrics_preserves_values"}]
+      "tests": [
+        {"layer": "usecase", "module_path": "usecase::telemetry::aggregate_interactor_tests", "test_name": "test_telemetry_aggregate_interactor_report_typed_metrics_preserves_values"},
+        {"layer": "cli_driver", "module_path": "cli_driver::telemetry::tests", "test_name": "test_telemetry_report_command_metrics_render_frequency_duration_and_failure_rate"}
+      ]
     },
     {
       "kind": "voluntary_binding",

@@ -5,7 +5,7 @@
 
 GO-01 → T001, T002, T003, T004, T005, T006, T007, T008, T009, T010.
 
-## Tasks (8/10 resolved)
+## Tasks (9/10 resolved)
 
 ### S1 — Typed command-trace application model
 
@@ -32,14 +32,14 @@ GO-01 → T001, T002, T003, T004, T005, T006, T007, T008, T009, T010.
 > Replace the infrastructure report DTO with its snapshot model, convert persisted command records through the existing aggregation path, and render the resulting metrics through the telemetry command. IN-03, OUT-01, CN-01, CN-04, AC-02, AC-03.
 
 - [x] **T006**: Delete the old infrastructure `TelemetryReportOutput`, modify `TelemetryReport::aggregate`, add the layer-unique `TelemetryReportSnapshot` read model, and update `FsTelemetryReportAdapter` parser-to-usecase conversion for persisted command metrics and fail-open malformed- and unknown-schema-record skip reporting, with focused aggregation-path tests. IN-03, OUT-01, CN-01, CN-04, AC-02, AC-03. (`1dc7b80fca414e70b70705d5313ffec72ceefed6`)
-- [ ] **T009**: Extend `TelemetryDriver::telemetry_report` and `apps/cli/src/commands/telemetry.rs::execute` to render command metrics from the existing aggregation path; add focused AC-02 CLI regression tests for frequency, duration, and failure rate. IN-03, CN-01, AC-02, AC-03.
+- [x] **T009**: Extend `TelemetryDriver::telemetry_report` and `apps/cli/src/commands/telemetry.rs::execute` to render command metrics from the existing aggregation path; add focused AC-02 CLI regression tests for frequency, duration, and failure rate. IN-03, CN-01, AC-02, AC-03.
 
 ### S5 — Tracing composition
 
 > Build the primary driver and wire the complete local tracing dependency graph before entrypoint use. IN-02, IN-04, OUT-01, CN-01, CN-02, CN-03, AC-01, AC-03, AC-04.
 
 - [x] **T007**: Update `CommandTraceDriver::handle(outcome, record) -> CommandOutcome` to invoke local trace recording and render trace diagnostics; add focused success/failure regression tests. IN-02, AC-01, AC-03. (`bfd13949a00cfed25b84483098700206458b28b1`)
-- [x] **T008**: Implement `CommandTraceCompositionRoot` to validate rotation defaults and wire the complete filesystem adapter, usecase flow, and primary driver before any entrypoint invokes it. IN-02, IN-04, OUT-01, CN-01, CN-02, CN-03, AC-01, AC-03, AC-04.
+- [x] **T008**: Implement `CommandTraceCompositionRoot` to validate rotation defaults and wire the complete filesystem adapter, usecase flow, and primary driver before any entrypoint invokes it. IN-02, IN-04, OUT-01, CN-01, CN-02, CN-03, AC-01, AC-03, AC-04. (`6bb94f15950ec117fa3339bb25b10a36a673d57f`)
 
 ### S6 — Cross-command entrypoint integration
 
