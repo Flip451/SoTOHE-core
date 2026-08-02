@@ -33,9 +33,11 @@ impl ReviewCompositionRoot {
     ///
     /// Wires `ReviewServiceImpl` (which holds all 11 sub-services internally)
     /// and injects it as a single `Arc<dyn ReviewService>` into the driver
-    /// (D3/D4 cli_driver policy).
+    /// (D3/D4 cli_driver policy). `run_local` is additionally gated by the
+    /// configured pre-review command dispatcher.
     pub fn review_driver(&self) -> cli_driver::review::ReviewDriver {
-        let service = Arc::new(ReviewServiceImpl) as Arc<dyn ReviewService>;
+        let inner = Arc::new(ReviewServiceImpl) as Arc<dyn ReviewService>;
+        let service = super::pre_review_command::gate_local_review_service(inner);
         cli_driver::review::ReviewDriver::new(service)
     }
 }
@@ -135,7 +137,7 @@ impl ReviewService for ReviewServiceImpl {
             group,
             items_dir,
         };
-        match root.review_run_local(input) {
+        match root.review_run_local_ungated(input) {
             Ok(outcome) => ReviewRunLocalOutput {
                 stdout: outcome.stdout,
                 stderr: outcome.stderr,
@@ -255,5 +257,24 @@ impl ReviewService for ReviewServiceImpl {
     ) -> Result<String, CommitHashPersistenceError> {
         super::commit_hash::persist_commit_hash_for_track(&track_id)
             .map_err(CommitHashPersistenceError::StoreWriteFailed)
+    }
+}
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+mod tests {
+    #[test]
+    fn test_review_composition_root_gates_local_review_service() {
+        let source = include_str!("shim.rs");
+        let production_source = source.split("#[cfg(test)]").next().unwrap();
+
+        assert!(
+            production_source.contains("Arc::new(ReviewServiceImpl) as Arc<dyn ReviewService>")
+        );
+        assert!(
+            production_source
+                .contains("super::pre_review_command::gate_local_review_service(inner)")
+        );
+        assert!(production_source.contains("cli_driver::review::ReviewDriver::new(service)"));
     }
 }

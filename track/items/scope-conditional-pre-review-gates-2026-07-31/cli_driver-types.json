@@ -115,6 +115,11 @@
       "action": "add",
       "for_type": "PhaseIdArg",
       "trait_ref": "core::str::FromStr"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandDriver",
+      "trait_ref": "core::fmt::Debug"
     }
   ],
   "traits": {},

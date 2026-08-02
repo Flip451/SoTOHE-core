@@ -12,13 +12,13 @@ implementation effort, broken ordering, or coverage gaps that surface only after
 partial implementation.
 
 **Mechanical checks** (schema validation, `task-coverage` binary gate, task ID
-uniqueness, status transitions, batch-plan structural conformance via
+uniqueness, status transitions, and batch-plan structural conformance via
 `bin/sotp batch-plan check`) are handled by `cargo make verify-*` /
-`bin/sotp track transition` / `bin/sotp task-contract coverage` /
-`bin/sotp batch-plan check`, not the reviewer. The machinery checks structure
-only; the **semantic validity** of indivisibility justifications and batch
-composition is deliberately this reviewer's lane — no LLM judgment sits in the
-gate path.
+`bin/sotp track transition` / `bin/sotp batch-plan check`, not the reviewer.
+`task-contract.json` is catalogue-entry attribution only. The machinery checks
+structure only; the **semantic validity** of indivisibility justifications and
+batch composition is deliberately this reviewer's lane — no LLM judgment sits
+in the gate path.
 
 ## What to report
 
@@ -60,9 +60,10 @@ specific `task_id` or `section.id`, or quote the offending text.
   intentionally an empty entries map. Every catalogue entry — including
   `action: reference` baseline entries — must carry a task attribution:
   `bin/sotp task-contract coverage` fails closed on `OrphanEntry`. A
-  reference-entry attribution names the carrier task whose diff the entry
-  rides with; it is not a claim that the task modifies the type, and it must
-  not be reported (or stripped) as spurious.
+  reference-entry attribution is not a claim that the task modifies the type,
+  and it must not be reported (or stripped) as spurious. Do not introduce
+  source-only restoration, evidence, inspection, liveness, or stale-carrier
+  variants into this attribution artifact.
 - **batch-size infeasibility**: a single task whose described work would
   *definitely* exceed the per-scope diff ceiling
   (`.harness/config/review-scope.json`: `default_diff_ceiling_lines` or

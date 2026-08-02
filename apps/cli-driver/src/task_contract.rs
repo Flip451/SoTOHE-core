@@ -136,8 +136,8 @@ impl TaskContractDriver {
 
         match self.check_service.check(cmd) {
             Ok(PreReviewGateOutcome::Passed) => CommandOutcome::success(None),
-            Ok(PreReviewGateOutcome::Blocked { violations, .. }) => {
-                let message = render_check_violations(&violations);
+            Ok(PreReviewGateOutcome::Blocked(violations)) => {
+                let message = render_check_violations(violations.as_slice());
                 CommandOutcome::failure(Some(message))
             }
             Err(e) => CommandOutcome::failure(Some(render_gate_error(e))),
@@ -158,8 +158,8 @@ impl TaskContractDriver {
 
         match self.coverage_service.verify_coverage(cmd) {
             Ok(CoverageVerifyOutcome::Passed) => CommandOutcome::success(None),
-            Ok(CoverageVerifyOutcome::Blocked { violations, .. }) => {
-                let message = render_coverage_violations(&violations);
+            Ok(CoverageVerifyOutcome::Blocked(violations)) => {
+                let message = render_coverage_violations(violations.as_slice());
                 CommandOutcome::failure(Some(message))
             }
             Err(e) => CommandOutcome::failure(Some(render_gate_error(e))),
@@ -199,7 +199,7 @@ fn render_check_violations(violations: &[PreReviewGateViolation]) -> String {
             PreReviewGateViolation::MissingTaskContract => {
                 "  - MissingTaskContract: task-contract.json is absent for this track".to_owned()
             }
-            PreReviewGateViolation::NonBlueSignal { entry, signal } => {
+            PreReviewGateViolation::NonBlueSignal(entry, signal) => {
                 format!(
                     "  - NonBlueSignal: {} / {} has signal {:?} (expected Blue)",
                     entry.layer().as_ref(),
@@ -250,28 +250,28 @@ fn render_coverage_violations(violations: &[CoverageViolation]) -> String {
             CoverageViolation::MissingTaskContract => {
                 "  - MissingTaskContract: task-contract.json is absent for this track".to_owned()
             }
-            CoverageViolation::OrphanEntry { entry } => {
+            CoverageViolation::OrphanEntry(entry) => {
                 format!(
                     "  - OrphanEntry: {} / {} has no task attribution in task-contract.json",
                     entry.layer().as_ref(),
                     entry.entry_key().as_str()
                 )
             }
-            CoverageViolation::InvalidEntryRef { entry, reason } => {
+            CoverageViolation::InvalidEntryRef(entry, reason) => {
                 format!(
                     "  - InvalidEntryRef: {} / {} — {reason}",
                     entry.layer().as_ref(),
                     entry.entry_key().as_str()
                 )
             }
-            CoverageViolation::MissingSignalDocument { layer } => {
+            CoverageViolation::MissingSignalDocument(layer) => {
                 format!(
                     "  - MissingSignalDocument: {}-type-signals.json is absent; \
                      run `bin/sotp signal calc-impl-catalog` to generate it",
                     layer.as_ref()
                 )
             }
-            CoverageViolation::InvalidTaskRef { task_id, entry_keys } => {
+            CoverageViolation::InvalidTaskRef(task_id, entry_keys) => {
                 let keys = entry_keys
                     .iter()
                     .map(|e| format!("{}/{}", e.layer().as_ref(), e.entry_key().as_str()))
@@ -298,6 +298,10 @@ fn render_coverage_violations(violations: &[CoverageViolation]) -> String {
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::expect_used)]
 mod tests {
+    use domain::ConfidenceSignal;
+    use domain::task_contract::ContractedEntryRef;
+    use domain::tddd::LayerId;
+    use domain::tddd::semantic_verify::CatalogueEntryKey;
     use usecase::pre_review_gate::PreReviewGateViolation;
 
     use super::{render_check_violations, render_coverage_violations};
@@ -308,7 +312,7 @@ mod tests {
     /// taxonomy, the Claude slash-command spec, and the provider-agnostic
     /// operational SSoT path for the calling LLM to pick up.
     #[test]
-    fn render_check_violations_includes_track_diagnose_soft_prompt() {
+    fn test_render_check_violations_includes_track_diagnose_soft_prompt() {
         let message = render_check_violations(&[PreReviewGateViolation::MissingTaskContract]);
         assert!(
             message.contains("/track:diagnose"),
@@ -329,7 +333,7 @@ mod tests {
     /// Coverage path renders attribution violations without the diagnose
     /// suggestion (T005 description, AC-03 anchor on D3 only).
     #[test]
-    fn render_coverage_violations_does_not_include_track_diagnose_soft_prompt() {
+    fn test_render_coverage_violations_does_not_include_track_diagnose_soft_prompt() {
         let message = render_coverage_violations(&[
             usecase::pre_review_gate::CoverageViolation::MissingTaskContract,
         ]);
@@ -338,5 +342,26 @@ mod tests {
             "Coverage render must NOT include the /track:diagnose soft prompt — that path is \
              a separate concern (AC-03 anchors on D3 / Check only), got: {message}"
         );
+    }
+
+    #[test]
+    fn test_render_tuple_violations_preserves_entry_and_free_text_diagnostics() {
+        let entry = ContractedEntryRef::new(
+            LayerId::try_new("cli_driver".to_owned()).expect("test layer"),
+            CatalogueEntryKey::try_new("PhaseCommandDriver".to_owned()).expect("test entry"),
+        );
+        let check = render_check_violations(&[PreReviewGateViolation::NonBlueSignal(
+            entry.clone(),
+            ConfidenceSignal::Yellow,
+        )]);
+        let coverage = render_coverage_violations(&[
+            usecase::pre_review_gate::CoverageViolation::InvalidEntryRef(
+                entry,
+                domain::FreeText::new("missing catalogue entry"),
+            ),
+        ]);
+
+        assert!(check.contains("cli_driver / PhaseCommandDriver"));
+        assert!(coverage.contains("missing catalogue entry"));
     }
 }

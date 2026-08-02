@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-02T06:16:43Z",
-  "declaration_hash": "1ef6ae872cb5deec3775f427dcae8103f54999e941d392e8e02a08afee345bdf",
-  "implementation_input_hash": "8265bf14748c159ac9fa94bca4826297c478e92707353353055a3ee455d31333",
+  "generated_at": "2026-08-02T21:12:13Z",
+  "declaration_hash": "aa1dc150bc7b7751f35e45c1684729a108015f09be36fd644ea028042597acab",
+  "implementation_input_hash": "58f59e66d18e6e6939d1f819d331ca570daf739b28a3ea613ce849f6538944b3",
   "signals": [
     {
       "type_name": "PhaseCompositionRoot",

@@ -1,15 +1,9 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-02T06:16:17Z",
-  "declaration_hash": "5321680cbdad39eaf8699607ea49a39fe88eae7f3eaa9b4a359b74f48df76d74",
-  "implementation_input_hash": "1f19e2c672e17aad8298dc241d8857766ac72280d855012d8a988e5343af79c6",
+  "generated_at": "2026-08-02T16:51:24Z",
+  "declaration_hash": "84dfefbe7e40f3ac6247a02034f0402d17a70c197e6c93e25fa593128af61d0a",
+  "implementation_input_hash": "12f8950d2fc32e4d67f73d2cfd345ce264d00933ecf1dffeb921450bbe39258b",
   "signals": [
-    {
-      "type_name": "ContractedEntryRef",
-      "kind_tag": "value_object",
-      "signal": "blue",
-      "found_type": true
-    },
     {
       "type_name": "CoverageVerifyOutcome",
       "kind_tag": "enum",
@@ -31,6 +25,12 @@
     {
       "type_name": "PreReviewGateViolation",
       "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ContractedEntryRef",
+      "kind_tag": "value_object",
       "signal": "blue",
       "found_type": true
     },

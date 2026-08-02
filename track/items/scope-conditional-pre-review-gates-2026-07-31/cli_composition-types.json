@@ -9,6 +9,7 @@
           "is_async": false,
           "name": "build",
           "params": [],
+          "receiver": "&self",
           "returns": "cli_driver::phase_command::PhaseCommandDriver"
         }
       ],

@@ -502,6 +502,110 @@
       "action": "add",
       "for_type": "GitCurrentReviewTrackResolver",
       "trait_ref": "usecase::pre_review_command::CurrentReviewTrackResolverPort"
+    },
+    {
+      "for_type": "TrackIdDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TrackIdDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "TrackIdDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TrackIdDto",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "TrackIdDto",
+      "trait_ref": "serde_core::ser::Serialize"
+    },
+    {
+      "for_type": "TrackIdDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "for_type": "TaskIdDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TaskIdDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "TaskIdDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TaskIdDto",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "TaskIdDto",
+      "trait_ref": "core::cmp::PartialOrd"
+    },
+    {
+      "for_type": "TaskIdDto",
+      "trait_ref": "core::cmp::Ord"
+    },
+    {
+      "for_type": "TaskIdDto",
+      "trait_ref": "serde_core::ser::Serialize"
+    },
+    {
+      "for_type": "TaskIdDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "for_type": "LayerIdDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "LayerIdDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "LayerIdDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "LayerIdDto",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "LayerIdDto",
+      "trait_ref": "serde_core::ser::Serialize"
+    },
+    {
+      "for_type": "LayerIdDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "for_type": "EntryKeyDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "EntryKeyDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "EntryKeyDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "EntryKeyDto",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "EntryKeyDto",
+      "trait_ref": "serde_core::ser::Serialize"
+    },
+    {
+      "for_type": "EntryKeyDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
     }
   ],
   "traits": {},
@@ -744,17 +848,47 @@
         "kind": "struct",
         "shape": {
           "fields": [
-            {
-              "name": "layer",
-              "ty": "domain::tddd::LayerId"
-            },
-            {
-              "name": "entry_key",
-              "ty": "domain::tddd::semantic_verify::CatalogueEntryKey"
-            }
+          {
+            "name": "layer",
+            "ty": "LayerIdDto"
+          },
+          {
+            "name": "entry_key",
+            "ty": "EntryKeyDto"
+          }
           ],
           "has_stripped_fields": false,
           "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "task_contract_codec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "EntryKeyDto": {
+      "action": "add",
+      "docs": "Transparent serde mirror for a task-contract catalogue-entry key (IN-07, AC-08).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            "String"
+          ],
+          "has_stripped_fields": false,
+          "kind": "tuple"
         }
       },
       "methods": [],
@@ -847,6 +981,36 @@
         },
         {
           "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "LayerIdDto": {
+      "action": "add",
+      "docs": "Transparent serde mirror for a task-contract layer identifier (IN-07, AC-08).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            "String"
+          ],
+          "has_stripped_fields": false,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "task_contract_codec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-08",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]
@@ -1102,14 +1266,14 @@
               "name": "schema_version",
               "ty": "TaskContractSchemaVersionDto"
             },
-            {
-              "name": "track_id",
-              "ty": "domain::TrackId"
-            },
-            {
-              "name": "entries",
-              "ty": "BTreeMap<domain::TaskId, Vec<ContractedEntryRefDto>>"
-            }
+          {
+            "name": "track_id",
+            "ty": "TrackIdDto"
+          },
+          {
+            "name": "entries",
+            "ty": "BTreeMap<TaskIdDto, Vec<ContractedEntryRefDto>>"
+          }
           ],
           "has_stripped_fields": false,
           "kind": "plain"
@@ -1146,6 +1310,66 @@
           ],
           "has_stripped_fields": false,
           "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "task_contract_codec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "TaskIdDto": {
+      "action": "add",
+      "docs": "Transparent serde mirror for a task-contract task identifier (IN-07, AC-08).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            "String"
+          ],
+          "has_stripped_fields": false,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "task_contract_codec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "TrackIdDto": {
+      "action": "add",
+      "docs": "Transparent serde mirror for a task-contract track identifier (IN-07, AC-08).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            "String"
+          ],
+          "has_stripped_fields": false,
+          "kind": "tuple"
         }
       },
       "methods": [],

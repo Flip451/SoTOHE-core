@@ -15,14 +15,6 @@
             }
           ],
           "returns": "Self"
-        },
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "as_str",
-          "params": [],
-          "receiver": "&self",
-          "returns": "&str"
         }
       ],
       "type_name": "CommandArgument"
@@ -39,7 +31,7 @@
               "ty": "Vec<CommandArgument>"
             }
           ],
-          "returns": "Result<Self, CommandConfigValidationError>"
+          "returns": "Result<Self, CommandArgvValidationError>"
         },
         {
           "has_default_impl": false,
@@ -64,7 +56,7 @@
               "ty": "UnvalidatedTimeoutSeconds"
             }
           ],
-          "returns": "Result<Self, CommandConfigValidationError>"
+          "returns": "Result<Self, CommandTimeoutValidationError>"
         },
         {
           "has_default_impl": false,
@@ -120,7 +112,7 @@
               "ty": "Option<UnvalidatedTimeoutSeconds>"
             }
           ],
-          "returns": "Result<Self, CommandConfigValidationError>"
+          "returns": "Result<Self, ConfiguredCommandValidationError>"
         },
         {
           "has_default_impl": false,
@@ -153,15 +145,7 @@
               "ty": "String"
             }
           ],
-          "returns": "Result<Self, CommandConfigValidationError>"
-        },
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "as_str",
-          "params": [],
-          "receiver": "&self",
-          "returns": "&str"
+          "returns": "Result<Self, CommandDeclarationIdValidationError>"
         }
       ],
       "type_name": "CommandDeclarationId"
@@ -231,7 +215,7 @@
               "ty": "Vec<PhaseCommandDeclaration>"
             }
           ],
-          "returns": "Result<Self, CommandConfigValidationError>"
+          "returns": "Result<Self, PhaseCommandConfigValidationError>"
         },
         {
           "has_default_impl": false,
@@ -302,7 +286,7 @@
               "ty": "Vec<PreReviewScopeCommandDeclaration>"
             }
           ],
-          "returns": "Result<Self, CommandConfigValidationError>"
+          "returns": "Result<Self, PreReviewCommandConfigValidationError>"
         },
         {
           "has_default_impl": false,
@@ -486,6 +470,19 @@
         }
       ],
       "type_name": "CommandConfigSchemaVersion"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "classify",
+          "params": [],
+          "receiver": "self",
+          "returns": "ClassifiedProgramExecutionRecord"
+        }
+      ],
+      "type_name": "ProgramExecutionRecord"
     }
   ],
   "layer": "usecase",
@@ -593,6 +590,11 @@
     },
     {
       "action": "add",
+      "for_type": "CommandArgument",
+      "trait_ref": "core::convert::AsRef<str>"
+    },
+    {
+      "action": "add",
       "for_type": "CommandArgv",
       "trait_ref": "core::fmt::Debug"
     },
@@ -693,6 +695,11 @@
     },
     {
       "action": "add",
+      "for_type": "CommandDeclarationId",
+      "trait_ref": "core::convert::AsRef<str>"
+    },
+    {
+      "action": "add",
       "for_type": "PhaseCommandDeclaration",
       "trait_ref": "core::fmt::Debug"
     },
@@ -769,26 +776,6 @@
     {
       "action": "add",
       "for_type": "PreReviewCommandConfig",
-      "trait_ref": "core::cmp::Eq"
-    },
-    {
-      "action": "add",
-      "for_type": "PhaseCommandStep",
-      "trait_ref": "core::fmt::Debug"
-    },
-    {
-      "action": "add",
-      "for_type": "PhaseCommandStep",
-      "trait_ref": "core::clone::Clone"
-    },
-    {
-      "action": "add",
-      "for_type": "PhaseCommandStep",
-      "trait_ref": "core::cmp::PartialEq"
-    },
-    {
-      "action": "add",
-      "for_type": "PhaseCommandStep",
       "trait_ref": "core::cmp::Eq"
     },
     {
@@ -1200,6 +1187,193 @@
       "action": "add",
       "for_type": "PhaseCommandEnterError",
       "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandConfigLoadError",
+      "trait_ref": "core::convert::From<CommandConfigValidationError>"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandEnterError",
+      "trait_ref": "core::convert::From<CommandConfigLoadError>"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandEnterError",
+      "trait_ref": "core::convert::From<ProgramRunnerError>"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandExplainError",
+      "trait_ref": "core::convert::From<CommandConfigLoadError>"
+    },
+    {
+      "action": "add",
+      "for_type": "PreReviewCommandDispatchError",
+      "trait_ref": "core::convert::From<CommandConfigLoadError>"
+    },
+    {
+      "action": "add",
+      "for_type": "PreReviewCommandDispatchError",
+      "trait_ref": "core::convert::From<CurrentReviewTrackResolveError>"
+    },
+    {
+      "action": "add",
+      "for_type": "PreReviewCommandDispatchError",
+      "trait_ref": "core::convert::From<ProgramRunnerError>"
+    },
+    {
+      "for_type": "CommandArgvValidationError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CommandArgvValidationError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "CommandArgvValidationError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "CommandTimeoutValidationError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CommandTimeoutValidationError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "CommandTimeoutValidationError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "ConfiguredCommandValidationError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ConfiguredCommandValidationError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "ConfiguredCommandValidationError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "ConfiguredCommandValidationError",
+      "trait_ref": "core::convert::From<CommandArgvValidationError>"
+    },
+    {
+      "for_type": "ConfiguredCommandValidationError",
+      "trait_ref": "core::convert::From<CommandTimeoutValidationError>"
+    },
+    {
+      "for_type": "CommandDeclarationIdValidationError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CommandDeclarationIdValidationError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "CommandDeclarationIdValidationError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "CommandConfigValidationError",
+      "trait_ref": "core::convert::From<ConfiguredCommandValidationError>"
+    },
+    {
+      "for_type": "CommandConfigValidationError",
+      "trait_ref": "core::convert::From<CommandDeclarationIdValidationError>"
+    },
+    {
+      "for_type": "CommandConfigValidationError",
+      "trait_ref": "core::convert::From<PhaseCommandConfigValidationError>"
+    },
+    {
+      "for_type": "CommandConfigValidationError",
+      "trait_ref": "core::convert::From<PreReviewCommandConfigValidationError>"
+    },
+    {
+      "for_type": "PhaseCommandConfigValidationError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "PhaseCommandConfigValidationError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "PhaseCommandConfigValidationError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "PreReviewCommandConfigValidationError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "PreReviewCommandConfigValidationError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "PreReviewCommandConfigValidationError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "SuccessfulProgramExecutionRecord",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "SuccessfulProgramExecutionRecord",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "SuccessfulProgramExecutionRecord",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "SuccessfulProgramExecutionRecord",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "SuccessfulProgramExecutionRecord",
+      "trait_ref": "core::convert::AsRef<ProgramExecutionRecord>"
+    },
+    {
+      "for_type": "FailedProgramExecutionRecord",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "FailedProgramExecutionRecord",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "FailedProgramExecutionRecord",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "FailedProgramExecutionRecord",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "FailedProgramExecutionRecord",
+      "trait_ref": "core::convert::AsRef<ProgramExecutionRecord>"
+    },
+    {
+      "for_type": "ClassifiedProgramExecutionRecord",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ClassifiedProgramExecutionRecord",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ClassifiedProgramExecutionRecord",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ClassifiedProgramExecutionRecord",
+      "trait_ref": "core::cmp::Eq"
     }
   ],
   "traits": {
@@ -1233,6 +1407,10 @@
         },
         {
           "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-02",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ],
@@ -1276,6 +1454,10 @@
         {
           "anchor": "AC-01",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ],
       "supertrait_bounds": [
@@ -1285,7 +1467,7 @@
     },
     "PhaseCommandService": {
       "action": "add",
-      "docs": "Phase validate, explain, and enter application service (IN-04, AC-03).",
+      "docs": "Deliberately synchronous application port for bounded phase-command I/O (AC-01, AC-02, AC-03).",
       "informal_grounds": [],
       "methods": [
         {
@@ -1352,6 +1534,10 @@
         {
           "anchor": "AC-03",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ],
       "supertrait_bounds": [
@@ -1398,6 +1584,10 @@
         {
           "anchor": "AC-05",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ],
       "supertrait_bounds": [
@@ -1407,7 +1597,7 @@
     },
     "PreReviewCommandDispatchService": {
       "action": "add",
-      "docs": "Pre-review command-dispatch application service (IN-05, CN-03).",
+      "docs": "Deliberately synchronous application port for bounded pre-review command I/O (AC-05, AC-07).",
       "informal_grounds": [],
       "methods": [
         {
@@ -1536,6 +1726,49 @@
         }
       ]
     },
+    "ClassifiedProgramExecutionRecord": {
+      "action": "add",
+      "docs": "Exhaustive application-boundary execution-record classification (CN-03, AC-03).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Succeeded",
+            "payload": {
+              "fields": [
+                "SuccessfulProgramExecutionRecord"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Failed",
+            "payload": {
+              "fields": [
+                "FailedProgramExecutionRecord"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "program_runner",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
     "CommandArgument": {
       "action": "add",
       "docs": "Opaque literal command-argument value (IN-03, AC-04).",
@@ -1564,6 +1797,14 @@
         },
         {
           "anchor": "AC-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-04",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]
@@ -1596,6 +1837,57 @@
         },
         {
           "anchor": "AC-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "CommandArgvValidationError": {
+      "action": "add",
+      "docs": "Command argv validation error.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Empty",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "RecursiveInvocation",
+            "payload": {
+              "fields": [
+                {
+                  "name": "prefix",
+                  "ty": "Vec<CommandArgument>"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "operator_command",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-05",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]
@@ -1700,7 +1992,7 @@
     },
     "CommandConfigValidationError": {
       "action": "add",
-      "docs": "Command-configuration validation failures (GO-03, CN-01).",
+      "docs": "Shared public error boundary for phase and pre-review command-configuration validation (GO-03, CN-01, AC-01, AC-05).",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -1847,6 +2139,47 @@
         }
       ]
     },
+    "CommandDeclarationIdValidationError": {
+      "action": "add",
+      "docs": "Command declaration identifier validation error.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Empty",
+            "payload": {
+              "fields": [
+                {
+                  "name": "value",
+                  "ty": "domain::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "operator_command",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
     "CommandSequenceIndex": {
       "action": "add",
       "docs": "Command-sequence position value (IN-02, CN-03).",
@@ -1923,6 +2256,51 @@
         }
       ]
     },
+    "CommandTimeoutValidationError": {
+      "action": "add",
+      "docs": "Command timeout validation error.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "OutOfRange",
+            "payload": {
+              "fields": [
+                {
+                  "name": "seconds",
+                  "ty": "UnvalidatedTimeoutSeconds"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "operator_command",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
     "ConfiguredCommand": {
       "action": "add",
       "docs": "Validated configured-command value (IN-01, IN-03, AC-04).",
@@ -1959,6 +2337,61 @@
         }
       ]
     },
+    "ConfiguredCommandValidationError": {
+      "action": "add",
+      "docs": "Configured-command validation error.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Argv",
+            "payload": {
+              "fields": [
+                "CommandArgvValidationError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Timeout",
+            "payload": {
+              "fields": [
+                "CommandTimeoutValidationError"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "operator_command",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
     "CurrentReviewTrackResolveError": {
       "action": "add",
       "docs": "Current-review-track resolution failure (IN-05, AC-05).",
@@ -1988,6 +2421,38 @@
       "spec_refs": [
         {
           "anchor": "IN-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "FailedProgramExecutionRecord": {
+      "action": "add",
+      "docs": "Failure-refined application-boundary execution record (CN-03, AC-03, AC-05).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "program_runner",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         },
         {
@@ -2046,6 +2511,52 @@
           "anchor": "IN-01",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PhaseCommandConfigValidationError": {
+      "action": "add",
+      "docs": "Phase-command configuration aggregate validation error (CN-01, AC-01).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "InvalidSchemaVersion",
+            "payload": {
+              "fields": [
+                {
+                  "name": "actual",
+                  "ty": "CommandConfigSchemaVersion"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "DuplicateDeclaration",
+            "payload": {
+              "fields": [
+                "CommandDeclarationId"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "phase_command",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
         {
           "anchor": "CN-01",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
@@ -2152,8 +2663,12 @@
             "payload": {
               "fields": [
                 {
-                  "name": "records",
-                  "ty": "Vec<ProgramExecutionRecord>"
+                  "name": "pre_entry_records",
+                  "ty": "Vec<SuccessfulProgramExecutionRecord>"
+                },
+                {
+                  "name": "writer_record",
+                  "ty": "SuccessfulProgramExecutionRecord"
                 }
               ],
               "kind": "struct"
@@ -2165,11 +2680,11 @@
               "fields": [
                 {
                   "name": "completed",
-                  "ty": "Vec<ProgramExecutionRecord>"
+                  "ty": "Vec<SuccessfulProgramExecutionRecord>"
                 },
                 {
                   "name": "failed",
-                  "ty": "ProgramExecutionRecord"
+                  "ty": "FailedProgramExecutionRecord"
                 }
               ],
               "kind": "struct"
@@ -2261,8 +2776,12 @@
               "ty": "CommandDeclarationId"
             },
             {
-              "name": "steps",
-              "ty": "Vec<PhaseCommandStep>"
+              "name": "pre_entry_commands",
+              "ty": "Vec<ConfiguredCommand>"
+            },
+            {
+              "name": "writer",
+              "ty": "ConfiguredCommand"
             },
             {
               "name": "output_limit",
@@ -2334,67 +2853,6 @@
         },
         {
           "anchor": "AC-04",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        }
-      ]
-    },
-    "PhaseCommandStep": {
-      "action": "add",
-      "docs": "Phase-command explanation step (IN-02, IN-04).",
-      "informal_grounds": [],
-      "kind": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "PreEntry",
-            "payload": {
-              "fields": [
-                {
-                  "name": "position",
-                  "ty": "CommandSequenceIndex"
-                },
-                {
-                  "name": "command",
-                  "ty": "ConfiguredCommand"
-                }
-              ],
-              "kind": "struct"
-            }
-          },
-          {
-            "name": "Writer",
-            "payload": {
-              "fields": [
-                {
-                  "name": "command",
-                  "ty": "ConfiguredCommand"
-                }
-              ],
-              "kind": "struct"
-            }
-          }
-        ]
-      },
-      "methods": [],
-      "module_path": "phase_command",
-      "role": {
-        "ValueObject": {}
-      },
-      "spec_refs": [
-        {
-          "anchor": "IN-02",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "IN-04",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "AC-02",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "AC-03",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]
@@ -2532,6 +2990,52 @@
           "anchor": "IN-05",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PreReviewCommandConfigValidationError": {
+      "action": "add",
+      "docs": "Pre-review command configuration aggregate validation error (CN-01, AC-05).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "InvalidSchemaVersion",
+            "payload": {
+              "fields": [
+                {
+                  "name": "actual",
+                  "ty": "CommandConfigSchemaVersion"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "DuplicateScope",
+            "payload": {
+              "fields": [
+                "domain::review_v2::ScopeName"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "pre_review_command",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
         {
           "anchor": "CN-01",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
@@ -2710,7 +3214,7 @@
               "fields": [
                 {
                   "name": "records",
-                  "ty": "Vec<ProgramExecutionRecord>"
+                  "ty": "Vec<SuccessfulProgramExecutionRecord>"
                 }
               ],
               "kind": "struct"
@@ -2722,11 +3226,11 @@
               "fields": [
                 {
                   "name": "completed",
-                  "ty": "Vec<ProgramExecutionRecord>"
+                  "ty": "Vec<SuccessfulProgramExecutionRecord>"
                 },
                 {
                   "name": "failed",
-                  "ty": "ProgramExecutionRecord"
+                  "ty": "FailedProgramExecutionRecord"
                 }
               ],
               "kind": "struct"
@@ -3224,6 +3728,38 @@
         },
         {
           "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "SuccessfulProgramExecutionRecord": {
+      "action": "add",
+      "docs": "Success-refined application-boundary execution record (CN-03, AC-02, AC-03).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "program_runner",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]

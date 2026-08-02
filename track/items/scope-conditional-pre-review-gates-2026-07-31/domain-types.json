@@ -4,7 +4,88 @@
   "inherent_impls": [],
   "layer": "domain",
   "schema_version": 5,
-  "trait_impls": [],
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "CoverageVerifyOutcome",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "CoverageVerifyOutcome",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "CoverageVerifyOutcome",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CoverageVerifyOutcome",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CoverageViolation",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "CoverageViolation",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "CoverageViolation",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CoverageViolation",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "PreReviewGateOutcome",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "PreReviewGateOutcome",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "PreReviewGateOutcome",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "PreReviewGateOutcome",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "PreReviewGateViolation",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "PreReviewGateViolation",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "PreReviewGateViolation",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "PreReviewGateViolation",
+      "trait_ref": "core::cmp::Eq"
+    }
+  ],
   "traits": {},
   "types": {
     "ContractedEntryRef": {
@@ -69,8 +150,8 @@
       ]
     },
     "CoverageVerifyOutcome": {
-      "action": "reference",
-      "docs": "Task-contract coverage outcome (IN-08, AC-10).",
+      "action": "modify",
+      "docs": "Modify task-contract coverage outcome; enum evolution: closed (IN-08, AC-10).",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -85,7 +166,7 @@
             "name": "Blocked",
             "payload": {
               "fields": [
-                "Vec<CoverageViolation>"
+                "NonEmptyVec<CoverageViolation>"
               ],
               "kind": "tuple"
             }
@@ -122,8 +203,8 @@
       ]
     },
     "CoverageViolation": {
-      "action": "reference",
-      "docs": "Task-contract coverage violation (IN-07, AC-08).",
+      "action": "modify",
+      "docs": "Modify task-contract coverage violation variants; enum evolution: closed (IN-07, AC-08).",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -191,8 +272,8 @@
       ]
     },
     "PreReviewGateOutcome": {
-      "action": "reference",
-      "docs": "Task-contract pre-review outcome (IN-08, AC-10).",
+      "action": "modify",
+      "docs": "Modify task-contract pre-review outcome; enum evolution: closed (IN-08, AC-10).",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -207,7 +288,7 @@
             "name": "Blocked",
             "payload": {
               "fields": [
-                "Vec<PreReviewGateViolation>"
+                "NonEmptyVec<PreReviewGateViolation>"
               ],
               "kind": "tuple"
             }
@@ -244,8 +325,8 @@
       ]
     },
     "PreReviewGateViolation": {
-      "action": "reference",
-      "docs": "Task-contract pre-review violation (IN-08, AC-10).",
+      "action": "modify",
+      "docs": "Modify task-contract pre-review violation variants; enum evolution: closed (IN-08, AC-10).",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",

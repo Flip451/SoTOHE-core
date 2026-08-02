@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "eec03cf359e41b888727014182e43f0adbfa777f7926677a19795ec843067ccb",
+  "catalogue_declaration_hash": "89b2252ccff399710658f79f5946f27bea1bbdfbe2a1fc4d821348a3267aca7a",
   "signals": [
     {
       "type_name": "CommandArgumentDto",
@@ -35,7 +35,12 @@
     {
       "type_name": "ContractedEntryRefDto",
       "signal": "blue",
-      "entry_hash": "981985188bce673d47058e81f58c357208e1e8fd3d41a6a062a7849a9185625f"
+      "entry_hash": "d05a0cd39814f68580ea84dd25927dbff460575c74f441ccfca20cf51e8056ea"
+    },
+    {
+      "type_name": "EntryKeyDto",
+      "signal": "blue",
+      "entry_hash": "1c22726a358b865b8482f8225b9ad7089cefb56c906b3877b1f6076c69b3d7c4"
     },
     {
       "type_name": "FsPhaseCommandConfigLoader",
@@ -51,6 +56,11 @@
       "type_name": "GitCurrentReviewTrackResolver",
       "signal": "blue",
       "entry_hash": "4dfaa606c2957affa2a296791f53ab5d783b7cd943506fd446a29f0e39c6d853"
+    },
+    {
+      "type_name": "LayerIdDto",
+      "signal": "blue",
+      "entry_hash": "af7cabb51672b37c338952e365f41a6a9bb0ef77fa7e541ec18090ab3b5c967e"
     },
     {
       "type_name": "PhaseCommandConfigDto",
@@ -85,12 +95,22 @@
     {
       "type_name": "TaskContractDocumentDto",
       "signal": "blue",
-      "entry_hash": "50c3926abd9b5a32f7c749296e4c41221adb29d27adde674c25c335b456b215b"
+      "entry_hash": "0c1dc61b295314653a4b12c225ee5483086a79f65fdab8a4224b5b1a64a1fb60"
     },
     {
       "type_name": "TaskContractSchemaVersionDto",
       "signal": "blue",
       "entry_hash": "b13e5fe27ee5891b53e324b05be31b1a23a058b9940f4995dbf06502d1918c45"
+    },
+    {
+      "type_name": "TaskIdDto",
+      "signal": "blue",
+      "entry_hash": "703d96db8273f7a37f9d2a55e1cee447ce1d1a167b48f6ab62054889fb2d6c38"
+    },
+    {
+      "type_name": "TrackIdDto",
+      "signal": "blue",
+      "entry_hash": "ec0ffc493027e11291b9592cb7b7b88b0e09b2131e077e50143f408e64e9093b"
     },
     {
       "type_name": "infrastructure::operator_command_config::decode_phase_command_config",

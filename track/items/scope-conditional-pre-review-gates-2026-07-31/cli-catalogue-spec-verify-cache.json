@@ -3,7 +3,103 @@
   "layer": "cli",
   "entries": [
     {
-      "claim_hash": "998644f58b76fb86f36ba5fcb2d0d163299872a4a171b8bf967b3486367e2843",
+      "claim_hash": "cd22548e18c1b5fbda57d8531c3f4443e3ad85d506867adc031ffe077ccb347a",
+      "evidence_hash": "c600677df01b23fc21e331a509de2c22f16a0ef63e6ef1cb2ef604999640d2bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI は validate、explain、enter の観測可能な outcome を提供し、operator が展開済み phase command、実行順序、validation failure、および command failure を監査できるようにする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CapabilityExecArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "CLI は validate、explain、enter の観測可能な outcome を提供し、operator が展開済み phase command、実行順序、validation failure、および command failure を監査できるようにする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cd22548e18c1b5fbda57d8531c3f4443e3ad85d506867adc031ffe077ccb347a",
+      "evidence_hash": "574c686246d7577d3ab00fe3d015a1ba12dac480d60fd748ff40da6e914bd3dc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "validate、explain、enter の CLI outcome により、operator は展開後の writer/pre-entry argv、実行順、default 3,600-second timeout または explicit timeout、その positive-integer / 3,600-second 上限、stdout/stderr 各 1 MiB (1,048,576-byte) capture limit、validation failure、first failing command、および output-limit または timeout outcome を監査できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CapabilityExecArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "validate、explain、enter の CLI outcome により、operator は展開後の writer/pre-entry argv、実行順、default 3,600-second timeout または explicit timeout、その positive-integer / 3,600-second 上限、stdout/stderr 各 1 MiB (1,048,576-byte) capture limit、validation failure、first failing command、および output-limit または timeout outcome を監査できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "40bac36bd75eac189bd133d242f62eea52bc08743cde17a2f169cca07e40ce4f",
+      "evidence_hash": "c600677df01b23fc21e331a509de2c22f16a0ef63e6ef1cb2ef604999640d2bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI は validate、explain、enter の観測可能な outcome を提供し、operator が展開済み phase command、実行順序、validation failure、および command failure を監査できるようにする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CliCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "CLI は validate、explain、enter の観測可能な outcome を提供し、operator が展開済み phase command、実行順序、validation failure、および command failure を監査できるようにする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "40bac36bd75eac189bd133d242f62eea52bc08743cde17a2f169cca07e40ce4f",
+      "evidence_hash": "574c686246d7577d3ab00fe3d015a1ba12dac480d60fd748ff40da6e914bd3dc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "validate、explain、enter の CLI outcome により、operator は展開後の writer/pre-entry argv、実行順、default 3,600-second timeout または explicit timeout、その positive-integer / 3,600-second 上限、stdout/stderr 各 1 MiB (1,048,576-byte) capture limit、validation failure、first failing command、および output-limit または timeout outcome を監査できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CliCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "validate、explain、enter の CLI outcome により、operator は展開後の writer/pre-entry argv、実行順、default 3,600-second timeout または explicit timeout、その positive-integer / 3,600-second 上限、stdout/stderr 各 1 MiB (1,048,576-byte) capture limit、validation failure、first failing command、および output-limit または timeout outcome を監査できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5c8e5dcb0972354a3bdc22168d6a7adbd5a73c00a8bff25003acbb895b8eb2a6",
       "evidence_hash": "c600677df01b23fc21e331a509de2c22f16a0ef63e6ef1cb2ef604999640d2bb",
       "verdict": {
         "kind": "pass",
@@ -27,7 +123,7 @@
       }
     },
     {
-      "claim_hash": "998644f58b76fb86f36ba5fcb2d0d163299872a4a171b8bf967b3486367e2843",
+      "claim_hash": "5c8e5dcb0972354a3bdc22168d6a7adbd5a73c00a8bff25003acbb895b8eb2a6",
       "evidence_hash": "574c686246d7577d3ab00fe3d015a1ba12dac480d60fd748ff40da6e914bd3dc",
       "verdict": {
         "kind": "pass",
@@ -51,18 +147,18 @@
       }
     },
     {
-      "claim_hash": "d6e5f0344720585303179a94b55bbf8a411022b3532fcff7ecc87235f017fae1",
+      "claim_hash": "4735a8d789898d7839c2bb3985fe605e76ef276ece91aff92bcf432454e470ef",
       "evidence_hash": "c600677df01b23fc21e331a509de2c22f16a0ef63e6ef1cb2ef604999640d2bb",
       "verdict": {
         "kind": "pass",
-        "citation": "CLI は validate、explain、enter の観測可能な outcome を提供し、operator が展開済み phase command、実行順序、validation failure、および command failure を監査できるようにする。"
+        "citation": "CLI は validate、explain、enter の観測可能な outcome を提供し"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
         "data": {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
           "section_key": "types",
-          "entry_key": "PhaseEnterArgs"
+          "entry_key": "PhaseIdArgs"
         }
       },
       "evidence_origin": {
@@ -75,7 +171,7 @@
       }
     },
     {
-      "claim_hash": "d6e5f0344720585303179a94b55bbf8a411022b3532fcff7ecc87235f017fae1",
+      "claim_hash": "4735a8d789898d7839c2bb3985fe605e76ef276ece91aff92bcf432454e470ef",
       "evidence_hash": "b49fb65c90adaab174287b910af03a5d2c7e928cd33ff55fd2b16efaa3957c33",
       "verdict": {
         "kind": "pass",
@@ -86,7 +182,7 @@
         "data": {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
           "section_key": "types",
-          "entry_key": "PhaseEnterArgs"
+          "entry_key": "PhaseIdArgs"
         }
       },
       "evidence_origin": {
@@ -99,7 +195,7 @@
       }
     },
     {
-      "claim_hash": "d6e5f0344720585303179a94b55bbf8a411022b3532fcff7ecc87235f017fae1",
+      "claim_hash": "4735a8d789898d7839c2bb3985fe605e76ef276ece91aff92bcf432454e470ef",
       "evidence_hash": "574c686246d7577d3ab00fe3d015a1ba12dac480d60fd748ff40da6e914bd3dc",
       "verdict": {
         "kind": "pass",
@@ -110,55 +206,7 @@
         "data": {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
           "section_key": "types",
-          "entry_key": "PhaseEnterArgs"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "acceptance_criteria",
-          "element_id": "AC-03",
-          "text_label": "validate、explain、enter の CLI outcome により、operator は展開後の writer/pre-entry argv、実行順、default 3,600-second timeout または explicit timeout、その positive-integer / 3,600-second 上限、stdout/stderr 各 1 MiB (1,048,576-byte) capture limit、validation failure、first failing command、および output-limit または timeout outcome を監査できる。"
-        }
-      }
-    },
-    {
-      "claim_hash": "330689247908679ea25de17298e318580acc254dc8e374ab44cfd37ca27cac39",
-      "evidence_hash": "c600677df01b23fc21e331a509de2c22f16a0ef63e6ef1cb2ef604999640d2bb",
-      "verdict": {
-        "kind": "pass",
-        "citation": "CLI は validate、explain、enter の観測可能な outcome を提供し、operator が展開済み phase command、実行順序、validation failure、および command failure を監査できるようにする。"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
-          "section_key": "types",
-          "entry_key": "PhaseExplainArgs"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "in_scope",
-          "element_id": "IN-04",
-          "text_label": "CLI は validate、explain、enter の観測可能な outcome を提供し、operator が展開済み phase command、実行順序、validation failure、および command failure を監査できるようにする。"
-        }
-      }
-    },
-    {
-      "claim_hash": "330689247908679ea25de17298e318580acc254dc8e374ab44cfd37ca27cac39",
-      "evidence_hash": "574c686246d7577d3ab00fe3d015a1ba12dac480d60fd748ff40da6e914bd3dc",
-      "verdict": {
-        "kind": "pass",
-        "citation": "validate、explain、enter の CLI outcome により、operator は展開後の writer/pre-entry argv、実行順、default 3,600-second timeout または explicit timeout、その positive-integer / 3,600-second 上限、stdout/stderr 各 1 MiB (1,048,576-byte) capture limit、validation failure、first failing command、および output-limit または timeout outcome を監査できる。"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
-          "section_key": "types",
-          "entry_key": "PhaseExplainArgs"
+          "entry_key": "PhaseIdArgs"
         }
       },
       "evidence_origin": {
@@ -231,6 +279,198 @@
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
           "section_key": "types",
           "entry_key": "PhaseValidateArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "validate、explain、enter の CLI outcome により、operator は展開後の writer/pre-entry argv、実行順、default 3,600-second timeout または explicit timeout、その positive-integer / 3,600-second 上限、stdout/stderr 各 1 MiB (1,048,576-byte) capture limit、validation failure、first failing command、および output-limit または timeout outcome を監査できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cc9d97c56ebbae48106463fb6647999fa41860786b8a4958e8659afe62e6ce6b",
+      "evidence_hash": "c600677df01b23fc21e331a509de2c22f16a0ef63e6ef1cb2ef604999640d2bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI は validate、explain、enter の観測可能な outcome を提供し、operator が展開済み phase command、実行順序、validation failure、および command failure を監査できるようにする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::capability::into_driver_input"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "CLI は validate、explain、enter の観測可能な outcome を提供し、operator が展開済み phase command、実行順序、validation failure、および command failure を監査できるようにする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cc9d97c56ebbae48106463fb6647999fa41860786b8a4958e8659afe62e6ce6b",
+      "evidence_hash": "574c686246d7577d3ab00fe3d015a1ba12dac480d60fd748ff40da6e914bd3dc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "validate、explain、enter の CLI outcome により、operator は展開後の writer/pre-entry argv、実行順、default 3,600-second timeout または explicit timeout、その positive-integer / 3,600-second 上限、stdout/stderr 各 1 MiB (1,048,576-byte) capture limit、validation failure、first failing command、および output-limit または timeout outcome を監査できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::capability::into_driver_input"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "validate、explain、enter の CLI outcome により、operator は展開後の writer/pre-entry argv、実行順、default 3,600-second timeout または explicit timeout、その positive-integer / 3,600-second 上限、stdout/stderr 各 1 MiB (1,048,576-byte) capture limit、validation failure、first failing command、および output-limit または timeout outcome を監査できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "955fb94b17596f754de7eeafa04a687ab0aa35fc145f29b219729c174b613833",
+      "evidence_hash": "c600677df01b23fc21e331a509de2c22f16a0ef63e6ef1cb2ef604999640d2bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI は validate、explain、enter の観測可能な outcome を提供し、operator が展開済み phase command、実行順序、validation failure、および command failure を監査できるようにする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::phase::execute"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "CLI は validate、explain、enter の観測可能な outcome を提供し、operator が展開済み phase command、実行順序、validation failure、および command failure を監査できるようにする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "955fb94b17596f754de7eeafa04a687ab0aa35fc145f29b219729c174b613833",
+      "evidence_hash": "574c686246d7577d3ab00fe3d015a1ba12dac480d60fd748ff40da6e914bd3dc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "validate、explain、enter の CLI outcome により、operator は展開後の writer/pre-entry argv、実行順、default 3,600-second timeout または explicit timeout、その positive-integer / 3,600-second 上限、stdout/stderr 各 1 MiB (1,048,576-byte) capture limit、validation failure、first failing command、および output-limit または timeout outcome を監査できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::phase::execute"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "validate、explain、enter の CLI outcome により、operator は展開後の writer/pre-entry argv、実行順、default 3,600-second timeout または explicit timeout、その positive-integer / 3,600-second 上限、stdout/stderr 各 1 MiB (1,048,576-byte) capture limit、validation failure、first failing command、および output-limit または timeout outcome を監査できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d82e856d1db9f91642585535701910c9d7cd31dda36ddb58f9dd8f090f67870d",
+      "evidence_hash": "c600677df01b23fc21e331a509de2c22f16a0ef63e6ef1cb2ef604999640d2bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI は validate、explain、enter の観測可能な outcome を提供し、operator が展開済み phase command、実行順序、validation failure、および command failure を監査できるようにする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::phase::execute_with_driver"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "CLI は validate、explain、enter の観測可能な outcome を提供し、operator が展開済み phase command、実行順序、validation failure、および command failure を監査できるようにする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d82e856d1db9f91642585535701910c9d7cd31dda36ddb58f9dd8f090f67870d",
+      "evidence_hash": "574c686246d7577d3ab00fe3d015a1ba12dac480d60fd748ff40da6e914bd3dc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "validate、explain、enter の CLI outcome により、operator は展開後の writer/pre-entry argv、実行順、default 3,600-second timeout または explicit timeout、その positive-integer / 3,600-second 上限、stdout/stderr 各 1 MiB (1,048,576-byte) capture limit、validation failure、first failing command、および output-limit または timeout outcome を監査できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::phase::execute_with_driver"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "validate、explain、enter の CLI outcome により、operator は展開後の writer/pre-entry argv、実行順、default 3,600-second timeout または explicit timeout、その positive-integer / 3,600-second 上限、stdout/stderr 各 1 MiB (1,048,576-byte) capture limit、validation failure、first failing command、および output-limit または timeout outcome を監査できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "42b203a007fcee46aed470abea5664b0a5d14f905456fb22c27c85dc562db98c",
+      "evidence_hash": "c600677df01b23fc21e331a509de2c22f16a0ef63e6ef1cb2ef604999640d2bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI は validate、explain、enter の観測可能な outcome を提供し、operator が展開済み phase command、実行順序、validation failure、および command failure を監査できるようにする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::phase::input_from_command"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "CLI は validate、explain、enter の観測可能な outcome を提供し、operator が展開済み phase command、実行順序、validation failure、および command failure を監査できるようにする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "42b203a007fcee46aed470abea5664b0a5d14f905456fb22c27c85dc562db98c",
+      "evidence_hash": "574c686246d7577d3ab00fe3d015a1ba12dac480d60fd748ff40da6e914bd3dc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "validate、explain、enter の CLI outcome により、operator は展開後の writer/pre-entry argv、実行順、default 3,600-second timeout または explicit timeout、その positive-integer / 3,600-second 上限、stdout/stderr 各 1 MiB (1,048,576-byte) capture limit、validation failure、first failing command、および output-limit または timeout outcome を監査できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::phase::input_from_command"
         }
       },
       "evidence_origin": {

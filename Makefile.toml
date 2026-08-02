@@ -795,7 +795,7 @@ args = ["test-obligation", "check"]
 
 [tasks.track-active-gate]
 private = true
-description = "[gate] Regen sequence: signal calc-impl-catalog → signal calc-catalog-spec → catalogue-lint check-active-track → catalog check → views sync. Both track-commit-message and review invocations depend on this shared task. Fail-closed: non-zero exit aborts the chain."
+description = "[gate] Commit-time regeneration sequence: signal calc-impl-catalog → signal calc-catalog-spec → catalogue-lint check-active-track → catalog check → views sync. `track-commit-message` depends on this shared task. Review wrappers carry no dependency: `bin/sotp review local` resolves scope and dispatches its scope-resolved pre-review sequence before any configured gate runs. Fail-closed: non-zero exit aborts the chain."
 script_runner = "@shell"
 script = ['''
 set -e
@@ -863,19 +863,25 @@ description = "[internal] Verify recorded and currently required ADR baselines. 
 command = "cargo"
 args = ["run", "--quiet", "-p", "cli", "--", "adr-baseline", "check-commit"]
 
-# Cargo-make dependencies run before task scripts, so pre-gate track/branch
-# guards must live outside these wrappers or inside the gate commands.
+# Cargo-make dependencies run before task scripts, so these wrappers carry no
+# unconditional gate dependency: the CLI resolves the review scope and track
+# first, then dispatches the operator-owned pre-review command sequence for
+# that scope. Scopes with an empty command vector stay genuinely gate-free,
+# and an explicit-track/branch mismatch is rejected before any gate runs.
 [tasks.track-local-review]
-description = "[wrapper] Fire attribution-completeness + liveness gates (via task-contract-check), refresh signals + rendered views (via track-active-gate), then invoke a single reviewer round via bin/sotp review local. ADR-baseline verification is performed by the review workflow before this wrapper. Running track-active-gate after task-contract-check ensures the reviewer sees view artifacts rendered from the latest signal state (the fixer's between-rounds code edits would otherwise leave *-types.md stale)."
-dependencies = ["task-contract-check", "track-active-gate"]
+description = "[wrapper] Delegate one reviewer round to bin/sotp review local. The CLI resolves the review scope and dispatches its operator-owned pre-review command sequence."
 script_runner = "@shell"
 script = ['case "${1:-}" in --) shift ;; esac; bin/sotp review local "$@"']
 
 [tasks.track-local-review-fix]
-description = "[wrapper] Same as track-local-review but invokes bin/sotp review fix-local instead of review local. It runs task-contract gates, then refreshes signals + rendered views before delegation. ADR-baseline verification is performed by the review workflow before this wrapper. Provider-agnostic: bin/sotp resolves provider/model from .harness/config/agent-profiles.json. Active track auto-resolved from current git branch (--track-id is intentionally not accepted at the cargo-make layer)."
-dependencies = ["task-contract-check", "track-active-gate"]
+description = "[wrapper] Delegate reviewer fixes to bin/sotp review fix-local. Provider/model resolution remains CLI-owned; pre-review gating is dispatched per scope by bin/sotp review local inside the fix loop."
 script_runner = "@shell"
 script = ['case "${1:-}" in --) shift ;; esac; bin/sotp review fix-local "$@"']
+
+[tasks.track-views-sync]
+description = "[wrapper] Regenerate rendered track views only (plan.md, contract-map.md, and catalogue views). This is an explicit fixer refresh route; it performs no signal, lint, catalogue, or task-contract gate."
+command = "bin/sotp"
+args = ["track", "views", "sync"]
 
 [tasks.track-local-dry-fix]
 description = "[wrapper] Launch the Codex dry-fix-lead fixer via bin/sotp dry fix-local"
@@ -934,7 +940,7 @@ exec gh pr comment --body-file "$1"
 ''']
 
 [tasks.track-commit-message]
-description = "[wrapper] Regenerate signals + views (via track-active-gate; that gate runs no ref-verify call), then run the strict commit gate: stage working tree, full cargo make ci, track-aware cargo make ci-track (including ADR-baseline check-commit), code-review gate (review not approved → BLOCK), semantic review refresh (`sotp ref-verify run` — the scope derives from track artifact existence, so pre-Phase-1 tracks pass with zero pairs; the only writing step, positioned after the code-review gate per CN-02 / IN-02), re-stage to capture verify-cache artifact writes, `sotp ref-verify check-approved` (non-Pass pairs → BLOCK; same existence-derived scope), test-obligation fulfillment gate (`sotp test-obligation check`; missing bindings / unresolved edges / stale verdicts → BLOCK), DRY gate (`sotp dry check-approved`; unresolved DRY violations → BLOCK), commit from tmp/track-commit/commit-message.txt, persist HEAD SHA to .commit_hash. The regen sequence is shared with review invocations via track-active-gate (CN-11 DRY, AC-12). The strict checks (ci + ci-track + check-approved + semantic review + test-obligation + DRY gate) are NOT weakened by the bare-chain refactor (CN-12)."
+description = "[wrapper] Regenerate signals + views (via track-active-gate; that gate runs no ref-verify call), then run the strict commit gate: stage working tree, full cargo make ci, track-aware cargo make ci-track (including ADR-baseline check-commit), code-review gate (review not approved → BLOCK), semantic review refresh (`sotp ref-verify run` — the scope derives from track artifact existence, so pre-Phase-1 tracks pass with zero pairs; the only writing step, positioned after the code-review gate per CN-02 / IN-02), re-stage to capture verify-cache artifact writes, `sotp ref-verify check-approved` (non-Pass pairs → BLOCK; same existence-derived scope), test-obligation fulfillment gate (`sotp test-obligation check`; missing bindings / unresolved edges / stale verdicts → BLOCK), DRY gate (`sotp dry check-approved`; unresolved DRY violations → BLOCK), commit from tmp/track-commit/commit-message.txt, persist HEAD SHA to .commit_hash. This regeneration is commit-only: review wrappers carry no `track-active-gate` dependency and receive their pre-review gating from the scope-resolved dispatch inside `bin/sotp review local`. The strict checks (ci + ci-track + check-approved + semantic review + test-obligation + DRY gate) are NOT weakened by the bare-chain refactor (CN-12)."
 dependencies = ["track-active-gate"]
 script_runner = "@shell"
 script = ['''

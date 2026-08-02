@@ -3,12 +3,14 @@
 pub(crate) mod approved;
 pub(crate) mod briefing;
 pub(crate) mod commit_hash;
+mod gated_entry;
 mod helpers;
 #[cfg(test)]
 pub(crate) use helpers::process_guards;
 pub(crate) use helpers::record_instant_once;
 mod inputs;
 pub(crate) mod null_reviewer;
+mod pre_review_command;
 pub(crate) mod results;
 pub(crate) mod run;
 pub mod run_fix;
@@ -268,10 +270,14 @@ impl ReviewCompositionRoot {
     /// reviewer implementation (codex or claude). Delegates all domain type
     /// handling to `run_codex_review_str` / `run_claude_review_str` (CN-02).
     ///
+    /// Ungated execution body: callers outside the gated service graph must go
+    /// through [`Self::review_run_local`] or the [`cli_driver::review::ReviewDriver`]
+    /// returned by [`ReviewCompositionRoot::review_driver`].
+    ///
     /// # Errors
     /// Returns `Err` when profile loading, provider resolution, arg validation,
     /// or the review cycle fails.
-    pub fn review_run_local(
+    pub(crate) fn review_run_local_ungated(
         &self,
         input: ReviewRunLocalInput,
     ) -> Result<CommandOutcome, CompositionError> {
@@ -1299,7 +1305,7 @@ exit 0
         std::env::set_current_dir(repo._dir.path()).unwrap();
 
         let outcome = crate::review_v2::ReviewCompositionRoot::new()
-            .review_run_local(crate::review_v2::ReviewRunLocalInput {
+            .review_run_local_ungated(crate::review_v2::ReviewRunLocalInput {
                 model: None,
                 timeout_seconds: 10,
                 briefing_file: None,
@@ -1604,7 +1610,7 @@ exit 0
         let _cwd_guard = CwdGuard::save_current();
         std::env::set_current_dir(repo._dir.path()).unwrap();
 
-        let result = crate::review_v2::ReviewCompositionRoot::new().review_run_local(
+        let result = crate::review_v2::ReviewCompositionRoot::new().review_run_local_ungated(
             crate::review_v2::ReviewRunLocalInput {
                 model: None,
                 timeout_seconds: 10,
@@ -1622,6 +1628,56 @@ exit 0
         assert!(
             msg.contains("unsupported reviewer provider 'gemini'"),
             "expected unsupported provider error, got: {msg}"
+        );
+    }
+
+    /// Pin that the driver entry point is gate-aware: a
+    /// failing configured pre-review command blocks the flow before any
+    /// reviewer provider is consulted (an inner launch would fail with an
+    /// unsupported-provider error instead of the pre-review block).
+    #[cfg(unix)]
+    #[test]
+    fn review_run_local_public_entry_blocks_on_failing_pre_review_gate() {
+        let dir = tempfile::tempdir().unwrap();
+        let config_dir = dir.path().join(".harness/config");
+        std::fs::create_dir_all(&config_dir).unwrap();
+        std::fs::write(
+            config_dir.join("pre-review-gates.json"),
+            r#"{
+                "schema_version": 1,
+                "scopes": [{
+                    "scope": "cli_composition",
+                    "commands": [{"argv": ["false"], "timeout_seconds": null}]
+                }]
+            }"#,
+        )
+        .unwrap();
+        let items_dir = dir.path().join("track/items");
+        std::fs::create_dir_all(&items_dir).unwrap();
+        GitRunner::at(dir.path()).assert_success(&["init", "-b", "main"]);
+        GitRunner::at(dir.path()).assert_success(&["config", "user.email", "test@example.invalid"]);
+        GitRunner::at(dir.path()).assert_success(&["config", "user.name", "test"]);
+        GitRunner::at(dir.path()).assert_success(&["commit", "--allow-empty", "-qm", "initial"]);
+        GitRunner::at(dir.path()).assert_success(&["checkout", "-qb", "track/gate-block-track"]);
+
+        let outcome = crate::review_v2::ReviewCompositionRoot::new()
+            .review_run_local(crate::review_v2::ReviewRunLocalInput {
+                model: None,
+                timeout_seconds: 10,
+                briefing_file: None,
+                prompt: Some("Review.".to_owned()),
+                track_id: Some("gate-block-track".to_owned()),
+                round_type: "fast".to_owned(),
+                group: "cli_composition".to_owned(),
+                items_dir,
+            })
+            .unwrap();
+
+        assert_eq!(outcome.exit_code, 1);
+        let stderr = outcome.stderr.as_deref().unwrap_or("");
+        assert!(
+            stderr.contains("pre-review command failed"),
+            "expected the pre-review gate block, got: {stderr}"
         );
     }
 

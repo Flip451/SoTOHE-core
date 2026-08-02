@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "6d28fa3dbd668409b4afe41fad30037bd30d96fd4c3deb80eb076f3d90626947",
+  "catalogue_declaration_hash": "a9a80bde63669aa1ded9e3db1ba534752a79e37e87fbd7b145a1146cbee3b062",
   "signals": [
     {
       "type_name": "CommandOutcome",

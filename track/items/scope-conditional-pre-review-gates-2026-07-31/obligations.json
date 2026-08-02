@@ -137,7 +137,7 @@
         "role": "SecondaryPort"
       },
       "brief": "Author a contract test covering 'trait_method:resolve' of CurrentReviewTrackResolverPort",
-      "declaration_hash": "6a50d89f6f82f55e934d0070f222eb527167809836c393becb185ddc3efc1cb3",
+      "declaration_hash": "41038e6d501f9fe8f7e515fe66c2468a266a0e995411d90f44ae556ac0db94e1",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -146,6 +146,10 @@
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "AC-05"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-02"
         }
       ]
     },
@@ -165,7 +169,7 @@
         "role": "SecondaryPort"
       },
       "brief": "Author a contract test covering 'trait_method:load' of PhaseCommandConfigLoaderPort",
-      "declaration_hash": "395c15d4aef1e2e894f6b7191506d2dedc2ff3467aac04c19798f1991077feef",
+      "declaration_hash": "0efcf782348988eef9c2efaa841ae28b736c61383369f958339c49d58a6c8309",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -178,6 +182,10 @@
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "AC-01"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-02"
         }
       ]
     },
@@ -197,7 +205,7 @@
         "role": "ApplicationService"
       },
       "brief": "Author a result test covering 'trait_method:validate' of PhaseCommandService",
-      "declaration_hash": "cdcc71291ebdcbccfa707175aad415df826d5dbb44ef427707669297239b04dd",
+      "declaration_hash": "d06d763b8e510b16d00c63de1a2f1d1d3d90fd0b3ae5d4c6ee416e0661cf3227",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -218,6 +226,10 @@
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "AC-03"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-01"
         }
       ]
     },
@@ -237,7 +249,7 @@
         "role": "ApplicationService"
       },
       "brief": "Author a result test covering 'trait_method:explain' of PhaseCommandService",
-      "declaration_hash": "cdcc71291ebdcbccfa707175aad415df826d5dbb44ef427707669297239b04dd",
+      "declaration_hash": "d06d763b8e510b16d00c63de1a2f1d1d3d90fd0b3ae5d4c6ee416e0661cf3227",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -258,6 +270,10 @@
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "AC-03"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-01"
         }
       ]
     },
@@ -277,7 +293,7 @@
         "role": "ApplicationService"
       },
       "brief": "Author a result test covering 'trait_method:enter' of PhaseCommandService",
-      "declaration_hash": "cdcc71291ebdcbccfa707175aad415df826d5dbb44ef427707669297239b04dd",
+      "declaration_hash": "d06d763b8e510b16d00c63de1a2f1d1d3d90fd0b3ae5d4c6ee416e0661cf3227",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -298,6 +314,10 @@
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "AC-03"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-01"
         }
       ]
     },
@@ -317,7 +337,7 @@
         "role": "SecondaryPort"
       },
       "brief": "Author a contract test covering 'trait_method:load' of PreReviewCommandConfigLoaderPort",
-      "declaration_hash": "17c5036745060e91b1c86e9a4f3353ca179e293e5185f9019b4d6fb3f25bd4aa",
+      "declaration_hash": "7b618e83cfe4f27a015f59dfcde6833131efcf4cb5104add4bd33a1b7af7a894",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -330,6 +350,10 @@
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "AC-05"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-02"
         }
       ]
     },
@@ -349,7 +373,7 @@
         "role": "ApplicationService"
       },
       "brief": "Author a result test covering 'trait_method:dispatch' of PreReviewCommandDispatchService",
-      "declaration_hash": "58a93ddf81599b832598c8b12dfa1a2fefbce811b27b9a1502e1f50a9692380f",
+      "declaration_hash": "fbaab28ef7bc1c0ce72d037ebac828d8289d06c90ab2ffe5f1cccacf55500c71",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -477,7 +501,7 @@
         "role": "SecondaryPort"
       },
       "brief": "Author a contract_conformance test covering 'trait_impl:usecase::phase_command::PhaseCommandConfigLoaderPort' of FsPhaseCommandConfigLoader",
-      "declaration_hash": "153e29d910745bfff1ca99a995e96132dedf849a6f5b26e820f509dd7e6e87a5",
+      "declaration_hash": "e40e625c2c93c8221d6100aafa1013db50845abf0cfd1dd9abfabc7123dd6cbf",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -490,6 +514,10 @@
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "AC-01"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-02"
         }
       ]
     },
@@ -509,7 +537,7 @@
         "role": "SecondaryPort"
       },
       "brief": "Author a contract_conformance test covering 'trait_impl:usecase::pre_review_command::PreReviewCommandConfigLoaderPort' of FsPreReviewCommandConfigLoader",
-      "declaration_hash": "f432994ff4c601d490e510b419f511b27ce577f87fea3dc74e7db0f7fd467abb",
+      "declaration_hash": "883f82032b0b73a05f6046083d41dcd5ed646698b6e36496d7af7782fb3337ed",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -522,6 +550,10 @@
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "AC-05"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-02"
         }
       ]
     },
@@ -577,7 +609,7 @@
         "role": "SecondaryPort"
       },
       "brief": "Author a contract_conformance test covering 'trait_impl:usecase::pre_review_command::CurrentReviewTrackResolverPort' of GitCurrentReviewTrackResolver",
-      "declaration_hash": "f824c8dfbf66d240e2212369c74f0663f6f7434656902edcd32855ca8dc88d9e",
+      "declaration_hash": "a49ba4e758d5fe9aa9c404597b7eb0b115bd61519aea4eeca9a47e7d9a347f9f",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -586,6 +618,122 @@
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "AC-05"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-02"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::capability::into_driver_input",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::capability::into_driver_input"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::capability::into_driver_input",
+      "declaration_hash": "d5d801fcad90f9c6a4d2210ccb7b030ea6c660dc80f28f3e4c78030d0f8d99fe",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-04"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::phase::execute",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::phase::execute"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::phase::execute",
+      "declaration_hash": "0abef1eb7c4edf90666cee99323eaf2d9b178f28a4fc9e1a2038bff0c2558ff3",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-04"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::phase::execute_with_driver",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::phase::execute_with_driver"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::phase::execute_with_driver",
+      "declaration_hash": "f708849a3ca0972d5c3a6a397031116878c24fa9098d4589a221ec5861cc5ec8",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-04"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::phase::input_from_command",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::phase::input_from_command"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::phase::input_from_command",
+      "declaration_hash": "f60bd34e7030492973cef957e43d73ef62856e5bb4115b8661bfb7ebe63eca4c",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-04"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-03"
         }
       ]
     }

@@ -1,4 +1,3413 @@
 {
   "track_id": "scope-conditional-pre-review-gates-2026-07-31",
-  "entries": []
+  "entries": [
+    {
+      "edge_id": {
+        "entry_key": "CapturedProgramOutput",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapturedProgramOutput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "waived_reason_hash": "f581fb0c1d03b84143dfd877ea15bb196af0d6551c6898003d80b9ab56026e75",
+        "declaration_hash": "63e3279e71bb0eace960b6b6366b6781ba0bdf600d1d78196837e1957375870e",
+        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Opaque captured process-output bytes (CN-02, AC-03)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapturedProgramOutput",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapturedProgramOutput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-02"
+      },
+      "key": {
+        "waived_reason_hash": "d4090b07a8fdd3d19ccdd74f3685702e461495df3c456ee19802878dde0a75a8",
+        "declaration_hash": "63e3279e71bb0eace960b6b6366b6781ba0bdf600d1d78196837e1957375870e",
+        "anchor_text_hash": "ca4264ace91339e8c6e987c4964bd99937e6d62d3b062c38cba5a5c8515d0f3a"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "FieldDecl { name: FieldName(Identifier(\"stdout\")), ty: TypeRef(\"Vec<u8>\") }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ClassifiedProgramExecutionRecord",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ClassifiedProgramExecutionRecord",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "waived_reason_hash": "05f0e3d98aa46b65839a9d1a701faade40e3ca44c823b844f39a744fcbba53a3",
+        "declaration_hash": "65b9bf34f56fdf86b20a06fe2f707be06d64da958f71923a1ecd8bb76c8b135b",
+        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Exhaustive application-boundary execution-record classification (CN-03, AC-03)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ClassifiedProgramExecutionRecord",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ClassifiedProgramExecutionRecord",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-03"
+      },
+      "key": {
+        "waived_reason_hash": "3ddecaf4ee95d07d5f360b45f86537a88874550fd060bb32d41d587f082bb4e4",
+        "declaration_hash": "65b9bf34f56fdf86b20a06fe2f707be06d64da958f71923a1ecd8bb76c8b135b",
+        "anchor_text_hash": "6166df4e5cb8aa348e839dc9faf6fdda9446f5782ff3880dec49513621a1e600"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "pre-entry または scope command が non-zero を返した場合、dispatcher は後続 command、writer、または reviewer を起動せず、失敗した argv と outcome を operator が識別できる形で返す。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CliCommand",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CliCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "waived_reason_hash": "f58d9dfc85e21b87abd9cfff48c34bc0af00c592025647f04893bc10a4c8be54",
+        "declaration_hash": "bc1193758e79b2ef128594ae35a4b75cd4ba9a140d2a2ffb71b4749ef60dd3b8",
+        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TypeEntry { action: Modify, role: Dto, kind: Enum"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CliCommand",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CliCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-04"
+      },
+      "key": {
+        "waived_reason_hash": "9ea90402528669970f7fa63944af08ae45aa00fc839f4a9821886fac5261c792",
+        "declaration_hash": "bc1193758e79b2ef128594ae35a4b75cd4ba9a140d2a2ffb71b4749ef60dd3b8",
+        "anchor_text_hash": "3a64b29a92e9e9eeaf1a9ea27e22587c95af88cf00d71369188fd9b70d334f36"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "CLI は validate、explain、enter の観測可能な outcome を提供し、operator が展開済み phase command、実行順序、validation failure、および command failure を監査できるようにする。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandArgument",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandArgument",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "waived_reason_hash": "58402f1a681822a321e2acfb247b684c1e8d3cf32f3e215a63763c0fc6182b6e",
+        "declaration_hash": "5457e56b5ee58fe5698d48e226710fe41e1f3cfdb9bed56e13ec2aba840bbc86",
+        "anchor_text_hash": "05b8094316a1aacabb4bec26100b679daf53d5554267297214266776d1838398"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Opaque literal command-argument value (IN-03, AC-04)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandArgument",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandArgument",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-04"
+      },
+      "key": {
+        "waived_reason_hash": "34054518716435d23d175ce44a74179ab501ddef2280b76b5f66fa9a2d7bc3e4",
+        "declaration_hash": "5457e56b5ee58fe5698d48e226710fe41e1f3cfdb9bed56e13ec2aba840bbc86",
+        "anchor_text_hash": "9e04804ce8a7fd2c873ad048240923655926a25e6a72b36ada8f4cac5887ddfe"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "phase と pre-review command は shell string ではなく literal argv として起動され"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandArgument",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandArgument",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "waived_reason_hash": "92f27217a2897fc2ab3e0ebb1a100b6bc3316423783b5d8df884103e9f52edf4",
+        "declaration_hash": "5457e56b5ee58fe5698d48e226710fe41e1f3cfdb9bed56e13ec2aba840bbc86",
+        "anchor_text_hash": "e44a2b38a1ce3bf278e618e41415dbd26068d287e4173facb0f0c39698f67474"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "ValueObject { invariants: [] }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandArgument",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandArgument",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "waived_reason_hash": "b12cda0caf5d15eac2ce3ad78d3603e065059f9118521567ea74df227e451bbb",
+        "declaration_hash": "5457e56b5ee58fe5698d48e226710fe41e1f3cfdb9bed56e13ec2aba840bbc86",
+        "anchor_text_hash": "57cb8a46e67a19b841ffe81921fef96722df9c62023de8d0968ad9bfaedd83b0"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Opaque literal command-argument value (IN-03, AC-04)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandArgumentDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandArgumentDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-04"
+      },
+      "key": {
+        "waived_reason_hash": "692ab8f5aff10683fbc4a8c558ac717aebf5efc62a90545920f7d8652111c105",
+        "declaration_hash": "ab6f4b6f367d43f6ae7d79e7d6463a14266dfd2a7e14888275afb200258f1d63",
+        "anchor_text_hash": "9e04804ce8a7fd2c873ad048240923655926a25e6a72b36ada8f4cac5887ddfe"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "phase と pre-review command は shell string ではなく literal argv として起動され"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandArgumentDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandArgumentDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "waived_reason_hash": "32df1710243b81907baa30597ea34065497a040c7389d3a586fe6a0b1b31ab0b",
+        "declaration_hash": "ab6f4b6f367d43f6ae7d79e7d6463a14266dfd2a7e14888275afb200258f1d63",
+        "anchor_text_hash": "57cb8a46e67a19b841ffe81921fef96722df9c62023de8d0968ad9bfaedd83b0"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Serde mirror of an opaque command argument (IN-03, AC-04)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandArgv",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandArgv",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "waived_reason_hash": "8fe215965f2ef236fe1e3500d35a25bbae56800b2e7449cbefba1769a4c60618",
+        "declaration_hash": "64763fa279fdc04aa7bbe9997855406d086b14fee38c4f18e4e0fc3579d19457",
+        "anchor_text_hash": "05b8094316a1aacabb4bec26100b679daf53d5554267297214266776d1838398"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandArgv",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandArgv",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "waived_reason_hash": "3bafea04fca6e60c3148c72f50d1ff52093ca2d8f18ede56a86b2bbf8beca2df",
+        "declaration_hash": "64763fa279fdc04aa7bbe9997855406d086b14fee38c4f18e4e0fc3579d19457",
+        "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandArgvDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandArgvDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "waived_reason_hash": "99a123669d799be09575b5d3bd32d3167a01e5e4f018fe296b7c5e93b22af5f9",
+        "declaration_hash": "049e287880d9751a457908056a9f12c8af80d3e8120b6bfab7ebc1ebb0a7a707",
+        "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Serde mirror of a command-argument sequence (CN-01, AC-01, AC-05)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandArgvDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandArgvDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "waived_reason_hash": "1bcdb2bd20f4f4d496b09415def8fc3ad992e0fbb8a83766b11b759c68f132b0",
+        "declaration_hash": "049e287880d9751a457908056a9f12c8af80d3e8120b6bfab7ebc1ebb0a7a707",
+        "anchor_text_hash": "e44a2b38a1ce3bf278e618e41415dbd26068d287e4173facb0f0c39698f67474"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Serde mirror of a command-argument sequence (CN-01, AC-01, AC-05)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandArgvDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandArgvDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "waived_reason_hash": "f050fce9aba94f525a50417cf343598899c53ace6cbf9c0b944427982536c192",
+        "declaration_hash": "049e287880d9751a457908056a9f12c8af80d3e8120b6bfab7ebc1ebb0a7a707",
+        "anchor_text_hash": "eb3acd9bc2b70f70d7e5b103ad0b2255c300e50456aaeadfd2f50815b79ff6cf"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandArgvValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandArgvValidationError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "waived_reason_hash": "57354d9b08be2d295743b4ef663f8a88632fda27eb898693822bde7f0a8efa08",
+        "declaration_hash": "1c354849d5aedc84d96e815cb013ef926583003309b60a04e94496089770a854",
+        "anchor_text_hash": "05b8094316a1aacabb4bec26100b679daf53d5554267297214266776d1838398"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandArgvValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandArgvValidationError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "waived_reason_hash": "2ce736facc27340a2a791275b7eaefc7d9146831ae9f3b79e9346d80f117a8ba",
+        "declaration_hash": "1c354849d5aedc84d96e815cb013ef926583003309b60a04e94496089770a854",
+        "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandArgvValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandArgvValidationError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "waived_reason_hash": "d6bc7c0c911ffac2f1e3ad78311a11f429e3d165d50a28a0d2ea48afabd973a6",
+        "declaration_hash": "1c354849d5aedc84d96e815cb013ef926583003309b60a04e94496089770a854",
+        "anchor_text_hash": "e44a2b38a1ce3bf278e618e41415dbd26068d287e4173facb0f0c39698f67474"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TypeEntry { action: Add, role: ErrorType, kind: Enum ..., methods: [] }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandConfigLoadError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandConfigLoadError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "waived_reason_hash": "ce9fd0b85f213300faa1c7f36153053033f180942d69964a88632975f09fdd57",
+        "declaration_hash": "a6bda68476a47e410538cb601dafca97a7c19d58d1f7502d4d4d8864cc28c3f4",
+        "anchor_text_hash": "05b8094316a1aacabb4bec26100b679daf53d5554267297214266776d1838398"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandConfigLoadError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandConfigLoadError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "waived_reason_hash": "7e6c2915589bc98e63695487609faae97e11f15e8d8e185105d1a1342ede50ff",
+        "declaration_hash": "a6bda68476a47e410538cb601dafca97a7c19d58d1f7502d4d4d8864cc28c3f4",
+        "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandConfigLoadError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandConfigLoadError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "waived_reason_hash": "43d3301aee570bcda962d7b833ee19f563eee03ee2fe0a4370b7705f42d5dfc0",
+        "declaration_hash": "a6bda68476a47e410538cb601dafca97a7c19d58d1f7502d4d4d8864cc28c3f4",
+        "anchor_text_hash": "e44a2b38a1ce3bf278e618e41415dbd26068d287e4173facb0f0c39698f67474"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TypeEntry { action: Add, role: ErrorType"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandConfigLoadError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "GO-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandConfigLoadError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:GO-03"
+      },
+      "key": {
+        "waived_reason_hash": "a16964e1a249e7246640c1adf92aaa2fcf67f7da06c2b79257f462884a609346",
+        "declaration_hash": "a6bda68476a47e410538cb601dafca97a7c19d58d1f7502d4d4d8864cc28c3f4",
+        "anchor_text_hash": "0203a405476f817ab74879ed006ba32454744fc289e4c38e0d204f4d9ddc995b"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Command-configuration loading failures (GO-03, AC-01, AC-05)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandConfigSchemaVersion",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandConfigSchemaVersion",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "waived_reason_hash": "b2b37523489fe356731bd2b9275ec541edeb820c43ddb77583137fefa0e3c0c6",
+        "declaration_hash": "a64d33952293f5b8146b53e2893a4089614178fc766bdfff99ae716a79cb3207",
+        "anchor_text_hash": "05b8094316a1aacabb4bec26100b679daf53d5554267297214266776d1838398"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandConfigSchemaVersion",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandConfigSchemaVersion",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "waived_reason_hash": "6a55b3b04279603ca964e1ed99948cb02dbd678e0feda7b6a05a0d69a1cda5a6",
+        "declaration_hash": "a64d33952293f5b8146b53e2893a4089614178fc766bdfff99ae716a79cb3207",
+        "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Command-configuration schema-version value (CN-01)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandConfigSchemaVersionDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandConfigSchemaVersionDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "waived_reason_hash": "df330665e9fc2cb9838caa9d5b7551d05e0354a0f3261f979c898dd8d29a4e9a",
+        "declaration_hash": "9409ffdcad8cf2401352668b30946958f868e441f0b8106827a86c4c8c670f81",
+        "anchor_text_hash": "05b8094316a1aacabb4bec26100b679daf53d5554267297214266776d1838398"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Serde mirror of the command-config schema version (CN-01)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandConfigSchemaVersionDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandConfigSchemaVersionDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "waived_reason_hash": "e18341ce6cb54d27250e53fdf58f300d6ad747be237daec4f3c01df5101f66da",
+        "declaration_hash": "9409ffdcad8cf2401352668b30946958f868e441f0b8106827a86c4c8c670f81",
+        "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandConfigSchemaVersionDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandConfigSchemaVersionDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "waived_reason_hash": "069fe49ed4f45ff18a808544a5434ac9ef25fcb6cd8386e3165db6986ffc6892",
+        "declaration_hash": "9409ffdcad8cf2401352668b30946958f868e441f0b8106827a86c4c8c670f81",
+        "anchor_text_hash": "e44a2b38a1ce3bf278e618e41415dbd26068d287e4173facb0f0c39698f67474"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: Dto"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandConfigValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandConfigValidationError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "waived_reason_hash": "69212b6817b9ffa83ddee92480e2fced9a5574557a0bf0e9abdbaf7c10208df3",
+        "declaration_hash": "741a6fc4584d8846a932c6566499a67ca4316faed4d26dbaaa64f38b525d5efd",
+        "anchor_text_hash": "05b8094316a1aacabb4bec26100b679daf53d5554267297214266776d1838398"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandConfigValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandConfigValidationError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "waived_reason_hash": "96eae4dd3892f69b10baa9adc3f8f4112e97f8d6090b1a18c7dc883607048ff1",
+        "declaration_hash": "741a6fc4584d8846a932c6566499a67ca4316faed4d26dbaaa64f38b525d5efd",
+        "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TypeEntry { action: Add, role: ErrorType, kind: Enum { ... }, methods: [], generics: [], where_predicates: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandConfigValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandConfigValidationError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "waived_reason_hash": "06994ffffee39617167221a85b6a73632981584662a215785f5a7dbb9a66df7f",
+        "declaration_hash": "741a6fc4584d8846a932c6566499a67ca4316faed4d26dbaaa64f38b525d5efd",
+        "anchor_text_hash": "e44a2b38a1ce3bf278e618e41415dbd26068d287e4173facb0f0c39698f67474"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandConfigValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "GO-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandConfigValidationError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:GO-03"
+      },
+      "key": {
+        "waived_reason_hash": "8670e9833956fd12519214193f9e2397869122de98ecc557f093dd53ce4642f2",
+        "declaration_hash": "741a6fc4584d8846a932c6566499a67ca4316faed4d26dbaaa64f38b525d5efd",
+        "anchor_text_hash": "0203a405476f817ab74879ed006ba32454744fc289e4c38e0d204f4d9ddc995b"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandDeclarationId",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandDeclarationId",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "waived_reason_hash": "cd3ccb0a5343ce5da4f2cbb494573fa404757d5dc222a0b03cb44c6cff6f1813",
+        "declaration_hash": "a5a6dc185ec2a919d4d70458409478d960be30d7b58dd367cd0efa1b1b571a47",
+        "anchor_text_hash": "05b8094316a1aacabb4bec26100b679daf53d5554267297214266776d1838398"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandDeclarationId",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandDeclarationId",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "waived_reason_hash": "1a4f1b4beb3840269973090ab1c4b5da4952721abf125e5ed36bd105bbb296ae",
+        "declaration_hash": "a5a6dc185ec2a919d4d70458409478d960be30d7b58dd367cd0efa1b1b571a47",
+        "anchor_text_hash": "e44a2b38a1ce3bf278e618e41415dbd26068d287e4173facb0f0c39698f67474"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandDeclarationId",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandDeclarationId",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "waived_reason_hash": "e70101cb8ab93df2b47e785d58207e64a86f8b6cd2d6d9bc36c30d8f736180e2",
+        "declaration_hash": "a5a6dc185ec2a919d4d70458409478d960be30d7b58dd367cd0efa1b1b571a47",
+        "anchor_text_hash": "eb3acd9bc2b70f70d7e5b103ad0b2255c300e50456aaeadfd2f50815b79ff6cf"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "shape: Plain { fields: [], has_stripped_fields: true }, methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandDeclarationIdDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandDeclarationIdDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "waived_reason_hash": "af2bdd0263a0be7c00f25838f339562aa75e36b7dcfea44032bff01df47b8e7c",
+        "declaration_hash": "fcee672395c2970ad1741645dddb3958456bf1096b913de55d61c0322dad4da8",
+        "anchor_text_hash": "05b8094316a1aacabb4bec26100b679daf53d5554267297214266776d1838398"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandDeclarationIdDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandDeclarationIdDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "waived_reason_hash": "338323b1446498e2d060ef4660f13a7b93eddac1d2f76425e3543a8ddb19b807",
+        "declaration_hash": "fcee672395c2970ad1741645dddb3958456bf1096b913de55d61c0322dad4da8",
+        "anchor_text_hash": "e44a2b38a1ce3bf278e618e41415dbd26068d287e4173facb0f0c39698f67474"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Serde mirror of a phase-declaration identifier (IN-01, CN-01)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandDeclarationIdDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandDeclarationIdDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "waived_reason_hash": "d8f2b6e00c12f7ca51479a84b48696e3d21724a03386fb243bb7a4261ddb1d9b",
+        "declaration_hash": "fcee672395c2970ad1741645dddb3958456bf1096b913de55d61c0322dad4da8",
+        "anchor_text_hash": "eb3acd9bc2b70f70d7e5b103ad0b2255c300e50456aaeadfd2f50815b79ff6cf"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: Dto; docs: Some(DocString(\"Serde mirror of a phase-declaration identifier (IN-01, CN-01).\"))"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandDeclarationIdValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandDeclarationIdValidationError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "waived_reason_hash": "5db4732d881e3fcd2f12e403b3756124105a6c44e6c4537f29024c7a4382b350",
+        "declaration_hash": "3973c106cdcc28e493282680dd304584a1b0ab7dfca9148d05dbd6bb4c4a56d2",
+        "anchor_text_hash": "05b8094316a1aacabb4bec26100b679daf53d5554267297214266776d1838398"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandDeclarationIdValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandDeclarationIdValidationError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "waived_reason_hash": "e3fb7948f9cbb228cd0f8b72052006c5a79c8aff9bb7751ce519c7d82ef4b335",
+        "declaration_hash": "3973c106cdcc28e493282680dd304584a1b0ab7dfca9148d05dbd6bb4c4a56d2",
+        "anchor_text_hash": "e44a2b38a1ce3bf278e618e41415dbd26068d287e4173facb0f0c39698f67474"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ErrorType, kind: Enum ..., methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandDeclarationIdValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandDeclarationIdValidationError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "waived_reason_hash": "4c1ed23c80ec101a0bba43a0e7ae2d483fdc4c6dab8f7efe58af00872787b22d",
+        "declaration_hash": "3973c106cdcc28e493282680dd304584a1b0ab7dfca9148d05dbd6bb4c4a56d2",
+        "anchor_text_hash": "eb3acd9bc2b70f70d7e5b103ad0b2255c300e50456aaeadfd2f50815b79ff6cf"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandSequenceIndex",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandSequenceIndex",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "waived_reason_hash": "7088ab7211edb05acf4d9005be3cf8fa01765a7bf06a9821f82ff79dfcd9095c",
+        "declaration_hash": "4d172171ad939a988b9cdb618eae54d50e868b1a8463466562f530ce57a7a8a8",
+        "anchor_text_hash": "edb4e92dab097edf9daf4986f7e535467ff8962fca5911e37dec2e1756d33671"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"shape: Plain { fields: [], has_stripped_fields: true }\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandSequenceIndex",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandSequenceIndex",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "waived_reason_hash": "13cf7fda462f31349fe8d143ba0e6840bb6c1b27a7406c202b0821ad41a7f5d2",
+        "declaration_hash": "4d172171ad939a988b9cdb618eae54d50e868b1a8463466562f530ce57a7a8a8",
+        "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ValueObject { invariants: [] }, kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandSequenceIndex",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandSequenceIndex",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-03"
+      },
+      "key": {
+        "waived_reason_hash": "6519df604dc0d90b4d5a08910fb9b4d84a0a31a8bc5768171274464733776a14",
+        "declaration_hash": "4d172171ad939a988b9cdb618eae54d50e868b1a8463466562f530ce57a7a8a8",
+        "anchor_text_hash": "6166df4e5cb8aa348e839dc9faf6fdda9446f5782ff3880dec49513621a1e600"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None })"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandSequenceIndex",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandSequenceIndex",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "waived_reason_hash": "df7c36a642c16ee832c605054f0c668b9f5b955733b231319863afd043918b96",
+        "declaration_hash": "4d172171ad939a988b9cdb618eae54d50e868b1a8463466562f530ce57a7a8a8",
+        "anchor_text_hash": "ef72acacfb5dc440638dcb1eca6898bd3db2fbdd6150c1af28c56c8594a8958d"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"methods: []\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandTimeoutSeconds",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandTimeoutSeconds",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "waived_reason_hash": "2f42210f87e790f1b63ad34bd16ebf87ec288e6dcfcc02520b2f2465ee70d6a4",
+        "declaration_hash": "64939d3332fec207d217a3319f87755edd1c8a02a373667a948fa65e2b4e384f",
+        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandTimeoutSeconds",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandTimeoutSeconds",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "waived_reason_hash": "ca02d5bf7323a2001d42bc920877981eaf3c794c8d6f75039240022b2d818623",
+        "declaration_hash": "64939d3332fec207d217a3319f87755edd1c8a02a373667a948fa65e2b4e384f",
+        "anchor_text_hash": "e44a2b38a1ce3bf278e618e41415dbd26068d287e4173facb0f0c39698f67474"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "phase と pre-review config は schema version、declaration id の一意性、non-empty literal argv、および positive integer かつ 3,600 seconds 以下の per-command timeout を fail-closed に検証する。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandTimeoutSeconds",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandTimeoutSeconds",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "waived_reason_hash": "daa11ce524dfdfb8bc3c9258d581b4a4bda80cce817102228bab5047288b0b33",
+        "declaration_hash": "64939d3332fec207d217a3319f87755edd1c8a02a373667a948fa65e2b4e384f",
+        "anchor_text_hash": "eb3acd9bc2b70f70d7e5b103ad0b2255c300e50456aaeadfd2f50815b79ff6cf"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "command ごとの明示 timeout または約 60 分の既定 timeout を宣言する。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandTimeoutSecondsDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandTimeoutSecondsDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "waived_reason_hash": "011d175f646c652751b5751bc08bf1f581bb726367c3fa5299532f422e8269c4",
+        "declaration_hash": "19bc58c1b5533f77d048d52c0d5b67449975446527683cd70d28f5772c12a185",
+        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: Dto"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandTimeoutSecondsDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandTimeoutSecondsDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "waived_reason_hash": "473bdc4da5c62603c9012ef01654beee112b9b11320b315b9b1de41417d392f0",
+        "declaration_hash": "19bc58c1b5533f77d048d52c0d5b67449975446527683cd70d28f5772c12a185",
+        "anchor_text_hash": "e44a2b38a1ce3bf278e618e41415dbd26068d287e4173facb0f0c39698f67474"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Serde mirror of a command-timeout value (CN-01, CN-02)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandTimeoutSecondsDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandTimeoutSecondsDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-02"
+      },
+      "key": {
+        "waived_reason_hash": "10e8a479783bf82a3218ac2279c1140bd3b3f1023a3b150fd7dac9fd75a0b4c4",
+        "declaration_hash": "19bc58c1b5533f77d048d52c0d5b67449975446527683cd70d28f5772c12a185",
+        "anchor_text_hash": "ca4264ace91339e8c6e987c4964bd99937e6d62d3b062c38cba5a5c8515d0f3a"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Serde mirror of a command-timeout value (CN-01, CN-02)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandTimeoutValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandTimeoutValidationError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "waived_reason_hash": "8c8cf159b730968a132df1715b8ab7d9611f00f591c1235f2fa36c916ef93d2f",
+        "declaration_hash": "7383e09944b2f5f80f542f6b150cdd8cd7373a60d129aa0cf42e8cf53698acc5",
+        "anchor_text_hash": "05b8094316a1aacabb4bec26100b679daf53d5554267297214266776d1838398"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ErrorType, methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandTimeoutValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandTimeoutValidationError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "waived_reason_hash": "b3019ac9c171aede1c50636e1493a588395c24e78a07eb1d3ad6d32539763d76",
+        "declaration_hash": "7383e09944b2f5f80f542f6b150cdd8cd7373a60d129aa0cf42e8cf53698acc5",
+        "anchor_text_hash": "e44a2b38a1ce3bf278e618e41415dbd26068d287e4173facb0f0c39698f67474"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"OutOfRange\")), payload: Struct([FieldDecl { name: FieldName(Identifier(\"seconds\")), ty: TypeRef(\"UnvalidatedTimeoutSeconds\") }]) }] }, methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandTimeoutValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandTimeoutValidationError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-02"
+      },
+      "key": {
+        "waived_reason_hash": "15f85903cd1afd7c6d280c1372be9c07b317e6056514cef442ac9a6ebe37430a",
+        "declaration_hash": "7383e09944b2f5f80f542f6b150cdd8cd7373a60d129aa0cf42e8cf53698acc5",
+        "anchor_text_hash": "ca4264ace91339e8c6e987c4964bd99937e6d62d3b062c38cba5a5c8515d0f3a"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConfiguredCommand",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConfiguredCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-04"
+      },
+      "key": {
+        "waived_reason_hash": "5e81953b15cfa24abbdea9ac5e068cc5e9e5f3b4536af6bda5ae6b2cbe0fd127",
+        "declaration_hash": "ac0548be2999e4e65245dc06dab132f2dfd5bae85899b6ca5f357303e35c82ca",
+        "anchor_text_hash": "9e04804ce8a7fd2c873ad048240923655926a25e6a72b36ada8f4cac5887ddfe"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConfiguredCommand",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "GO-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConfiguredCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:GO-01"
+      },
+      "key": {
+        "waived_reason_hash": "3cb71df4478086f34945e8aa24bf0f48c9c7db9af6700f988f816e84bbdec97e",
+        "declaration_hash": "ac0548be2999e4e65245dc06dab132f2dfd5bae85899b6ca5f357303e35c82ca",
+        "anchor_text_hash": "710f43f6f2e7f4aec1880b80b72ee6c14a81113a889685939df9f226b0f0075a"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "literal argv 配列の宣言として管理する"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConfiguredCommand",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConfiguredCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "waived_reason_hash": "cf342f1a73adbd62c4715ec3510a87c0bbcd2756fd3d4bef877dbc5286c673df",
+        "declaration_hash": "ac0548be2999e4e65245dc06dab132f2dfd5bae85899b6ca5f357303e35c82ca",
+        "anchor_text_hash": "eb3acd9bc2b70f70d7e5b103ad0b2255c300e50456aaeadfd2f50815b79ff6cf"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ValueObject { invariants: [] }, kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConfiguredCommand",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConfiguredCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "waived_reason_hash": "bda7fee834baea4294a54a7cbe014e77c9d5506ddffc32e29e388c1b8904056d",
+        "declaration_hash": "ac0548be2999e4e65245dc06dab132f2dfd5bae85899b6ca5f357303e35c82ca",
+        "anchor_text_hash": "57cb8a46e67a19b841ffe81921fef96722df9c62023de8d0968ad9bfaedd83b0"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "engine は argv を書き換えず、subcommand grammar や command の意味論を解釈しない。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConfiguredCommandDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConfiguredCommandDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "waived_reason_hash": "4ed41d047d95c78c5d09c836ee228eba3fe61e6e928eeef96d6c695a9e2eba02",
+        "declaration_hash": "e7106f614838efabdf8796fca7f6763c45c76738e90a9edffe73de086e664756",
+        "anchor_text_hash": "05b8094316a1aacabb4bec26100b679daf53d5554267297214266776d1838398"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: Dto, kind: Struct(...), methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConfiguredCommandDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConfiguredCommandDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "waived_reason_hash": "875d7b769c1220936d6c8688857846585d18480e388c35a8bdee74aad820ca34",
+        "declaration_hash": "e7106f614838efabdf8796fca7f6763c45c76738e90a9edffe73de086e664756",
+        "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TypeEntry { action: Add, role: Dto, kind: Struct("
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConfiguredCommandDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConfiguredCommandDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "waived_reason_hash": "ab30be2db4dda2ad82e82b2d84ee8be620642254729154a60a646bcc7dfe176f",
+        "declaration_hash": "e7106f614838efabdf8796fca7f6763c45c76738e90a9edffe73de086e664756",
+        "anchor_text_hash": "e44a2b38a1ce3bf278e618e41415dbd26068d287e4173facb0f0c39698f67474"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: Dto"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConfiguredCommandDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConfiguredCommandDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "waived_reason_hash": "f9369439111f54520d564a320f000e24568e6f01d2f5955c270329509c37c7d7",
+        "declaration_hash": "e7106f614838efabdf8796fca7f6763c45c76738e90a9edffe73de086e664756",
+        "anchor_text_hash": "eb3acd9bc2b70f70d7e5b103ad0b2255c300e50456aaeadfd2f50815b79ff6cf"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConfiguredCommandValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConfiguredCommandValidationError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "waived_reason_hash": "9a75ae975b1ca10b76a4095d1137e4fc803e03bb3125d87216acab2b7536864b",
+        "declaration_hash": "2c47bd69ee27bb4135bc6bb8de6468c668159026fe759f7f41790158695ead4a",
+        "anchor_text_hash": "05b8094316a1aacabb4bec26100b679daf53d5554267297214266776d1838398"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"Argv\")) ... }, VariantDecl { name: VariantName(Identifier(\"Timeout\")) ... }] }, methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConfiguredCommandValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConfiguredCommandValidationError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "waived_reason_hash": "fb394609435a08f3a7c9fcaba3dd643b12b23d986acc61b12d1339f417b6e2fc",
+        "declaration_hash": "2c47bd69ee27bb4135bc6bb8de6468c668159026fe759f7f41790158695ead4a",
+        "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConfiguredCommandValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConfiguredCommandValidationError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "waived_reason_hash": "da33d83e2f8f94b6308f170a9b2c61c16211744ac4974d8845a00d6555ba087e",
+        "declaration_hash": "2c47bd69ee27bb4135bc6bb8de6468c668159026fe759f7f41790158695ead4a",
+        "anchor_text_hash": "e44a2b38a1ce3bf278e618e41415dbd26068d287e4173facb0f0c39698f67474"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"Argv\")), payload: Tuple([TypeRef(\"CommandArgvValidationError\")]) }, VariantDecl { name: VariantName(Identifier(\"Timeout\")), payload: Tuple([TypeRef(\"CommandTimeoutValidationError\")]) }] }, methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConfiguredCommandValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConfiguredCommandValidationError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-02"
+      },
+      "key": {
+        "waived_reason_hash": "065df6b7dff58744d01a8c7a8b2a4bccde7743a087876d5b4296abfcb0959be8",
+        "declaration_hash": "2c47bd69ee27bb4135bc6bb8de6468c668159026fe759f7f41790158695ead4a",
+        "anchor_text_hash": "ca4264ace91339e8c6e987c4964bd99937e6d62d3b062c38cba5a5c8515d0f3a"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: [], generics: [], where_predicates: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConfiguredCommandValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConfiguredCommandValidationError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "waived_reason_hash": "48d62fe3a5330e742c9f7ae6ae1b00d6ab0f8aed7f13cb8d230cec7b8171fc23",
+        "declaration_hash": "2c47bd69ee27bb4135bc6bb8de6468c668159026fe759f7f41790158695ead4a",
+        "anchor_text_hash": "eb3acd9bc2b70f70d7e5b103ad0b2255c300e50456aaeadfd2f50815b79ff6cf"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ContractedEntryRefDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ContractedEntryRefDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-08"
+      },
+      "key": {
+        "waived_reason_hash": "1bc6c88653e7aa920d509c69d64e5ec7d8fac4364a257bea9f1f852ad43cc01c",
+        "declaration_hash": "0750e0530c006366b08c29a17ecd4a0c4370a3d587c815a7a556e1191407ba12",
+        "anchor_text_hash": "c6e5c18bf5cad17887f4e549819d0397ade7094237ea54caea13553e8d0be0c6"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Serde mirror of a catalogue-entry attribution identity (IN-07, AC-08)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ContractedEntryRefDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ContractedEntryRefDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-07"
+      },
+      "key": {
+        "waived_reason_hash": "acad24a752727a7baded1ca92ee3841a6a35c90c4b96907b0a3da40b0214dffe",
+        "declaration_hash": "0750e0530c006366b08c29a17ecd4a0c4370a3d587c815a7a556e1191407ba12",
+        "anchor_text_hash": "49ca0a9a32f87a071ed1596ecadc8dffc6f22a3356b5f7ac2972e8c40448c1a9"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "task-contract の attribution target は catalogue entry のみとし、source-only baseline restoration、evidence/inspector eligibility、coverage/liveness carrier variant、および stale-carrier lifecycle を持ち込まない。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CoverageVerifyOutcome",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CoverageVerifyOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-10"
+      },
+      "key": {
+        "waived_reason_hash": "a498b766be5e27299faab0095902bfb9cfdf61f32156718199c37ada9ae8e19c",
+        "declaration_hash": "dac23d731e10e9ee633789215597528db2b2d067587b0066ed3abf05087f0c4e",
+        "anchor_text_hash": "2d0510b1801ea41134f064a97a28f9c742e8a7adacf4920ed051c4f3412d2bf6"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TypeEntry ... kind: Enum"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CoverageViolation",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CoverageViolation",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-08"
+      },
+      "key": {
+        "waived_reason_hash": "17b09d12eaa5485160e8d27ce5f7d0895cd8b598954c5c2c7652e5578e18a071",
+        "declaration_hash": "740b8737b2ec8265361041139565bed6c300d22f99a82d9dff1f0b91661650ae",
+        "anchor_text_hash": "c6e5c18bf5cad17887f4e549819d0397ade7094237ea54caea13553e8d0be0c6"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"MissingTaskContract\")), payload: Unit }, VariantDecl { name: VariantName(Identifier(\"OrphanEntry\")), payload: Tuple([TypeRef(\"ContractedEntryRef\")]) }, VariantDecl { name: VariantName(Identifier(\"InvalidEntryRef\")), payload: Tuple([TypeRef(\"ContractedEntryRef\"), TypeRef(\"FreeText\")]) }, VariantDecl { name: VariantName(Identifier(\"MissingSignalDocument\")), payload: Tuple([TypeRef(\"LayerId\")]) }, VariantDecl { name: VariantName(Identifier(\"InvalidTaskRef\")), payload: Tuple([TypeRef(\"TaskId\"), TypeRef(\"Vec<ContractedEntryRef>\")]) }] }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CoverageViolation",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CoverageViolation",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-07"
+      },
+      "key": {
+        "waived_reason_hash": "c193130d4d0757e41100914c14a22d7479e4a09973c4db7db60b106bf472817f",
+        "declaration_hash": "740b8737b2ec8265361041139565bed6c300d22f99a82d9dff1f0b91661650ae",
+        "anchor_text_hash": "49ca0a9a32f87a071ed1596ecadc8dffc6f22a3356b5f7ac2972e8c40448c1a9"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "task-contract の attribution target は catalogue entry のみとし、source-only baseline restoration、evidence/inspector eligibility、coverage/liveness carrier variant、および stale-carrier lifecycle を持ち込まない。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CurrentReviewTrackResolveError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CurrentReviewTrackResolveError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "waived_reason_hash": "ec58bbd5e25ec9012ce62c5e7ac0555bc6da6fc13345cfc52c0a8d84656b5e5d",
+        "declaration_hash": "52e7abba077e44e504f33e9c13011bf80d2244f74d61e7dae176738c9dbbaee0",
+        "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "FailedProgramExecutionRecord",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FailedProgramExecutionRecord",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "waived_reason_hash": "5c9e5a44a6c1cc08ebaaff65d5a16d1639eadc31daf6be40ae367c91d1830386",
+        "declaration_hash": "b51f682cface9ab77f6646acf9f5453bfb8df6e9acbde83dc18d81b94cfe640e",
+        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None })"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "FailedProgramExecutionRecord",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FailedProgramExecutionRecord",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "waived_reason_hash": "97056c110863418298af5f8b712b32762e21f032bd28cc4c3d7c3dc3c2c41660",
+        "declaration_hash": "b51f682cface9ab77f6646acf9f5453bfb8df6e9acbde83dc18d81b94cfe640e",
+        "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "FailedProgramExecutionRecord",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FailedProgramExecutionRecord",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-03"
+      },
+      "key": {
+        "waived_reason_hash": "ea69cfe122166cc6815e34144fe04c77ba1b6220caa4b0ffb5f84cdf16894691",
+        "declaration_hash": "b51f682cface9ab77f6646acf9f5453bfb8df6e9acbde83dc18d81b94cfe640e",
+        "anchor_text_hash": "6166df4e5cb8aa348e839dc9faf6fdda9446f5782ff3880dec49513621a1e600"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "pre-entry または scope command が non-zero を返した場合、dispatcher は後続 command、writer、または reviewer を起動せず、失敗した argv と outcome を operator が識別できる形で返す。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "OutputCaptureLimitBytes",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "OutputCaptureLimitBytes",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "waived_reason_hash": "bcee752d9479f6a3625b1966fb7896011834aa81e9853d2f10f34128e4849557",
+        "declaration_hash": "2f50b9cc4108dc97af758723c99f6c991b75b9377651500cd2b3a6ce1c4cbb1b",
+        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ValueObject ... kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None })"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "OutputCaptureLimitBytes",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "OutputCaptureLimitBytes",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-02"
+      },
+      "key": {
+        "waived_reason_hash": "77089c74d982aebad2bc74ee6ada35a57fe3d64c647f1ad66a691ac7495a672c",
+        "declaration_hash": "2f50b9cc4108dc97af758723c99f6c991b75b9377651500cd2b3a6ce1c4cbb1b",
+        "anchor_text_hash": "ca4264ace91339e8c6e987c4964bd99937e6d62d3b062c38cba5a5c8515d0f3a"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: []\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewCommandConfig",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewCommandConfig",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "waived_reason_hash": "2d2ab8e2e289d5f95a78c309b8945ab45026b7e70497437f63e2e181a0772d7f",
+        "declaration_hash": "ccd9d5e9ce5615e9b325b15113d1f2e43fbd9aa1d97981862db332499bbde752",
+        "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: [], generics: [], where_predicates: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewCommandConfig",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewCommandConfig",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "waived_reason_hash": "14aaac7448656cb3ceb873003438e4953e7733bf71a7b51d71e8e78ef684ca16",
+        "declaration_hash": "ccd9d5e9ce5615e9b325b15113d1f2e43fbd9aa1d97981862db332499bbde752",
+        "anchor_text_hash": "e44a2b38a1ce3bf278e618e41415dbd26068d287e4173facb0f0c39698f67474"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: [], generics: [], where_predicates: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewCommandConfig",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewCommandConfig",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "waived_reason_hash": "9e08d56218657fa2d8f447ff5d8cc5b5341a5065c163e16abf97a4869b36c24e",
+        "declaration_hash": "ccd9d5e9ce5615e9b325b15113d1f2e43fbd9aa1d97981862db332499bbde752",
+        "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "`TypeEntry { action: Add, role: ValueObject { invariants: [] }, kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: [], generics: [], where_predicates: [] ... }`"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewCommandConfigDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewCommandConfigDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "waived_reason_hash": "6e0286f04ca3873a423e8b59cfd35508fe5f826f586d6b909988c62a9feb1f02",
+        "declaration_hash": "829d8bab93c7f185066c41dc2940633333126768739b014e3f722e320a624be1",
+        "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TypeEntry { action: Add, role: Dto, kind: Struct"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewCommandConfigDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewCommandConfigDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "waived_reason_hash": "81eb231ac861ba138c420f73fadea01f87ab43993b8627971ff1bba00950a979",
+        "declaration_hash": "829d8bab93c7f185066c41dc2940633333126768739b014e3f722e320a624be1",
+        "anchor_text_hash": "e44a2b38a1ce3bf278e618e41415dbd26068d287e4173facb0f0c39698f67474"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewCommandConfigDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewCommandConfigDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "waived_reason_hash": "8bf4a231d391d26417f7dee12b4ad424990fae48051665c9da466a89d8ae113a",
+        "declaration_hash": "829d8bab93c7f185066c41dc2940633333126768739b014e3f722e320a624be1",
+        "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "`sotp review local` が scope を解決してその配列を順次 dispatch する。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewCommandConfigValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewCommandConfigValidationError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "waived_reason_hash": "4f9ab23907da90f38007244daa615de2a4013a5a543a30b0eb54f6fe894fc07e",
+        "declaration_hash": "100f218dc902d30ad9152e6b5e78b751a355e4044b86cd683d19591af38496d2",
+        "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewCommandConfigValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewCommandConfigValidationError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "waived_reason_hash": "9ee92008eadd487e21115d26abd5da978c3b753147e95e45a8db8e726b0f9589",
+        "declaration_hash": "100f218dc902d30ad9152e6b5e78b751a355e4044b86cd683d19591af38496d2",
+        "anchor_text_hash": "e44a2b38a1ce3bf278e618e41415dbd26068d287e4173facb0f0c39698f67474"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewCommandDispatchCommand",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewCommandDispatchCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "waived_reason_hash": "ab49de35be9fdcb88e4b895cc0c33ce3143aa58b040e413e8382ad743576002d",
+        "declaration_hash": "22d5078d3d151b588158e18d081bfafb3e5b29c4199178ba3bad14ac77987366",
+        "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Pre-review command-dispatch request (IN-05, AC-05)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewCommandDispatchCommand",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewCommandDispatchCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "waived_reason_hash": "9ab488a26e5ede52214e8ba7677359a50d3da4e098b80c8aa8b9f606f23eb902",
+        "declaration_hash": "22d5078d3d151b588158e18d081bfafb3e5b29c4199178ba3bad14ac77987366",
+        "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewCommandDispatchError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewCommandDispatchError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "waived_reason_hash": "e7f1fc4d73dab746b68ccf92cdf3b9d2c234d368210c8a595af9c4e754f261ba",
+        "declaration_hash": "ed13c20af2031c176e184a5594da2af2dfb4081d20dfe20f8e8c0a9906577863",
+        "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ErrorType, kind: Enum { variants: [...] }, methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewCommandDispatchError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "GO-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewCommandDispatchError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:GO-03"
+      },
+      "key": {
+        "waived_reason_hash": "74a5db1e6343c042fca07e0224a1ab2b819c46bc3a4599d1e0dcb3c09ee49cfa",
+        "declaration_hash": "ed13c20af2031c176e184a5594da2af2dfb4081d20dfe20f8e8c0a9906577863",
+        "anchor_text_hash": "0203a405476f817ab74879ed006ba32454744fc289e4c38e0d204f4d9ddc995b"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"methods: []\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewCommandDispatchError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewCommandDispatchError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "waived_reason_hash": "8609107c31d46021a9c2dd90d97db84e31298198841123c75c63e76f71f13d1a",
+        "declaration_hash": "ed13c20af2031c176e184a5594da2af2dfb4081d20dfe20f8e8c0a9906577863",
+        "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ErrorType, kind: Enum"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewCommandDispatchOutcome",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewCommandDispatchOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "waived_reason_hash": "a64a5aa8518742fce654d893fdf191fa0c54981bc638be4dc33d8ef0af77ccb4",
+        "declaration_hash": "7b3fe8ecede5c6e1bce6abe977e1b6e27cac35d493afd2fb1e1d7e1b18168dc1",
+        "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Pre-review command-dispatch outcome (CN-03, AC-05, AC-07)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewCommandDispatchOutcome",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewCommandDispatchOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-07"
+      },
+      "key": {
+        "waived_reason_hash": "0f8a4197b56c98b6db23eab4a119456cc2c3deaeebc21afb7a2f8ae693798f6e",
+        "declaration_hash": "7b3fe8ecede5c6e1bce6abe977e1b6e27cac35d493afd2fb1e1d7e1b18168dc1",
+        "anchor_text_hash": "3503592124957ba7751cc28fe43d9a296d963b754b236386592298f341297962"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewCommandDispatchOutcome",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewCommandDispatchOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-03"
+      },
+      "key": {
+        "waived_reason_hash": "069ea09ba7a1af4189671f38b561c6739179f5ca24bee78f060da6fe55027ddd",
+        "declaration_hash": "7b3fe8ecede5c6e1bce6abe977e1b6e27cac35d493afd2fb1e1d7e1b18168dc1",
+        "anchor_text_hash": "6166df4e5cb8aa348e839dc9faf6fdda9446f5782ff3880dec49513621a1e600"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: Dto"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewCommandDispatchOutcome",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewCommandDispatchOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "waived_reason_hash": "a3ecf43f551aaf057917f2dea047bd420391d3bd75128d18b8fd8c2caf555138",
+        "declaration_hash": "7b3fe8ecede5c6e1bce6abe977e1b6e27cac35d493afd2fb1e1d7e1b18168dc1",
+        "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: [], generics: [], where_predicates: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewGateOutcome",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewGateOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-10"
+      },
+      "key": {
+        "waived_reason_hash": "8d099a205a4219b12b508501a3443eb112a9658d7a6b7bda3231c488c97ded60",
+        "declaration_hash": "8e7a74b64b207248258ab281465a6458cdfd44d99b2b792ec39395474d31b7b3",
+        "anchor_text_hash": "2d0510b1801ea41134f064a97a28f9c742e8a7adacf4920ed051c4f3412d2bf6"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "scope-conditional applicability と既存 task-contract status rule は維持され、NonBlueSignal の既存判定規則は変更されない。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewGateOutcome",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewGateOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-08"
+      },
+      "key": {
+        "waived_reason_hash": "f3c48d5630997bd9e74c777bab51ae5bffbe7ca8d88d6cd4e42e9f8e588d3a29",
+        "declaration_hash": "8e7a74b64b207248258ab281465a6458cdfd44d99b2b792ec39395474d31b7b3",
+        "anchor_text_hash": "2e8f1baed5944f5eca9daf1081560f221365cd751f31e041306d0eb4931e74e0"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "kind: Enum"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewGateViolation",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewGateViolation",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-10"
+      },
+      "key": {
+        "waived_reason_hash": "9687fb9d3566201b61817d66556f195631446f0d24e5380cdbc450d134f7c834",
+        "declaration_hash": "6df8b382900dc28f27c2890051033cac14f60802e95eb42d8749634cc64e7abd",
+        "anchor_text_hash": "2d0510b1801ea41134f064a97a28f9c742e8a7adacf4920ed051c4f3412d2bf6"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "scope-conditional applicability と既存 task-contract status rule は維持され、NonBlueSignal の既存判定規則は変更されない。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewGateViolation",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewGateViolation",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-08"
+      },
+      "key": {
+        "waived_reason_hash": "bd637ac0f17838b39bddec018a7c0975651acadf328a05897b49912eddb0c812",
+        "declaration_hash": "6df8b382900dc28f27c2890051033cac14f60802e95eb42d8749634cc64e7abd",
+        "anchor_text_hash": "2e8f1baed5944f5eca9daf1081560f221365cd751f31e041306d0eb4931e74e0"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewScopeCommandDeclaration",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewScopeCommandDeclaration",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "waived_reason_hash": "5ac27d73f481a12a7fcde393cf794c7b4ac1c3877190506a209b6a5bbaf7750c",
+        "declaration_hash": "f447c19a5a1f95b150d03fdbaed8ce94f8d2dcb874438d80cee182f9fa6b355c",
+        "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewScopeCommandDeclaration",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewScopeCommandDeclaration",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "waived_reason_hash": "9ec4c7a587f648f3d531333a6475cc6bae1c90f13fd0e1a07c481f68be8a3c52",
+        "declaration_hash": "f447c19a5a1f95b150d03fdbaed8ce94f8d2dcb874438d80cee182f9fa6b355c",
+        "anchor_text_hash": "e44a2b38a1ce3bf278e618e41415dbd26068d287e4173facb0f0c39698f67474"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ValueObject { invariants: [] }, kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewScopeCommandDeclaration",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewScopeCommandDeclaration",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "waived_reason_hash": "eb8b42edf07b009f9db6254e635b55d9b8617bfeae37e88566087674bdee52a4",
+        "declaration_hash": "f447c19a5a1f95b150d03fdbaed8ce94f8d2dcb874438d80cee182f9fa6b355c",
+        "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"Pre-review scope-command declaration (IN-05, AC-05).\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewScopeCommandDeclarationDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewScopeCommandDeclarationDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "waived_reason_hash": "3704e0a4e89535d47b7ab2bbe1563b266c5e7afa7b39cd0b5f01eda0add79ca7",
+        "declaration_hash": "19c55523432ec8c0b313743529bce2f8d4472cf840af46d4bc0f0a28aa7b8664",
+        "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewScopeCommandDeclarationDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewScopeCommandDeclarationDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "waived_reason_hash": "b251c5f74ba7fbd18ffcb4d35e825e2236c68dbc651f9b44a6f640f49fb18c48",
+        "declaration_hash": "19c55523432ec8c0b313743529bce2f8d4472cf840af46d4bc0f0a28aa7b8664",
+        "anchor_text_hash": "e44a2b38a1ce3bf278e618e41415dbd26068d287e4173facb0f0c39698f67474"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: Dto; methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewScopeCommandDeclarationDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewScopeCommandDeclarationDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "waived_reason_hash": "d2adf3b0a6cfe8a1464e2a293efd98d9332fa4c947cbbb80eff103d9a689f4bf",
+        "declaration_hash": "19c55523432ec8c0b313743529bce2f8d4472cf840af46d4bc0f0a28aa7b8664",
+        "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Serde pre-review scope-command declaration (IN-05, AC-05)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ProgramExecutionRecord",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ProgramExecutionRecord",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "waived_reason_hash": "11d16e157ca3a84139e66613c1c2e3f8dfe8471f7beb0ad9c40af581a02d7faa",
+        "declaration_hash": "85f5641e2561d1cbb0523e83ef99de9fb1aab521431f32dd2b13ea1d8a60f213",
+        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TypeEntry { action: Add, role: Dto, kind: Struct(StructKind { shape: Plain"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ProgramExecutionRecord",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ProgramExecutionRecord",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-03"
+      },
+      "key": {
+        "waived_reason_hash": "caebb777397815fd88ab40cd9f2ae866399f6f1ecc05696c2df4d36d6850583e",
+        "declaration_hash": "85f5641e2561d1cbb0523e83ef99de9fb1aab521431f32dd2b13ea1d8a60f213",
+        "anchor_text_hash": "6166df4e5cb8aa348e839dc9faf6fdda9446f5782ff3880dec49513621a1e600"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"dispatcher は後続 command、writer、または reviewer を起動せず、失敗した argv と outcome を operator が識別できる形で返す。\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ProgramExecutionRecord",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ProgramExecutionRecord",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-04"
+      },
+      "key": {
+        "waived_reason_hash": "0e81b200d6d35866f5de0145a777f0a88a9b1fd50edebd472a0eaded43c4bd9f",
+        "declaration_hash": "85f5641e2561d1cbb0523e83ef99de9fb1aab521431f32dd2b13ea1d8a60f213",
+        "anchor_text_hash": "3a64b29a92e9e9eeaf1a9ea27e22587c95af88cf00d71369188fd9b70d334f36"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "CLI は validate、explain、enter の観測可能な outcome を提供し"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ProgramExitCode",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ProgramExitCode",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "waived_reason_hash": "fc7e4f1db08d2ae068991e03b245bb66086dcf029de758cd93ebdf39dd2492fd",
+        "declaration_hash": "42d30a29b2b7b32d3ca9680afe6358673dcd217351a7b1fbcb1d0725e800fae7",
+        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Opaque operating-system exit-code value (CN-03, AC-03)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ProgramExitCode",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ProgramExitCode",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-03"
+      },
+      "key": {
+        "waived_reason_hash": "c8cdcee9579c1a47dcaeb208199c701148cb3597daf8463b5fdf26ce62af8cd3",
+        "declaration_hash": "42d30a29b2b7b32d3ca9680afe6358673dcd217351a7b1fbcb1d0725e800fae7",
+        "anchor_text_hash": "6166df4e5cb8aa348e839dc9faf6fdda9446f5782ff3880dec49513621a1e600"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Opaque operating-system exit-code value (CN-03, AC-03)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ProgramInvocation",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ProgramInvocation",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-04"
+      },
+      "key": {
+        "waived_reason_hash": "16390e196d0bf7c80b9b59b0ab3f3c2c53fbd032140a344764738d1ca64c0fb3",
+        "declaration_hash": "eafb4f4ff7dfee437df5bd35076ddb012bf32868be6983db6c3a70c9ee565f15",
+        "anchor_text_hash": "9e04804ce8a7fd2c873ad048240923655926a25e6a72b36ada8f4cac5887ddfe"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "phase と pre-review command は shell string ではなく literal argv として起動され"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ProgramInvocation",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ProgramInvocation",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-02"
+      },
+      "key": {
+        "waived_reason_hash": "82935000964b1e421c2e7c07398175013913499b2a5eaa35afd18c780a2b4287",
+        "declaration_hash": "eafb4f4ff7dfee437df5bd35076ddb012bf32868be6983db6c3a70c9ee565f15",
+        "anchor_text_hash": "ca4264ace91339e8c6e987c4964bd99937e6d62d3b062c38cba5a5c8515d0f3a"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ProgramInvocation",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ProgramInvocation",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "waived_reason_hash": "8b22d392fcfc1a60183d3aecd4b8c94603b7ff6b3426348b32261228fd2ec59d",
+        "declaration_hash": "eafb4f4ff7dfee437df5bd35076ddb012bf32868be6983db6c3a70c9ee565f15",
+        "anchor_text_hash": "ef72acacfb5dc440638dcb1eca6898bd3db2fbdd6150c1af28c56c8594a8958d"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "phase engine は repository root を cwd として pre-entry command を宣言順に実行し、最初の non-zero で停止して残りと writer を起動せず、全 command が zero の場合だけ writer を一度実行する。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ProgramInvocation",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ProgramInvocation",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "waived_reason_hash": "05c8544a571eb70bd2d1a3cf737371e1dfc66eb1e351142a9eb42d2764db4999",
+        "declaration_hash": "eafb4f4ff7dfee437df5bd35076ddb012bf32868be6983db6c3a70c9ee565f15",
+        "anchor_text_hash": "57cb8a46e67a19b841ffe81921fef96722df9c62023de8d0968ad9bfaedd83b0"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "engine は argv を書き換えず、subcommand grammar や command の意味論を解釈しない。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ProgramOutputStream",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ProgramOutputStream",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "waived_reason_hash": "301a539234442e664365cddf67fd9fb4f990a602edda71e50db4883955b471f1",
+        "declaration_hash": "16fe792938fdba170eb407f7e45886f5f379c4d190ab80258328c4eef379db89",
+        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"Stdout\")), payload: Unit }, VariantDecl { name: VariantName(Identifier(\"Stderr\")), payload: Unit }] }, methods: [], generics: [], where_predicates: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ProgramOutputStream",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ProgramOutputStream",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-02"
+      },
+      "key": {
+        "waived_reason_hash": "d0bdf539c9155816e10732f059ede0003ebbdefeed0197295e0dfe89cb8385a2",
+        "declaration_hash": "16fe792938fdba170eb407f7e45886f5f379c4d190ab80258328c4eef379db89",
+        "anchor_text_hash": "ca4264ace91339e8c6e987c4964bd99937e6d62d3b062c38cba5a5c8515d0f3a"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: [], invariants: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ProgramRunOutcome",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ProgramRunOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "waived_reason_hash": "6043ed731a0f44b338cfd403ef1128358b0a2d9a8fc5c22a476d99d3f7cf6f29",
+        "declaration_hash": "c5e6278ec809829457fcc3b5b510b2f7ec07dc9b487c86e172b840bd1bcf15b0",
+        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: [], generics: [], where_predicates: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ProgramRunOutcome",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ProgramRunOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-02"
+      },
+      "key": {
+        "waived_reason_hash": "0d0d171e63c5e032ea7d19aff6390273320edec065667b2856b491e890d18345",
+        "declaration_hash": "c5e6278ec809829457fcc3b5b510b2f7ec07dc9b487c86e172b840bd1bcf15b0",
+        "anchor_text_hash": "ca4264ace91339e8c6e987c4964bd99937e6d62d3b062c38cba5a5c8515d0f3a"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "kind: Enum"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ProgramRunOutcome",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ProgramRunOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-03"
+      },
+      "key": {
+        "waived_reason_hash": "a48f2d967b7ed0f9bafbcf986aeac10565671668b9db2bd5e70e0b5a5504f485",
+        "declaration_hash": "c5e6278ec809829457fcc3b5b510b2f7ec07dc9b487c86e172b840bd1bcf15b0",
+        "anchor_text_hash": "6166df4e5cb8aa348e839dc9faf6fdda9446f5782ff3880dec49513621a1e600"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TypeEntry { action: Add, role: Dto, kind: Enum"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ProgramRunnerError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ProgramRunnerError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-04"
+      },
+      "key": {
+        "waived_reason_hash": "3c3f83e5a522d31157bfb1d6ad619ac2bc0f9af38a674e5cd80351f2480bb7cc",
+        "declaration_hash": "3f47349b7f6f3606caf0ba5d851e11b4679c94ef9612598a5967ccabb62ad8ba",
+        "anchor_text_hash": "9e04804ce8a7fd2c873ad048240923655926a25e6a72b36ada8f4cac5887ddfe"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"phase と pre-review command は shell string ではなく literal argv として起動され\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ProgramRunnerError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ProgramRunnerError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-02"
+      },
+      "key": {
+        "waived_reason_hash": "da122b41162f4eed3a68b3c966f35686da9618026a7e67b378bcbe90875ad1d3",
+        "declaration_hash": "3f47349b7f6f3606caf0ba5d851e11b4679c94ef9612598a5967ccabb62ad8ba",
+        "anchor_text_hash": "ca4264ace91339e8c6e987c4964bd99937e6d62d3b062c38cba5a5c8515d0f3a"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ProgramRunnerError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "GO-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ProgramRunnerError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:GO-03"
+      },
+      "key": {
+        "waived_reason_hash": "758a89b6fdd7e3fd27a653b0b0f708a183f8d264e80c856df04baa716c8577b5",
+        "declaration_hash": "3f47349b7f6f3606caf0ba5d851e11b4679c94ef9612598a5967ccabb62ad8ba",
+        "anchor_text_hash": "0203a405476f817ab74879ed006ba32454744fc289e4c38e0d204f4d9ddc995b"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Generic process-runner failures (GO-03, CN-02)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewScopeNameDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewScopeNameDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "waived_reason_hash": "b28c558bba06bd2ee11e93e995086fd9958faad494acb0cb26267bb0d6200c4d",
+        "declaration_hash": "8ce40cbd58eef12346a5d377c2816a6a76ca8212d789084e2877bb79af173ae7",
+        "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: Dto"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewScopeNameDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewScopeNameDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "waived_reason_hash": "431b4085fc3792e7d369e23fe3e4d6193078a559793dedcfd0c498770b0a6909",
+        "declaration_hash": "8ce40cbd58eef12346a5d377c2816a6a76ca8212d789084e2877bb79af173ae7",
+        "anchor_text_hash": "e44a2b38a1ce3bf278e618e41415dbd26068d287e4173facb0f0c39698f67474"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: Dto, methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewScopeNameDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewScopeNameDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "waived_reason_hash": "56c6421a162dad5f4a2902e4ac1be942f6e5ac31dc7f9cca6618b3dce17bd9f2",
+        "declaration_hash": "8ce40cbd58eef12346a5d377c2816a6a76ca8212d789084e2877bb79af173ae7",
+        "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "`methods: []`"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewScopeSelector",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewScopeSelector",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "waived_reason_hash": "7eea423ab05cbbd6e273321bc4690f2a186d8c0247ee1aa38d6487010349854e",
+        "declaration_hash": "66f64f00a1a765f040a556e01aef497848ba52915384ee5c84f8880a5c43a326",
+        "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "kind: Enum { variants: [...] }, methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewScopeSelector",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewScopeSelector",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "waived_reason_hash": "e17ed577cb25f1286164a44d7fe0e068df2d989527a469fb26faa384b737931a",
+        "declaration_hash": "66f64f00a1a765f040a556e01aef497848ba52915384ee5c84f8880a5c43a326",
+        "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"Named\")), payload: Tuple([TypeRef(\"domain::review_v2::MainScopeName\")]) }, VariantDecl { name: VariantName(Identifier(\"Other\")), payload: Unit }] }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewTrackSelector",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewTrackSelector",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "waived_reason_hash": "1910edabdbd466b72017cb584b678072d731c6bb468e13d9994e1a1b48677c92",
+        "declaration_hash": "6b303721a1caa7bf4d68c098ea94492e55d166fd39db5c40fe28091f78b421b8",
+        "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"Explicit\")), payload: Tuple([TypeRef(\"domain::TrackId\")]) }, VariantDecl { name: VariantName(Identifier(\"CurrentBranch\")), payload: Unit }] }, methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewTrackSelector",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewTrackSelector",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "waived_reason_hash": "e33fb2ecfafa024aa8996aea1dcca1d7732679e4123233b01f94e7e86dc3d3b5",
+        "declaration_hash": "6b303721a1caa7bf4d68c098ea94492e55d166fd39db5c40fe28091f78b421b8",
+        "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SuccessfulProgramExecutionRecord",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SuccessfulProgramExecutionRecord",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "waived_reason_hash": "251842f22d0ea996822c23f8157b50dbaca3152ad85821d1ccc96adc5917997b",
+        "declaration_hash": "18645628c7ca4798c96a0205321288ddcd31949c592802a2e10172a3c311b4db",
+        "anchor_text_hash": "edb4e92dab097edf9daf4986f7e535467ff8962fca5911e37dec2e1756d33671"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"Success-refined application-boundary execution record (CN-03, AC-02, AC-03).\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SuccessfulProgramExecutionRecord",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SuccessfulProgramExecutionRecord",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "waived_reason_hash": "8e60f47bd667bd641708f3f3b7651c4e62abc2505d363828bdce52fca3b6e34f",
+        "declaration_hash": "18645628c7ca4798c96a0205321288ddcd31949c592802a2e10172a3c311b4db",
+        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: Dto, kind: Struct(...), methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SuccessfulProgramExecutionRecord",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SuccessfulProgramExecutionRecord",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-03"
+      },
+      "key": {
+        "waived_reason_hash": "f5e8b700f9cc3765fa038bb174c9a30988e46fe34ab1dc50168cd498e38e8544",
+        "declaration_hash": "18645628c7ca4798c96a0205321288ddcd31949c592802a2e10172a3c311b4db",
+        "anchor_text_hash": "6166df4e5cb8aa348e839dc9faf6fdda9446f5782ff3880dec49513621a1e600"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskContractDocumentDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskContractDocumentDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-08"
+      },
+      "key": {
+        "waived_reason_hash": "dc33735d581ceb7d468f31be3d24fb105186113acf136148ecb54f944ba4cc99",
+        "declaration_hash": "0e94cc1ee3a993794858de15a6cae62190f8dcc850cf79a03595f91c2b7b4713",
+        "anchor_text_hash": "c6e5c18bf5cad17887f4e549819d0397ade7094237ea54caea13553e8d0be0c6"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskContractDocumentDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskContractDocumentDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-07"
+      },
+      "key": {
+        "waived_reason_hash": "20f92f6ca158b6f6d6392fa21e0fa47acdf5649739cfc8dc887a83aa24bcbf97",
+        "declaration_hash": "0e94cc1ee3a993794858de15a6cae62190f8dcc850cf79a03595f91c2b7b4713",
+        "anchor_text_hash": "49ca0a9a32f87a071ed1596ecadc8dffc6f22a3356b5f7ac2972e8c40448c1a9"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "task-contract の attribution target は catalogue entry のみとし、source-only baseline restoration、evidence/inspector eligibility、coverage/liveness carrier variant、および stale-carrier lifecycle を持ち込まない。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskContractSchemaVersionDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskContractSchemaVersionDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-08"
+      },
+      "key": {
+        "waived_reason_hash": "d5f7c3d4b694e1070b8c2bcd0cd67170a8e60e096e4feddaaf57ff18247edf4c",
+        "declaration_hash": "0c64eae3ae3640ad446136fbe1dade285454df9db22516f65f346eece1a9c8db",
+        "anchor_text_hash": "c6e5c18bf5cad17887f4e549819d0397ade7094237ea54caea13553e8d0be0c6"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "task-contract は catalogue-entry attribution だけを受理し、source-only baseline-restoration、evidence/inspector eligibility、coverage/liveness carrier variant、または stale-carrier lifecycle の入力を受理しない。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskContractSchemaVersionDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskContractSchemaVersionDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-07"
+      },
+      "key": {
+        "waived_reason_hash": "97e536fa890c2477236b94972cc6843afa82de4623264f7e56704e8b3014915c",
+        "declaration_hash": "0c64eae3ae3640ad446136fbe1dade285454df9db22516f65f346eece1a9c8db",
+        "anchor_text_hash": "49ca0a9a32f87a071ed1596ecadc8dffc6f22a3356b5f7ac2972e8c40448c1a9"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "task-contract の attribution target は catalogue entry のみとし"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "UnvalidatedTimeoutSeconds",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "UnvalidatedTimeoutSeconds",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "waived_reason_hash": "a547d3a0b8469158bced66bb404096227d79feb6b87a955a4366e98d67b60a35",
+        "declaration_hash": "6418917b747055741cabd3a0d70f7dfc899e9b3116989309eafb7f64c68fd3fe",
+        "anchor_text_hash": "05b8094316a1aacabb4bec26100b679daf53d5554267297214266776d1838398"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: [], fields: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "UnvalidatedTimeoutSeconds",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "UnvalidatedTimeoutSeconds",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "waived_reason_hash": "adf320ee255397143e20035607b77ae7bdc85ac683506a1a263a88e813fec46c",
+        "declaration_hash": "6418917b747055741cabd3a0d70f7dfc899e9b3116989309eafb7f64c68fd3fe",
+        "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "docs: Some(DocString(\"Unvalidated command-timeout input value (CN-01, CN-02).\")), invariants: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "UnvalidatedTimeoutSeconds",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "UnvalidatedTimeoutSeconds",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "waived_reason_hash": "22252293b2aea5ed848aba64d6187739c15d6e54a6bb795c29370aee0283210d",
+        "declaration_hash": "6418917b747055741cabd3a0d70f7dfc899e9b3116989309eafb7f64c68fd3fe",
+        "anchor_text_hash": "e44a2b38a1ce3bf278e618e41415dbd26068d287e4173facb0f0c39698f67474"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Unvalidated command-timeout input value (CN-01, CN-02)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "UnvalidatedTimeoutSeconds",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "UnvalidatedTimeoutSeconds",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-02"
+      },
+      "key": {
+        "waived_reason_hash": "fb525d297cd39d2808c37b9a3dfd1cb5f8c1fed8ab739ca473446ed58d203d60",
+        "declaration_hash": "6418917b747055741cabd3a0d70f7dfc899e9b3116989309eafb7f64c68fd3fe",
+        "anchor_text_hash": "ca4264ace91339e8c6e987c4964bd99937e6d62d3b062c38cba5a5c8515d0f3a"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Unvalidated command-timeout input value (CN-01, CN-02)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TrackIdDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TrackIdDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-07"
+      },
+      "key": {
+        "waived_reason_hash": "1288c81ec6fb198e0173586840e3197bd808247739120034a13e4deaa5cb1100",
+        "declaration_hash": "579d39da8308c311b73fd80e09188a33478edce6d75780d7299da4755b279065",
+        "anchor_text_hash": "49ca0a9a32f87a071ed1596ecadc8dffc6f22a3356b5f7ac2972e8c40448c1a9"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"Transparent serde mirror for a task-contract track identifier (IN-07, AC-08).\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    }
+  ]
 }

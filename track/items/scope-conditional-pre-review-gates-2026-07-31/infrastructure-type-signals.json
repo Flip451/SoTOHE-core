@@ -1,15 +1,15 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-02T06:16:28Z",
-  "declaration_hash": "eec03cf359e41b888727014182e43f0adbfa777f7926677a19795ec843067ccb",
-  "implementation_input_hash": "534ff31ff0ac572391a52b74df4b15f65e0d7a0827894e8db04ecb05c21531b1",
+  "generated_at": "2026-08-02T20:59:38Z",
+  "declaration_hash": "89b2252ccff399710658f79f5946f27bea1bbdfbe2a1fc4d821348a3267aca7a",
+  "implementation_input_hash": "63692024a91254bf911913dc93133c10718a51f5022331453a4e547aa1508e5a",
   "signals": [
     {
       "type_name": "CommandArgumentDto",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Deserialize<'de>",
@@ -20,9 +20,9 @@
     {
       "type_name": "CommandArgvDto",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Deserialize<'de>",
@@ -33,9 +33,9 @@
     {
       "type_name": "CommandConfigSchemaVersionDto",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Deserialize<'de>",
@@ -59,9 +59,9 @@
     {
       "type_name": "CommandTimeoutSecondsDto",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Deserialize<'de>",
@@ -72,9 +72,9 @@
     {
       "type_name": "ConfiguredCommandDto",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Deserialize<'de>",
@@ -85,8 +85,22 @@
     {
       "type_name": "ContractedEntryRefDto",
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
+    },
+    {
+      "type_name": "EntryKeyDto",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Deserialize<'de>",
+        "Eq",
+        "PartialEq",
+        "Serialize"
+      ]
     },
     {
       "type_name": "FsPhaseCommandConfigLoader",
@@ -102,9 +116,9 @@
     {
       "type_name": "FsPreReviewCommandConfigLoader",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Debug",
         "Default",
         "usecase::pre_review_command::PreReviewCommandConfigLoaderPort"
@@ -113,12 +127,26 @@
     {
       "type_name": "GitCurrentReviewTrackResolver",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Debug",
         "Default",
         "usecase::pre_review_command::CurrentReviewTrackResolverPort"
+      ]
+    },
+    {
+      "type_name": "LayerIdDto",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Deserialize<'de>",
+        "Eq",
+        "PartialEq",
+        "Serialize"
       ]
     },
     {
@@ -150,9 +178,9 @@
     {
       "type_name": "PreReviewCommandConfigDto",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Deserialize<'de>",
@@ -163,9 +191,9 @@
     {
       "type_name": "PreReviewScopeCommandDeclarationDto",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Deserialize<'de>",
@@ -176,9 +204,9 @@
     {
       "type_name": "ProcessProgramRunner",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Debug",
         "Default",
         "usecase::program_runner::ProgramRunnerPort"
@@ -187,9 +215,9 @@
     {
       "type_name": "ReviewScopeNameDto",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Deserialize<'de>",
@@ -200,17 +228,47 @@
     {
       "type_name": "TaskContractDocumentDto",
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
       "type_name": "TaskContractSchemaVersionDto",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Copy",
+        "Debug",
+        "Deserialize<'de>",
+        "Eq",
+        "PartialEq",
+        "Serialize"
+      ]
+    },
+    {
+      "type_name": "TaskIdDto",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Deserialize<'de>",
+        "Eq",
+        "Ord",
+        "PartialEq",
+        "PartialOrd",
+        "Serialize"
+      ]
+    },
+    {
+      "type_name": "TrackIdDto",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
         "Debug",
         "Deserialize<'de>",
         "Eq",
@@ -227,19 +285,8 @@
     {
       "type_name": "infrastructure::operator_command_config::decode_pre_review_command_config",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
-    },
-    {
-      "type_name": "FsPreReviewGateConfigLoader",
-      "kind_tag": "unknown",
-      "signal": "red",
-      "found_type": true,
-      "extra_items": [
-        "Debug",
-        "Default",
-        "usecase::pre_review_gate_dispatch::PreReviewGateConfigLoaderPort"
-      ]
+      "signal": "blue",
+      "found_type": true
     }
   ]
 }

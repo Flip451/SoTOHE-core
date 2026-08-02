@@ -459,7 +459,7 @@
       }
     },
     {
-      "claim_hash": "981985188bce673d47058e81f58c357208e1e8fd3d41a6a062a7849a9185625f",
+      "claim_hash": "d05a0cd39814f68580ea84dd25927dbff460575c74f441ccfca20cf51e8056ea",
       "evidence_hash": "29d445cbda3b29cd7e70298aa5416d506e4c65526b0b46e78232d518bfab6d15",
       "verdict": {
         "kind": "pass",
@@ -483,7 +483,7 @@
       }
     },
     {
-      "claim_hash": "981985188bce673d47058e81f58c357208e1e8fd3d41a6a062a7849a9185625f",
+      "claim_hash": "d05a0cd39814f68580ea84dd25927dbff460575c74f441ccfca20cf51e8056ea",
       "evidence_hash": "86401aab231a908018e505096908217adba1bb1ae4b72a6a8fc42d24bfc234a9",
       "verdict": {
         "kind": "pass",
@@ -495,6 +495,54 @@
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
           "section_key": "types",
           "entry_key": "ContractedEntryRefDto"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "task-contract は catalogue-entry attribution だけを受理し、source-only baseline-restoration、evidence/inspector eligibility、coverage/liveness carrier variant、または stale-carrier lifecycle の入力を受理しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "1c22726a358b865b8482f8225b9ad7089cefb56c906b3877b1f6076c69b3d7c4",
+      "evidence_hash": "29d445cbda3b29cd7e70298aa5416d506e4c65526b0b46e78232d518bfab6d15",
+      "verdict": {
+        "kind": "pass",
+        "citation": "task-contract の attribution target は catalogue entry のみとし、source-only baseline restoration、evidence/inspector eligibility、coverage/liveness carrier variant、および stale-carrier lifecycle を持ち込まない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "EntryKeyDto"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "task-contract の attribution target は catalogue entry のみとし、source-only baseline restoration、evidence/inspector eligibility、coverage/liveness carrier variant、および stale-carrier lifecycle を持ち込まない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "1c22726a358b865b8482f8225b9ad7089cefb56c906b3877b1f6076c69b3d7c4",
+      "evidence_hash": "86401aab231a908018e505096908217adba1bb1ae4b72a6a8fc42d24bfc234a9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue-entry attribution だけを受理し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "EntryKeyDto"
         }
       },
       "evidence_origin": {
@@ -647,6 +695,54 @@
           "section": "acceptance_criteria",
           "element_id": "AC-05",
           "text_label": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または configured argv の先頭三要素が exactly `[\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、もしくは `[\"bin/sotp\", \"review\", \"fix-local\"]` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "af7cabb51672b37c338952e365f41a6a9bb0ef77fa7e541ec18090ab3b5c967e",
+      "evidence_hash": "29d445cbda3b29cd7e70298aa5416d506e4c65526b0b46e78232d518bfab6d15",
+      "verdict": {
+        "kind": "pass",
+        "citation": "task-contract の attribution target は catalogue entry のみとし"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "LayerIdDto"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "task-contract の attribution target は catalogue entry のみとし、source-only baseline restoration、evidence/inspector eligibility、coverage/liveness carrier variant、および stale-carrier lifecycle を持ち込まない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "af7cabb51672b37c338952e365f41a6a9bb0ef77fa7e541ec18090ab3b5c967e",
+      "evidence_hash": "86401aab231a908018e505096908217adba1bb1ae4b72a6a8fc42d24bfc234a9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "task-contract は catalogue-entry attribution だけを受理し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "LayerIdDto"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "task-contract は catalogue-entry attribution だけを受理し、source-only baseline-restoration、evidence/inspector eligibility、coverage/liveness carrier variant、または stale-carrier lifecycle の入力を受理しない。"
         }
       }
     },
@@ -1107,11 +1203,11 @@
       }
     },
     {
-      "claim_hash": "50c3926abd9b5a32f7c749296e4c41221adb29d27adde674c25c335b456b215b",
+      "claim_hash": "0c1dc61b295314653a4b12c225ee5483086a79f65fdab8a4224b5b1a64a1fb60",
       "evidence_hash": "29d445cbda3b29cd7e70298aa5416d506e4c65526b0b46e78232d518bfab6d15",
       "verdict": {
         "kind": "pass",
-        "citation": "task-contract の attribution target は catalogue entry のみとし"
+        "citation": "task-contract の attribution target は catalogue entry のみとし、source-only baseline restoration、evidence/inspector eligibility、coverage/liveness carrier variant、および stale-carrier lifecycle を持ち込まない。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1131,7 +1227,7 @@
       }
     },
     {
-      "claim_hash": "50c3926abd9b5a32f7c749296e4c41221adb29d27adde674c25c335b456b215b",
+      "claim_hash": "0c1dc61b295314653a4b12c225ee5483086a79f65fdab8a4224b5b1a64a1fb60",
       "evidence_hash": "86401aab231a908018e505096908217adba1bb1ae4b72a6a8fc42d24bfc234a9",
       "verdict": {
         "kind": "pass",
@@ -1191,6 +1287,102 @@
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
           "section_key": "types",
           "entry_key": "TaskContractSchemaVersionDto"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "task-contract は catalogue-entry attribution だけを受理し、source-only baseline-restoration、evidence/inspector eligibility、coverage/liveness carrier variant、または stale-carrier lifecycle の入力を受理しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "703d96db8273f7a37f9d2a55e1cee447ce1d1a167b48f6ab62054889fb2d6c38",
+      "evidence_hash": "29d445cbda3b29cd7e70298aa5416d506e4c65526b0b46e78232d518bfab6d15",
+      "verdict": {
+        "kind": "pass",
+        "citation": "task-contract の attribution target は catalogue entry のみとし"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "TaskIdDto"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "task-contract の attribution target は catalogue entry のみとし、source-only baseline restoration、evidence/inspector eligibility、coverage/liveness carrier variant、および stale-carrier lifecycle を持ち込まない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "703d96db8273f7a37f9d2a55e1cee447ce1d1a167b48f6ab62054889fb2d6c38",
+      "evidence_hash": "86401aab231a908018e505096908217adba1bb1ae4b72a6a8fc42d24bfc234a9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "task-contract は catalogue-entry attribution だけを受理し、source-only baseline-restoration、evidence/inspector eligibility、coverage/liveness carrier variant、または stale-carrier lifecycle の入力を受理しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "TaskIdDto"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "task-contract は catalogue-entry attribution だけを受理し、source-only baseline-restoration、evidence/inspector eligibility、coverage/liveness carrier variant、または stale-carrier lifecycle の入力を受理しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ec0ffc493027e11291b9592cb7b7b88b0e09b2131e077e50143f408e64e9093b",
+      "evidence_hash": "29d445cbda3b29cd7e70298aa5416d506e4c65526b0b46e78232d518bfab6d15",
+      "verdict": {
+        "kind": "pass",
+        "citation": "task-contract の attribution target は catalogue entry のみとし、source-only baseline restoration、evidence/inspector eligibility、coverage/liveness carrier variant、および stale-carrier lifecycle を持ち込まない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "TrackIdDto"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "task-contract の attribution target は catalogue entry のみとし、source-only baseline restoration、evidence/inspector eligibility、coverage/liveness carrier variant、および stale-carrier lifecycle を持ち込まない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ec0ffc493027e11291b9592cb7b7b88b0e09b2131e077e50143f408e64e9093b",
+      "evidence_hash": "86401aab231a908018e505096908217adba1bb1ae4b72a6a8fc42d24bfc234a9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "task-contract は catalogue-entry attribution だけを受理し、source-only baseline-restoration、evidence/inspector eligibility、coverage/liveness carrier variant、または stale-carrier lifecycle の入力を受理しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "TrackIdDto"
         }
       },
       "evidence_origin": {

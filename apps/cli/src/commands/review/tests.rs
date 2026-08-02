@@ -11,6 +11,72 @@ fn env_lock() -> &'static Mutex<()> {
     LOCK.get_or_init(|| Mutex::new(()))
 }
 
+#[test]
+fn review_reviewer_commands_default_to_one_hour_timeouts() {
+    use clap::Parser;
+
+    #[derive(Parser)]
+    struct TestCli {
+        #[command(subcommand)]
+        command: super::ReviewCommand,
+    }
+
+    let codex = TestCli::try_parse_from([
+        "sotp",
+        "codex-local",
+        "--model",
+        "gpt-5.6",
+        "--prompt",
+        "review",
+        "--round-type",
+        "fast",
+        "--group",
+        "cli",
+    ])
+    .expect("codex-local must parse");
+    let claude = TestCli::try_parse_from([
+        "sotp",
+        "claude-local",
+        "--model",
+        "claude",
+        "--prompt",
+        "review",
+        "--round-type",
+        "fast",
+        "--group",
+        "cli",
+    ])
+    .expect("claude-local must parse");
+    let local = TestCli::try_parse_from([
+        "sotp",
+        "local",
+        "--prompt",
+        "review",
+        "--round-type",
+        "fast",
+        "--group",
+        "cli",
+    ])
+    .expect("local must parse");
+
+    for timeout_seconds in [
+        match codex.command {
+            super::ReviewCommand::CodexLocal(args) => args.timeout_seconds,
+            _ => panic!("expected codex-local"),
+        },
+        match claude.command {
+            super::ReviewCommand::ClaudeLocal(args) => args.timeout_seconds,
+            _ => panic!("expected claude-local"),
+        },
+        match local.command {
+            super::ReviewCommand::Local(args) => args.timeout_seconds,
+            _ => panic!("expected local"),
+        },
+    ] {
+        assert_eq!(timeout_seconds, 3_600);
+    }
+}
+
 struct CurrentDirGuard {
     original: PathBuf,
 }

@@ -1,14 +1,17 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-02T06:16:31Z",
-  "declaration_hash": "6d28fa3dbd668409b4afe41fad30037bd30d96fd4c3deb80eb076f3d90626947",
-  "implementation_input_hash": "ebc0c71312207b18f846f9a628a516e3db4c5c6fcb5c21b07bdea63c02f9ed8e",
+  "generated_at": "2026-08-02T16:43:56Z",
+  "declaration_hash": "a9a80bde63669aa1ded9e3db1ba534752a79e37e87fbd7b145a1146cbee3b062",
+  "implementation_input_hash": "a84eca45d6cdbecb6604d4bc2561f703dc27d3f8badd1df8bd4685b220692d5c",
   "signals": [
     {
       "type_name": "PhaseCommandDriver",
       "kind_tag": "primary_adapter",
       "signal": "yellow",
-      "found_type": false
+      "found_type": false,
+      "missing_items": [
+        "Debug"
+      ]
     },
     {
       "type_name": "PhaseCommandInput",

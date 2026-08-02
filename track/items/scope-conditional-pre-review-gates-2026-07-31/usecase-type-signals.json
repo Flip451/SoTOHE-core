@@ -1,15 +1,27 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-02T06:16:21Z",
-  "declaration_hash": "9cea7d87c47c1b25058ba71bf82320b9eb16167fde6f8b2c40ced2338bdf7b98",
-  "implementation_input_hash": "1a2b5daec22bd309b3da648d39bea64a477db5e0eeeabedff9cf2cc3a6ba1a24",
+  "generated_at": "2026-08-02T20:59:31Z",
+  "declaration_hash": "434bd174cecada5dc40fec9dd7acafbbf2a9f9258a62c30c4725cf3d96d3f22f",
+  "implementation_input_hash": "3dda4c66b26f763fc7c09649aee6f82ad1a0cda3552832b834dc7e2eca4e25fd",
   "signals": [
     {
       "type_name": "CapturedProgramOutput",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "ClassifiedProgramExecutionRecord",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -20,20 +32,23 @@
       "type_name": "CommandArgument",
       "kind_tag": "value_object",
       "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
         "PartialEq"
+      ],
+      "missing_items": [
+        "AsRef<str>"
       ]
     },
     {
       "type_name": "CommandArgv",
       "kind_tag": "value_object",
       "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -41,7 +56,7 @@
       ]
     },
     {
-      "type_name": "CommandConfigLoadError",
+      "type_name": "CommandArgvValidationError",
       "kind_tag": "error_type",
       "signal": "yellow",
       "found_type": false,
@@ -52,11 +67,23 @@
       ]
     },
     {
+      "type_name": "CommandConfigLoadError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error",
+        "From<CommandConfigValidationError>"
+      ]
+    },
+    {
       "type_name": "CommandConfigSchemaVersion",
       "kind_tag": "value_object",
       "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -67,64 +94,36 @@
       "type_name": "CommandConfigValidationError",
       "kind_tag": "error_type",
       "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "found_type": true,
+      "found_items": [
         "Debug",
         "Display",
         "Error"
+      ],
+      "missing_items": [
+        "From<CommandDeclarationIdValidationError>",
+        "From<ConfiguredCommandValidationError>",
+        "From<PhaseCommandConfigValidationError>",
+        "From<PreReviewCommandConfigValidationError>"
       ]
     },
     {
       "type_name": "CommandDeclarationId",
       "kind_tag": "value_object",
       "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
         "PartialEq"
-      ]
-    },
-    {
-      "type_name": "CommandSequenceIndex",
-      "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
+      ],
       "missing_items": [
-        "Clone",
-        "Debug",
-        "Eq",
-        "PartialEq"
+        "AsRef<str>"
       ]
     },
     {
-      "type_name": "CommandTimeoutSeconds",
-      "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
-        "Clone",
-        "Copy",
-        "Debug",
-        "Eq",
-        "PartialEq"
-      ]
-    },
-    {
-      "type_name": "ConfiguredCommand",
-      "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
-        "Clone",
-        "Debug",
-        "Eq",
-        "PartialEq"
-      ]
-    },
-    {
-      "type_name": "CurrentReviewTrackResolveError",
+      "type_name": "CommandDeclarationIdValidationError",
       "kind_tag": "error_type",
       "signal": "yellow",
       "found_type": false,
@@ -135,17 +134,104 @@
       ]
     },
     {
+      "type_name": "CommandSequenceIndex",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "CommandTimeoutSeconds",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Copy",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "CommandTimeoutValidationError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "ConfiguredCommand",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "ConfiguredCommandValidationError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error",
+        "From<CommandArgvValidationError>",
+        "From<CommandTimeoutValidationError>"
+      ]
+    },
+    {
+      "type_name": "CurrentReviewTrackResolveError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
       "type_name": "CurrentReviewTrackResolverPort",
       "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "FailedProgramExecutionRecord",
+      "kind_tag": "dto",
       "signal": "yellow",
-      "found_type": false
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "missing_items": [
+        "AsRef<ProgramExecutionRecord>"
+      ]
     },
     {
       "type_name": "OutputCaptureLimitBytes",
       "kind_tag": "value_object",
       "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Copy",
         "Debug",
@@ -172,6 +258,17 @@
       "found_type": false
     },
     {
+      "type_name": "PhaseCommandConfigValidationError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
       "type_name": "PhaseCommandDeclaration",
       "kind_tag": "value_object",
       "signal": "yellow",
@@ -191,7 +288,9 @@
       "missing_items": [
         "Debug",
         "Display",
-        "Error"
+        "Error",
+        "From<CommandConfigLoadError>",
+        "From<ProgramRunnerError>"
       ]
     },
     {
@@ -214,7 +313,8 @@
       "missing_items": [
         "Debug",
         "Display",
-        "Error"
+        "Error",
+        "From<CommandConfigLoadError>"
       ]
     },
     {
@@ -243,18 +343,6 @@
       "kind_tag": "application_service",
       "signal": "yellow",
       "found_type": false
-    },
-    {
-      "type_name": "PhaseCommandStep",
-      "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
-        "Clone",
-        "Debug",
-        "Eq",
-        "PartialEq"
-      ]
     },
     {
       "type_name": "PhaseEnterCommand",
@@ -296,8 +384,8 @@
       "type_name": "PreReviewCommandConfig",
       "kind_tag": "value_object",
       "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -307,15 +395,26 @@
     {
       "type_name": "PreReviewCommandConfigLoaderPort",
       "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "PreReviewCommandConfigValidationError",
+      "kind_tag": "error_type",
       "signal": "yellow",
-      "found_type": false
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
     },
     {
       "type_name": "PreReviewCommandDispatchCommand",
       "kind_tag": "command",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -326,28 +425,31 @@
       "type_name": "PreReviewCommandDispatchError",
       "kind_tag": "error_type",
       "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "found_type": true,
+      "found_items": [
         "Debug",
         "Display",
-        "Error"
+        "Error",
+        "From<CommandConfigLoadError>",
+        "From<CurrentReviewTrackResolveError>",
+        "From<ProgramRunnerError>"
       ]
     },
     {
       "type_name": "PreReviewCommandDispatchInteractor",
       "kind_tag": "interactor",
       "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "found_type": true,
+      "found_items": [
         "PreReviewCommandDispatchService"
       ]
     },
     {
       "type_name": "PreReviewCommandDispatchOutcome",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -357,24 +459,24 @@
     {
       "type_name": "PreReviewCommandDispatchService",
       "kind_tag": "application_service",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "PreReviewCommandGatedReviewInteractor",
       "kind_tag": "interactor",
       "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "found_type": true,
+      "found_items": [
         "ReviewService"
       ]
     },
     {
       "type_name": "PreReviewScopeCommandDeclaration",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -384,9 +486,9 @@
     {
       "type_name": "ProgramExecutionRecord",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -397,8 +499,8 @@
       "type_name": "ProgramExitCode",
       "kind_tag": "value_object",
       "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -408,9 +510,9 @@
     {
       "type_name": "ProgramInvocation",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -420,9 +522,9 @@
     {
       "type_name": "ProgramOutputStream",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -432,9 +534,9 @@
     {
       "type_name": "ProgramRunOutcome",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -444,9 +546,9 @@
     {
       "type_name": "ProgramRunnerError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Debug",
         "Display",
         "Error"
@@ -455,15 +557,15 @@
     {
       "type_name": "ProgramRunnerPort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "ReviewScopeSelector",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -473,146 +575,39 @@
     {
       "type_name": "ReviewTrackSelector",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
         "PartialEq"
+      ]
+    },
+    {
+      "type_name": "SuccessfulProgramExecutionRecord",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "missing_items": [
+        "AsRef<ProgramExecutionRecord>"
       ]
     },
     {
       "type_name": "UnvalidatedTimeoutSeconds",
       "kind_tag": "value_object",
       "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
-        "PartialEq"
-      ]
-    },
-    {
-      "type_name": "PreReviewGateConfigLoadError",
-      "kind_tag": "unknown",
-      "signal": "red",
-      "found_type": true,
-      "extra_items": [
-        "Debug",
-        "Display",
-        "Error"
-      ]
-    },
-    {
-      "type_name": "PreReviewGateConfigLoaderPort",
-      "kind_tag": "unknown",
-      "signal": "red",
-      "found_type": true
-    },
-    {
-      "type_name": "PreReviewGateDispatchCommand",
-      "kind_tag": "unknown",
-      "signal": "red",
-      "found_type": true,
-      "extra_items": [
-        "Clone",
-        "Debug"
-      ]
-    },
-    {
-      "type_name": "PreReviewGateDispatchError",
-      "kind_tag": "unknown",
-      "signal": "red",
-      "found_type": true,
-      "extra_items": [
-        "Debug",
-        "Display",
-        "Error",
-        "From<PreReviewGateConfigLoadError>",
-        "From<PreReviewGateError>",
-        "From<PreReviewGateLookupError>"
-      ]
-    },
-    {
-      "type_name": "PreReviewGateDispatchInteractor",
-      "kind_tag": "unknown",
-      "signal": "red",
-      "found_type": true,
-      "extra_items": [
-        "PreReviewGateDispatchService"
-      ]
-    },
-    {
-      "type_name": "PreReviewGateDispatchOutcome",
-      "kind_tag": "unknown",
-      "signal": "red",
-      "found_type": true,
-      "extra_items": [
-        "Clone",
-        "Debug",
-        "Eq",
-        "PartialEq"
-      ]
-    },
-    {
-      "type_name": "PreReviewGateDispatchService",
-      "kind_tag": "unknown",
-      "signal": "red",
-      "found_type": true
-    },
-    {
-      "type_name": "PreReviewGateKind",
-      "kind_tag": "unknown",
-      "signal": "red",
-      "found_type": true,
-      "extra_items": [
-        "Clone",
-        "Copy",
-        "Debug",
-        "Eq",
-        "Hash",
-        "PartialEq"
-      ]
-    },
-    {
-      "type_name": "PreReviewGateLookupError",
-      "kind_tag": "unknown",
-      "signal": "red",
-      "found_type": true,
-      "extra_items": [
-        "Clone",
-        "Debug",
-        "Display",
-        "Eq",
-        "Error",
-        "PartialEq"
-      ]
-    },
-    {
-      "type_name": "PreReviewGateMatrix",
-      "kind_tag": "unknown",
-      "signal": "red",
-      "found_type": true,
-      "extra_items": [
-        "Clone",
-        "Debug",
-        "Eq",
-        "PartialEq"
-      ]
-    },
-    {
-      "type_name": "PreReviewGateMatrixError",
-      "kind_tag": "unknown",
-      "signal": "red",
-      "found_type": true,
-      "extra_items": [
-        "Clone",
-        "Debug",
-        "Display",
-        "Eq",
-        "Error",
         "PartialEq"
       ]
     }

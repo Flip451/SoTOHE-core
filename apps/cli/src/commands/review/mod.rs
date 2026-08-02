@@ -26,7 +26,7 @@ use fix_local::{FixLocalArgs, execute_fix_local};
 use local::{LocalArgs, execute_local};
 use results::execute_results;
 
-const DEFAULT_TIMEOUT_SECONDS: u64 = 1800;
+const DEFAULT_TIMEOUT_SECONDS: u64 = 3_600;
 
 #[derive(Debug, Subcommand)]
 pub enum ReviewCommand {
