@@ -866,6 +866,64 @@ mod tests {
     }
 
     #[test]
+    fn test_decode_type_alias_with_reserved_keyword_generic_name_returns_invalid_entry_error() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "BadAlias": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "type_alias",
+        "target": "Box<type>",
+        "generics": [{ "name": "type", "bounds": [] }]
+      }
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+
+        let err = CatalogueDocumentCodec::decode(json, "domain").unwrap_err();
+        assert!(
+            matches!(err, CatalogueDocumentCodecError::InvalidEntry { ref entry_name, ref reason }
+                if entry_name == "BadAlias" && reason.contains("must not be a Rust keyword")),
+            "unexpected error: {err:?}"
+        );
+    }
+
+    #[test]
+    fn test_decode_type_alias_with_wildcard_generic_name_returns_invalid_entry_error() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "BadAlias": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "type_alias",
+        "target": "Box<_>",
+        "generics": [{ "name": "_", "bounds": [] }]
+      }
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+
+        let err = CatalogueDocumentCodec::decode(json, "domain").unwrap_err();
+        assert!(
+            matches!(err, CatalogueDocumentCodecError::InvalidEntry { ref entry_name, ref reason }
+                if entry_name == "BadAlias" && reason.contains("generic param name '_'") ),
+            "unexpected error: {err:?}"
+        );
+    }
+
+    #[test]
     fn test_decode_type_alias_with_empty_generic_bound_returns_invalid_entry_error() {
         let json = r#"{
   "schema_version": 5,
@@ -1019,6 +1077,41 @@ mod tests {
         assert!(
             matches!(err, CatalogueDocumentCodecError::InvalidEntry { ref entry_name, ref reason }
                 if entry_name == "BadLegacyAlias" && reason.contains("duplicate generic param name")),
+            "unexpected error: {err:?}"
+        );
+    }
+
+    #[test]
+    fn test_encode_type_alias_with_wildcard_generic_name_returns_invalid_entry_error() {
+        let mut doc = CatalogueDocument::new(
+            SCHEMA_VERSION,
+            CrateName::new("domain").unwrap(),
+            LayerId::try_new("domain").unwrap(),
+        );
+        let wildcard = MethodGenericParam { name: ParamName::new("_").unwrap(), bounds: vec![] };
+        doc.insert_type(
+            TypeName::new("BadAlias").unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::TypeAlias {
+                    target: TypeRef::new("Vec<_>").unwrap(),
+                    generics: vec![wildcard],
+                },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let err = CatalogueDocumentCodec::encode(&doc).unwrap_err();
+        assert!(
+            matches!(err, CatalogueDocumentCodecError::InvalidEntry { ref entry_name, ref reason }
+                if entry_name == "BadAlias" && reason.contains("generic param name")),
             "unexpected error: {err:?}"
         );
     }

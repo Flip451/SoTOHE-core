@@ -164,6 +164,43 @@
           "hash": "rvw1:sha256:32d263928c0c3424dbeafe7bc4327b56e8f5edb5c4514cb4066ddbf9a1b6893e",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T09:43:17Z",
+          "findings": [
+            {
+              "category": "broken domain invariant",
+              "file": "libs/domain/src/tddd/catalogue_v2/identifiers.rs",
+              "line": 72,
+              "message": "The reserved-keyword list omits `gen`, which is a reserved keyword in Rust edition 2024. `ParamName::new(\"gen\")` therefore succeeds, allowing generated generic/function declarations that fail to compile.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3ee2733307732ef0a4ab674765bb8ca9dc3beebdb5f3a364d5e09221d844639b",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T09:49:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:06311f7c43f70ba94bcde295f2c4eeb3ab840c81598f6914cab5c40eab36c988",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T10:01:54Z",
+          "findings": [
+            {
+              "category": "broken invariant",
+              "file": "libs/domain/src/tddd/catalogue_v2/identifiers.rs",
+              "line": 291,
+              "message": "`ParamName` now rejects all Rust keywords even though raw identifiers are valid parameter/type-parameter names and rustdoc removes their `r#` prefix. Thus valid code such as `type Alias<r#type> = r#type;` reaches the catalogue as parameter name `type` and is rejected here, causing false catalogue/implementation mismatches. This normalization is already documented in `catalogue.rs:42-44`. Preserve rustdoc-normalized keyword names in the shared `ParamName`; enforce alias-generic-specific restrictions at that declaration boundary.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c3fcd20ceb13cdf71a1244990e12a330d4c5e74406f04b7b8e2ed05bfa920cc0",
+          "type": "final",
+          "verdict": "findings_remain"
         }
       ]
     },
@@ -625,6 +662,108 @@
           "hash": "rvw1:sha256:2a76d147cc247dc7f5cb9f4abbe75ea0fc5996ce741029c91e2255cf967ec53e",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T09:42:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:597bb0e3cbb0f9a876f21530619f296b3474701b461cbd07be4d8f7a1cee26e2",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T09:49:44Z",
+          "findings": [
+            {
+              "category": "external-input-validation",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs",
+              "line": 415,
+              "message": "Generic-name validation still accepts the reserved identifier `_`: `ParamName::new(\"_\")` succeeds, so an alias with `generics: [{\"name\":\"_\",\"bounds\":[]}]` crosses the document boundary even though Rust rejects `type Alias<_> = ...`. Reject `_` specifically for generic parameters and add a regression test.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:597bb0e3cbb0f9a876f21530619f296b3474701b461cbd07be4d8f7a1cee26e2",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T09:50:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:597bb0e3cbb0f9a876f21530619f296b3474701b461cbd07be4d8f7a1cee26e2",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T10:04:23Z",
+          "findings": [
+            {
+              "category": "external-input-validation",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs",
+              "line": 420,
+              "message": "Reserved keywords are still accepted. `ParamName::new` only validates identifier characters, so `ParamName::new(\"type\")` succeeds and this error mapping is never entered. Consequently the new test at `mod.rs:889` panics and invalid Rust generic declarations still cross the document boundary. Add an explicit keyword check before constructing the generic parameter.",
+              "severity": "P1"
+            },
+            {
+              "category": "codec-symmetry",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs",
+              "line": 415,
+              "message": "The new `_` rejection is decode-only. A domain alias can still contain `ParamName::new(\"_\")`, and the encoder validates only duplicate names and bounds, so `encode` returns JSON that this branch immediately rejects on `decode`. Mirror generic-name validation in the encoding path and cover the encode error/round-trip behavior.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:457423ab012d6f53e901f998defe480e95da7de2f54332adc27a6d87d1e481e7",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T10:34:44Z",
+          "findings": [
+            {
+              "category": "codec-symmetry",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs",
+              "line": 419,
+              "message": "Keyword/wildcard validation is added to the shared decoder for every generic declaration, but encoding performs the equivalent validation only for type aliases. Consequently, domain values such as a function, trait, method, or impl with `ParamName::new(\"type\")` or `ParamName::new(\"_\")` encode successfully and then fail to decode, violating codec round-trip symmetry. Either restrict this new check to aliases or validate every generic-bearing encoder path.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs",
+              "line": 465,
+              "message": "This production-only module is now 713 lines, exceeding the repository's hard 700-line module limit. The newly added alias-name helper is also redundant with the validation already performed by `method_generics_from_dtos`; remove it or extract validation/conversion into a smaller module.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:36bcab5b00fb01d2aad9c5b4c9d0330562aa183e439e4754b02c82741f5b3e9f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T10:44:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8767ce1375c0d5a8eaae772317f9749bb9da2e3ed2f4c3e1e302d517356989c1",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T10:50:45Z",
+          "findings": [
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs",
+              "line": 458,
+              "message": "This production-only module is now 706 lines, exceeding the repository's hard 700-line module limit. Extract the newly added alias-name validation helper (for example into `validate.rs`) or otherwise reduce the module below the limit.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:faef9ee04678c795973f7ae6ca17c4c089e14d3b035e86c7bd84cd342b3f4279",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T10:59:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0baf4c2eaa805421f1517377db7580683075ea795502f89da2b7cfecdc02bd37",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -690,6 +829,42 @@
           "at": "2026-08-02T09:05:07Z",
           "findings": [],
           "hash": "rvw1:sha256:56c46aff4cebf6d397246b70dfb40155c32e24bf80b4f59495ff57139b3f7b46",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T09:43:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:34cb93688886645f1b9b81620372564e31d7773b4bb4dc6953bd8b6bb21e6a7b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T09:49:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:34cb93688886645f1b9b81620372564e31d7773b4bb4dc6953bd8b6bb21e6a7b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T09:51:06Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/test-bindings.json",
+              "line": 81,
+              "message": "The newly bound test does not have a current frozen verdict. `bin/sotp test-obligation check` reports `TestChanged` for `TypeKindV2/AC-02`, `TypeKindV2/IN-02`, and `evaluate_catalogue_lint/CN-01`; results show three stale done edges. Re-evaluate the changed test evidence before these bindings can satisfy the obligation gate.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:34cb93688886645f1b9b81620372564e31d7773b4bb4dc6953bd8b6bb21e6a7b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T11:02:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:64adf21c8df0e56a1480a1dc965b77a65c48c060542c170a19455373eb0c1853",
           "type": "final",
           "verdict": "zero_findings"
         }

@@ -27,7 +27,7 @@ use super::dto_roles::{
     ContractRoleDto, DataRoleDto, IdentityAccessorDto, InvariantDeclDto, InvariantPredicateDto,
 };
 use super::dto_slots::{EntrySlotDto, TombstoneDto};
-use super::validate::validate_bound_str;
+use super::validate::{is_valid_generic_param_name, validate_bound_str};
 
 // ---------------------------------------------------------------------------
 // Top-level entry point
@@ -283,6 +283,16 @@ fn validate_type_alias_generics(
 ) -> Result<(), CatalogueDocumentCodecError> {
     let mut seen = HashSet::new();
     for generic in generics {
+        if !is_valid_generic_param_name(generic.name.as_str()) {
+            return Err(CatalogueDocumentCodecError::InvalidEntry {
+                entry_name: entry_name.to_owned(),
+                reason: format!(
+                    "generic param name '{}' is not a valid Rust identifier \
+                     (must match [a-zA-Z_][a-zA-Z0-9_]* and must not be a Rust keyword)",
+                    generic.name.as_str()
+                ),
+            });
+        }
         if !seen.insert(generic.name.as_str()) {
             return Err(CatalogueDocumentCodecError::InvalidEntry {
                 entry_name: entry_name.to_owned(),

@@ -97,6 +97,21 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_decode_type_alias_with_reserved_keyword_generic_name_returns_invalid_entry_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_decode_type_alias_with_wildcard_generic_name_returns_invalid_entry_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_encode_type_alias_with_wildcard_generic_name_returns_invalid_entry_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
           "test_name": "test_decode_type_alias_with_empty_generic_bound_returns_invalid_entry_error"
         },
         {
@@ -114,7 +129,7 @@
       },
       "key": {
         "anchor_text_hash": "945699e91bc9830b157461ef9064692c511760f28af856b5e2894041b6def8c0",
-        "bound_tests_set_hash": "d2b6c731fe852d80cbc43caa01eb11626789aec22d5ba338747244f5037f091f",
+        "bound_tests_set_hash": "c4c08188f83e062994c124f9144ca9670a935e61e78054ffd05ea508ed45b1fe",
         "declaration_hash": "4a84e5ff2041b5b39abf5267dd60d1cd013687473165920ede0e73588bc19fce"
       },
       "obligation_id": {
@@ -123,7 +138,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(generics.iter().map(|generic| generic.name.as_str()).collect::<Vec<_>>(), vec![\"T\", \"U\"]); ... assert_eq!(generics[0].bounds.iter().map(TypeRef::as_str).collect::<Vec<_>>(), vec![\"Clone\"]); ... assert_eq!(generics[1].bounds.iter().map(TypeRef::as_str).collect::<Vec<_>>(), vec![\"Send\"]); ... reason.contains(\"generic param name\") ... reason.contains(\"invalid generic param bound\") ... reason.contains(\"duplicate generic param name\")",
+        "citation": "assert_eq!(generics.iter().map(|generic| generic.name.as_str()).collect::<Vec<_>>(), vec![\"T\", \"U\"]); ... reason.contains(\"generic param name\") ... reason.contains(\"must not be a Rust keyword\") ... reason.contains(\"invalid generic param bound\") ... reason.contains(\"duplicate generic param name\")",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -358,6 +373,21 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_decode_type_alias_with_reserved_keyword_generic_name_returns_invalid_entry_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_decode_type_alias_with_wildcard_generic_name_returns_invalid_entry_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_encode_type_alias_with_wildcard_generic_name_returns_invalid_entry_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
           "test_name": "test_decode_type_alias_with_empty_generic_bound_returns_invalid_entry_error"
         },
         {
@@ -375,7 +405,7 @@
       },
       "key": {
         "anchor_text_hash": "8d3283d1c4f863ebbd4f2651f55ce831a5c2527b9ac7c99d61671cd0140929ce",
-        "bound_tests_set_hash": "d2b6c731fe852d80cbc43caa01eb11626789aec22d5ba338747244f5037f091f",
+        "bound_tests_set_hash": "c4c08188f83e062994c124f9144ca9670a935e61e78054ffd05ea508ed45b1fe",
         "declaration_hash": "4a84e5ff2041b5b39abf5267dd60d1cd013687473165920ede0e73588bc19fce"
       },
       "obligation_id": {
@@ -384,7 +414,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "let doc = CatalogueDocumentCodec::decode(json, \"domain\").unwrap(); ... assert_eq!(generics[1].bounds.iter().map(TypeRef::as_str).collect::<Vec<_>>(), vec![\"Send\"]); ... let err = CatalogueDocumentCodec::decode(json, \"domain\").unwrap_err(); assert!(matches!(err, CatalogueDocumentCodecError::InvalidEntry { ref entry_name, ref reason } if entry_name == \"BadAlias\" && reason.contains(\"generic param name\")), ... assert!(matches!(err, CatalogueDocumentCodecError::InvalidEntry { ref entry_name, ref reason } if entry_name == \"BadAlias\" && reason.contains(\"invalid generic param bound\")), ... assert!(matches!(err, CatalogueDocumentCodecError::InvalidEntry { ref entry_name, ref reason } if entry_name == \"BadAlias\" && reason.contains(\"duplicate generic param name\")),",
+        "citation": "let doc = CatalogueDocumentCodec::decode(json, \"domain\").unwrap();\n        let entry = doc.types().values().next().unwrap();\n        let TypeKindV2::TypeAlias { target, generics } = entry.kind() else {\n            panic!(\"expected TypeAlias kind\");\n        };\n\n        assert_eq!(target.as_str(), \"Pair<T, U>\");\n        assert_eq!(\n            generics.iter().map(|generic| generic.name.as_str()).collect::<Vec<_>>(),\n            vec![\"T\", \"U\"]\n        );\n        assert_eq!(\n            generics[0].bounds.iter().map(TypeRef::as_str).collect::<Vec<_>>(),\n            vec![\"Clone\"]\n        );\n        assert_eq!(\n            generics[1].bounds.iter().map(TypeRef::as_str).collect::<Vec<_>>(),\n            vec![\"Send\"]\n        );\n    }\n{\n        let err = CatalogueDocumentCodec::decode(json, \"domain\").unwrap_err();\n        assert!(\n            matches!(err, CatalogueDocumentCodecError::InvalidEntry { ref entry_name, ref reason }\n                if entry_name == \"BadAlias\" && reason.contains(\"generic param name\")),\n            \"unexpected error: {err:?}\"\n        );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -465,6 +495,21 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_decode_type_alias_with_reserved_keyword_generic_name_returns_invalid_entry_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_decode_type_alias_with_wildcard_generic_name_returns_invalid_entry_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_encode_type_alias_with_wildcard_generic_name_returns_invalid_entry_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
           "test_name": "test_decode_type_alias_with_empty_generic_bound_returns_invalid_entry_error"
         },
         {
@@ -497,7 +542,7 @@
       },
       "key": {
         "anchor_text_hash": "44c181e097d06c33658028ef1d86b3bde7673a6fecc2778a9036de3aedfeb06a",
-        "bound_tests_set_hash": "dab5b6f0864875ca454d24419f33df1834661f1747db6ed05db0a7aae08750ac",
+        "bound_tests_set_hash": "099f23f83b494f04be6ad73e91fd731891977bc3be7dee31279c2525c5e40fd6",
         "declaration_hash": "938fc16eb72e26e723ec50a7070ef4c50eada1715a2b324b0775ca6851b35fb1"
       },
       "obligation_id": {
@@ -506,7 +551,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "TypeKindV2::TypeAlias { target: TypeRef::new(\"String\").unwrap(), generics: vec![] },\n...\nassert!(matches!(result, Ok(violations) if violations.is_empty()));",
+        "citation": "let result =\n            evaluate_catalogue_lint(&[], &all_catalogues, &target_layer, &StubPrimitiveScanner);\n\n        assert!(matches!(result, Ok(violations) if violations.is_empty()));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"

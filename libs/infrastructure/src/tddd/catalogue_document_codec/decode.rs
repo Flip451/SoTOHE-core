@@ -30,7 +30,9 @@ use super::dto::{
     TypestateMarkerDto, VariantDeclDto, VariantPayloadDto, WherePredicateDeclDto,
 };
 use super::dto_slots::{EntrySlotDto, TombstoneDto};
-use super::validate::{validate_bound_str, validate_type_ref_str};
+use super::validate::{
+    validate_bound_str, validate_type_alias_generic_names, validate_type_ref_str,
+};
 
 // Keep the path-only validator referenced for callers outside top-level impl slots.
 const _: fn(&str) -> Result<(), String> = super::validate::validate_trait_ref_is_path;
@@ -209,6 +211,9 @@ pub(super) fn type_entry_from_dto(
         .collect::<Result<Vec<_>, _>>()?;
 
     let generics = method_generics_from_dtos(name, dto.generics)?;
+    if matches!(&kind, TypeKindV2::TypeAlias { .. }) {
+        validate_type_alias_generic_names(name, &generics)?;
+    }
     let where_predicates = where_predicates_from_dtos(name, dto.where_predicates)?;
 
     if matches!(&kind, TypeKindV2::TypeAlias { generics: alias_generics, .. }
@@ -280,6 +285,7 @@ fn type_kind_from_dto(
             let target = TypeRef::new(target.clone())
                 .map_err(|e| err(format!("invalid type_alias target '{}': {e}", target)))?;
             let generics = method_generics_from_dtos(name, generics)?;
+            validate_type_alias_generic_names(name, &generics)?;
             Ok(TypeKindV2::TypeAlias { target, generics })
         }
     }

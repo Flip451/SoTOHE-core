@@ -4,6 +4,10 @@
 //! human-readable error on failure. Used at the decode boundary to surface
 //! malformed inputs before they reach `CatalogueToExtendedCrateCodec`.
 
+use domain::tddd::catalogue_v2::MethodGenericParam;
+
+use super::CatalogueDocumentCodecError;
+
 /// Validates that `bound_str` is syntactically well-formed as a Rust type param bound
 /// using `syn::parse_str::<syn::TypeParamBound>`.
 ///
@@ -24,6 +28,93 @@ pub(super) fn validate_bound_str(bound_str: &str) -> Result<(), String> {
     syn::parse_str::<syn::TypeParamBound>(bound_str)
         .map(|_| ())
         .map_err(|e| format!("invalid bound syntax '{}': {e}", bound_str))
+}
+
+/// Returns whether `name` is a valid Rust generic type-parameter identifier.
+///
+/// Generic declarations are decoded from rustdoc-normalized names, so raw-identifier spellings
+/// are unavailable at this boundary. Reject strict and reserved keywords, the Rust 2024 `gen`
+/// keyword, and the bare wildcard `_`, which is a pattern rather than a generic parameter name.
+pub(super) fn is_valid_generic_param_name(name: &str) -> bool {
+    name != "_"
+        && name != "gen"
+        && !matches!(
+            name,
+            "as" | "async"
+                | "await"
+                | "break"
+                | "const"
+                | "continue"
+                | "crate"
+                | "dyn"
+                | "else"
+                | "enum"
+                | "extern"
+                | "false"
+                | "fn"
+                | "for"
+                | "if"
+                | "impl"
+                | "in"
+                | "let"
+                | "loop"
+                | "match"
+                | "mod"
+                | "move"
+                | "mut"
+                | "pub"
+                | "ref"
+                | "return"
+                | "self"
+                | "Self"
+                | "static"
+                | "struct"
+                | "super"
+                | "trait"
+                | "true"
+                | "type"
+                | "unsafe"
+                | "use"
+                | "where"
+                | "while"
+                | "abstract"
+                | "become"
+                | "box"
+                | "do"
+                | "final"
+                | "macro"
+                | "override"
+                | "priv"
+                | "typeof"
+                | "unsized"
+                | "virtual"
+                | "yield"
+                | "try"
+        )
+}
+
+/// Validates that all type-alias generic parameter names are Rust identifiers.
+///
+/// Type aliases share the domain `MethodGenericParam` declaration with methods. The decoder
+/// invokes this adapter-boundary validation after conversion so keyword spellings produce the
+/// same `InvalidEntry` error shape as other malformed catalogue fields.
+pub(super) fn validate_type_alias_generic_names(
+    entry_name: &str,
+    generics: &[MethodGenericParam],
+) -> Result<(), CatalogueDocumentCodecError> {
+    for generic in generics {
+        if !is_valid_generic_param_name(generic.name.as_str()) {
+            return Err(CatalogueDocumentCodecError::InvalidEntry {
+                entry_name: entry_name.to_owned(),
+                reason: format!(
+                    "generic param name '{}' is not a valid Rust identifier \
+                     (must match [a-zA-Z_][a-zA-Z0-9_]* and must not be a Rust keyword)",
+                    generic.name.as_str()
+                ),
+            });
+        }
+    }
+    Ok(())
 }
 
 /// Validates that `type_str` is syntactically well-formed as a Rust type expression
