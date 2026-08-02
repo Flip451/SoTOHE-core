@@ -231,6 +231,71 @@
           "hash": "rvw1:sha256:fd41a78448519a292ba6447436988484f1ac1d543870aaaecd05ac749654f593",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T06:35:23Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-02-codex-reasoning-effort-max/impl-plan.json",
+              "line": 30,
+              "message": "T002 の説明は対象ファイル／シンボルを特定せず「selected default capability-profile entries」とだけ述べており、実行者が変更境界を発明する必要がある。`.harness/config/agent-profiles.json` と対象 capability entries を明示すること。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-02-codex-reasoning-effort-max/impl-plan.json",
+              "line": 43,
+              "message": "T004 の「the completion step emits `observations.md` after rollout outcomes exist」は AC-05 の挙動契約を散文で再記述している。対象ファイル、操作、アンカーだけに限定すること。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0369f3d94087ff1a29dcac83df768c979344e1a86c9950bc4d447d258b1d939b",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T06:38:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0bcedd755cfc229e0fbf15973e61666ffeb8797160cfe0d45dc5f1aa772f55e9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T06:47:55Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-02-codex-reasoning-effort-max/impl-plan.json",
+              "line": 12,
+              "message": "T005 is not executable as written: “capability-execution, agent-profile-resolution, and review-execution route tests” names no target file or symbol, and its agent-profile portion overlaps T001’s “focused adapter tests.” The executor must invent both the locations and the task boundary. Name the concrete test modules or symbols and assign the overlapping profile tests to exactly one task.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-02-codex-reasoning-effort-max/impl-plan.json",
+              "line": 12,
+              "message": "T005 bundles three independently verifiable behavior units while still todo: capability dispatch (IN-02/AC-02(1)), profile validation (IN-02/AC-02(2)), and review dispatch/verdict recording (IN-02/AC-02(3)). Split these units before implementation; the profile-validation unit can remain with T001, while capability and review-route validation should have separately targeted tasks.",
+              "severity": "P1"
+            },
+            {
+              "category": "wrong ordering / observations.md mandate without trigger",
+              "file": "track/items/2026-08-02-codex-reasoning-effort-max/impl-plan.json",
+              "line": 41,
+              "message": "T004 is ordered after T002 and placed in the final batch, although it only changes workflow SSoTs. Those workflows are loaded before batch execution, and T003 supplies the sole explicit stop/reload boundary before rollout, so T004’s new completion rule will not govern this track’s current post-loop. The existing rule only creates observations.md when an AC names that file, which AC-05 does not; therefore no task reliably records the required current-track observations. Move T004 before T003’s reload, add a reload after T004, or add an explicit task that creates the current observations.md.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0bcedd755cfc229e0fbf15973e61666ffeb8797160cfe0d45dc5f1aa772f55e9",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T06:59:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dc0083d475720683b46cfbcbe7705a1a0c141de92d0171db8d00ba33c79c8294",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },

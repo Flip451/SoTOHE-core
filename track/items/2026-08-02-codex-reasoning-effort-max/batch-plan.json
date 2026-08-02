@@ -8,7 +8,51 @@
         {
           "scope": "infrastructure",
           "production_lines": 20,
-          "test_lines": 70
+          "test_lines": 30
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T005",
+      "scope_estimates": [
+        {
+          "scope": "infrastructure",
+          "production_lines": 0,
+          "test_lines": 30
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T006",
+      "scope_estimates": [
+        {
+          "scope": "cli_composition",
+          "production_lines": 0,
+          "test_lines": 35
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T004",
+      "scope_estimates": [
+        {
+          "scope": "harness-policy",
+          "production_lines": 40,
+          "test_lines": 0
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T003",
+      "scope_estimates": [
+        {
+          "scope": "harness-policy",
+          "production_lines": 55,
+          "test_lines": 0
         }
       ],
       "oversize_justification": null
@@ -28,28 +72,6 @@
         }
       ],
       "oversize_justification": null
-    },
-    {
-      "task_id": "T003",
-      "scope_estimates": [
-        {
-          "scope": "harness-policy",
-          "production_lines": 55,
-          "test_lines": 0
-        }
-      ],
-      "oversize_justification": null
-    },
-    {
-      "task_id": "T004",
-      "scope_estimates": [
-        {
-          "scope": "harness-policy",
-          "production_lines": 40,
-          "test_lines": 0
-        }
-      ],
-      "oversize_justification": null
     }
   ],
   "batches": [
@@ -59,15 +81,23 @@
     },
     {
       "id": "B2",
-      "task_ids": ["T003"]
+      "task_ids": ["T005"]
     },
     {
       "id": "B3",
-      "task_ids": ["T002"]
+      "task_ids": ["T006"]
     },
     {
       "id": "B4",
       "task_ids": ["T004"]
+    },
+    {
+      "id": "B5",
+      "task_ids": ["T003"]
+    },
+    {
+      "id": "B6",
+      "task_ids": ["T002"]
     }
   ]
 }

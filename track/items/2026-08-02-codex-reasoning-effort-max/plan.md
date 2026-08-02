@@ -3,31 +3,33 @@
 
 ## Summary
 
-GO-01 → T001.
-GO-02 → T003, T002, T004.
+GO-01 → T001, T005, T006.
+GO-02 → T004, T003, T002.
 
-## Tasks (0/4 resolved)
+## Tasks (0/6 resolved)
 
 ### provider-compatibility — Provider compatibility
 
-> Update `profiles.rs::supports_effort` and execution-route tests. [IN-01; IN-02; OUT-01; CN-01; AC-01; AC-02]
+> Update profile validation and execution-route coverage. [D1; AC-01; AC-02]
 
-- [ ] **T001**: Update `libs/infrastructure/src/agent_profiles/profiles.rs::supports_effort` and capability-execution, agent-profile-resolution, and review-execution route tests. [IN-01; IN-02; OUT-01; CN-01; AC-01; AC-02]
+- [ ] **T001**: Update `libs/infrastructure/src/agent_profiles/profiles.rs::AgentProfiles::resolve_execution` and `tests.rs::test_resolve_execution_unsupported_provider_effort_returns_error` for profile compatibility validation. [D1; IN-01; IN-02; CN-01; AC-01; AC-02]
+- [ ] **T005**: Extend `libs/infrastructure/src/capability_exec/codex.rs::{build_codex_args,test_codex_capability_adapter_dispatches_native_skill_with_profile_model_and_prompt}` for capability dispatch. [D1; IN-02; AC-02]
+- [ ] **T006**: Extend `apps/cli-composition/src/review_v2/mod.rs::{CliApp::review_run_local,review_run_local_resolves_profile_happy_path_writes_verdict_and_telemetry}` for review dispatch and verdict recording. [D1; IN-02; AC-02]
+
+### completion-observation-preparation — Completion observation preparation
+
+> Install the completion-recording workflow step. [D2; AC-05]
+
+- [ ] **T004**: Amend the completion steps in `.harness/workflows/track/implement.md` and `.harness/workflows/track/full-cycle.md` to emit the current-track record after rollout outcomes exist. [D2; IN-06; AC-05]
 
 ### pre-rollout-recovery — Pre-rollout recovery
 
-> Update rollout workflow SSoTs with recovery verification and the B2-to-B3 stop/reload handoff. [IN-05; OUT-03; CN-03; AC-04]
+> Install the recovery workflow and reload boundary. [D2; AC-04]
 
-- [ ] **T003**: Update `.harness/workflows/track/implement.md` and `.harness/workflows/track/full-cycle.md` with the pre-rollout recovery procedure, verification coverage, and the B2-to-B3 stop/reload handoff. [IN-05; OUT-03; CN-03; AC-04]
+- [ ] **T003**: Amend `.harness/workflows/track/implement.md` and `.harness/workflows/track/full-cycle.md` with the pre-rollout recovery procedure and a stop/reload boundary. [D2; IN-05; CN-03; AC-04]
 
 ### limited-profile-rollout — Limited profile rollout
 
-> Update selected agent-profile entries and committed-profile-resolution tests. [IN-03; IN-04; OUT-02; CN-02; AC-03]
+> Update the selected capability profiles. [D2; AC-03]
 
-- [ ] **T002**: Update selected `.harness/config/agent-profiles.json` entries and `AgentProfiles::resolve_execution` committed-profile-resolution tests. [IN-03; IN-04; OUT-02; CN-02; AC-03]
-
-### post-rollout-observation — Post-rollout observation
-
-> Update rollout workflow SSoTs with the completion-time observation-recording procedure. [IN-06; OUT-04; AC-05]
-
-- [ ] **T004**: Update `.harness/workflows/track/implement.md` and `.harness/workflows/track/full-cycle.md` with the completion-time observation-recording procedure and verification coverage; the completion step emits this track's `observations.md` after rollout outcomes exist. [IN-06; OUT-04; AC-05]
+- [ ] **T002**: Update `.harness/config/agent-profiles.json` entries `implementer`, `review-fix-lead`, and `dry-fix-lead`; retain the designated Terra entries and extend committed-profile resolution coverage. [D2; IN-03; IN-04; CN-02; AC-03]

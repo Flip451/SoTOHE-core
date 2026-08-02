@@ -18,19 +18,21 @@
       {
         "layer": "infrastructure",
         "entry_key": "ResolvedExecution"
-      }
-    ],
-    "T002": [
-      {
-        "layer": "infrastructure",
-        "entry_key": "CapabilityConfigDto"
       },
       {
         "layer": "infrastructure",
         "entry_key": "ReasoningEffortDto"
       }
     ],
+    "T005": [],
+    "T006": [],
+    "T004": [],
     "T003": [],
-    "T004": []
+    "T002": [
+      {
+        "layer": "infrastructure",
+        "entry_key": "CapabilityConfigDto"
+      }
+    ]
   }
 }

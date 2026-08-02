@@ -3,57 +3,89 @@
   "tasks": [
     {
       "id": "T001",
-      "description": "Update `libs/infrastructure/src/agent_profiles/profiles.rs::supports_effort` and capability-execution, agent-profile-resolution, and review-execution route tests. [IN-01; IN-02; OUT-01; CN-01; AC-01; AC-02]",
+      "description": "Update `libs/infrastructure/src/agent_profiles/profiles.rs::AgentProfiles::resolve_execution` and `tests.rs::test_resolve_execution_unsupported_provider_effort_returns_error` for profile compatibility validation. [D1; IN-01; IN-02; CN-01; AC-01; AC-02]",
       "status": "todo",
       "commit_hash": null
     },
     {
+      "id": "T005",
+      "description": "Extend `libs/infrastructure/src/capability_exec/codex.rs::{build_codex_args,test_codex_capability_adapter_dispatches_native_skill_with_profile_model_and_prompt}` for capability dispatch. [D1; IN-02; AC-02]",
+      "status": "todo",
+      "commit_hash": null,
+      "depends_on": [
+        "T001"
+      ]
+    },
+    {
+      "id": "T006",
+      "description": "Extend `apps/cli-composition/src/review_v2/mod.rs::{CliApp::review_run_local,review_run_local_resolves_profile_happy_path_writes_verdict_and_telemetry}` for review dispatch and verdict recording. [D1; IN-02; AC-02]",
+      "status": "todo",
+      "commit_hash": null,
+      "depends_on": [
+        "T001"
+      ]
+    },
+    {
+      "id": "T004",
+      "description": "Amend the completion steps in `.harness/workflows/track/implement.md` and `.harness/workflows/track/full-cycle.md` to emit the current-track record after rollout outcomes exist. [D2; IN-06; AC-05]",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T003",
+      "description": "Amend `.harness/workflows/track/implement.md` and `.harness/workflows/track/full-cycle.md` with the pre-rollout recovery procedure and a stop/reload boundary. [D2; IN-05; CN-03; AC-04]",
+      "status": "todo",
+      "commit_hash": null,
+      "depends_on": [
+        "T004"
+      ]
+    },
+    {
       "id": "T002",
-      "description": "Update selected `.harness/config/agent-profiles.json` entries and `AgentProfiles::resolve_execution` committed-profile-resolution tests. [IN-03; IN-04; OUT-02; CN-02; AC-03]",
+      "description": "Update `.harness/config/agent-profiles.json` entries `implementer`, `review-fix-lead`, and `dry-fix-lead`; retain the designated Terra entries and extend committed-profile resolution coverage. [D2; IN-03; IN-04; CN-02; AC-03]",
       "status": "todo",
       "commit_hash": null,
       "depends_on": [
         "T001",
+        "T005",
+        "T006",
         "T003"
-      ]
-    },
-    {
-      "id": "T003",
-      "description": "Update `.harness/workflows/track/implement.md` and `.harness/workflows/track/full-cycle.md` with the pre-rollout recovery procedure, verification coverage, and the B2-to-B3 stop/reload handoff. [IN-05; OUT-03; CN-03; AC-04]",
-      "status": "todo",
-      "commit_hash": null
-    },
-    {
-      "id": "T004",
-      "description": "Update `.harness/workflows/track/implement.md` and `.harness/workflows/track/full-cycle.md` with the completion-time observation-recording procedure and verification coverage; the completion step emits this track's `observations.md` after rollout outcomes exist. [IN-06; OUT-04; AC-05]",
-      "status": "todo",
-      "commit_hash": null,
-      "depends_on": [
-        "T002"
       ]
     }
   ],
   "plan": {
     "summary": [
-      "GO-01 → T001.",
-      "GO-02 → T003, T002, T004."
+      "GO-01 → T001, T005, T006.",
+      "GO-02 → T004, T003, T002."
     ],
     "sections": [
       {
         "id": "provider-compatibility",
         "title": "Provider compatibility",
         "description": [
-          "Update `profiles.rs::supports_effort` and execution-route tests. [IN-01; IN-02; OUT-01; CN-01; AC-01; AC-02]"
+          "Update profile validation and execution-route coverage. [D1; AC-01; AC-02]"
         ],
         "task_ids": [
-          "T001"
+          "T001",
+          "T005",
+          "T006"
+        ]
+      },
+      {
+        "id": "completion-observation-preparation",
+        "title": "Completion observation preparation",
+        "description": [
+          "Install the completion-recording workflow step. [D2; AC-05]"
+        ],
+        "task_ids": [
+          "T004"
         ]
       },
       {
         "id": "pre-rollout-recovery",
         "title": "Pre-rollout recovery",
         "description": [
-          "Update rollout workflow SSoTs with recovery verification and the B2-to-B3 stop/reload handoff. [IN-05; OUT-03; CN-03; AC-04]"
+          "Install the recovery workflow and reload boundary. [D2; AC-04]"
         ],
         "task_ids": [
           "T003"
@@ -63,20 +95,10 @@
         "id": "limited-profile-rollout",
         "title": "Limited profile rollout",
         "description": [
-          "Update selected agent-profile entries and committed-profile-resolution tests. [IN-03; IN-04; OUT-02; CN-02; AC-03]"
+          "Update the selected capability profiles. [D2; AC-03]"
         ],
         "task_ids": [
           "T002"
-        ]
-      },
-      {
-        "id": "post-rollout-observation",
-        "title": "Post-rollout observation",
-        "description": [
-          "Update rollout workflow SSoTs with the completion-time observation-recording procedure. [IN-06; OUT-04; AC-05]"
-        ],
-        "task_ids": [
-          "T004"
         ]
       }
     ]
