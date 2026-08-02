@@ -1,0 +1,38 @@
+{
+  "declaration_hash": "a99e435b1786984600be600978fba8c2004731b4f235ceaf180b3fd9e581ba62",
+  "generated_at": "2026-08-02T05:45:16Z",
+  "implementation_input_hash": "17d7f6dd6ac02c9990de8d02b1d2120dde1231aae0cc209baa81e87a1061398a",
+  "schema_version": 3,
+  "signals": [
+    {
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "type_name": "AgentProfiles"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "AgentProfilesError"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "CapabilityConfigDto"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "enum",
+      "signal": "blue",
+      "type_name": "ReasoningEffortDto"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "enum",
+      "signal": "blue",
+      "type_name": "ResolvedExecution"
+    }
+  ]
+}

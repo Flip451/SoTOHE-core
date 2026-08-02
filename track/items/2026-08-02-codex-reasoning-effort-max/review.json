@@ -18,6 +18,392 @@
           "verdict": "zero_findings"
         }
       ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "at": "2026-08-02T04:22:10Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-02-codex-reasoning-effort-max/impl-plan.json",
+              "line": 6,
+              "message": "T001 restates the upstream behavior contract (“Codex accepts…”, fail-closed rejection) instead of limiting the task text to target + operation + anchor cite. Remove the prose behavior restatement per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-02-codex-reasoning-effort-max/impl-plan.json",
+              "line": 12,
+              "message": "T002 restates the upstream profile behavior contract (“only… resolve…”, Terra lanes remain unchanged) instead of limiting the task text to target + operation + anchor cite. Remove the prose behavior restatement per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-02-codex-reasoning-effort-max/impl-plan.json",
+              "line": 21,
+              "message": "T003 restates the upstream rerun, fallback, regression, and observation behavior contract instead of limiting the task text to target + operation + anchor cite. Remove the prose behavior restatement per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-02-codex-reasoning-effort-max/impl-plan.json",
+              "line": 39,
+              "message": "The `provider-compatibility` section description restates the upstream behavior contract instead of using only target + operation + anchor cite. Remove the prose restatement per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-02-codex-reasoning-effort-max/impl-plan.json",
+              "line": 49,
+              "message": "The `limited-profile-rollout` section description restates the upstream profile behavior contract instead of using only target + operation + anchor cite. Remove the prose restatement per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-02-codex-reasoning-effort-max/impl-plan.json",
+              "line": 59,
+              "message": "The `rollout-observation-procedure` section description restates the upstream rerun and fallback behavior contract instead of using only target + operation + anchor cite. Remove the prose restatement per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-02-codex-reasoning-effort-max/impl-plan.json",
+              "line": 6,
+              "message": "AC-02 is mapped only to T001, but T001 describes tests limited to `agent_profiles` resolution and does not include validation of the capability-execution and review-execution paths that AC-02 explicitly covers. Add those route-level validation steps or revise the mapping so the acceptance criterion is executable.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:290518938e4bd8fdaf6c17368578567dab4757cec8cba85a67869cb957b8b399",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T04:25:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9c6523162c16ebf68f3e1f32e4b2f1afb1d01ca70081cc70689c01570b2cf6ae",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T04:54:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:202a3c78d8288e46df8eab963293861584e9f6692e4932b9f614a867ad13c5a9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T05:05:59Z",
+          "findings": [
+            {
+              "category": "dependency cycle or wrong ordering",
+              "file": "track/items/2026-08-02-codex-reasoning-effort-max/impl-plan.json",
+              "line": 24,
+              "message": "T003 depends on T002, but T002 activates Luna Max before T003 installs the Terra-rerun and observation procedures. Because `full-cycle` loads its workflow SSoTs before consuming the batches, T003's later edits cannot govern B2 or its own B3 execution. AC-04's one-time Terra recovery is therefore unavailable during the first rollout. Split the pre-rollout recovery procedure from post-rollout observation work, install and reload the procedure before T002, then switch the profiles.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:202a3c78d8288e46df8eab963293861584e9f6692e4932b9f614a867ad13c5a9",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T05:13:55Z",
+          "findings": [
+            {
+              "category": "unsound batch composition",
+              "file": "track/items/2026-08-02-codex-reasoning-effort-max/batch-plan.json",
+              "line": 61,
+              "message": "B2/B3 assume T003's workflow edits become active before T002, but canonical `full-cycle` reads the `implement` and `full-cycle` SSoTs once at Step 0 before consuming any batches. Completing T003 inside that run does not update the executing state machine, so T002 can enable Luna Max while AC-04 recovery remains inactive. Require a stop/reload boundary after T003, or place recovery in a mechanism already active before T002.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-02-codex-reasoning-effort-max/impl-plan.json",
+              "line": 28,
+              "message": "AC-05 is mapped only to T004, but T004 updates a future observation procedure and its verification coverage; it never captures and writes this track's actual rollout observations at completion. The task can therefore finish without recording the required assignment, provider, quality, credits, duration, and retry data. Add an explicit current-track observation-recording operation to T004 or a separate post-rollout task.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f25b990ba826574f5336a8869cfa02cb64e5c2ec1dbd7c342f0276597ba5f5b3",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T05:25:56Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-02-codex-reasoning-effort-max/impl-plan.json",
+              "line": 28,
+              "message": "T004 includes an upstream behavior-contract restatement: “at completion, record this rollout's assignment identifier and lane, provider and effort, completion and per-gate quality results, incomplete-output/timeout/gate-failure status, reported or unavailable credits, duration, execution and Terra-rerun counts, Terra result, and model-regression-candidate status.” Keep the task to target + operation + anchor cite per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-02-codex-reasoning-effort-max/impl-plan.json",
+              "line": 76,
+              "message": "The `post-rollout-observation` section restates the upstream AC-05 recording contract in “including recording the required facts for this rollout at completion.” Keep the section to target + operation + anchor cite per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d83ba2cda57b535316d95afd006f24bd9f4173c7d9258938d43d47e0fe8a1650",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T05:27:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0b8aaee9c303c8dcc5b0ef02ddb5806c374e6ddfb53fdac11b432916c3103610",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T06:01:02Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-02-codex-reasoning-effort-max/impl-plan.json",
+              "line": 28,
+              "message": "AC-05 is mapped to T004, but T004 requires writing the actual rollout observations “after T002.” Because T004 is implemented in batch B4 before the track’s full-cycle execution completes, the plan schedules recording quality, credits, duration, retry, and regression outcomes before those outcomes exist. Make T004 update the workflow to record observations at track completion, with the actual `observations.md` write occurring only in that completion step.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:48cbc6d089b522941917911d1e3af290e5cd30920a340004def9cb0e0134c8b3",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T06:03:26Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-02-codex-reasoning-effort-max/impl-plan.json",
+              "line": 28,
+              "message": "T004 still restates the AC-05 behavior contract in the clause “so the track-completion step, after all rollout assignments have completed, writes this track's assignment/lane, provider/effort, quality/gate, credits, duration, and retry/regression observations.” Keep the task to target + operation + anchor cite per `.harness/policies/no-upstream-restatement.md`; the required fields belong in the upstream spec.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f06540ba7893ed3405330bf1131f0a7d1738c05c4b7cd103fd740fbab3df2069",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T06:05:48Z",
+          "findings": [
+            {
+              "category": "unsound batch composition",
+              "file": "track/items/2026-08-02-codex-reasoning-effort-max/batch-plan.json",
+              "line": 55,
+              "message": "B4/T004 carries a nonzero `impl-plan` scope estimate (30 production lines), but T004 now only updates the two `.harness/workflows/track/*.md` files and has no operation on `impl-plan`-scope artifacts such as `observations.md`. Remove the stale `impl-plan` estimate or add the missing scoped operation; otherwise batch admission estimates work that the task does not perform.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7c32ec1f9ede103a7f094453f2a20bd696c33b274cba030fc8c3a50c46c16d70",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T06:10:04Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-02-codex-reasoning-effort-max/impl-plan.json",
+              "line": 28,
+              "message": "AC-05 remains mapped to T004, but T004 still requires the implementation task to “record this track's rollout observations” in `observations.md`. T004 runs in batch B4 before the track-completion workflow has produced the actual quality, credits, duration, retry, and regression outcomes. Restrict T004 to implementing the completion-time recording procedure; the actual record must be emitted only by that completion step.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f70e8f6d9d2fc9c5bfad8d9771726345ec4405f66f246e19c39b2e9accbdc04d",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T06:13:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fd41a78448519a292ba6447436988484f1ac1d543870aaaecd05ac749654f593",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T06:16:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fd41a78448519a292ba6447436988484f1ac1d543870aaaecd05ac749654f593",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "at": "2026-08-02T04:21:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6eede754e12dae5012b11a1b5ff93267c99c4d26b52c8b1d74ebf1a37bbee33d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T04:53:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6eede754e12dae5012b11a1b5ff93267c99c4d26b52c8b1d74ebf1a37bbee33d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T05:00:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6eede754e12dae5012b11a1b5ff93267c99c4d26b52c8b1d74ebf1a37bbee33d",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "at": "2026-08-02T04:21:43Z",
+          "findings": [
+            {
+              "category": "acceptance criterion non-observable",
+              "file": "track/items/2026-08-02-codex-reasoning-effort-max/spec.json",
+              "line": 41,
+              "message": "AC-04 は「不完全出力」の判定条件を定義しておらず、どの状態で再実行を開始すべきか決定的に検証できない。",
+              "severity": "P1"
+            },
+            {
+              "category": "acceptance criterion non-observable",
+              "file": "track/items/2026-08-02-codex-reasoning-effort-max/spec.json",
+              "line": 51,
+              "message": "AC-05 は「取得可能な品質」の意味や記録すべき観測項目を定義しておらず、track 完了時の達成可否を決定的に確認できない。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:533582211e612b5654ae4bdb7452f3032a87749683f804936bdd568742cc6878",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T04:54:38Z",
+          "findings": [
+            {
+              "category": "acceptance criterion non-observable",
+              "file": "track/items/2026-08-02-codex-reasoning-effort-max/spec.json",
+              "line": 21,
+              "message": "AC-02 の「処理に欠落がない」は、capability 実行・agent profile 検証・review 系実行経路それぞれで何を満たせばよいかを定義しておらず、決定的な手順で達成可否を判定できない。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4ad43eb5d44f71cdbbaea181a8b0183c564fd39129d4a73c16880129e8266bdf",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T04:56:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cd2c2de6cd314bbec1b5d932fceeee6c9166fcddd593a8bad233670d026a9d3c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T05:00:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cd2c2de6cd314bbec1b5d932fceeee6c9166fcddd593a8bad233670d026a9d3c",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "at": "2026-08-02T04:22:06Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-02-codex-reasoning-effort-max/infrastructure-types.json",
+              "line": 10,
+              "message": "`AgentProfiles` docs restate the upstream fail-closed resolution behavior; retain only the type/change description plus anchor cites per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-02-codex-reasoning-effort-max/infrastructure-types.json",
+              "line": 263,
+              "message": "`CapabilityConfigDto` docs restate the upstream D2 row-change contract; replace the behavioral prose with a concise type/reference description and anchor cite.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-02-codex-reasoning-effort-max/usecase-types.json",
+              "line": 10,
+              "message": "`ReasoningEffort` docs restate upstream placement rationale and track behavior (`Max` baseline/compatibility changes); type docs should reference anchors rather than reproduce that rationale.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:852bd0cd4267e469966e8a22471e2d7d1ab5d190a3a6000e5dee5756985c5604",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T04:53:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2cf4835b41563469395d9a4ea84e302a63a502429faca114be0a9524914b06ac",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T05:07:17Z",
+          "findings": [
+            {
+              "category": "action incoherent with the diff",
+              "file": "track/items/2026-08-02-codex-reasoning-effort-max/infrastructure-types.json",
+              "line": 9,
+              "message": "`infrastructure::AgentProfiles` and its `Debug` impl are declared `action: modify`, but the rustdoc baseline already contains the same struct shape, all five public method signatures, and the same `Debug` impl. The implementation plan changes only private `supports_effort` behavior, so these declarations should be `reference`; otherwise Chain ③ is blue before the planned change exists.",
+              "severity": "P1"
+            },
+            {
+              "category": "per-method error imprecision",
+              "file": "track/items/2026-08-02-codex-reasoning-effort-max/infrastructure-types.json",
+              "line": 35,
+              "message": "`infrastructure::AgentProfiles::load` and `resolve_execution` expose the shared `AgentProfilesError` despite producing disjoint subsets: `load` cannot produce the four resolution variants, while `resolve_execution` cannot produce the six loader/validation variants. Neither method documents its producible subset or justifies the broad error surface, forcing callers to handle structurally impossible failures.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:2cf4835b41563469395d9a4ea84e302a63a502429faca114be0a9524914b06ac",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T05:30:07Z",
+          "findings": [
+            {
+              "category": "action incoherent with the diff",
+              "file": "track/items/2026-08-02-codex-reasoning-effort-max/infrastructure-types.json",
+              "line": 9,
+              "message": "`infrastructure::AgentProfiles` is declared as `action: reference`, but this track changes its resolution behavior for the Max/provider compatibility path described by `IN-02`/`AC-01` (including fail-closed `UnsupportedEffort` handling). The modified adapter surface must remain `action: modify`, with its post-change structure and impl closure declared.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:fc6ee3a44dc1d3c6d0a3b2a53532405b4b4b05b4bb9a9a8b6bafc97d195a4a45",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T05:50:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7d1be6d001549bba3825d11fa4f436c95c483aa7d142d1a97389f96be1d4158d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T06:20:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7d1be6d001549bba3825d11fa4f436c95c483aa7d142d1a97389f96be1d4158d",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
     }
   }
 }
