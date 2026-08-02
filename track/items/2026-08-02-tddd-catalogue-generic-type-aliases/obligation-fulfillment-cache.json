@@ -445,6 +445,11 @@
         {
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_malformed_type_alias_generic_bound"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
           "test_name": "test_evaluate_catalogue_lint_preserves_non_generic_type_alias_evaluation"
         },
         {
@@ -492,7 +497,7 @@
       },
       "key": {
         "anchor_text_hash": "44c181e097d06c33658028ef1d86b3bde7673a6fecc2778a9036de3aedfeb06a",
-        "bound_tests_set_hash": "f2f715a9c1df716087e4484432e24f60178a96ac6525e289686ed50c919e9cf0",
+        "bound_tests_set_hash": "dab5b6f0864875ca454d24419f33df1834661f1747db6ed05db0a7aae08750ac",
         "declaration_hash": "938fc16eb72e26e723ec50a7070ef4c50eada1715a2b324b0775ca6851b35fb1"
       },
       "obligation_id": {
@@ -501,7 +506,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "let result =\n            evaluate_catalogue_lint(&[], &all_catalogues, &target_layer, &StubPrimitiveScanner);\n\n        assert!(matches!(result, Ok(violations) if violations.is_empty()));",
+        "citation": "TypeKindV2::TypeAlias { target: TypeRef::new(\"String\").unwrap(), generics: vec![] },\n...\nassert!(matches!(result, Ok(violations) if violations.is_empty()));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"

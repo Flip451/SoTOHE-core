@@ -611,8 +611,9 @@ mod eval_layer_signature;
 /// rule evaluator.  The declaration is intentionally represented by public
 /// value fields for codec conversion, so this boundary check is where the
 /// cross-field uniqueness invariant is enforced.
-fn validate_type_alias_generic_parameters(
+fn validate_type_alias_generic_parameters<S: PrimitiveOccurrenceScanner>(
     catalogue: &CatalogueDocument,
+    scanner: &S,
 ) -> Result<(), CatalogueLinterError> {
     for (alias_name, entry) in catalogue.types() {
         let TypeKindV2::TypeAlias { generics, .. } = entry.kind() else {
@@ -627,6 +628,26 @@ fn validate_type_alias_generic_parameters(
                     parameter_name: generic.name.clone(),
                 });
             }
+
+            // `TypeRef` deliberately remains a permissive, syntax-free value
+            // object.  Alias bounds are nevertheless parsed at this boundary
+            // so programmatically constructed catalogues cannot bypass the
+            // codec's malformed-bound rejection.  The scanner port owns the
+            // parser (the domain must not depend on `syn`); a probe primitive
+            // keeps this validation independent of any configured lint rule.
+            for bound in &generic.bounds {
+                let probe =
+                    PrimitiveName::new("__sotp_catalogue_lint_syntax_probe").map_err(|_| {
+                        CatalogueLinterError::InvalidRuleConfig(FreeText::new(
+                            "catalogue lint syntax probe is invalid",
+                        ))
+                    })?;
+                scanner.scan(
+                    bound.clone(),
+                    NonEmptyVec::new(probe, vec![]),
+                    PrimitiveOccurrencePosition::Bound,
+                )?;
+            }
         }
     }
     Ok(())
@@ -635,8 +656,9 @@ fn validate_type_alias_generic_parameters(
 /// Evaluate catalogue-lint rules after validating every alias generic declaration.
 ///
 /// The wrapper preserves the original pure evaluator API while enforcing the
-/// catalogue invariant that each alias generic parameter name occurs once in
-/// every catalogue available to the evaluator.
+/// catalogue invariant that each alias generic parameter name occurs once and
+/// each alias bound is syntactically valid in every catalogue available to the
+/// evaluator.
 pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner>(
     rules: &[CatalogueLinterRule],
     all_catalogues: &std::collections::BTreeMap<LayerId, CatalogueDocument>,
@@ -644,7 +666,7 @@ pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner>(
     scanner: &S,
 ) -> Result<Vec<CatalogueLintViolation>, CatalogueLinterError> {
     for catalogue in all_catalogues.values() {
-        validate_type_alias_generic_parameters(catalogue)?;
+        validate_type_alias_generic_parameters(catalogue, scanner)?;
     }
     eval::evaluate_catalogue_lint(rules, all_catalogues, target_layer_id, scanner)
 }
@@ -717,6 +739,27 @@ mod tests {
             _position: PrimitiveOccurrencePosition,
         ) -> Result<PrimitiveOccurrenceReport, PrimitiveOccurrenceScanError> {
             Err(PrimitiveOccurrenceScanError::ParseFailure { type_ref })
+        }
+    }
+
+    /// Test double for the alias-bound syntax validation path.  The real
+    /// infrastructure scanner delegates this check to `syn`; this focused
+    /// double keeps the domain test independent of that adapter while making
+    /// the malformed-bound case observable.
+    struct AliasBoundSyntaxScanner;
+
+    impl PrimitiveOccurrenceScanner for AliasBoundSyntaxScanner {
+        fn scan(
+            &self,
+            type_ref: TypeRef,
+            _primitives: NonEmptyVec<PrimitiveName>,
+            position: PrimitiveOccurrencePosition,
+        ) -> Result<PrimitiveOccurrenceReport, PrimitiveOccurrenceScanError> {
+            if position == PrimitiveOccurrencePosition::Bound && type_ref.as_str().starts_with('<')
+            {
+                return Err(PrimitiveOccurrenceScanError::ParseFailure { type_ref });
+            }
+            Ok(PrimitiveOccurrenceReport::new(std::collections::BTreeMap::new()))
         }
     }
 
@@ -1554,6 +1597,36 @@ mod tests {
             evaluate_catalogue_lint(&[], &all_catalogues, &target_layer, &StubPrimitiveScanner);
 
         assert!(matches!(result, Ok(violations) if violations.is_empty()));
+    }
+
+    #[test]
+    fn test_evaluate_catalogue_lint_rejects_malformed_type_alias_generic_bound() {
+        let mut catalogue = make_doc("domain");
+        catalogue.insert_type(
+            TypeName::new("MalformedAlias").unwrap(),
+            make_type_entry_with_kind(
+                DataRole::value_object(),
+                TypeKindV2::TypeAlias {
+                    target: TypeRef::new("Wrapper<T>").unwrap(),
+                    generics: vec![MethodGenericParam {
+                        name: ParamName::new("T").unwrap(),
+                        bounds: vec![TypeRef::new("<T>").unwrap()],
+                    }],
+                },
+            ),
+        );
+        let all_catalogues = all_catalogues_single(&catalogue);
+        let target_layer = layer("domain");
+
+        let result =
+            evaluate_catalogue_lint(&[], &all_catalogues, &target_layer, &AliasBoundSyntaxScanner);
+
+        assert!(matches!(
+            result,
+            Err(CatalogueLinterError::ScanFailed(
+                PrimitiveOccurrenceScanError::ParseFailure { type_ref }
+            )) if type_ref.as_str() == "<T>"
+        ));
     }
 
     #[test]

@@ -334,6 +334,11 @@
         {
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_malformed_type_alias_generic_bound"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
           "test_name": "test_evaluate_catalogue_lint_preserves_non_generic_type_alias_evaluation"
         },
         {
