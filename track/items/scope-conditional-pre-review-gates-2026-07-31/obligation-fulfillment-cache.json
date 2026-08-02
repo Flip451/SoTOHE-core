@@ -2009,42 +2009,6 @@
     },
     {
       "edge_id": {
-        "entry_key": "CoverageVerifyOutcome",
-        "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-08"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "CoverageVerifyOutcome",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-08"
-      },
-      "key": {
-        "bound_tests_set_hash": "0f23349b46006e2a4018cd424ceda511ee4594d89a9eab3c5e5aa1cb1dcfecaa",
-        "declaration_hash": "dac23d731e10e9ee633789215597528db2b2d067587b0066ed3abf05087f0c4e",
-        "anchor_text_hash": "2e8f1baed5944f5eca9daf1081560f221365cd751f31e041306d0eb4931e74e0"
-      },
-      "verdict": {
-        "kind": "fulfilled",
-        "citation": "assert!(\n            matches!(outcome, CoverageVerifyOutcome::Passed),\n            \"expected Passed, got {outcome:?}\"\n        );"
-      },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
-      "bound_tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::pre_review_gate::tests",
-          "test_name": "coverage_all_entries_attributed_and_consistent_yields_passed"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::pre_review_gate::tests",
-          "test_name": "coverage_signal_entry_not_attributed_yields_orphan_entry_violation"
-        }
-      ]
-    },
-    {
-      "edge_id": {
         "entry_key": "CurrentReviewTrackResolveError",
         "anchor_id": {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",

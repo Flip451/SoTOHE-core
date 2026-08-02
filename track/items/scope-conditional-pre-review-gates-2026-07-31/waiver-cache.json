@@ -1695,13 +1695,37 @@
         "item_identifier": "voluntary:AC-10"
       },
       "key": {
-        "waived_reason_hash": "a498b766be5e27299faab0095902bfb9cfdf61f32156718199c37ada9ae8e19c",
+        "waived_reason_hash": "8a8dbd54410d4744ebd4f286885fb840f08cd6be29033a4230bd8c0bce15eda6",
         "declaration_hash": "dac23d731e10e9ee633789215597528db2b2d067587b0066ed3abf05087f0c4e",
         "anchor_text_hash": "2d0510b1801ea41134f064a97a28f9c742e8a7adacf4920ed051c4f3412d2bf6"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "TypeEntry ... kind: Enum"
+        "citation": "scope-conditional applicability と既存 task-contract status rule は維持され、NonBlueSignal の既存判定規則は変更されない。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CoverageVerifyOutcome",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CoverageVerifyOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-08"
+      },
+      "key": {
+        "waived_reason_hash": "ec4c24271227dabcd9307549c54ceeb87e2b669743bc4afc4cc3a83c66449298",
+        "declaration_hash": "dac23d731e10e9ee633789215597528db2b2d067587b0066ed3abf05087f0c4e",
+        "anchor_text_hash": "2e8f1baed5944f5eca9daf1081560f221365cd751f31e041306d0eb4931e74e0"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "scope 条件付き review behavior、task-contract の status 別 rule、および既存の NonBlueSignal 判定"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -2319,7 +2343,7 @@
         "item_identifier": "voluntary:AC-10"
       },
       "key": {
-        "waived_reason_hash": "8d099a205a4219b12b508501a3443eb112a9658d7a6b7bda3231c488c97ded60",
+        "waived_reason_hash": "e0d2923fdb46c1599b268702dafde5ef3b2b97df7e05b8d827a87c376a66e7b2",
         "declaration_hash": "8e7a74b64b207248258ab281465a6458cdfd44d99b2b792ec39395474d31b7b3",
         "anchor_text_hash": "2d0510b1801ea41134f064a97a28f9c742e8a7adacf4920ed051c4f3412d2bf6"
       },
@@ -2343,13 +2367,13 @@
         "item_identifier": "voluntary:IN-08"
       },
       "key": {
-        "waived_reason_hash": "f3c48d5630997bd9e74c777bab51ae5bffbe7ca8d88d6cd4e42e9f8e588d3a29",
+        "waived_reason_hash": "4b1cb279d5fc62b00c82cc856084bb807c06b7e6622b1a25eb43a6c5e3237235",
         "declaration_hash": "8e7a74b64b207248258ab281465a6458cdfd44d99b2b792ec39395474d31b7b3",
         "anchor_text_hash": "2e8f1baed5944f5eca9daf1081560f221365cd751f31e041306d0eb4931e74e0"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "kind: Enum"
+        "citation": "scope 条件付き review behavior、task-contract の status 別 rule、および既存の NonBlueSignal 判定は、明示した command ownership と ordering の変更以外では維持する。"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },

@@ -37,12 +37,14 @@
     {
       "id": "T017",
       "description": "`libs/domain/src/task_contract.rs` と domain module registration の catalogue-entry-only task-contract types を復元し、carrier variants と tests を削除・更新する。IN-07、IN-08、OS-03、CN-05、AC-08、AC-09、AC-10。",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "cf20210b86e0d19fd452f014ba931bbeebf31483"
     },
     {
       "id": "T018",
       "description": "`libs/usecase/**` の carrier / evidence / hidden-gate identities、`pre_review_gate_dispatch.rs`、`pre_review_gate/evidence.rs`、`review_v2/pre_review_gated.rs` を削除し、task-contract migration、baseline program-runner primitives、pre-review scope selection primitives、module registrations と tests を実装する。refined execution-record adaptation は T025、operator command adaptation は T026、phase command adaptation は T027、pre-review command dispatch adaptation は T028 に属する。IN-01、IN-02、IN-03、IN-04、IN-05、IN-06、IN-07、IN-08、OS-01、OS-02、OS-03、OS-04、CN-01、CN-02、CN-03、CN-05、AC-01、AC-02、AC-03、AC-04、AC-05、AC-06、AC-07、AC-08、AC-09、AC-10。",
       "status": "done",
+      "commit_hash": "cf20210b86e0d19fd452f014ba931bbeebf31483",
       "depends_on": [
         "T017"
       ]
@@ -51,6 +53,7 @@
       "id": "T019",
       "description": "`libs/infrastructure/**` の `source_only_baseline_restoration_inspector.rs` と `pre_review_gate_config.rs` を削除し、task-contract codec、program runner、pre-review command configuration の loader / DTO / decode / validation、registrations と tests を実装する。phase-command configuration DTO / loader / decode adaptation は T029 に属する。IN-01、IN-02、IN-03、IN-05、IN-07、IN-08、OS-02、OS-03、OS-04、CN-01、CN-02、CN-03、CN-05、AC-01、AC-02、AC-03、AC-04、AC-05、AC-08、AC-09、AC-10。",
       "status": "done",
+      "commit_hash": "cf20210b86e0d19fd452f014ba931bbeebf31483",
       "depends_on": [
         "T017",
         "T018"
@@ -60,6 +63,7 @@
       "id": "T020",
       "description": "`apps/cli-driver/**` の obsolete task-contract / review carrier surfaces を削除し、initial `CommandOutcome` migration、review dispatch migration、module registrations と tests を実装する。phase-command driver / input / render-boundary adaptation は T030 に属する。IN-02、IN-03、IN-04、IN-05、IN-06、IN-07、IN-08、OS-01、OS-02、OS-03、OS-04、CN-01、CN-03、CN-05、AC-02、AC-03、AC-04、AC-05、AC-06、AC-07、AC-08、AC-09、AC-10。",
       "status": "done",
+      "commit_hash": "cf20210b86e0d19fd452f014ba931bbeebf31483",
       "depends_on": [
         "T018",
         "T019"
@@ -69,6 +73,7 @@
       "id": "T021",
       "description": "`apps/cli-composition/**` の `task_contract.rs` と `review_v2/pre_review_gate.rs` carrier / gate adapters を削除し、phase / review service wiring、`review_v2/{mod.rs,shim.rs,pre_review_command.rs}`、module registrations と tests を実装する。IN-02、IN-03、IN-05、IN-06、IN-07、IN-08、OS-01、OS-03、OS-04、CN-03、CN-05、AC-02、AC-04、AC-05、AC-06、AC-07、AC-08、AC-09、AC-10。",
       "status": "done",
+      "commit_hash": "cf20210b86e0d19fd452f014ba931bbeebf31483",
       "depends_on": [
         "T018",
         "T019",
@@ -79,6 +84,7 @@
       "id": "T022",
       "description": "`apps/cli/**` の task-contract CLI carrier surfaces を削除し、`commands/phase.rs`、`commands/review/{mod.rs,local.rs}` の phase parsing / emission と review dispatch、registrations、CLI integration tests を実装する。IN-02、IN-03、IN-04、IN-05、IN-06、IN-07、IN-08、OS-01、OS-03、OS-04、CN-01、CN-03、CN-04、CN-05、AC-02、AC-03、AC-04、AC-05、AC-06、AC-07、AC-08、AC-09、AC-10。",
       "status": "done",
+      "commit_hash": "cf20210b86e0d19fd452f014ba931bbeebf31483",
       "depends_on": [
         "T018",
         "T019",
@@ -90,6 +96,7 @@
       "id": "T023",
       "description": "`.harness/config/phase-commands.json` を追加し、`.harness/config/pre-review-gates.json` を literal argv declarations に置換し、`Makefile.toml` を thin delegation に保ち、`.harness/capabilities/impl-planner.md` と `.harness/custom/review-prompts/impl-plan.md` を更新する。IN-01、IN-05、IN-06、IN-08、OS-04、CN-01、CN-04、CN-05、AC-01、AC-05、AC-06、AC-07、AC-10。",
       "status": "done",
+      "commit_hash": "cf20210b86e0d19fd452f014ba931bbeebf31483",
       "depends_on": [
         "T019",
         "T022"
@@ -98,7 +105,7 @@
     {
       "id": "T024",
       "description": "`libs/domain/src/task_contract.rs` と `apps/cli-driver/src/task_contract.rs` の blocked outcome を validated `NonEmptyVec` payload に適応し、`CommandOutcome` render boundary の空 payload 拒否を unit tests で確認する。IN-08、AC-10。",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T025",
@@ -144,7 +151,7 @@
     },
     {
       "id": "T029",
-      "description": "`libs/infrastructure/src/operator_command_config.rs` の phase command configuration loader、command DTO 群、phase DTO / declaration DTO、`decode_phase_command_config` を operation-specific validation error を adapter boundary まで保持する catalogue shape に適応し、phase DTO decode / invalid-config tests を更新する。IN-01、IN-03、AC-01。",
+      "description": "`libs/infrastructure/src/operator_command_config.rs` の phase command configuration loader、command DTO 群、phase DTO / declaration DTO、`decode_phase_command_config` を更新し、phase DTO decode / invalid-config tests を更新する。IN-01、IN-03、AC-01。",
       "status": "todo",
       "depends_on": [
         "T026"
@@ -168,12 +175,12 @@
     },
     {
       "id": "T032",
-      "description": "`apps/cli-composition/src/capability.rs` の `PhaseCompositionRoot`、`apps/cli/src/commands/capability.rs` の `CliCommand`、`CapabilityExecArgs` と `into_driver_input`、`.harness/config/phase-commands.json` の phase writer argv から固定 provider host を除去し、omitted `--host` を composition boundary で `agent-profiles.json` の `orchestrator` provider に解決するよう適応し、provider-neutral argv tests を更新する。IN-01、IN-04、CN-01、AC-01、AC-03。",
+      "description": "`apps/cli-composition/src/capability.rs` の `PhaseCompositionRoot`、`apps/cli/src/commands/capability.rs` の `CliCommand`、`CapabilityExecArgs` と `into_driver_input`、`.harness/config/phase-commands.json` の phase writer argv から固定 provider host を除去し、provider-neutral argv tests を更新する。IN-01、IN-04、CN-01、AC-01、AC-03。",
       "status": "todo"
     },
     {
       "id": "T033",
-      "description": "`libs/infrastructure/src/operator_command_config.rs` で pre-review-gate configuration decode が operation-specific validation error を adapter boundary まで保持するよう適応し、pre-review DTO / review-scope decode / invalid-config tests を更新する。IN-05、AC-05。",
+      "description": "`libs/infrastructure/src/operator_command_config.rs` の pre-review-gate configuration decode を更新し、pre-review DTO / review-scope decode / invalid-config tests を更新する。IN-05、AC-05。",
       "status": "todo",
       "depends_on": [
         "T026",
