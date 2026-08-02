@@ -1,7 +1,7 @@
 {
   "declaration_hash": "a99e435b1786984600be600978fba8c2004731b4f235ceaf180b3fd9e581ba62",
-  "generated_at": "2026-08-02T08:58:48Z",
-  "implementation_input_hash": "3267a8f2aae0562209f0824060f8ac2e05b6182cfaba5605218fa47433b633e6",
+  "generated_at": "2026-08-02T11:32:41Z",
+  "implementation_input_hash": "2697892ab523648761b47eb157f79b5f7d9dabfe3ef2e71fd68c587129c20d05",
   "schema_version": 3,
   "signals": [
     {

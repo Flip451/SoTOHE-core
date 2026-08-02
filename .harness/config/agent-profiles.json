@@ -59,8 +59,8 @@
     },
     "implementer": {
       "provider": "codex",
-      "model": "gpt-5.6-terra",
-      "reasoning_effort": "high",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "max",
       "execution_mode": "orchestrator-output"
     },
     "reviewer": {
@@ -79,8 +79,8 @@
     },
     "review-fix-lead": {
       "provider": "codex",
-      "model": "gpt-5.6-terra",
-      "reasoning_effort": "high",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "max",
       "execution_mode": "typed-pipeline"
     },
     "dry-checker": {
@@ -93,8 +93,8 @@
     },
     "dry-fix-lead": {
       "provider": "codex",
-      "model": "gpt-5.6-terra",
-      "reasoning_effort": "high",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "max",
       "execution_mode": "typed-pipeline"
     },
     "pr-reviewer": {

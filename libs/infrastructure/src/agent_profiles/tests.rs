@@ -370,6 +370,44 @@ fn test_committed_profiles_subprocess_entries_resolve_explicit_effort() {
 }
 
 #[test]
+fn test_committed_profiles_limited_rollout_resolves_luna_max_and_preserves_terra() {
+    let manifest_dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
+    let workspace_root = manifest_dir
+        .parent()
+        .and_then(std::path::Path::parent)
+        .expect("infrastructure crate is nested under the workspace");
+    let profiles = AgentProfiles::load(workspace_root, &workspace_root.join(AGENT_PROFILES_PATH))
+        .expect("committed profile loads");
+
+    for capability_name in ["implementer", "review-fix-lead", "dry-fix-lead"] {
+        assert!(matches!(
+            profiles.resolve_execution(&capability(capability_name), RoundType::Final),
+            Ok(ResolvedExecution::ProviderCli { provider, model, effort })
+                if provider.as_str() == "codex"
+                    && model.as_str() == "gpt-5.6-luna"
+                    && effort == ReasoningEffort::Max
+        ));
+    }
+
+    for (capability_name, expected_effort) in [
+        ("spec-designer", ReasoningEffort::High),
+        ("impl-planner", ReasoningEffort::High),
+        ("researcher", ReasoningEffort::High),
+        ("dry-checker", ReasoningEffort::XHigh),
+        ("obligation-fulfillment-verifier", ReasoningEffort::XHigh),
+        ("waiver-verifier", ReasoningEffort::XHigh),
+    ] {
+        assert!(matches!(
+            profiles.resolve_execution(&capability(capability_name), RoundType::Final),
+            Ok(ResolvedExecution::ProviderCli { provider, model, effort })
+                if provider.as_str() == "codex"
+                    && model.as_str() == "gpt-5.6-terra"
+                    && effort == expected_effort
+        ));
+    }
+}
+
+#[test]
 fn test_committed_and_default_profiles_resolve_full_cli_effort_contract() {
     let manifest_dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
     let workspace_root = manifest_dir

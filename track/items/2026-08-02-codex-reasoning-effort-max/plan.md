@@ -6,7 +6,7 @@
 GO-01 → T001, T005, T006.
 GO-02 → T004, T003, T002.
 
-## Tasks (5/6 resolved)
+## Tasks (6/6 resolved)
 
 ### provider-compatibility — Provider compatibility
 
@@ -26,10 +26,10 @@ GO-02 → T004, T003, T002.
 
 > Install the recovery workflow and reload boundary. [D2; AC-04]
 
-- [x] **T003**: Amend `.harness/workflows/track/implement.md` and `.harness/workflows/track/full-cycle.md` with the pre-rollout recovery procedure and a stop/reload boundary. [D2; IN-05; CN-03; AC-04]
+- [x] **T003**: Amend `.harness/workflows/track/implement.md` and `.harness/workflows/track/full-cycle.md` with the pre-rollout recovery procedure and a stop/reload boundary. [D2; IN-05; CN-03; AC-04] (`93b90c60`)
 
 ### limited-profile-rollout — Limited profile rollout
 
 > Update the selected capability profiles. [D2; AC-03]
 
-- [ ] **T002**: Update `.harness/config/agent-profiles.json` entries `implementer`, `review-fix-lead`, and `dry-fix-lead`; extend committed-profile resolution coverage. [D2; IN-03; IN-04; CN-02; AC-03]
+- [x] **T002**: Update `.harness/config/agent-profiles.json` entries `implementer`, `review-fix-lead`, and `dry-fix-lead`; extend committed-profile resolution coverage. [D2; IN-03; IN-04; CN-02; AC-03]

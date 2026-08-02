@@ -274,6 +274,20 @@
           "hash": "rvw1:sha256:359cbcd9a55517164712b651851dc5c76abf48edb26a08e40de7829fbb339135",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T11:34:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a9b4770bc7a5516f88cef1a656dbfed1ca10261409e00f1650769b062bd46ffa",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T11:43:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a9b4770bc7a5516f88cef1a656dbfed1ca10261409e00f1650769b062bd46ffa",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -654,6 +668,56 @@
           "hash": "rvw1:sha256:db5ded022b471a4062e1b91a55fe523d6926212bf8169557197c335eed872265",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T11:39:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:55995f761bb3d4f76cc37d54b5b54c00ef9850e37a1e09adf7c69f38270a1c0f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T11:48:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:55995f761bb3d4f76cc37d54b5b54c00ef9850e37a1e09adf7c69f38270a1c0f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T11:54:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8c224830d86d2113536e54720467ab0627fb2868f7f7365a4e22d92d96d95f32",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T11:57:15Z",
+          "findings": [
+            {
+              "category": "observations.md mandate without trigger",
+              "file": "track/items/2026-08-02-codex-reasoning-effort-max/observations.md",
+              "line": 22,
+              "message": "The `review-fix-lead:impl-plan:final` row records a completed post-rollout final review with `zero_findings` before that outcome exists. The canonical current results show only `fast@2026-08-02T11:54:18Z`; the latest final result (`10:49:19Z`) predates the rollout boundary commit. This makes the AC-05 completion record speculative rather than auditable. Record the actual final outcome only after its trigger completes.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:8c224830d86d2113536e54720467ab0627fb2868f7f7365a4e22d92d96d95f32",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T12:00:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:55995f761bb3d4f76cc37d54b5b54c00ef9850e37a1e09adf7c69f38270a1c0f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T12:03:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4f86eaf9f650786a01d5aa8803ad6a12cca5dfd086174d9d863a1aa13d5bd8d9",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -684,6 +748,20 @@
           "at": "2026-08-02T09:05:28Z",
           "findings": [],
           "hash": "rvw1:sha256:71e9a3919f799f18b80f0cb34300c1baaac2637438bab0edaaebc3c6980fb4a9",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T11:36:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e5ce8bf363d1124403749e5be644ccdc8738233d2b9a86c90bb4fb2e27ef1348",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T11:45:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e5ce8bf363d1124403749e5be644ccdc8738233d2b9a86c90bb4fb2e27ef1348",
           "type": "final",
           "verdict": "zero_findings"
         }

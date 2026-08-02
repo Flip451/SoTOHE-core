@@ -82,6 +82,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "93b90c60",
       "depends_on": [
         "T004"
       ],
@@ -98,7 +99,7 @@
       ],
       "description": "Update `.harness/config/agent-profiles.json` entries `implementer`, `review-fix-lead`, and `dry-fix-lead`; extend committed-profile resolution coverage. [D2; IN-03; IN-04; CN-02; AC-03]",
       "id": "T002",
-      "status": "todo"
+      "status": "done"
     }
   ]
 }
