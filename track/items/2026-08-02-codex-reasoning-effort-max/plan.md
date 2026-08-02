@@ -32,4 +32,4 @@ GO-02 → T004, T003, T002.
 
 > Update the selected capability profiles. [D2; AC-03]
 
-- [x] **T002**: Update `.harness/config/agent-profiles.json` entries `implementer`, `review-fix-lead`, and `dry-fix-lead`; extend committed-profile resolution coverage. [D2; IN-03; IN-04; CN-02; AC-03]
+- [x] **T002**: Update `.harness/config/agent-profiles.json` entries `implementer`, `review-fix-lead`, and `dry-fix-lead`; extend committed-profile resolution coverage. [D2; IN-03; IN-04; CN-02; AC-03] (`75248598`)
