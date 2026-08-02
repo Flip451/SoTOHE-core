@@ -31,6 +31,7 @@
   "schema_version": 2,
   "tasks": [
     {
+      "commit_hash": "32098201981ef0e16e7ef322362691756c332b21",
       "description": "Update `TypeKindV2::TypeAlias`, `TypeKindDto::TypeAlias`, and `type_kind_{from,to}_dto` to carry the alias generic-parameter declaration; cover codec boundary cases in `catalogue_document_codec` tests. [GO-01; IN-01; OUT-01; CN-01; CN-03; AC-01]",
       "id": "T001",
       "status": "done"
@@ -49,7 +50,7 @@
       ],
       "description": "Update `catalogue_to_extended_crate_codec::encode_type_alias` and `signal_evaluator_v2::structural_eq::items_structurally_equal` for alias generic-parameter comparison; add evaluator match/mismatch tests. [GO-01; IN-03; OUT-01; OUT-02; CN-02; CN-03; AC-03; AC-04]",
       "id": "T003",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [
