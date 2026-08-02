@@ -10,21 +10,15 @@
       {"layer": "domain", "entry_key": "domain::branch_strategy::derive_base_merge_direction"}
     ],
     "T002": [
-      {"layer": "usecase", "entry_key": "BaseMergeCleanupPort"},
       {"layer": "usecase", "entry_key": "BaseMergeContextPort"},
-      {"layer": "usecase", "entry_key": "BaseMergeGitPort"},
       {"layer": "usecase", "entry_key": "BaseMergeService"},
-      {"layer": "usecase", "entry_key": "BaseMergeAttemptOutcome"},
       {"layer": "usecase", "entry_key": "BaseMergeCommand"},
       {"layer": "usecase", "entry_key": "BaseMergeContextError"},
-      {"layer": "usecase", "entry_key": "BaseMergeError"},
       {"layer": "usecase", "entry_key": "BaseMergeGitError"},
       {"layer": "usecase", "entry_key": "BaseMergeInteractor"},
-      {"layer": "usecase", "entry_key": "BaseMergeOutcome"},
-      {"layer": "usecase", "entry_key": "PostMergeCleanupStage"}
+      {"layer": "usecase", "entry_key": "BaseMergeOutcome"}
     ],
     "T003": [
-      {"layer": "infrastructure", "entry_key": "FsBaseMergeCleanupAdapter"},
       {"layer": "infrastructure", "entry_key": "FsBaseMergeContextAdapter"},
       {"layer": "infrastructure", "entry_key": "FsBaseMergeGitAdapter"}
     ],
@@ -66,6 +60,23 @@
       {"layer": "infrastructure", "entry_key": "infrastructure::tddd::type_signals_codec::encode"},
       {"layer": "infrastructure", "entry_key": "EvaluateSignalsError"},
       {"layer": "infrastructure", "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"}
+    ],
+    "T010": [
+      {"layer": "domain", "entry_key": "CommitHash"},
+      {"layer": "usecase", "entry_key": "BaseMergeAttemptOutcome"},
+      {"layer": "usecase", "entry_key": "BaseMergeCleanupPort"},
+      {"layer": "usecase", "entry_key": "BaseMergeGitPort"},
+      {"layer": "usecase", "entry_key": "BaseMergeError"},
+      {"layer": "usecase", "entry_key": "BaseMergeCleanupRequest"},
+      {"layer": "usecase", "entry_key": "PostMergeCleanupError"},
+      {"layer": "usecase", "entry_key": "ViewsRegenerationError"},
+      {"layer": "usecase", "entry_key": "BaselineReplacementError"},
+      {"layer": "usecase", "entry_key": "SyncBaseRecordError"},
+      {"layer": "infrastructure", "entry_key": "SyncBaseRecordSchemaVersion"},
+      {"layer": "infrastructure", "entry_key": "SyncBaseRecord"}
+    ],
+    "T011": [
+      {"layer": "infrastructure", "entry_key": "FsBaseMergeCleanupAdapter"}
     ]
   }
 }

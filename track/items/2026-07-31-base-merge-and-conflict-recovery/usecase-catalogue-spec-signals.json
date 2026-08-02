@@ -1,11 +1,16 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "d8b23fdf6bfb8ed851029e967d18168f2688ee481525b168f19e792722b641f3",
+  "catalogue_declaration_hash": "a11bce450ec3179e54d691ab1c70565ba687a869f4a42f9962d0229f64158d3e",
   "signals": [
     {
       "type_name": "BaseMergeAttemptOutcome",
       "signal": "blue",
-      "entry_hash": "0bba3f352484ca6d113281b03dfa50a0e9598783e6d898c65eea422d7a0e32a1"
+      "entry_hash": "ab658097655eeb67d01198dafc1e61a50d1ea68728ebdb6f30343165d44d3afe"
+    },
+    {
+      "type_name": "BaseMergeCleanupRequest",
+      "signal": "blue",
+      "entry_hash": "a61748bb23f671c02c89a8b611c10c138a4f8a96fb3c00a28020395dd900de23"
     },
     {
       "type_name": "BaseMergeCommand",
@@ -20,7 +25,7 @@
     {
       "type_name": "BaseMergeError",
       "signal": "blue",
-      "entry_hash": "77e9dec9db9b12beb4e18a9e590319c698277a8c0f8d6dc4782aa18961b41625"
+      "entry_hash": "b9dbceaab6524996da57e2fcd4705c30f81d27c280091175229c35afe0467cd0"
     },
     {
       "type_name": "BaseMergeGitError",
@@ -30,12 +35,17 @@
     {
       "type_name": "BaseMergeInteractor",
       "signal": "blue",
-      "entry_hash": "fdd5c566f400437b567c7482f07c41642581250ed0580edae79dd51159fef5f3"
+      "entry_hash": "f86af0e2899273ca4ae2585deb08e1e5c94935f6ddaa8025d87c9186be6acd0b"
     },
     {
       "type_name": "BaseMergeOutcome",
       "signal": "blue",
-      "entry_hash": "52dd9635e49244ab5368c6d9b2d25edd766faab2e87f02fd47e487b22e4ee3c7"
+      "entry_hash": "36b3dacd79c82d6cef4a501a3d2cbaaf84a7b9a8207ca367a2299e04ed1f6f4d"
+    },
+    {
+      "type_name": "BaselineReplacementError",
+      "signal": "blue",
+      "entry_hash": "a38ea04400cf48c386679951815f60e2dc684fbb378bfc4c20ebeb66584b7d8c"
     },
     {
       "type_name": "GitStashCommand",
@@ -53,9 +63,14 @@
       "entry_hash": "4d517e8f56c91a9431ee0f4986c989e719d9f7fc7843823529a4d3fa86ee8edf"
     },
     {
-      "type_name": "PostMergeCleanupStage",
+      "type_name": "PostMergeCleanupError",
       "signal": "blue",
-      "entry_hash": "5304e296d1d0b702a38e02d997274116839528712cb469be91180f838b2cc6e2"
+      "entry_hash": "f91a18059aa5f228a328ddfb31518d32174868e7f2d819473a401fea53461359"
+    },
+    {
+      "type_name": "SyncBaseRecordError",
+      "signal": "blue",
+      "entry_hash": "00b1403a8dd43b904cbf0b60bfc64d6186c7f7ad1ef1112852300239ce43d711"
     },
     {
       "type_name": "TypeSignalsError",
@@ -73,9 +88,14 @@
       "entry_hash": "d3ad682cf87df5015b771f8b9f0ffca36ee21095a3df4383e6a4adacfda593b0"
     },
     {
+      "type_name": "ViewsRegenerationError",
+      "signal": "blue",
+      "entry_hash": "8d4e737d16d4058f4ab8e9a267d08b6be314f09f464964301cafe68d1a5903ae"
+    },
+    {
       "type_name": "BaseMergeCleanupPort",
       "signal": "blue",
-      "entry_hash": "d9c19eb64b9d6f4115f0c8035d0e1dffaa5bf9ccf9ccb5044ab5a689b24f6dc3"
+      "entry_hash": "258a4b43498d10f32a9c932ee1561e6e2478677fd1f74928a23f02f7651c2343"
     },
     {
       "type_name": "BaseMergeContextPort",
@@ -85,12 +105,12 @@
     {
       "type_name": "BaseMergeGitPort",
       "signal": "blue",
-      "entry_hash": "95358a1d7db0840e710c313cfd12b5371b1426ce9ded0e619b28e8ab0eddd540"
+      "entry_hash": "301c9c84eb43192e873297b345a06c94af65687c540fee221d3b88565e24c510"
     },
     {
       "type_name": "BaseMergeService",
       "signal": "blue",
-      "entry_hash": "1e8c3fe40a3e66cd43ec928421f59e91660d3d4620843de5440880cd58853f1e"
+      "entry_hash": "803684946032e46b52185f945fc57bbb8ccd8630930c78080bb126e48dd196c4"
     },
     {
       "type_name": "GitStashPort",

@@ -75,11 +75,11 @@
       }
     },
     {
-      "claim_hash": "24b89d60d56c6869b61c2c1e2f5e75d8d3aefcb225d6d786f0ab1d1b68aa6b7b",
-      "evidence_hash": "b22837e4e8db0d1daed1a472908e64e7690ef1c152e9cd17985411dec3dadfbb",
+      "claim_hash": "544e1592601496626421162c61a5b5e9a713915e214cd5714708d42d521375ed",
+      "evidence_hash": "b1ebe6f4e3ef241cee3ab49ab127483a283048c40c19b452348de4ac09005a15",
       "verdict": {
         "kind": "pass",
-        "citation": "Complete derived-view regeneration, baseline recapture, and sync-base stamping after every clean guarded base merge."
+        "citation": "After every clean guarded base merge, regenerate derived views, replace the baseline from a commit-pinned isolated worktree without exposing a partial replacement, and then record synchronization of that exact merged base commit."
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -94,16 +94,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-02",
-          "text_label": "Complete derived-view regeneration, baseline recapture, and sync-base stamping after every clean guarded base merge."
+          "text_label": "After every clean guarded base merge, regenerate derived views, replace the baseline from a commit-pinned isolated worktree without exposing a partial replacement, and then record synchronization of that exact merged base commit."
         }
       }
     },
     {
-      "claim_hash": "24b89d60d56c6869b61c2c1e2f5e75d8d3aefcb225d6d786f0ab1d1b68aa6b7b",
-      "evidence_hash": "20672dd9b869a8730d34d786e4d6028c3d2656e006bc61d813639d4cdde399d6",
+      "claim_hash": "544e1592601496626421162c61a5b5e9a713915e214cd5714708d42d521375ed",
+      "evidence_hash": "1c4d4eda6a4a2dafa6178979f4e7ea21c499d9e8bb85d6284e8503b3c3db7e71",
       "verdict": {
         "kind": "pass",
-        "citation": "Conflict recovery must follow the canonical workflow through conflict editing, zero-findings review, guarded commit, and post-merge cleanup under orchestrator ownership."
+        "citation": "Conflict recovery must follow the canonical workflow through conflict editing, zero-findings review, and guarded commit under orchestrator ownership; conflict outcomes do not run clean-merge cleanup."
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -118,16 +118,16 @@
         "data": {
           "section": "constraint",
           "element_id": "CN-02",
-          "text_label": "Conflict recovery must follow the canonical workflow through conflict editing, zero-findings review, guarded commit, and post-merge cleanup under orchestrator ownership."
+          "text_label": "Conflict recovery must follow the canonical workflow through conflict editing, zero-findings review, and guarded commit under orchestrator ownership; conflict outcomes do not run clean-merge cleanup."
         }
       }
     },
     {
-      "claim_hash": "24b89d60d56c6869b61c2c1e2f5e75d8d3aefcb225d6d786f0ab1d1b68aa6b7b",
-      "evidence_hash": "a7e9d387cbc9e0e5b5b1f57fd6be040e99e6cd6bf276b6da3e2d604773788e89",
+      "claim_hash": "544e1592601496626421162c61a5b5e9a713915e214cd5714708d42d521375ed",
+      "evidence_hash": "c11596aa73c9d76385bd11d40c389db9cf0df6530af7fa89addda894842ed6c7",
       "verdict": {
         "kind": "pass",
-        "citation": "After a clean guarded base merge, derived views are regenerated, the baseline is recaptured, and the sync-base stamp is recorded before the operation reports success."
+        "citation": "After a clean guarded base merge, derived views are regenerated; a complete, validated baseline replacement produced in an isolated worktree pinned to the exact merged base commit is atomically published; and only then is the sync-base record atomically written before the operation reports success."
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -142,16 +142,16 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-03",
-          "text_label": "After a clean guarded base merge, derived views are regenerated, the baseline is recaptured, and the sync-base stamp is recorded before the operation reports success."
+          "text_label": "After a clean guarded base merge, derived views are regenerated; a complete, validated baseline replacement produced in an isolated worktree pinned to the exact merged base commit is atomically published; and only then is the sync-base record atomically written before the operation reports success."
         }
       }
     },
     {
-      "claim_hash": "24b89d60d56c6869b61c2c1e2f5e75d8d3aefcb225d6d786f0ab1d1b68aa6b7b",
-      "evidence_hash": "b8243c7cdfc01edc89a03deb1a86fb52c146b5e334afd78bada0e8131bccac66",
+      "claim_hash": "544e1592601496626421162c61a5b5e9a713915e214cd5714708d42d521375ed",
+      "evidence_hash": "9e9abe7181b71316e54964a1694e1196b70e7705e3e78b819044365c33947b16",
       "verdict": {
         "kind": "pass",
-        "citation": "When a guarded base merge conflicts, the orchestrator drives the canonical recovery workflow through editing, zero-findings review, guarded commit, and post-merge cleanup."
+        "citation": "without running clean-merge cleanup"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -166,7 +166,175 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-04",
-          "text_label": "When a guarded base merge conflicts, the orchestrator drives the canonical recovery workflow through editing, zero-findings review, guarded commit, and post-merge cleanup."
+          "text_label": "When a guarded base merge conflicts, the orchestrator drives the canonical recovery workflow through editing, zero-findings review, and guarded commit without running clean-merge cleanup."
+        }
+      }
+    },
+    {
+      "claim_hash": "544e1592601496626421162c61a5b5e9a713915e214cd5714708d42d521375ed",
+      "evidence_hash": "afa25e34321fdb5da8f872a16ef1824d39af8f7cc621c064c6093d0ee631c5e5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Persist the active track's synchronization state as an atomically replaced, schema-versioned record containing its track identity, base branch, and the exact base commit incorporated by a successful guarded merge."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsBaseMergeCleanupAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "Persist the active track's synchronization state as an atomically replaced, schema-versioned record containing its track identity, base branch, and the exact base commit incorporated by a successful guarded merge."
+        }
+      }
+    },
+    {
+      "claim_hash": "544e1592601496626421162c61a5b5e9a713915e214cd5714708d42d521375ed",
+      "evidence_hash": "e83f6a2ed9edffe9aa6824d83e7db6682b02f2d49a18bb16493e9c5133fde6e2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Baseline recapture must generate and validate a complete replacement in an isolated worktree pinned to the already-authorized base commit, atomically publish it only after success, and preserve or restore the prior baseline on any failure; every failure, including failed restoration, fails closed."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsBaseMergeCleanupAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-05",
+          "text_label": "Baseline recapture must generate and validate a complete replacement in an isolated worktree pinned to the already-authorized base commit, atomically publish it only after success, and preserve or restore the prior baseline on any failure; every failure, including failed restoration, fails closed."
+        }
+      }
+    },
+    {
+      "claim_hash": "544e1592601496626421162c61a5b5e9a713915e214cd5714708d42d521375ed",
+      "evidence_hash": "d7421f665ec7a508d92f8962947fd4a3a43ba801fb68280a5dd6945a66f96bc8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution, be atomically written only after views and baseline recapture succeed, support idempotent retry for the same value, and fail closed on record generation, validation, write, or replacement failure."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsBaseMergeCleanupAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-06",
+          "text_label": "The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution, be atomically written only after views and baseline recapture succeed, support idempotent retry for the same value, and fail closed on record generation, validation, write, or replacement failure."
+        }
+      }
+    },
+    {
+      "claim_hash": "544e1592601496626421162c61a5b5e9a713915e214cd5714708d42d521375ed",
+      "evidence_hash": "65ebff364d15b048f25f2ee5785481fd781016dfaf00df1feb36b5f9ff0d8706",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Clean-merge cleanup may complete only in the order Views, Baseline, then SyncBaseStamp; conflict outcomes do not run that cleanup, and baseline replacement does not delete the type-signals cache."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsBaseMergeCleanupAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "Clean-merge cleanup may complete only in the order Views, Baseline, then SyncBaseStamp; conflict outcomes do not run that cleanup, and baseline replacement does not delete the type-signals cache."
+        }
+      }
+    },
+    {
+      "claim_hash": "544e1592601496626421162c61a5b5e9a713915e214cd5714708d42d521375ed",
+      "evidence_hash": "25f655f974305b546c6635b354735cdf64f7896f137dbfe26030bac0aedf968f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "If isolated baseline generation, validation, atomic replacement, or necessary restoration fails, the operation reports failure rather than cleanup completion and the previously valid baseline remains available whenever restoration succeeds."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsBaseMergeCleanupAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-10",
+          "text_label": "If isolated baseline generation, validation, atomic replacement, or necessary restoration fails, the operation reports failure rather than cleanup completion and the previously valid baseline remains available whenever restoration succeeds."
+        }
+      }
+    },
+    {
+      "claim_hash": "544e1592601496626421162c61a5b5e9a713915e214cd5714708d42d521375ed",
+      "evidence_hash": "84b79eec5107343a4c45d0108c7d1c022b92aa7eb54aa2e887aad4ad7fdf9dff",
+      "verdict": {
+        "kind": "pass",
+        "citation": "\"Following successful views and baseline steps, the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit; rerunning with that same commit is idempotent, while a later successful merge atomically replaces the record with its newly incorporated commit.\""
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsBaseMergeCleanupAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-11",
+          "text_label": "Following successful views and baseline steps, the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit; rerunning with that same commit is idempotent, while a later successful merge atomically replaces the record with its newly incorporated commit."
+        }
+      }
+    },
+    {
+      "claim_hash": "544e1592601496626421162c61a5b5e9a713915e214cd5714708d42d521375ed",
+      "evidence_hash": "3cbbb014a4f62d867a0a746c1980e7b0582bb989d47ff548f21d8b10481109c6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "A conflict outcome enters the canonical recovery workflow without running clean-merge cleanup, and a failure in views, baseline recapture, or sync-base recording prevents a completed-cleanup success result."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsBaseMergeCleanupAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-12",
+          "text_label": "A conflict outcome enters the canonical recovery workflow without running clean-merge cleanup, and a failure in views, baseline recapture, or sync-base recording prevents a completed-cleanup success result."
         }
       }
     },
@@ -267,7 +435,7 @@
       }
     },
     {
-      "claim_hash": "dd405d5e070eaff08c0e638a12a5488de04ac41dbb437aea2f31da8755e564cf",
+      "claim_hash": "702b8a1a7249e444b5a5a562f9fa46aa03201f2d47c7dace0b841dc270871ed4",
       "evidence_hash": "9c04c25ac8797b57a56b46079c14b00823ac3b1b860495b5d228d67b89b00db7",
       "verdict": {
         "kind": "pass",
@@ -291,7 +459,7 @@
       }
     },
     {
-      "claim_hash": "dd405d5e070eaff08c0e638a12a5488de04ac41dbb437aea2f31da8755e564cf",
+      "claim_hash": "702b8a1a7249e444b5a5a562f9fa46aa03201f2d47c7dace0b841dc270871ed4",
       "evidence_hash": "7ec10995aa47e8531cbd5645e1c378863fa0617b440210cba4f0929d62416aaa",
       "verdict": {
         "kind": "pass",
@@ -315,7 +483,7 @@
       }
     },
     {
-      "claim_hash": "dd405d5e070eaff08c0e638a12a5488de04ac41dbb437aea2f31da8755e564cf",
+      "claim_hash": "702b8a1a7249e444b5a5a562f9fa46aa03201f2d47c7dace0b841dc270871ed4",
       "evidence_hash": "d5914c88f34ebe09359d33c2238a2158fe5f2350d2a22258922277f31f29cb76",
       "verdict": {
         "kind": "pass",
@@ -339,7 +507,7 @@
       }
     },
     {
-      "claim_hash": "dd405d5e070eaff08c0e638a12a5488de04ac41dbb437aea2f31da8755e564cf",
+      "claim_hash": "702b8a1a7249e444b5a5a562f9fa46aa03201f2d47c7dace0b841dc270871ed4",
       "evidence_hash": "d1a8d3e43a11bbad62882da88d0ebfbaced67f21758977ebd741d2beb5bf6129",
       "verdict": {
         "kind": "pass",
@@ -363,11 +531,11 @@
       }
     },
     {
-      "claim_hash": "dd405d5e070eaff08c0e638a12a5488de04ac41dbb437aea2f31da8755e564cf",
-      "evidence_hash": "b8243c7cdfc01edc89a03deb1a86fb52c146b5e334afd78bada0e8131bccac66",
+      "claim_hash": "702b8a1a7249e444b5a5a562f9fa46aa03201f2d47c7dace0b841dc270871ed4",
+      "evidence_hash": "9e9abe7181b71316e54964a1694e1196b70e7705e3e78b819044365c33947b16",
       "verdict": {
         "kind": "pass",
-        "citation": "When a guarded base merge conflicts, the orchestrator drives the canonical recovery workflow through editing, zero-findings review, guarded commit, and post-merge cleanup."
+        "citation": "When a guarded base merge conflicts, the orchestrator drives the canonical recovery workflow through editing, zero-findings review, and guarded commit without running clean-merge cleanup."
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -382,7 +550,103 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-04",
-          "text_label": "When a guarded base merge conflicts, the orchestrator drives the canonical recovery workflow through editing, zero-findings review, guarded commit, and post-merge cleanup."
+          "text_label": "When a guarded base merge conflicts, the orchestrator drives the canonical recovery workflow through editing, zero-findings review, and guarded commit without running clean-merge cleanup."
+        }
+      }
+    },
+    {
+      "claim_hash": "702b8a1a7249e444b5a5a562f9fa46aa03201f2d47c7dace0b841dc270871ed4",
+      "evidence_hash": "b1ebe6f4e3ef241cee3ab49ab127483a283048c40c19b452348de4ac09005a15",
+      "verdict": {
+        "kind": "pass",
+        "citation": "After every clean guarded base merge, regenerate derived views, replace the baseline from a commit-pinned isolated worktree without exposing a partial replacement, and then record synchronization of that exact merged base commit."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsBaseMergeGitAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "After every clean guarded base merge, regenerate derived views, replace the baseline from a commit-pinned isolated worktree without exposing a partial replacement, and then record synchronization of that exact merged base commit."
+        }
+      }
+    },
+    {
+      "claim_hash": "702b8a1a7249e444b5a5a562f9fa46aa03201f2d47c7dace0b841dc270871ed4",
+      "evidence_hash": "d7421f665ec7a508d92f8962947fd4a3a43ba801fb68280a5dd6945a66f96bc8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution, be atomically written only after views and baseline recapture succeed, support idempotent retry for the same value, and fail closed on record generation, validation, write, or replacement failure."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsBaseMergeGitAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-06",
+          "text_label": "The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution, be atomically written only after views and baseline recapture succeed, support idempotent retry for the same value, and fail closed on record generation, validation, write, or replacement failure."
+        }
+      }
+    },
+    {
+      "claim_hash": "702b8a1a7249e444b5a5a562f9fa46aa03201f2d47c7dace0b841dc270871ed4",
+      "evidence_hash": "c11596aa73c9d76385bd11d40c389db9cf0df6530af7fa89addda894842ed6c7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "After a clean guarded base merge, derived views are regenerated; a complete, validated baseline replacement produced in an isolated worktree pinned to the exact merged base commit is atomically published; and only then is the sync-base record atomically written before the operation reports success."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsBaseMergeGitAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "After a clean guarded base merge, derived views are regenerated; a complete, validated baseline replacement produced in an isolated worktree pinned to the exact merged base commit is atomically published; and only then is the sync-base record atomically written before the operation reports success."
+        }
+      }
+    },
+    {
+      "claim_hash": "702b8a1a7249e444b5a5a562f9fa46aa03201f2d47c7dace0b841dc270871ed4",
+      "evidence_hash": "84b79eec5107343a4c45d0108c7d1c022b92aa7eb54aa2e887aad4ad7fdf9dff",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Following successful views and baseline steps, the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit; rerunning with that same commit is idempotent, while a later successful merge atomically replaces the record with its newly incorporated commit."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsBaseMergeGitAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-11",
+          "text_label": "Following successful views and baseline steps, the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit; rerunning with that same commit is idempotent, while a later successful merge atomically replaces the record with its newly incorporated commit."
         }
       }
     },
@@ -431,6 +695,150 @@
           "section": "acceptance_criteria",
           "element_id": "AC-06",
           "text_label": "A guarded stash records untracked track artifacts, and a successful guarded stash-pop restores them through the `bin/sotp git stash` command path without changing branch history, updating branch refs, or changing the active track branch; the stash-internal objects and `refs/stash` updates required by stash and stash-pop are permitted."
+        }
+      }
+    },
+    {
+      "claim_hash": "cffe1a62718dbadc8527c5dd5e1b58f1d992b5438ed744c0eda5f93b7a331d5c",
+      "evidence_hash": "afa25e34321fdb5da8f872a16ef1824d39af8f7cc621c064c6093d0ee631c5e5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Persist the active track's synchronization state as an atomically replaced, schema-versioned record containing its track identity, base branch, and the exact base commit incorporated by a successful guarded merge."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "SyncBaseRecord"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "Persist the active track's synchronization state as an atomically replaced, schema-versioned record containing its track identity, base branch, and the exact base commit incorporated by a successful guarded merge."
+        }
+      }
+    },
+    {
+      "claim_hash": "cffe1a62718dbadc8527c5dd5e1b58f1d992b5438ed744c0eda5f93b7a331d5c",
+      "evidence_hash": "d7421f665ec7a508d92f8962947fd4a3a43ba801fb68280a5dd6945a66f96bc8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution, be atomically written only after views and baseline recapture succeed, support idempotent retry for the same value, and fail closed on record generation, validation, write, or replacement failure."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "SyncBaseRecord"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-06",
+          "text_label": "The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution, be atomically written only after views and baseline recapture succeed, support idempotent retry for the same value, and fail closed on record generation, validation, write, or replacement failure."
+        }
+      }
+    },
+    {
+      "claim_hash": "cffe1a62718dbadc8527c5dd5e1b58f1d992b5438ed744c0eda5f93b7a331d5c",
+      "evidence_hash": "84b79eec5107343a4c45d0108c7d1c022b92aa7eb54aa2e887aad4ad7fdf9dff",
+      "verdict": {
+        "kind": "pass",
+        "citation": "the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "SyncBaseRecord"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-11",
+          "text_label": "Following successful views and baseline steps, the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit; rerunning with that same commit is idempotent, while a later successful merge atomically replaces the record with its newly incorporated commit."
+        }
+      }
+    },
+    {
+      "claim_hash": "25c47dfcc0072c1ebb06e881fffc78c4a8f967c9a7ad7799312b64aa50e832db",
+      "evidence_hash": "afa25e34321fdb5da8f872a16ef1824d39af8f7cc621c064c6093d0ee631c5e5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "schema-versioned record"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "SyncBaseRecordSchemaVersion"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "Persist the active track's synchronization state as an atomically replaced, schema-versioned record containing its track identity, base branch, and the exact base commit incorporated by a successful guarded merge."
+        }
+      }
+    },
+    {
+      "claim_hash": "25c47dfcc0072c1ebb06e881fffc78c4a8f967c9a7ad7799312b64aa50e832db",
+      "evidence_hash": "d7421f665ec7a508d92f8962947fd4a3a43ba801fb68280a5dd6945a66f96bc8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "SyncBaseRecordSchemaVersion"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-06",
+          "text_label": "The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution, be atomically written only after views and baseline recapture succeed, support idempotent retry for the same value, and fail closed on record generation, validation, write, or replacement failure."
+        }
+      }
+    },
+    {
+      "claim_hash": "25c47dfcc0072c1ebb06e881fffc78c4a8f967c9a7ad7799312b64aa50e832db",
+      "evidence_hash": "84b79eec5107343a4c45d0108c7d1c022b92aa7eb54aa2e887aad4ad7fdf9dff",
+      "verdict": {
+        "kind": "pass",
+        "citation": "has a schema-versioned sync-base record"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "SyncBaseRecordSchemaVersion"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-11",
+          "text_label": "Following successful views and baseline steps, the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit; rerunning with that same commit is idempotent, while a later successful merge atomically replaces the record with its newly incorporated commit."
         }
       }
     },

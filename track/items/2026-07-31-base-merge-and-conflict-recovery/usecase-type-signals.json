@@ -1,8 +1,8 @@
 {
   "schema_version": 4,
-  "generated_at": "2026-08-01T15:32:02Z",
-  "declaration_hash": "d8b23fdf6bfb8ed851029e967d18168f2688ee481525b168f19e792722b641f3",
-  "implementation_input_hash": "29098a7dace68188c8664c7dcf95104ee61c3efcac0a36aeb9d1f33135878e41",
+  "generated_at": "2026-08-02T08:48:15Z",
+  "declaration_hash": "a11bce450ec3179e54d691ab1c70565ba687a869f4a42f9962d0229f64158d3e",
+  "implementation_input_hash": "801f34084a8a3d67577a49988c0f49c069dcbd6ff97189f9eb23c1669f6a7e88",
   "baseline_hash": "b6ea45923fb0c899652e55346695062b570c173e489820e030c671f46b17c41b",
   "signals": [
     {
@@ -12,7 +12,6 @@
       "found_type": true,
       "found_items": [
         "Clone",
-        "Copy",
         "Debug",
         "Eq",
         "PartialEq"
@@ -23,6 +22,18 @@
       "kind_tag": "secondary_port",
       "signal": "blue",
       "found_type": true
+    },
+    {
+      "type_name": "BaseMergeCleanupRequest",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
     },
     {
       "type_name": "BaseMergeCommand",
@@ -110,6 +121,17 @@
       "found_type": true
     },
     {
+      "type_name": "BaselineReplacementError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
       "type_name": "GitStashCommand",
       "kind_tag": "enum",
       "signal": "yellow",
@@ -155,16 +177,25 @@
       "found_type": false
     },
     {
-      "type_name": "PostMergeCleanupStage",
-      "kind_tag": "enum",
+      "type_name": "PostMergeCleanupError",
+      "kind_tag": "error_type",
       "signal": "blue",
       "found_type": true,
       "found_items": [
-        "Clone",
-        "Copy",
         "Debug",
-        "Eq",
-        "PartialEq"
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "SyncBaseRecordError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
       ]
     },
     {
@@ -185,6 +216,17 @@
       "found_type": true,
       "found_items": [
         "Clone",
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "ViewsRegenerationError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Debug",
         "Display",
         "Error"

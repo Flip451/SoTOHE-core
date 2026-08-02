@@ -73,7 +73,7 @@
         "role": "Interactor"
       },
       "brief": "Author a result test covering 'entry' of BaseMergeInteractor",
-      "declaration_hash": "ce1a7ca347da2c4054bf94a0b0faa6940155c77ebb55bba0f780d688d4d8aa98",
+      "declaration_hash": "a32eca11e5762fdf6def09788dc2c7992c0841b913ae400f83a450d17002b662",
       "spec_refs": [
         {
           "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
@@ -110,6 +110,34 @@
         {
           "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
           "element_id": "AC-04"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-06"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-05"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-06"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-07"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-10"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-11"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-12"
         }
       ]
     },
@@ -157,7 +185,7 @@
         "role": "SecondaryPort"
       },
       "brief": "Author a contract test covering 'trait_method:regenerate_views' of BaseMergeCleanupPort",
-      "declaration_hash": "34ccb97304ed062a94f4c8c25c873065e436f7bcde243154df70ede1cd5a2532",
+      "declaration_hash": "5ac6584703179f572ce269db7dfaa15713fe8a6223bbbc699bc96bf5f8e7dd9e",
       "spec_refs": [
         {
           "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
@@ -174,6 +202,34 @@
         {
           "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
           "element_id": "AC-04"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-06"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-05"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-06"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-07"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-10"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-11"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-12"
         }
       ]
     },
@@ -181,7 +237,7 @@
       "id": {
         "entry_key": "BaseMergeCleanupPort",
         "obligation_kind": "contract",
-        "item_identifier": "trait_method:recapture_baselines"
+        "item_identifier": "trait_method:replace_baselines"
       },
       "target_entry": {
         "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
@@ -192,8 +248,8 @@
         "kind": "contract_role",
         "role": "SecondaryPort"
       },
-      "brief": "Author a contract test covering 'trait_method:recapture_baselines' of BaseMergeCleanupPort",
-      "declaration_hash": "34ccb97304ed062a94f4c8c25c873065e436f7bcde243154df70ede1cd5a2532",
+      "brief": "Author a contract test covering 'trait_method:replace_baselines' of BaseMergeCleanupPort",
+      "declaration_hash": "5ac6584703179f572ce269db7dfaa15713fe8a6223bbbc699bc96bf5f8e7dd9e",
       "spec_refs": [
         {
           "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
@@ -210,6 +266,34 @@
         {
           "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
           "element_id": "AC-04"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-06"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-05"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-06"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-07"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-10"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-11"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-12"
         }
       ]
     },
@@ -217,7 +301,7 @@
       "id": {
         "entry_key": "BaseMergeCleanupPort",
         "obligation_kind": "contract",
-        "item_identifier": "trait_method:record_sync_base_stamp"
+        "item_identifier": "trait_method:write_sync_base_record"
       },
       "target_entry": {
         "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
@@ -228,8 +312,8 @@
         "kind": "contract_role",
         "role": "SecondaryPort"
       },
-      "brief": "Author a contract test covering 'trait_method:record_sync_base_stamp' of BaseMergeCleanupPort",
-      "declaration_hash": "34ccb97304ed062a94f4c8c25c873065e436f7bcde243154df70ede1cd5a2532",
+      "brief": "Author a contract test covering 'trait_method:write_sync_base_record' of BaseMergeCleanupPort",
+      "declaration_hash": "5ac6584703179f572ce269db7dfaa15713fe8a6223bbbc699bc96bf5f8e7dd9e",
       "spec_refs": [
         {
           "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
@@ -246,6 +330,34 @@
         {
           "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
           "element_id": "AC-04"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-06"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-05"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-06"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-07"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-10"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-11"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-12"
         }
       ]
     },
@@ -301,7 +413,7 @@
         "role": "SecondaryPort"
       },
       "brief": "Author a contract test covering 'trait_method:merge_base' of BaseMergeGitPort",
-      "declaration_hash": "318479435b77df5c4e0a4171903380853bd56d6b14317305f862ce59fc6c1636",
+      "declaration_hash": "eb4fb2ef3052ce781ee2890654671eec5b6c0f71e28cabd6157a338fa42d29cf",
       "spec_refs": [
         {
           "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
@@ -322,6 +434,22 @@
         {
           "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
           "element_id": "AC-04"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-02"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-06"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-03"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-11"
         }
       ]
     },
@@ -341,7 +469,7 @@
         "role": "ApplicationService"
       },
       "brief": "Author a result test covering 'trait_method:execute' of BaseMergeService",
-      "declaration_hash": "238b8c7004943fac290b01ed0f77637bdaa947bd23e04fed73f5d2742a14d132",
+      "declaration_hash": "1531029a561c3fcb3df1584a8b97686956f9e29cbf7baaca84f288a0b12435fc",
       "spec_refs": [
         {
           "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
@@ -378,6 +506,34 @@
         {
           "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
           "element_id": "AC-04"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-06"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-05"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-06"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-07"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-10"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-11"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-12"
         }
       ]
     },
@@ -521,7 +677,7 @@
         "role": "SecondaryPort"
       },
       "brief": "Author a contract_conformance test covering 'trait_impl:usecase::base_merge::BaseMergeGitPort' of FsBaseMergeGitAdapter",
-      "declaration_hash": "b139ae71b826be52073a96f0e76c6309314a5e1ecebc0a66bea9c6ea954c1a4e",
+      "declaration_hash": "7e659d19867b5bef7cbcbb6337753a45369c1c0604256dc766e7d5ec790c7a8c",
       "spec_refs": [
         {
           "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
@@ -542,6 +698,22 @@
         {
           "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
           "element_id": "AC-04"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-02"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-06"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-03"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-11"
         }
       ]
     },
@@ -561,7 +733,7 @@
         "role": "SecondaryPort"
       },
       "brief": "Author a contract_conformance test covering 'trait_impl:usecase::base_merge::BaseMergeCleanupPort' of FsBaseMergeCleanupAdapter",
-      "declaration_hash": "2f6075a148b1bf9f0eb45df3ca5af0462c4f55fea33b0dfe9e7a352240f66ca0",
+      "declaration_hash": "c611885111258e65b0b8598f8e3714a0f2ed37bbdc818c4ec6d79ccd66877710",
       "spec_refs": [
         {
           "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
@@ -578,6 +750,34 @@
         {
           "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
           "element_id": "AC-04"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-06"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-05"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-06"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-07"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-10"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-11"
+        },
+        {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-12"
         }
       ]
     },

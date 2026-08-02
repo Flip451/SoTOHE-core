@@ -1,7 +1,7 @@
 {
   "schema_version": 4,
-  "generated_at": "2026-08-01T12:12:46Z",
-  "declaration_hash": "7d521a29c61391b6626242bb8575260ae91c5ed070190ab650364aeb0a90e465",
+  "generated_at": "2026-08-02T01:41:41Z",
+  "declaration_hash": "ed4f3dbf73bf331786ee8221ececfface8c4d1d42a953cdea5b5555c6b352472",
   "implementation_input_hash": "0e9ea46a2a136a2ed9c3501eba7de54d82af9bba03989cbef3074ceaf6bc009e",
   "baseline_hash": "c228f6dfed89d2c6ea098767d635435278776915a9cb7474161b8b1b7a8957ac",
   "signals": [
@@ -89,6 +89,12 @@
     {
       "type_name": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
       "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CommitHash",
+      "kind_tag": "value_object",
       "signal": "blue",
       "found_type": true
     },

@@ -16,12 +16,12 @@
       },
       "key": {
         "waived_reason_hash": "c1693f47bc315a8c7387bd2e8ad75a35c663cc39bea2b0c623a04ac74de6f35a",
-        "declaration_hash": "318479435b77df5c4e0a4171903380853bd56d6b14317305f862ce59fc6c1636",
+        "declaration_hash": "eb4fb2ef3052ce781ee2890654671eec5b6c0f71e28cabd6157a338fa42d29cf",
         "anchor_text_hash": "bbbb8b0ae8e121225a1f2c7388f5aa303e348da890d769ed1323f1fac625ca34"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "\"its method exposes a pre-cleanup attempt result and git-specific error\""
+        "citation": "\"params: [ParamDeclaration { name: ParamName(Identifier(\"workspace_root\")), ty: TypeRef(\"&std::path::Path\") }, ParamDeclaration { name: ParamName(Identifier(\"direction\")), ty: TypeRef(\"&domain::branch_strategy::BaseMergeDirection\") }]\""
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -40,36 +40,12 @@
       },
       "key": {
         "waived_reason_hash": "c4e4f2d31ba9f4a24dc802174bbb0ec8fa068f0eaa38655b1d2ba7b2d7964db1",
-        "declaration_hash": "318479435b77df5c4e0a4171903380853bd56d6b14317305f862ce59fc6c1636",
+        "declaration_hash": "eb4fb2ef3052ce781ee2890654671eec5b6c0f71e28cabd6157a338fa42d29cf",
         "anchor_text_hash": "f18c851ca6bcb1742ea5111e940f5b4d764e8a3f5972d5c76b358096ed16f950"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "ParamDeclaration { name: ParamName(Identifier(\"direction\")), ty: TypeRef(\"&domain::branch_strategy::BaseMergeDirection\") }"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "entry_key": "BaseMergeAttemptOutcome",
-        "anchor_id": {
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
-          "element_id": "IN-01"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "BaseMergeAttemptOutcome",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-01"
-      },
-      "key": {
-        "waived_reason_hash": "77237bb9946dc49c0b28d128466995676f4e69b601c7e33ebf0407b55de3bd27",
-        "declaration_hash": "b38d307274bbfd116b5559961b73e2fffd1b0fa8f0954747c3f4b6dd086a572d",
-        "anchor_text_hash": "008a36faed29453afb25460ea4db3d92210eddc427c7d565839f29f1cce2e93e"
-      },
-      "verdict": {
-        "kind": "waived",
-        "citation": "\"variants: [VariantDecl { name: VariantName(Identifier(\"Clean\")), payload: Unit }, VariantDecl { name: VariantName(Identifier(\"Conflicted\")), payload: Unit }]\""
+        "citation": "\"merge_base\""
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -160,12 +136,12 @@
       },
       "key": {
         "waived_reason_hash": "e93900cb50b7586b8b1d5cb59c8e70e5933359b376f758818181e8abae005fc8",
-        "declaration_hash": "cb48773054e03a0c20760b73d7fb15e4915cf4944c48f31713418934d9b0773a",
+        "declaration_hash": "e607701a4e54cf73d62f72c0400bfee63c7842771f21812e4f2b113055b427c0",
         "anchor_text_hash": "40f4d9f0d37fa58dfb35671b5faada2feea33e0d3a44c57a471647c25bc0d4f5"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "Application error union for context, active-track identity mismatch, git execution, and staged cleanup failures."
+        "citation": "methods: []"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -184,12 +160,12 @@
       },
       "key": {
         "waived_reason_hash": "c18a578e29299335039b40b3c25142adfa4016e3d539e78d5f718bdf54a20e2f",
-        "declaration_hash": "cb48773054e03a0c20760b73d7fb15e4915cf4944c48f31713418934d9b0773a",
-        "anchor_text_hash": "c43a9f220f2dfd90a0f665bb2a4988ca8cba389c771d7c50aba2afc25f49bfad"
+        "declaration_hash": "e607701a4e54cf73d62f72c0400bfee63c7842771f21812e4f2b113055b427c0",
+        "anchor_text_hash": "ae93f16b8b5af6d307d274a5c694b4ac052045cff1123092ed79af420e71bad1"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "Application error union for context, active-track identity mismatch, git execution, and staged cleanup failures."
+        "citation": "\"Error type returned by the guarded base-merge application service.\""
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -305,11 +281,11 @@
       "key": {
         "waived_reason_hash": "6588159324fb7ab2bd190af6e3a0542f0c3af39166867239a9839aba922d30cb",
         "declaration_hash": "1fa1982e64b9150eaff67bda63fcd06cbe3086c44e4047508ea858c61016fae3",
-        "anchor_text_hash": "c43a9f220f2dfd90a0f665bb2a4988ca8cba389c771d7c50aba2afc25f49bfad"
+        "anchor_text_hash": "ae93f16b8b5af6d307d274a5c694b4ac052045cff1123092ed79af420e71bad1"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "Git-process failure carrying opaque adapter diagnostics."
+        "citation": "\"Git-process failure carrying opaque adapter diagnostics.\""
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -328,12 +304,12 @@
       },
       "key": {
         "waived_reason_hash": "9b72a894e173475ffbbde2edd1bbc62743e80a238b26286de648fee9c6ec5a1f",
-        "declaration_hash": "ce1a7ca347da2c4054bf94a0b0faa6940155c77ebb55bba0f780d688d4d8aa98",
+        "declaration_hash": "a32eca11e5762fdf6def09788dc2c7992c0841b913ae400f83a450d17002b662",
         "anchor_text_hash": "04ee06225d2dde855bd2ce4384bd448922a1ef5d7cb6550b5f702ec87f32e137"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "TypeEntry { action: Add, role: Interactor, kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: [],"
+        "citation": "TypeEntry { action: Add, role: Interactor, kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: [], generics: [], where_predicates: [], module_path: ModulePath([Identifier(\"base_merge\")]), docs: Some(DocString(\"Dependency-injected interactor implementing BaseMergeService.\"))"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -352,12 +328,12 @@
       },
       "key": {
         "waived_reason_hash": "6ef534796618f6601b3ed3fdce4c46a531f01e1c8b26cb24e429821fb2f9ecb4",
-        "declaration_hash": "ce1a7ca347da2c4054bf94a0b0faa6940155c77ebb55bba0f780d688d4d8aa98",
-        "anchor_text_hash": "b6d58ef2fbe2a0ba0cceb148bcb9928018225a258fdaf1340e4abd3be561262e"
+        "declaration_hash": "a32eca11e5762fdf6def09788dc2c7992c0841b913ae400f83a450d17002b662",
+        "anchor_text_hash": "ab5b95bd2bf1ac2a636655117378a08d874c0d9763dac951949ae62fddda6b5d"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "methods: []"
+        "citation": "\"under orchestrator ownership\""
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -376,8 +352,8 @@
       },
       "key": {
         "waived_reason_hash": "c69c80cad896a6e574ac66351de55e503b0aeb05c97264ca1601a80e441dfe2b",
-        "declaration_hash": "238b8c7004943fac290b01ed0f77637bdaa947bd23e04fed73f5d2742a14d132",
-        "anchor_text_hash": "b6d58ef2fbe2a0ba0cceb148bcb9928018225a258fdaf1340e4abd3be561262e"
+        "declaration_hash": "1531029a561c3fcb3df1584a8b97686956f9e29cbf7baaca84f288a0b12435fc",
+        "anchor_text_hash": "ab5b95bd2bf1ac2a636655117378a08d874c0d9763dac951949ae62fddda6b5d"
       },
       "verdict": {
         "kind": "waived",
@@ -400,7 +376,7 @@
       },
       "key": {
         "waived_reason_hash": "06dcfa0f3c0e7756dda79cc3cbc6896e5e3138503e4fe90e3f40c4e80e7c97d1",
-        "declaration_hash": "238b8c7004943fac290b01ed0f77637bdaa947bd23e04fed73f5d2742a14d132",
+        "declaration_hash": "1531029a561c3fcb3df1584a8b97686956f9e29cbf7baaca84f288a0b12435fc",
         "anchor_text_hash": "04ee06225d2dde855bd2ce4384bd448922a1ef5d7cb6550b5f702ec87f32e137"
       },
       "verdict": {
@@ -424,12 +400,12 @@
       },
       "key": {
         "waived_reason_hash": "6fd29fb7daf6bde7c3fd2d5b06d09bb5fcf04f5d358b1a4338139e1f6b3ede18",
-        "declaration_hash": "238b8c7004943fac290b01ed0f77637bdaa947bd23e04fed73f5d2742a14d132",
-        "anchor_text_hash": "c43a9f220f2dfd90a0f665bb2a4988ca8cba389c771d7c50aba2afc25f49bfad"
+        "declaration_hash": "1531029a561c3fcb3df1584a8b97686956f9e29cbf7baaca84f288a0b12435fc",
+        "anchor_text_hash": "ae93f16b8b5af6d307d274a5c694b4ac052045cff1123092ed79af420e71bad1"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "\"its declared command, result, and error surface has no conflict-editing, review, guarded-commit, or post-conflict recovery-cleanup operation\""
+        "citation": "\"Application-service boundary for BaseMergeCommand and final BaseMergeOutcome values.\""
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -448,12 +424,12 @@
       },
       "key": {
         "waived_reason_hash": "5e884b84d54500bce9728aa6108e34f4a95d4ab5cf97fd6445e41a3c1f8fbdb8",
-        "declaration_hash": "fb7b3c8ae9f2a2112fdb296cb20b02615f0e7056ae982ec77340d6fd29b125a0",
+        "declaration_hash": "d39d07f581772cedd86402619946b7d3a68230f5fcd29a6603d83dd0ce6a9737",
         "anchor_text_hash": "008a36faed29453afb25460ea4db3d92210eddc427c7d565839f29f1cce2e93e"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "TypeEntry { action: Add, role: ValueObject { invariants: [] }, kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"Completed\")), payload: Unit }, VariantDecl { name: VariantName(Identifier(\"Conflicted\")), payload: Unit }]"
+        "citation": "TypeEntry { action: Add, role: Dto, kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"Completed\")), payload: Unit }, VariantDecl { name: VariantName(Identifier(\"Conflicted\")), payload: Unit }]"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -472,8 +448,8 @@
       },
       "key": {
         "waived_reason_hash": "0ac972a755997168d93738fface37db91ae30eceb16e0657e082c2434b31e6e6",
-        "declaration_hash": "fb7b3c8ae9f2a2112fdb296cb20b02615f0e7056ae982ec77340d6fd29b125a0",
-        "anchor_text_hash": "c43a9f220f2dfd90a0f665bb2a4988ca8cba389c771d7c50aba2afc25f49bfad"
+        "declaration_hash": "d39d07f581772cedd86402619946b7d3a68230f5fcd29a6603d83dd0ce6a9737",
+        "anchor_text_hash": "ae93f16b8b5af6d307d274a5c694b4ac052045cff1123092ed79af420e71bad1"
       },
       "verdict": {
         "kind": "waived",
@@ -483,25 +459,577 @@
     },
     {
       "edge_id": {
-        "entry_key": "PostMergeCleanupStage",
+        "entry_key": "BaseMergeInteractor",
         "anchor_id": {
           "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
-          "element_id": "AC-04"
+          "element_id": "IN-06"
         }
       },
       "obligation_id": {
-        "entry_key": "PostMergeCleanupStage",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:AC-04"
+        "entry_key": "BaseMergeInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
       },
       "key": {
-        "waived_reason_hash": "b8476b139cdab1cae3793361d47c2ef258d176dca2a9b50c86e15e6c4c54716c",
-        "declaration_hash": "9ef7862dc37e8dc92f9a453da391ca5103350e6a1f5b6d38a42296c600f50186",
-        "anchor_text_hash": "c43a9f220f2dfd90a0f665bb2a4988ca8cba389c771d7c50aba2afc25f49bfad"
+        "waived_reason_hash": "12f748ca9c402759def88cf90160522d2ac9cc5a28dac0da0f1b93de6a98cbcf",
+        "declaration_hash": "a32eca11e5762fdf6def09788dc2c7992c0841b913ae400f83a450d17002b662",
+        "anchor_text_hash": "92a7601808ae36e0d63a8e8e4e46f7ae285b3e663bc9b63579db5ea2ff17841a"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "Finite stage identifier with Views, Baseline, and SyncBaseStamp variants."
+        "citation": "\"Dependency-injected interactor implementing BaseMergeService.\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeInteractor",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "waived_reason_hash": "394f34f1eb4b9611daf88a4878ed80142abf73b88f56da4400fd496637666124",
+        "declaration_hash": "a32eca11e5762fdf6def09788dc2c7992c0841b913ae400f83a450d17002b662",
+        "anchor_text_hash": "10b98eec1056add45bb868001fad34b38c6acacf628f4a2ed3215b58620ad424"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"Isolated worktree generation, validation, atomic publication, restoration, and preservation of the prior baseline\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeInteractor",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "waived_reason_hash": "c7c54bb32b59cd11fff5555450b6131a11860a61b9512aefe0981fc00b7e859a",
+        "declaration_hash": "a32eca11e5762fdf6def09788dc2c7992c0841b913ae400f83a450d17002b662",
+        "anchor_text_hash": "94cd89ee88ae29b2d2034ebc97ab9f63217d17250a55a77d97d2546302a8e43e"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeInteractor",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "waived_reason_hash": "e6696cf05aeaca40c8eb0bfc78a0d2b37e7327a98714878d5ab6260a495b7711",
+        "declaration_hash": "a32eca11e5762fdf6def09788dc2c7992c0841b913ae400f83a450d17002b662",
+        "anchor_text_hash": "d5e6be0352d264e24422b08e522cd2fa714eb06575771f564fde0ddad0d1c7a0"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:regenerate_views"
+      },
+      "key": {
+        "waived_reason_hash": "ce5bc64f6e5c581c04c1d6f1d6531729dbfbfbf3a4775465272bfd082c144644",
+        "declaration_hash": "5ac6584703179f572ce269db7dfaa15713fe8a6223bbbc699bc96bf5f8e7dd9e",
+        "anchor_text_hash": "ab5b95bd2bf1ac2a636655117378a08d874c0d9763dac951949ae62fddda6b5d"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Synchronous secondary port matching the blocking CLI-process and filesystem adapter boundary."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:replace_baselines"
+      },
+      "key": {
+        "waived_reason_hash": "ce5bc64f6e5c581c04c1d6f1d6531729dbfbfbf3a4775465272bfd082c144644",
+        "declaration_hash": "5ac6584703179f572ce269db7dfaa15713fe8a6223bbbc699bc96bf5f8e7dd9e",
+        "anchor_text_hash": "ab5b95bd2bf1ac2a636655117378a08d874c0d9763dac951949ae62fddda6b5d"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"Synchronous secondary port matching the blocking CLI-process and filesystem adapter boundary.\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:write_sync_base_record"
+      },
+      "key": {
+        "waived_reason_hash": "ce5bc64f6e5c581c04c1d6f1d6531729dbfbfbf3a4775465272bfd082c144644",
+        "declaration_hash": "5ac6584703179f572ce269db7dfaa15713fe8a6223bbbc699bc96bf5f8e7dd9e",
+        "anchor_text_hash": "ab5b95bd2bf1ac2a636655117378a08d874c0d9763dac951949ae62fddda6b5d"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"Conflict outcomes do not run clean-merge cleanup.\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:regenerate_views"
+      },
+      "key": {
+        "waived_reason_hash": "7918e080a4e6ffaa32cf3c4598eede1b907f2c076fb1946c4528ad32a32ba172",
+        "declaration_hash": "5ac6584703179f572ce269db7dfaa15713fe8a6223bbbc699bc96bf5f8e7dd9e",
+        "anchor_text_hash": "92a7601808ae36e0d63a8e8e4e46f7ae285b3e663bc9b63579db5ea2ff17841a"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"Synchronous sync-base record-write operation matching the blocking CLI-process and filesystem adapter boundary.\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:replace_baselines"
+      },
+      "key": {
+        "waived_reason_hash": "7918e080a4e6ffaa32cf3c4598eede1b907f2c076fb1946c4528ad32a32ba172",
+        "declaration_hash": "5ac6584703179f572ce269db7dfaa15713fe8a6223bbbc699bc96bf5f8e7dd9e",
+        "anchor_text_hash": "92a7601808ae36e0d63a8e8e4e46f7ae285b3e663bc9b63579db5ea2ff17841a"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"Synchronous sync-base record-write operation matching the blocking CLI-process and filesystem adapter boundary.\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:write_sync_base_record"
+      },
+      "key": {
+        "waived_reason_hash": "7918e080a4e6ffaa32cf3c4598eede1b907f2c076fb1946c4528ad32a32ba172",
+        "declaration_hash": "5ac6584703179f572ce269db7dfaa15713fe8a6223bbbc699bc96bf5f8e7dd9e",
+        "anchor_text_hash": "92a7601808ae36e0d63a8e8e4e46f7ae285b3e663bc9b63579db5ea2ff17841a"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"write_sync_base_record\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:regenerate_views"
+      },
+      "key": {
+        "waived_reason_hash": "4e2c2917e301cd2bf29d1eb85c797c337f63a0d75038ed34691063e463ca760f",
+        "declaration_hash": "5ac6584703179f572ce269db7dfaa15713fe8a6223bbbc699bc96bf5f8e7dd9e",
+        "anchor_text_hash": "10b98eec1056add45bb868001fad34b38c6acacf628f4a2ed3215b58620ad424"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Synchronous TDDD baseline-replacement operation matching the blocking CLI-process and filesystem adapter boundary."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:replace_baselines"
+      },
+      "key": {
+        "waived_reason_hash": "4e2c2917e301cd2bf29d1eb85c797c337f63a0d75038ed34691063e463ca760f",
+        "declaration_hash": "5ac6584703179f572ce269db7dfaa15713fe8a6223bbbc699bc96bf5f8e7dd9e",
+        "anchor_text_hash": "10b98eec1056add45bb868001fad34b38c6acacf628f4a2ed3215b58620ad424"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"Synchronous TDDD baseline-replacement operation matching the blocking CLI-process and filesystem adapter boundary.\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:write_sync_base_record"
+      },
+      "key": {
+        "waived_reason_hash": "4e2c2917e301cd2bf29d1eb85c797c337f63a0d75038ed34691063e463ca760f",
+        "declaration_hash": "5ac6584703179f572ce269db7dfaa15713fe8a6223bbbc699bc96bf5f8e7dd9e",
+        "anchor_text_hash": "10b98eec1056add45bb868001fad34b38c6acacf628f4a2ed3215b58620ad424"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"returns: TypeRef(\\\"Result<(), BaselineReplacementError>\\\")\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:regenerate_views"
+      },
+      "key": {
+        "waived_reason_hash": "ed566ffb26b10016a78353d4744c9ba8cf66d20188c93d35bf1b18de9cf01651",
+        "declaration_hash": "5ac6584703179f572ce269db7dfaa15713fe8a6223bbbc699bc96bf5f8e7dd9e",
+        "anchor_text_hash": "94cd89ee88ae29b2d2034ebc97ab9f63217d17250a55a77d97d2546302a8e43e"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"Synchronous sync-base record-write operation matching the blocking CLI-process and filesystem adapter boundary.\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:replace_baselines"
+      },
+      "key": {
+        "waived_reason_hash": "ed566ffb26b10016a78353d4744c9ba8cf66d20188c93d35bf1b18de9cf01651",
+        "declaration_hash": "5ac6584703179f572ce269db7dfaa15713fe8a6223bbbc699bc96bf5f8e7dd9e",
+        "anchor_text_hash": "94cd89ee88ae29b2d2034ebc97ab9f63217d17250a55a77d97d2546302a8e43e"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"Synchronous sync-base record-write operation matching the blocking CLI-process and filesystem adapter boundary.\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:write_sync_base_record"
+      },
+      "key": {
+        "waived_reason_hash": "ed566ffb26b10016a78353d4744c9ba8cf66d20188c93d35bf1b18de9cf01651",
+        "declaration_hash": "5ac6584703179f572ce269db7dfaa15713fe8a6223bbbc699bc96bf5f8e7dd9e",
+        "anchor_text_hash": "94cd89ee88ae29b2d2034ebc97ab9f63217d17250a55a77d97d2546302a8e43e"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Synchronous sync-base record-write operation matching the blocking CLI-process and filesystem adapter boundary."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-11"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:regenerate_views"
+      },
+      "key": {
+        "waived_reason_hash": "fdbad2601eedbe77f3827ad81de441fc9da14a93c4cdd6234aee0189ff909089",
+        "declaration_hash": "5ac6584703179f572ce269db7dfaa15713fe8a6223bbbc699bc96bf5f8e7dd9e",
+        "anchor_text_hash": "8f72df7566d25066016278de5e0f6d20ef327f95a6f72e7f2d2de2b00cc5e843"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"Synchronous sync-base record-write operation matching the blocking CLI-process and filesystem adapter boundary.\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-11"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:replace_baselines"
+      },
+      "key": {
+        "waived_reason_hash": "fdbad2601eedbe77f3827ad81de441fc9da14a93c4cdd6234aee0189ff909089",
+        "declaration_hash": "5ac6584703179f572ce269db7dfaa15713fe8a6223bbbc699bc96bf5f8e7dd9e",
+        "anchor_text_hash": "8f72df7566d25066016278de5e0f6d20ef327f95a6f72e7f2d2de2b00cc5e843"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"Synchronous sync-base record-write operation matching the blocking CLI-process and filesystem adapter boundary.\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-11"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:write_sync_base_record"
+      },
+      "key": {
+        "waived_reason_hash": "fdbad2601eedbe77f3827ad81de441fc9da14a93c4cdd6234aee0189ff909089",
+        "declaration_hash": "5ac6584703179f572ce269db7dfaa15713fe8a6223bbbc699bc96bf5f8e7dd9e",
+        "anchor_text_hash": "8f72df7566d25066016278de5e0f6d20ef327f95a6f72e7f2d2de2b00cc5e843"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Synchronous sync-base record-write operation matching the blocking CLI-process and filesystem adapter boundary."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-12"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:regenerate_views"
+      },
+      "key": {
+        "waived_reason_hash": "23be5974465c886b8f2ba01e8ad601405e8ab02b24583b66bda93752fba02f6c",
+        "declaration_hash": "5ac6584703179f572ce269db7dfaa15713fe8a6223bbbc699bc96bf5f8e7dd9e",
+        "anchor_text_hash": "2f8501ce2880b06ce24e84c087b1539e8bdfef95c479944a0d0853e85ec77cc5"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "returns: TypeRef(\"Result<(), ViewsRegenerationError>\")"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-12"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:replace_baselines"
+      },
+      "key": {
+        "waived_reason_hash": "23be5974465c886b8f2ba01e8ad601405e8ab02b24583b66bda93752fba02f6c",
+        "declaration_hash": "5ac6584703179f572ce269db7dfaa15713fe8a6223bbbc699bc96bf5f8e7dd9e",
+        "anchor_text_hash": "2f8501ce2880b06ce24e84c087b1539e8bdfef95c479944a0d0853e85ec77cc5"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "returns: TypeRef(\"Result<(), ViewsRegenerationError>\")"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-12"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeCleanupPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:write_sync_base_record"
+      },
+      "key": {
+        "waived_reason_hash": "23be5974465c886b8f2ba01e8ad601405e8ab02b24583b66bda93752fba02f6c",
+        "declaration_hash": "5ac6584703179f572ce269db7dfaa15713fe8a6223bbbc699bc96bf5f8e7dd9e",
+        "anchor_text_hash": "2f8501ce2880b06ce24e84c087b1539e8bdfef95c479944a0d0853e85ec77cc5"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"prevents a completed-cleanup success result\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeGitPort",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeGitPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:merge_base"
+      },
+      "key": {
+        "waived_reason_hash": "2c34a45400953264be24026cfaf8eec80e1f8b1a937965f970e373650626a099",
+        "declaration_hash": "eb4fb2ef3052ce781ee2890654671eec5b6c0f71e28cabd6157a338fa42d29cf",
+        "anchor_text_hash": "008a36faed29453afb25460ea4db3d92210eddc427c7d565839f29f1cce2e93e"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"params: [ParamDeclaration { name: ParamName(Identifier(\\\"workspace_root\\\")), ty: TypeRef(\\\"&std::path::Path\\\") }, ParamDeclaration { name: ParamName(Identifier(\\\"direction\\\")), ty: TypeRef(\\\"&domain::branch_strategy::BaseMergeDirection\\\") }]\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeService",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:execute"
+      },
+      "key": {
+        "waived_reason_hash": "098457c6c72bce5d06ee80b28535224b0fb9dcef21fd073c89d678c19770e958",
+        "declaration_hash": "1531029a561c3fcb3df1584a8b97686956f9e29cbf7baaca84f288a0b12435fc",
+        "anchor_text_hash": "10b98eec1056add45bb868001fad34b38c6acacf628f4a2ed3215b58620ad424"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Application-service boundary for BaseMergeCommand and final BaseMergeOutcome values."
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     }

@@ -3,18 +3,20 @@
 
 ## Summary
 
-GO-01 → T001–T004.
+GO-01 → T001–T004, T010, and T011.
 GO-02 → T005–T009.
 
-## Tasks (5/9 resolved)
+## Tasks (7/11 resolved)
 
 ### S1 — Guarded base merge
 
-> Modify `libs/domain/src/branch_strategy.rs`, `libs/usecase/src/base_merge.rs`, `libs/infrastructure/src/base_merge.rs`, and the named track CLI surfaces in T004. D1; IN-01; AC-01; AC-02; AC-03; AC-04.
+> Modify `libs/domain/src/branch_strategy.rs`, `libs/usecase/src/base_merge.rs`, `libs/infrastructure/src/base_merge.rs`, and the named track CLI surfaces through T001–T004, T010, and T011. D1; IN-01; IN-02; IN-06; CN-05; CN-06; CN-07; AC-01; AC-02; AC-03; AC-04; AC-10; AC-11; AC-12.
 
 - [x] **T001**: Add `BaseBranchName`, `BaseMergeDirection`, `BaseMergeDirectionError`, and `derive_base_merge_direction` in `libs/domain/src/branch_strategy.rs`, updating `TrackMetadata` in `libs/domain/src/track.rs`; add regression coverage. D1; IN-01. (`daf758c60802d14be799f267826bec46a2cd8782`)
-- [x] **T002**: Add `libs/usecase/src/base_merge.rs` with `BaseMergeContextPort`, `BaseMergeGitPort`, `BaseMergeCleanupPort`, `BaseMergeService`, `BaseMergeInteractor`, command, outcomes, and errors; export it from `libs/usecase/src/lib.rs` and add regression coverage. D1; IN-01; IN-02; OS-01; CN-01; CN-02; AC-01; AC-02; AC-03; AC-04.
-- [ ] **T003**: Add `FsBaseMergeContextAdapter`, `FsBaseMergeGitAdapter`, and `FsBaseMergeCleanupAdapter` in `libs/infrastructure/src/base_merge.rs`; export the module from `libs/infrastructure/src/lib.rs` and add adapter regression coverage. D1; IN-01; IN-02; OS-01; CN-01; CN-02; AC-01; AC-02; AC-03; AC-04.
+- [x] **T002**: Add `libs/usecase/src/base_merge.rs` with `BaseMergeContextPort`, `BaseMergeGitPort`, `BaseMergeCleanupPort`, `BaseMergeService`, `BaseMergeInteractor`, command, outcomes, and errors; export it from `libs/usecase/src/lib.rs` and add regression coverage. D1; IN-01; IN-02; OS-01; CN-01; CN-02; AC-01; AC-02; AC-03; AC-04. (`a5259acf836d40408c7940ef73798a2f76ba721e`)
+- [x] **T010**: Update `BaseMergeAttemptOutcome`, `BaseMergeError`, `BaseMergeCleanupRequest`, `PostMergeCleanupError`, `ViewsRegenerationError`, `BaselineReplacementError`, `SyncBaseRecordError`, the base-merge cleanup and git ports, and the sync-base record adapter with their regression coverage. D1; IN-02; IN-06; CN-05; CN-06; CN-07; AC-03; AC-10; AC-11; AC-12.
+- [x] **T003**: Add `FsBaseMergeContextAdapter` and `FsBaseMergeGitAdapter` in `libs/infrastructure/src/base_merge.rs`; export the module from `libs/infrastructure/src/lib.rs` and add focused adapter regression coverage. D1; IN-01; IN-02; OS-01; CN-01; AC-01; AC-02; AC-03; AC-04.
+- [ ] **T011**: Add `FsBaseMergeCleanupAdapter` in `libs/infrastructure/src/base_merge.rs` and focused cleanup adapter regression coverage. D1; IN-02; IN-06; CN-02; CN-05; CN-06; CN-07; AC-03; AC-04; AC-10; AC-11; AC-12.
 - [ ] **T004**: Add `BaseMergeInput` and `TrackDriver` handling in `apps/cli-driver/src/track.rs`, the `TrackCommand` variant and `execute` dispatch in `apps/cli/src/commands/track/{mod.rs,dispatch.rs}`, and `TrackCompositionRoot::track_driver` wiring in `apps/cli-composition/src/track/composition_root.rs`; add command regression coverage. D1; IN-01; OS-01; CN-01; AC-01; AC-02; AC-03; AC-04.
 
 ### S2 — Conflict recovery and guarded stash

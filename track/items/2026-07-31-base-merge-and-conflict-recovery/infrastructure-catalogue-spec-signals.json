@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "f0777e79409294121e0b23e6868138f9ac15f743bf831370927a0eaf6da06026",
+  "catalogue_declaration_hash": "cde79c801ad2c6c75cc827bf05eb9ff037fb301ea0b5971775394ff4a58f37f3",
   "signals": [
     {
       "type_name": "EvaluateSignalsError",
@@ -10,7 +10,7 @@
     {
       "type_name": "FsBaseMergeCleanupAdapter",
       "signal": "blue",
-      "entry_hash": "24b89d60d56c6869b61c2c1e2f5e75d8d3aefcb225d6d786f0ab1d1b68aa6b7b"
+      "entry_hash": "544e1592601496626421162c61a5b5e9a713915e214cd5714708d42d521375ed"
     },
     {
       "type_name": "FsBaseMergeContextAdapter",
@@ -20,12 +20,22 @@
     {
       "type_name": "FsBaseMergeGitAdapter",
       "signal": "blue",
-      "entry_hash": "dd405d5e070eaff08c0e638a12a5488de04ac41dbb437aea2f31da8755e564cf"
+      "entry_hash": "702b8a1a7249e444b5a5a562f9fa46aa03201f2d47c7dace0b841dc270871ed4"
     },
     {
       "type_name": "FsGitStashAdapter",
       "signal": "blue",
       "entry_hash": "fd641ee1e5607f90728e97f5b24ee29399c4c6560b7e5d8c8affb766b6d76aed"
+    },
+    {
+      "type_name": "SyncBaseRecord",
+      "signal": "blue",
+      "entry_hash": "cffe1a62718dbadc8527c5dd5e1b58f1d992b5438ed744c0eda5f93b7a331d5c"
+    },
+    {
+      "type_name": "SyncBaseRecordSchemaVersion",
+      "signal": "blue",
+      "entry_hash": "25c47dfcc0072c1ebb06e881fffc78c4a8f967c9a7ad7799312b64aa50e832db"
     },
     {
       "type_name": "TypeSignalsExecutorAdapter",

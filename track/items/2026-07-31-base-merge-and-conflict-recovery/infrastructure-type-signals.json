@@ -1,8 +1,8 @@
 {
   "schema_version": 4,
-  "generated_at": "2026-08-01T12:12:55Z",
-  "declaration_hash": "f0777e79409294121e0b23e6868138f9ac15f743bf831370927a0eaf6da06026",
-  "implementation_input_hash": "77f36b12f3e832fbac09195ac9965a056b63bb8d1764e733ed14f05e39f08a89",
+  "generated_at": "2026-08-02T11:05:49Z",
+  "declaration_hash": "cde79c801ad2c6c75cc827bf05eb9ff037fb301ea0b5971775394ff4a58f37f3",
+  "implementation_input_hash": "848010ac22ee7eb9a8ffb3a47ae224ab8e7a765dee8b3e3584e804b8aee08574",
   "baseline_hash": "b52e74766c05f7fc413f6eb8219885a763c3ed4deb69ac3b6669ad68beb1c93b",
   "signals": [
     {
@@ -14,27 +14,27 @@
     {
       "type_name": "FsBaseMergeCleanupAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "usecase::base_merge::BaseMergeCleanupPort"
       ]
     },
     {
       "type_name": "FsBaseMergeContextAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "usecase::base_merge::BaseMergeContextPort"
       ]
     },
     {
       "type_name": "FsBaseMergeGitAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "usecase::base_merge::BaseMergeGitPort"
       ]
     },
@@ -45,6 +45,35 @@
       "found_type": false,
       "missing_items": [
         "usecase::git_stash::GitStashPort"
+      ]
+    },
+    {
+      "type_name": "SyncBaseRecord",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Deserialize",
+        "Eq",
+        "PartialEq",
+        "Serialize"
+      ]
+    },
+    {
+      "type_name": "SyncBaseRecordSchemaVersion",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Copy",
+        "Debug",
+        "Deserialize",
+        "Eq",
+        "PartialEq",
+        "Serialize"
       ]
     },
     {

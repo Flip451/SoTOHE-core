@@ -1,18 +1,30 @@
 <!-- Generated from infrastructure-types.json — DO NOT EDIT DIRECTLY -->
 
+## Enums
+
+| Name | Kind | Action | Details | Signal | Cat-Spec |
+|------|------|--------|---------|--------|----------|
+| SyncBaseRecordSchemaVersion | enum | add | V1 | 🔵 | 🔵 |
+
 ## Error Types
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | EvaluateSignalsError | error_type | modify | AuthoritativeInput, Evaluation, CacheWrite | 🔵 | 🔵 |
 
+## DTOs
+
+| Name | Kind | Action | Details | Signal | Cat-Spec |
+|------|------|--------|---------|--------|----------|
+| SyncBaseRecord | dto | add | — | 🔵 | 🔵 |
+
 ## Secondary Adapters
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| FsBaseMergeCleanupAdapter | secondary_adapter | add | impl BaseMergeCleanupPort | 🟡 | 🔵 |
-| FsBaseMergeContextAdapter | secondary_adapter | add | impl BaseMergeContextPort | 🟡 | 🔵 |
-| FsBaseMergeGitAdapter | secondary_adapter | add | impl BaseMergeGitPort | 🟡 | 🔵 |
+| FsBaseMergeCleanupAdapter | secondary_adapter | add | impl BaseMergeCleanupPort | 🔵 | 🔵 |
+| FsBaseMergeContextAdapter | secondary_adapter | add | impl BaseMergeContextPort | 🔵 | 🔵 |
+| FsBaseMergeGitAdapter | secondary_adapter | add | impl BaseMergeGitPort | 🔵 | 🔵 |
 | FsGitStashAdapter | secondary_adapter | add | impl GitStashPort | 🟡 | 🔵 |
 | TypeSignalsExecutorAdapter | secondary_adapter | reference | impl Debug, impl Default, impl TypeSignalsExecutorPort | 🔵 | 🔵 |
 

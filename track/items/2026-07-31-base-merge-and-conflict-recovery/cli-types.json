@@ -211,7 +211,7 @@
     },
     "TrackCommand": {
       "action": "modify",
-      "docs": "CLI enum for track subcommands, including a unit MergeBase variant; pre-existing String payloads remain parsing-boundary text.",
+      "docs": "CLI track-command enum modified to add the unit MergeBase variant.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",

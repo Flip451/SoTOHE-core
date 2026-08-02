@@ -5,11 +5,23 @@
   "goal": [
     {
       "id": "GO-01",
-      "text": "Permit an active track to safely incorporate the base branch recorded in its branch-strategy snapshot, while preserving the prohibition on merging a track into its base branch.",
+      "text": "Permit an active track to safely incorporate the base branch recorded in its branch-strategy snapshot and complete its cleanup against the exact merged base commit, while preserving the prohibition on merging a track into its base branch.",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-29-0839-base-merge-and-conflict-recovery.md",
           "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md",
+          "anchor": "D3"
         }
       ]
     },
@@ -46,11 +58,33 @@
       },
       {
         "id": "IN-02",
-        "text": "Complete derived-view regeneration, baseline recapture, and sync-base stamping after every clean guarded base merge.",
+        "text": "After every clean guarded base merge, regenerate derived views, replace the baseline from a commit-pinned isolated worktree without exposing a partial replacement, and then record synchronization of that exact merged base commit.",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-07-29-0839-base-merge-and-conflict-recovery.md",
             "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md",
+            "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md",
+            "anchor": "D2"
+          },
+          {
+            "file": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "IN-06",
+        "text": "Persist the active track's synchronization state as an atomically replaced, schema-versioned record containing its track identity, base branch, and the exact base commit incorporated by a successful guarded merge.",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md",
+            "anchor": "D2"
           }
         ]
       },
@@ -131,11 +165,15 @@
     },
     {
       "id": "CN-02",
-      "text": "Conflict recovery must follow the canonical workflow through conflict editing, zero-findings review, guarded commit, and post-merge cleanup under orchestrator ownership.",
+      "text": "Conflict recovery must follow the canonical workflow through conflict editing, zero-findings review, and guarded commit under orchestrator ownership; conflict outcomes do not run clean-merge cleanup.",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-29-0839-base-merge-and-conflict-recovery.md",
           "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md",
+          "anchor": "D3"
         }
       ]
     },
@@ -156,6 +194,40 @@
         {
           "file": "knowledge/adr/2026-07-29-0839-base-merge-and-conflict-recovery.md",
           "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "CN-05",
+      "text": "Baseline recapture must generate and validate a complete replacement in an isolated worktree pinned to the already-authorized base commit, atomically publish it only after success, and preserve or restore the prior baseline on any failure; every failure, including failed restoration, fails closed.",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-06",
+      "text": "The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution, be atomically written only after views and baseline recapture succeed, support idempotent retry for the same value, and fail closed on record generation, validation, write, or replacement failure.",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "CN-07",
+      "text": "Clean-merge cleanup may complete only in the order Views, Baseline, then SyncBaseStamp; conflict outcomes do not run that cleanup, and baseline replacement does not delete the type-signals cache.",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md",
+          "anchor": "D3"
         }
       ]
     }
@@ -183,21 +255,37 @@
     },
     {
       "id": "AC-03",
-      "text": "After a clean guarded base merge, derived views are regenerated, the baseline is recaptured, and the sync-base stamp is recorded before the operation reports success.",
+      "text": "After a clean guarded base merge, derived views are regenerated; a complete, validated baseline replacement produced in an isolated worktree pinned to the exact merged base commit is atomically published; and only then is the sync-base record atomically written before the operation reports success.",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-29-0839-base-merge-and-conflict-recovery.md",
           "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md",
+          "anchor": "D3"
         }
       ]
     },
     {
       "id": "AC-04",
-      "text": "When a guarded base merge conflicts, the orchestrator drives the canonical recovery workflow through editing, zero-findings review, guarded commit, and post-merge cleanup.",
+      "text": "When a guarded base merge conflicts, the orchestrator drives the canonical recovery workflow through editing, zero-findings review, and guarded commit without running clean-merge cleanup.",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-29-0839-base-merge-and-conflict-recovery.md",
           "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md",
+          "anchor": "D3"
         }
       ]
     },
@@ -250,6 +338,36 @@
           "anchor": "D4"
         }
       ]
+    },
+    {
+      "id": "AC-10",
+      "text": "If isolated baseline generation, validation, atomic replacement, or necessary restoration fails, the operation reports failure rather than cleanup completion and the previously valid baseline remains available whenever restoration succeeds.",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-11",
+      "text": "Following successful views and baseline steps, the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit; rerunning with that same commit is idempotent, while a later successful merge atomically replaces the record with its newly incorporated commit.",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-12",
+      "text": "A conflict outcome enters the canonical recovery workflow without running clean-merge cleanup, and a failure in views, baseline recapture, or sync-base recording prevents a completed-cleanup success result.",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md",
+          "anchor": "D3"
+        }
+      ]
     }
   ],
   "related_conventions": [
@@ -263,7 +381,7 @@
     }
   ],
   "signals": {
-    "blue": 23,
+    "blue": 30,
     "yellow": 0,
     "red": 0
   }

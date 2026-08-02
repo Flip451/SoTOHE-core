@@ -7,6 +7,7 @@
 | BaseBranchName | value_object | add | — | 🔵 | 🔵 |
 | BaseMergeDirection | value_object | add | — | 🔵 | 🔵 |
 | BaselineHash | value_object | add | — | 🔵 | 🔵 |
+| CommitHash | value_object | reference | — | 🔵 | 🔵 |
 | TypeSignalsCacheKey | value_object | add | — | 🔵 | 🔵 |
 | TypeSignalsDocument | value_object | modify | — | 🔵 | 🔵 |
 

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "7d521a29c61391b6626242bb8575260ae91c5ed070190ab650364aeb0a90e465",
+  "catalogue_declaration_hash": "ed4f3dbf73bf331786ee8221ececfface8c4d1d42a953cdea5b5555c6b352472",
   "signals": [
     {
       "type_name": "BaseBranchName",
@@ -21,6 +21,11 @@
       "type_name": "BaselineHash",
       "signal": "blue",
       "entry_hash": "1f086893c905a07613ed6b7e6d0a30b076be3436c8ca2c8b025043337c7820ca"
+    },
+    {
+      "type_name": "CommitHash",
+      "signal": "blue",
+      "entry_hash": "ca568831dc2b0359bede7d343df2de0feaa29ac998ae32117c71ebeab2b097cf"
     },
     {
       "type_name": "TrackMetadata",

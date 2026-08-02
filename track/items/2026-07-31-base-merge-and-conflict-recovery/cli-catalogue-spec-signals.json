@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "58e4ac326319f7ff2161bc452992d088c01d3284f2bdffb66e010bd894789e1b",
+  "catalogue_declaration_hash": "1c58ac5db995b6829202c42634dee90f5b3518ca6f3d0229260c5b97752e0498",
   "signals": [
     {
       "type_name": "GitCommand",
@@ -15,7 +15,7 @@
     {
       "type_name": "TrackCommand",
       "signal": "blue",
-      "entry_hash": "9712431c2566e83b8e5fae9483cb45198630538d3e7956af1f9295cf7d9b3abe"
+      "entry_hash": "6d513129d681e58eeef766f95098ffd9088fc53dacb9861306e1aff5aca89da3"
     },
     {
       "type_name": "cli::commands::git::execute",

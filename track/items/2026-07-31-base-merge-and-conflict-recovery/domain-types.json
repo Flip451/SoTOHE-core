@@ -285,6 +285,51 @@
     },
     {
       "action": "reference",
+      "for_type": "CommitHash",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "CommitHash",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "CommitHash",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CommitHash",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CommitHash",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "action": "reference",
+      "for_type": "CommitHash",
+      "trait_ref": "core::cmp::PartialOrd"
+    },
+    {
+      "action": "reference",
+      "for_type": "CommitHash",
+      "trait_ref": "core::cmp::Ord"
+    },
+    {
+      "action": "reference",
+      "for_type": "CommitHash",
+      "trait_ref": "core::convert::AsRef<str>"
+    },
+    {
+      "action": "reference",
+      "for_type": "CommitHash",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
       "for_type": "TrackMetadata",
       "trait_ref": "core::fmt::Debug"
     },
@@ -434,6 +479,67 @@
         },
         {
           "anchor": "AC-07",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
+    "CommitHash": {
+      "action": "reference",
+      "docs": "Referenced validated git commit identity.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "impl Into"
+            }
+          ],
+          "returns": "Result<Self, ValidationError>"
+        }
+      ],
+      "module_path": "ids",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "IN-06",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-05",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-06",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-11",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         }
       ]

@@ -6,6 +6,7 @@ extern crate self as infrastructure;
 pub mod adr_baseline;
 pub mod adr_decision;
 pub mod agent_profiles;
+pub mod base_merge;
 pub mod batch_plan_codec;
 pub mod batch_plan_reader;
 pub mod branch_reader;
