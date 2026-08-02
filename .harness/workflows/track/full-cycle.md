@@ -204,17 +204,68 @@ Procedure (after Step 3 of the **last** batch):
    succeeds, `git status --short` must be empty; any remaining dirty file is unexpected and
    must be investigated before declaring the loop complete.
 
-The workflow completes only when `git status --short` is empty after this step.
+The lifecycle loop (Steps 1–4) completes only when `git status --short` is empty after this
+step. Do not declare the full workflow complete until Step 5 has either recorded the required
+single AC-05/equivalent completion record or validly skipped observations under its stated
+conditions.
 
-### Post-loop
+### Step 5: Record observations after the complete rollout (conditional)
 
-After all batches are committed and the optional lifecycle tail commit is recorded, create or
-append to `track/items/<id>/observations.md` only when:
+Run this step only after every declared batch has completed and Step 4 has either completed its
+lifecycle-tail commit or validly found no tail diff. The final `git status --short` check must
+already be empty. Do not create a per-batch or standalone-implementation partial record.
+
+For ordinary tracks, create or append to `track/items/<id>/observations.md` only when:
 
 - (a) Any task produced machine-non-verifiable observations worth recording, or
 - (b) `spec.json`'s `acceptance_criteria` explicitly mandates recording to `observations.md`.
 
 Otherwise, skip (file absence = no observations).
+
+When this track's AC-05, or an equivalent explicit acceptance criterion, requires a
+completion-time limited-rollout observation, create exactly one dedicated current-track record
+in `track/items/<id>/observations.md` after all rollout assignments and any permitted Terra
+retries have recorded their outcomes. Do not pre-create, partially append, or duplicate this
+record. Use the following repeatable template; every assignment receives one row, and an
+inapplicable value is recorded as `not run` / `not applicable` while a measurement that cannot
+be obtained is recorded as `unavailable`.
+
+```markdown
+## Limited rollout completion record
+
+- Track: `<id>`
+- Recorded after: all rollout assignments, applicable gates, retries, batches, and lifecycle tail
+- Historical comparison: No historical A/B comparison is available or required.
+
+| Assignment id / lane | Provider / effort | Completion-condition / quality result | Applicable gate results | Flags: incomplete-output; timeout; gate failure | Credits | Elapsed: start → recorded completion result or verdict | Executions (including Terra retry) | Terra retry result | Model-regression candidate | Evidence |
+|---|---|---|---|---|---|---|---:|---|---|---|
+| `<assignment id> / <lane>` | `<provider> / <effort>; retry: <provider> / <effort>` | `<met / unmet / unavailable>` | `<gate: pass/fail/unavailable; ...>` | `<no/no/no>` | `<reported value / unavailable>` | `<duration / unavailable>` | `<count>` | `<not run / pass / fail / unavailable>` | `<yes / no / unavailable>` | `<telemetry/session log; verdict or gate record; retry record>` |
+```
+
+Build each row only from auditable evidence. Use telemetry or session logs for assignment id,
+lane, provider, effort, timestamps, and provider-reported credits; use recorded completion
+results or verdicts plus review and DRY verdicts for quality and completion-condition results;
+use obligation and CI gate records for applicable gate results; and use retry records for the
+execution count, Terra retry result, and model-regression-candidate determination. Preserve
+explicit `unavailable` markers rather than guessing, deriving absent values, or silently omitting
+an AC-05 field. For this AC-05 rollout, state explicitly in the completed record: “No historical
+Luna Max A/B comparison is available or required.”
+
+**AC-05/equivalent-only persistence.** The following review and guarded-commit sequence applies
+only when the AC-05/equivalent limited-rollout criterion applies and the single limited-rollout
+record above was written or changed. It is not triggered merely because an ordinary track created
+or appended `observations.md`; those tracks retain their existing conditional observation
+handling and do not receive this extra review or completion-record commit. After the limited-
+rollout record exists, run the `review` workflow again. Its expected required scope is
+`impl-plan`, because that scope owns `observations.md`; do not stage the record until its final
+round reaches `zero_findings` and `bin/sotp review check-approved` succeeds for the observation
+diff. Then stage the record and review-operational artifacts with `bin/sotp git add-all`, and
+invoke the `commit` workflow for one guarded completion-record commit. Use a message that
+identifies the limited-rollout completion record. After the guarded commit succeeds, `git status
+--short` must be empty. If the observation review requires a correction, amend the one existing
+record from its auditable evidence and repeat this review → guarded-commit sequence; never add a
+second AC-05 record. This persistence sequence is after the recording boundary above and does not
+permit a partial or per-batch record.
 
 ## Gates
 
@@ -228,6 +279,8 @@ Otherwise, skip (file absence = no observations).
 | 2 | R2 placement verification repeated on each back-edge pass | pass / fail |
 | 3 | `cargo make track-commit-message` (CI + track-aware gates + DRY check) | OK / ERROR |
 | 4 | `git status --short` empty | OK / unexpected dirty state |
+| 5 | AC-05/equivalent completion record written once after all rollout outcomes exist | pass / stop |
+| 5 | AC-05/equivalent observation diff reaches final `zero_findings`, then guarded completion-record commit leaves a clean tree | pass / stop |
 
 ## Failure / recovery
 
@@ -238,12 +291,18 @@ Otherwise, skip (file absence = no observations).
 - **Review `failed` / timeout**: relaunch (up to 2 retries per fixer), then report.
 - **Commit failure**: fix CI or staging issue. Do not re-stage until the issue is resolved.
 - **Unexpected dirty state in Step 4**: stop and investigate before declaring completion.
+- **Observation review or completion-record commit failure**: correct the one existing record
+  from its evidence, re-run the observation review, and retry the guarded commit. Do not create
+  another completion record.
 
 ## Outputs
 
 - Commits on the current `track/<id>` branch, one per batch + optional lifecycle tail
 - Commit hashes recorded by the orchestrator on all batch tasks via
   `bin/sotp track transition done --commit-hash`
-- Optional `track/items/<id>/observations.md`
+- Optional `track/items/<id>/observations.md` (the AC-05/equivalent completion record, when
+  required, is written once after all rollout outcomes exist, then reviewed and committed in a
+  final guarded persistence commit)
 - Summary: batches executed (task IDs, commit hash per batch), tasks completed, tasks remaining,
-  any failures, recommended next command (`pr-review` workflow)
+  any failures, the path to the completion record when written, and recommended next command
+  (`pr-review` workflow)

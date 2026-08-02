@@ -106,6 +106,72 @@
           "hash": "rvw1:sha256:54c58846654117ecffc676a811f70cf9424794f624b1504891090010295a6cf5",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T10:11:21Z",
+          "findings": [
+            {
+              "category": "workflow completion boundary",
+              "file": ".harness/workflows/track/full-cycle.md",
+              "line": 207,
+              "message": "The workflow still declares completion immediately after Step 4 (`git status --short` empty), before the newly required Step 5 AC-05 record is written. This contradicts the required completion boundary and permits a run to be reported complete without the mandated single record; move this completion claim after Step 5 or explicitly make it only the lifecycle-loop completion condition.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0e6963b155bd89f9b569e9aaf83858349c3257913181821539529c4ce3debd60",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T10:14:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bc2710b081f8bc458e27a38420e9230f9c40aabedcaf7a7b8ce118ccf308fc27",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T10:18:19Z",
+          "findings": [
+            {
+              "category": "workflow wiring",
+              "file": ".harness/workflows/track/full-cycle.md",
+              "line": 225,
+              "message": "Step 5 writes `observations.md` only after the lifecycle-tail commit and clean-tree check, but defines no subsequent review, staging, commit, or cleanliness gate. Because `observations.md` belongs to the `impl-plan` review scope and `pr-review` only pushes committed HEAD, the workflow can report completion while the required AC-05 record remains dirty, unreviewed, and absent from the PR. Add a final reviewed/guarded persistence step while preserving the after-all-outcomes boundary.",
+              "severity": "P1"
+            },
+            {
+              "category": "workflow wiring",
+              "file": ".harness/workflows/track/implement.md",
+              "line": 106,
+              "message": "A standalone `implement` invocation cannot hand its assignment data to an “enclosing” `full-cycle` workflow, and Step 7/Outputs do not require that data in the caller-facing handoff. Consequently, a later `full-cycle` invocation can lack the telemetry needed for the single completion record. Require the complete assignment payload and evidence references in the standalone report, or define another sanctioned durable handoff without creating the final record early.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:bc2710b081f8bc458e27a38420e9230f9c40aabedcaf7a7b8ce118ccf308fc27",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T10:23:41Z",
+          "findings": [
+            {
+              "category": "workflow wiring",
+              "file": ".harness/workflows/track/full-cycle.md",
+              "line": 254,
+              "message": "The persistence paragraph applies whenever Step 5 changes `observations.md`, including ordinary tracks handled at lines 218–223. It therefore adds an extra impl-plan review and guarded “completion-record” commit to ordinary observations, contradicting the briefing’s requirement that their existing conditional behavior remain unchanged. Scope this persistence sequence specifically to the AC-05/equivalent limited-rollout record.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9916fc7c02829d2de2c548c03cfe0711efc8c062bcf730c9f9bb7a3774dca22a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T10:28:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:15d56349c0314861cfad12db6540831bf62a5995933a5d70d58912e121f3b75e",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -441,6 +507,35 @@
           "at": "2026-08-02T09:29:41Z",
           "findings": [],
           "hash": "rvw1:sha256:b28ff204ab265639e91987c7f3fe52136d8ecdf34191aa5f66a93d827ea565f7",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T10:11:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:32b0b061338c0d6a14014b6f58dbf2c4549ec3115f827245dc10454eadd42d96",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T10:17:24Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-02-codex-reasoning-effort-max/impl-plan.json",
+              "line": 79,
+              "message": "T004 restates the upstream behavioral timing in prose: “to emit the current-track record after rollout outcomes exist.” Under `.harness/policies/no-upstream-restatement.md`, the description must contain only target + operation + anchor cites; remove this clause and leave the two workflow files, the completion-step amendment, and `[D2; IN-06; AC-05]`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:32b0b061338c0d6a14014b6f58dbf2c4549ec3115f827245dc10454eadd42d96",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T10:19:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1ca18a8cb78b2f5f3a5ed8c4639972714b45114f2d437c6cb6f528ab5e84e723",
           "type": "final",
           "verdict": "zero_findings"
         }

@@ -99,17 +99,26 @@ Before review is launched on this work, also perform the pre-review verification
 `cargo make ci` run above satisfies that rule's `cargo make check-layers` step; its remaining
 confirmations are the delegator's own and are covered by no gate.
 
-**Step 6: Record observations (conditional)**
+**Step 6: Prepare or record observations (conditional)**
 
-After CI passes, create or append to `track/items/<id>/observations.md` only when one of the
-following holds:
+When the acceptance criterion is AC-05 or an equivalent criterion requiring one completion-time
+record for a limited rollout, a standalone `implement` run must **not** create or claim that
+track-completion record. Instead, hand the enclosing `full-cycle` workflow the assignment-level
+outcome data it has observed: assignment id and lane; provider and effort; completion-condition
+or quality result; each applicable gate result; incomplete-output, timeout, and gate-failure
+flags; provider-reported credits (or `unavailable`); elapsed time from assignment start to its
+recorded completion result or verdict; execution count; and any Terra retry result and
+model-regression-candidate determination. Preserve the source references with the handoff and
+mark unavailable measurements explicitly; do not infer or omit them. The full-cycle workflow
+writes the single auditable record only after the limited rollout has finished and every
+assignment outcome is available.
 
-- (a) The task produced machine-non-verifiable observations (wall-time measurements, UX
-  confirmation, dogfooding results) worth recording.
-- (b) `spec.json`'s `acceptance_criteria` explicitly mandates recording to `observations.md`.
-
-The file is free-form markdown with no required scaffold. Otherwise, skip this step
-(file absence = no observations).
+For all other tracks or observation mandates, create or append to
+`track/items/<id>/observations.md` only when either the task produced machine-non-verifiable
+observations (wall-time measurements, UX confirmation, dogfooding results) worth recording or
+`spec.json`'s `acceptance_criteria` explicitly mandates recording to `observations.md`. The file
+remains free-form markdown with no required scaffold. Otherwise, skip this step (file absence =
+no observations).
 
 **Step 7: Report implementation handoff**
 
@@ -118,6 +127,15 @@ orchestrator. The orchestrator keeps successful tasks `in_progress` until the en
 DRY fix phase closes; after that phase and CI pass, it marks them `done` before review. It
 backfills the commit hash only after the batch commit. If work remains blocked, keep tasks in
 `in_progress` and report why.
+
+For an AC-05/equivalent standalone run, this caller-facing report is also the required assignment
+handoff to the later `full-cycle` invocation. It must include the complete Step 6 payload and its
+auditable evidence references: assignment id/lane; provider/effort; completion-condition or
+quality result; applicable gate results; incomplete-output, timeout, and gate-failure flags;
+credits or `unavailable`; elapsed time; execution count; Terra retry result; and
+model-regression-candidate determination. State `unavailable` for every unavailable measurement.
+The report must identify its receiving full-cycle invocation; it is handoff data only, never a
+track-completion claim or an early `observations.md` completion record.
 
 ## Gates
 
@@ -148,7 +166,11 @@ backfills the commit hash only after the batch commit. If work remains blocked, 
 - Orchestrator-updated `impl-plan.json` task states (`todo` → `in_progress`; successful tasks
   become `done` after CI and the DRY fix phase, before review; commit hashes are backfilled
   after the batch commit)
-- Optional `track/items/<id>/observations.md` (appended if conditions are met)
+- Optional `track/items/<id>/observations.md` (ordinary observations appended when conditions
+  are met; an AC-05/equivalent rollout-completion record is written once by `full-cycle` after
+  all assignment outcomes exist)
 - `plan.md` and `registry.md` regenerated as side effects of task state transitions
 - Implemented scope summary and remaining tasks (reported to caller)
+- For AC-05/equivalent standalone runs, a complete assignment-level handoff payload with
+  evidence references for the receiving `full-cycle` invocation (not a completion record)
 - No commit is created by this workflow
