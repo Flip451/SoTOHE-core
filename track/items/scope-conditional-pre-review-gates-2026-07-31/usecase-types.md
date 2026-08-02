@@ -28,7 +28,7 @@
 | PhaseCommandDeclaration | value_object | add | — | 🟡 | 🔵 |
 | PreReviewCommandConfig | value_object | add | — | 🟡 | 🔵 |
 | PreReviewScopeCommandDeclaration | value_object | add | — | 🔵 | 🔵 |
-| ProgramExitCode | value_object | add | — | 🟡 | 🔵 |
+| ProgramExitCode | value_object | add | — | 🔵 | 🔵 |
 | UnvalidatedTimeoutSeconds | value_object | add | — | 🟡 | 🔵 |
 
 ## Error Types
@@ -78,11 +78,11 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | CapturedProgramOutput | dto | add | — | 🔵 | 🔵 |
-| FailedProgramExecutionRecord | dto | add | — | 🟡 | 🔵 |
+| FailedProgramExecutionRecord | dto | add | — | 🔵 | 🔵 |
 | PhaseCommandExplanation | dto | add | — | 🟡 | 🔵 |
 | ProgramExecutionRecord | dto | add | — | 🔵 | 🔵 |
 | ProgramInvocation | dto | add | — | 🔵 | 🔵 |
-| SuccessfulProgramExecutionRecord | dto | add | — | 🟡 | 🔵 |
+| SuccessfulProgramExecutionRecord | dto | add | — | 🔵 | 🔵 |
 
 ## Commands
 

@@ -2955,11 +2955,11 @@
       }
     },
     {
-      "claim_hash": "e47407e0b9037bd03144ee1f4a556639403ff3ad800d03fd16870983d56b0453",
+      "claim_hash": "38a13fd71a4213d87437f0fc41d0a86bcc8bf103d5136b98b314baf966e0046e",
       "evidence_hash": "3a5e9bfe0d346bd4954b8a1b5e75e3144ca58519d0d0207e5f5861d453dfc660",
       "verdict": {
         "kind": "pass",
-        "citation": "scope command が non-zero を返した場合、dispatcher は後続 command、writer、または reviewer を起動せず、失敗した argv と outcome を operator が識別できる形で返す。"
+        "citation": "non-zero を返した場合"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -2979,11 +2979,11 @@
       }
     },
     {
-      "claim_hash": "e47407e0b9037bd03144ee1f4a556639403ff3ad800d03fd16870983d56b0453",
+      "claim_hash": "38a13fd71a4213d87437f0fc41d0a86bcc8bf103d5136b98b314baf966e0046e",
       "evidence_hash": "574c686246d7577d3ab00fe3d015a1ba12dac480d60fd748ff40da6e914bd3dc",
       "verdict": {
         "kind": "pass",
-        "citation": "CLI outcome により、operator は展開後の writer/pre-entry argv、実行順、default 3,600-second timeout または explicit timeout、その positive-integer / 3,600-second 上限、stdout/stderr 各 1 MiB (1,048,576-byte) capture limit、validation failure、first failing command、および output-limit または timeout outcome を監査できる。"
+        "citation": "validate、explain、enter の CLI outcome により、operator は展開後の writer/pre-entry argv、実行順、default 3,600-second timeout または explicit timeout、その positive-integer / 3,600-second 上限、stdout/stderr 各 1 MiB (1,048,576-byte) capture limit、validation failure、first failing command、および output-limit または timeout outcome を監査できる。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",

@@ -9,7 +9,7 @@ GO-03 → T018、T019、T020、T021、T022、T023。
 GO-04 → T018、T020、T021、T022、T023。
 GO-05 → T017、T018、T019、T020、T021、T022。
 
-## Tasks (11/23 resolved)
+## Tasks (12/23 resolved)
 
 ### S0 — 確定済みの履歴 task
 
@@ -36,8 +36,8 @@ GO-05 → T017、T018、T019、T020、T021、T022。
 
 > T024–T035 は T001–T023 を reopen せず、approved catalogue が要求する source-shape repair と provider-neutral phase-writer configuration を file-exclusive に実装する。
 
-- [~] **T024**: `libs/domain/src/task_contract.rs` と `apps/cli-driver/src/task_contract.rs` の blocked outcome を validated `NonEmptyVec` payload に適応し、`CommandOutcome` render boundary の空 payload 拒否を unit tests で確認する。IN-08、AC-10。
-- [ ] **T025**: `libs/usecase/src/program_runner.rs` の execution record を success / failure の refined wrapper と分類 outcome に適応し、成功、非 zero、output-limit、timeout の record tests を更新する。IN-02、IN-03、IN-04、CN-02、CN-03、AC-02、AC-03、AC-04、AC-05。
+- [x] **T024**: `libs/domain/src/task_contract.rs` と `apps/cli-driver/src/task_contract.rs` の blocked outcome を validated `NonEmptyVec` payload に適応し、`CommandOutcome` render boundary の空 payload 拒否を unit tests で確認する。IN-08、AC-10。 (`60e6c796627cc98404bccaa2421920b227df04eb`)
+- [~] **T025**: `libs/usecase/src/program_runner.rs` の execution record を success / failure の refined wrapper と分類 outcome に適応し、成功、非 zero、output-limit、timeout の record tests を更新する。IN-02、IN-03、IN-04、CN-02、CN-03、AC-02、AC-03、AC-04、AC-05。
 - [ ] **T026**: `libs/usecase/src/operator_command.rs` の validated argv / configured-command value objects と operation-specific configuration validation error vocabulary を catalogue shape に適応し、各 validation failure の tests を更新する。IN-01、IN-03、CN-01、AC-01、AC-04、AC-05。
 - [ ] **T027**: `libs/usecase/src/phase_command.rs` の phase command config / declaration / loader-port、configuration validation error、validate command を catalogue shape に適応し、configuration validation tests を更新する。IN-01、CN-01、AC-01。
 - [ ] **T034**: `libs/usecase/src/phase_command.rs` の phase explanation と explain query を catalogue shape に適応し、explain result tests を更新する。IN-04、AC-03。

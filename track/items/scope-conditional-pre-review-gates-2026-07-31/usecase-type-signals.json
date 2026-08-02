@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-02T20:59:31Z",
-  "declaration_hash": "434bd174cecada5dc40fec9dd7acafbbf2a9f9258a62c30c4725cf3d96d3f22f",
-  "implementation_input_hash": "3dda4c66b26f763fc7c09649aee6f82ad1a0cda3552832b834dc7e2eca4e25fd",
+  "generated_at": "2026-08-02T22:49:07Z",
+  "declaration_hash": "74f5ce9f11c6090882e4880cfee2d37788c07f8e7f4c0b5193d03f1bd7a5e001",
+  "implementation_input_hash": "ffd95c32ccf4e9974d1d8e4e693a7c11abe714048dac9a5469c95c3350f926c3",
   "signals": [
     {
       "type_name": "CapturedProgramOutput",
@@ -214,16 +214,14 @@
     {
       "type_name": "FailedProgramExecutionRecord",
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
+        "AsRef<ProgramExecutionRecord>",
         "Clone",
         "Debug",
         "Eq",
         "PartialEq"
-      ],
-      "missing_items": [
-        "AsRef<ProgramExecutionRecord>"
       ]
     },
     {
@@ -498,7 +496,7 @@
     {
       "type_name": "ProgramExitCode",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "Clone",
@@ -587,16 +585,14 @@
     {
       "type_name": "SuccessfulProgramExecutionRecord",
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
+        "AsRef<ProgramExecutionRecord>",
         "Clone",
         "Debug",
         "Eq",
         "PartialEq"
-      ],
-      "missing_items": [
-        "AsRef<ProgramExecutionRecord>"
       ]
     },
     {

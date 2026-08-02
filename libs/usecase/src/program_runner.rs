@@ -77,31 +77,25 @@ pub struct ProgramExecutionRecord {
 /// The inner record is private so callers cannot construct a successful record
 /// from a timeout, output-limit, or non-zero-exit outcome.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SuccessfulProgramExecutionRecord(ProgramExecutionRecord);
+pub struct SuccessfulProgramExecutionRecord {
+    record: ProgramExecutionRecord,
+}
 
-impl SuccessfulProgramExecutionRecord {
-    #[must_use]
-    pub fn record(&self) -> &ProgramExecutionRecord {
-        &self.0
+impl AsRef<ProgramExecutionRecord> for SuccessfulProgramExecutionRecord {
+    fn as_ref(&self) -> &ProgramExecutionRecord {
+        &self.record
     }
 }
 
 /// A program execution record whose outcome is known to prevent review.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum FailedProgramExecutionRecord {
-    NonZeroExit(ProgramExecutionRecord),
-    TimedOut(ProgramExecutionRecord),
-    OutputLimitExceeded(ProgramExecutionRecord),
+pub struct FailedProgramExecutionRecord {
+    record: ProgramExecutionRecord,
 }
 
-impl FailedProgramExecutionRecord {
-    #[must_use]
-    pub fn record(&self) -> &ProgramExecutionRecord {
-        match self {
-            Self::NonZeroExit(record)
-            | Self::TimedOut(record)
-            | Self::OutputLimitExceeded(record) => record,
-        }
+impl AsRef<ProgramExecutionRecord> for FailedProgramExecutionRecord {
+    fn as_ref(&self) -> &ProgramExecutionRecord {
+        &self.record
     }
 }
 
@@ -117,18 +111,117 @@ impl ProgramExecutionRecord {
     pub fn classify(self) -> ClassifiedProgramExecutionRecord {
         match &self.outcome {
             ProgramRunOutcome::Exited { exit_code, .. } if exit_code.as_i32() == 0 => {
-                ClassifiedProgramExecutionRecord::Succeeded(SuccessfulProgramExecutionRecord(self))
+                ClassifiedProgramExecutionRecord::Succeeded(SuccessfulProgramExecutionRecord {
+                    record: self,
+                })
             }
-            ProgramRunOutcome::Exited { .. } => ClassifiedProgramExecutionRecord::Failed(
-                FailedProgramExecutionRecord::NonZeroExit(self),
-            ),
-            ProgramRunOutcome::TimedOut { .. } => ClassifiedProgramExecutionRecord::Failed(
-                FailedProgramExecutionRecord::TimedOut(self),
-            ),
-            ProgramRunOutcome::OutputLimitExceeded { .. } => {
-                ClassifiedProgramExecutionRecord::Failed(
-                    FailedProgramExecutionRecord::OutputLimitExceeded(self),
-                )
+            ProgramRunOutcome::Exited { .. }
+            | ProgramRunOutcome::TimedOut { .. }
+            | ProgramRunOutcome::OutputLimitExceeded { .. } => {
+                ClassifiedProgramExecutionRecord::Failed(FailedProgramExecutionRecord {
+                    record: self,
+                })
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+#[allow(clippy::panic, clippy::unwrap_used)]
+mod tests {
+    use crate::operator_command::{CommandArgument, ConfiguredCommand};
+
+    use super::{
+        CapturedProgramOutput, ClassifiedProgramExecutionRecord, ProgramExecutionRecord,
+        ProgramExitCode, ProgramOutputStream, ProgramRunOutcome,
+    };
+
+    fn record(outcome: ProgramRunOutcome) -> ProgramExecutionRecord {
+        ProgramExecutionRecord {
+            sequence_index: crate::operator_command::CommandSequenceIndex::new(0),
+            command: ConfiguredCommand::try_new(
+                vec![CommandArgument::try_new("command".to_owned())],
+                None,
+            )
+            .unwrap(),
+            outcome,
+        }
+    }
+
+    fn output() -> CapturedProgramOutput {
+        CapturedProgramOutput { stdout: Vec::new(), stderr: Vec::new() }
+    }
+
+    #[test]
+    fn test_program_execution_record_classify_zero_exit_returns_succeeded() {
+        let classified = record(ProgramRunOutcome::Exited {
+            exit_code: ProgramExitCode::new(0),
+            output: output(),
+        })
+        .classify();
+
+        match classified {
+            ClassifiedProgramExecutionRecord::Succeeded(success) => {
+                assert_eq!(success.as_ref().sequence_index.as_usize(), 0);
+            }
+            ClassifiedProgramExecutionRecord::Failed(failure) => {
+                panic!("expected successful execution record, got {failure:?}");
+            }
+        }
+    }
+
+    #[test]
+    fn test_program_execution_record_classify_non_zero_exit_returns_non_zero_failure() {
+        let classified = record(ProgramRunOutcome::Exited {
+            exit_code: ProgramExitCode::new(1),
+            output: output(),
+        })
+        .classify();
+
+        match classified {
+            ClassifiedProgramExecutionRecord::Failed(failure) => {
+                assert!(matches!(
+                    failure.as_ref().outcome,
+                    ProgramRunOutcome::Exited { ref exit_code, .. } if exit_code.as_i32() != 0
+                ));
+            }
+            ClassifiedProgramExecutionRecord::Succeeded(success) => {
+                panic!("expected non-zero failure record, got {success:?}");
+            }
+        }
+    }
+
+    #[test]
+    fn test_program_execution_record_classify_output_limit_returns_output_limit_failure() {
+        let classified = record(ProgramRunOutcome::OutputLimitExceeded {
+            stream: ProgramOutputStream::Stdout,
+            output: output(),
+        })
+        .classify();
+
+        match classified {
+            ClassifiedProgramExecutionRecord::Failed(failure) => {
+                assert!(matches!(
+                    failure.as_ref().outcome,
+                    ProgramRunOutcome::OutputLimitExceeded { .. }
+                ));
+            }
+            ClassifiedProgramExecutionRecord::Succeeded(success) => {
+                panic!("expected output-limit failure record, got {success:?}");
+            }
+        }
+    }
+
+    #[test]
+    fn test_program_execution_record_classify_timeout_returns_timed_out_failure() {
+        let classified = record(ProgramRunOutcome::TimedOut { output: output() }).classify();
+
+        match classified {
+            ClassifiedProgramExecutionRecord::Failed(failure) => {
+                assert!(matches!(failure.as_ref().outcome, ProgramRunOutcome::TimedOut { .. }));
+            }
+            ClassifiedProgramExecutionRecord::Succeeded(success) => {
+                panic!("expected timed-out failure record, got {success:?}");
             }
         }
     }

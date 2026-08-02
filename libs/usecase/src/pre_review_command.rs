@@ -550,9 +550,12 @@ mod tests {
         match outcome {
             PreReviewCommandDispatchOutcome::Blocked { completed, failed } => {
                 assert_eq!(completed.len(), 1);
-                assert!(matches!(failed, FailedProgramExecutionRecord::NonZeroExit(_)));
+                assert!(matches!(
+                    failed.as_ref().outcome,
+                    ProgramRunOutcome::Exited { ref exit_code, .. } if exit_code.as_i32() != 0
+                ));
                 let failed_argv: Vec<&str> = failed
-                    .record()
+                    .as_ref()
                     .command
                     .argv()
                     .arguments()
@@ -681,7 +684,7 @@ mod tests {
             ProgramRunOutcome::TimedOut {
                 output: CapturedProgramOutput { stdout: Vec::new(), stderr: Vec::new() },
             },
-            |record| matches!(record, FailedProgramExecutionRecord::TimedOut(_)),
+            |record| matches!(record.as_ref().outcome, ProgramRunOutcome::TimedOut { .. }),
         );
     }
 
@@ -692,7 +695,9 @@ mod tests {
                 stream: ProgramOutputStream::Stderr,
                 output: CapturedProgramOutput { stdout: Vec::new(), stderr: Vec::new() },
             },
-            |record| matches!(record, FailedProgramExecutionRecord::OutputLimitExceeded(_)),
+            |record| {
+                matches!(record.as_ref().outcome, ProgramRunOutcome::OutputLimitExceeded { .. })
+            },
         );
     }
 
@@ -930,8 +935,67 @@ mod tests {
         );
         assert_eq!(output.exit_code, 1);
         assert!(output.stderr.as_deref().unwrap_or("").contains("fail"));
-        assert!(output.stderr.as_deref().unwrap_or("").contains("NonZeroExit"));
+        assert!(output.stderr.as_deref().unwrap_or("").contains("Exited"));
         assert_eq!(review.0.load(Ordering::SeqCst), 0);
+    }
+
+    #[test]
+    fn test_pre_review_gated_review_runs_implementation_gates_in_order_and_stops_on_failure() {
+        let review = Arc::new(CountingReview(AtomicUsize::new(0)));
+        let runner = Arc::new(OutcomeRecordingRunner {
+            outcomes: Mutex::new(std::collections::VecDeque::from([
+                ProgramRunOutcome::Exited {
+                    exit_code: ProgramExitCode::new(0),
+                    output: CapturedProgramOutput { stdout: Vec::new(), stderr: Vec::new() },
+                },
+                ProgramRunOutcome::Exited {
+                    exit_code: ProgramExitCode::new(1),
+                    output: CapturedProgramOutput { stdout: Vec::new(), stderr: Vec::new() },
+                },
+            ])),
+            invocations: Mutex::new(Vec::new()),
+        });
+        let config = PreReviewCommandConfig::try_new(
+            CommandConfigSchemaVersion::new(1),
+            vec![PreReviewScopeCommandDeclaration::new(
+                scope("implementation"),
+                vec![
+                    command_argv(&["bin/sotp", "signal", "calc-impl-catalog"]),
+                    command_argv(&["bin/sotp", "signal", "check-impl-catalog", "--gate", "commit"]),
+                    command_argv(&["bin/sotp", "task-contract", "coverage"]),
+                    command_argv(&["bin/sotp", "task-contract", "check"]),
+                ],
+            )],
+        )
+        .unwrap();
+        let dispatcher = Arc::new(PreReviewCommandDispatchInteractor::new(
+            Arc::new(StaticLoader(config)),
+            Arc::new(FixedTrackResolver),
+            runner.clone(),
+        ));
+        let gated = PreReviewCommandGatedReviewInteractor::new(review.clone(), dispatcher);
+
+        let output = gated.run_local(
+            None,
+            60,
+            None,
+            None,
+            Some("test-track".to_owned()),
+            "fast".to_owned(),
+            "implementation".to_owned(),
+            PathBuf::from("track/items"),
+        );
+
+        assert_eq!(output.exit_code, 1);
+        assert!(output.stderr.as_deref().unwrap_or("").contains("check-impl-catalog"));
+        assert_eq!(review.0.load(Ordering::SeqCst), 0);
+        assert_eq!(
+            *runner.invocations.lock().unwrap(),
+            vec![
+                vec!["bin/sotp", "signal", "calc-impl-catalog"],
+                vec!["bin/sotp", "signal", "check-impl-catalog", "--gate", "commit"],
+            ]
+        );
     }
 
     #[test]

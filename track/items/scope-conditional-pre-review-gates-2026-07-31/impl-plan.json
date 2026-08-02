@@ -105,12 +105,13 @@
     {
       "id": "T024",
       "description": "`libs/domain/src/task_contract.rs` と `apps/cli-driver/src/task_contract.rs` の blocked outcome を validated `NonEmptyVec` payload に適応し、`CommandOutcome` render boundary の空 payload 拒否を unit tests で確認する。IN-08、AC-10。",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "60e6c796627cc98404bccaa2421920b227df04eb"
     },
     {
       "id": "T025",
       "description": "`libs/usecase/src/program_runner.rs` の execution record を success / failure の refined wrapper と分類 outcome に適応し、成功、非 zero、output-limit、timeout の record tests を更新する。IN-02、IN-03、IN-04、CN-02、CN-03、AC-02、AC-03、AC-04、AC-05。",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T026",

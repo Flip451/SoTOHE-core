@@ -3,6 +3,54 @@
   "entries": [
     {
       "edge_id": {
+        "entry_key": "CurrentReviewTrackResolverPort",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CurrentReviewTrackResolverPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:resolve"
+      },
+      "key": {
+        "waived_reason_hash": "ff7b7caf03ddac63509eef66d0cf85ca7c74515c0af14f1c3c097a8ada82dee7",
+        "declaration_hash": "41038e6d501f9fe8f7e515fe66c2468a266a0e995411d90f44ae556ac0db94e1",
+        "anchor_text_hash": "ef72acacfb5dc440638dcb1eca6898bd3db2fbdd6150c1af28c56c8594a8958d"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"Synchronous repository-state track resolver for the sequential CLI path (IN-02, IN-05).\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "GitCurrentReviewTrackResolver",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "GitCurrentReviewTrackResolver",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::pre_review_command::CurrentReviewTrackResolverPort"
+      },
+      "key": {
+        "waived_reason_hash": "a033d2961cc63f54d49d246f20f1d30df81d5775a33a7c613da19cfe19fe4a2e",
+        "declaration_hash": "a49ba4e758d5fe9aa9c404597b7eb0b115bd61519aea4eeca9a47e7d9a347f9f",
+        "anchor_text_hash": "ef72acacfb5dc440638dcb1eca6898bd3db2fbdd6150c1af28c56c8594a8958d"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Synchronous repository-state track resolver for the sequential CLI path (IN-02, IN-05)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
         "entry_key": "CapturedProgramOutput",
         "anchor_id": {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -2656,12 +2704,12 @@
       },
       "key": {
         "waived_reason_hash": "fc7e4f1db08d2ae068991e03b245bb66086dcf029de758cd93ebdf39dd2492fd",
-        "declaration_hash": "42d30a29b2b7b32d3ca9680afe6358673dcd217351a7b1fbcb1d0725e800fae7",
+        "declaration_hash": "cd317901584b90be2b0d9e32d5e2296fc9db42832ab659b4df7728d85cc7cabc",
         "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "Opaque operating-system exit-code value (CN-03, AC-03)."
+        "citation": "TypeEntry { action: Add, role: ValueObject { invariants: [] }, kind: Struct(StructKind { shape: Tuple { fields: [], has_stripped_fields: true }, typestate: None }), methods: [], generics: [], where_predicates: [] }"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -2680,7 +2728,7 @@
       },
       "key": {
         "waived_reason_hash": "c8cdcee9579c1a47dcaeb208199c701148cb3597daf8463b5fdf26ce62af8cd3",
-        "declaration_hash": "42d30a29b2b7b32d3ca9680afe6358673dcd217351a7b1fbcb1d0725e800fae7",
+        "declaration_hash": "cd317901584b90be2b0d9e32d5e2296fc9db42832ab659b4df7728d85cc7cabc",
         "anchor_text_hash": "6166df4e5cb8aa348e839dc9faf6fdda9446f5782ff3880dec49513621a1e600"
       },
       "verdict": {

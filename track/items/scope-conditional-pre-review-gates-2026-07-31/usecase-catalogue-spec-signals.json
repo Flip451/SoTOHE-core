@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "434bd174cecada5dc40fec9dd7acafbbf2a9f9258a62c30c4725cf3d96d3f22f",
+  "catalogue_declaration_hash": "74f5ce9f11c6090882e4880cfee2d37788c07f8e7f4c0b5193d03f1bd7a5e001",
   "signals": [
     {
       "type_name": "CapturedProgramOutput",
@@ -195,7 +195,7 @@
     {
       "type_name": "ProgramExitCode",
       "signal": "blue",
-      "entry_hash": "e47407e0b9037bd03144ee1f4a556639403ff3ad800d03fd16870983d56b0453"
+      "entry_hash": "38a13fd71a4213d87437f0fc41d0a86bcc8bf103d5136b98b314baf966e0046e"
     },
     {
       "type_name": "ProgramInvocation",
