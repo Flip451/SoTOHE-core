@@ -122,6 +122,30 @@ fn test_resolve_execution_missing_final_effort_returns_error() {
 }
 
 #[test]
+fn test_schema_v1_provider_without_effort_list_preserves_legacy_support() {
+    let profiles = load_profiles(
+        r#"{
+            "schema_version": 1,
+            "providers": { "codex": { "label": "Codex CLI" } },
+            "capabilities": {
+                "implementer": {
+                    "provider": "codex",
+                    "model": "gpt-5.6-terra",
+                    "reasoning_effort": "high",
+                    "execution_mode": "orchestrator-output"
+                }
+            }
+        }"#,
+    );
+
+    assert!(matches!(
+        profiles.resolve_execution(&capability("implementer"), RoundType::Final),
+        Ok(ResolvedExecution::ProviderCli { provider, effort, .. })
+            if provider.as_str() == "codex" && effort == ReasoningEffort::High
+    ));
+}
+
+#[test]
 fn test_resolve_execution_unsupported_provider_effort_returns_error() {
     let profiles = load_profiles(
         r#"{

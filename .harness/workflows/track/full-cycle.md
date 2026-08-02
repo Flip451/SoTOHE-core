@@ -304,13 +304,21 @@ handling and do not receive this extra review or completion-record commit. After
 rollout record exists, run the `review` workflow again. Its expected required scope is
 `impl-plan`, because that scope owns `observations.md`; do not stage the record until its final
 round reaches `zero_findings` and `bin/sotp review check-approved` succeeds for the observation
-diff. Then stage the record and review-operational artifacts with `bin/sotp git add-all`, and
-invoke the `commit` workflow for one guarded completion-record commit. Use a message that
-identifies the limited-rollout completion record. After the guarded commit succeeds, `git status
---short` must be empty. If the observation review requires a correction, amend the one existing
-record from its auditable evidence and repeat this review → guarded-commit sequence; never add a
-second AC-05 record. This persistence sequence is after the recording boundary above and does not
-permit a partial or per-batch record.
+diff. This post-record review is an **accounting-excluded record-finalization gate**, not another
+AC-05 rollout assignment: close the assignment table and its execution counts before launching
+this review, and do not append a row for the finalization fixer, its limited-profile recovery, or
+any finalization retry. Record those outcomes only in the ordinary review/gate artifacts. The
+finalization gate may still use the limited-profile recovery boundary when its resolved fixer is
+the Luna lane, but that dispatch is explicitly outside the rollout ledger and cannot make the
+completion record incomplete.
+
+Then stage the record and review-operational artifacts with `bin/sotp git add-all`, and invoke the
+`commit` workflow for one guarded completion-record commit. Use a message that identifies the
+limited-rollout completion record. After the guarded commit succeeds, `git status --short` must be
+empty. If the observation review requires a correction, amend the one existing record from its
+auditable evidence and repeat this finalization review → guarded-commit sequence; the correction
+does not create a second AC-05 record or a new assignment row. This persistence sequence is after
+the recording boundary above and does not permit a partial or per-batch record.
 
 ## Gates
 

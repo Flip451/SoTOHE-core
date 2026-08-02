@@ -138,8 +138,23 @@ pub(super) struct ProviderMetadataDto {
     #[allow(dead_code)]
     pub(super) label: Option<String>,
     /// Reasoning efforts this provider accepts for provider-CLI execution.
-    #[serde(default)]
+    ///
+    /// The field was added without a schema-version bump.  A schema-v1 profile
+    /// that predates the field therefore has no provider capability declaration;
+    /// retain the v1 behaviour for that case while allowing an explicit empty
+    /// list to remain a fail-closed declaration.
+    #[serde(default = "legacy_supported_reasoning_efforts")]
     pub(super) supported_reasoning_efforts: Vec<ReasoningEffortDto>,
+}
+
+fn legacy_supported_reasoning_efforts() -> Vec<ReasoningEffortDto> {
+    vec![
+        ReasoningEffortDto::Low,
+        ReasoningEffortDto::Medium,
+        ReasoningEffortDto::High,
+        ReasoningEffortDto::XHigh,
+        ReasoningEffortDto::Max,
+    ]
 }
 
 /// Configuration for a single capability entry.
