@@ -1,0 +1,294 @@
+{
+  "schema_version": 1,
+  "layer": "domain",
+  "entries": [
+    {
+      "claim_hash": "72b0660d93c22e01bfa8a09a3c17607ccf9593e896658c3753dae0d06cd5bde0",
+      "evidence_hash": "29d445cbda3b29cd7e70298aa5416d506e4c65526b0b46e78232d518bfab6d15",
+      "verdict": {
+        "kind": "pass",
+        "citation": "task-contract の attribution target は catalogue entry のみとし、source-only baseline restoration、evidence/inspector eligibility、coverage/liveness carrier variant、および stale-carrier lifecycle を持ち込まない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ContractedEntryRef"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "task-contract の attribution target は catalogue entry のみとし、source-only baseline restoration、evidence/inspector eligibility、coverage/liveness carrier variant、および stale-carrier lifecycle を持ち込まない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "72b0660d93c22e01bfa8a09a3c17607ccf9593e896658c3753dae0d06cd5bde0",
+      "evidence_hash": "86401aab231a908018e505096908217adba1bb1ae4b72a6a8fc42d24bfc234a9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "task-contract は catalogue-entry attribution だけを受理し、source-only baseline-restoration、evidence/inspector eligibility、coverage/liveness carrier variant、または stale-carrier lifecycle の入力を受理しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ContractedEntryRef"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "task-contract は catalogue-entry attribution だけを受理し、source-only baseline-restoration、evidence/inspector eligibility、coverage/liveness carrier variant、または stale-carrier lifecycle の入力を受理しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cc9ed906ebcb6e725cb44be282a76388ad80285c9318667fdedcc9c4b2636b50",
+      "evidence_hash": "3d1538bde700052ce1f5b200477709588b7fec97a383899bfca37fb449ee0a7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "scope 条件付き review behavior、task-contract の status 別 rule、および既存の NonBlueSignal 判定は、明示した command ownership と ordering の変更以外では維持する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CoverageVerifyOutcome"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "scope 条件付き review behavior、task-contract の status 別 rule、および既存の NonBlueSignal 判定は、明示した command ownership と ordering の変更以外では維持する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cc9ed906ebcb6e725cb44be282a76388ad80285c9318667fdedcc9c4b2636b50",
+      "evidence_hash": "a7c8b3267199d51b0530478844b49c15c7bc0d1f9c5c2aaf407d37e326fe6a92",
+      "verdict": {
+        "kind": "pass",
+        "citation": "scope-conditional applicability と既存 task-contract status rule は維持され"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CoverageVerifyOutcome"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-10",
+          "text_label": "scope-conditional applicability と既存 task-contract status rule は維持され、NonBlueSignal の既存判定規則は変更されない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "487732ea7e71927a9eb97d51c61683db372d5769ea46021202bf3e8a7e11fb9e",
+      "evidence_hash": "29d445cbda3b29cd7e70298aa5416d506e4c65526b0b46e78232d518bfab6d15",
+      "verdict": {
+        "kind": "pass",
+        "citation": "task-contract の attribution target は catalogue entry のみとし、source-only baseline restoration、evidence/inspector eligibility、coverage/liveness carrier variant、および stale-carrier lifecycle を持ち込まない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CoverageViolation"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "task-contract の attribution target は catalogue entry のみとし、source-only baseline restoration、evidence/inspector eligibility、coverage/liveness carrier variant、および stale-carrier lifecycle を持ち込まない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "487732ea7e71927a9eb97d51c61683db372d5769ea46021202bf3e8a7e11fb9e",
+      "evidence_hash": "86401aab231a908018e505096908217adba1bb1ae4b72a6a8fc42d24bfc234a9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "task-contract は catalogue-entry attribution だけを受理し、source-only baseline-restoration、evidence/inspector eligibility、coverage/liveness carrier variant、または stale-carrier lifecycle の入力を受理しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CoverageViolation"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "task-contract は catalogue-entry attribution だけを受理し、source-only baseline-restoration、evidence/inspector eligibility、coverage/liveness carrier variant、または stale-carrier lifecycle の入力を受理しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6b0e3c20101afeb958c64ad6622d12f936103c740cc4aa997c87df9857f23a95",
+      "evidence_hash": "3d1538bde700052ce1f5b200477709588b7fec97a383899bfca37fb449ee0a7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "scope 条件付き review behavior、task-contract の status 別 rule"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/domain-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateOutcome"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "scope 条件付き review behavior、task-contract の status 別 rule、および既存の NonBlueSignal 判定は、明示した command ownership と ordering の変更以外では維持する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6b0e3c20101afeb958c64ad6622d12f936103c740cc4aa997c87df9857f23a95",
+      "evidence_hash": "a7c8b3267199d51b0530478844b49c15c7bc0d1f9c5c2aaf407d37e326fe6a92",
+      "verdict": {
+        "kind": "pass",
+        "citation": "scope-conditional applicability と既存 task-contract status rule は維持され、NonBlueSignal の既存判定規則は変更されない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/domain-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateOutcome"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-10",
+          "text_label": "scope-conditional applicability と既存 task-contract status rule は維持され、NonBlueSignal の既存判定規則は変更されない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8d6b87715670fe7f0b9d24686aba4577f5a691aeb77889ecc3080c6fe29bbf7e",
+      "evidence_hash": "3d1538bde700052ce1f5b200477709588b7fec97a383899bfca37fb449ee0a7c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "scope 条件付き review behavior、task-contract の status 別 rule、および既存の NonBlueSignal 判定は、明示した command ownership と ordering の変更以外では維持する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/domain-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateViolation"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "scope 条件付き review behavior、task-contract の status 別 rule、および既存の NonBlueSignal 判定は、明示した command ownership と ordering の変更以外では維持する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8d6b87715670fe7f0b9d24686aba4577f5a691aeb77889ecc3080c6fe29bbf7e",
+      "evidence_hash": "a7c8b3267199d51b0530478844b49c15c7bc0d1f9c5c2aaf407d37e326fe6a92",
+      "verdict": {
+        "kind": "pass",
+        "citation": "scope-conditional applicability と既存 task-contract status rule は維持され、NonBlueSignal の既存判定規則は変更されない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/domain-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateViolation"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-10",
+          "text_label": "scope-conditional applicability と既存 task-contract status rule は維持され、NonBlueSignal の既存判定規則は変更されない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0559e68a790a150a6b95e90591b2d587dc665f29bc0f661323dca552f9dd1765",
+      "evidence_hash": "29d445cbda3b29cd7e70298aa5416d506e4c65526b0b46e78232d518bfab6d15",
+      "verdict": {
+        "kind": "pass",
+        "citation": "task-contract の attribution target は catalogue entry のみとし、source-only baseline restoration、evidence/inspector eligibility、coverage/liveness carrier variant、および stale-carrier lifecycle を持ち込まない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TaskContractDocument"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "task-contract の attribution target は catalogue entry のみとし、source-only baseline restoration、evidence/inspector eligibility、coverage/liveness carrier variant、および stale-carrier lifecycle を持ち込まない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0559e68a790a150a6b95e90591b2d587dc665f29bc0f661323dca552f9dd1765",
+      "evidence_hash": "86401aab231a908018e505096908217adba1bb1ae4b72a6a8fc42d24bfc234a9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "task-contract は catalogue-entry attribution だけを受理し、source-only baseline-restoration、evidence/inspector eligibility、coverage/liveness carrier variant、または stale-carrier lifecycle の入力を受理しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TaskContractDocument"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "task-contract は catalogue-entry attribution だけを受理し、source-only baseline-restoration、evidence/inspector eligibility、coverage/liveness carrier variant、または stale-carrier lifecycle の入力を受理しない。"
+        }
+      }
+    }
+  ]
+}

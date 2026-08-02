@@ -1,5 +1,26 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "a37dc03aacd2f1bf2a071561c0012c9023c6ced85febf0eb530df5b6feb60d7d",
-  "signals": []
+  "catalogue_declaration_hash": "2ae1f2b5eb0fba26585f22bbe431adfd87cf0377bdb98e020cd3b631643adaaa",
+  "signals": [
+    {
+      "type_name": "PhaseCommand",
+      "signal": "blue",
+      "entry_hash": "998644f58b76fb86f36ba5fcb2d0d163299872a4a171b8bf967b3486367e2843"
+    },
+    {
+      "type_name": "PhaseEnterArgs",
+      "signal": "blue",
+      "entry_hash": "d6e5f0344720585303179a94b55bbf8a411022b3532fcff7ecc87235f017fae1"
+    },
+    {
+      "type_name": "PhaseExplainArgs",
+      "signal": "blue",
+      "entry_hash": "330689247908679ea25de17298e318580acc254dc8e374ab44cfd37ca27cac39"
+    },
+    {
+      "type_name": "PhaseValidateArgs",
+      "signal": "blue",
+      "entry_hash": "079521ac57ccf0ce57502eaa781898372387fa8f3645071f87b49241f935caf0"
+    }
+  ]
 }

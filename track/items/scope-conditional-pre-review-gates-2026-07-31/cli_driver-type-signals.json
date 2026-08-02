@@ -1,7 +1,45 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-31T12:30:55Z",
-  "declaration_hash": "d78dd1aba3148b227f3c009e165a097f37132b396d02844f22f2898cf794a5b2",
+  "generated_at": "2026-08-02T06:16:31Z",
+  "declaration_hash": "6d28fa3dbd668409b4afe41fad30037bd30d96fd4c3deb80eb076f3d90626947",
   "implementation_input_hash": "ebc0c71312207b18f846f9a628a516e3db4c5c6fcb5c21b07bdea63c02f9ed8e",
-  "signals": []
+  "signals": [
+    {
+      "type_name": "PhaseCommandDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "PhaseCommandInput",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "PhaseIdArg",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "FromStr",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "CommandOutcome",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
 }

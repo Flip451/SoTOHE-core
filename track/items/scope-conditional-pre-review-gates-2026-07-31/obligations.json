@@ -3,21 +3,21 @@
   "obligations": [
     {
       "id": {
-        "entry_key": "PreReviewGateDispatchInteractor",
+        "entry_key": "PhaseCommandInteractor",
         "obligation_kind": "result",
         "item_identifier": "entry"
       },
       "target_entry": {
         "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
         "section_key": "types",
-        "entry_key": "PreReviewGateDispatchInteractor"
+        "entry_key": "PhaseCommandInteractor"
       },
       "target_role": {
         "kind": "data_role",
         "role": "Interactor"
       },
-      "brief": "Author a result test covering 'entry' of PreReviewGateDispatchInteractor",
-      "declaration_hash": "1707a68e4ea804bf943e3604774cd858ed60ed8aeee2dd0c759067cedaeb3dfd",
+      "brief": "Author a result test covering 'entry' of PhaseCommandInteractor",
+      "declaration_hash": "5e60400c38e8ce6bc29af9c8cbf158c0245a1f632a4256c4a25d5a4fb20014db",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -33,7 +33,143 @@
         },
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-04"
+          "element_id": "AC-02"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "PreReviewCommandDispatchInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "PreReviewCommandDispatchInteractor"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      },
+      "brief": "Author a result test covering 'entry' of PreReviewCommandDispatchInteractor",
+      "declaration_hash": "a65ba2b8d3e5b2a77ef45875d113db26416e2210d9fa6ad2481cab6164709d90",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-03"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-05"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-07"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "PreReviewCommandGatedReviewInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "PreReviewCommandGatedReviewInteractor"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      },
+      "brief": "Author a result test covering 'entry' of PreReviewCommandGatedReviewInteractor",
+      "declaration_hash": "47b3d7e2b0b425b903d42abe13da315cdaeef1114c0f6e37b380bb444ce578a1",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "GO-04"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-03"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-05"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-06"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-07"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "CurrentReviewTrackResolverPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:resolve"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "CurrentReviewTrackResolverPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:resolve' of CurrentReviewTrackResolverPort",
+      "declaration_hash": "6a50d89f6f82f55e934d0070f222eb527167809836c393becb185ddc3efc1cb3",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-05"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "PhaseCommandConfigLoaderPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "PhaseCommandConfigLoaderPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:load' of PhaseCommandConfigLoaderPort",
+      "declaration_hash": "395c15d4aef1e2e894f6b7191506d2dedc2ff3467aac04c19798f1991077feef",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-01"
         },
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -41,75 +177,27 @@
         },
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "CN-02"
-        },
-        {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-02"
-        },
-        {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-03"
-        },
-        {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-04"
-        }
-      ]
-    },
-    {
-      "id": {
-        "entry_key": "PreReviewGateConfigLoaderPort",
-        "obligation_kind": "contract",
-        "item_identifier": "trait_method:load"
-      },
-      "target_entry": {
-        "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
-        "section_key": "traits",
-        "entry_key": "PreReviewGateConfigLoaderPort"
-      },
-      "target_role": {
-        "kind": "contract_role",
-        "role": "SecondaryPort"
-      },
-      "brief": "Author a contract test covering 'trait_method:load' of PreReviewGateConfigLoaderPort",
-      "declaration_hash": "876babdef0d4d185483bede7a55c03bbd6eb628644717ba808b69cfb9139f653",
-      "spec_refs": [
-        {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "GO-01"
-        },
-        {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-01"
-        },
-        {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "AC-01"
-        },
-        {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-04"
         }
       ]
     },
     {
       "id": {
-        "entry_key": "PreReviewGateDispatchService",
+        "entry_key": "PhaseCommandService",
         "obligation_kind": "result",
-        "item_identifier": "trait_method:dispatch"
+        "item_identifier": "trait_method:validate"
       },
       "target_entry": {
         "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
         "section_key": "traits",
-        "entry_key": "PreReviewGateDispatchService"
+        "entry_key": "PhaseCommandService"
       },
       "target_role": {
         "kind": "contract_role",
         "role": "ApplicationService"
       },
-      "brief": "Author a result test covering 'trait_method:dispatch' of PreReviewGateDispatchService",
-      "declaration_hash": "bca81852fc49617b3ce207f796736eb9896849dde9fb2d340b9b8da73642daff",
+      "brief": "Author a result test covering 'trait_method:validate' of PhaseCommandService",
+      "declaration_hash": "cdcc71291ebdcbccfa707175aad415df826d5dbb44ef427707669297239b04dd",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -121,15 +209,7 @@
         },
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-03"
-        },
-        {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "IN-04"
-        },
-        {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "CN-02"
         },
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -138,6 +218,186 @@
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "AC-03"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "PhaseCommandService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:explain"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "PhaseCommandService"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      },
+      "brief": "Author a result test covering 'trait_method:explain' of PhaseCommandService",
+      "declaration_hash": "cdcc71291ebdcbccfa707175aad415df826d5dbb44ef427707669297239b04dd",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "GO-02"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-02"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-04"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-02"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "PhaseCommandService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:enter"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "PhaseCommandService"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      },
+      "brief": "Author a result test covering 'trait_method:enter' of PhaseCommandService",
+      "declaration_hash": "cdcc71291ebdcbccfa707175aad415df826d5dbb44ef427707669297239b04dd",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "GO-02"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-02"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-04"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-02"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "PreReviewCommandConfigLoaderPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "PreReviewCommandConfigLoaderPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:load' of PreReviewCommandConfigLoaderPort",
+      "declaration_hash": "17c5036745060e91b1c86e9a4f3353ca179e293e5185f9019b4d6fb3f25bd4aa",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-01"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-05"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "PreReviewCommandDispatchService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:dispatch"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "PreReviewCommandDispatchService"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      },
+      "brief": "Author a result test covering 'trait_method:dispatch' of PreReviewCommandDispatchService",
+      "declaration_hash": "58a93ddf81599b832598c8b12dfa1a2fefbce811b27b9a1502e1f50a9692380f",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-03"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-05"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-07"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ProgramRunnerPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:run"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "ProgramRunnerPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:run' of ProgramRunnerPort",
+      "declaration_hash": "33faedc0921bd162fd3083410d25118bc65909659fd2c2ba76f0bce05c1192c6",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-02"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-03"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-02"
         },
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -147,37 +407,185 @@
     },
     {
       "id": {
-        "entry_key": "FsPreReviewGateConfigLoader",
+        "entry_key": "infrastructure::operator_command_config::decode_phase_command_config",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
+        "section_key": "functions",
+        "entry_key": "infrastructure::operator_command_config::decode_phase_command_config"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of infrastructure::operator_command_config::decode_phase_command_config",
+      "declaration_hash": "e58c952323eb901b80b1640d4ffd178a63927fb6d26ab614e31e53e2ef66f6eb",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-01"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-01"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "infrastructure::operator_command_config::decode_pre_review_command_config",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
+        "section_key": "functions",
+        "entry_key": "infrastructure::operator_command_config::decode_pre_review_command_config"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of infrastructure::operator_command_config::decode_pre_review_command_config",
+      "declaration_hash": "70635ad33f29ce8827d8de3120436aac44079e81b9bf09084d3eec798b67074a",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-01"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-05"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "FsPhaseCommandConfigLoader",
         "obligation_kind": "contract_conformance",
-        "item_identifier": "trait_impl:usecase::pre_review_gate_dispatch::PreReviewGateConfigLoaderPort"
+        "item_identifier": "trait_impl:usecase::phase_command::PhaseCommandConfigLoaderPort"
       },
       "target_entry": {
         "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
         "section_key": "traits",
-        "entry_key": "FsPreReviewGateConfigLoader"
+        "entry_key": "FsPhaseCommandConfigLoader"
       },
       "target_role": {
         "kind": "trait_impl",
         "role": "SecondaryPort"
       },
-      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::pre_review_gate_dispatch::PreReviewGateConfigLoaderPort' of FsPreReviewGateConfigLoader",
-      "declaration_hash": "f64745ae1bedeef8b2c3e6163dd6120f6089f24bcce06bf86b0ebdabb2185756",
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::phase_command::PhaseCommandConfigLoaderPort' of FsPhaseCommandConfigLoader",
+      "declaration_hash": "153e29d910745bfff1ca99a995e96132dedf849a6f5b26e820f509dd7e6e87a5",
       "spec_refs": [
-        {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "GO-01"
-        },
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "IN-01"
         },
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-01"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "AC-01"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "FsPreReviewCommandConfigLoader",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::pre_review_command::PreReviewCommandConfigLoaderPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "FsPreReviewCommandConfigLoader"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::pre_review_command::PreReviewCommandConfigLoaderPort' of FsPreReviewCommandConfigLoader",
+      "declaration_hash": "f432994ff4c601d490e510b419f511b27ce577f87fea3dc74e7db0f7fd467abb",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-01"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-05"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ProcessProgramRunner",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::program_runner::ProgramRunnerPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "ProcessProgramRunner"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::program_runner::ProgramRunnerPort' of ProcessProgramRunner",
+      "declaration_hash": "2166336660e38d526663b9e6fa468e181c1d94ae41911a2ca5bde3ce988f697e",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-02"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-03"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-02"
         },
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "AC-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "GitCurrentReviewTrackResolver",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::pre_review_command::CurrentReviewTrackResolverPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "GitCurrentReviewTrackResolver"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::pre_review_command::CurrentReviewTrackResolverPort' of GitCurrentReviewTrackResolver",
+      "declaration_hash": "f824c8dfbf66d240e2212369c74f0663f6f7434656902edcd32855ca8dc88d9e",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-05"
         }
       ]
     }

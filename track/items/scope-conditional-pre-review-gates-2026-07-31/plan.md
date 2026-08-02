@@ -3,28 +3,31 @@
 
 ## Summary
 
-GO-01 → T001、T002、T003。
-GO-02 → T004、T005、T006。
+GO-01 → T018、T019、T023。
+GO-02 → T018、T019、T020、T021、T022。
+GO-03 → T018、T019、T020、T021、T022、T023。
+GO-04 → T018、T020、T021、T022、T023。
+GO-05 → T017、T018、T019、T020、T021、T022。
 
-## Tasks (4/6 resolved)
+## Tasks (4/11 resolved)
 
-### S1 — 適用ポリシーと設定境界
+### S0 — 確定済みの履歴 task
 
-> `libs/usecase/src/pre_review_gate_dispatch.rs`、`libs/infrastructure/src/pre_review_gate_config.rs`、`.harness/config/pre-review-gates.json` を T001–T003 の順に追加する。IN-01、OS-03、CN-01、AC-01。
+> T001–T004 は recorded commit を持つ historical task として保持する。
 
 - [x] **T001**: `libs/usecase/src/pre_review_gate_dispatch.rs` に `PreReviewGateKind`、`PreReviewGateMatrix`、matrix / lookup / load error、`PreReviewGateConfigLoaderPort` を追加し、`libs/usecase/src/lib.rs` から公開する。matrix validation と lookup の unit tests を追加する。IN-01、CN-01、AC-01。 (`94600fc2fb39340e10fbffad046570612bd458cb`)
 - [x] **T002**: `libs/infrastructure/src/pre_review_gate_config.rs` に `FsPreReviewGateConfigLoader` を実装し、infrastructure module に登録する。loader port の conformance / decode tests を追加する。IN-01、CN-01、AC-01。 (`35a4fd6ff771e6aaf5f179d7d24a1866e192a511`)
 - [x] **T003**: `.harness/config/pre-review-gates.json` に scope × gate declaration を追加し、`libs/infrastructure/src/pre_review_gate_config.rs` に declaration fixture validation を追加する。IN-01、OS-03、CN-01、AC-01。 (`bc598f770db5f6d9bf2630c8312a5727ee1612bc`)
+- [x] **T004**: `libs/usecase/src/pre_review_gate_dispatch.rs` に `PreReviewGateDispatchService`、`PreReviewGateDispatchCommand`、`PreReviewGateDispatchError`、`PreReviewGateDispatchInteractor`、`PreReviewGateDispatchOutcome` を実装する。scope lookup、`NotApplicable`、`TaskContractLiveness` の全 path と result / error tests を追加する。IN-02、IN-03、IN-04、OS-01、OS-02、CN-02、CN-03、AC-02、AC-03、AC-04。 (`f866a34ffc7a9d994b4be36e9280ae2d006909c8`)
 
-### S2 — dispatch と composition 接続
+### S1 — scope-owned atomic cutover
 
-> `libs/usecase/src/pre_review_gate_dispatch.rs` の T004 を完了してから、`apps/cli-composition/src/review_v2/mod.rs` の T005 を更新する。IN-02、IN-03、IN-04、CN-02、CN-03、AC-02、AC-03、AC-04。
+> T017–T023 が domain、usecase、infrastructure、cli_driver、cli_composition、cli、harness-policy の exclusive targets を一括で更新する。
 
-- [x] **T004**: `libs/usecase/src/pre_review_gate_dispatch.rs` に `PreReviewGateDispatchService`、`PreReviewGateDispatchCommand`、`PreReviewGateDispatchError`、`PreReviewGateDispatchInteractor`、`PreReviewGateDispatchOutcome` を実装する。scope lookup、`NotApplicable`、`TaskContractLiveness` の全 path と result / error tests を追加する。IN-02、IN-03、IN-04、OS-01、OS-02、CN-02、CN-03、AC-02、AC-03、AC-04。
-- [ ] **T005**: `apps/cli-composition/src/review_v2/mod.rs` の `ReviewCompositionRoot::review_run_local` に T002 の loader と T004 の dispatcher を配線し、local-review integration tests を追加する。IN-02、IN-03、IN-04、OS-01、OS-02、CN-02、CN-03、AC-02、AC-03、AC-04。
-
-### S3 — Makefile wrapper
-
-> T005 完了後に `Makefile.toml` と `apps/cli/tests/consumer_scaffold_host_first.rs` を T006 で更新する。IN-05、CN-02、AC-05。
-
-- [ ] **T006**: `Makefile.toml` の `[tasks.track-local-review]` から scope-blind pre-review dependencies を削除し、delegated `bin/sotp review local` script を維持する。`apps/cli/tests/consumer_scaffold_host_first.rs` に wrapper validation を追加する。IN-05、CN-02、AC-05。
+- [ ] **T017**: `libs/domain/src/task_contract.rs` と domain module registration の catalogue-entry-only task-contract types を復元し、carrier variants と tests を削除・更新する。IN-07、IN-08、OS-03、CN-05、AC-08、AC-09、AC-10。
+- [ ] **T018**: `libs/usecase/**` の carrier / evidence / hidden-gate identities、`pre_review_gate_dispatch.rs`、`pre_review_gate/evidence.rs`、`review_v2/pre_review_gated.rs` を削除し、task-contract migration、`program_runner.rs`、`operator_command.rs`、`phase_command.rs`、`pre_review_command.rs`、全 module registrations と tests を実装する。IN-01、IN-02、IN-03、IN-04、IN-05、IN-06、IN-07、IN-08、OS-01、OS-02、OS-03、OS-04、CN-01、CN-02、CN-03、CN-05、AC-01、AC-02、AC-03、AC-04、AC-05、AC-06、AC-07、AC-08、AC-09、AC-10。
+- [ ] **T019**: `libs/infrastructure/**` の `source_only_baseline_restoration_inspector.rs` と `pre_review_gate_config.rs` を削除し、`task_contract_codec.rs`、`program_runner.rs`、`operator_command_config.rs`、全 registrations / loader / DTO / decode / validation tests を実装する。IN-01、IN-02、IN-03、IN-05、IN-07、IN-08、OS-02、OS-03、OS-04、CN-01、CN-02、CN-03、CN-05、AC-01、AC-02、AC-03、AC-04、AC-05、AC-08、AC-09、AC-10。
+- [ ] **T020**: `apps/cli-driver/**` の obsolete task-contract / review carrier surfaces を削除し、`phase_command.rs`、review dispatch migration、module registrations、driver and render-boundary tests を実装する。IN-02、IN-03、IN-04、IN-05、IN-06、IN-07、IN-08、OS-01、OS-02、OS-03、OS-04、CN-01、CN-03、CN-05、AC-02、AC-03、AC-04、AC-05、AC-06、AC-07、AC-08、AC-09、AC-10。
+- [ ] **T021**: `apps/cli-composition/**` の `task_contract.rs` と `review_v2/pre_review_gate.rs` carrier / gate adapters を削除し、phase / review service wiring、`review_v2/{mod.rs,shim.rs,pre_review_command.rs}`、module registrations と tests を実装する。IN-02、IN-03、IN-05、IN-06、IN-07、IN-08、OS-01、OS-03、OS-04、CN-03、CN-05、AC-02、AC-04、AC-05、AC-06、AC-07、AC-08、AC-09、AC-10。
+- [ ] **T022**: `apps/cli/**` の task-contract CLI carrier surfaces を削除し、`commands/phase.rs`、`commands/review/{mod.rs,local.rs}` の phase parsing / emission と review dispatch、registrations、CLI integration tests を実装する。IN-02、IN-03、IN-04、IN-05、IN-06、IN-07、IN-08、OS-01、OS-03、OS-04、CN-01、CN-03、CN-04、CN-05、AC-02、AC-03、AC-04、AC-05、AC-06、AC-07、AC-08、AC-09、AC-10。
+- [ ] **T023**: `.harness/config/phase-commands.json` を追加し、`.harness/config/pre-review-gates.json` を literal argv declarations に置換し、`Makefile.toml` を thin delegation に保ち、`.harness/capabilities/impl-planner.md` と `.harness/custom/review-prompts/impl-plan.md` を更新する。IN-01、IN-05、IN-06、IN-08、OS-04、CN-01、CN-04、CN-05、AC-01、AC-05、AC-06、AC-07、AC-10。

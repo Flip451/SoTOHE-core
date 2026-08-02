@@ -1,61 +1,231 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "c3348b0ca6063b6cfe2c0ae4d49a97c08b9b5db106de137bdade74660ffa939f",
+  "catalogue_declaration_hash": "9cea7d87c47c1b25058ba71bf82320b9eb16167fde6f8b2c40ced2338bdf7b98",
   "signals": [
     {
-      "type_name": "PreReviewGateConfigLoadError",
+      "type_name": "CapturedProgramOutput",
       "signal": "blue",
-      "entry_hash": "9e843f9cf7eb93a709c6a35576bfd329bb1151f858acc52436fe51b875eeecc4"
+      "entry_hash": "5c18e8a82ea466f1efca8743529e8e4dc0dc09899775ee239adefa6f14b1c7bb"
     },
     {
-      "type_name": "PreReviewGateDispatchCommand",
+      "type_name": "CommandArgument",
       "signal": "blue",
-      "entry_hash": "4259a89948be4337f422f640f0a9cf6280c9e175a3da09a822e6303ec99861b4"
+      "entry_hash": "c6568afc654a56e02af5f2f1a14bc5e81156849ab39cdc1d8a60012e0ec7fa46"
     },
     {
-      "type_name": "PreReviewGateDispatchError",
+      "type_name": "CommandArgv",
       "signal": "blue",
-      "entry_hash": "693f2044045b2bfe2f1b47d6b39e077002ed31630a51af05179699312c081838"
+      "entry_hash": "9b6889fcff8e39ed31e3ec26f84c1ef8ddee17d4be3ddb76e185460ab50d73df"
     },
     {
-      "type_name": "PreReviewGateDispatchInteractor",
+      "type_name": "CommandConfigLoadError",
       "signal": "blue",
-      "entry_hash": "f7e078c02ce1976292d080f318eac42f6606f64179a478e08c761e64e8eed87e"
+      "entry_hash": "7347d331971af490f7c53aa35afc40c7b9e0063faccbf79f6fa7f4008900ae97"
     },
     {
-      "type_name": "PreReviewGateDispatchOutcome",
+      "type_name": "CommandConfigSchemaVersion",
       "signal": "blue",
-      "entry_hash": "d8ffbea9908b05f83346b3ff9ffc9fe5e0ee2cbe3ca8ab5ea24625d74f1b4526"
+      "entry_hash": "cf874f61a8089dfcfc6c2cdfaf7a8c9897d6f6969a5cb2323fa36fd5bc7f671b"
     },
     {
-      "type_name": "PreReviewGateKind",
+      "type_name": "CommandConfigValidationError",
       "signal": "blue",
-      "entry_hash": "918b2599779d3844ecf3dbe0d98f6589f376cd4b8dfcb938ff79bf4636e00f7c"
+      "entry_hash": "7d1f0c0af651d2438ff0d679956531a68002b28dc6f9aea34757b5b6507dbe29"
     },
     {
-      "type_name": "PreReviewGateLookupError",
+      "type_name": "CommandDeclarationId",
       "signal": "blue",
-      "entry_hash": "6954361eabec5c4c0de3f199fcc5bf017fdf35747c83280573db3d5644d2413f"
+      "entry_hash": "57f1a69552eda5f8ef86d9a2e7ac0214d7020a4b7064201d0711de990240c1e4"
     },
     {
-      "type_name": "PreReviewGateMatrix",
+      "type_name": "CommandSequenceIndex",
       "signal": "blue",
-      "entry_hash": "05e33e9e4b8dd0bcbd8e208be7e815e72519f77fa4388858126b25c21cf96924"
+      "entry_hash": "7129fe2e446f448b41ad416a048b63cf21d7542b7b69b8433d4b031cc242fa04"
     },
     {
-      "type_name": "PreReviewGateMatrixError",
+      "type_name": "CommandTimeoutSeconds",
       "signal": "blue",
-      "entry_hash": "d823b18cdf87fdeb6fa727206ba6b8e7ae667afd74caf790a07b1fb49ceb0e70"
+      "entry_hash": "e361c28861264c9ad1650b0c11de31aa71939092ef5a4eb4a146e1a6eed42a2d"
     },
     {
-      "type_name": "PreReviewGateConfigLoaderPort",
+      "type_name": "ConfiguredCommand",
       "signal": "blue",
-      "entry_hash": "58a8156c07ba19fb9932ca1483038fcd5c965f78444c243d8a818e11d9a8d9fd"
+      "entry_hash": "6300e9bece65776469689049dd610d4182ce5e1c84af1fc41ca9e84b49679908"
     },
     {
-      "type_name": "PreReviewGateDispatchService",
+      "type_name": "CurrentReviewTrackResolveError",
       "signal": "blue",
-      "entry_hash": "a8dad723afbc36e43085b43dca0e2c54d3a15a2d67e7879c744516386e316cf6"
+      "entry_hash": "1b19f40dec3598c3c701093fcd5e046e8146b0e7661fc66c0ef5198a31bd4b33"
+    },
+    {
+      "type_name": "OutputCaptureLimitBytes",
+      "signal": "blue",
+      "entry_hash": "5961443a540156aac96e84c89c16bd6d46b747ff430c82de579851f48030a071"
+    },
+    {
+      "type_name": "PhaseCommandConfig",
+      "signal": "blue",
+      "entry_hash": "308dab41e136484e8365ce63639dc7b4884a756a9bcf9115ab50a955fd9bd8fb"
+    },
+    {
+      "type_name": "PhaseCommandDeclaration",
+      "signal": "blue",
+      "entry_hash": "237095863bac08c2c0a2505b26d88edfefeb48da8fb3c6d9ffa0fa7e0f145148"
+    },
+    {
+      "type_name": "PhaseCommandEnterError",
+      "signal": "blue",
+      "entry_hash": "69727a5a0a4239dc6980bd2cf19cc90aba4d8511ad004ff884373ce2eb71f114"
+    },
+    {
+      "type_name": "PhaseCommandEnterOutcome",
+      "signal": "blue",
+      "entry_hash": "4bfd9e71a6dcfbe39b9f0eda5e731ba01ff0767ed50ce2c725614479c750faa4"
+    },
+    {
+      "type_name": "PhaseCommandExplainError",
+      "signal": "blue",
+      "entry_hash": "853b7fa81c4663a12995ea4b602383822c386905eb035cfd580dfddc16b5b74c"
+    },
+    {
+      "type_name": "PhaseCommandExplanation",
+      "signal": "blue",
+      "entry_hash": "f51f83d5a5a41f62f8dd7aeb17e6438341f4fbf3c438969da06f603cfe6bbd4c"
+    },
+    {
+      "type_name": "PhaseCommandInteractor",
+      "signal": "blue",
+      "entry_hash": "76ad84753e14ce50b05e4d5cb953b32ed580341e070b2098115f0579e7d5bef8"
+    },
+    {
+      "type_name": "PhaseCommandStep",
+      "signal": "blue",
+      "entry_hash": "3d41077b6af74b00caefc1f20f6f71508247fba23fdb18b6c3f361e3cf1fd11b"
+    },
+    {
+      "type_name": "PhaseEnterCommand",
+      "signal": "blue",
+      "entry_hash": "20de4b9d3a8687e91907c1a5c0d02049b95244be786f0c9eb062652631f35768"
+    },
+    {
+      "type_name": "PhaseExplainQuery",
+      "signal": "blue",
+      "entry_hash": "1b4c6f2f655e96a5a348ea7904bf8f0498ca86b32dc0ae2fd23636f34ecd7ca1"
+    },
+    {
+      "type_name": "PhaseValidateCommand",
+      "signal": "blue",
+      "entry_hash": "dab244da6e959629f231eda9788286ec9d5a6f66a2912606e7e3b6d4c485fa9a"
+    },
+    {
+      "type_name": "PreReviewCommandConfig",
+      "signal": "blue",
+      "entry_hash": "30203cc606bfa131373500553f1ddcc72b39ea512e4c11b5cf55689056e7dcb9"
+    },
+    {
+      "type_name": "PreReviewCommandDispatchCommand",
+      "signal": "blue",
+      "entry_hash": "cf534e804d0c95d2c3d5040fe7c3fbac4230bc1253c03208c4fdb0e77881bf1f"
+    },
+    {
+      "type_name": "PreReviewCommandDispatchError",
+      "signal": "blue",
+      "entry_hash": "b2f5481fe7feaeceba4bb0e048df30587cb147af32ad86bd4467486381c492e1"
+    },
+    {
+      "type_name": "PreReviewCommandDispatchInteractor",
+      "signal": "blue",
+      "entry_hash": "13989e4014bb514f585a77625454b58e214fe851a2fc84736d4820c88ce08f70"
+    },
+    {
+      "type_name": "PreReviewCommandDispatchOutcome",
+      "signal": "blue",
+      "entry_hash": "f669ccd622d92809cf85b438536782e6072265a87ae7ec8ddcb92d85c2a9e5cc"
+    },
+    {
+      "type_name": "PreReviewCommandGatedReviewInteractor",
+      "signal": "blue",
+      "entry_hash": "e8672890fd2d055ba58b60c6e1b939c61fefba87d433f1696d754dff47435d81"
+    },
+    {
+      "type_name": "PreReviewScopeCommandDeclaration",
+      "signal": "blue",
+      "entry_hash": "bb2189bdffd63f71f230f2ece0f3121fac14c2e5ef50540b0f61d2550455294f"
+    },
+    {
+      "type_name": "ProgramExecutionRecord",
+      "signal": "blue",
+      "entry_hash": "ef48f76e3f91f0bcc370bc1ee1aaa02c9ca2c4dc65366f8246217332391bd75c"
+    },
+    {
+      "type_name": "ProgramExitCode",
+      "signal": "blue",
+      "entry_hash": "e47407e0b9037bd03144ee1f4a556639403ff3ad800d03fd16870983d56b0453"
+    },
+    {
+      "type_name": "ProgramInvocation",
+      "signal": "blue",
+      "entry_hash": "6b4e77f60cf94fc2be1ea6ec1f499c158292fdaf20ae0ae233c436af690760af"
+    },
+    {
+      "type_name": "ProgramOutputStream",
+      "signal": "blue",
+      "entry_hash": "b05555b1ad4a65daa1858b3e76b6589890b2db138227f1e8f57aa8247e6eae74"
+    },
+    {
+      "type_name": "ProgramRunOutcome",
+      "signal": "blue",
+      "entry_hash": "b5b9ccaab585750daf85e756ab824199a62a35b3511e9acc9bad07dcb811dec0"
+    },
+    {
+      "type_name": "ProgramRunnerError",
+      "signal": "blue",
+      "entry_hash": "86a2a1f7d56610b8fb4ab377d35e8ae4f239cdd53570a77dd7a91fe9efcfb15a"
+    },
+    {
+      "type_name": "ReviewScopeSelector",
+      "signal": "blue",
+      "entry_hash": "9867b51315ba84d48b11e322cc8844020fa5ec21ee3362711c9c2a4155d91e8e"
+    },
+    {
+      "type_name": "ReviewTrackSelector",
+      "signal": "blue",
+      "entry_hash": "313abe779b325a79a9e08a32868b5785af23b60274a452f581521c33e8c05f39"
+    },
+    {
+      "type_name": "UnvalidatedTimeoutSeconds",
+      "signal": "blue",
+      "entry_hash": "ba82cd2e326daddfc21628ee14e90daaee9440d9f33319ddd075924881dfa609"
+    },
+    {
+      "type_name": "CurrentReviewTrackResolverPort",
+      "signal": "blue",
+      "entry_hash": "fb150a074bde45c31f125d65f60f2307f09a98f5f90bf2edffc076348f077fbe"
+    },
+    {
+      "type_name": "PhaseCommandConfigLoaderPort",
+      "signal": "blue",
+      "entry_hash": "a3d78b61f61805ded4a4e5c9070ba41de034d77ab562550492010f526ac19df7"
+    },
+    {
+      "type_name": "PhaseCommandService",
+      "signal": "blue",
+      "entry_hash": "c94f93b5a2c6aa0fabd415663da4bee734ae7c6455de858334ac64c482844c9a"
+    },
+    {
+      "type_name": "PreReviewCommandConfigLoaderPort",
+      "signal": "blue",
+      "entry_hash": "dea9c6f6e795bd36a6d4c0f39f6128aa8d13d131bc441584ae2a27883b167ace"
+    },
+    {
+      "type_name": "PreReviewCommandDispatchService",
+      "signal": "blue",
+      "entry_hash": "7a2aa945eb77a4b2b63dcc2117a52dfb0a49bf9539339da28a41a58d1f97f340"
+    },
+    {
+      "type_name": "ProgramRunnerPort",
+      "signal": "blue",
+      "entry_hash": "d49b5165ce5926cac4cc005cdff3ae323187a58af0cd34bed74b5586d427dd3f"
     }
   ]
 }

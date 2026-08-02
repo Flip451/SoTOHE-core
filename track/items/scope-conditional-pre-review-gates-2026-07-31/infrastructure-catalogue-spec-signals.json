@@ -1,11 +1,106 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "a742cfb157fcbe8ef816b66a3f46ca534a7eed53a07d8c3dd5b85cee55002eef",
+  "catalogue_declaration_hash": "eec03cf359e41b888727014182e43f0adbfa777f7926677a19795ec843067ccb",
   "signals": [
     {
-      "type_name": "FsPreReviewGateConfigLoader",
+      "type_name": "CommandArgumentDto",
       "signal": "blue",
-      "entry_hash": "117f10f60732797b5fb472d02313cfc7e607befdd2478ca538cccdce1f4f9614"
+      "entry_hash": "53965b2bded41d104d5038c790fbfeb145bf55b3db89e6597eaaf7bc4779960f"
+    },
+    {
+      "type_name": "CommandArgvDto",
+      "signal": "blue",
+      "entry_hash": "d585f4c32fe00b487b73ce77d3e6bc8cd2e4d1552bcdf2b6bb37bdbe3edb0965"
+    },
+    {
+      "type_name": "CommandConfigSchemaVersionDto",
+      "signal": "blue",
+      "entry_hash": "eee730bed1793ebec8362244f22ade7c49d604b8ac2e49d5029d537c6bd7ea16"
+    },
+    {
+      "type_name": "CommandDeclarationIdDto",
+      "signal": "blue",
+      "entry_hash": "708f984cde4c23b04d76983ee9b544fe1d6f3905840143bdeaaf916b5ef73fc7"
+    },
+    {
+      "type_name": "CommandTimeoutSecondsDto",
+      "signal": "blue",
+      "entry_hash": "635182ea28b2cce5cd6efa77685723209d3d1b46ab5098f02d0d80322134b3ee"
+    },
+    {
+      "type_name": "ConfiguredCommandDto",
+      "signal": "blue",
+      "entry_hash": "df6c8ee361e5761910a9ca55da7f69bbe52f1c8dc14e6754a66c40e50c5d0856"
+    },
+    {
+      "type_name": "ContractedEntryRefDto",
+      "signal": "blue",
+      "entry_hash": "981985188bce673d47058e81f58c357208e1e8fd3d41a6a062a7849a9185625f"
+    },
+    {
+      "type_name": "FsPhaseCommandConfigLoader",
+      "signal": "blue",
+      "entry_hash": "27036fd07e5aa58f43de624a0aa31ddeb539d4c3d829e4471618625d8dd325a4"
+    },
+    {
+      "type_name": "FsPreReviewCommandConfigLoader",
+      "signal": "blue",
+      "entry_hash": "a3f99c5ba56df9424e7bd2b59d20ee1f77b9676199670b999146179c9e86e7fe"
+    },
+    {
+      "type_name": "GitCurrentReviewTrackResolver",
+      "signal": "blue",
+      "entry_hash": "4dfaa606c2957affa2a296791f53ab5d783b7cd943506fd446a29f0e39c6d853"
+    },
+    {
+      "type_name": "PhaseCommandConfigDto",
+      "signal": "blue",
+      "entry_hash": "ebc7239851062b20f2c7d35000169f1c75c146eb250ad3fd422dd315d61e8df2"
+    },
+    {
+      "type_name": "PhaseCommandDeclarationDto",
+      "signal": "blue",
+      "entry_hash": "94aea2a91b9d0aaaa8068caf3368d96ff8f05b9c023b28056c5f10eb65aa4bc4"
+    },
+    {
+      "type_name": "PreReviewCommandConfigDto",
+      "signal": "blue",
+      "entry_hash": "8ad40084f6680529774b0e05255803c03b5b237cbc7901faa9dde07403e14d0f"
+    },
+    {
+      "type_name": "PreReviewScopeCommandDeclarationDto",
+      "signal": "blue",
+      "entry_hash": "4d846fa35d8767c20303bc42e895f78e373f4c7825f179168630addbe9b13896"
+    },
+    {
+      "type_name": "ProcessProgramRunner",
+      "signal": "blue",
+      "entry_hash": "5c49961aa67d03c8ec521e30c0867442ea951b7aa31ee3bb87a7c88b5bce8a88"
+    },
+    {
+      "type_name": "ReviewScopeNameDto",
+      "signal": "blue",
+      "entry_hash": "fbbc172386af955ca47bc50955acc4cdd8afdf982d711a6bdc1daed968e292b3"
+    },
+    {
+      "type_name": "TaskContractDocumentDto",
+      "signal": "blue",
+      "entry_hash": "50c3926abd9b5a32f7c749296e4c41221adb29d27adde674c25c335b456b215b"
+    },
+    {
+      "type_name": "TaskContractSchemaVersionDto",
+      "signal": "blue",
+      "entry_hash": "b13e5fe27ee5891b53e324b05be31b1a23a058b9940f4995dbf06502d1918c45"
+    },
+    {
+      "type_name": "infrastructure::operator_command_config::decode_phase_command_config",
+      "signal": "blue",
+      "entry_hash": "5d8c1dfb9723cc5aee0eda850761aa7328bb426bbd6034f71c136dc2c2f16a3f"
+    },
+    {
+      "type_name": "infrastructure::operator_command_config::decode_pre_review_command_config",
+      "signal": "blue",
+      "entry_hash": "31f36d48983111454b0b78d6498e05598d7c38d96de67ce2c7c31a1a3dc4dab9"
     }
   ]
 }

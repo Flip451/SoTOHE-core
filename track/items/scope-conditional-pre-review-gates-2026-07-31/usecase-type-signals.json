@@ -1,15 +1,505 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-01T00:46:03Z",
-  "declaration_hash": "c3348b0ca6063b6cfe2c0ae4d49a97c08b9b5db106de137bdade74660ffa939f",
+  "generated_at": "2026-08-02T06:16:21Z",
+  "declaration_hash": "9cea7d87c47c1b25058ba71bf82320b9eb16167fde6f8b2c40ced2338bdf7b98",
   "implementation_input_hash": "1a2b5daec22bd309b3da648d39bea64a477db5e0eeeabedff9cf2cc3a6ba1a24",
   "signals": [
     {
-      "type_name": "PreReviewGateConfigLoadError",
+      "type_name": "CapturedProgramOutput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "CommandArgument",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "CommandArgv",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "CommandConfigLoadError",
       "kind_tag": "error_type",
-      "signal": "blue",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "CommandConfigSchemaVersion",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "CommandConfigValidationError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "CommandDeclarationId",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "CommandSequenceIndex",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "CommandTimeoutSeconds",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Copy",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "ConfiguredCommand",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "CurrentReviewTrackResolveError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "CurrentReviewTrackResolverPort",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "OutputCaptureLimitBytes",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Copy",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "PhaseCommandConfig",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "PhaseCommandConfigLoaderPort",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "PhaseCommandDeclaration",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "PhaseCommandEnterError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "PhaseCommandEnterOutcome",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "PhaseCommandExplainError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "PhaseCommandExplanation",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "PhaseCommandInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "PhaseCommandService"
+      ]
+    },
+    {
+      "type_name": "PhaseCommandService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "PhaseCommandStep",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "PhaseEnterCommand",
+      "kind_tag": "command",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "PhaseExplainQuery",
+      "kind_tag": "query",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "PhaseValidateCommand",
+      "kind_tag": "command",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "PreReviewCommandConfig",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "PreReviewCommandConfigLoaderPort",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "PreReviewCommandDispatchCommand",
+      "kind_tag": "command",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "PreReviewCommandDispatchError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "PreReviewCommandDispatchInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "PreReviewCommandDispatchService"
+      ]
+    },
+    {
+      "type_name": "PreReviewCommandDispatchOutcome",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "PreReviewCommandDispatchService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "PreReviewCommandGatedReviewInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "ReviewService"
+      ]
+    },
+    {
+      "type_name": "PreReviewScopeCommandDeclaration",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "ProgramExecutionRecord",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "ProgramExitCode",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "ProgramInvocation",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "ProgramOutputStream",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "ProgramRunOutcome",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "ProgramRunnerError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "ProgramRunnerPort",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ReviewScopeSelector",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "ReviewTrackSelector",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "UnvalidatedTimeoutSeconds",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "PreReviewGateConfigLoadError",
+      "kind_tag": "unknown",
+      "signal": "red",
       "found_type": true,
-      "found_items": [
+      "extra_items": [
         "Debug",
         "Display",
         "Error"
@@ -17,26 +507,26 @@
     },
     {
       "type_name": "PreReviewGateConfigLoaderPort",
-      "kind_tag": "secondary_port",
-      "signal": "blue",
+      "kind_tag": "unknown",
+      "signal": "red",
       "found_type": true
     },
     {
       "type_name": "PreReviewGateDispatchCommand",
-      "kind_tag": "command",
-      "signal": "blue",
+      "kind_tag": "unknown",
+      "signal": "red",
       "found_type": true,
-      "found_items": [
+      "extra_items": [
         "Clone",
         "Debug"
       ]
     },
     {
       "type_name": "PreReviewGateDispatchError",
-      "kind_tag": "error_type",
-      "signal": "blue",
+      "kind_tag": "unknown",
+      "signal": "red",
       "found_type": true,
-      "found_items": [
+      "extra_items": [
         "Debug",
         "Display",
         "Error",
@@ -47,19 +537,19 @@
     },
     {
       "type_name": "PreReviewGateDispatchInteractor",
-      "kind_tag": "interactor",
-      "signal": "blue",
+      "kind_tag": "unknown",
+      "signal": "red",
       "found_type": true,
-      "found_items": [
+      "extra_items": [
         "PreReviewGateDispatchService"
       ]
     },
     {
       "type_name": "PreReviewGateDispatchOutcome",
-      "kind_tag": "enum",
-      "signal": "blue",
+      "kind_tag": "unknown",
+      "signal": "red",
       "found_type": true,
-      "found_items": [
+      "extra_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -68,16 +558,16 @@
     },
     {
       "type_name": "PreReviewGateDispatchService",
-      "kind_tag": "application_service",
-      "signal": "blue",
+      "kind_tag": "unknown",
+      "signal": "red",
       "found_type": true
     },
     {
       "type_name": "PreReviewGateKind",
-      "kind_tag": "enum",
-      "signal": "blue",
+      "kind_tag": "unknown",
+      "signal": "red",
       "found_type": true,
-      "found_items": [
+      "extra_items": [
         "Clone",
         "Copy",
         "Debug",
@@ -88,10 +578,10 @@
     },
     {
       "type_name": "PreReviewGateLookupError",
-      "kind_tag": "error_type",
-      "signal": "blue",
+      "kind_tag": "unknown",
+      "signal": "red",
       "found_type": true,
-      "found_items": [
+      "extra_items": [
         "Clone",
         "Debug",
         "Display",
@@ -102,10 +592,10 @@
     },
     {
       "type_name": "PreReviewGateMatrix",
-      "kind_tag": "value_object",
-      "signal": "blue",
+      "kind_tag": "unknown",
+      "signal": "red",
       "found_type": true,
-      "found_items": [
+      "extra_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -114,10 +604,10 @@
     },
     {
       "type_name": "PreReviewGateMatrixError",
-      "kind_tag": "error_type",
-      "signal": "blue",
+      "kind_tag": "unknown",
+      "signal": "red",
       "found_type": true,
-      "found_items": [
+      "extra_items": [
         "Clone",
         "Debug",
         "Display",

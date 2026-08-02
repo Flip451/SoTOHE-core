@@ -1,24 +1,98 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "track_id": "scope-conditional-pre-review-gates-2026-07-31",
   "entries": {
-    "T001": [
-      { "layer": "usecase", "entry_key": "PreReviewGateConfigLoaderPort" },
-      { "layer": "usecase", "entry_key": "PreReviewGateKind" },
-      { "layer": "usecase", "entry_key": "PreReviewGateMatrix" },
-      { "layer": "usecase", "entry_key": "PreReviewGateMatrixError" },
-      { "layer": "usecase", "entry_key": "PreReviewGateLookupError" },
-      { "layer": "usecase", "entry_key": "PreReviewGateConfigLoadError" }
+    "T017": [
+      {"kind": "catalogue_entry", "layer": "domain", "entry_key": "ContractedEntryRef"},
+      {"kind": "catalogue_entry", "layer": "domain", "entry_key": "CoverageVerifyOutcome"},
+      {"kind": "catalogue_entry", "layer": "domain", "entry_key": "CoverageViolation"},
+      {"kind": "catalogue_entry", "layer": "domain", "entry_key": "PreReviewGateOutcome"},
+      {"kind": "catalogue_entry", "layer": "domain", "entry_key": "PreReviewGateViolation"},
+      {"kind": "catalogue_entry", "layer": "domain", "entry_key": "TaskContractDocument"}
     ],
-    "T002": [
-      { "layer": "infrastructure", "entry_key": "FsPreReviewGateConfigLoader" }
+    "T018": [
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "CapturedProgramOutput"},
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "ProgramExecutionRecord"},
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "ProgramExitCode"},
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "ProgramInvocation"},
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "ProgramOutputStream"},
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "ProgramRunOutcome"},
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "ProgramRunnerError"},
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "ProgramRunnerPort"},
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "CommandArgument"},
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "CommandArgv"},
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "CommandConfigLoadError"},
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "CommandConfigSchemaVersion"},
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "CommandConfigValidationError"},
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "CommandDeclarationId"},
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "CommandSequenceIndex"},
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "CommandTimeoutSeconds"},
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "ConfiguredCommand"},
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "OutputCaptureLimitBytes"},
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "PhaseCommandConfig"},
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "PhaseCommandDeclaration"},
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "PhaseCommandConfigLoaderPort"},
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "UnvalidatedTimeoutSeconds"},
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "CurrentReviewTrackResolveError"},
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "CurrentReviewTrackResolverPort"},
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "PreReviewCommandConfig"},
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "PreReviewCommandConfigLoaderPort"},
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "PreReviewScopeCommandDeclaration"},
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "ReviewScopeSelector"},
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "ReviewTrackSelector"},
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "PhaseCommandEnterError"},
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "PhaseCommandEnterOutcome"},
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "PhaseCommandExplainError"},
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "PhaseCommandExplanation"},
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "PhaseCommandInteractor"},
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "PhaseCommandService"},
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "PhaseCommandStep"},
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "PhaseEnterCommand"},
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "PhaseExplainQuery"},
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "PhaseValidateCommand"},
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "PreReviewCommandDispatchCommand"},
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "PreReviewCommandDispatchError"},
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "PreReviewCommandDispatchInteractor"},
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "PreReviewCommandDispatchOutcome"},
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "PreReviewCommandDispatchService"},
+      {"kind": "catalogue_entry", "layer": "usecase", "entry_key": "PreReviewCommandGatedReviewInteractor"}
     ],
-    "T004": [
-      { "layer": "usecase", "entry_key": "PreReviewGateDispatchService" },
-      { "layer": "usecase", "entry_key": "PreReviewGateDispatchCommand" },
-      { "layer": "usecase", "entry_key": "PreReviewGateDispatchError" },
-      { "layer": "usecase", "entry_key": "PreReviewGateDispatchInteractor" },
-      { "layer": "usecase", "entry_key": "PreReviewGateDispatchOutcome" }
+    "T019": [
+      {"kind": "catalogue_entry", "layer": "infrastructure", "entry_key": "ContractedEntryRefDto"},
+      {"kind": "catalogue_entry", "layer": "infrastructure", "entry_key": "TaskContractDocumentDto"},
+      {"kind": "catalogue_entry", "layer": "infrastructure", "entry_key": "TaskContractSchemaVersionDto"},
+      {"kind": "catalogue_entry", "layer": "infrastructure", "entry_key": "ProcessProgramRunner"},
+      {"kind": "catalogue_entry", "layer": "infrastructure", "entry_key": "CommandArgumentDto"},
+      {"kind": "catalogue_entry", "layer": "infrastructure", "entry_key": "CommandArgvDto"},
+      {"kind": "catalogue_entry", "layer": "infrastructure", "entry_key": "CommandConfigSchemaVersionDto"},
+      {"kind": "catalogue_entry", "layer": "infrastructure", "entry_key": "CommandDeclarationIdDto"},
+      {"kind": "catalogue_entry", "layer": "infrastructure", "entry_key": "CommandTimeoutSecondsDto"},
+      {"kind": "catalogue_entry", "layer": "infrastructure", "entry_key": "ConfiguredCommandDto"},
+      {"kind": "catalogue_entry", "layer": "infrastructure", "entry_key": "FsPhaseCommandConfigLoader"},
+      {"kind": "catalogue_entry", "layer": "infrastructure", "entry_key": "PhaseCommandConfigDto"},
+      {"kind": "catalogue_entry", "layer": "infrastructure", "entry_key": "PhaseCommandDeclarationDto"},
+      {"kind": "catalogue_entry", "layer": "infrastructure", "entry_key": "infrastructure::operator_command_config::decode_phase_command_config"},
+      {"kind": "catalogue_entry", "layer": "infrastructure", "entry_key": "FsPreReviewCommandConfigLoader"},
+      {"kind": "catalogue_entry", "layer": "infrastructure", "entry_key": "GitCurrentReviewTrackResolver"},
+      {"kind": "catalogue_entry", "layer": "infrastructure", "entry_key": "PreReviewCommandConfigDto"},
+      {"kind": "catalogue_entry", "layer": "infrastructure", "entry_key": "PreReviewScopeCommandDeclarationDto"},
+      {"kind": "catalogue_entry", "layer": "infrastructure", "entry_key": "ReviewScopeNameDto"},
+      {"kind": "catalogue_entry", "layer": "infrastructure", "entry_key": "infrastructure::operator_command_config::decode_pre_review_command_config"}
+    ],
+    "T020": [
+      {"kind": "catalogue_entry", "layer": "cli_driver", "entry_key": "CommandOutcome"},
+      {"kind": "catalogue_entry", "layer": "cli_driver", "entry_key": "PhaseCommandDriver"},
+      {"kind": "catalogue_entry", "layer": "cli_driver", "entry_key": "PhaseCommandInput"},
+      {"kind": "catalogue_entry", "layer": "cli_driver", "entry_key": "PhaseIdArg"}
+    ],
+    "T021": [
+      {"kind": "catalogue_entry", "layer": "cli_composition", "entry_key": "PhaseCompositionRoot"}
+    ],
+    "T022": [
+      {"kind": "catalogue_entry", "layer": "cli", "entry_key": "PhaseCommand"},
+      {"kind": "catalogue_entry", "layer": "cli", "entry_key": "PhaseEnterArgs"},
+      {"kind": "catalogue_entry", "layer": "cli", "entry_key": "PhaseExplainArgs"},
+      {"kind": "catalogue_entry", "layer": "cli", "entry_key": "PhaseValidateArgs"}
     ]
   }
 }

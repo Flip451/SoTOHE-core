@@ -1,7 +1,52 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-31T12:30:57Z",
-  "declaration_hash": "a37dc03aacd2f1bf2a071561c0012c9023c6ced85febf0eb530df5b6feb60d7d",
+  "generated_at": "2026-08-02T06:16:42Z",
+  "declaration_hash": "2ae1f2b5eb0fba26585f22bbe431adfd87cf0377bdb98e020cd3b631643adaaa",
   "implementation_input_hash": "cdd14a3fa4406a7bb7dc5fa2a2927e302e5d158c975a1924cf38dc8246913214",
-  "signals": []
+  "signals": [
+    {
+      "type_name": "PhaseCommand",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "FromArgMatches",
+        "Subcommand"
+      ]
+    },
+    {
+      "type_name": "PhaseEnterArgs",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Args",
+        "Debug",
+        "FromArgMatches"
+      ]
+    },
+    {
+      "type_name": "PhaseExplainArgs",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Args",
+        "Debug",
+        "FromArgMatches"
+      ]
+    },
+    {
+      "type_name": "PhaseValidateArgs",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Args",
+        "Debug",
+        "FromArgMatches"
+      ]
+    }
+  ]
 }

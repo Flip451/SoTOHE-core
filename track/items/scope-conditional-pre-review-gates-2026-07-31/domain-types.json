@@ -1,8 +1,357 @@
 {
   "crate_name": "domain",
   "functions": {},
+  "inherent_impls": [],
   "layer": "domain",
   "schema_version": 5,
+  "trait_impls": [],
   "traits": {},
-  "types": {}
+  "types": {
+    "ContractedEntryRef": {
+      "action": "reference",
+      "docs": "Catalogue-entry attribution identity (IN-07, AC-08).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "layer",
+              "ty": "LayerId"
+            },
+            {
+              "name": "entry_key",
+              "ty": "CatalogueEntryKey"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "layer",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&LayerId"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "entry_key",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&CatalogueEntryKey"
+        }
+      ],
+      "module_path": "task_contract",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "CoverageVerifyOutcome": {
+      "action": "reference",
+      "docs": "Task-contract coverage outcome (IN-08, AC-10).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Passed",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Blocked",
+            "payload": {
+              "fields": [
+                "Vec<CoverageViolation>"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "blocked",
+          "params": [
+            {
+              "name": "violations",
+              "ty": "Vec<CoverageViolation>"
+            }
+          ],
+          "returns": "Result<Self, ValidationError>"
+        }
+      ],
+      "module_path": "task_contract",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "CoverageViolation": {
+      "action": "reference",
+      "docs": "Task-contract coverage violation (IN-07, AC-08).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "MissingTaskContract",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "OrphanEntry",
+            "payload": {
+              "fields": [
+                "ContractedEntryRef"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidEntryRef",
+            "payload": {
+              "fields": [
+                "ContractedEntryRef",
+                "FreeText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "MissingSignalDocument",
+            "payload": {
+              "fields": [
+                "LayerId"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidTaskRef",
+            "payload": {
+              "fields": [
+                "TaskId",
+                "Vec<ContractedEntryRef>"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "task_contract",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PreReviewGateOutcome": {
+      "action": "reference",
+      "docs": "Task-contract pre-review outcome (IN-08, AC-10).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Passed",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Blocked",
+            "payload": {
+              "fields": [
+                "Vec<PreReviewGateViolation>"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "blocked",
+          "params": [
+            {
+              "name": "violations",
+              "ty": "Vec<PreReviewGateViolation>"
+            }
+          ],
+          "returns": "Result<Self, ValidationError>"
+        }
+      ],
+      "module_path": "task_contract",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PreReviewGateViolation": {
+      "action": "reference",
+      "docs": "Task-contract pre-review violation (IN-08, AC-10).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "MissingTaskContract",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "NonBlueSignal",
+            "payload": {
+              "fields": [
+                "ContractedEntryRef",
+                "ConfidenceSignal"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "task_contract",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "TaskContractDocument": {
+      "action": "reference",
+      "docs": "Task-contract attribution document (IN-07, AC-08).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "TrackId"
+            },
+            {
+              "name": "entries",
+              "ty": "BTreeMap<TaskId, Vec<ContractedEntryRef>>"
+            }
+          ],
+          "returns": "Result<Self, ValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "schema_version",
+          "params": [],
+          "receiver": "&self",
+          "returns": "u32"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "track_id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TrackId"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "entries",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&BTreeMap<TaskId, Vec<ContractedEntryRef>>"
+        }
+      ],
+      "module_path": "task_contract",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    }
+  }
 }

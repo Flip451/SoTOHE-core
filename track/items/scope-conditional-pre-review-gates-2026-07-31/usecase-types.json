@@ -10,21 +10,304 @@
           "name": "try_new",
           "params": [
             {
-              "name": "known_scopes",
-              "ty": "std::collections::HashSet<domain::review_v2::ScopeName>"
-            },
-            {
-              "name": "entries",
-              "ty": "Vec<(domain::review_v2::ScopeName, Vec<PreReviewGateKind>)>"
+              "name": "value",
+              "ty": "String"
             }
           ],
-          "returns": "Result<Self, PreReviewGateMatrixError>"
+          "returns": "Self"
         },
         {
-          "docs": "Returns the gates for a configured scope; the only failure is PreReviewGateLookupError::UnknownScope.",
           "has_default_impl": false,
           "is_async": false,
-          "name": "gates_for",
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "type_name": "CommandArgument"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "arguments",
+              "ty": "Vec<CommandArgument>"
+            }
+          ],
+          "returns": "Result<Self, CommandConfigValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "arguments",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[CommandArgument]"
+        }
+      ],
+      "type_name": "CommandArgv"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "seconds",
+              "ty": "UnvalidatedTimeoutSeconds"
+            }
+          ],
+          "returns": "Result<Self, CommandConfigValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "default_max",
+          "params": [],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_secs",
+          "params": [],
+          "receiver": "&self",
+          "returns": "u64"
+        }
+      ],
+      "type_name": "CommandTimeoutSeconds"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "one_mebibyte",
+          "params": [],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_usize",
+          "params": [],
+          "receiver": "&self",
+          "returns": "usize"
+        }
+      ],
+      "type_name": "OutputCaptureLimitBytes"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "arguments",
+              "ty": "Vec<CommandArgument>"
+            },
+            {
+              "name": "timeout_seconds",
+              "ty": "Option<UnvalidatedTimeoutSeconds>"
+            }
+          ],
+          "returns": "Result<Self, CommandConfigValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "argv",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&CommandArgv"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "timeout",
+          "params": [],
+          "receiver": "&self",
+          "returns": "CommandTimeoutSeconds"
+        }
+      ],
+      "type_name": "ConfiguredCommand"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<Self, CommandConfigValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "type_name": "CommandDeclarationId"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "id",
+              "ty": "CommandDeclarationId"
+            },
+            {
+              "name": "writer",
+              "ty": "ConfiguredCommand"
+            },
+            {
+              "name": "pre_entry_commands",
+              "ty": "Vec<ConfiguredCommand>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&CommandDeclarationId"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "writer",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ConfiguredCommand"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "pre_entry_commands",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[ConfiguredCommand]"
+        }
+      ],
+      "type_name": "PhaseCommandDeclaration"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "schema_version",
+              "ty": "CommandConfigSchemaVersion"
+            },
+            {
+              "name": "declarations",
+              "ty": "Vec<PhaseCommandDeclaration>"
+            }
+          ],
+          "returns": "Result<Self, CommandConfigValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "declaration",
+          "params": [
+            {
+              "name": "id",
+              "ty": "&CommandDeclarationId"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Option<&PhaseCommandDeclaration>"
+        }
+      ],
+      "type_name": "PhaseCommandConfig"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "scope",
+              "ty": "domain::review_v2::ScopeName"
+            },
+            {
+              "name": "commands",
+              "ty": "Vec<ConfiguredCommand>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "scope",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&domain::review_v2::ScopeName"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "commands",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[ConfiguredCommand]"
+        }
+      ],
+      "type_name": "PreReviewScopeCommandDeclaration"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "schema_version",
+              "ty": "CommandConfigSchemaVersion"
+            },
+            {
+              "name": "scopes",
+              "ty": "Vec<PreReviewScopeCommandDeclaration>"
+            }
+          ],
+          "returns": "Result<Self, CommandConfigValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "commands_for",
           "params": [
             {
               "name": "scope",
@@ -32,10 +315,10 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<&[PreReviewGateKind], PreReviewGateLookupError>"
+          "returns": "Option<&[ConfiguredCommand]>"
         }
       ],
-      "type_name": "PreReviewGateMatrix"
+      "type_name": "PreReviewCommandConfig"
     },
     {
       "methods": [
@@ -46,247 +329,1006 @@
           "params": [
             {
               "name": "config_loader",
-              "ty": "std::sync::Arc<dyn PreReviewGateConfigLoaderPort>"
+              "ty": "Arc<dyn PhaseCommandConfigLoaderPort>"
             },
             {
-              "name": "task_contract_gate",
-              "ty": "std::sync::Arc<dyn PreReviewGateService>"
+              "name": "runner",
+              "ty": "Arc<dyn ProgramRunnerPort>"
             }
           ],
           "returns": "Self"
         }
       ],
-      "type_name": "PreReviewGateDispatchInteractor"
+      "type_name": "PhaseCommandInteractor"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "config_loader",
+              "ty": "Arc<dyn PreReviewCommandConfigLoaderPort>"
+            },
+            {
+              "name": "track_resolver",
+              "ty": "Arc<dyn CurrentReviewTrackResolverPort>"
+            },
+            {
+              "name": "runner",
+              "ty": "Arc<dyn ProgramRunnerPort>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "PreReviewCommandDispatchInteractor"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "inner",
+              "ty": "Arc<dyn review_v2::ReviewService>"
+            },
+            {
+              "name": "dispatcher",
+              "ty": "Arc<dyn PreReviewCommandDispatchService>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "PreReviewCommandGatedReviewInteractor"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "i32"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_i32",
+          "params": [],
+          "receiver": "&self",
+          "returns": "i32"
+        }
+      ],
+      "type_name": "ProgramExitCode"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "usize"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_usize",
+          "params": [],
+          "receiver": "&self",
+          "returns": "usize"
+        }
+      ],
+      "type_name": "CommandSequenceIndex"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "u64"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_u64",
+          "params": [],
+          "receiver": "&self",
+          "returns": "u64"
+        }
+      ],
+      "type_name": "UnvalidatedTimeoutSeconds"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "u32"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_u32",
+          "params": [],
+          "receiver": "&self",
+          "returns": "u32"
+        }
+      ],
+      "type_name": "CommandConfigSchemaVersion"
     }
   ],
   "layer": "usecase",
   "schema_version": 5,
   "trait_impls": [
     {
-      "for_type": "PreReviewGateKind",
+      "action": "add",
+      "for_type": "ProgramExitCode",
       "trait_ref": "core::fmt::Debug"
     },
     {
-      "for_type": "PreReviewGateKind",
+      "action": "add",
+      "for_type": "ProgramExitCode",
       "trait_ref": "core::clone::Clone"
     },
     {
-      "for_type": "PreReviewGateKind",
+      "action": "add",
+      "for_type": "ProgramExitCode",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "ProgramExitCode",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandSequenceIndex",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandSequenceIndex",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandSequenceIndex",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandSequenceIndex",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "UnvalidatedTimeoutSeconds",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "UnvalidatedTimeoutSeconds",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "UnvalidatedTimeoutSeconds",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "UnvalidatedTimeoutSeconds",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandConfigSchemaVersion",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandConfigSchemaVersion",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandConfigSchemaVersion",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandConfigSchemaVersion",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandArgument",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandArgument",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandArgument",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandArgument",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandArgv",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandArgv",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandArgv",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandArgv",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandTimeoutSeconds",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandTimeoutSeconds",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandTimeoutSeconds",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandTimeoutSeconds",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "OutputCaptureLimitBytes",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "OutputCaptureLimitBytes",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "OutputCaptureLimitBytes",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "OutputCaptureLimitBytes",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "ConfiguredCommand",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ConfiguredCommand",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "ConfiguredCommand",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "ConfiguredCommand",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandDeclarationId",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandDeclarationId",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandDeclarationId",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandDeclarationId",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandDeclaration",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandDeclaration",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandDeclaration",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandDeclaration",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandConfig",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandConfig",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandConfig",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandConfig",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "PreReviewScopeCommandDeclaration",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "PreReviewScopeCommandDeclaration",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "PreReviewScopeCommandDeclaration",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "PreReviewScopeCommandDeclaration",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "PreReviewCommandConfig",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "PreReviewCommandConfig",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "PreReviewCommandConfig",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "PreReviewCommandConfig",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandStep",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandStep",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandStep",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandStep",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "ProgramOutputStream",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ProgramOutputStream",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "ProgramOutputStream",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "ProgramOutputStream",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "CapturedProgramOutput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "CapturedProgramOutput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "CapturedProgramOutput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "CapturedProgramOutput",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "ProgramInvocation",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ProgramInvocation",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "ProgramInvocation",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "ProgramInvocation",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "ProgramRunOutcome",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ProgramRunOutcome",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "ProgramRunOutcome",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "ProgramRunOutcome",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "ProgramExecutionRecord",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ProgramExecutionRecord",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "ProgramExecutionRecord",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "ProgramExecutionRecord",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseValidateCommand",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseValidateCommand",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseValidateCommand",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseValidateCommand",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseExplainQuery",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseExplainQuery",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseExplainQuery",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseExplainQuery",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseEnterCommand",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseEnterCommand",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseEnterCommand",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseEnterCommand",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandExplanation",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandExplanation",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandExplanation",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandExplanation",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandEnterOutcome",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandEnterOutcome",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandEnterOutcome",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandEnterOutcome",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewTrackSelector",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewTrackSelector",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewTrackSelector",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewTrackSelector",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewScopeSelector",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewScopeSelector",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewScopeSelector",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewScopeSelector",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "PreReviewCommandDispatchCommand",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "PreReviewCommandDispatchCommand",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "PreReviewCommandDispatchCommand",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "PreReviewCommandDispatchCommand",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "PreReviewCommandDispatchOutcome",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "PreReviewCommandDispatchOutcome",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "PreReviewCommandDispatchOutcome",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "PreReviewCommandDispatchOutcome",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandTimeoutSeconds",
       "trait_ref": "core::marker::Copy"
     },
     {
-      "for_type": "PreReviewGateKind",
-      "trait_ref": "core::cmp::PartialEq"
+      "action": "add",
+      "for_type": "OutputCaptureLimitBytes",
+      "trait_ref": "core::marker::Copy"
     },
     {
-      "for_type": "PreReviewGateKind",
-      "trait_ref": "core::cmp::Eq"
-    },
-    {
-      "for_type": "PreReviewGateKind",
-      "trait_ref": "core::hash::Hash"
-    },
-    {
-      "for_type": "PreReviewGateMatrix",
+      "action": "add",
+      "for_type": "CommandConfigValidationError",
       "trait_ref": "core::fmt::Debug"
     },
     {
-      "for_type": "PreReviewGateMatrix",
-      "trait_ref": "core::clone::Clone"
-    },
-    {
-      "for_type": "PreReviewGateMatrix",
-      "trait_ref": "core::cmp::PartialEq"
-    },
-    {
-      "for_type": "PreReviewGateMatrix",
-      "trait_ref": "core::cmp::Eq"
-    },
-    {
-      "for_type": "PreReviewGateMatrixError",
-      "trait_ref": "core::fmt::Debug"
-    },
-    {
-      "for_type": "PreReviewGateMatrixError",
-      "trait_ref": "core::clone::Clone"
-    },
-    {
-      "for_type": "PreReviewGateMatrixError",
-      "trait_ref": "core::cmp::PartialEq"
-    },
-    {
-      "for_type": "PreReviewGateMatrixError",
-      "trait_ref": "core::cmp::Eq"
-    },
-    {
-      "for_type": "PreReviewGateMatrixError",
+      "action": "add",
+      "for_type": "CommandConfigValidationError",
       "trait_ref": "core::fmt::Display"
     },
     {
-      "for_type": "PreReviewGateMatrixError",
-      "trait_ref": "std::error::Error"
+      "action": "add",
+      "for_type": "CommandConfigValidationError",
+      "trait_ref": "core::error::Error"
     },
     {
-      "for_type": "PreReviewGateConfigLoadError",
+      "action": "add",
+      "for_type": "CommandConfigLoadError",
       "trait_ref": "core::fmt::Debug"
     },
     {
-      "for_type": "PreReviewGateConfigLoadError",
+      "action": "add",
+      "for_type": "CommandConfigLoadError",
       "trait_ref": "core::fmt::Display"
     },
     {
-      "for_type": "PreReviewGateConfigLoadError",
-      "trait_ref": "std::error::Error"
+      "action": "add",
+      "for_type": "CommandConfigLoadError",
+      "trait_ref": "core::error::Error"
     },
     {
-      "for_type": "PreReviewGateDispatchCommand",
+      "action": "add",
+      "for_type": "ProgramRunnerError",
       "trait_ref": "core::fmt::Debug"
     },
     {
-      "for_type": "PreReviewGateDispatchCommand",
-      "trait_ref": "core::clone::Clone"
-    },
-    {
-      "for_type": "PreReviewGateDispatchOutcome",
-      "trait_ref": "core::fmt::Debug"
-    },
-    {
-      "for_type": "PreReviewGateDispatchOutcome",
-      "trait_ref": "core::clone::Clone"
-    },
-    {
-      "for_type": "PreReviewGateDispatchOutcome",
-      "trait_ref": "core::cmp::PartialEq"
-    },
-    {
-      "for_type": "PreReviewGateDispatchOutcome",
-      "trait_ref": "core::cmp::Eq"
-    },
-    {
-      "for_type": "PreReviewGateDispatchError",
-      "trait_ref": "core::fmt::Debug"
-    },
-    {
-      "for_type": "PreReviewGateDispatchError",
+      "action": "add",
+      "for_type": "ProgramRunnerError",
       "trait_ref": "core::fmt::Display"
     },
     {
-      "for_type": "PreReviewGateDispatchError",
-      "trait_ref": "std::error::Error"
+      "action": "add",
+      "for_type": "ProgramRunnerError",
+      "trait_ref": "core::error::Error"
     },
     {
-      "for_type": "PreReviewGateDispatchError",
-      "trait_ref": "core::convert::From<PreReviewGateConfigLoadError>"
-    },
-    {
-      "for_type": "PreReviewGateDispatchError",
-      "trait_ref": "core::convert::From<PreReviewGateError>"
-    },
-    {
-      "for_type": "PreReviewGateDispatchError",
-      "trait_ref": "core::convert::From<PreReviewGateLookupError>"
-    },
-    {
-      "for_type": "PreReviewGateDispatchInteractor",
-      "trait_ref": "PreReviewGateDispatchService"
-    },
-    {
-      "for_type": "PreReviewGateLookupError",
+      "action": "add",
+      "for_type": "PreReviewCommandDispatchError",
       "trait_ref": "core::fmt::Debug"
     },
     {
-      "for_type": "PreReviewGateLookupError",
-      "trait_ref": "core::clone::Clone"
-    },
-    {
-      "for_type": "PreReviewGateLookupError",
-      "trait_ref": "core::cmp::PartialEq"
-    },
-    {
-      "for_type": "PreReviewGateLookupError",
-      "trait_ref": "core::cmp::Eq"
-    },
-    {
-      "for_type": "PreReviewGateLookupError",
+      "action": "add",
+      "for_type": "PreReviewCommandDispatchError",
       "trait_ref": "core::fmt::Display"
     },
     {
-      "for_type": "PreReviewGateLookupError",
-      "trait_ref": "std::error::Error"
+      "action": "add",
+      "for_type": "PreReviewCommandDispatchError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "add",
+      "for_type": "CurrentReviewTrackResolveError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "CurrentReviewTrackResolveError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "add",
+      "for_type": "CurrentReviewTrackResolveError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandInteractor",
+      "trait_ref": "PhaseCommandService"
+    },
+    {
+      "action": "add",
+      "for_type": "PreReviewCommandDispatchInteractor",
+      "trait_ref": "PreReviewCommandDispatchService"
+    },
+    {
+      "action": "add",
+      "for_type": "PreReviewCommandGatedReviewInteractor",
+      "trait_ref": "review_v2::ReviewService"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandExplainError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandExplainError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandExplainError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandEnterError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandEnterError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandEnterError",
+      "trait_ref": "core::error::Error"
     }
   ],
   "traits": {
-    "PreReviewGateConfigLoaderPort": {
+    "CurrentReviewTrackResolverPort": {
       "action": "add",
-      "docs": "Synchronous secondary port that loads and validates the declared review-scope to pre-review-gate applicability matrix before local-review dispatch; sync I/O is deliberate because the owning CLI workflow is synchronous and reads one small local config file.",
+      "docs": "Synchronous repository-state track resolver for the sequential CLI path (IN-02, IN-05).",
       "informal_grounds": [],
       "methods": [
         {
-          "docs": "Synchronous by design: local review performs this single small configuration read before gate dispatch and does not require an async runtime.",
           "has_default_impl": false,
           "is_async": false,
-          "name": "load",
+          "name": "resolve",
           "params": [
             {
-              "name": "items_dir",
+              "name": "repository_root",
               "ty": "&std::path::Path"
-            },
-            {
-              "name": "track_id",
-              "ty": "&domain::TrackId"
             }
           ],
           "receiver": "&self",
-          "returns": "Result<PreReviewGateMatrix, PreReviewGateConfigLoadError>"
+          "returns": "Result<domain::TrackId, CurrentReviewTrackResolveError>"
         }
       ],
-      "module_path": "pre_review_gate_dispatch",
+      "module_path": "pre_review_command",
       "role": {
         "SecondaryPort": {}
       },
       "spec_refs": [
         {
-          "anchor": "GO-01",
+          "anchor": "IN-05",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         },
         {
-          "anchor": "IN-01",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "AC-01",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "AC-04",
+          "anchor": "AC-05",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ],
       "supertrait_bounds": [
-        "core::marker::Send",
-        "core::marker::Sync"
+        "Send",
+        "Sync"
       ]
     },
-    "PreReviewGateDispatchService": {
+    "PhaseCommandConfigLoaderPort": {
       "action": "add",
-      "docs": "Application service that resolves scope applicability and dispatches only the configured pre-review gates.",
+      "docs": "Synchronous phase-config loader for the sequential CLI path (IN-02, AC-01).",
       "informal_grounds": [],
       "methods": [
         {
           "has_default_impl": false,
           "is_async": false,
-          "name": "dispatch",
+          "name": "load",
           "params": [
             {
-              "name": "cmd",
-              "ty": "PreReviewGateDispatchCommand"
+              "name": "repository_root",
+              "ty": "&std::path::Path"
             }
           ],
           "receiver": "&self",
-          "returns": "Result<PreReviewGateDispatchOutcome, PreReviewGateDispatchError>"
+          "returns": "Result<PhaseCommandConfig, CommandConfigLoadError>"
         }
       ],
-      "module_path": "pre_review_gate_dispatch",
+      "module_path": "phase_command",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "PhaseCommandService": {
+      "action": "add",
+      "docs": "Phase validate, explain, and enter application service (IN-04, AC-03).",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "validate",
+          "params": [
+            {
+              "name": "command",
+              "ty": "PhaseValidateCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(), CommandConfigLoadError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "explain",
+          "params": [
+            {
+              "name": "query",
+              "ty": "PhaseExplainQuery"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<PhaseCommandExplanation, PhaseCommandExplainError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "enter",
+          "params": [
+            {
+              "name": "command",
+              "ty": "PhaseEnterCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<PhaseCommandEnterOutcome, PhaseCommandEnterError>"
+        }
+      ],
+      "module_path": "phase_command",
       "role": {
         "ApplicationService": {}
       },
@@ -300,15 +1342,7 @@
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         },
         {
-          "anchor": "IN-03",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
           "anchor": "IN-04",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "CN-02",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         },
         {
@@ -318,6 +1352,140 @@
         {
           "anchor": "AC-03",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "PreReviewCommandConfigLoaderPort": {
+      "action": "add",
+      "docs": "Synchronous pre-review-config loader for the sequential CLI path (IN-02, AC-05).",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "load",
+          "params": [
+            {
+              "name": "repository_root",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<PreReviewCommandConfig, CommandConfigLoadError>"
+        }
+      ],
+      "module_path": "pre_review_command",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "PreReviewCommandDispatchService": {
+      "action": "add",
+      "docs": "Pre-review command-dispatch application service (IN-05, CN-03).",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "dispatch",
+          "params": [
+            {
+              "name": "command",
+              "ty": "PreReviewCommandDispatchCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<PreReviewCommandDispatchOutcome, PreReviewCommandDispatchError>"
+        }
+      ],
+      "module_path": "pre_review_command",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "ProgramRunnerPort": {
+      "action": "add",
+      "docs": "Synchronous generic process port for bounded sequential CLI invocation (IN-02, CN-02).",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "run",
+          "params": [
+            {
+              "name": "invocation",
+              "ty": "ProgramInvocation"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<ProgramRunOutcome, ProgramRunnerError>"
+        }
+      ],
+      "module_path": "program_runner",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         },
         {
           "anchor": "AC-04",
@@ -325,15 +1493,116 @@
         }
       ],
       "supertrait_bounds": [
-        "core::marker::Send",
-        "core::marker::Sync"
+        "Send",
+        "Sync"
       ]
     }
   },
   "types": {
-    "PreReviewGateConfigLoadError": {
+    "CapturedProgramOutput": {
       "action": "add",
-      "docs": "Failure to read or validate the declarative pre-review-gate applicability matrix.",
+      "docs": "Opaque captured process-output bytes (CN-02, AC-03).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "stdout",
+              "ty": "Vec<u8>"
+            },
+            {
+              "name": "stderr",
+              "ty": "Vec<u8>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "program_runner",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "CommandArgument": {
+      "action": "add",
+      "docs": "Opaque literal command-argument value (IN-03, AC-04).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "operator_command",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "CommandArgv": {
+      "action": "add",
+      "docs": "Validated command-argument sequence (CN-01, AC-01, AC-05).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "operator_command",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "CommandConfigLoadError": {
+      "action": "add",
+      "docs": "Command-configuration loading failures (GO-03, AC-01, AC-05).",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -351,10 +1620,22 @@
             }
           },
           {
-            "name": "InvalidMatrix",
+            "name": "DecodeFailed",
             "payload": {
               "fields": [
-                "PreReviewGateMatrixError"
+                {
+                  "name": "message",
+                  "ty": "domain::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Invalid",
+            "payload": {
+              "fields": [
+                "CommandConfigValidationError"
               ],
               "kind": "tuple"
             }
@@ -362,9 +1643,302 @@
         ]
       },
       "methods": [],
-      "module_path": "pre_review_gate_dispatch",
+      "module_path": "operator_command",
       "role": {
         "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "GO-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "CommandConfigSchemaVersion": {
+      "action": "add",
+      "docs": "Command-configuration schema-version value (CN-01).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "operator_command",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "CommandConfigValidationError": {
+      "action": "add",
+      "docs": "Command-configuration validation failures (GO-03, CN-01).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "InvalidSchemaVersion",
+            "payload": {
+              "fields": [
+                {
+                  "name": "actual",
+                  "ty": "CommandConfigSchemaVersion"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "InvalidDeclarationId",
+            "payload": {
+              "fields": [
+                {
+                  "name": "value",
+                  "ty": "domain::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "InvalidReviewScope",
+            "payload": {
+              "fields": [
+                {
+                  "name": "value",
+                  "ty": "domain::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "DuplicateDeclaration",
+            "payload": {
+              "fields": [
+                "CommandDeclarationId"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "DuplicateScope",
+            "payload": {
+              "fields": [
+                "domain::review_v2::ScopeName"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "EmptyArgv",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "TimeoutOutOfRange",
+            "payload": {
+              "fields": [
+                {
+                  "name": "seconds",
+                  "ty": "UnvalidatedTimeoutSeconds"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "RecursiveInvocation",
+            "payload": {
+              "fields": [
+                {
+                  "name": "prefix",
+                  "ty": "Vec<CommandArgument>"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "operator_command",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "GO-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "CommandDeclarationId": {
+      "action": "add",
+      "docs": "Validated phase-declaration identifier (IN-01, CN-01).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "operator_command",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "CommandSequenceIndex": {
+      "action": "add",
+      "docs": "Command-sequence position value (IN-02, CN-03).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "operator_command",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "CommandTimeoutSeconds": {
+      "action": "add",
+      "docs": "Validated command-timeout value (CN-01, CN-02).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "operator_command",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ConfiguredCommand": {
+      "action": "add",
+      "docs": "Validated configured-command value (IN-01, IN-03, AC-04).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "operator_command",
+      "role": {
+        "ValueObject": {}
       },
       "spec_refs": [
         {
@@ -376,48 +1950,7 @@
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         },
         {
-          "anchor": "AC-01",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        }
-      ]
-    },
-    "PreReviewGateDispatchCommand": {
-      "action": "add",
-      "docs": "Command carrying the resolved review scope and track location for pre-review-gate dispatch.",
-      "informal_grounds": [],
-      "kind": {
-        "kind": "struct",
-        "shape": {
-          "fields": [
-            {
-              "name": "track_id",
-              "ty": "domain::TrackId"
-            },
-            {
-              "name": "scope",
-              "ty": "domain::review_v2::ScopeName"
-            },
-            {
-              "name": "items_dir",
-              "ty": "std::path::PathBuf"
-            }
-          ],
-          "has_stripped_fields": false,
-          "kind": "plain"
-        }
-      },
-      "methods": [],
-      "module_path": "pre_review_gate_dispatch",
-      "role": {
-        "Command": {}
-      },
-      "spec_refs": [
-        {
-          "anchor": "GO-02",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "IN-04",
+          "anchor": "IN-03",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         },
         {
@@ -426,81 +1959,46 @@
         }
       ]
     },
-    "PreReviewGateDispatchError": {
+    "CurrentReviewTrackResolveError": {
       "action": "add",
-      "docs": "Failure while loading applicability policy, resolving a configured scope, or executing an applicable pre-review gate.",
+      "docs": "Current-review-track resolution failure (IN-05, AC-05).",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
         "variants": [
           {
-            "name": "Config",
+            "name": "ResolveFailed",
             "payload": {
               "fields": [
-                "PreReviewGateConfigLoadError"
+                {
+                  "name": "message",
+                  "ty": "domain::FreeText"
+                }
               ],
-              "kind": "tuple"
-            }
-          },
-          {
-            "name": "TaskContract",
-            "payload": {
-              "fields": [
-                "PreReviewGateError"
-              ],
-              "kind": "tuple"
-            }
-          },
-          {
-            "name": "Lookup",
-            "payload": {
-              "fields": [
-                "PreReviewGateLookupError"
-              ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           }
         ]
       },
       "methods": [],
-      "module_path": "pre_review_gate_dispatch",
+      "module_path": "pre_review_command",
       "role": {
         "ErrorType": {}
       },
       "spec_refs": [
         {
-          "anchor": "GO-02",
+          "anchor": "IN-05",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         },
         {
-          "anchor": "IN-02",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "IN-03",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "IN-04",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "AC-02",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "AC-03",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "AC-04",
+          "anchor": "AC-05",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]
     },
-    "PreReviewGateDispatchInteractor": {
+    "OutputCaptureLimitBytes": {
       "action": "add",
-      "docs": "Interactor that combines matrix loading with the existing task-contract liveness gate.",
+      "docs": "Process-output capture-limit value (CN-02, AC-03).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -511,7 +2009,309 @@
         }
       },
       "methods": [],
-      "module_path": "pre_review_gate_dispatch",
+      "module_path": "operator_command",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PhaseCommandConfig": {
+      "action": "add",
+      "docs": "Validated phase-command configuration (IN-01, CN-01, AC-01).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "phase_command",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PhaseCommandDeclaration": {
+      "action": "add",
+      "docs": "Phase-command declaration value (IN-01, AC-01).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "phase_command",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PhaseCommandEnterError": {
+      "action": "add",
+      "docs": "Phase-enter operation failures (GO-03, IN-04, AC-03).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Config",
+            "payload": {
+              "fields": [
+                "CommandConfigLoadError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "UnknownPhase",
+            "payload": {
+              "fields": [
+                "CommandDeclarationId"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Runner",
+            "payload": {
+              "fields": [
+                "ProgramRunnerError"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "phase_command",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "GO-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PhaseCommandEnterOutcome": {
+      "action": "add",
+      "docs": "Phase-enter execution outcome (IN-02, CN-03).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Completed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "records",
+                  "ty": "Vec<ProgramExecutionRecord>"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Blocked",
+            "payload": {
+              "fields": [
+                {
+                  "name": "completed",
+                  "ty": "Vec<ProgramExecutionRecord>"
+                },
+                {
+                  "name": "failed",
+                  "ty": "ProgramExecutionRecord"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "phase_command",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PhaseCommandExplainError": {
+      "action": "add",
+      "docs": "Phase-explain operation failures (GO-03, IN-04, AC-03).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Config",
+            "payload": {
+              "fields": [
+                "CommandConfigLoadError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "UnknownPhase",
+            "payload": {
+              "fields": [
+                "CommandDeclarationId"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "phase_command",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "GO-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PhaseCommandExplanation": {
+      "action": "add",
+      "docs": "Phase-command explanation output (IN-04, AC-03).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "phase_id",
+              "ty": "CommandDeclarationId"
+            },
+            {
+              "name": "steps",
+              "ty": "Vec<PhaseCommandStep>"
+            },
+            {
+              "name": "output_limit",
+              "ty": "OutputCaptureLimitBytes"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "phase_command",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PhaseCommandInteractor": {
+      "action": "add",
+      "docs": "Phase-command orchestration interactor (GO-02, AC-02).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "config_loader",
+              "ty": "Arc<dyn PhaseCommandConfigLoaderPort>"
+            },
+            {
+              "name": "runner",
+              "ty": "Arc<dyn ProgramRunnerPort>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "phase_command",
       "role": {
         "Interactor": {}
       },
@@ -529,15 +2329,64 @@
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         },
         {
+          "anchor": "AC-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PhaseCommandStep": {
+      "action": "add",
+      "docs": "Phase-command explanation step (IN-02, IN-04).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "PreEntry",
+            "payload": {
+              "fields": [
+                {
+                  "name": "position",
+                  "ty": "CommandSequenceIndex"
+                },
+                {
+                  "name": "command",
+                  "ty": "ConfiguredCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Writer",
+            "payload": {
+              "fields": [
+                {
+                  "name": "command",
+                  "ty": "ConfiguredCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "phase_command",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
           "anchor": "IN-04",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "CN-01",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "CN-02",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         },
         {
@@ -547,41 +2396,34 @@
         {
           "anchor": "AC-03",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "AC-04",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]
     },
-    "PreReviewGateDispatchOutcome": {
+    "PhaseEnterCommand": {
       "action": "add",
-      "docs": "Dispatch result that distinguishes a non-applicable gate from an executed task-contract gate outcome.",
+      "docs": "Phase-enter request (IN-02, AC-02).",
       "informal_grounds": [],
       "kind": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "NotApplicable",
-            "payload": {
-              "kind": "unit"
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "repository_root",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "phase_id",
+              "ty": "CommandDeclarationId"
             }
-          },
-          {
-            "name": "TaskContract",
-            "payload": {
-              "fields": [
-                "domain::task_contract::PreReviewGateOutcome"
-              ],
-              "kind": "tuple"
-            }
-          }
-        ]
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
       },
       "methods": [],
-      "module_path": "pre_review_gate_dispatch",
+      "module_path": "phase_command",
       "role": {
-        "Dto": {}
+        "Command": {}
       },
       "spec_refs": [
         {
@@ -593,70 +2435,40 @@
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         },
         {
-          "anchor": "IN-03",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
           "anchor": "AC-02",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "AC-03",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "AC-04",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]
     },
-    "PreReviewGateKind": {
+    "PhaseExplainQuery": {
       "action": "add",
-      "docs": "Application-workflow vocabulary of pre-review gates that may be assigned to a resolved review scope.",
+      "docs": "Phase-explain request (IN-04, AC-03).",
       "informal_grounds": [],
       "kind": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "TaskContractLiveness",
-            "payload": {
-              "kind": "unit"
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "repository_root",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "phase_id",
+              "ty": "CommandDeclarationId"
             }
-          }
-        ]
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
       },
       "methods": [],
-      "module_path": "pre_review_gate_dispatch",
+      "module_path": "phase_command",
       "role": {
-        "ValueObject": {}
+        "Query": {}
       },
       "spec_refs": [
         {
-          "anchor": "GO-01",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "IN-01",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "IN-02",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "IN-03",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "CN-01",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "AC-01",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "AC-02",
+          "anchor": "IN-04",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         },
         {
@@ -665,51 +2477,42 @@
         }
       ]
     },
-    "PreReviewGateLookupError": {
+    "PhaseValidateCommand": {
       "action": "add",
-      "docs": "Lookup failure when a requested review scope is absent from the validated applicability matrix.",
+      "docs": "Phase-validation request (IN-04, AC-03).",
       "informal_grounds": [],
       "kind": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "UnknownScope",
-            "payload": {
-              "fields": [
-                "domain::review_v2::ScopeName"
-              ],
-              "kind": "tuple"
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "repository_root",
+              "ty": "std::path::PathBuf"
             }
-          }
-        ]
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
       },
       "methods": [],
-      "module_path": "pre_review_gate_dispatch",
+      "module_path": "phase_command",
       "role": {
-        "ErrorType": {}
+        "Command": {}
       },
       "spec_refs": [
         {
-          "anchor": "GO-01",
+          "anchor": "IN-04",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         },
         {
-          "anchor": "IN-01",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "CN-01",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "AC-01",
+          "anchor": "AC-03",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]
     },
-    "PreReviewGateMatrix": {
+    "PreReviewCommandConfig": {
       "action": "add",
-      "docs": "Application-workflow value that validates a total mapping from every configured review scope to its applicable pre-review gates.",
+      "docs": "Validated pre-review command configuration (IN-05, CN-01, AC-05).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -720,25 +2523,13 @@
         }
       },
       "methods": [],
-      "module_path": "pre_review_gate_dispatch",
+      "module_path": "pre_review_command",
       "role": {
         "ValueObject": {}
       },
       "spec_refs": [
         {
-          "anchor": "GO-01",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "IN-01",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "IN-02",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "IN-03",
+          "anchor": "IN-05",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         },
         {
@@ -746,31 +2537,64 @@
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         },
         {
-          "anchor": "AC-01",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "AC-02",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "AC-03",
+          "anchor": "AC-05",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]
     },
-    "PreReviewGateMatrixError": {
+    "PreReviewCommandDispatchCommand": {
       "action": "add",
-      "docs": "Construction failure while validating a total, duplicate-free review-scope applicability matrix.",
+      "docs": "Pre-review command-dispatch request (IN-05, AC-05).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "repository_root",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "track",
+              "ty": "ReviewTrackSelector"
+            },
+            {
+              "name": "scope",
+              "ty": "ReviewScopeSelector"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "pre_review_command",
+      "role": {
+        "Command": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PreReviewCommandDispatchError": {
+      "action": "add",
+      "docs": "Pre-review command-dispatch failures (GO-03, AC-05).",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
         "variants": [
           {
-            "name": "MissingScope",
+            "name": "Config",
             "payload": {
               "fields": [
-                "domain::review_v2::ScopeName"
+                "CommandConfigLoadError"
               ],
               "kind": "tuple"
             }
@@ -785,25 +2609,124 @@
             }
           },
           {
-            "name": "DuplicateScope",
+            "name": "TrackResolution",
             "payload": {
               "fields": [
-                "domain::review_v2::ScopeName"
+                "CurrentReviewTrackResolveError"
               ],
               "kind": "tuple"
             }
           },
           {
-            "name": "DuplicateGate",
+            "name": "Runner",
+            "payload": {
+              "fields": [
+                "ProgramRunnerError"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "pre_review_command",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "GO-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PreReviewCommandDispatchInteractor": {
+      "action": "add",
+      "docs": "Pre-review command-dispatch interactor (IN-05, AC-05, AC-07).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "config_loader",
+              "ty": "Arc<dyn PreReviewCommandConfigLoaderPort>"
+            },
+            {
+              "name": "track_resolver",
+              "ty": "Arc<dyn CurrentReviewTrackResolverPort>"
+            },
+            {
+              "name": "runner",
+              "ty": "Arc<dyn ProgramRunnerPort>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "pre_review_command",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PreReviewCommandDispatchOutcome": {
+      "action": "add",
+      "docs": "Pre-review command-dispatch outcome (CN-03, AC-05, AC-07).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ReadyForReview",
             "payload": {
               "fields": [
                 {
-                  "name": "scope",
-                  "ty": "domain::review_v2::ScopeName"
+                  "name": "records",
+                  "ty": "Vec<ProgramExecutionRecord>"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Blocked",
+            "payload": {
+              "fields": [
+                {
+                  "name": "completed",
+                  "ty": "Vec<ProgramExecutionRecord>"
                 },
                 {
-                  "name": "gate",
-                  "ty": "PreReviewGateKind"
+                  "name": "failed",
+                  "ty": "ProgramExecutionRecord"
                 }
               ],
               "kind": "struct"
@@ -812,17 +2735,102 @@
         ]
       },
       "methods": [],
-      "module_path": "pre_review_gate_dispatch",
+      "module_path": "pre_review_command",
       "role": {
-        "ErrorType": {}
+        "Dto": {}
       },
       "spec_refs": [
         {
-          "anchor": "GO-01",
+          "anchor": "IN-05",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         },
         {
-          "anchor": "IN-01",
+          "anchor": "CN-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PreReviewCommandGatedReviewInteractor": {
+      "action": "add",
+      "docs": "Pre-review-gated review-service decorator (GO-04, AC-05, AC-06, AC-07).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "inner",
+              "ty": "Arc<dyn review_v2::ReviewService>"
+            },
+            {
+              "name": "dispatcher",
+              "ty": "Arc<dyn PreReviewCommandDispatchService>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "pre_review_command",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "GO-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PreReviewScopeCommandDeclaration": {
+      "action": "add",
+      "docs": "Pre-review scope-command declaration (IN-05, AC-05).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "pre_review_command",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         },
         {
@@ -830,7 +2838,428 @@
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         },
         {
+          "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ProgramExecutionRecord": {
+      "action": "add",
+      "docs": "Command-execution record (IN-04, CN-03).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "sequence_index",
+              "ty": "CommandSequenceIndex"
+            },
+            {
+              "name": "command",
+              "ty": "ConfiguredCommand"
+            },
+            {
+              "name": "outcome",
+              "ty": "ProgramRunOutcome"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "program_runner",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ProgramExitCode": {
+      "action": "add",
+      "docs": "Opaque operating-system exit-code value (CN-03, AC-03).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "program_runner",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ProgramInvocation": {
+      "action": "add",
+      "docs": "Bounded generic process invocation (IN-02, IN-03, CN-02).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "argv",
+              "ty": "CommandArgv"
+            },
+            {
+              "name": "repository_root",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "timeout",
+              "ty": "CommandTimeoutSeconds"
+            },
+            {
+              "name": "stdout_limit",
+              "ty": "OutputCaptureLimitBytes"
+            },
+            {
+              "name": "stderr_limit",
+              "ty": "OutputCaptureLimitBytes"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "program_runner",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ProgramOutputStream": {
+      "action": "add",
+      "docs": "Process-output stream identity (CN-02).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Stdout",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Stderr",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "program_runner",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ProgramRunOutcome": {
+      "action": "add",
+      "docs": "Generic process-run outcome (CN-02, CN-03).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Exited",
+            "payload": {
+              "fields": [
+                {
+                  "name": "exit_code",
+                  "ty": "ProgramExitCode"
+                },
+                {
+                  "name": "output",
+                  "ty": "CapturedProgramOutput"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "TimedOut",
+            "payload": {
+              "fields": [
+                {
+                  "name": "output",
+                  "ty": "CapturedProgramOutput"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "OutputLimitExceeded",
+            "payload": {
+              "fields": [
+                {
+                  "name": "stream",
+                  "ty": "ProgramOutputStream"
+                },
+                {
+                  "name": "output",
+                  "ty": "CapturedProgramOutput"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "program_runner",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ProgramRunnerError": {
+      "action": "add",
+      "docs": "Generic process-runner failures (GO-03, CN-02).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "SpawnFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "message",
+                  "ty": "domain::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "WaitFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "message",
+                  "ty": "domain::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "TerminateFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "message",
+                  "ty": "domain::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "program_runner",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "GO-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewScopeSelector": {
+      "action": "add",
+      "docs": "Review-scope selector (IN-05, AC-05).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Named",
+            "payload": {
+              "fields": [
+                "domain::review_v2::MainScopeName"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Other",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "pre_review_command",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewTrackSelector": {
+      "action": "add",
+      "docs": "Review-track selector (IN-05, AC-05).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Explicit",
+            "payload": {
+              "fields": [
+                "domain::TrackId"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "CurrentBranch",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "pre_review_command",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "UnvalidatedTimeoutSeconds": {
+      "action": "add",
+      "docs": "Unvalidated command-timeout input value (CN-01, CN-02).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "operator_command",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
           "anchor": "AC-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-05",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]

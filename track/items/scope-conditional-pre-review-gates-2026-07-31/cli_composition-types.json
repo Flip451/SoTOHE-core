@@ -1,8 +1,65 @@
 {
   "crate_name": "cli_composition",
   "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "build",
+          "params": [],
+          "returns": "cli_driver::phase_command::PhaseCommandDriver"
+        }
+      ],
+      "type_name": "PhaseCompositionRoot"
+    }
+  ],
   "layer": "cli_composition",
   "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "add",
+      "for_type": "PhaseCompositionRoot",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCompositionRoot",
+      "trait_ref": "core::default::Default"
+    }
+  ],
   "traits": {},
-  "types": {}
+  "types": {
+    "PhaseCompositionRoot": {
+      "action": "add",
+      "docs": "Phase-command composition root (IN-04, AC-02, AC-03).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "phase_command",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    }
+  }
 }

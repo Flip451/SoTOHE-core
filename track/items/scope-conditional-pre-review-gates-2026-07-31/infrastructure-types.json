@@ -1,6 +1,55 @@
 {
   "crate_name": "infrastructure",
-  "functions": {},
+  "functions": {
+    "infrastructure::operator_command_config::decode_phase_command_config": {
+      "action": "add",
+      "docs": "Decode a phase-command DTO into the usecase contract (CN-01, AC-01).",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "dto",
+          "ty": "PhaseCommandConfigDto"
+        }
+      ],
+      "returns": "Result<usecase::phase_command::PhaseCommandConfig, usecase::operator_command::CommandConfigValidationError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "CN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "infrastructure::operator_command_config::decode_pre_review_command_config": {
+      "action": "add",
+      "docs": "Decode a pre-review-command DTO into the usecase contract (CN-01, AC-05).",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "dto",
+          "ty": "PreReviewCommandConfigDto"
+        }
+      ],
+      "returns": "Result<usecase::pre_review_command::PreReviewCommandConfig, usecase::operator_command::CommandConfigValidationError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "CN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    }
+  },
   "inherent_impls": [
     {
       "methods": [
@@ -12,30 +61,721 @@
           "returns": "Self"
         }
       ],
-      "type_name": "FsPreReviewGateConfigLoader"
+      "type_name": "FsPhaseCommandConfigLoader"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "FsPreReviewCommandConfigLoader"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "ProcessProgramRunner"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "GitCurrentReviewTrackResolver"
     }
   ],
   "layer": "infrastructure",
   "schema_version": 5,
   "trait_impls": [
     {
-      "for_type": "FsPreReviewGateConfigLoader",
-      "trait_ref": "usecase::pre_review_gate_dispatch::PreReviewGateConfigLoaderPort"
-    },
-    {
-      "for_type": "FsPreReviewGateConfigLoader",
+      "action": "reference",
+      "for_type": "ContractedEntryRefDto",
       "trait_ref": "core::fmt::Debug"
     },
     {
-      "for_type": "FsPreReviewGateConfigLoader",
+      "action": "reference",
+      "for_type": "ContractedEntryRefDto",
+      "trait_ref": "serde_core::ser::Serialize"
+    },
+    {
+      "action": "reference",
+      "for_type": "ContractedEntryRefDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "action": "reference",
+      "for_type": "TaskContractDocumentDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "TaskContractDocumentDto",
+      "trait_ref": "serde_core::ser::Serialize"
+    },
+    {
+      "action": "reference",
+      "for_type": "TaskContractDocumentDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "action": "add",
+      "for_type": "TaskContractSchemaVersionDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TaskContractSchemaVersionDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TaskContractSchemaVersionDto",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "action": "add",
+      "for_type": "TaskContractSchemaVersionDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TaskContractSchemaVersionDto",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TaskContractSchemaVersionDto",
+      "trait_ref": "serde_core::ser::Serialize"
+    },
+    {
+      "action": "add",
+      "for_type": "TaskContractSchemaVersionDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandArgumentDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandArgumentDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandArgumentDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandArgumentDto",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandArgumentDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandArgvDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandArgvDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandArgvDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandArgvDto",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandArgvDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandTimeoutSecondsDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandTimeoutSecondsDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandTimeoutSecondsDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandTimeoutSecondsDto",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandTimeoutSecondsDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandConfigSchemaVersionDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandConfigSchemaVersionDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandConfigSchemaVersionDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandConfigSchemaVersionDto",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandConfigSchemaVersionDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandDeclarationIdDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandDeclarationIdDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandDeclarationIdDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandDeclarationIdDto",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "CommandDeclarationIdDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewScopeNameDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewScopeNameDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewScopeNameDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewScopeNameDto",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewScopeNameDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "action": "add",
+      "for_type": "ConfiguredCommandDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ConfiguredCommandDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "ConfiguredCommandDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "ConfiguredCommandDto",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "ConfiguredCommandDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandDeclarationDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandDeclarationDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandDeclarationDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandDeclarationDto",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandDeclarationDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandConfigDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandConfigDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandConfigDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandConfigDto",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandConfigDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "action": "add",
+      "for_type": "PreReviewScopeCommandDeclarationDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "PreReviewScopeCommandDeclarationDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "PreReviewScopeCommandDeclarationDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "PreReviewScopeCommandDeclarationDto",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "PreReviewScopeCommandDeclarationDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "action": "add",
+      "for_type": "PreReviewCommandConfigDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "PreReviewCommandConfigDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "PreReviewCommandConfigDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "PreReviewCommandConfigDto",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "PreReviewCommandConfigDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "action": "add",
+      "for_type": "FsPhaseCommandConfigLoader",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "FsPhaseCommandConfigLoader",
       "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "add",
+      "for_type": "FsPreReviewCommandConfigLoader",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "FsPreReviewCommandConfigLoader",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "add",
+      "for_type": "ProcessProgramRunner",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ProcessProgramRunner",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "add",
+      "for_type": "GitCurrentReviewTrackResolver",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "GitCurrentReviewTrackResolver",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "add",
+      "for_type": "FsPhaseCommandConfigLoader",
+      "trait_ref": "usecase::phase_command::PhaseCommandConfigLoaderPort"
+    },
+    {
+      "action": "add",
+      "for_type": "FsPreReviewCommandConfigLoader",
+      "trait_ref": "usecase::pre_review_command::PreReviewCommandConfigLoaderPort"
+    },
+    {
+      "action": "add",
+      "for_type": "ProcessProgramRunner",
+      "trait_ref": "usecase::program_runner::ProgramRunnerPort"
+    },
+    {
+      "action": "add",
+      "for_type": "GitCurrentReviewTrackResolver",
+      "trait_ref": "usecase::pre_review_command::CurrentReviewTrackResolverPort"
     }
   ],
   "traits": {},
   "types": {
-    "FsPreReviewGateConfigLoader": {
+    "CommandArgumentDto": {
       "action": "add",
-      "docs": "Synchronous filesystem adapter that performs one small local config read before review dispatch, using typed deserialization into ScopeName and PreReviewGateKind values; sync I/O intentionally matches the synchronous CLI workflow.",
+      "docs": "Serde mirror of an opaque command argument (IN-03, AC-04).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "operator_command_config",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "CommandArgvDto": {
+      "action": "add",
+      "docs": "Serde mirror of a command-argument sequence (CN-01, AC-01, AC-05).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "arguments",
+              "ty": "Vec<CommandArgumentDto>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "operator_command_config",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "CommandConfigSchemaVersionDto": {
+      "action": "add",
+      "docs": "Serde mirror of the command-config schema version (CN-01).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "version",
+              "ty": "u32"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "operator_command_config",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "CommandDeclarationIdDto": {
+      "action": "add",
+      "docs": "Serde mirror of a phase-declaration identifier (IN-01, CN-01).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "operator_command_config",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "CommandTimeoutSecondsDto": {
+      "action": "add",
+      "docs": "Serde mirror of a command-timeout value (CN-01, CN-02).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "seconds",
+              "ty": "u64"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "operator_command_config",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ConfiguredCommandDto": {
+      "action": "add",
+      "docs": "Serde mirror of a configured command (IN-01, AC-04).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "argv",
+              "ty": "CommandArgvDto"
+            },
+            {
+              "name": "timeout_seconds",
+              "ty": "Option<CommandTimeoutSecondsDto>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "operator_command_config",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ContractedEntryRefDto": {
+      "action": "modify",
+      "docs": "Serde mirror of a catalogue-entry attribution identity (IN-07, AC-08).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "layer",
+              "ty": "domain::tddd::LayerId"
+            },
+            {
+              "name": "entry_key",
+              "ty": "domain::tddd::semantic_verify::CatalogueEntryKey"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "task_contract_codec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "FsPhaseCommandConfigLoader": {
+      "action": "add",
+      "docs": "Filesystem phase-config loader adapter (AC-01).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -44,15 +784,11 @@
         }
       },
       "methods": [],
-      "module_path": "pre_review_gate_config",
+      "module_path": "operator_command_config",
       "role": {
         "SecondaryAdapter": {}
       },
       "spec_refs": [
-        {
-          "anchor": "GO-01",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
         {
           "anchor": "IN-01",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
@@ -60,9 +796,370 @@
         {
           "anchor": "AC-01",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "FsPreReviewCommandConfigLoader": {
+      "action": "add",
+      "docs": "Filesystem pre-review-config loader adapter (AC-05).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "operator_command_config",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "GitCurrentReviewTrackResolver": {
+      "action": "add",
+      "docs": "Repository-state current-track resolver adapter (IN-05, AC-05).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "operator_command_config",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PhaseCommandConfigDto": {
+      "action": "add",
+      "docs": "Serde phase-command configuration document (IN-01, CN-01).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "schema_version",
+              "ty": "CommandConfigSchemaVersionDto"
+            },
+            {
+              "name": "phases",
+              "ty": "Vec<PhaseCommandDeclarationDto>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "operator_command_config",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PhaseCommandDeclarationDto": {
+      "action": "add",
+      "docs": "Serde phase-command declaration (IN-01, AC-01).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "id",
+              "ty": "CommandDeclarationIdDto"
+            },
+            {
+              "name": "writer",
+              "ty": "ConfiguredCommandDto"
+            },
+            {
+              "name": "pre_entry_commands",
+              "ty": "Vec<ConfiguredCommandDto>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "operator_command_config",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PreReviewCommandConfigDto": {
+      "action": "add",
+      "docs": "Serde pre-review command configuration document (IN-05, CN-01).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "schema_version",
+              "ty": "CommandConfigSchemaVersionDto"
+            },
+            {
+              "name": "scopes",
+              "ty": "Vec<PreReviewScopeCommandDeclarationDto>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "operator_command_config",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PreReviewScopeCommandDeclarationDto": {
+      "action": "add",
+      "docs": "Serde pre-review scope-command declaration (IN-05, AC-05).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "scope",
+              "ty": "ReviewScopeNameDto"
+            },
+            {
+              "name": "commands",
+              "ty": "Vec<ConfiguredCommandDto>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "operator_command_config",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ProcessProgramRunner": {
+      "action": "add",
+      "docs": "Bounded generic process-runner adapter (CN-02, AC-04).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "program_runner",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         },
         {
           "anchor": "AC-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewScopeNameDto": {
+      "action": "add",
+      "docs": "Serde mirror of a review-scope identifier (IN-05, CN-01).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "operator_command_config",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "TaskContractDocumentDto": {
+      "action": "modify",
+      "docs": "Serde task-contract attribution document (IN-07, AC-08).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "schema_version",
+              "ty": "TaskContractSchemaVersionDto"
+            },
+            {
+              "name": "track_id",
+              "ty": "domain::TrackId"
+            },
+            {
+              "name": "entries",
+              "ty": "BTreeMap<domain::TaskId, Vec<ContractedEntryRefDto>>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "task_contract_codec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "TaskContractSchemaVersionDto": {
+      "action": "add",
+      "docs": "Serde mirror of the task-contract schema version (IN-07, AC-08).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "value",
+              "ty": "u32"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "task_contract_codec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-08",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]

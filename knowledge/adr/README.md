@@ -160,6 +160,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [feature バッチ消化への既定反転 — per-layer 並列レビューを始動させる](2026-06-22-1327-feature-batch-default-inversion.md) | Accepted | 2026-06-22 |
 | [impl 段階の構造的不整合検出時のフェーズ遷移診断スキル](2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md) | Proposed | 2026-06-26 |
 | [タスク単位の契約履行 pre-review ゲート — Phase 3 attribution artifact と impl_catalog 信号の binary 再利用](2026-06-27-0852-pre-review-task-contract-conformance-gate.md) | Accepted | 2026-06-27 |
+| [phase command と pre-review gate を operator-owned argv 配列で宣言する](2026-08-02-0806-operator-owned-phase-command-config.md) | Proposed | 2026-08-02 |
 | [remote sync 専用コマンドの新設と git 操作の hexagonal 是正 — switch と pull の分離、意味論 port への全面移管](2026-07-04-0155-git-sync-dedicated-command.md) | Proposed | 2026-07-04 |
 | [/track:adr2pr の呼び出し型を引数指定から文脈自動解決に戻す](2026-07-20-1508-adr2pr-argless-context-resolution.md) | Proposed | 2026-07-20 |
 | [SoT 再入の順次処理規律 — ルーティング後のフェーズ収束 Prerequisite](2026-07-22-0400-sot-reentry-sequencing.md) | Proposed | 2026-07-22 |

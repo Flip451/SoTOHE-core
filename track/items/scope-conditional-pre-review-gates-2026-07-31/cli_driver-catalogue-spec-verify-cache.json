@@ -1,0 +1,246 @@
+{
+  "schema_version": 1,
+  "layer": "cli_driver",
+  "entries": [
+    {
+      "claim_hash": "0db6c6c10cecaca06e4778a2d9b96c3d56e95afdf97cdc3035d6db3b0d95bd50",
+      "evidence_hash": "c600677df01b23fc21e331a509de2c22f16a0ef63e6ef1cb2ef604999640d2bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI は validate、explain、enter の観測可能な outcome を提供し、operator が展開済み phase command、実行順序、validation failure、および command failure を監査できるようにする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "CommandOutcome"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "CLI は validate、explain、enter の観測可能な outcome を提供し、operator が展開済み phase command、実行順序、validation failure、および command failure を監査できるようにする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0db6c6c10cecaca06e4778a2d9b96c3d56e95afdf97cdc3035d6db3b0d95bd50",
+      "evidence_hash": "574c686246d7577d3ab00fe3d015a1ba12dac480d60fd748ff40da6e914bd3dc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "validate、explain、enter の CLI outcome により、operator は展開後の writer/pre-entry argv、実行順、default 3,600-second timeout または explicit timeout、その positive-integer / 3,600-second 上限、stdout/stderr 各 1 MiB (1,048,576-byte) capture limit、validation failure、first failing command、および output-limit または timeout outcome を監査できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "CommandOutcome"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "validate、explain、enter の CLI outcome により、operator は展開後の writer/pre-entry argv、実行順、default 3,600-second timeout または explicit timeout、その positive-integer / 3,600-second 上限、stdout/stderr 各 1 MiB (1,048,576-byte) capture limit、validation failure、first failing command、および output-limit または timeout outcome を監査できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "40f22f6fc5218e2b48dd21325d1c38e1407fa16fbaba79f761f1d55b7cd894ab",
+      "evidence_hash": "c600677df01b23fc21e331a509de2c22f16a0ef63e6ef1cb2ef604999640d2bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI は validate、explain、enter の観測可能な outcome を提供し、operator が展開済み phase command、実行順序、validation failure、および command failure を監査できるようにする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "PhaseCommandDriver"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "CLI は validate、explain、enter の観測可能な outcome を提供し、operator が展開済み phase command、実行順序、validation failure、および command failure を監査できるようにする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "40f22f6fc5218e2b48dd21325d1c38e1407fa16fbaba79f761f1d55b7cd894ab",
+      "evidence_hash": "b49fb65c90adaab174287b910af03a5d2c7e928cd33ff55fd2b16efaa3957c33",
+      "verdict": {
+        "kind": "pass",
+        "citation": "phase enter は repository root で pre-entry argv を宣言順に実行し、最初の non-zero の後に remaining command と writer を実行せず、全て zero の場合だけ canonical writer を一度実行する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "PhaseCommandDriver"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "phase enter は repository root で pre-entry argv を宣言順に実行し、最初の non-zero の後に remaining command と writer を実行せず、全て zero の場合だけ canonical writer を一度実行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "40f22f6fc5218e2b48dd21325d1c38e1407fa16fbaba79f761f1d55b7cd894ab",
+      "evidence_hash": "574c686246d7577d3ab00fe3d015a1ba12dac480d60fd748ff40da6e914bd3dc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "validate、explain、enter の CLI outcome により、operator は展開後の writer/pre-entry argv、実行順、default 3,600-second timeout または explicit timeout、その positive-integer / 3,600-second 上限、stdout/stderr 各 1 MiB (1,048,576-byte) capture limit、validation failure、first failing command、および output-limit または timeout outcome を監査できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "PhaseCommandDriver"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "validate、explain、enter の CLI outcome により、operator は展開後の writer/pre-entry argv、実行順、default 3,600-second timeout または explicit timeout、その positive-integer / 3,600-second 上限、stdout/stderr 各 1 MiB (1,048,576-byte) capture limit、validation failure、first failing command、および output-limit または timeout outcome を監査できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "23213c0fab1df1e8ac8078910351fb204edfd649865ca64c3c55779e87785d98",
+      "evidence_hash": "c600677df01b23fc21e331a509de2c22f16a0ef63e6ef1cb2ef604999640d2bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI は validate、explain、enter の観測可能な outcome を提供し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "PhaseCommandInput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "CLI は validate、explain、enter の観測可能な outcome を提供し、operator が展開済み phase command、実行順序、validation failure、および command failure を監査できるようにする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "23213c0fab1df1e8ac8078910351fb204edfd649865ca64c3c55779e87785d98",
+      "evidence_hash": "b49fb65c90adaab174287b910af03a5d2c7e928cd33ff55fd2b16efaa3957c33",
+      "verdict": {
+        "kind": "pass",
+        "citation": "phase enter は repository root で pre-entry argv を宣言順に実行し、最初の non-zero の後に remaining command と writer を実行せず、全て zero の場合だけ canonical writer を一度実行する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "PhaseCommandInput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "phase enter は repository root で pre-entry argv を宣言順に実行し、最初の non-zero の後に remaining command と writer を実行せず、全て zero の場合だけ canonical writer を一度実行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "23213c0fab1df1e8ac8078910351fb204edfd649865ca64c3c55779e87785d98",
+      "evidence_hash": "574c686246d7577d3ab00fe3d015a1ba12dac480d60fd748ff40da6e914bd3dc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "validate、explain、enter の CLI outcome により、operator は展開後の writer/pre-entry argv、実行順、default 3,600-second timeout または explicit timeout、その positive-integer / 3,600-second 上限、stdout/stderr 各 1 MiB (1,048,576-byte) capture limit、validation failure、first failing command、および output-limit または timeout outcome を監査できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "PhaseCommandInput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "validate、explain、enter の CLI outcome により、operator は展開後の writer/pre-entry argv、実行順、default 3,600-second timeout または explicit timeout、その positive-integer / 3,600-second 上限、stdout/stderr 各 1 MiB (1,048,576-byte) capture limit、validation failure、first failing command、および output-limit または timeout outcome を監査できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "9c58223c89dbded0cbbc322fcc9b3a15b78f06ee4d42c136afce8f58063e2913",
+      "evidence_hash": "c600677df01b23fc21e331a509de2c22f16a0ef63e6ef1cb2ef604999640d2bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI は validate、explain、enter の観測可能な outcome を提供し、operator が展開済み phase command、実行順序、validation failure、および command failure を監査できるようにする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "PhaseIdArg"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "CLI は validate、explain、enter の観測可能な outcome を提供し、operator が展開済み phase command、実行順序、validation failure、および command failure を監査できるようにする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "9c58223c89dbded0cbbc322fcc9b3a15b78f06ee4d42c136afce8f58063e2913",
+      "evidence_hash": "574c686246d7577d3ab00fe3d015a1ba12dac480d60fd748ff40da6e914bd3dc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "validate、explain、enter の CLI outcome により、operator は展開後の writer/pre-entry argv、実行順、default 3,600-second timeout または explicit timeout、その positive-integer / 3,600-second 上限、stdout/stderr 各 1 MiB (1,048,576-byte) capture limit、validation failure、first failing command、および output-limit または timeout outcome を監査できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "PhaseIdArg"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "validate、explain、enter の CLI outcome により、operator は展開後の writer/pre-entry argv、実行順、default 3,600-second timeout または explicit timeout、その positive-integer / 3,600-second 上限、stdout/stderr 各 1 MiB (1,048,576-byte) capture limit、validation failure、first failing command、および output-limit または timeout outcome を監査できる。"
+        }
+      }
+    }
+  ]
+}

@@ -4,45 +4,89 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| PreReviewGateDispatchOutcome | enum | add | NotApplicable, TaskContract | 🔵 | 🔵 |
-| PreReviewGateKind | enum | add | TaskContractLiveness | 🔵 | 🔵 |
+| PhaseCommandEnterOutcome | enum | add | Completed, Blocked | 🟡 | 🔵 |
+| PhaseCommandStep | enum | add | PreEntry, Writer | 🟡 | 🔵 |
+| PreReviewCommandDispatchOutcome | enum | add | ReadyForReview, Blocked | 🟡 | 🔵 |
+| ProgramOutputStream | enum | add | Stdout, Stderr | 🟡 | 🔵 |
+| ProgramRunOutcome | enum | add | Exited, TimedOut, OutputLimitExceeded | 🟡 | 🔵 |
+| ReviewScopeSelector | enum | add | Named, Other | 🟡 | 🔵 |
+| ReviewTrackSelector | enum | add | Explicit, CurrentBranch | 🟡 | 🔵 |
 
 ## Value Objects
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| PreReviewGateMatrix | value_object | add | — | 🔵 | 🔵 |
+| CommandArgument | value_object | add | — | 🟡 | 🔵 |
+| CommandArgv | value_object | add | — | 🟡 | 🔵 |
+| CommandConfigSchemaVersion | value_object | add | — | 🟡 | 🔵 |
+| CommandDeclarationId | value_object | add | — | 🟡 | 🔵 |
+| CommandSequenceIndex | value_object | add | — | 🟡 | 🔵 |
+| CommandTimeoutSeconds | value_object | add | — | 🟡 | 🔵 |
+| ConfiguredCommand | value_object | add | — | 🟡 | 🔵 |
+| OutputCaptureLimitBytes | value_object | add | — | 🟡 | 🔵 |
+| PhaseCommandConfig | value_object | add | — | 🟡 | 🔵 |
+| PhaseCommandDeclaration | value_object | add | — | 🟡 | 🔵 |
+| PreReviewCommandConfig | value_object | add | — | 🟡 | 🔵 |
+| PreReviewScopeCommandDeclaration | value_object | add | — | 🟡 | 🔵 |
+| ProgramExitCode | value_object | add | — | 🟡 | 🔵 |
+| UnvalidatedTimeoutSeconds | value_object | add | — | 🟡 | 🔵 |
 
 ## Error Types
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| PreReviewGateConfigLoadError | error_type | add | ReadFailed, InvalidMatrix | 🔵 | 🔵 |
-| PreReviewGateDispatchError | error_type | add | Config, TaskContract, Lookup | 🔵 | 🔵 |
-| PreReviewGateLookupError | error_type | add | UnknownScope | 🔵 | 🔵 |
-| PreReviewGateMatrixError | error_type | add | MissingScope, UnknownScope, DuplicateScope, DuplicateGate | 🔵 | 🔵 |
+| CommandConfigLoadError | error_type | add | ReadFailed, DecodeFailed, Invalid | 🟡 | 🔵 |
+| CommandConfigValidationError | error_type | add | InvalidSchemaVersion, InvalidDeclarationId, InvalidReviewScope, DuplicateDeclaration, DuplicateScope, EmptyArgv, TimeoutOutOfRange, RecursiveInvocation | 🟡 | 🔵 |
+| CurrentReviewTrackResolveError | error_type | add | ResolveFailed | 🟡 | 🔵 |
+| PhaseCommandEnterError | error_type | add | Config, UnknownPhase, Runner | 🟡 | 🔵 |
+| PhaseCommandExplainError | error_type | add | Config, UnknownPhase | 🟡 | 🔵 |
+| PreReviewCommandDispatchError | error_type | add | Config, UnknownScope, TrackResolution, Runner | 🟡 | 🔵 |
+| ProgramRunnerError | error_type | add | SpawnFailed, WaitFailed, TerminateFailed | 🟡 | 🔵 |
 
 ## Secondary Ports
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| PreReviewGateConfigLoaderPort | secondary_port | add | fn load(&self, items_dir: &std::path::Path, track_id: &domain::TrackId) -> Result<PreReviewGateMatrix, PreReviewGateConfigLoadError> | 🔵 | 🔵 |
+| CurrentReviewTrackResolverPort | secondary_port | add | fn resolve(&self, repository_root: &std::path::Path) -> Result<domain::TrackId, CurrentReviewTrackResolveError> | 🟡 | 🔵 |
+| PhaseCommandConfigLoaderPort | secondary_port | add | fn load(&self, repository_root: &std::path::Path) -> Result<PhaseCommandConfig, CommandConfigLoadError> | 🟡 | 🔵 |
+| PreReviewCommandConfigLoaderPort | secondary_port | add | fn load(&self, repository_root: &std::path::Path, track_id: &domain::TrackId) -> Result<PreReviewCommandConfig, CommandConfigLoadError> | 🟡 | 🔵 |
+| ProgramRunnerPort | secondary_port | add | fn run(&self, invocation: ProgramInvocation) -> Result<ProgramRunOutcome, ProgramRunnerError> | 🟡 | 🔵 |
 
 ## Application Services
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| PreReviewGateDispatchService | application_service | add | fn dispatch(&self, cmd: PreReviewGateDispatchCommand) -> Result<PreReviewGateDispatchOutcome, PreReviewGateDispatchError> | 🔵 | 🔵 |
+| PhaseCommandService | application_service | add | fn validate(&self, command: PhaseValidateCommand) -> Result<(), CommandConfigLoadError>, fn explain(&self, query: PhaseExplainQuery) -> Result<PhaseCommandExplanation, PhaseCommandExplainError>, fn enter(&self, command: PhaseEnterCommand) -> Result<PhaseCommandEnterOutcome, PhaseCommandEnterError> | 🟡 | 🔵 |
+| PreReviewCommandDispatchService | application_service | add | fn dispatch(&self, command: PreReviewCommandDispatchCommand) -> Result<PreReviewCommandDispatchOutcome, PreReviewCommandDispatchError> | 🟡 | 🔵 |
 
 ## Interactors
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| PreReviewGateDispatchInteractor | interactor | add | — | 🔵 | 🔵 |
+| PhaseCommandInteractor | interactor | add | — | 🟡 | 🔵 |
+| PreReviewCommandDispatchInteractor | interactor | add | — | 🟡 | 🔵 |
+| PreReviewCommandGatedReviewInteractor | interactor | add | — | 🟡 | 🔵 |
+
+## DTOs
+
+| Name | Kind | Action | Details | Signal | Cat-Spec |
+|------|------|--------|---------|--------|----------|
+| CapturedProgramOutput | dto | add | — | 🟡 | 🔵 |
+| PhaseCommandExplanation | dto | add | — | 🟡 | 🔵 |
+| ProgramExecutionRecord | dto | add | — | 🟡 | 🔵 |
+| ProgramInvocation | dto | add | — | 🟡 | 🔵 |
 
 ## Commands
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| PreReviewGateDispatchCommand | command | add | — | 🔵 | 🔵 |
+| PhaseEnterCommand | command | add | — | 🟡 | 🔵 |
+| PhaseValidateCommand | command | add | — | 🟡 | 🔵 |
+| PreReviewCommandDispatchCommand | command | add | — | 🟡 | 🔵 |
+
+## Queries
+
+| Name | Kind | Action | Details | Signal | Cat-Spec |
+|------|------|--------|---------|--------|----------|
+| PhaseExplainQuery | query | add | — | 🟡 | 🔵 |
 

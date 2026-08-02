@@ -1,8 +1,332 @@
 {
   "crate_name": "cli_driver",
   "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "usecase::operator_command::CommandDeclarationId"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_declaration_id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&usecase::operator_command::CommandDeclarationId"
+        }
+      ],
+      "type_name": "PhaseIdArg"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "service",
+              "ty": "Arc<dyn usecase::phase_command::PhaseCommandService>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [
+            {
+              "name": "input",
+              "ty": "PhaseCommandInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "CommandOutcome"
+        }
+      ],
+      "type_name": "PhaseCommandDriver"
+    }
+  ],
   "layer": "cli_driver",
   "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "add",
+      "for_type": "PhaseIdArg",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseIdArg",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseIdArg",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseIdArg",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandInput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandInput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandInput",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CommandOutcome",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "CommandOutcome",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseIdArg",
+      "trait_ref": "core::str::FromStr"
+    }
+  ],
   "traits": {},
-  "types": {}
+  "types": {
+    "CommandOutcome": {
+      "action": "reference",
+      "docs": "CLI render boundary carrying opaque stdout/stderr text and process exit status (IN-04, AC-03).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "stdout",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "stderr",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "exit_code",
+              "ty": "u8"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "success",
+          "params": [
+            {
+              "name": "stdout",
+              "ty": "Option<String>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "failure",
+          "params": [
+            {
+              "name": "stderr",
+              "ty": "Option<String>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "render",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PhaseCommandDriver": {
+      "action": "add",
+      "docs": "Phase-command primary adapter rendering every service result into CommandOutcome (IN-04, AC-02, AC-03).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "service",
+              "ty": "Arc<dyn usecase::phase_command::PhaseCommandService>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "phase_command",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PhaseCommandInput": {
+      "action": "add",
+      "docs": "Phase-command primary-adapter input (IN-04, AC-03).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Validate",
+            "payload": {
+              "fields": [
+                {
+                  "name": "repository_root",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Explain",
+            "payload": {
+              "fields": [
+                {
+                  "name": "repository_root",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "phase_id",
+                  "ty": "PhaseIdArg"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Enter",
+            "payload": {
+              "fields": [
+                {
+                  "name": "repository_root",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "phase_id",
+                  "ty": "PhaseIdArg"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "phase_command",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PhaseIdArg": {
+      "action": "add",
+      "docs": "CLI transport wrapper for a usecase-owned phase identifier (IN-04, AC-03).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "value",
+              "ty": "usecase::operator_command::CommandDeclarationId"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "phase_command",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    }
+  }
 }

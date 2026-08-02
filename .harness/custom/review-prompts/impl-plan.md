@@ -85,13 +85,31 @@ specific `task_id` or `section.id`, or quote the offending text.
   whose implementation has started or completed, diff growth from review fixes
   and obligation-mandated tests is the legitimate consequence of correct
   behaviour — never report it as 超過 or demand a retroactive justification.
-- **unsound batch composition**: an ordered `batches[]` declaration that is
-  structurally valid but semantically unsound — e.g., a batch grouping tasks
-  whose per-scope estimate sum leaves no room for the estimates' stated
-  uncertainty, a batch mixing tasks so a declared dependency's consumer sits in
-  practice before its producer's verifiable completion, or an ordering that
-  defers the sole validation-bearing task after everything it validates has
-  already merged.
+- **unsound batch composition**: an ordered `batches[]` declaration that
+  passes structural checks but remains semantically unsound — e.g., a batch
+  grouping tasks with a concrete overlapping write target that prevents safe
+  concurrent ownership, or an ordering that defers the sole validation-bearing
+  task until after everything it validates has already merged. Do not report
+  estimate-sum or declared dependency-order violations here: `bin/sotp
+  batch-plan check` owns those structural failures.
+- **avoidable batch serialization (P1)**: an ordered `batches[]` declaration
+  places tasks in different batches even though they can share a
+  dependency-respecting implementation order, have no overlapping write targets,
+  and each combined per-scope estimate fits its resolved ceiling or satisfies
+  the structural gate's sole-contributor exception for a valid indivisible
+  over-ceiling task. A declared
+  dependency path does not prevent same-batch membership when its producer runs
+  first. Report the specific task ids, the dependency frontier where the first
+  task is ready (or the predecessor placement that makes the other ready within
+  the batch), their non-overlapping targets and combined estimates, and the
+  earlier batch that can contain them. A singleton batch is a finding when
+  another task was ready, or became ready through predecessors already in that
+  batch, and fit without a concrete write-ownership or per-scope ceiling
+  conflict. An indivisibility justification alone does not excuse serialization;
+  it only permits the over-ceiling task's sole contribution in its affected
+  scope. Do not demand globally optimal bin packing or speculate about unlisted
+  conflicts; the evidence must show a concrete removable batch boundary. This
+  category applies only while the affected tasks are unstarted (`todo`).
 - **pre-implementation split proposal**: when a task bundles multiple
   *independently verifiable behavior units* (each unit testable on its own
   through the spec's acceptance criteria), propose the split **before
@@ -111,7 +129,7 @@ specific `task_id` or `section.id`, or quote the offending text.
   belongs to the planning and admission domains, and review-fix / DFP diff
   growth is the legitimate consequence of correct behaviour, never 超過. This
   covers batch-size infeasibility, indivisibility-justification validity,
-  estimate-sum headroom concerns, and retroactive split demands alike; the one
+  estimate-sum concerns, and retroactive split demands alike; the one
   forward-looking split lane is the pre-implementation category above, and it
   closes when implementation starts.
 - Missing `GO-NN` mappings in `task-coverage.json` — the schema has no `goal`
@@ -120,7 +138,9 @@ specific `task_id` or `section.id`, or quote the offending text.
   `task-contract.json` — the `OrphanEntry` gate requires them
 - Task description wording nits / sentence-length preferences
 - Re-ordering suggestions when the existing order is plausibly valid and the
-  alternative is purely stylistic
+  alternative is purely stylistic. This exclusion does not apply to an
+  `avoidable batch serialization` finding that satisfies its dependency,
+  ownership, and ceiling evidence requirements.
 - Suggested task splits for a task whose estimates fit within every touched
   scope's ceiling AND whose description does not bundle independently
   verifiable behavior units — splitting there is purely stylistic

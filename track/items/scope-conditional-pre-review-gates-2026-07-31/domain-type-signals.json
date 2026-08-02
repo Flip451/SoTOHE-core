@@ -1,7 +1,44 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-31T12:30:49Z",
-  "declaration_hash": "88ac5c2327865f7319bfcd0e301acf990bd6ca0f1172e4571712967562f3a242",
+  "generated_at": "2026-08-02T06:16:17Z",
+  "declaration_hash": "5321680cbdad39eaf8699607ea49a39fe88eae7f3eaa9b4a359b74f48df76d74",
   "implementation_input_hash": "1f19e2c672e17aad8298dc241d8857766ac72280d855012d8a988e5343af79c6",
-  "signals": []
+  "signals": [
+    {
+      "type_name": "ContractedEntryRef",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CoverageVerifyOutcome",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CoverageViolation",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "PreReviewGateOutcome",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "PreReviewGateViolation",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TaskContractDocument",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
 }

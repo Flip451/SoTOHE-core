@@ -1,41 +1,55 @@
 <!-- Generated from spec.json — DO NOT EDIT DIRECTLY -->
 ---
-version: "1.0"
-signals: { blue: 18, yellow: 0, red: 0 }
+version: "1.3"
+signals: { blue: 32, yellow: 0, red: 0 }
 ---
 
-# pre-review gate の scope 条件付き適用と CLI dispatch
+# operator-owned argv による phase command と scope 条件付き pre-review gate dispatch
 
 ## Goal
 
-- [GO-01] pre-review gate の適用可否を review scope × pre-review gate の宣言的な設定マトリクスとして管理し、各 review scope が自身の上流 SoT chain に関係しない下流整合検査によって妨げられない review 経路を提供する。 [adr: knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md#D1]
-- [GO-02] scope を解決できる `sotp review local` が必要な pre-review gate を dispatch し、Makefile wrapper が scope-blind な gate dependency を持たない review 経路を提供する。 [adr: knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md#D2]
+- [GO-01] phase の writer 前 prerequisite と scope 条件付き pre-review gate を、operator が公開 `bin/sotp` interface だけで監査できる literal argv 配列の宣言として管理する。 [adr: knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D1, knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D4]
+- [GO-02] phase engine が宣言済みの pre-entry command を順番に通過させてから canonical writer を一度だけ起動し、SoT 再入の順次処理を機械実行可能にする。 [adr: knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D2]
+- [GO-03] command configuration と実行を fail-closed に扱い、無効または危険な invocation を writer や reviewer の起動前に可観測な失敗として止める。 [adr: knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D5]
+- [GO-04] planning scope を下流 implementation liveness から独立に review 可能に保ちつつ、implementation scope では必要な implementation-to-catalogue と task-contract の検査を reviewer dispatch 前に順序どおり実施する。 [adr: knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md#D1, knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D4]
+- [GO-05] task-contract を catalogue entry の task attribution に戻し、baseline 復元の source-only Red は implementation review の直接的な impl-catalog 再計算・検査で検出する。 [adr: knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D6]
 
 ## Scope
 
 ### In Scope
-- [IN-01] review scope × pre-review gate の適用有無を config で宣言する。これは types scope の一回限りの例外ではなく、planning scope と implementation scope を含む一般的な適用範囲の SoT とする。 [adr: knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md#D1] [tasks: T001, T002, T003]
-- [IN-02] spec および types を含む planning scope の local review は、下流 chain ③ に由来する liveness state または task-contract 成果物の存在・整合を前提としない。 [adr: knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md#D1] [tasks: T004, T005]
-- [IN-03] implementation scope の local review には、既存どおり chain ③ に由来する pre-review liveness gate を適用する。 [adr: knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md#D1] [tasks: T004, T005]
-- [IN-04] `sotp review local` が review scope を解決し、適用マトリクスに従って必要な pre-review gate だけを内部で実行する。 [adr: knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md#D2] [tasks: T004, T005]
-- [IN-05] Makefile review wrapper は CLI への薄い委譲に限定し、scope を認識しない dependency chain で pre-review gate を無条件に前置しない。 [adr: knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md#D2] [tasks: T006]
+- [IN-01] machine-readable phase command config は、各 phase の一意な id、literal かつ non-empty な argv 配列で表す canonical writer 一件、同形式の ordered pre-entry command 群、ならびに command ごとの明示 timeout または約 60 分の既定 timeout を宣言する。 [adr: knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D1, knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D2, knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D5] [tasks: T018, T019, T023]
+- [IN-02] phase engine は repository root を cwd として pre-entry command を宣言順に実行し、最初の non-zero で停止して残りと writer を起動せず、全 command が zero の場合だけ writer を一度実行する。stdout/stderr は bounded に捕捉する。 [adr: knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D2, knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D3, knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D5] [tasks: T018, T019, T020, T021, T022]
+- [IN-03] config author/operator は公開 `bin/sotp` command の有効性と順序を所有し、engine は argv を書き換えず、subcommand grammar や command の意味論を解釈しない。 [adr: knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D1, knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D3] [tasks: T018, T019, T020, T021, T022]
+- [IN-04] CLI は validate、explain、enter の観測可能な outcome を提供し、operator が展開済み phase command、実行順序、validation failure、および command failure を監査できるようにする。 [adr: knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D3] [tasks: T018, T020, T022]
+- [IN-05] `pre-review-gates.json` は review scope ごとに ordered literal `bin/sotp` argv 配列を宣言し、`sotp review local` が scope を解決してその配列を順次 dispatch する。Makefile review wrapper は scope 条件分岐または gate dependency を持たない薄い委譲に留める。 [adr: knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md#D1, knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md#D2, knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D4] [tasks: T018, T019, T020, T021, T022, T023]
+- [IN-06] planning/SoT scope の pre-review command sequence は downstream implementation liveness または task-contract 成果物を要求しない。implementation scope は reviewer dispatch 前に `bin/sotp signal calc-impl-catalog`、`bin/sotp signal check-impl-catalog`、task-contract coverage、task-contract check の順に実行する。 [adr: knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md#D1, knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D4] [tasks: T018, T020, T021, T022, T023]
+- [IN-07] task-contract の attribution target は catalogue entry のみとし、source-only baseline restoration、evidence/inspector eligibility、coverage/liveness carrier variant、および stale-carrier lifecycle を持ち込まない。 [adr: knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D6] [tasks: T017, T018, T019, T020, T021, T022]
+- [IN-08] scope 条件付き review behavior、task-contract の status 別 rule、および既存の NonBlueSignal 判定は、明示した command ownership と ordering の変更以外では維持する。 [adr: knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md#D1] [tasks: T017, T018, T019, T020, T021, T022, T023]
 
 ### Out of Scope
-- [OS-01] task-contract gate が NonBlueSignal を判定する既存の decision rules、Red / Yellow の意味論、または implementation scope における liveness gate の判定内容を変更しない。 [adr: knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md#D1] [tasks: T004, T005]
-- [OS-02] todo-lane または declaration-ahead の帰属意味論を補強・変更する第二段の対応は含まない。 [adr: knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md#D1] [tasks: T004, T005]
-- [OS-03] scope × gate の設定を既存の signal-gates.json と統合することは含まない。統合の妥当性は設定宣言の増加時に別途再評価する。 [adr: knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md#D1] [tasks: T003]
+- [OS-01] phase engine または pre-review dispatcher が arbitrary または full な `bin/sotp` subcommand grammar、gate predicate、argv rewrite、または hidden executable mapping を実装・再現することは含まない。ただし、D5 が義務付ける config safety validation としての finite exact-literal-prefix recursion denylist はこれに含まれず、command semantic interpretation ではない。 [adr: knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D1, knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D4, knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D5] [tasks: T018, T020, T021, T022]
+- [OS-02] shell command string、shell interpolation、pipe、または implicit `sh -c` による command 実行を導入することは含まない。 [adr: knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D1, knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D5] [tasks: T018, T019, T020]
+- [OS-03] catalogue entry ではない task-contract carrier で source-only Red を attribution、coverage、liveness、または task settlement から除外することは含まない。 [adr: knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D6] [tasks: T017, T018, T019, T020, T021, T022]
+- [OS-04] pre-review command declaration を `signal-gates.json` と統合すること、または todo-lane / declaration-ahead attribution semantics を変更することは含まない。 [adr: knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md#D1] [tasks: T018, T019, T020, T021, T022, T023]
 
 ## Constraints
-- [CN-01] pre-review gate applicability は review scope × gate の config マトリクスとして表現し、特定 scope 向けの ad-hoc な例外分岐で表現しない。 [adr: knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md#D1] [tasks: T001, T002, T003]
-- [CN-02] scope-aware な gate dispatch の所有権は `sotp review local` に置き、Makefile に scope 条件分岐または review policy を実装しない。 [adr: knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md#D2] [tasks: T004, T005, T006]
-- [CN-03] 本変更は gate の適用範囲だけを変更し、NonBlueSignal の既存判定規則を変更しない。 [adr: knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md#D1] [tasks: T004, T005]
+- [CN-01] phase と pre-review config は schema version、declaration id の一意性、non-empty literal argv、および positive integer かつ 3,600 seconds 以下の per-command timeout を fail-closed に検証する。phase command config validation と pre-review config validation は、configured writer、pre-entry、pre-review argv のいずれにも shared finite exact-literal-prefix recursion denylist を適用し、先頭三要素が exactly `["bin/sotp", "phase", "enter"]`、`["bin/sotp", "review", "local"]`、または `["bin/sotp", "review", "fix-local"]` である argv を configured command、writer、reviewer の起動前に non-zero で拒否する。 [adr: knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D5] [tasks: T018, T019, T020, T022, T023]
+- [CN-02] command execution は repository-root cwd と literal argv に限定し、per command で stdout を最大 1 MiB (1,048,576 bytes)、stderr を独立に最大 1 MiB (1,048,576 bytes) capture する。いずれかの output bound を超えた場合は当該 command を terminate し output-limit outcome の non-zero を返す。default timeout は 3,600 seconds とし、explicit timeout は positive integer かつ 3,600 seconds 以下に限る。timeout 時は当該 command を terminate し non-zero を返す。 [adr: knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D3, knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D5] [tasks: T018, T019]
+- [CN-03] pre-entry または scope command が non-zero を返した場合、dispatcher は後続 command、writer、または reviewer を起動せず、失敗した argv と outcome を operator が識別できる形で返す。 [adr: knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D2, knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D4] [tasks: T018, T019, T020, T021, T022]
+- [CN-04] scope-aware dispatch の所有権は CLI に置き、Makefile に scope 条件分岐または review policy を実装しない。 [adr: knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md#D2, knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D4] [tasks: T022, T023]
+- [CN-05] implementation review で task-contract check を実行する前に impl-catalog signal を再計算して検査し、task-contract は catalogue-entry attribution の structural contract に限定する。 [adr: knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D6] [tasks: T017, T018, T019, T020, T021, T022, T023]
 
 ## Acceptance Criteria
-- [ ] [AC-01] review scope × pre-review gate の適用有無を表す設定マトリクスが存在し、planning scope と implementation scope の適用差を宣言として確認できる。 [adr: knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md#D1] [tasks: T001, T002, T003]
-- [ ] [AC-02] spec または types の local review は、下流 chain ③ liveness state または task-contract 成果物がまだ存在しない通常の planning 段階でも、当該 scope の上流 prerequisite を満たす限り開始できる。 [adr: knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md#D1] [tasks: T004, T005]
-- [ ] [AC-03] implementation scope の local review は既存の chain ③ liveness gate を実行し、NonBlueSignal の既存判定規則に従って結果を返す。 [adr: knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md#D1, knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md#D1] [tasks: T004, T005]
-- [ ] [AC-04] `sotp review local` は scope を解決して設定マトリクスを参照し、適用対象の pre-review gate を内部で dispatch する。 [adr: knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md#D2] [tasks: T004, T005]
-- [ ] [AC-05] Makefile review wrapper は scope-blind な pre-review liveness gate dependency を持たず、review policy を CLI に委譲する薄い wrapper である。 [adr: knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md#D2] [tasks: T006]
+- [ ] [AC-01] phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに writer/pre-entry argv の先頭三要素が exactly `["bin/sotp", "phase", "enter"]`、`["bin/sotp", "review", "local"]`、または `["bin/sotp", "review", "fix-local"]` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。 [adr: knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D2, knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D5] [tasks: T018, T019, T023]
+- [ ] [AC-02] phase enter は repository root で pre-entry argv を宣言順に実行し、最初の non-zero の後に remaining command と writer を実行せず、全て zero の場合だけ canonical writer を一度実行する。 [adr: knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D2, knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D3] [tasks: T018, T019, T020, T021, T022]
+- [ ] [AC-03] validate、explain、enter の CLI outcome により、operator は展開後の writer/pre-entry argv、実行順、default 3,600-second timeout または explicit timeout、その positive-integer / 3,600-second 上限、stdout/stderr 各 1 MiB (1,048,576-byte) capture limit、validation failure、first failing command、および output-limit または timeout outcome を監査できる。 [adr: knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D3, knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D5] [tasks: T018, T019, T020, T022]
+- [ ] [AC-04] phase と pre-review command は shell string ではなく literal argv として起動され、shell interpolation、pipe、implicit `sh -c`、argv rewrite、または command semantic interpretation を経由しない。 [adr: knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D1, knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D5] [tasks: T018, T019, T020, T021, T022]
+- [ ] [AC-05] `pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または configured argv の先頭三要素が exactly `["bin/sotp", "phase", "enter"]`、`["bin/sotp", "review", "local"]`、もしくは `["bin/sotp", "review", "fix-local"]` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。 [adr: knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md#D2, knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D4, knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D5] [tasks: T018, T019, T020, T021, T022, T023]
+- [ ] [AC-06] spec と types を含む planning/SoT scope の local review は、downstream implementation liveness または task-contract artifact が未存在でも、当該 scope の宣言済み上流 prerequisite を満たせば開始できる。 [adr: knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md#D1] [tasks: T018, T020, T021, T022, T023]
+- [ ] [AC-07] implementation scope の local review は reviewer dispatch 前に `bin/sotp signal calc-impl-catalog`、`bin/sotp signal check-impl-catalog`、task-contract coverage、task-contract check を順に実行し、いずれかの non-zero で停止する。 [adr: knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md#D1, knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D4] [tasks: T018, T020, T021, T022, T023]
+- [ ] [AC-08] task-contract は catalogue-entry attribution だけを受理し、source-only baseline-restoration、evidence/inspector eligibility、coverage/liveness carrier variant、または stale-carrier lifecycle の入力を受理しない。 [adr: knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D6] [tasks: T017, T018, T019, T020, T021, T022]
+- [ ] [AC-09] source-only Red が残る implementation review は direct impl-catalog recalculation/check で検出され、task-contract carrier、signal override、gate skip、または settlement exception では回避できない。 [adr: knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D6] [tasks: T017, T018, T019, T020, T021, T022]
+- [ ] [AC-10] scope-conditional applicability と既存 task-contract status rule は維持され、NonBlueSignal の既存判定規則は変更されない。 [adr: knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md#D1] [tasks: T017, T018, T019, T020, T021, T022, T023]
 
 ## Related Conventions (Required Reading)
 - knowledge/conventions/coding-principles.md#Rules
@@ -44,5 +58,5 @@ signals: { blue: 18, yellow: 0, red: 0 }
 ## Signal Summary
 
 ### Stage 1: Spec Signals
-🔵 18  🟡 0  🔴 0
+🔵 32  🟡 0  🔴 0
 

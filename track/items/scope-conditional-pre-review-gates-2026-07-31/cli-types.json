@@ -1,8 +1,224 @@
 {
   "crate_name": "cli",
   "functions": {},
+  "inherent_impls": [],
   "layer": "cli",
   "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "add",
+      "for_type": "PhaseCommand",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommand",
+      "trait_ref": "clap_builder::derive::Subcommand"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseValidateArgs",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseValidateArgs",
+      "trait_ref": "clap_builder::derive::Args"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseExplainArgs",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseExplainArgs",
+      "trait_ref": "clap_builder::derive::Args"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseEnterArgs",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseEnterArgs",
+      "trait_ref": "clap_builder::derive::Args"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommand",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseValidateArgs",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseExplainArgs",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseEnterArgs",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
+    }
+  ],
   "traits": {},
-  "types": {}
+  "types": {
+    "PhaseCommand": {
+      "action": "add",
+      "docs": "Public phase-command family (IN-04, AC-03).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Validate",
+            "payload": {
+              "fields": [
+                "PhaseValidateArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Explain",
+            "payload": {
+              "fields": [
+                "PhaseExplainArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Enter",
+            "payload": {
+              "fields": [
+                "PhaseEnterArgs"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "commands::phase",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PhaseEnterArgs": {
+      "action": "add",
+      "docs": "Phase-enter CLI arguments (AC-02, AC-03).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "phase_id",
+              "ty": "cli_driver::phase_command::PhaseIdArg"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "commands::phase",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PhaseExplainArgs": {
+      "action": "add",
+      "docs": "Phase-explain CLI arguments (IN-04, AC-03).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "phase_id",
+              "ty": "cli_driver::phase_command::PhaseIdArg"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "commands::phase",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PhaseValidateArgs": {
+      "action": "add",
+      "docs": "Phase-validation CLI arguments (AC-01, AC-03).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "commands::phase",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    }
+  }
 }
