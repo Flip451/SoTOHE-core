@@ -608,7 +608,10 @@ mod tests {
                 format!(
                     r#"{{
   "schema_version": 1,
-  "providers": {{ "{provider}": {{ "label": "Test Provider" }} }},
+  "providers": {{ "{provider}": {{
+    "label": "Test Provider",
+    "supported_reasoning_efforts": ["{reasoning_effort}"]
+  }} }},
   "capabilities": {{
     "dry-fix-lead": {{
       "provider": "{provider}",

@@ -1,4 +1,81 @@
 {
   "track_id": "2026-08-02-codex-reasoning-effort-max",
-  "records": []
+  "records": [
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "AgentProfiles",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-02-codex-reasoning-effort-max/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::agent_profiles::tests",
+          "test_name": "test_resolve_execution_codex_max_returns_provider_cli"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::agent_profiles::tests",
+          "test_name": "test_resolve_execution_unsupported_provider_effort_returns_error"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "AgentProfiles",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-02-codex-reasoning-effort-max/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::agent_profiles::tests",
+          "test_name": "test_resolve_execution_codex_max_returns_provider_cli"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::agent_profiles::tests",
+          "test_name": "test_resolve_execution_unsupported_provider_effort_returns_error"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "AgentProfiles",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-02-codex-reasoning-effort-max/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::agent_profiles::tests",
+          "test_name": "test_resolve_execution_codex_max_returns_provider_cli"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::agent_profiles::tests",
+          "test_name": "test_resolve_execution_unsupported_provider_effort_returns_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::agent_profiles::tests",
+          "test_name": "test_resolve_execution_provider_declaration_rejects_undeclared_effort"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::agent_profiles::tests",
+          "test_name": "test_resolve_execution_custom_provider_declares_max_returns_provider_cli"
+        }
+      ]
+    }
+  ]
 }

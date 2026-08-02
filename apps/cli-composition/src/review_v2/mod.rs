@@ -814,8 +814,14 @@ mod tests {
             r#"{{
   "schema_version": 1,
   "providers": {{
-    "codex": {{ "label": "Codex" }},
-    "{provider}": {{ "label": "Test Provider" }}
+    "codex": {{
+      "label": "Codex",
+      "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"]
+    }},
+    "{provider}": {{
+      "label": "Test Provider",
+      "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"]
+    }}
   }},
   "capabilities": {{
     "reviewer": {{
@@ -851,7 +857,10 @@ mod tests {
         let content = r#"{
   "schema_version": 1,
   "providers": {
-    "codex": { "label": "Codex" }
+    "codex": {
+      "label": "Codex",
+      "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"]
+    }
   },
   "capabilities": {
     "review-fix-lead": {

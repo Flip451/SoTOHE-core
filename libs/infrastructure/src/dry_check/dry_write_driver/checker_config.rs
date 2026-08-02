@@ -159,7 +159,12 @@ mod tests {
             dir.path().join(".harness/config/agent-profiles.json"),
             r#"{
   "schema_version": 1,
-  "providers": { "codex": { "label": "Codex" } },
+  "providers": {
+    "codex": {
+      "label": "Codex",
+      "supported_reasoning_efforts": ["low", "high"]
+    }
+  },
   "capabilities": {
     "dry-checker": {
       "provider": "codex",
@@ -191,7 +196,12 @@ mod tests {
             dir.path().join(".harness/config/agent-profiles.json"),
             r#"{
   "schema_version": 1,
-  "providers": { "codex": { "label": "Codex" } },
+  "providers": {
+    "codex": {
+      "label": "Codex",
+      "supported_reasoning_efforts": ["low", "high"]
+    }
+  },
   "capabilities": {
     "dry-checker": {
       "provider": "codex",
@@ -227,7 +237,12 @@ mod tests {
             dir.path().join(".harness/config/agent-profiles.json"),
             r#"{
   "schema_version": 1,
-  "providers": { "codex": { "label": "Codex" } },
+  "providers": {
+    "codex": {
+      "label": "Codex",
+      "supported_reasoning_efforts": ["high"]
+    }
+  },
   "capabilities": {
     "dry-checker": {
       "provider": "codex",
@@ -260,7 +275,12 @@ mod tests {
             &real_profiles,
             r#"{
   "schema_version": 1,
-  "providers": { "codex": { "label": "Codex" } },
+  "providers": {
+    "codex": {
+      "label": "Codex",
+      "supported_reasoning_efforts": ["high"]
+    }
+  },
   "capabilities": {
     "dry-checker": {
       "provider": "codex",
@@ -291,7 +311,12 @@ mod tests {
                 format!(
                     r#"{{
   "schema_version": 1,
-  "providers": {{ "codex": {{ "label": "Codex" }} }},
+  "providers": {{
+    "codex": {{
+      "label": "Codex",
+      "supported_reasoning_efforts": ["low", "medium", "high"]
+    }}
+  }},
   "capabilities": {{
     "dry-checker": {{
       "provider": "codex",

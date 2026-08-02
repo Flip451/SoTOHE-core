@@ -17,7 +17,12 @@ fn load_profiles(contents: &str) -> AgentProfiles {
 
 const CODEX_PROFILE: &str = r#"{
     "schema_version": 1,
-    "providers": { "codex": { "label": "Codex CLI" } },
+    "providers": {
+        "codex": {
+            "label": "Codex CLI",
+            "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"]
+        }
+    },
     "capabilities": {
         "reviewer": {
             "provider": "codex",
@@ -121,7 +126,12 @@ fn test_resolve_execution_unsupported_provider_effort_returns_error() {
     let profiles = load_profiles(
         r#"{
             "schema_version": 1,
-            "providers": { "gemini": { "label": "Gemini CLI" } },
+            "providers": {
+                "gemini": {
+                    "label": "Gemini CLI",
+                    "supported_reasoning_efforts": ["low", "medium", "high"]
+                }
+            },
             "capabilities": {
                 "researcher": {
                     "provider": "gemini",
@@ -141,6 +151,35 @@ fn test_resolve_execution_unsupported_provider_effort_returns_error() {
 }
 
 #[test]
+fn test_resolve_execution_codex_max_returns_provider_cli() {
+    let profiles = load_profiles(
+        r#"{
+            "schema_version": 1,
+            "providers": {
+                "codex": {
+                    "label": "Codex CLI",
+                    "supported_reasoning_efforts": ["max"]
+                }
+            },
+            "capabilities": {
+                "implementer": {
+                    "provider": "codex",
+                    "model": "gpt-5.6-luna",
+                    "reasoning_effort": "max",
+                    "execution_mode": "orchestrator-output"
+                }
+            }
+        }"#,
+    );
+
+    assert!(matches!(
+        profiles.resolve_execution(&capability("implementer"), RoundType::Final),
+        Ok(ResolvedExecution::ProviderCli { provider, effort, .. })
+            if provider.as_str() == "codex" && effort == ReasoningEffort::Max
+    ));
+}
+
+#[test]
 fn test_resolve_execution_claude_accepts_every_effort_level() {
     for (encoded, expected) in [
         ("low", ReasoningEffort::Low),
@@ -152,7 +191,12 @@ fn test_resolve_execution_claude_accepts_every_effort_level() {
         let profiles = load_profiles(&format!(
             r#"{{
                 "schema_version": 1,
-                "providers": {{ "claude": {{ "label": "Claude Code" }} }},
+                "providers": {{
+                    "claude": {{
+                        "label": "Claude Code",
+                        "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"]
+                    }}
+                }},
                 "capabilities": {{
                     "implementer": {{
                         "provider": "claude",
@@ -170,6 +214,64 @@ fn test_resolve_execution_claude_accepts_every_effort_level() {
                 if provider.as_str() == "claude" && effort == expected
         ));
     }
+}
+
+#[test]
+fn test_resolve_execution_provider_declaration_rejects_undeclared_effort() {
+    let profiles = load_profiles(
+        r#"{
+            "schema_version": 1,
+            "providers": {
+                "claude": {
+                    "label": "Claude Code",
+                    "supported_reasoning_efforts": ["low"]
+                }
+            },
+            "capabilities": {
+                "implementer": {
+                    "provider": "claude",
+                    "model": "claude-opus-5",
+                    "reasoning_effort": "high",
+                    "execution_mode": "orchestrator-output"
+                }
+            }
+        }"#,
+    );
+
+    assert!(matches!(
+        profiles.resolve_execution(&capability("implementer"), RoundType::Final),
+        Err(AgentProfilesError::UnsupportedEffort(provider, ReasoningEffort::High))
+            if provider.as_str() == "claude"
+    ));
+}
+
+#[test]
+fn test_resolve_execution_custom_provider_declares_max_returns_provider_cli() {
+    let profiles = load_profiles(
+        r#"{
+            "schema_version": 1,
+            "providers": {
+                "custom": {
+                    "label": "Custom CLI",
+                    "supported_reasoning_efforts": ["max"]
+                }
+            },
+            "capabilities": {
+                "implementer": {
+                    "provider": "custom",
+                    "model": "custom-reasoner",
+                    "reasoning_effort": "max",
+                    "execution_mode": "orchestrator-output"
+                }
+            }
+        }"#,
+    );
+
+    assert!(matches!(
+        profiles.resolve_execution(&capability("implementer"), RoundType::Final),
+        Ok(ResolvedExecution::ProviderCli { provider, effort, .. })
+            if provider.as_str() == "custom" && effort == ReasoningEffort::Max
+    ));
 }
 
 #[test]

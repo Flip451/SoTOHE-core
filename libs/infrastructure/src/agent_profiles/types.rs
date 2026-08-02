@@ -137,6 +137,9 @@ pub(super) struct AgentProfilesDto {
 pub(super) struct ProviderMetadataDto {
     #[allow(dead_code)]
     pub(super) label: Option<String>,
+    /// Reasoning efforts this provider accepts for provider-CLI execution.
+    #[serde(default)]
+    pub(super) supported_reasoning_efforts: Vec<ReasoningEffortDto>,
 }
 
 /// Configuration for a single capability entry.

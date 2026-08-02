@@ -431,9 +431,18 @@ mod tests {
             r#"{
                 "schema_version": 1,
                 "providers": {
-                    "codex": { "label": "Codex" },
-                    "claude": { "label": "Claude" },
-                    "gemini": { "label": "Gemini" }
+                    "codex": {
+                        "label": "Codex",
+                        "supported_reasoning_efforts": ["high"]
+                    },
+                    "claude": {
+                        "label": "Claude",
+                        "supported_reasoning_efforts": ["low", "high"]
+                    },
+                    "gemini": {
+                        "label": "Gemini",
+                        "supported_reasoning_efforts": ["high"]
+                    }
                 },
                 "capabilities": {
                     "obligation-fulfillment-verifier": {

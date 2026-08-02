@@ -1,4 +1,123 @@
 {
-  "entries": [],
+  "entries": [
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::agent_profiles::tests",
+          "test_name": "test_resolve_execution_codex_max_returns_provider_cli"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::agent_profiles::tests",
+          "test_name": "test_resolve_execution_unsupported_provider_effort_returns_error"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-02-codex-reasoning-effort-max/spec.json"
+        },
+        "entry_key": "AgentProfiles"
+      },
+      "key": {
+        "anchor_text_hash": "4963ab71f759d5246610dbac591b38cc1dcbe13e4f0a0d0381d5da4df2518602",
+        "bound_tests_set_hash": "a5d3183e931bd383ed5eb7c1803d94964569c0a20cb9fa6e50198dc24d642a09",
+        "declaration_hash": "99faddcd3f4c87ef6f491617c5fbf49506b34f975d96c5fbb057a2a99d8c029c"
+      },
+      "obligation_id": {
+        "entry_key": "AgentProfiles",
+        "item_identifier": "voluntary:IN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "if provider.as_str() == \"codex\" && effort == ReasoningEffort::Max\n    ));\n}\n{\n    let profiles = load_profiles(\n        r#\"{\n            \"schema_version\": 1,\n            \"providers\": {\n                \"gemini\": {\n                    \"label\": \"Gemini CLI\",\n                    \"supported_reasoning_efforts\": [\"low\", \"medium\", \"high\"]\n                }\n            },\n            \"capabilities\": {\n                \"researcher\": {\n                    \"provider\": \"gemini\",\n                    \"model\": \"gemini-3-pro\",\n                    \"reasoning_effort\": \"xhigh\",\n                    \"execution_mode\": \"orchestrator-output\"\n                }\n            }\n        }\"#,\n    );\n\n    assert!(matches!(\n        profiles.resolve_execution(&capability(\"researcher\"), RoundType::Final),\n        Err(AgentProfilesError::UnsupportedEffort(provider, ReasoningEffort::XHigh))\n            if provider.as_str() == \"gemini\"\n    ));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::agent_profiles::tests",
+          "test_name": "test_resolve_execution_codex_max_returns_provider_cli"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::agent_profiles::tests",
+          "test_name": "test_resolve_execution_unsupported_provider_effort_returns_error"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-02-codex-reasoning-effort-max/spec.json"
+        },
+        "entry_key": "AgentProfiles"
+      },
+      "key": {
+        "anchor_text_hash": "6ea80142a8bd718ff50fcb63fbc5cb615b821fe5d2f2e5fea43347454f2b2a61",
+        "bound_tests_set_hash": "a5d3183e931bd383ed5eb7c1803d94964569c0a20cb9fa6e50198dc24d642a09",
+        "declaration_hash": "99faddcd3f4c87ef6f491617c5fbf49506b34f975d96c5fbb057a2a99d8c029c"
+      },
+      "obligation_id": {
+        "entry_key": "AgentProfiles",
+        "item_identifier": "voluntary:AC-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "if provider.as_str() == \"codex\" && effort == ReasoningEffort::Max\n\nErr(AgentProfilesError::UnsupportedEffort(provider, ReasoningEffort::XHigh))",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::agent_profiles::tests",
+          "test_name": "test_resolve_execution_codex_max_returns_provider_cli"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::agent_profiles::tests",
+          "test_name": "test_resolve_execution_unsupported_provider_effort_returns_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::agent_profiles::tests",
+          "test_name": "test_resolve_execution_provider_declaration_rejects_undeclared_effort"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::agent_profiles::tests",
+          "test_name": "test_resolve_execution_custom_provider_declares_max_returns_provider_cli"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-02-codex-reasoning-effort-max/spec.json"
+        },
+        "entry_key": "AgentProfiles"
+      },
+      "key": {
+        "anchor_text_hash": "44e0113db1bfb5db5a4913acca78deecd6de4a3627060391b467d31692e702b7",
+        "bound_tests_set_hash": "d197f3591ad8857a40c86689a740f5a77d8be31a2b538200b98d58cbfc771cc2",
+        "declaration_hash": "99faddcd3f4c87ef6f491617c5fbf49506b34f975d96c5fbb057a2a99d8c029c"
+      },
+      "obligation_id": {
+        "entry_key": "AgentProfiles",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "if provider.as_str() == \"codex\" && effort == ReasoningEffort::Max\n\nErr(AgentProfilesError::UnsupportedEffort(provider, ReasoningEffort::XHigh))\n            if provider.as_str() == \"gemini\"\n\nErr(AgentProfilesError::UnsupportedEffort(provider, ReasoningEffort::High))\n            if provider.as_str() == \"claude\"\n\nif provider.as_str() == \"custom\" && effort == ReasoningEffort::Max",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    }
+  ],
   "track_id": "2026-08-02-codex-reasoning-effort-max"
 }
