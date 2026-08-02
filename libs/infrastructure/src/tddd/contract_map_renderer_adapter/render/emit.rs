@@ -207,7 +207,7 @@ pub(super) fn emit_entry<'a>(
             // (ADR 2026-04-17-1528 §D1 — silent skip for primitives / external types).
             // Uses resolve_type_ref_node_ids so that reference-wrapped alias targets
             // (e.g. `&DeclaredType`) are also resolved correctly.
-            if let TypeKindV2::TypeAlias { target } = type_entry.kind() {
+            if let TypeKindV2::TypeAlias { target, .. } = type_entry.kind() {
                 let target_ids = resolve_type_ref_node_ids(
                     target.as_str(),
                     node_index,

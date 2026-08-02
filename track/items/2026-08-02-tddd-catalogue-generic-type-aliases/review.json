@@ -26,6 +26,105 @@
         }
       ]
     },
+    "domain": {
+      "rounds": [
+        {
+          "at": "2026-08-02T03:10:49Z",
+          "findings": [
+            {
+              "category": "missing generic-alias validation",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval_composition_root.rs",
+              "line": 197,
+              "message": "Alias generic bounds are ignored when building the public type surface. A `TypeAlias` whose generic bound exposes a prohibited role is therefore accepted by `CompositionRootPureDi`; include `generics` in the collected bound types.",
+              "severity": "P1"
+            },
+            {
+              "category": "missing generic-alias validation",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval_primitives.rs",
+              "line": 281,
+              "message": "Primitive linting scans only the alias target and skips `TypeAlias.generics`, so primitives nested in alias bounds are never reported at the `Bound` position. Collect the alias generic bounds alongside the target slot.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9b48d44b4385287019b1df9364561752e2f7a8a25104dc54e303c79b8fa46b7d",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T03:17:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:39f06d655269c38d9c23d0e0920aa0e754e85a5b8c92ca0f2a91a6aecef72b36",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T03:24:37Z",
+          "findings": [
+            {
+              "category": "domain invariant",
+              "file": "libs/domain/src/tddd/catalogue_v2/composite.rs",
+              "line": 238,
+              "message": "`generics` is an unconstrained `Vec`, and the linter changes only scan its bounds; nothing rejects duplicate parameter names. Consequently, `TypeAlias` can contain `[T, T]` and still pass `evaluate_catalogue_lint`, violating AC-02/CN-03 and admitting an invalid Rust declaration. Add uniqueness validation and a rejection test.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:39f06d655269c38d9c23d0e0920aa0e754e85a5b8c92ca0f2a91a6aecef72b36",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T04:04:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:39f06d655269c38d9c23d0e0920aa0e754e85a5b8c92ca0f2a91a6aecef72b36",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T04:08:17Z",
+          "findings": [
+            {
+              "category": "domain invariant",
+              "file": "libs/domain/src/tddd/catalogue_v2/composite.rs",
+              "line": 238,
+              "message": "The alias generic list is never validated for duplicate parameter names. `TypeAlias` can contain `[T, T]`, and the added linter paths only scan bounds, so `evaluate_catalogue_lint` can return success instead of the `DuplicateTypeAliasGenericParameter` validation error required by AC-02/CN-03 and T002. Add uniqueness validation and a rejection test.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:39f06d655269c38d9c23d0e0920aa0e754e85a5b8c92ca0f2a91a6aecef72b36",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T04:49:26Z",
+          "findings": [
+            {
+              "category": "incomplete invariant validation",
+              "file": "libs/domain/src/tddd/catalogue_linter.rs",
+              "line": 645,
+              "message": "Duplicate alias-generic validation only runs for `target_layer_id` (line 645), so aliases with duplicate parameter names in other catalogues in `all_catalogues` are accepted during evaluation. Validate every catalogue before delegating to the rule evaluator; otherwise the invariant depends on which layer happens to be reviewed.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e997193c2e2712e08d3cb32eebdf3e5c962d9a6278cabc332a7ed0d00b914a8f",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T04:55:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:87f03db4a5eb89ad3945e66f1981cf6c023f5cda22387e4a5927001d8c8e868f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T05:00:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:87f03db4a5eb89ad3945e66f1981cf6c023f5cda22387e4a5927001d8c8e868f",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
     "impl-plan": {
       "rounds": [
         {
@@ -214,6 +313,227 @@
           "hash": "rvw1:sha256:e66fe212fc48b2e006b2ed67038db3bf8216c6fcf7b8e0c0dfd86a5a77cd1fc7",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T02:41:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f314a34725b62717f2edb34a9f5252150fea47058d2d383008e8da941ca627d4",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T02:45:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f314a34725b62717f2edb34a9f5252150fea47058d2d383008e8da941ca627d4",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T03:10:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cd60f6138c62608ab06d06674dfc7f8352294e4fcccc10ed3f66f6cd52356db8",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T03:12:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cd60f6138c62608ab06d06674dfc7f8352294e4fcccc10ed3f66f6cd52356db8",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T03:54:46Z",
+          "findings": [
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/task-contract.json",
+              "line": 11,
+              "message": "T002's task-contract attribution adds `domain / CatalogueLinterError`, but T002's description only names `catalogue_linter::evaluate_catalogue_lint` and test fixtures and does not identify any operation on `CatalogueLinterError`. An executor could implement the linter validation without the attributed catalogue entry, leaving the attribution unsupported.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1a3e971dd445921582faa9639d8a4c75365c6dfe3137fe0c43f25834862661d8",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T04:00:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9b8026ee909fe5b5bc1d872b92efa796c336510dc7b00b9ab9289660667484e6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T04:03:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9b8026ee909fe5b5bc1d872b92efa796c336510dc7b00b9ab9289660667484e6",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T04:41:46Z",
+          "findings": [
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/task-contract.json",
+              "line": 16,
+              "message": "T002's task-contract attribution includes `domain::tddd::catalogue_linter::eval::evaluate_catalogue_lint`, whose catalogue action is `delete`, but the task description names only `catalogue_linter::evaluate_catalogue_lint` and does not specify deleting or updating the `eval` implementation. The attributed internal function boundary is therefore not executable from T002's description.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4458caea01758c8130a8a51f3df6d546bd81c86fc3186f1fcea1202b515395b6",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T04:44:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c109f6bcde97e99782070f373cadca8f11d3680f64e252b060652103bc1a20a8",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T04:46:58Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c109f6bcde97e99782070f373cadca8f11d3680f64e252b060652103bc1a20a8",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "at": "2026-08-02T03:11:35Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder.rs",
+              "line": 289,
+              "message": "Generic parameters decoded into `TypeKindV2::TypeAlias` are dropped during extended-crate encoding: this call passes only `target`, while `encode_type_alias` builds rustdoc generics from `entry.generics()` (the separate type-entry field). For the new wire shape, `entry.generics()` remains empty, so `type Foo<T> = ...` is encoded without `T` and structural comparison reports a mismatch instead of matching the implementation.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:3ea37050a4a6dd0ce512b2d3cdce96f6fdc344daa2b1413421aa96056bf594cf",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T03:26:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:91e8bb52bd7e9f75f722e800715cf8cc4ca1289d3f1fb454aa1d861ddb46e899",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T04:05:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:91e8bb52bd7e9f75f722e800715cf8cc4ca1289d3f1fb454aa1d861ddb46e899",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T04:15:35Z",
+          "findings": [
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/structural_eq.rs",
+              "line": 48,
+              "message": "Type aliases still use the name-independent, normalized `generics_structurally_equal`. It canonicalizes parameter names and sorts bounds, so lexically different declarations can compare equal—for example `<T: Clone, U: Clone> = (T, U)` versus `<U: Clone, T: Clone> = (T, U)`, or `T: Clone + Send` versus `T: Send + Clone`. The added tests avoid these counterexamples. Use an alias-specific comparison that preserves parameter order, names, and bound spelling as required by CN-03.",
+              "severity": "P0"
+            },
+            {
+              "category": "non_fail_closed_input",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_type_codec.rs",
+              "line": 288,
+              "message": "The JSON DTO accepts both entry-level `generics` and alias-kind `generics`, but this selection silently discards the entry-level declaration whenever the alias-kind list is non-empty, while still applying entry-level `where_predicates`. A document containing conflicting declarations therefore decodes and round-trips but chain-③ evaluates only one of them. Reject conflicting dual declarations at the boundary or represent a single authoritative source.",
+              "severity": "P0"
+            },
+            {
+              "category": "error_handling",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/encode.rs",
+              "line": 251,
+              "message": "Decode rejects duplicate alias generic names, but encode copies the public `Vec<MethodGenericParam>` without the equivalent validation. Consequently `CatalogueDocumentCodec::encode` can successfully emit JSON that the same codec refuses to decode. Make alias conversion fallible and return `InvalidEntry`, or enforce uniqueness in a validated domain collection.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:91e8bb52bd7e9f75f722e800715cf8cc4ca1289d3f1fb454aa1d861ddb46e899",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T04:50:13Z",
+          "findings": [
+            {
+              "category": "structural equality correctness",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/structural_eq.rs",
+              "line": 273,
+              "message": "Alias bound comparison strips qualified trait paths to their final segment (`foo::Trait` and `bar::Trait` both become `Trait`). This can mark semantically/lexically different alias declarations as equal, contrary to the required lexical bound comparison; preserve the full bound spelling (including qualified paths and nested argument paths).",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:89ad0f3595a8a136e748b37d77644d879086db18fbaf3da4e6d49abc9ca900b7",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T04:55:59Z",
+          "findings": [
+            {
+              "category": "structural equality correctness",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/structural_eq.rs",
+              "line": 279,
+              "message": "Alias bound comparison still formats generic arguments with the shared short-name formatter. Thus bounds such as `Trait<foo::Arg>` and `Trait<bar::Arg>` can compare equal because nested paths are reduced to `Arg`, violating lexical bound comparison.",
+              "severity": "P0"
+            },
+            {
+              "category": "structural equality correctness",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/structural_eq.rs",
+              "line": 258,
+              "message": "Non-parameter alias where-predicates are compared via `Debug`, which includes rustdoc path IDs. The A-side and implementation-side graphs use different IDs, so equivalent predicates containing resolved paths can compare unequal and produce false mismatches.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:c4ae0aee032a63ac733c7ad2ad19716077fabfc80e50d5e00ec192474f0e8ff3",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T05:03:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:24830983135056d68901e4904cf93328b949a5a222e35d0505b0e6840c71458c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T05:17:21Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/encode.rs",
+              "line": 264,
+              "message": "`type_kind_to_dto` validates duplicate names only in the new kind-level list. It serializes those bounds without `validate_bound_str`, and when that list is empty it does not validate the supported legacy `entry_generics` list at all. An in-memory alias with a malformed bound—or legacy generics `[T, T]`—therefore encodes successfully, while `method_generics_from_dtos` rejects the emitted JSON on decode. Validate the effective alias declaration with the same bound and uniqueness rules before emitting it.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:24830983135056d68901e4904cf93328b949a5a222e35d0505b0e6840c71458c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T05:26:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2a76d147cc247dc7f5cb9f4abbe75ea0fc5996ce741029c91e2255cf967ec53e",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T05:29:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2a76d147cc247dc7f5cb9f4abbe75ea0fc5996ce741029c91e2255cf967ec53e",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -230,6 +550,27 @@
           "at": "2026-08-02T01:07:06Z",
           "findings": [],
           "hash": "rvw1:sha256:112b40ee5776a73bd40a38d9c8bac2a8d990cfe17b60e0cbfebaf70aae1d664e",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T03:11:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3b53fde93d4de92953b60817e5007ab198aeebb4ee84c5e03753809192155a39",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T04:05:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3b53fde93d4de92953b60817e5007ab198aeebb4ee84c5e03753809192155a39",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T04:10:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3b53fde93d4de92953b60817e5007ab198aeebb4ee84c5e03753809192155a39",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -318,6 +659,66 @@
           "at": "2026-08-02T01:52:42Z",
           "findings": [],
           "hash": "rvw1:sha256:9afbabb44f36cae6e695752d766451e3f653c760a1293f539a162efff4a154bf",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T03:46:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:45bf569362efeae2e3c90dbc02c2d656d39bbe8ff64fc8a65d7b54bf07b41732",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T03:52:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:45bf569362efeae2e3c90dbc02c2d656d39bbe8ff64fc8a65d7b54bf07b41732",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T04:35:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:53db7758153b953f07cf7959162662d6456ca0bfeecfffc96c47309914a2f5ad",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T04:39:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:53db7758153b953f07cf7959162662d6456ca0bfeecfffc96c47309914a2f5ad",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T06:38:58Z",
+          "findings": [],
+          "hash": "rvw1:sha256:540e600d3968a194d521892bc895f7370739febe2a747f5093dc8390a1250467",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T06:42:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:540e600d3968a194d521892bc895f7370739febe2a747f5093dc8390a1250467",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "at": "2026-08-02T03:10:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3a4a89c441ada799d2ab8c33805629c12b07c8e20a6a132009286315d4cc2b2c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T03:14:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3a4a89c441ada799d2ab8c33805629c12b07c8e20a6a132009286315d4cc2b2c",
           "type": "final",
           "verdict": "zero_findings"
         }

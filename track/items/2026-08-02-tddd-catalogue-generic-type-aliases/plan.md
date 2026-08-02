@@ -5,14 +5,14 @@
 
 GO-01: T001, T002, T003, T004.
 
-## Tasks (0/4 resolved)
+## Tasks (1/4 resolved)
 
 ### S1 — Catalogue declaration and validation
 
 > Update alias declaration schema and lint boundaries. [IN-01; IN-02; CN-01; CN-03; AC-01; AC-02]
 
-- [ ] **T001**: Update `TypeKindV2::TypeAlias`, `TypeKindDto::TypeAlias`, and `type_kind_{from,to}_dto` to carry the alias generic-parameter declaration; cover codec boundary cases in `catalogue_document_codec` tests. [GO-01; IN-01; OUT-01; CN-01; CN-03; AC-01]
-- [ ] **T002**: Extend `catalogue_linter::evaluate_catalogue_lint` and its alias-entry test fixtures to validate the alias generic-parameter declaration. [GO-01; IN-02; CN-01; CN-03; AC-01; AC-02]
+- [x] **T001**: Update `TypeKindV2::TypeAlias`, `TypeKindDto::TypeAlias`, and `type_kind_{from,to}_dto` to carry the alias generic-parameter declaration; cover codec boundary cases in `catalogue_document_codec` tests. [GO-01; IN-01; OUT-01; CN-01; CN-03; AC-01]
+- [ ] **T002**: Replace the obsolete `catalogue_linter::eval::evaluate_catalogue_lint` implementation with `catalogue_linter::evaluate_catalogue_lint`; extend it and `CatalogueLinterError::DuplicateTypeAliasGenericParameter`, with alias-entry test fixtures, to reject duplicate alias generic-parameter declarations. [GO-01; IN-02; CN-01; CN-03; AC-01; AC-02]
 
 ### S2 — Lexical comparison and compatibility
 

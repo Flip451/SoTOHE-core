@@ -8,7 +8,20 @@
         "entry_key": "TypeKindV2"
       }
     ],
-    "T002": [],
+    "T002": [
+      {
+        "layer": "domain",
+        "entry_key": "CatalogueLinterError"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "domain::tddd::catalogue_linter::evaluate_catalogue_lint"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "domain::tddd::catalogue_linter::eval::evaluate_catalogue_lint"
+      }
+    ],
     "T003": [],
     "T004": []
   }

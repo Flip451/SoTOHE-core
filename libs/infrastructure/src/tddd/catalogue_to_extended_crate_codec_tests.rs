@@ -643,7 +643,10 @@ fn test_encode_type_alias_produces_type_alias_item() {
         TypeEntry::new(
             ItemAction::Add,
             DataRole::value_object(),
-            TypeKindV2::TypeAlias { target: TypeRef::new("Result<User, DomainError>").unwrap() },
+            TypeKindV2::TypeAlias {
+                target: TypeRef::new("Result<User, DomainError>").unwrap(),
+                generics: vec![],
+            },
             vec![],
             vec![],
             vec![],
@@ -1016,9 +1019,15 @@ fn test_encode_type_alias_target_generic_emits_type_generic() {
         TypeEntry::new(
             ItemAction::Add,
             DataRole::value_object(),
-            TypeKindV2::TypeAlias { target: TypeRef::new("T").unwrap() },
+            TypeKindV2::TypeAlias {
+                target: TypeRef::new("T").unwrap(),
+                generics: vec![MethodGenericParam {
+                    name: ParamName::new("T").unwrap(),
+                    bounds: vec![],
+                }],
+            },
             vec![],
-            vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
+            vec![],
             vec![],
             ModulePath::root(),
             None,
@@ -1037,6 +1046,38 @@ fn test_encode_type_alias_target_generic_emits_type_generic() {
         matches!(&ta.type_, Type::Generic(g) if g == "T"),
         "expected alias target Type::Generic(\"T\"), got: {:?}",
         ta.type_
+    );
+}
+
+#[test]
+fn test_encode_type_alias_with_two_generic_declarations_returns_error() {
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        TypeName::new("Alias").unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::TypeAlias {
+                target: TypeRef::new("T").unwrap(),
+                generics: vec![MethodGenericParam {
+                    name: ParamName::new("T").unwrap(),
+                    bounds: vec![],
+                }],
+            },
+            vec![],
+            vec![MethodGenericParam { name: ParamName::new("U").unwrap(), bounds: vec![] }],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let err = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap_err();
+    assert!(
+        err.to_string().contains("both the entry and kind payload"),
+        "unexpected error: {err:?}"
     );
 }
 

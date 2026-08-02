@@ -1,11 +1,26 @@
 {
-  "catalogue_declaration_hash": "49d1df32b9a0577335c0027a2d154e00db4489094eeb5f8bbdec4966ea2f8f67",
+  "catalogue_declaration_hash": "ccb95f2a8d6e59bfba0a47fdff01c15a09090b02b3c42fd4ecbf89c3eb864215",
   "schema_version": 1,
   "signals": [
+    {
+      "entry_hash": "2efa798afdf637a897df5d6029aca5671d862338376d899fdd6467b3abe75592",
+      "signal": "blue",
+      "type_name": "CatalogueLinterError"
+    },
     {
       "entry_hash": "ac55aeed0e2dfadec384186ed6f36b48f600922147459968a7eeef22417ba0ec",
       "signal": "blue",
       "type_name": "TypeKindV2"
+    },
+    {
+      "entry_hash": "7fdcc49b4d7b4328dfe0b28943b43beade7747892a934618863ffec749bf0a18",
+      "signal": "blue",
+      "type_name": "domain::tddd::catalogue_linter::evaluate_catalogue_lint"
+    },
+    {
+      "entry_hash": "e1333beb34d98dc5b553448341fe4b479ce2b3fcc2c5d8d19f8dad1b1fb38b9c",
+      "signal": "blue",
+      "type_name": "domain::tddd::catalogue_linter::eval::evaluate_catalogue_lint"
     }
   ]
 }

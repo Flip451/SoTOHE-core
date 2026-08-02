@@ -1,4 +1,37 @@
 {
-  "obligations": [],
+  "obligations": [
+    {
+      "brief": "Author a logic test covering 'entry' of domain::tddd::catalogue_linter::evaluate_catalogue_lint",
+      "declaration_hash": "beef7b0df01f1e19b18978010b9206bd92636a74abf30d68e3d086bc249fc901",
+      "id": {
+        "entry_key": "domain::tddd::catalogue_linter::evaluate_catalogue_lint",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json"
+        },
+        {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "domain::tddd::catalogue_linter::evaluate_catalogue_lint",
+        "file_path": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/domain-types.json",
+        "section_key": "functions"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      }
+    }
+  ],
   "track_id": "2026-08-02-tddd-catalogue-generic-type-aliases"
 }

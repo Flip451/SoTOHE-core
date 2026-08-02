@@ -36,6 +36,14 @@ subgraph domain["domain"]
   direction TB
   subgraph domain_domain_module_tddd["domain::tddd"]
     direction TB
+  subgraph T34_domain_domain_CatalogueLinterError["tddd::catalogue_linter::CatalogueLinterError"]
+    direction TB
+    T34_domain_domain_CatalogueLinterError__self[CatalogueLinterError]
+    T34_domain_domain_CatalogueLinterError_DuplicateTypeAliasGenericParameter[DuplicateTypeAliasGenericParameter]
+    T34_domain_domain_CatalogueLinterError_InvalidRuleConfig[InvalidRuleConfig]
+    T34_domain_domain_CatalogueLinterError_UnknownLayer[UnknownLayer]
+    T34_domain_domain_CatalogueLinterError_ScanFailed[ScanFailed]
+  end
   subgraph T24_domain_domain_TypeKindV2["tddd::catalogue_v2::composite::TypeKindV2"]
     direction TB
     T24_domain_domain_TypeKindV2__self[TypeKindV2]
@@ -43,6 +51,7 @@ subgraph domain["domain"]
     T24_domain_domain_TypeKindV2_Enum[Enum]
     T24_domain_domain_TypeKindV2_TypeAlias[TypeAlias]
   end
+  F69_domain_domain_domain__tddd__catalogue_linter__evaluate_catalogue_lint[[evaluate_catalogue_lint]]
   end
 end
 subgraph usecase["usecase"]
@@ -60,8 +69,16 @@ end
 subgraph cli["cli"]
   direction TB
 end
+F69_domain_domain_domain__tddd__catalogue_linter__evaluate_catalogue_lint --> T34_domain_domain_CatalogueLinterError__self
+class T34_domain_domain_CatalogueLinterError_DuplicateTypeAliasGenericParameter variant_node
+class T34_domain_domain_CatalogueLinterError_InvalidRuleConfig variant_node
+class T34_domain_domain_CatalogueLinterError_UnknownLayer variant_node
+class T34_domain_domain_CatalogueLinterError_ScanFailed variant_node
+class T34_domain_domain_CatalogueLinterError__self error_type
 class T24_domain_domain_TypeKindV2_Struct variant_node
 class T24_domain_domain_TypeKindV2_Enum variant_node
 class T24_domain_domain_TypeKindV2_TypeAlias variant_node
 class T24_domain_domain_TypeKindV2__self value_object
+class F69_domain_domain_domain__tddd__catalogue_linter__evaluate_catalogue_lint free_function
+class F69_domain_domain_domain__tddd__catalogue_linter__evaluate_catalogue_lint function_node
 ```

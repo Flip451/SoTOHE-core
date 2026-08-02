@@ -1292,7 +1292,7 @@ mod tests {
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
-                TypeKindV2::TypeAlias { target: TypeRef::new("String").unwrap() },
+                TypeKindV2::TypeAlias { target: TypeRef::new("String").unwrap(), generics: vec![] },
                 vec![],
                 vec![],
                 vec![],

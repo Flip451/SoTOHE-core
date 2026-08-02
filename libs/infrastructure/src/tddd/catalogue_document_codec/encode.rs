@@ -1,6 +1,6 @@
 //! Domain → DTO conversions for [`CatalogueDocument`] (encode path).
 
-use std::collections::{BTreeMap, btree_map::Entry};
+use std::collections::{BTreeMap, HashSet, btree_map::Entry};
 
 use domain::tddd::catalogue_v2::composite::{StructShape, TypeKindV2, TypestateMarker};
 use domain::tddd::catalogue_v2::entries::{
@@ -27,6 +27,7 @@ use super::dto_roles::{
     ContractRoleDto, DataRoleDto, IdentityAccessorDto, InvariantDeclDto, InvariantPredicateDto,
 };
 use super::dto_slots::{EntrySlotDto, TombstoneDto};
+use super::validate::validate_bound_str;
 
 // ---------------------------------------------------------------------------
 // Top-level entry point
@@ -39,7 +40,8 @@ pub(super) fn domain_to_dto(
         .types()
         .iter()
         .map(|(k, v)| {
-            type_entry_to_dto(v).map(|dto| (k.as_str().to_owned(), EntrySlotDto::Live(dto)))
+            type_entry_to_dto(k.as_str(), v)
+                .map(|dto| (k.as_str().to_owned(), EntrySlotDto::Live(dto)))
         })
         .collect::<Result<_, _>>()?;
     let mut traits: BTreeMap<String, EntrySlotDto<TraitEntryDto>> = doc
@@ -149,6 +151,7 @@ fn insert_tombstone<T>(
 // ---------------------------------------------------------------------------
 
 pub(super) fn type_entry_to_dto(
+    entry_name: &str,
     entry: &TypeEntry,
 ) -> Result<TypeEntryDto, CatalogueDocumentCodecError> {
     let methods = entry.methods().iter().map(method_decl_to_dto).collect::<Result<_, _>>()?;
@@ -160,7 +163,7 @@ pub(super) fn type_entry_to_dto(
     Ok(TypeEntryDto {
         action: entry.action().to_string(),
         role: data_role_to_dto(entry.role()),
-        kind: type_kind_to_dto(entry.kind()),
+        kind: type_kind_to_dto(entry_name, entry.kind(), entry.generics())?,
         methods,
         generics: method_generic_params_to_dtos(entry.generics()),
         where_predicates,
@@ -237,19 +240,68 @@ fn invariants_to_dtos(invariants: &[InvariantDecl]) -> Vec<InvariantDeclDto> {
         .collect()
 }
 
-fn type_kind_to_dto(kind: &TypeKindV2) -> TypeKindDto {
+fn type_kind_to_dto(
+    entry_name: &str,
+    kind: &TypeKindV2,
+    entry_generics: &[MethodGenericParam],
+) -> Result<TypeKindDto, CatalogueDocumentCodecError> {
     match kind {
-        TypeKindV2::Struct(struct_kind) => TypeKindDto::Struct {
+        TypeKindV2::Struct(struct_kind) => Ok(TypeKindDto::Struct {
             shape: struct_shape_to_dto(&struct_kind.shape),
             typestate: struct_kind.typestate.as_ref().map(typestate_marker_to_dto),
-        },
+        }),
         TypeKindV2::Enum { variants } => {
-            TypeKindDto::Enum { variants: variants.iter().map(variant_decl_to_dto).collect() }
+            Ok(TypeKindDto::Enum { variants: variants.iter().map(variant_decl_to_dto).collect() })
         }
-        TypeKindV2::TypeAlias { target } => {
-            TypeKindDto::TypeAlias { target: target.as_str().to_owned() }
+        TypeKindV2::TypeAlias { target, generics } => {
+            if !generics.is_empty() && !entry_generics.is_empty() {
+                return Err(CatalogueDocumentCodecError::InvalidEntry {
+                    entry_name: entry_name.to_owned(),
+                    reason: "type alias generic declarations must not appear in both the entry and kind payload"
+                        .to_owned(),
+                });
+            }
+            let effective_generics = if generics.is_empty() { entry_generics } else { generics };
+            validate_type_alias_generics(entry_name, effective_generics)?;
+            Ok(TypeKindDto::TypeAlias {
+                target: target.as_str().to_owned(),
+                generics: method_generic_params_to_dtos(generics),
+            })
         }
     }
+}
+
+/// Validates the sole generic declaration that a type alias will encode.
+///
+/// Aliases support a legacy entry-level declaration as well as the current
+/// kind-level declaration. The decoder applies these checks to either shape,
+/// so encode must do the same to preserve the document codec round-trip
+/// contract.
+fn validate_type_alias_generics(
+    entry_name: &str,
+    generics: &[MethodGenericParam],
+) -> Result<(), CatalogueDocumentCodecError> {
+    let mut seen = HashSet::new();
+    for generic in generics {
+        if !seen.insert(generic.name.as_str()) {
+            return Err(CatalogueDocumentCodecError::InvalidEntry {
+                entry_name: entry_name.to_owned(),
+                reason: format!(
+                    "duplicate generic param name '{}' in type alias declaration",
+                    generic.name.as_str()
+                ),
+            });
+        }
+        for (idx, bound) in generic.bounds.iter().enumerate() {
+            validate_bound_str(bound.as_str()).map_err(|error| {
+                CatalogueDocumentCodecError::InvalidEntry {
+                    entry_name: entry_name.to_owned(),
+                    reason: format!("invalid generic param bound[{idx}]: {error}"),
+                }
+            })?;
+        }
+    }
+    Ok(())
 }
 
 fn struct_shape_to_dto(shape: &StructShape) -> StructShapeDto {

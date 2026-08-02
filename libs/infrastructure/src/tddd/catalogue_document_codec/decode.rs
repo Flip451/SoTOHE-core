@@ -211,6 +211,15 @@ pub(super) fn type_entry_from_dto(
     let generics = method_generics_from_dtos(name, dto.generics)?;
     let where_predicates = where_predicates_from_dtos(name, dto.where_predicates)?;
 
+    if matches!(&kind, TypeKindV2::TypeAlias { generics: alias_generics, .. }
+        if !alias_generics.is_empty() && !generics.is_empty())
+    {
+        return Err(err(
+            "type alias generic declarations must not appear in both the entry and kind payload"
+                .to_owned(),
+        ));
+    }
+
     let module_path = if dto.module_path.is_empty() {
         ModulePath::root()
     } else {
@@ -267,10 +276,11 @@ fn type_kind_from_dto(
                 .collect::<Result<Vec<_>, _>>()?;
             Ok(TypeKindV2::Enum { variants })
         }
-        TypeKindDto::TypeAlias { target } => {
+        TypeKindDto::TypeAlias { target, generics } => {
             let target = TypeRef::new(target.clone())
                 .map_err(|e| err(format!("invalid type_alias target '{}': {e}", target)))?;
-            Ok(TypeKindV2::TypeAlias { target })
+            let generics = method_generics_from_dtos(name, generics)?;
+            Ok(TypeKindV2::TypeAlias { target, generics })
         }
     }
 }

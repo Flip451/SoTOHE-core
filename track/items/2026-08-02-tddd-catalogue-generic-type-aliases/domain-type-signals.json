@@ -1,9 +1,20 @@
 {
-  "declaration_hash": "49d1df32b9a0577335c0027a2d154e00db4489094eeb5f8bbdec4966ea2f8f67",
-  "generated_at": "2026-08-02T01:42:17Z",
-  "implementation_input_hash": "bef52f26cac3bfa8739758cb8c7df63fd51f3cf631c0e5b183366dfaee4b0f38",
+  "declaration_hash": "ccb95f2a8d6e59bfba0a47fdff01c15a09090b02b3c42fd4ecbf89c3eb864215",
+  "generated_at": "2026-08-02T06:31:51Z",
+  "implementation_input_hash": "0fd6fe564caba7f2c05d16e2b6fb145b51cb8b1a6124bd52db6f9d72886440d9",
   "schema_version": 3,
   "signals": [
+    {
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "CatalogueLinterError"
+    },
     {
       "found_items": [
         "Clone",
@@ -13,8 +24,20 @@
       ],
       "found_type": true,
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TypeKindV2"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "type_name": "domain::tddd::catalogue_linter::evaluate_catalogue_lint"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "type_name": "domain::tddd::catalogue_linter::eval::evaluate_catalogue_lint"
     }
   ]
 }

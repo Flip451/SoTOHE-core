@@ -3,7 +3,7 @@
 
 use domain::tddd::catalogue_v2::entries::TypeEntry;
 use domain::tddd::catalogue_v2::variants::{FieldDecl, VariantDecl, VariantPayload};
-use domain::tddd::catalogue_v2::{MethodDeclaration, TypeName};
+use domain::tddd::catalogue_v2::{MethodDeclaration, MethodGenericParam, TypeName};
 use rustdoc_types::{Id, ItemEnum, ItemKind, Struct, StructKind, TypeAlias, Variant, VariantKind};
 
 use crate::tddd::catalogue_to_extended_crate_codec_error::CatalogueToExtendedCrateCodecError;
@@ -276,14 +276,28 @@ impl EncoderState {
         type_name: &TypeName,
         entry: &TypeEntry,
         target: domain::tddd::catalogue_v2::TypeRef,
+        alias_generics: &[MethodGenericParam],
     ) -> Result<(), CatalogueToExtendedCrateCodecError> {
         let module_path = entry.module_path().clone();
         let docs = entry.docs().map(|d| d.as_str().to_owned());
 
+        // Alias declarations carry their generic parameters in the `TypeAlias` kind.  Fall
+        // back to the legacy entry-level field when the kind payload is empty so existing
+        // catalogues retain their pre-extension encoding. Both locations cannot be populated:
+        // that would make the encoded declaration depend on an undocumented precedence rule.
+        if !alias_generics.is_empty() && !entry.generics().is_empty() {
+            return Err(CatalogueToExtendedCrateCodecError::InvalidTypeRef {
+                type_ref: type_name.as_str().to_owned(),
+                reason: "type alias generic declarations must not appear in both the entry and kind payload"
+                    .to_owned(),
+            });
+        }
+        let declared_generics =
+            if alias_generics.is_empty() { entry.generics() } else { alias_generics };
         // Type-declaration-level generics / where predicates (ADR `2026-07-02-1345` D6).
-        let generic_names: Vec<&str> = entry.generics().iter().map(|g| g.name.as_str()).collect();
+        let generic_names: Vec<&str> = declared_generics.iter().map(|g| g.name.as_str()).collect();
         let generics = self.build_where_form_generics(
-            entry.generics(),
+            declared_generics,
             entry.where_predicates(),
             &generic_names,
         )?;

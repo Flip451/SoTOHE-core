@@ -27,9 +27,11 @@
 
 use crate::tddd::catalogue_v2::identifiers::TypeRef;
 use crate::tddd::catalogue_v2::roles::{NonEmptyVec, SelfReceiver};
+use crate::tddd::catalogue_v2::{CatalogueDocument, TypeKindV2};
 use crate::tddd::layer_id::LayerId;
 use crate::tddd::primitive_occurrence_scanner::{
     PrimitiveName, PrimitiveOccurrencePosition, PrimitiveOccurrenceScanError,
+    PrimitiveOccurrenceScanner,
 };
 
 // ---------------------------------------------------------------------------
@@ -561,6 +563,19 @@ impl CatalogueLintViolation {
 /// Errors returned by [`evaluate_catalogue_lint`].
 #[derive(Debug, thiserror::Error)]
 pub enum CatalogueLinterError {
+    /// A type alias declares the same generic parameter name more than once.
+    ///
+    /// Generic parameter names form an ordered, unique declaration in Rust;
+    /// accepting duplicates would admit an invalid alias into the catalogue
+    /// and make downstream comparison ambiguous.
+    #[error("type alias '{alias_name}' declares duplicate generic parameter '{parameter_name}'")]
+    DuplicateTypeAliasGenericParameter {
+        /// Name of the alias containing the duplicate declaration.
+        alias_name: crate::tddd::catalogue_v2::identifiers::TypeName,
+        /// Name repeated by the alias declaration.
+        parameter_name: crate::tddd::catalogue_v2::identifiers::ParamName,
+    },
+
     /// The linter rule configuration is invalid and prevents execution.
     #[error("invalid linter rule configuration: {0}")]
     InvalidRuleConfig(FreeText),
@@ -592,9 +607,47 @@ mod eval_primitives;
 #[path = "catalogue_linter_eval_layer_signature.rs"]
 mod eval_layer_signature;
 
-/// Re-export so that consumers of `catalogue_linter` see `evaluate_catalogue_lint`
-/// at the expected path without knowing about the `eval` submodule.
-pub use eval::evaluate_catalogue_lint;
+/// Validates generic declarations on type aliases before delegating to the
+/// rule evaluator.  The declaration is intentionally represented by public
+/// value fields for codec conversion, so this boundary check is where the
+/// cross-field uniqueness invariant is enforced.
+fn validate_type_alias_generic_parameters(
+    catalogue: &CatalogueDocument,
+) -> Result<(), CatalogueLinterError> {
+    for (alias_name, entry) in catalogue.types() {
+        let TypeKindV2::TypeAlias { generics, .. } = entry.kind() else {
+            continue;
+        };
+
+        let mut seen = std::collections::BTreeSet::new();
+        for generic in generics {
+            if !seen.insert(generic.name.clone()) {
+                return Err(CatalogueLinterError::DuplicateTypeAliasGenericParameter {
+                    alias_name: alias_name.clone(),
+                    parameter_name: generic.name.clone(),
+                });
+            }
+        }
+    }
+    Ok(())
+}
+
+/// Evaluate catalogue-lint rules after validating every alias generic declaration.
+///
+/// The wrapper preserves the original pure evaluator API while enforcing the
+/// catalogue invariant that each alias generic parameter name occurs once in
+/// every catalogue available to the evaluator.
+pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner>(
+    rules: &[CatalogueLinterRule],
+    all_catalogues: &std::collections::BTreeMap<LayerId, CatalogueDocument>,
+    target_layer_id: &LayerId,
+    scanner: &S,
+) -> Result<Vec<CatalogueLintViolation>, CatalogueLinterError> {
+    for catalogue in all_catalogues.values() {
+        validate_type_alias_generic_parameters(catalogue)?;
+    }
+    eval::evaluate_catalogue_lint(rules, all_catalogues, target_layer_id, scanner)
+}
 
 // ---------------------------------------------------------------------------
 // Tests
@@ -1378,7 +1431,10 @@ mod tests {
             TypeName::new("AliasCompositionRoot").unwrap(),
             make_type_entry_with_kind(
                 DataRole::CompositionRoot,
-                TypeKindV2::TypeAlias { target: TypeRef::new("usecase::GreetUser").unwrap() },
+                TypeKindV2::TypeAlias {
+                    target: TypeRef::new("usecase::GreetUser").unwrap(),
+                    generics: vec![],
+                },
             ),
         );
         let mut usecase_catalogue = make_doc("usecase");
@@ -1409,6 +1465,79 @@ mod tests {
             2,
             "enum payloads and alias targets must both be scanned"
         );
+    }
+
+    #[test]
+    fn test_composition_root_pure_di_detects_role_in_type_alias_generic_bound() {
+        let mut composition_catalogue = make_doc("cli_composition");
+        composition_catalogue.insert_type(
+            TypeName::new("AliasCompositionRoot").unwrap(),
+            make_type_entry_with_kind(
+                DataRole::CompositionRoot,
+                TypeKindV2::TypeAlias {
+                    target: TypeRef::new("Box<T>").unwrap(),
+                    generics: vec![MethodGenericParam {
+                        name: ParamName::new("T").unwrap(),
+                        bounds: vec![TypeRef::new("usecase::ApplicationService").unwrap()],
+                    }],
+                },
+            ),
+        );
+        let mut usecase_catalogue = make_doc("usecase");
+        usecase_catalogue.insert_trait(
+            TraitName::new("ApplicationService").unwrap(),
+            make_trait_entry(ContractRole::ApplicationService),
+        );
+        let mut all_catalogues = BTreeMap::new();
+        let composition_layer = composition_catalogue.layer().clone();
+        all_catalogues.insert(composition_layer.clone(), composition_catalogue);
+        all_catalogues.insert(usecase_catalogue.layer().clone(), usecase_catalogue);
+
+        let violations = evaluate_catalogue_lint(
+            &[composition_root_rule()],
+            &all_catalogues,
+            &composition_layer,
+            &StubPrimitiveScanner,
+        )
+        .unwrap();
+
+        assert!(violations.iter().any(|violation| {
+            violation.message().contains("public-surface role 'ApplicationService'")
+        }));
+    }
+
+    #[test]
+    fn test_evaluate_catalogue_lint_rejects_duplicate_type_alias_generic_parameter_in_any_catalogue()
+     {
+        let target_catalogue = make_doc("domain");
+        let mut invalid_catalogue = make_doc("usecase");
+        invalid_catalogue.insert_type(
+            TypeName::new("DuplicateAlias").unwrap(),
+            make_type_entry_with_kind(
+                DataRole::value_object(),
+                TypeKindV2::TypeAlias {
+                    target: TypeRef::new("Vec<T>").unwrap(),
+                    generics: vec![
+                        MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] },
+                        MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] },
+                    ],
+                },
+            ),
+        );
+        let mut all_catalogues = all_catalogues_single(&target_catalogue);
+        all_catalogues.insert(invalid_catalogue.layer().clone(), invalid_catalogue);
+        let target_layer = layer("domain");
+
+        let result =
+            evaluate_catalogue_lint(&[], &all_catalogues, &target_layer, &StubPrimitiveScanner);
+
+        assert!(matches!(
+            result,
+            Err(CatalogueLinterError::DuplicateTypeAliasGenericParameter {
+                alias_name,
+                parameter_name,
+            }) if alias_name.as_str() == "DuplicateAlias" && parameter_name.as_str() == "T"
+        ));
     }
 
     #[test]
@@ -5285,7 +5414,7 @@ mod tests {
             TypeName::new("Description").unwrap(),
             make_type_entry_with_kind(
                 DataRole::value_object(),
-                TypeKindV2::TypeAlias { target: TypeRef::new("String").unwrap() },
+                TypeKindV2::TypeAlias { target: TypeRef::new("String").unwrap(), generics: vec![] },
             ),
         );
         let violations = run_rule(
@@ -5302,6 +5431,36 @@ mod tests {
             1,
             "expected 1 violation for the type_alias target, got: {violations:?}"
         );
+        assert_eq!(violations[0].entry_name(), "Description");
+    }
+
+    #[test]
+    fn test_forbid_primitive_in_types_detects_type_alias_generic_bound_occurrence() {
+        let mut doc = make_doc("domain");
+        doc.insert_type(
+            TypeName::new("Description").unwrap(),
+            make_type_entry_with_kind(
+                DataRole::value_object(),
+                TypeKindV2::TypeAlias {
+                    target: TypeRef::new("Vec<T>").unwrap(),
+                    generics: vec![MethodGenericParam {
+                        name: ParamName::new("T").unwrap(),
+                        bounds: vec![TypeRef::new("Into<String>").unwrap()],
+                    }],
+                },
+            ),
+        );
+        let violations = run_rule(
+            &doc,
+            RuleTarget::all_roles(),
+            CatalogueLinterRuleKind::ForbidPrimitiveInTypes {
+                primitives: NonEmptyVec::new(PrimitiveName::new("String").unwrap(), vec![]),
+                layers: NonEmptyVec::new(layer("domain"), vec![]),
+                positions: NonEmptyVec::new(PrimitiveOccurrencePosition::Bound, vec![]),
+            },
+        );
+
+        assert_eq!(violations.len(), 1, "alias generic bounds must be scanned as bounds");
         assert_eq!(violations[0].entry_name(), "Description");
     }
 

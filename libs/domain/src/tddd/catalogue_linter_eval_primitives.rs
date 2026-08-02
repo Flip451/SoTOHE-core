@@ -278,12 +278,13 @@ fn collect_type_entry_slots(
                     }
                 }
             }
-            TypeKindV2::TypeAlias { target } => {
+            TypeKindV2::TypeAlias { target, generics } => {
                 slots.push(PrimitiveSlot::new(
                     entry_name.clone(),
                     target.clone(),
                     PrimitiveOccurrencePosition::TypeAliasTarget,
                 ));
+                push_generic_and_where_slots(&entry_name, generics, &[], bound_filter, slots);
             }
         }
 

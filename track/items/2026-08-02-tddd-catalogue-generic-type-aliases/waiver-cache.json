@@ -1,4 +1,53 @@
 {
-  "entries": [],
+  "entries": [
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json"
+        },
+        "entry_key": "TypeKindV2"
+      },
+      "key": {
+        "anchor_text_hash": "f1c6f699e3665cc81d24d07b0dda9da9850e01075bd3c817c94912b9f5f3e779",
+        "declaration_hash": "4a84e5ff2041b5b39abf5267dd60d1cd013687473165920ede0e73588bc19fce",
+        "waived_reason_hash": "62c88a611706212dbd7475cb60f83a972561e100cd95267f7a0e7f0f203f3ee3"
+      },
+      "obligation_id": {
+        "entry_key": "TypeKindV2",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json"
+        },
+        "entry_key": "TypeKindV2"
+      },
+      "key": {
+        "anchor_text_hash": "4035540b0926e1eada4930dc6ea612d4b8efbf80a048580c7f858c2ed38cf171",
+        "declaration_hash": "4a84e5ff2041b5b39abf5267dd60d1cd013687473165920ede0e73588bc19fce",
+        "waived_reason_hash": "c7beef96ffd2a8655ed18cdfd2928c736d9321fbc7ffcf1b0e5c4efb6cf75f3c"
+      },
+      "obligation_id": {
+        "entry_key": "TypeKindV2",
+        "item_identifier": "voluntary:AC-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    }
+  ],
   "track_id": "2026-08-02-tddd-catalogue-generic-type-aliases"
 }

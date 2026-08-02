@@ -1169,7 +1169,7 @@ include_function_roles = []
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
-                TypeKindV2::TypeAlias { target: TypeRef::new("RawId").unwrap() },
+                TypeKindV2::TypeAlias { target: TypeRef::new("RawId").unwrap(), generics: vec![] },
                 vec![],
                 vec![],
                 vec![],
@@ -2201,7 +2201,10 @@ include_function_roles = []
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
-                TypeKindV2::TypeAlias { target: TypeRef::new("Arc<dyn AliasPort>").unwrap() },
+                TypeKindV2::TypeAlias {
+                    target: TypeRef::new("Arc<dyn AliasPort>").unwrap(),
+                    generics: vec![],
+                },
                 vec![],
                 vec![],
                 vec![],

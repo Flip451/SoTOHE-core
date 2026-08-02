@@ -349,12 +349,14 @@ mod tests {
     use domain::tddd::LayerId;
     use domain::tddd::catalogue_v2::ItemAction;
     use domain::tddd::catalogue_v2::composite::{StructShape, TypeKindV2};
-    use domain::tddd::catalogue_v2::entries::FunctionEntry;
+    use domain::tddd::catalogue_v2::entries::{FunctionEntry, TypeEntry};
     use domain::tddd::catalogue_v2::identifiers::{
-        CrateName, FunctionName, FunctionPath, ModulePath, TraitName, TypeName,
+        CrateName, FunctionName, FunctionPath, ModulePath, ParamName, TraitName, TypeName,
     };
     use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, FunctionRole};
-    use domain::tddd::catalogue_v2::{BoundOp, DeletionRecord, TypeRef, WherePredicateDecl};
+    use domain::tddd::catalogue_v2::{
+        BoundOp, DeletionRecord, MethodGenericParam, TypeRef, WherePredicateDecl,
+    };
 
     fn minimal_v5_json(crate_name: &str, layer: &str) -> String {
         format!(
@@ -690,6 +692,372 @@ mod tests {
             },
             _ => panic!("expected Struct kind"),
         }
+    }
+
+    #[test]
+    fn test_decode_type_alias_with_generic_declaration() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "ResultAlias": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "type_alias",
+        "target": "Result<T, DomainError>",
+        "generics": [
+          { "name": "T", "bounds": ["Clone", "Send"] }
+        ]
+      }
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let entry = doc.types().values().next().unwrap();
+        let TypeKindV2::TypeAlias { target, generics } = entry.kind() else {
+            panic!("expected TypeAlias kind");
+        };
+        assert_eq!(target.as_str(), "Result<T, DomainError>");
+        assert_eq!(generics.len(), 1);
+        assert_eq!(generics[0].name.as_str(), "T");
+        assert_eq!(
+            generics[0].bounds.iter().map(TypeRef::as_str).collect::<Vec<_>>(),
+            vec!["Clone", "Send"]
+        );
+    }
+
+    #[test]
+    fn test_decode_type_alias_accepts_ordered_generic_declaration() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "PairAlias": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "type_alias",
+        "target": "Pair<T, U>",
+        "generics": [
+          { "name": "T", "bounds": ["Clone"] },
+          { "name": "U", "bounds": ["Send"] }
+        ]
+      }
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let entry = doc.types().values().next().unwrap();
+        let TypeKindV2::TypeAlias { target, generics } = entry.kind() else {
+            panic!("expected TypeAlias kind");
+        };
+
+        assert_eq!(target.as_str(), "Pair<T, U>");
+        assert_eq!(
+            generics.iter().map(|generic| generic.name.as_str()).collect::<Vec<_>>(),
+            vec!["T", "U"]
+        );
+        assert_eq!(
+            generics[0].bounds.iter().map(TypeRef::as_str).collect::<Vec<_>>(),
+            vec!["Clone"]
+        );
+        assert_eq!(
+            generics[1].bounds.iter().map(TypeRef::as_str).collect::<Vec<_>>(),
+            vec!["Send"]
+        );
+    }
+
+    #[test]
+    fn test_decode_type_alias_without_generics_defaults_to_empty_and_encode_omits_field() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "ValueAlias": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": { "kind": "type_alias", "target": "String" }
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let entry = doc.types().values().next().unwrap();
+        assert!(matches!(
+            entry.kind(),
+            TypeKindV2::TypeAlias { generics, .. } if generics.is_empty()
+        ));
+
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let value: serde_json::Value = serde_json::from_str(&encoded).unwrap();
+        assert_eq!(value["types"]["ValueAlias"]["kind"]["target"], "String");
+        assert!(value["types"]["ValueAlias"]["kind"].get("generics").is_none());
+    }
+
+    #[test]
+    fn test_encode_decode_type_alias_generic_declaration_round_trips() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "BoxAlias": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "type_alias",
+        "target": "Box<T>",
+        "generics": [
+          { "name": "T", "bounds": ["Sized"] },
+          { "name": "U", "bounds": [] }
+        ]
+      }
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let round_tripped = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
+        assert_eq!(round_tripped, doc);
+    }
+
+    #[test]
+    fn test_decode_type_alias_with_invalid_generic_name_returns_invalid_entry_error() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "BadAlias": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "type_alias",
+        "target": "Box<T>",
+        "generics": [{ "name": "not-valid", "bounds": [] }]
+      }
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+
+        let err = CatalogueDocumentCodec::decode(json, "domain").unwrap_err();
+        assert!(
+            matches!(err, CatalogueDocumentCodecError::InvalidEntry { ref entry_name, ref reason }
+                if entry_name == "BadAlias" && reason.contains("generic param name")),
+            "unexpected error: {err:?}"
+        );
+    }
+
+    #[test]
+    fn test_decode_type_alias_with_empty_generic_bound_returns_invalid_entry_error() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "BadAlias": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "type_alias",
+        "target": "Box<T>",
+        "generics": [{ "name": "T", "bounds": [""] }]
+      }
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+
+        let err = CatalogueDocumentCodec::decode(json, "domain").unwrap_err();
+        assert!(
+            matches!(err, CatalogueDocumentCodecError::InvalidEntry { ref entry_name, ref reason }
+                if entry_name == "BadAlias" && reason.contains("invalid generic param bound")),
+            "unexpected error: {err:?}"
+        );
+    }
+
+    #[test]
+    fn test_decode_type_alias_with_duplicate_generic_names_returns_invalid_entry_error() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "BadAlias": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "type_alias",
+        "target": "Box<T>",
+        "generics": [
+          { "name": "T", "bounds": [] },
+          { "name": "T", "bounds": [] }
+        ]
+      }
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+
+        let err = CatalogueDocumentCodec::decode(json, "domain").unwrap_err();
+        assert!(
+            matches!(err, CatalogueDocumentCodecError::InvalidEntry { ref entry_name, ref reason }
+                if entry_name == "BadAlias" && reason.contains("duplicate generic param name")),
+            "unexpected error: {err:?}"
+        );
+    }
+
+    #[test]
+    fn test_decode_type_alias_with_entry_and_kind_generics_returns_invalid_entry_error() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "AmbiguousAlias": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "generics": [{ "name": "T", "bounds": [] }],
+      "kind": {
+        "kind": "type_alias",
+        "target": "Vec<T>",
+        "generics": [{ "name": "T", "bounds": [] }]
+      }
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+
+        let err = CatalogueDocumentCodec::decode(json, "domain").unwrap_err();
+        assert!(
+            matches!(err, CatalogueDocumentCodecError::InvalidEntry { ref entry_name, ref reason }
+                if entry_name == "AmbiguousAlias" && reason.contains("both the entry and kind payload")),
+            "unexpected error: {err:?}"
+        );
+    }
+
+    #[test]
+    fn test_encode_type_alias_with_duplicate_generic_names_returns_invalid_entry_error() {
+        let mut doc = CatalogueDocument::new(
+            SCHEMA_VERSION,
+            CrateName::new("domain").unwrap(),
+            LayerId::try_new("domain").unwrap(),
+        );
+        let duplicate = MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] };
+        doc.insert_type(
+            TypeName::new("BadAlias").unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::TypeAlias {
+                    target: TypeRef::new("Vec<T>").unwrap(),
+                    generics: vec![duplicate.clone(), duplicate],
+                },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let err = CatalogueDocumentCodec::encode(&doc).unwrap_err();
+        assert!(
+            matches!(err, CatalogueDocumentCodecError::InvalidEntry { ref entry_name, ref reason }
+                if entry_name == "BadAlias" && reason.contains("duplicate generic param name")),
+            "unexpected error: {err:?}"
+        );
+    }
+
+    #[test]
+    fn test_encode_type_alias_with_duplicate_legacy_generic_names_returns_invalid_entry_error() {
+        let mut doc = CatalogueDocument::new(
+            SCHEMA_VERSION,
+            CrateName::new("domain").unwrap(),
+            LayerId::try_new("domain").unwrap(),
+        );
+        let duplicate = MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] };
+        doc.insert_type(
+            TypeName::new("BadLegacyAlias").unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::TypeAlias { target: TypeRef::new("Vec<T>").unwrap(), generics: vec![] },
+                vec![],
+                vec![duplicate.clone(), duplicate],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let err = CatalogueDocumentCodec::encode(&doc).unwrap_err();
+        assert!(
+            matches!(err, CatalogueDocumentCodecError::InvalidEntry { ref entry_name, ref reason }
+                if entry_name == "BadLegacyAlias" && reason.contains("duplicate generic param name")),
+            "unexpected error: {err:?}"
+        );
+    }
+
+    #[test]
+    fn test_encode_type_alias_with_invalid_generic_bound_returns_invalid_entry_error() {
+        let mut doc = CatalogueDocument::new(
+            SCHEMA_VERSION,
+            CrateName::new("domain").unwrap(),
+            LayerId::try_new("domain").unwrap(),
+        );
+        doc.insert_type(
+            TypeName::new("BadAliasBound").unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::TypeAlias {
+                    target: TypeRef::new("Vec<T>").unwrap(),
+                    generics: vec![MethodGenericParam {
+                        name: ParamName::new("T").unwrap(),
+                        bounds: vec![TypeRef::new("<T>").unwrap()],
+                    }],
+                },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let err = CatalogueDocumentCodec::encode(&doc).unwrap_err();
+        assert!(
+            matches!(err, CatalogueDocumentCodecError::InvalidEntry { ref entry_name, ref reason }
+                if entry_name == "BadAliasBound" && reason.contains("invalid generic param bound")),
+            "unexpected error: {err:?}"
+        );
     }
 
     #[test]
