@@ -51,10 +51,6 @@
       },
       "spec_refs": [
         {
-          "anchor": "IN-01",
-          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
-        },
-        {
           "anchor": "IN-02",
           "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
         },

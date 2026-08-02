@@ -100,6 +100,7 @@ pub use review_v2::ReviewCompositionRoot;
 pub use semantic_dup::SemanticDupCompositionRoot;
 pub use signal::SignalCompositionRoot;
 pub use task_contract::TaskContractCompositionRoot;
+pub use telemetry::CommandTraceCompositionRoot;
 pub use telemetry::TelemetryCompositionRoot;
 pub use template_export::TemplateCompositionRoot;
 pub use test_obligation::TestObligationCompositionRoot;

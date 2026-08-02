@@ -1,14 +1,14 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-01T09:52:44Z",
-  "declaration_hash": "0ac9217c63a6e676aebe4d53cde741ec4827ea17bb4f9c858de120474116f006",
-  "implementation_input_hash": "36a28f2f1b83ed3b20ff8072817123bc5be9e6243a753d97ea9b2b1f89fe94e1",
+  "generated_at": "2026-08-02T03:39:01Z",
+  "declaration_hash": "c60dff90ad97e2b62160dfc582b76f9c9a6fde25985e7fbf31a3811576e2e080",
+  "implementation_input_hash": "80796d01458ced5296815b7c96b60256e5dc58e1a73dd5002289028c5328b1af",
   "signals": [
     {
       "type_name": "CommandTraceCompositionRoot",
       "kind_tag": "composition_root",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     }
   ]
 }

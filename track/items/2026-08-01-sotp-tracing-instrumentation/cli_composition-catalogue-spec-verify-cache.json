@@ -3,31 +3,7 @@
   "layer": "cli_composition",
   "entries": [
     {
-      "claim_hash": "297e7d00fd85f9bb57909fe2d38b7143b0b6a51274c4d02c478e31107a1f64a2",
-      "evidence_hash": "f92832f5450d69a09850f4956fad3ba679b857fc835c4266b0c10df3e15394c3",
-      "verdict": {
-        "kind": "pass",
-        "citation": "すべての `sotp` コマンドを共通の entry point で tracing 計装し、コマンド横断で一貫した実行観測を行う。"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/cli_composition-types.json",
-          "section_key": "types",
-          "entry_key": "CommandTraceCompositionRoot"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "in_scope",
-          "element_id": "IN-01",
-          "text_label": "すべての `sotp` コマンドを共通の entry point で tracing 計装し、コマンド横断で一貫した実行観測を行う。"
-        }
-      }
-    },
-    {
-      "claim_hash": "297e7d00fd85f9bb57909fe2d38b7143b0b6a51274c4d02c478e31107a1f64a2",
+      "claim_hash": "ab9f738bc68dcea6908edb089a3c2be207eb8fa4948c4d364ec94714710ed5b6",
       "evidence_hash": "7d442a8ba6b078174131cac5825c183427295e92bdc20170d3064381163593a3",
       "verdict": {
         "kind": "pass",
@@ -51,7 +27,7 @@
       }
     },
     {
-      "claim_hash": "297e7d00fd85f9bb57909fe2d38b7143b0b6a51274c4d02c478e31107a1f64a2",
+      "claim_hash": "ab9f738bc68dcea6908edb089a3c2be207eb8fa4948c4d364ec94714710ed5b6",
       "evidence_hash": "86efca5df5f571c38243782ca22c0165c83d4284aa69e57f1179db74520fdc81",
       "verdict": {
         "kind": "pass",

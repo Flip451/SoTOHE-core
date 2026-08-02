@@ -1319,6 +1319,68 @@
           "test_name": "test_command_trace_driver_write_failure_preserves_command_failure_outcome"
         }
       ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandTraceCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandTraceCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "3009ef518bebdda021e0df1b9986ef5cb1f1886d3f32f712f8a433eeb67f7955",
+        "declaration_hash": "3ce6d143906ad01c23ec8a40fca33e8fac7ef3dc3b39009445c94329a40f86b5",
+        "anchor_text_hash": "886b259b72d31a9481887873baede5471f2b81415aad543979b98bd24b8f0528"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(record.get(\"command\").and_then(serde_json::Value::as_str), Some(\"track status\"));\n        assert_eq!(record.get(\"duration_ms\").and_then(serde_json::Value::as_u64), Some(42));\n        assert_eq!(\n            record\n                .get(\"result\")\n                .and_then(|result| result.get(\"status\"))\n                .and_then(serde_json::Value::as_str),\n            Some(\"success\")\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::telemetry::command_trace::tests",
+          "test_name": "test_command_trace_composition_root_new_wires_driver_without_writing"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandTraceCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandTraceCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "23aba04c554f09df747b374277d7a07ee41b01bfe4835549a863ab1548008588",
+        "declaration_hash": "3ce6d143906ad01c23ec8a40fca33e8fac7ef3dc3b39009445c94329a40f86b5",
+        "anchor_text_hash": "7616d596773f8086b87aba449dfacee4aa3448d3d0a9c3495e3cb2f8e22cd85f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(fs::metadata(&output_path)?.len() <= DEFAULT_MAX_FILE_SIZE_BYTES);\n        assert_eq!(fs::metadata(rotated_path(&output_path, 1))?.len(), DEFAULT_MAX_FILE_SIZE_BYTES);\n        assert_eq!(fs::read_to_string(rotated_path(&output_path, 2))?, \"old-generation-1\");\n        assert_eq!(\n            fs::read_to_string(rotated_path(&output_path, DEFAULT_RETAINED_FILE_COUNT))?,\n            \"old-generation-4\"\n        );\n        assert!(!rotated_path(&output_path, DEFAULT_RETAINED_FILE_COUNT + 1).exists());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::telemetry::command_trace::tests",
+          "test_name": "test_command_trace_composition_root_driver_rotates_and_bounds_retained_files"
+        }
+      ]
     }
   ]
 }

@@ -4,5 +4,5 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CommandTraceCompositionRoot | composition_root | add | — | 🟡 | 🔵 |
+| CommandTraceCompositionRoot | composition_root | add | — | 🔵 | 🔵 |
 

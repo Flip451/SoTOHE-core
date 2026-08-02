@@ -14,6 +14,10 @@
 use std::path::PathBuf;
 use std::sync::Arc;
 
+mod command_trace;
+
+pub use command_trace::CommandTraceCompositionRoot;
+
 // ---------------------------------------------------------------------------
 // Per-context composition root
 // ---------------------------------------------------------------------------

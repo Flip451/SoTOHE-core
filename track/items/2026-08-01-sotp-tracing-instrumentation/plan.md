@@ -5,7 +5,7 @@
 
 GO-01 → T001, T002, T003, T004, T005, T006, T007, T008, T009, T010.
 
-## Tasks (7/10 resolved)
+## Tasks (8/10 resolved)
 
 ### S1 — Typed command-trace application model
 
@@ -38,8 +38,8 @@ GO-01 → T001, T002, T003, T004, T005, T006, T007, T008, T009, T010.
 
 > Build the primary driver and wire the complete local tracing dependency graph before entrypoint use. IN-02, IN-04, OUT-01, CN-01, CN-02, CN-03, AC-01, AC-03, AC-04.
 
-- [x] **T007**: Update `CommandTraceDriver::handle(outcome, record) -> CommandOutcome` to invoke local trace recording and render trace diagnostics; add focused success/failure regression tests. IN-02, AC-01, AC-03.
-- [ ] **T008**: Implement `CommandTraceCompositionRoot` to validate rotation defaults and wire the complete filesystem adapter, usecase flow, and primary driver before any entrypoint invokes it. IN-02, IN-04, OUT-01, CN-01, CN-02, CN-03, AC-01, AC-03, AC-04.
+- [x] **T007**: Update `CommandTraceDriver::handle(outcome, record) -> CommandOutcome` to invoke local trace recording and render trace diagnostics; add focused success/failure regression tests. IN-02, AC-01, AC-03. (`bfd13949a00cfed25b84483098700206458b28b1`)
+- [x] **T008**: Implement `CommandTraceCompositionRoot` to validate rotation defaults and wire the complete filesystem adapter, usecase flow, and primary driver before any entrypoint invokes it. IN-02, IN-04, OUT-01, CN-01, CN-02, CN-03, AC-01, AC-03, AC-04.
 
 ### S6 — Cross-command entrypoint integration
 
