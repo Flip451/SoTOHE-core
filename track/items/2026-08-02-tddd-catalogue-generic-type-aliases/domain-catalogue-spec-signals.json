@@ -1,0 +1,11 @@
+{
+  "catalogue_declaration_hash": "49d1df32b9a0577335c0027a2d154e00db4489094eeb5f8bbdec4966ea2f8f67",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "ac55aeed0e2dfadec384186ed6f36b48f600922147459968a7eeef22417ba0ec",
+      "signal": "blue",
+      "type_name": "TypeKindV2"
+    }
+  ]
+}

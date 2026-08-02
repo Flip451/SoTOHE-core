@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "track_id": "2026-08-02-tddd-catalogue-generic-type-aliases",
+  "entries": {
+    "T001": [
+      {
+        "layer": "domain",
+        "entry_key": "TypeKindV2"
+      }
+    ],
+    "T002": [],
+    "T003": [],
+    "T004": []
+  }
+}

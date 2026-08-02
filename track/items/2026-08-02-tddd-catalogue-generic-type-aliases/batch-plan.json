@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "track_id": "2026-08-02-tddd-catalogue-generic-type-aliases",
+  "task_estimates": [
+    {
+      "task_id": "T001",
+      "scope_estimates": [
+        {
+          "scope": "domain",
+          "production_lines": 100,
+          "test_lines": 80
+        },
+        {
+          "scope": "infrastructure",
+          "production_lines": 90,
+          "test_lines": 120
+        }
+      ]
+    },
+    {
+      "task_id": "T002",
+      "scope_estimates": [
+        {
+          "scope": "domain",
+          "production_lines": 100,
+          "test_lines": 100
+        }
+      ]
+    },
+    {
+      "task_id": "T003",
+      "scope_estimates": [
+        {
+          "scope": "domain",
+          "production_lines": 80,
+          "test_lines": 80
+        },
+        {
+          "scope": "infrastructure",
+          "production_lines": 90,
+          "test_lines": 100
+        }
+      ]
+    },
+    {
+      "task_id": "T004",
+      "scope_estimates": [
+        {
+          "scope": "infrastructure",
+          "production_lines": 50,
+          "test_lines": 90
+        }
+      ]
+    }
+  ],
+  "batches": [
+    {
+      "id": "B-01",
+      "task_ids": [
+        "T001",
+        "T002"
+      ]
+    },
+    {
+      "id": "B-02",
+      "task_ids": [
+        "T003",
+        "T004"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,133 @@
+{
+  "crate_name": "domain",
+  "functions": {},
+  "layer": "domain",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "modify",
+      "for_type": "TypeKindV2",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeKindV2",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeKindV2",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeKindV2",
+      "trait_ref": "core::cmp::Eq"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "TypeKindV2": {
+      "action": "modify",
+      "docs": "Catalogue type-shape vocabulary whose TypeAlias payload is extended with generic-parameter metadata.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Struct",
+            "payload": {
+              "fields": [
+                "StructKind"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Enum",
+            "payload": {
+              "fields": [
+                {
+                  "name": "variants",
+                  "ty": "Vec<VariantDecl>"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "TypeAlias",
+            "payload": {
+              "fields": [
+                {
+                  "name": "target",
+                  "ty": "TypeRef"
+                },
+                {
+                  "name": "generics",
+                  "ty": "Vec<MethodGenericParam>"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_v2::composite",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "GO-01",
+          "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json"
+        },
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "declaration_hash": "49d1df32b9a0577335c0027a2d154e00db4489094eeb5f8bbdec4966ea2f8f67",
+  "generated_at": "2026-08-02T01:42:17Z",
+  "implementation_input_hash": "bef52f26cac3bfa8739758cb8c7df63fd51f3cf631c0e5b183366dfaee4b0f38",
+  "schema_version": 3,
+  "signals": [
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "type_name": "TypeKindV2"
+    }
+  ]
+}

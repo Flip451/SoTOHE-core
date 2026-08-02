@@ -1,0 +1,294 @@
+{
+  "entries": [
+    {
+      "claim_hash": "ac55aeed0e2dfadec384186ed6f36b48f600922147459968a7eeef22417ba0ec",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeKindV2",
+          "file_path": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "67e3adcd8cc0d4f0835f1e1c682eda36ec6662b3185deed06584a89dd4b136c6",
+      "evidence_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "TDDD カタログが Rust 実装で使用するジェネリクスパラメータ付き型エイリアスをそのまま契約として表現し、カタログ設計を非ジェネリクスな代替表現へ歪めずに実装との照合を可能にする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "TDDD カタログが Rust 実装で使用するジェネリクスパラメータ付き型エイリアスをそのまま契約として表現し、カタログ設計を非ジェネリクスな代替表現へ歪めずに実装との照合を可能にする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ac55aeed0e2dfadec384186ed6f36b48f600922147459968a7eeef22417ba0ec",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeKindV2",
+          "file_path": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "f485642c16fa483f82265df258c72d249344c137c8ab0bf22cb9304d9c90dd98",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "ジェネリクスパラメータを持つ alias をカタログで宣言して読み書きでき、パラメータを持たない既存 alias も従来どおり読み書き・評価できる。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "ジェネリクスパラメータを持つ alias をカタログで宣言して読み書きでき、パラメータを持たない既存 alias も従来どおり読み書き・評価できる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ac55aeed0e2dfadec384186ed6f36b48f600922147459968a7eeef22417ba0ec",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeKindV2",
+          "file_path": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "10c9eb5615a095fd38ce1f834f7e4cbe57ac779ae19ed0bf5ef6fa31ae3911ec",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "catalogue lint は、alias entry のジェネリクス宣言が順序付きの型パラメータ列であり、各パラメータ名が空でない Rust 識別子、重複せず、各 bound が空でない型・trait 参照である場合に通過させる。これらを満たさない宣言は検証エラーとして報告する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "catalogue lint は、alias entry のジェネリクス宣言が順序付きの型パラメータ列であり、各パラメータ名が空でない Rust 識別子、重複せず、各 bound が空でない型・trait 参照である場合に通過させる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ac55aeed0e2dfadec384186ed6f36b48f600922147459968a7eeef22417ba0ec",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeKindV2",
+          "file_path": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "dcd1f22135db76693ffb82d190e082c176b77065d00d721578a210918762caae",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "カタログと実装が同じジェネリクスパラメータ表記の alias を宣言すると catalogue-to-implementation 照合が一致として評価する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "カタログと実装が同じジェネリクスパラメータ表記の alias を宣言すると catalogue-to-implementation 照合が一致として評価する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ac55aeed0e2dfadec384186ed6f36b48f600922147459968a7eeef22417ba0ec",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeKindV2",
+          "file_path": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "e437f2b91cddd19f1a25edaa6a3b65d9b4a0d3968efbc34c4e3302aa695fb193",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "実装側の alias がカタログのジェネリクスパラメータ正規表記と異なる場合、catalogue-to-implementation 照合は mismatch を報告する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "実装側の alias がカタログのジェネリクスパラメータ正規表記と異なる場合、catalogue-to-implementation 照合は mismatch を報告する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ac55aeed0e2dfadec384186ed6f36b48f600922147459968a7eeef22417ba0ec",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeKindV2",
+          "file_path": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "ab9e861068c816c2a4ab33f3a5ed6b79175116c6161f7ff734cae8a71088a472",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-05",
+          "section": "acceptance_criteria",
+          "text_label": "既存の generic type alias を含む実装に対して、拡張前の照合結果を変えないことを確認する回帰検証がある。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "既存の generic type alias を含む実装に対して、拡張前の照合結果を変えないことを確認する回帰検証がある。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ac55aeed0e2dfadec384186ed6f36b48f600922147459968a7eeef22417ba0ec",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeKindV2",
+          "file_path": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "04be13cf3d8e8a68810c120bd93ecee2e38991bd1e933afade09c5dc5b3434c9",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "ジェネリクスパラメータ宣言は追加的な契約とし、未宣言の既存 alias entry の評価結果を変えない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "ジェネリクスパラメータ宣言は追加的な契約とし、未宣言の既存 alias entry の評価結果を変えない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ac55aeed0e2dfadec384186ed6f36b48f600922147459968a7eeef22417ba0ec",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeKindV2",
+          "file_path": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "1b4588a3c463a271ed212e942ea9118e52b4176e64eeee2da454a0136b022131",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "照合は既存の字句照合の境界を維持し、パラメータ表記はカタログ側の宣言表記を正規形として実装側がそれに従う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "照合は既存の字句照合の境界を維持し、パラメータ表記はカタログ側の宣言表記を正規形として実装側がそれに従う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ac55aeed0e2dfadec384186ed6f36b48f600922147459968a7eeef22417ba0ec",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeKindV2",
+          "file_path": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "93f39f5def9019c3229ebfde93bd9993a3e666bedd2bee94b94bf280e5c47dc8",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "ジェネリクスパラメータを含む alias 契約では、宣言の欠落は非ジェネリクス alias として有効、宣言がある場合は順序付きの型パラメータ列として扱う。schema は宣言列・パラメータ名・bound 参照を復号できない入力を拒否し、lint は空の名前・重複した名前・空の bound を検証エラーとして報告する。照合は有効な宣言どうしだけを字句的に比較し、順序、名前、または bound 表記がカタログの正規表記と異なれば mismatch として報告する。いずれの境界も入力を暗黙に補正せず、bound の意味解析は行わない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "ジェネリクスパラメータを含む alias 契約では、宣言の欠落は非ジェネリクス alias として有効、宣言がある場合は順序付きの型パラメータ列として扱う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ac55aeed0e2dfadec384186ed6f36b48f600922147459968a7eeef22417ba0ec",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeKindV2",
+          "file_path": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "536816a7a1a0b28ace0e78ee716293a42d476539d49c50daecf4af402dd85ac6",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "カタログスキーマで alias の型契約にジェネリクスパラメータ宣言を任意で記録できるようにし、ジェネリクスを宣言しない既存 alias の読み取りと評価を維持する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "カタログスキーマで alias の型契約にジェネリクスパラメータ宣言を任意で記録できるようにし、ジェネリクスを宣言しない既存 alias の読み取りと評価を維持する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ac55aeed0e2dfadec384186ed6f36b48f600922147459968a7eeef22417ba0ec",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeKindV2",
+          "file_path": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "66627767dbbe06343fb89e30e543d57dcc40645299afdfbe01a7d95d929c6db5",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "catalogue lint がジェネリクスパラメータ付き alias 宣言を受理し、不正な宣言を明示的な検証エラーとして扱えるようにする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "catalogue lint がジェネリクスパラメータ付き alias 宣言を受理し、不正な宣言を明示的な検証エラーとして扱えるようにする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ac55aeed0e2dfadec384186ed6f36b48f600922147459968a7eeef22417ba0ec",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeKindV2",
+          "file_path": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "39f5aee2200814ee437ad8c80430ce8c449fcb444bcdeab84d312913c1c36d3b",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "catalogue-to-implementation 照合が、カタログで宣言したジェネリクスパラメータ付き alias と実装側の alias を照合し、パラメータ表記の不一致を mismatch として報告できるようにする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "カタログで宣言したジェネリクスパラメータ付き alias と実装側の alias を照合し、パラメータ表記の不一致を mismatch として報告できるようにする。",
+        "kind": "pass"
+      }
+    }
+  ],
+  "layer": "domain",
+  "schema_version": 1
+}

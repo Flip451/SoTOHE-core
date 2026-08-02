@@ -25,6 +25,303 @@
           "verdict": "zero_findings"
         }
       ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "at": "2026-08-02T01:03:14Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/impl-plan.json",
+              "line": 6,
+              "message": "T001 is not executable: it names only abstract boundaries (\"alias catalogue contract\" / \"strict serialization boundary\"), not a target file or symbol, so the executor must invent the implementation boundary.",
+              "severity": "P1"
+            },
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/impl-plan.json",
+              "line": 12,
+              "message": "T002 is not executable: \"catalogue linting\" does not identify a target file or symbol, leaving the implementation boundary unspecified.",
+              "severity": "P1"
+            },
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/impl-plan.json",
+              "line": 21,
+              "message": "T003 is not executable: \"catalogue-to-implementation lexical alias comparison\" identifies a subsystem but no target file or symbol, so the executor must invent the boundary.",
+              "severity": "P1"
+            },
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/impl-plan.json",
+              "line": 30,
+              "message": "T004 is not executable: it requests a compatibility regression but names neither the target test file nor the comparison symbol.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/impl-plan.json",
+              "line": 6,
+              "message": "T001 restates upstream behavior (preserving omitted declarations and adding malformed-declaration/read-write behavior) instead of using only target + operation + anchor. Remove the contract prose and retain an anchored operation per .harness/policies/no-upstream-restatement.md.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/impl-plan.json",
+              "line": 12,
+              "message": "T002 restates AC-01/AC-02/CN-01 behavior (valid declarations pass, invalid declarations error, undeclared aliases retain their result) in the task text. Keep only the target, operation, and anchors.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/impl-plan.json",
+              "line": 21,
+              "message": "T003 restates the comparison contract and out-of-scope boundaries (canonical spelling, matching/mismatch behavior, semantic parsing exclusion, and non-alias exclusion) in prose. Keep only the target, operation, and anchors.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/impl-plan.json",
+              "line": 30,
+              "message": "T004 restates AC-05/CN-01 compatibility behavior (unchanged pre-extension result) in prose. Keep only the target, operation, and anchors.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/impl-plan.json",
+              "line": 47,
+              "message": "Section S1 restates upstream behavior (optional declaration, validation, and preserving undeclared aliases) in its description. Section descriptions must avoid reproducing the spec contract; retain a concise plan label plus anchors.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/impl-plan.json",
+              "line": 58,
+              "message": "Section S2 restates upstream behavior and boundaries (lexical comparison, existing boundary, and compatibility preservation) in its description. Remove the contract prose and retain only plan-level operation/anchors.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:bbcc53501f457763a5b96137338d67d75e98ab23f10f2ec9e345094044e5f2ed",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T01:06:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2b46d9e3155d1ddc2702f30c8b9e81081163438e17105dfd21e77ffb03b5e5f8",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T01:13:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2b46d9e3155d1ddc2702f30c8b9e81081163438e17105dfd21e77ffb03b5e5f8",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T01:23:41Z",
+          "findings": [
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/task-contract.json",
+              "line": 5,
+              "message": "T001 is attributed to the catalogue entry `TypeKindV2`, but the current type catalogues are empty and the task description names `TypeKindV2` as an implementation symbol, not an existing catalogue entry. Remove this attribution (or attribute only a real catalogue entry); the empty-catalogue track must keep `entries` empty.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ca8887af58d4bca45111bb144b39ec4e76dac505e4bfc6131e66321ed180e4a7",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T01:27:48Z",
+          "findings": [
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/task-contract.json",
+              "line": 5,
+              "message": "T001 still attributes the catalogue entry `TypeKindV2`, but the current catalogues are empty and the task description names `TypeKindV2` as an implementation symbol rather than an existing catalogue entry. Remove this attribution so the empty-catalogue track keeps `entries` empty.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ca8887af58d4bca45111bb144b39ec4e76dac505e4bfc6131e66321ed180e4a7",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T01:30:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ca8887af58d4bca45111bb144b39ec4e76dac505e4bfc6131e66321ed180e4a7",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T01:34:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ca8887af58d4bca45111bb144b39ec4e76dac505e4bfc6131e66321ed180e4a7",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T01:36:16Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/task-coverage.json",
+              "line": 41,
+              "message": "AC-01 is mapped only to T001 and T002, which cover codec and lint behavior. AC-01 also requires legacy aliases without parameter declarations to retain their evaluation result; T004 is the only evaluator regression task, but it is omitted from this mapping and does not cite AC-01. Add T004 to AC-01 traceability or add equivalent evaluation validation to a mapped task.",
+              "severity": "P1"
+            },
+            {
+              "category": "unsound batch composition",
+              "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/batch-plan.json",
+              "line": 24,
+              "message": "T002 is estimated only in `infrastructure`, but its declared production target, `catalogue_linter::evaluate_catalogue_lint`, and associated tests are in `libs/domain`. Consequently B-01 omits T002's domain contribution, so admission cannot apply the domain ceiling when starting this task. Record T002's estimate under `domain` and retain an infrastructure estimate only if explicit infrastructure work is added to the task.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ca8887af58d4bca45111bb144b39ec4e76dac505e4bfc6131e66321ed180e4a7",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T01:40:12Z",
+          "findings": [
+            {
+              "category": "unsound batch composition",
+              "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/batch-plan.json",
+              "line": 24,
+              "message": "T002's batch estimate assigns all work to the `domain` scope, but the task targets `catalogue_linter::evaluate_catalogue_lint` and alias-entry fixtures, an infrastructure/catalogue-processing boundary. The declared estimate omits the scope where the described implementation and tests will land; restore the infrastructure estimate or revise the task target if it is genuinely domain-owned.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e66fe212fc48b2e006b2ed67038db3bf8216c6fcf7b8e0c0dfd86a5a77cd1fc7",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T01:45:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e66fe212fc48b2e006b2ed67038db3bf8216c6fcf7b8e0c0dfd86a5a77cd1fc7",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T01:47:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e66fe212fc48b2e006b2ed67038db3bf8216c6fcf7b8e0c0dfd86a5a77cd1fc7",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "at": "2026-08-02T01:03:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:112b40ee5776a73bd40a38d9c8bac2a8d990cfe17b60e0cbfebaf70aae1d664e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T01:07:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:112b40ee5776a73bd40a38d9c8bac2a8d990cfe17b60e0cbfebaf70aae1d664e",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "at": "2026-08-02T01:02:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6edf8f041619e129738b2522d47bd721b2c556dd546d8ae9b83a098e05563bde",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T01:06:25Z",
+          "findings": [
+            {
+              "category": "constraint vague or untestable",
+              "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json",
+              "line": 83,
+              "message": "CN-03 leaves “unrepresentable or inconsistent” states and their responsible schema/lint/comparison boundaries undefined; AC-02 similarly relies on undefined “valid/invalid” declarations. Because OUT-02 excludes semantic parsing, downstream phases must invent which declarations fail where, so this contract cannot be tested deterministically.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6edf8f041619e129738b2522d47bd721b2c556dd546d8ae9b83a098e05563bde",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T01:09:58Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fb369761b10bf5695f4ffc5c33c0d1448c72f812a4665ae29d07de1686a7b276",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "at": "2026-08-02T01:03:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:16e4d0cc58cc1e72bcfd54078f04c474f4c39f0b64853b9a0bedd7f414cfb03b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T01:10:27Z",
+          "findings": [
+            {
+              "category": "missing companion modify",
+              "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/domain-types.json",
+              "line": 7,
+              "message": "`domain::TypeKindV2` の `action: modify` 宣言が欠落しています。現行の公開 enum は `TypeAlias { target: TypeRef }` を持ち、この track の T001 は同 variant にジェネリクスパラメータ宣言を追加すると明記していますが、`types` が空のため変更後の公開型契約と `spec_refs` が記録されません。`TypeAlias` の変更後フィールドを含む modify entry を追加してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:16e4d0cc58cc1e72bcfd54078f04c474f4c39f0b64853b9a0bedd7f414cfb03b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T01:38:52Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/domain-types.json",
+              "line": 32,
+              "message": "`domain::TypeKindV2` の `docs` が、TypeAlias の ordered generic declaration、空宣言の意味、検証済み名称・bound の字句比較という spec の挙動契約を散文で再記述しています。`.harness/policies/no-upstream-restatement.md` に従い、変更対象と anchor cite のみにしてください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:231e9bb6964e99d17a566ce9f11b5fceb2b5123f9270e8909fb9b53581252da9",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T01:48:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9afbabb44f36cae6e695752d766451e3f653c760a1293f539a162efff4a154bf",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T01:52:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9afbabb44f36cae6e695752d766451e3f653c760a1293f539a162efff4a154bf",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
     }
   }
 }
