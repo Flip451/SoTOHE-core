@@ -364,6 +364,35 @@
           "hash": "rvw1:sha256:870e8d68ca946bac58ad81618d80eb0c4776fde4f9c969c583b4a7ce6a15bd1d",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T09:00:46Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-02-codex-reasoning-effort-max/impl-plan.json",
+              "line": 96,
+              "message": "T002 の説明中「retain the designated Terra entries」は D2/AC-03 の挙動契約の upstream restatement です。実行計画には対象・操作・アンカーのみを残してください（`.harness/policies/no-upstream-restatement.md`）。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a2e7e86968639caf35ec091ee8639c91580a3ab1c36804774d298f1065850372",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T09:02:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:077c02ff815f98ad0d806091cac05c73aa99b87a91099fde077da1ce5b07a7e3",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T09:07:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:077c02ff815f98ad0d806091cac05c73aa99b87a91099fde077da1ce5b07a7e3",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -380,6 +409,20 @@
           "at": "2026-08-02T08:36:41Z",
           "findings": [],
           "hash": "rvw1:sha256:e94b4a76ccc51c39c19412a78bcdb897a192b6fe3fee2473bb777072c1a36362",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T09:00:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:71e9a3919f799f18b80f0cb34300c1baaac2637438bab0edaaebc3c6980fb4a9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T09:05:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:71e9a3919f799f18b80f0cb34300c1baaac2637438bab0edaaebc3c6980fb4a9",
           "type": "final",
           "verdict": "zero_findings"
         }

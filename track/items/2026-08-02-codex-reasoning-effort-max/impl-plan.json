@@ -52,6 +52,7 @@
   "schema_version": 2,
   "tasks": [
     {
+      "commit_hash": "e3dca232",
       "description": "Update `libs/infrastructure/src/agent_profiles/profiles.rs::AgentProfiles::resolve_execution` and `tests.rs::test_resolve_execution_unsupported_provider_effort_returns_error` for profile compatibility validation. [D1; IN-01; IN-02; CN-01; AC-01; AC-02]",
       "id": "T001",
       "status": "done"
@@ -62,7 +63,7 @@
       ],
       "description": "Extend `libs/infrastructure/src/capability_exec/codex.rs::{build_codex_args,test_codex_capability_adapter_dispatches_native_skill_with_profile_model_and_prompt}` for capability dispatch. [D1; IN-02; AC-02]",
       "id": "T005",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [
@@ -92,7 +93,7 @@
         "T006",
         "T003"
       ],
-      "description": "Update `.harness/config/agent-profiles.json` entries `implementer`, `review-fix-lead`, and `dry-fix-lead`; retain the designated Terra entries and extend committed-profile resolution coverage. [D2; IN-03; IN-04; CN-02; AC-03]",
+      "description": "Update `.harness/config/agent-profiles.json` entries `implementer`, `review-fix-lead`, and `dry-fix-lead`; extend committed-profile resolution coverage. [D2; IN-03; IN-04; CN-02; AC-03]",
       "id": "T002",
       "status": "todo"
     }
