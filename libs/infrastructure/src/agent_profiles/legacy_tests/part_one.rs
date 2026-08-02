@@ -13,9 +13,9 @@ fn write_json(dir: &std::path::Path, content: &str) -> std::path::PathBuf {
 const FULL_CONFIG: &str = r#"{
         "schema_version": 1,
         "providers": {
-            "claude": { "label": "Claude Code" },
-            "codex": { "label": "Codex CLI" },
-            "gemini": { "label": "Gemini CLI" }
+            "claude": { "label": "Claude Code", "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"] },
+            "codex": { "label": "Codex CLI", "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"] },
+            "gemini": { "label": "Gemini CLI", "supported_reasoning_efforts": ["low", "medium", "high"] }
         },
         "capabilities": {
             "orchestrator": { "provider": "claude", "model": "claude-opus-4-7", "execution_mode": "typed-pipeline" },
@@ -165,8 +165,8 @@ fn test_resolve_fast_with_cross_provider() {
     let json = r#"{
             "schema_version": 1,
             "providers": {
-                "claude": { "label": "Claude" },
-                "codex": { "label": "Codex" }
+                "claude": { "label": "Claude", "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"] },
+                "codex": { "label": "Codex", "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"] }
             },
             "capabilities": {
                 "reviewer": {

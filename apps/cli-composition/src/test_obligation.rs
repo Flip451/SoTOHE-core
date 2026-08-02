@@ -977,7 +977,7 @@ mod tests {
             &profiles_path,
             r#"{
                 "schema_version": 1,
-                "providers": { "codex": { "label": "Codex" } },
+                "providers": { "codex": { "label": "Codex", "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"] } },
                 "capabilities": {
                     "unrelated-capability": { "provider": "codex", "model": "unrelated", "execution_mode": "typed-pipeline" }
                 }

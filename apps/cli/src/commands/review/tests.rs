@@ -657,7 +657,7 @@ fn resolve_reviewer_fails_closed_when_reviewer_capability_missing() {
         dir.path(),
         r#"{
   "schema_version": 1,
-  "providers": { "codex": { "label": "Codex CLI" } },
+  "providers": { "codex": { "label": "Codex CLI", "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"] } },
   "capabilities": {}
 }"#,
     );

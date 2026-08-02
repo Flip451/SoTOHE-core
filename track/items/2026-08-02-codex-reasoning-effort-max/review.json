@@ -34,6 +34,20 @@
           "hash": "rvw1:sha256:4123b0fde3fe5752dd080cb79539dc6a94c7eaef3bde79b71af65e74e05aa307",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T14:16:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a65c32c0a46d374603dc6b0606d7fb32432521588984dd409763537668537d87",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T14:19:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a65c32c0a46d374603dc6b0606d7fb32432521588984dd409763537668537d87",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -86,6 +100,20 @@
           "at": "2026-08-02T09:38:35Z",
           "findings": [],
           "hash": "rvw1:sha256:63079b39e5b7e3d2dc66403d2566a55bf394c47caa2755debbbef306dfda72f9",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T14:16:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:73021f76926d6931539642093f5a719b5fb2255e0bcf2c5553f98ae25675818f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T14:18:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:73021f76926d6931539642093f5a719b5fb2255e0bcf2c5553f98ae25675818f",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -300,6 +328,34 @@
           "at": "2026-08-02T12:30:48Z",
           "findings": [],
           "hash": "rvw1:sha256:df914f455c9ccdde1f87781f94978c8dddbf8e1a7542d1c3b48450a73d8a1c94",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T13:32:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1ee5cb540ae5145d5d8dc120e560f03863da1da6f709e6472bb598470ebf7665",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T13:45:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1ee5cb540ae5145d5d8dc120e560f03863da1da6f709e6472bb598470ebf7665",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T14:01:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1ee5cb540ae5145d5d8dc120e560f03863da1da6f709e6472bb598470ebf7665",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T14:04:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1ee5cb540ae5145d5d8dc120e560f03863da1da6f709e6472bb598470ebf7665",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -804,6 +860,86 @@
           "at": "2026-08-02T12:43:33Z",
           "findings": [],
           "hash": "rvw1:sha256:a8c61a0b206a78b6237d340796add7cc24ecc184ca74803ae80bc682c3cab8dc",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T13:33:06Z",
+          "findings": [
+            {
+              "category": "serde codec break",
+              "file": "libs/infrastructure/src/agent_profiles/profiles.rs",
+              "line": 237,
+              "message": "`supported_reasoning_efforts` がない schema-v1 provider の従来デフォルトは全 effort 語彙でしたが、`legacy_supports_effort` は codex の `max` や未知 provider を拒否し、既存 profile の互換性を壊します。旧デフォルトをそのまま適用してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "non-fail-closed config",
+              "file": "libs/infrastructure/src/agent_profiles/types.rs",
+              "line": 147,
+              "message": "`Option<Vec<ReasoningEffortDto>>` と `#[serde(default)]` の組み合わせにより、明示的な `supported_reasoning_efforts: null` が「フィールド欠落」と同じ legacy fallback に変換されます。無効な明示値は parse error として拒否し、欠落時だけ互換デフォルトを適用してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:2e4f569a1a6d7a20b88a2b6a2870941d1ba2cf1a99e7d7049f9ba0bb439f6651",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T13:50:23Z",
+          "findings": [
+            {
+              "category": "test failure",
+              "file": "libs/infrastructure/src/agent_profiles/tests.rs",
+              "line": 85,
+              "message": "`supported_reasoning_efforts` が必須化された一方、`tests.rs` の既存 fixture（missing fast/final effort、`pr-reviewer`、effort alias、missing final effort）が provider list を欠いたまま `load_profiles(...).expect(...)` を呼びます。これらは設定検証で失敗して各テストが panic するため、fixture に明示的な supported list を追加してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3d03fa3064e6c119749aedb3630d97362c2028778abad1065ed147141028ea0d",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T13:54:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2db5631f07730fa6b6134d63b2b498ed6c317036c13b300ad41b55657effe9be",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T13:56:05Z",
+          "findings": [
+            {
+              "category": "non-fail-closed config",
+              "file": "libs/infrastructure/src/agent_profiles/types.rs",
+              "line": 146,
+              "message": "The current working-tree version still applies `#[serde(default = \"legacy_supported_reasoning_efforts\")]`, so a provider without `supported_reasoning_efforts` is accepted and receives an implicit all-efforts default. This contradicts the briefing’s required fail-closed behavior and the accepted-deviation note; the corresponding test also asserts acceptance instead of rejection.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6a1839c3273344a6b5be5fc3ab880917b0635631c8edecd84c179d4c24cbf337",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T14:00:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2db5631f07730fa6b6134d63b2b498ed6c317036c13b300ad41b55657effe9be",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T14:16:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8a7dfa35a3d8576a97b474bdf650a9f1e5ec998f31e913b3b6514e2aad12ef18",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T14:19:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8a7dfa35a3d8576a97b474bdf650a9f1e5ec998f31e913b3b6514e2aad12ef18",
           "type": "final",
           "verdict": "zero_findings"
         }

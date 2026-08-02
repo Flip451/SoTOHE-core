@@ -455,7 +455,7 @@ mod tests {
         let error = resolve_profile(
             r#"{
                 "schema_version": 1,
-                "providers": { "codex": { "label": "Codex CLI" } },
+                "providers": { "codex": { "label": "Codex CLI", "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"] } },
                 "capabilities": {
                     "implementer": {
                         "provider": "codex",

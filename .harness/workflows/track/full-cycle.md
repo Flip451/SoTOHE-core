@@ -66,42 +66,6 @@ Within the batch, run `implement` in dependency order for `todo` / `in_progress`
 honouring the `depends_on` edges declared in `impl-plan.json` (lower-layer first where no
 edge dictates otherwise). DonePending tasks keep their position for downstream gates.
 
-**Step 0c: Prepare the limited-profile recovery boundary when applicable**
-
-For every assignment selected for the limited Luna Max rollout, apply the `implement` workflow's
-Step 3 limited-profile preflight before its dispatch. Exclusively reserve the canonical
-current-track worktree (a coordination lock, not an adapter-created per-assignment worktree),
-serialize the limited assignment in that workspace, quiesce every source-writing worker, wait for
-each to reach a terminal state, and preserve its completed work and evidence before creating the
-recoverable checkpoint. Verify the approved baseline, `track/<id>` branch, worktree, and the
-prepared track/profile artifacts before activation. No implementer, DFP worker, review fixer, or
-source-writing process may start or write in the worktree while that reservation is active. If a
-Terra assignment is running, stop it and wait for its terminal state before reloading or activating
-Luna Max. The new Luna dispatch must be a fresh run with no overlapping or reused Terra run/session
-state.
-
-The same Step 0c boundary is mandatory for the standalone `review` and `dry-check` workflows when
-they dispatch the Luna-selected `review-fix-lead` or `dry-fix-lead` capabilities: their caller must
-perform this checkpoint, canonical-worktree reservation, quiescence, stop/reload, and recovery
-procedure before dispatch, and must not use a direct bypass. A standalone invocation that cannot
-establish the boundary is stopped before dispatch. This reference is the common dispatch contract
-for every applicable Luna assignment; it does not authorize changing the Terra-only final or
-verifier lanes.
-
-Keep the checkpoint and evidence references with the batch's assignment data. If Luna ends with
-incomplete output, timeout, or an applicable gate failure, follow the explicit recovery procedure
-in `implement` Step 3: classify and preserve the outcome, stop Luna, restore the verified
-checkpoint, reload the approved Terra profile, re-verify the recovery boundary, and dispatch one
-fresh Terra retry with the same input, completion condition, and gates. The retry is exactly once;
-no automatic runtime fallback, partial-output continuation, or second retry is permitted. Carry
-the classification, retry result, total execution count, and model-regression-candidate result
-forward to Step 5's existing AC-05 handoff/completion data. Preserve provider-reported credits
-and unavailable measurements as explicit values; no historical Luna A/B data is required.
-Preserve the Luna partial diff and evidence before restoring, and re-verify that every other
-writer remains quiescent; restore only the exclusively reserved worktree so no unrelated changes
-are overwritten. Release the reservation only after the assignment's terminal result and evidence
-are recorded.
-
 ### Execution (per batch)
 
 **Step 1: Implement (batch-scoped)**
@@ -126,15 +90,6 @@ and CI passes, skip re-implementation and carry it forward like a DonePending ta
 skip implementation only — keep the task in the batch so its working-tree changes flow through
 DFP, Review, Commit, and post-commit task hash recording. Do NOT commit between tasks in the
 same batch.
-
-For a limited Luna Max assignment, the Step 0c recovery boundary is a pre-dispatch gate. A
-classified Luna failure leaves the task `in_progress` until its one Terra retry has reached the
-same completion condition and applicable gates; the normal DFP, task-state, review, and commit
-ownership remains unchanged. A partial Luna result never qualifies as an implementation handoff.
-If that one Terra retry is incomplete, times out, or fails an applicable gate, stop that assignment
-and report its recorded outcome; do not re-dispatch it under either profile. The review-fixer
-retry policy applies only to review-fixer process failures and never authorizes another execution
-of this limited-rollout assignment or another Terra retry.
 
 Test-obligation handoff: a catalogue-bearing track enters this loop already enrolled
 (`obligations.json` + `test-bindings.json` from the `type-design` workflow's terminal derive
@@ -249,84 +204,23 @@ Procedure (after Step 3 of the **last** batch):
    succeeds, `git status --short` must be empty; any remaining dirty file is unexpected and
    must be investigated before declaring the loop complete.
 
-The lifecycle loop (Steps 1–4) completes only when `git status --short` is empty after this
-step. Do not declare the full workflow complete until Step 5 has either recorded the required
-single AC-05/equivalent completion record or validly skipped observations under its stated
-conditions.
+The workflow completes only when `git status --short` is empty after this step.
 
-### Step 5: Record observations after the complete rollout (conditional)
+### Post-loop
 
-Run this step only after every declared batch has completed and Step 4 has either completed its
-lifecycle-tail commit or validly found no tail diff. The final `git status --short` check must
-already be empty. Do not create a per-batch or standalone-implementation partial record.
-
-For ordinary tracks, create or append to `track/items/<id>/observations.md` only when:
+After all batches are committed and the optional lifecycle tail commit is recorded, create or
+append to `track/items/<id>/observations.md` only when:
 
 - (a) Any task produced machine-non-verifiable observations worth recording, or
 - (b) `spec.json`'s `acceptance_criteria` explicitly mandates recording to `observations.md`.
 
 Otherwise, skip (file absence = no observations).
 
-When this track's AC-05, or an equivalent explicit acceptance criterion, requires a
-completion-time limited-rollout observation, create exactly one dedicated current-track record
-in `track/items/<id>/observations.md` after all rollout assignments and any permitted Terra
-retries have recorded their outcomes. Do not pre-create, partially append, or duplicate this
-record. Use the following repeatable template; every assignment receives one row, and an
-inapplicable value is recorded as `not run` / `not applicable` while a measurement that cannot
-be obtained is recorded as `unavailable`.
-
-```markdown
-## Limited rollout completion record
-
-- Track: `<id>`
-- Recorded after: all rollout assignments, applicable gates, retries, batches, and lifecycle tail
-- Historical comparison: No historical A/B comparison is available or required.
-
-| Assignment id / lane | Provider / effort | Completion-condition / quality result | Applicable gate results | Flags: incomplete-output; timeout; gate failure | Credits | Elapsed: start → recorded completion result or verdict | Executions (including Terra retry) | Terra retry result | Model-regression candidate | Evidence |
-|---|---|---|---|---|---|---|---:|---|---|---|
-| `<assignment id> / <lane>` | `<provider> / <effort>; retry: <provider> / <effort>` | `<met / unmet / unavailable>` | `<gate: pass/fail/unavailable; ...>` | `<no/no/no>` | `<reported value / unavailable>` | `<duration / unavailable>` | `<count>` | `<not run / pass / fail / unavailable>` | `<yes / no / unavailable>` | `<telemetry/session log; verdict or gate record; retry record>` |
-```
-
-Build each row only from auditable evidence. Use telemetry or session logs for assignment id,
-lane, provider, effort, timestamps, and provider-reported credits; use recorded completion
-results or verdicts plus review and DRY verdicts for quality and completion-condition results;
-use obligation and CI gate records for applicable gate results; and use retry records for the
-execution count, Terra retry result, and model-regression-candidate determination. Preserve
-explicit `unavailable` markers rather than guessing, deriving absent values, or silently omitting
-an AC-05 field. For this AC-05 rollout, state explicitly in the completed record: “No historical
-Luna Max A/B comparison is available or required.”
-
-**AC-05/equivalent-only persistence.** The following review and guarded-commit sequence applies
-only when the AC-05/equivalent limited-rollout criterion applies and the single limited-rollout
-record above was written or changed. It is not triggered merely because an ordinary track created
-or appended `observations.md`; those tracks retain their existing conditional observation
-handling and do not receive this extra review or completion-record commit. After the limited-
-rollout record exists, run the `review` workflow again. Its expected required scope is
-`impl-plan`, because that scope owns `observations.md`; do not stage the record until its final
-round reaches `zero_findings` and `bin/sotp review check-approved` succeeds for the observation
-diff. This post-record review is an **accounting-excluded record-finalization gate**, not another
-AC-05 rollout assignment: close the assignment table and its execution counts before launching
-this review, and do not append a row for the finalization fixer, its limited-profile recovery, or
-any finalization retry. Record those outcomes only in the ordinary review/gate artifacts. The
-finalization gate may still use the limited-profile recovery boundary when its resolved fixer is
-the Luna lane, but that dispatch is explicitly outside the rollout ledger and cannot make the
-completion record incomplete.
-
-Then stage the record and review-operational artifacts with `bin/sotp git add-all`, and invoke the
-`commit` workflow for one guarded completion-record commit. Use a message that identifies the
-limited-rollout completion record. After the guarded commit succeeds, `git status --short` must be
-empty. If the observation review requires a correction, amend the one existing record from its
-auditable evidence and repeat this finalization review → guarded-commit sequence; the correction
-does not create a second AC-05 record or a new assignment row. This persistence sequence is after
-the recording boundary above and does not permit a partial or per-batch record.
-
 ## Gates
 
 | Step | Gate | Verdict |
 |------|------|---------|
 | 1 | Track branch and active tasks found | OK / stop |
-| 0c / 1 | Limited Luna Max dispatch has a verified exclusively reserved checkpoint; any running Terra assignment stopped before reload/activation; no overlapping or reused run/session state | pass / stop |
-| 0c / 1 | Each classified Luna incomplete-output, timeout, or gate-failure outcome preserves evidence and gets exactly one fresh same-input Terra retry | pass / stop |
 | 1c | DFP terminal state | skipped/completed → Step 1d; blocked/failed → halt |
 | 1c | R2 placement verification repeated after a `completed` DFP | pass / fail |
 | 1d | Successful batch tasks marked `done` before review | OK / stop |
@@ -334,40 +228,22 @@ the recording boundary above and does not permit a partial or per-batch record.
 | 2 | R2 placement verification repeated on each back-edge pass | pass / fail |
 | 3 | `cargo make track-commit-message` (CI + track-aware gates + DRY check) | OK / ERROR |
 | 4 | `git status --short` empty | OK / unexpected dirty state |
-| 5 | AC-05/equivalent completion record written once after all rollout outcomes exist | pass / stop |
-| 5 | AC-05/equivalent observation diff reaches final `zero_findings`, then guarded completion-record commit leaves a clean tree | pass / stop |
 
 ## Failure / recovery
 
 - **Wrong branch**: stop and suggest switching to `track/<id>`.
-- **Limited Luna Max incomplete output, timeout, or gate failure**: do not continue the partial
-  run or auto-fallback. Preserve evidence, stop the Luna run, restore and re-verify the
-  pre-dispatch checkpoint, reload the approved Terra profile, and run the one fresh identical
-  Terra retry. Record its result, execution count, and model-regression-candidate determination
-  for Step 5. If the recovery boundary cannot be verified, stop the batch and report it. If the
-  one Terra retry is incomplete, times out, or fails a gate, stop and report the assignment; do
-  not apply the review-fixer retry allowance to it or launch another Terra execution.
 - **DFP `blocked`**: halt the loop. Surface violation pairs. Do not proceed to review.
 - **DFP `failed`**: stop and report tooling error.
 - **Review `blocked_cross_scope`**: fix cross-scope dependencies, then relaunch the affected scope.
-- **Review `failed` / timeout**: relaunch the review fixer (up to 2 retries per fixer), then
-  report. This process-retry allowance never applies to any assignment selected for the limited
-  Luna Max rollout, including implementer, review-fix-lead, and dry-fix-lead: its Terra recovery is
-  limited to the one retry in Step 0c.
+- **Review `failed` / timeout**: relaunch (up to 2 retries per fixer), then report.
 - **Commit failure**: fix CI or staging issue. Do not re-stage until the issue is resolved.
 - **Unexpected dirty state in Step 4**: stop and investigate before declaring completion.
-- **Observation review or completion-record commit failure**: correct the one existing record
-  from its evidence, re-run the observation review, and retry the guarded commit. Do not create
-  another completion record.
 
 ## Outputs
 
 - Commits on the current `track/<id>` branch, one per batch + optional lifecycle tail
 - Commit hashes recorded by the orchestrator on all batch tasks via
   `bin/sotp track transition done --commit-hash`
-- Optional `track/items/<id>/observations.md` (the AC-05/equivalent completion record, when
-  required, is written once after all rollout outcomes exist, then reviewed and committed in a
-  final guarded persistence commit)
+- Optional `track/items/<id>/observations.md`
 - Summary: batches executed (task IDs, commit hash per batch), tasks completed, tasks remaining,
-  any failures, the path to the completion record when written, and recommended next command
-  (`pr-review` workflow)
+  any failures, recommended next command (`pr-review` workflow)

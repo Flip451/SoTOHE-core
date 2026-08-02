@@ -9,10 +9,14 @@ fn capability(value: &str) -> CapabilityName {
 }
 
 fn load_profiles(contents: &str) -> AgentProfiles {
+    load_profiles_result(contents).expect("test profile loads")
+}
+
+fn load_profiles_result(contents: &str) -> Result<AgentProfiles, AgentProfilesError> {
     let directory = tempfile::tempdir().expect("test directory is created");
     let path = directory.path().join("agent-profiles.json");
     fs::write(&path, contents).expect("test profile is written");
-    AgentProfiles::load(directory.path(), &path).expect("test profile loads")
+    AgentProfiles::load(directory.path(), &path)
 }
 
 const CODEX_PROFILE: &str = r#"{
@@ -78,7 +82,7 @@ fn test_resolve_execution_missing_fast_effort_returns_error() {
     let profiles = load_profiles(
         r#"{
             "schema_version": 1,
-            "providers": { "codex": { "label": "Codex CLI" } },
+            "providers": { "codex": { "label": "Codex CLI", "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"] } },
             "capabilities": {
                 "reviewer": {
                     "provider": "codex",
@@ -102,7 +106,7 @@ fn test_resolve_execution_missing_final_effort_returns_error() {
     let profiles = load_profiles(
         r#"{
             "schema_version": 1,
-            "providers": { "codex": { "label": "Codex CLI" } },
+            "providers": { "codex": { "label": "Codex CLI", "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"] } },
             "capabilities": {
                 "reviewer": {
                     "provider": "codex",
@@ -122,8 +126,8 @@ fn test_resolve_execution_missing_final_effort_returns_error() {
 }
 
 #[test]
-fn test_schema_v1_provider_without_effort_list_preserves_legacy_support() {
-    let profiles = load_profiles(
+fn test_provider_without_effort_list_is_rejected() {
+    let result = load_profiles_result(
         r#"{
             "schema_version": 1,
             "providers": { "codex": { "label": "Codex CLI" } },
@@ -138,11 +142,7 @@ fn test_schema_v1_provider_without_effort_list_preserves_legacy_support() {
         }"#,
     );
 
-    assert!(matches!(
-        profiles.resolve_execution(&capability("implementer"), RoundType::Final),
-        Ok(ResolvedExecution::ProviderCli { provider, effort, .. })
-            if provider.as_str() == "codex" && effort == ReasoningEffort::High
-    ));
+    assert!(matches!(result, Err(AgentProfilesError::Parse(_))));
 }
 
 #[test]
@@ -270,6 +270,35 @@ fn test_resolve_execution_provider_declaration_rejects_undeclared_effort() {
 }
 
 #[test]
+fn test_resolve_execution_explicit_empty_provider_effort_list_rejects_all_efforts() {
+    let profiles = load_profiles(
+        r#"{
+            "schema_version": 1,
+            "providers": {
+                "codex": {
+                    "label": "Codex CLI",
+                    "supported_reasoning_efforts": []
+                }
+            },
+            "capabilities": {
+                "implementer": {
+                    "provider": "codex",
+                    "model": "gpt-5.6-luna",
+                    "reasoning_effort": "max",
+                    "execution_mode": "orchestrator-output"
+                }
+            }
+        }"#,
+    );
+
+    assert!(matches!(
+        profiles.resolve_execution(&capability("implementer"), RoundType::Final),
+        Err(AgentProfilesError::UnsupportedEffort(provider, ReasoningEffort::Max))
+            if provider.as_str() == "codex"
+    ));
+}
+
+#[test]
 fn test_resolve_execution_custom_provider_declares_max_returns_provider_cli() {
     let profiles = load_profiles(
         r#"{
@@ -303,7 +332,7 @@ fn test_resolve_execution_pr_reviewer_is_hosted_service_exempt() {
     let profiles = load_profiles(
         r#"{
             "schema_version": 1,
-            "providers": { "codex": { "label": "Codex CLI" } },
+            "providers": { "codex": { "label": "Codex CLI", "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"] } },
             "capabilities": {
                 "pr-reviewer": {
                     "provider": "codex",
@@ -324,7 +353,7 @@ fn test_capability_config_final_effort_alias_maps_to_typed_accessor() {
     let profiles = load_profiles(
         r#"{
             "schema_version": 1,
-            "providers": { "codex": { "label": "Codex CLI" } },
+            "providers": { "codex": { "label": "Codex CLI", "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"] } },
             "capabilities": {
                 "dry-checker": {
                     "provider": "codex",
@@ -495,7 +524,7 @@ fn test_resolve_execution_non_pr_reviewer_missing_final_effort_returns_error() {
     let profiles = load_profiles(
         r#"{
             "schema_version": 1,
-            "providers": { "codex": { "label": "Codex CLI" } },
+            "providers": { "codex": { "label": "Codex CLI", "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"] } },
             "capabilities": {
                 "implementer": {
                     "provider": "codex",

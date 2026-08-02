@@ -104,8 +104,8 @@ fn test_load_empty_fast_provider_returns_invalid_capability() {
 const REF_VERIFIER_CONFIG: &str = r#"{
         "schema_version": 1,
         "providers": {
-            "claude": { "label": "Claude Code" },
-            "codex": { "label": "Codex CLI" }
+            "claude": { "label": "Claude Code", "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"] },
+            "codex": { "label": "Codex CLI", "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"] }
         },
         "capabilities": {
             "reviewer": {
@@ -204,7 +204,7 @@ fn test_capability_config_with_timeout_seconds_is_rejected() {
     // must fail-closed on configs that still carry it.
     let json = r#"{
             "schema_version": 1,
-            "providers": { "claude": { "label": "Claude" } },
+            "providers": { "claude": { "label": "Claude", "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"] } },
             "capabilities": {
                 "ref-verifier-chain1": {
                     "provider": "claude",
@@ -230,7 +230,7 @@ fn test_capability_config_with_timeout_seconds_is_rejected() {
 const TEST_OBLIGATION_VERIFIER_CONFIG: &str = r#"{
         "schema_version": 1,
         "providers": {
-            "codex": { "label": "Codex CLI" }
+            "codex": { "label": "Codex CLI", "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"] }
         },
         "capabilities": {
             "obligation-fulfillment-verifier": {
@@ -292,7 +292,7 @@ fn test_default_agent_profiles_register_test_obligation_verifiers() {
 const DRY_CHECKER_CONFIG: &str = r#"{
         "schema_version": 1,
         "providers": {
-            "codex": { "label": "Codex CLI" }
+            "codex": { "label": "Codex CLI", "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"] }
         },
         "capabilities": {
             "dry-checker": {
@@ -365,7 +365,7 @@ fn test_capability_dto_reasoning_effort_returns_none_when_absent() {
     // When reasoning_effort fields are absent from the capability, accessors return None.
     let json = r#"{
             "schema_version": 1,
-            "providers": { "codex": { "label": "Codex CLI" } },
+            "providers": { "codex": { "label": "Codex CLI", "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"] } },
             "capabilities": {
                 "dry-checker": {
                     "provider": "codex",
