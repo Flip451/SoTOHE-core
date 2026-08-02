@@ -1507,6 +1507,56 @@ mod tests {
     }
 
     #[test]
+    fn test_evaluate_catalogue_lint_accepts_ordered_unique_type_alias_generic_parameters() {
+        let mut catalogue = make_doc("domain");
+        catalogue.insert_type(
+            TypeName::new("PairAlias").unwrap(),
+            make_type_entry_with_kind(
+                DataRole::value_object(),
+                TypeKindV2::TypeAlias {
+                    target: TypeRef::new("Pair<T, U>").unwrap(),
+                    generics: vec![
+                        MethodGenericParam {
+                            name: ParamName::new("T").unwrap(),
+                            bounds: vec![TypeRef::new("Clone").unwrap()],
+                        },
+                        MethodGenericParam {
+                            name: ParamName::new("U").unwrap(),
+                            bounds: vec![TypeRef::new("Send").unwrap()],
+                        },
+                    ],
+                },
+            ),
+        );
+        let all_catalogues = all_catalogues_single(&catalogue);
+        let target_layer = layer("domain");
+
+        let result =
+            evaluate_catalogue_lint(&[], &all_catalogues, &target_layer, &StubPrimitiveScanner);
+
+        assert!(matches!(result, Ok(violations) if violations.is_empty()));
+    }
+
+    #[test]
+    fn test_evaluate_catalogue_lint_preserves_non_generic_type_alias_evaluation() {
+        let mut catalogue = make_doc("domain");
+        catalogue.insert_type(
+            TypeName::new("LegacyAlias").unwrap(),
+            make_type_entry_with_kind(
+                DataRole::value_object(),
+                TypeKindV2::TypeAlias { target: TypeRef::new("String").unwrap(), generics: vec![] },
+            ),
+        );
+        let all_catalogues = all_catalogues_single(&catalogue);
+        let target_layer = layer("domain");
+
+        let result =
+            evaluate_catalogue_lint(&[], &all_catalogues, &target_layer, &StubPrimitiveScanner);
+
+        assert!(matches!(result, Ok(violations) if violations.is_empty()));
+    }
+
+    #[test]
     fn test_evaluate_catalogue_lint_rejects_duplicate_type_alias_generic_parameter_in_any_catalogue()
      {
         let target_catalogue = make_doc("domain");

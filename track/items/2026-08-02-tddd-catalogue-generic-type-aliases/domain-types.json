@@ -21,7 +21,7 @@
     },
     "domain::tddd::catalogue_linter::evaluate_catalogue_lint": {
       "action": "add",
-      "docs": "Validates alias-generic declarations and evaluates catalogue-lint rules without I/O.",
+      "docs": "Catalogue lint evaluator for validated declarations.",
       "generics": [
         {
           "bounds": [
@@ -54,15 +54,7 @@
       "role": "FreeFunction",
       "spec_refs": [
         {
-          "anchor": "AC-02",
-          "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json"
-        },
-        {
-          "anchor": "CN-03",
-          "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json"
-        },
-        {
-          "anchor": "IN-02",
+          "anchor": "CN-01",
           "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json"
         }
       ]

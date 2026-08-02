@@ -317,6 +317,112 @@
           "test_name": "test_type_alias_generic_parameter_bound_spelling_difference_is_mismatch"
         }
       ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "domain::tddd::catalogue_linter::evaluate_catalogue_lint",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_accepts_ordered_unique_type_alias_generic_parameters"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_preserves_non_generic_type_alias_evaluation"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_duplicate_type_alias_generic_parameter_in_any_catalogue"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_decode_type_alias_with_invalid_generic_name_returns_invalid_entry_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_decode_type_alias_with_empty_generic_bound_returns_invalid_entry_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::structural_eq::tests",
+          "test_name": "test_type_alias_same_ordered_generic_name_and_bound_notation_compares_equal"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::structural_eq::tests",
+          "test_name": "test_type_alias_generic_parameter_order_difference_is_mismatch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::structural_eq::tests",
+          "test_name": "test_type_alias_generic_parameter_name_difference_is_mismatch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::structural_eq::tests",
+          "test_name": "test_type_alias_generic_parameter_bound_spelling_difference_is_mismatch"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CatalogueLinterError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_duplicate_type_alias_generic_parameter_in_any_catalogue"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CatalogueLinterError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_duplicate_type_alias_generic_parameter_in_any_catalogue"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CatalogueLinterError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_duplicate_type_alias_generic_parameter_in_any_catalogue"
+        }
+      ]
     }
   ]
 }

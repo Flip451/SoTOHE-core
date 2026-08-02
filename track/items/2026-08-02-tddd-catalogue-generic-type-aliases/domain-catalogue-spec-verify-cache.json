@@ -361,7 +361,7 @@
       }
     },
     {
-      "claim_hash": "7fdcc49b4d7b4328dfe0b28943b43beade7747892a934618863ffec749bf0a18",
+      "claim_hash": "375e581953801a9506c0a5d00fafb55a888e091e37663182ce6aa78fef863d09",
       "claim_origin": {
         "data": {
           "entry_key": "domain::tddd::catalogue_linter::evaluate_catalogue_lint",
@@ -370,65 +370,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "10c9eb5615a095fd38ce1f834f7e4cbe57ac779ae19ed0bf5ef6fa31ae3911ec",
+      "evidence_hash": "04be13cf3d8e8a68810c120bd93ecee2e38991bd1e933afade09c5dc5b3434c9",
       "evidence_origin": {
         "data": {
-          "element_id": "AC-02",
-          "section": "acceptance_criteria",
-          "text_label": "catalogue lint は、alias entry のジェネリクス宣言が順序付きの型パラメータ列であり、各パラメータ名が空でない Rust 識別子、重複せず、各 bound が空でない型・trait 参照である場合に通過させる。これらを満たさない宣言は検証エラーとして報告する。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "catalogue lint は、alias entry のジェネリクス宣言が順序付きの型パラメータ列であり、各パラメータ名が空でない Rust 識別子、重複せず、各 bound が空でない型・trait 参照である場合に通過させる。これらを満たさない宣言は検証エラーとして報告する。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "7fdcc49b4d7b4328dfe0b28943b43beade7747892a934618863ffec749bf0a18",
-      "claim_origin": {
-        "data": {
-          "entry_key": "domain::tddd::catalogue_linter::evaluate_catalogue_lint",
-          "file_path": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/domain-types.json",
-          "section_key": "functions"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "93f39f5def9019c3229ebfde93bd9993a3e666bedd2bee94b94bf280e5c47dc8",
-      "evidence_origin": {
-        "data": {
-          "element_id": "CN-03",
+          "element_id": "CN-01",
           "section": "constraint",
-          "text_label": "ジェネリクスパラメータを含む alias 契約では、宣言の欠落は非ジェネリクス alias として有効、宣言がある場合は順序付きの型パラメータ列として扱う。schema は宣言列・パラメータ名・bound 参照を復号できない入力を拒否し、lint は空の名前・重複した名前・空の bound を検証エラーとして報告する。照合は有効な宣言どうしだけを字句的に比較し、順序、名前、または bound 表記がカタログの正規表記と異なれば mismatch として報告する。いずれの境界も入力を暗黙に補正せず、bound の意味解析は行わない。"
+          "text_label": "ジェネリクスパラメータ宣言は追加的な契約とし、未宣言の既存 alias entry の評価結果を変えない。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "lint は空の名前・重複した名前・空の bound を検証エラーとして報告する。照合は有効な宣言どうしだけを字 lexical に比較し、順序、名前、または bound 表記がカタログの正規表記と異なれば mismatch として報告する。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "7fdcc49b4d7b4328dfe0b28943b43beade7747892a934618863ffec749bf0a18",
-      "claim_origin": {
-        "data": {
-          "entry_key": "domain::tddd::catalogue_linter::evaluate_catalogue_lint",
-          "file_path": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/domain-types.json",
-          "section_key": "functions"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "66627767dbbe06343fb89e30e543d57dcc40645299afdfbe01a7d95d929c6db5",
-      "evidence_origin": {
-        "data": {
-          "element_id": "IN-02",
-          "section": "in_scope",
-          "text_label": "catalogue lint がジェネリクスパラメータ付き alias 宣言を受理し、不正な宣言を明示的な検証エラーとして扱えるようにする。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "catalogue lint がジェネリクスパラメータ付き alias 宣言を受理し、不正な宣言を明示的な検証エラーとして扱えるようにする。",
+        "citation": "ジェネリクスパラメータ宣言は追加的な契約とし、未宣言の既存 alias entry の評価結果を変えない。",
         "kind": "pass"
       }
     },

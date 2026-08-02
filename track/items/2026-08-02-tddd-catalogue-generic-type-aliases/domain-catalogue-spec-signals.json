@@ -1,5 +1,5 @@
 {
-  "catalogue_declaration_hash": "ccb95f2a8d6e59bfba0a47fdff01c15a09090b02b3c42fd4ecbf89c3eb864215",
+  "catalogue_declaration_hash": "0739db0654c920a2a321f421c7789a576136e8f90e83ba22d06e7ad6ca8aaac9",
   "schema_version": 1,
   "signals": [
     {
@@ -13,7 +13,7 @@
       "type_name": "TypeKindV2"
     },
     {
-      "entry_hash": "7fdcc49b4d7b4328dfe0b28943b43beade7747892a934618863ffec749bf0a18",
+      "entry_hash": "375e581953801a9506c0a5d00fafb55a888e091e37663182ce6aa78fef863d09",
       "signal": "blue",
       "type_name": "domain::tddd::catalogue_linter::evaluate_catalogue_lint"
     },

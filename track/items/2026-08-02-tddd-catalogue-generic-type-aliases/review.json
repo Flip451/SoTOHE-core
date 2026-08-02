@@ -122,6 +122,20 @@
           "hash": "rvw1:sha256:87f03db4a5eb89ad3945e66f1981cf6c023f5cda22387e4a5927001d8c8e868f",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T07:59:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:39827622c05e689ae2e810059a52a4baad84bda3ff1856d55a02a1ec9311184f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T08:05:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:39827622c05e689ae2e810059a52a4baad84bda3ff1856d55a02a1ec9311184f",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -413,6 +427,34 @@
           "hash": "rvw1:sha256:ea8800b3f862690610f2393706e8cde25689d72b2229f04f31a5c2459288d1e7",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T07:59:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0dc874b4f3fb71fdeae0e76644d264457cbc1cc91d2b7e1c1dbffffc44ebcdc3",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T08:04:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0dc874b4f3fb71fdeae0e76644d264457cbc1cc91d2b7e1c1dbffffc44ebcdc3",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T08:21:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0dc874b4f3fb71fdeae0e76644d264457cbc1cc91d2b7e1c1dbffffc44ebcdc3",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T08:26:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0dc874b4f3fb71fdeae0e76644d264457cbc1cc91d2b7e1c1dbffffc44ebcdc3",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -587,6 +629,20 @@
           "hash": "rvw1:sha256:3b53fde93d4de92953b60817e5007ab198aeebb4ee84c5e03753809192155a39",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T08:00:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6c7ac7b8d321df853f5a97d281dd12549feca41fd5ce2ea31a314d816f360da0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T08:05:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6c7ac7b8d321df853f5a97d281dd12549feca41fd5ce2ea31a314d816f360da0",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -715,6 +771,35 @@
           "at": "2026-08-02T06:42:25Z",
           "findings": [],
           "hash": "rvw1:sha256:540e600d3968a194d521892bc895f7370739febe2a747f5093dc8390a1250467",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T07:59:35Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/domain-types.json",
+              "line": 24,
+              "message": "`domain::tddd::catalogue_linter::evaluate_catalogue_lint`'s `docs` field restates the upstream behavior contract (validation, legacy preservation, duplicate rejection, decoding ownership, and structural-equality ownership) instead of using a concise change description with anchor references, violating the no-upstream-restatement policy.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4b1a414a3a58edd5f652875d41679635cc22e53304ed20488feeb44c2b8854a5",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T08:10:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1085f42e786740073c9272c387e41eda148aa2cf2bdcf7486cb9d117cb67ec06",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T08:14:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1085f42e786740073c9272c387e41eda148aa2cf2bdcf7486cb9d117cb67ec06",
           "type": "final",
           "verdict": "zero_findings"
         }
