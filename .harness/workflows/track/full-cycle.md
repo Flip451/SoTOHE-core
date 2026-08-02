@@ -66,6 +66,42 @@ Within the batch, run `implement` in dependency order for `todo` / `in_progress`
 honouring the `depends_on` edges declared in `impl-plan.json` (lower-layer first where no
 edge dictates otherwise). DonePending tasks keep their position for downstream gates.
 
+**Step 0c: Prepare the limited-profile recovery boundary when applicable**
+
+For every assignment selected for the limited Luna Max rollout, apply the `implement` workflow's
+Step 3 limited-profile preflight before its dispatch. Exclusively reserve the canonical
+current-track worktree (a coordination lock, not an adapter-created per-assignment worktree),
+serialize the limited assignment in that workspace, quiesce every source-writing worker, wait for
+each to reach a terminal state, and preserve its completed work and evidence before creating the
+recoverable checkpoint. Verify the approved baseline, `track/<id>` branch, worktree, and the
+prepared track/profile artifacts before activation. No implementer, DFP worker, review fixer, or
+source-writing process may start or write in the worktree while that reservation is active. If a
+Terra assignment is running, stop it and wait for its terminal state before reloading or activating
+Luna Max. The new Luna dispatch must be a fresh run with no overlapping or reused Terra run/session
+state.
+
+The same Step 0c boundary is mandatory for the standalone `review` and `dry-check` workflows when
+they dispatch the Luna-selected `review-fix-lead` or `dry-fix-lead` capabilities: their caller must
+perform this checkpoint, canonical-worktree reservation, quiescence, stop/reload, and recovery
+procedure before dispatch, and must not use a direct bypass. A standalone invocation that cannot
+establish the boundary is stopped before dispatch. This reference is the common dispatch contract
+for every applicable Luna assignment; it does not authorize changing the Terra-only final or
+verifier lanes.
+
+Keep the checkpoint and evidence references with the batch's assignment data. If Luna ends with
+incomplete output, timeout, or an applicable gate failure, follow the explicit recovery procedure
+in `implement` Step 3: classify and preserve the outcome, stop Luna, restore the verified
+checkpoint, reload the approved Terra profile, re-verify the recovery boundary, and dispatch one
+fresh Terra retry with the same input, completion condition, and gates. The retry is exactly once;
+no automatic runtime fallback, partial-output continuation, or second retry is permitted. Carry
+the classification, retry result, total execution count, and model-regression-candidate result
+forward to Step 5's existing AC-05 handoff/completion data. Preserve provider-reported credits
+and unavailable measurements as explicit values; no historical Luna A/B data is required.
+Preserve the Luna partial diff and evidence before restoring, and re-verify that every other
+writer remains quiescent; restore only the exclusively reserved worktree so no unrelated changes
+are overwritten. Release the reservation only after the assignment's terminal result and evidence
+are recorded.
+
 ### Execution (per batch)
 
 **Step 1: Implement (batch-scoped)**
@@ -90,6 +126,15 @@ and CI passes, skip re-implementation and carry it forward like a DonePending ta
 skip implementation only — keep the task in the batch so its working-tree changes flow through
 DFP, Review, Commit, and post-commit task hash recording. Do NOT commit between tasks in the
 same batch.
+
+For a limited Luna Max assignment, the Step 0c recovery boundary is a pre-dispatch gate. A
+classified Luna failure leaves the task `in_progress` until its one Terra retry has reached the
+same completion condition and applicable gates; the normal DFP, task-state, review, and commit
+ownership remains unchanged. A partial Luna result never qualifies as an implementation handoff.
+If that one Terra retry is incomplete, times out, or fails an applicable gate, stop that assignment
+and report its recorded outcome; do not re-dispatch it under either profile. The review-fixer
+retry policy applies only to review-fixer process failures and never authorizes another execution
+of this limited-rollout assignment or another Terra retry.
 
 Test-obligation handoff: a catalogue-bearing track enters this loop already enrolled
 (`obligations.json` + `test-bindings.json` from the `type-design` workflow's terminal derive
@@ -272,6 +317,8 @@ permit a partial or per-batch record.
 | Step | Gate | Verdict |
 |------|------|---------|
 | 1 | Track branch and active tasks found | OK / stop |
+| 0c / 1 | Limited Luna Max dispatch has a verified exclusively reserved checkpoint; any running Terra assignment stopped before reload/activation; no overlapping or reused run/session state | pass / stop |
+| 0c / 1 | Each classified Luna incomplete-output, timeout, or gate-failure outcome preserves evidence and gets exactly one fresh same-input Terra retry | pass / stop |
 | 1c | DFP terminal state | skipped/completed → Step 1d; blocked/failed → halt |
 | 1c | R2 placement verification repeated after a `completed` DFP | pass / fail |
 | 1d | Successful batch tasks marked `done` before review | OK / stop |
@@ -285,10 +332,20 @@ permit a partial or per-batch record.
 ## Failure / recovery
 
 - **Wrong branch**: stop and suggest switching to `track/<id>`.
+- **Limited Luna Max incomplete output, timeout, or gate failure**: do not continue the partial
+  run or auto-fallback. Preserve evidence, stop the Luna run, restore and re-verify the
+  pre-dispatch checkpoint, reload the approved Terra profile, and run the one fresh identical
+  Terra retry. Record its result, execution count, and model-regression-candidate determination
+  for Step 5. If the recovery boundary cannot be verified, stop the batch and report it. If the
+  one Terra retry is incomplete, times out, or fails a gate, stop and report the assignment; do
+  not apply the review-fixer retry allowance to it or launch another Terra execution.
 - **DFP `blocked`**: halt the loop. Surface violation pairs. Do not proceed to review.
 - **DFP `failed`**: stop and report tooling error.
 - **Review `blocked_cross_scope`**: fix cross-scope dependencies, then relaunch the affected scope.
-- **Review `failed` / timeout**: relaunch (up to 2 retries per fixer), then report.
+- **Review `failed` / timeout**: relaunch the review fixer (up to 2 retries per fixer), then
+  report. This process-retry allowance never applies to any assignment selected for the limited
+  Luna Max rollout, including implementer, review-fix-lead, and dry-fix-lead: its Terra recovery is
+  limited to the one retry in Step 0c.
 - **Commit failure**: fix CI or staging issue. Do not re-stage until the issue is resolved.
 - **Unexpected dirty state in Step 4**: stop and investigate before declaring completion.
 - **Observation review or completion-record commit failure**: correct the one existing record

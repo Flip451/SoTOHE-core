@@ -6,7 +6,7 @@
 GO-01 → T001, T005, T006.
 GO-02 → T004, T003, T002.
 
-## Tasks (4/6 resolved)
+## Tasks (5/6 resolved)
 
 ### provider-compatibility — Provider compatibility
 
@@ -20,13 +20,13 @@ GO-02 → T004, T003, T002.
 
 > Install the completion-recording workflow step. [D2; AC-05]
 
-- [x] **T004**: Amend the completion steps in `.harness/workflows/track/implement.md` and `.harness/workflows/track/full-cycle.md`. [D2; IN-06; AC-05]
+- [x] **T004**: Amend the completion steps in `.harness/workflows/track/implement.md` and `.harness/workflows/track/full-cycle.md`. [D2; IN-06; AC-05] (`c7939d73`)
 
 ### pre-rollout-recovery — Pre-rollout recovery
 
 > Install the recovery workflow and reload boundary. [D2; AC-04]
 
-- [ ] **T003**: Amend `.harness/workflows/track/implement.md` and `.harness/workflows/track/full-cycle.md` with the pre-rollout recovery procedure and a stop/reload boundary. [D2; IN-05; CN-03; AC-04]
+- [x] **T003**: Amend `.harness/workflows/track/implement.md` and `.harness/workflows/track/full-cycle.md` with the pre-rollout recovery procedure and a stop/reload boundary. [D2; IN-05; CN-03; AC-04]
 
 ### limited-profile-rollout — Limited profile rollout
 

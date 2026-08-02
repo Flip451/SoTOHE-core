@@ -63,6 +63,57 @@ directly — it is a read-only view rendered from the track artifacts.
 Implement the selected tasks in dependency order (lower-layer first, then upper layers that
 consume the new lower-layer surface). The order is encoded in the impl-plan sections.
 
+**Limited-profile rollout preflight and recovery boundary (AC-04).** Before dispatching an
+assignment under a limited Luna Max profile, the orchestrator must exclusively reserve the
+current-track worktree and create a recoverable checkpoint before activation. Before reserving it,
+quiesce every source-writing worker, wait for each to reach a terminal state, and preserve its
+session evidence and any completed work. The checkpoint must preserve the current branch and
+baseline identity, the worktree state (including expected uncommitted work), and the relevant
+current-track artifacts: `metadata.json`, `spec.json`, `impl-plan.json`,
+`batch-plan.json`, the selected profile, and the assignment's input, completion condition, and
+applicable gates. Verify that the approved baseline is still applicable, the branch is the
+expected `track/<id>` branch, the worktree state matches the checkpoint, and the listed artifacts
+are present and are the ones from which the assignment was prepared. Do not discard, reset, or
+overwrite unrelated work in order to make this check pass.
+
+The reservation is a coordination lock on the canonical current-track worktree, not a request for
+an adapter-created per-assignment worktree. Limited-profile assignments are therefore serialized
+in that canonical worktree: the adapter dispatches the fresh run in the exclusively reserved
+workspace, and no second limited assignment can start until the first assignment's terminal outcome
+and any one permitted Terra retry are recorded. No implementer, DFP worker, review fixer, or other
+source-writing process may start or write in the current-track worktree while the reservation is
+active. Restore only after that quiescence has been re-verified, so no unrelated changes exist
+after the checkpoint; preserve the Luna partial diff and evidence before restoration. Release the
+reservation only after the assignment's terminal result and evidence are recorded, then resume
+ordinary batch work.
+
+If a Terra assignment is running, first stop it, wait until it has reached a terminal state, and
+preserve its session evidence. Only then reload and activate the approved Luna Max profile. This
+is an explicit stop/reload boundary before *any* new Luna dispatch: the stopped Terra process or
+session must not overlap with, be resumed as, or share run/session state with the Luna assignment.
+The Luna assignment starts as a fresh run from the verified checkpoint.
+
+When a Luna Max assignment produces an outcome below, classify every applicable outcome and
+preserve its session/telemetry, recorded completion result or verdict, gate records, timing,
+provider-reported credits (or `unavailable`), and any partial output before restoring anything:
+
+- **Incomplete output** — the assignment ends before its configured time limit without its
+  defined completion result or verdict being recorded.
+- **Timeout** — the configured time limit is reached without that completion result or verdict
+  being recorded.
+- **Gate failure** — an applicable gate records a failing result.
+
+For any such outcome, do not silently continue the partial Luna run and do not invoke a runtime
+fallback. Stop the Luna assignment and wait for its terminal state; preserve its evidence and
+partial diff; restore the recoverable checkpoint; then reload the approved Terra profile. Verify
+the baseline, branch, worktree, relevant artifacts, and Terra profile again before dispatching a
+fresh retry. Re-run the same assignment **exactly once** with the identical input, completion
+condition, and applicable gates. Record the retry result and total execution count. Mark the
+assignment a model-regression candidate only when the Luna outcome is classified above and that
+single Terra retry succeeds; record `no` when the retry runs but does not succeed and
+`unavailable` when the determination cannot be made. Never perform a second Terra retry or use
+the Luna partial output as the Terra retry's starting point.
+
 Every dispatch to a source-editing capability must carry the `## Architecture Constraints`
 section required by
 `.harness/policies/implementation-delegation.md#R1. 委譲時に architecture 制約を注入する`. That
@@ -71,6 +122,10 @@ policy owns what the section must state; this workflow owns injecting it into ea
 Parallelism rules:
 
 - Tasks touching independent files may be implemented in parallel.
+- A limited Luna Max assignment is an exception: it exclusively reserves the current-track
+  worktree as described above and is serialized in that canonical workspace; no adapter-created
+  per-assignment worktree or parallel limited dispatch is required. Do not start concurrent
+  source-writing work until its terminal outcome and any one permitted Terra retry are recorded.
 - Serialize `cargo add`, `cargo update`, and any `Cargo.lock`-changing step through a single
   worker to avoid lock contention, then resume parallel work.
 - Parallel workers should prefer `cargo make test` for test validation. Reserve full-suite
@@ -143,6 +198,9 @@ track-completion claim or an early `observations.md` completion record.
 |------|------|---------|
 | 1 | Active `track/<id>` branch found | OK / stop |
 | 3 | Each source-editing dispatch carries `## Architecture Constraints` | pass / fail |
+| 3 | Each limited Luna Max assignment has an exclusively reserved recoverable checkpoint and verified baseline, branch, worktree, and relevant artifacts before activation | pass / stop |
+| 3 | A running Terra assignment is stopped before Luna reload/activation; each Luna failure recovery has a fresh, non-overlapping Terra retry run | pass / stop |
+| 3 | A classified Luna incomplete-output, timeout, or gate-failure outcome has preserved evidence and one identical-input Terra retry (or an explicit stop before retry dispatch) | pass / stop |
 | 4 | `bin/sotp test-obligation check` exits 0 | pass / fail |
 | 5 | `cargo make ci` exits 0 | pass / fail |
 | 5 | R2 pre-review placement verification performed | pass / fail |
@@ -154,6 +212,11 @@ track-completion claim or an early `observations.md` completion record.
 - **CI failure**: fix the failing gate (fmt, clippy, test, deny, layers, verify-*), re-run
   `cargo make ci`, and continue. The orchestrator must not mark tasks done until every
   post-implementation completion condition has passed.
+- **Luna Max incomplete output, timeout, or gate failure**: classify the outcome using Step 3,
+  preserve its evidence and partial diff, restore the pre-dispatch checkpoint, and perform the
+  one explicit fresh Terra retry with the same input, completion condition, and gates. Do not
+  activate Luna or Terra over a still-running assignment, automatically fall back, continue
+  partial output, restore before every other writer is quiescent, or retry Terra a second time.
 - **Blocked task**: keep the task in `in_progress`. Report the blocker and the remaining work.
   The `review` + `commit` cycle may proceed for other tasks once the orchestrator has completed
   their pre-review `done` transition after CI and the DRY fix phase.

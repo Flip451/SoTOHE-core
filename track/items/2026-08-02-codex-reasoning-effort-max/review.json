@@ -172,6 +172,108 @@
           "hash": "rvw1:sha256:15d56349c0314861cfad12db6540831bf62a5995933a5d70d58912e121f3b75e",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T10:46:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:611058ca0273f72f6fae745c88d37223292895d9bd72d1bff7dff469ae14d115",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T10:53:54Z",
+          "findings": [
+            {
+              "category": "data_corruption",
+              "file": ".harness/workflows/track/implement.md",
+              "line": 95,
+              "message": "The recovery restores a whole current-track/worktree checkpoint while Step 3 still permits parallel workers, and full-cycle also runs parallel review fixers in the same tree. A failed Luna assignment can therefore erase unrelated edits made after its checkpoint. Require isolated per-assignment worktrees/checkpoints or quiesce and preserve all other writers before restoration.",
+              "severity": "P0"
+            },
+            {
+              "category": "workflow_consistency",
+              "file": ".harness/workflows/track/full-cycle.md",
+              "line": 83,
+              "message": "The new exactly-once rule is contradicted by the existing failure path that relaunches failed/timed-out review fixers up to two times. If the single Terra recovery attempt fails, that path permits additional Terra executions of the same assignment. Add a limited-rollout exception that stops after the one Terra retry.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:611058ca0273f72f6fae745c88d37223292895d9bd72d1bff7dff469ae14d115",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T11:00:19Z",
+          "findings": [
+            {
+              "category": "adapter_ssot_mismatch",
+              "file": ".harness/workflows/track/implement.md",
+              "line": 67,
+              "message": "The mandatory per-assignment worktree is not wired through either provider adapter: they still launch workers in the existing workspace, and no reservation or successful-diff integration surface exists. This also contradicts full-cycle's same-working-tree batch model, so isolated changes cannot reliably reach DFP, review, and commit. Add adapter provisioning/integration or serialize limited assignments in the canonical worktree.",
+              "severity": "P1"
+            },
+            {
+              "category": "workflow_consistency",
+              "file": ".harness/workflows/track/full-cycle.md",
+              "line": 333,
+              "message": "The review-fixer retry exception still excludes only implementation assignments. Because review-fix-lead is itself a Luna limited-rollout assignment, a failed Terra recovery can enter this branch and receive up to two additional executions, contradicting the exactly-once rule above. Apply the exception to every selected limited-rollout assignment.",
+              "severity": "P1"
+            },
+            {
+              "category": "command_wiring",
+              "file": ".harness/workflows/track/full-cycle.md",
+              "line": 71,
+              "message": "The recovery boundary is only installed in implement/full-cycle. Standalone review and dry-check workflows directly dispatch the other Luna-selected capabilities without reading either workflow, so those assignments bypass checkpointing and the required single Terra recovery. Move or reference the boundary from every applicable dispatch surface.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:81ac1d8efc24f972ca5c70e0f25e8501b4a11e8f46c48e661669b6de3811db23",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T11:06:26Z",
+          "findings": [
+            {
+              "category": "workflow_consistency",
+              "file": ".harness/workflows/track/full-cycle.md",
+              "line": 74,
+              "message": "This serialization rule conflicts with the review workflow, which mandates launching every required scope's review-fix-lead in one parallel wave and explicitly treats serialization as a workflow violation. Once review-fix-lead uses the limited Luna profile, full-cycle cannot satisfy both contracts. Add a limited-rollout exception to review or use a recovery boundary compatible with its mandatory parallel wave.",
+              "severity": "P1"
+            },
+            {
+              "category": "command_wiring",
+              "file": ".harness/workflows/track/full-cycle.md",
+              "line": 83,
+              "message": "Declaring Step 0c mandatory for standalone review and dry-check here does not wire those entry points: their adapters and workflow SSoTs do not read full-cycle or implement before directly dispatching their fixers. Direct invocations therefore still bypass checkpointing, stop/reload, and exactly-one recovery. Reference or enforce the shared boundary from each actual dispatch surface.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:19ba2d46b94da0b5b4bc39835c87b2713d3f3e4a4708ce46638f416a0698cc5d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T11:13:07Z",
+          "findings": [
+            {
+              "category": "workflow_consistency",
+              "file": ".harness/workflows/track/review.md",
+              "line": 168,
+              "message": "The limited-Luna ordering remains internally contradictory. Step 4 says to release the reservation and launch the next scope after the fast fixer's terminal outcome, while Step 5 requires immediately launching that same scope's final round; it then also states that no cross-scope ordering constraint exists despite mandatory Luna serialization. Define one unambiguous sequence—preferably fast → final for one scope, then the next scope—and qualify the no-ordering rule as Terra-only.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b513006769d645208829e9c089035111858cb790fe186f8bed1de2416c231ae7",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T11:17:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:359cbcd9a55517164712b651851dc5c76abf48edb26a08e40de7829fbb339135",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -536,6 +638,20 @@
           "at": "2026-08-02T10:19:32Z",
           "findings": [],
           "hash": "rvw1:sha256:1ca18a8cb78b2f5f3a5ed8c4639972714b45114f2d437c6cb6f528ab5e84e723",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T10:46:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:db5ded022b471a4062e1b91a55fe523d6926212bf8169557197c335eed872265",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T10:49:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:db5ded022b471a4062e1b91a55fe523d6926212bf8169557197c335eed872265",
           "type": "final",
           "verdict": "zero_findings"
         }

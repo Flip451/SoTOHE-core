@@ -48,7 +48,23 @@ status without duplicating the config probe.
 
 Use the track id resolved in Step 0a. Read `spec.md` and `plan.md` for context.
 
-**Step 1: Launch the dfl capability**
+**Step 0c: Apply the limited-profile recovery boundary to the direct dfl dispatch**
+
+When the resolved `dry-fix-lead` profile is the limited `gpt-5.6-luna` + `max` lane, this
+workflow is an applicable Luna dispatch surface and must execute the shared preflight in
+`.harness/workflows/track/implement.md` Step 3 before dispatch: quiesce all other source writers,
+reserve the canonical current-track worktree (a coordination lock, not an adapter-created
+per-assignment worktree), checkpoint the baseline/branch/worktree and prepared artifacts, and stop
+any running Terra assignment before reloading Luna. The dfl run is fresh and must not overlap or
+reuse another session. On incomplete output, timeout, or gate failure, preserve the evidence and
+partial diff, restore and re-verify the checkpoint, reload Terra, and run the same assignment
+exactly once with identical input, completion condition, and gates. Record the retry and
+model-regression-candidate result; do not invoke a runtime fallback or a second execution. A direct
+dry-check invocation that cannot establish this boundary stops before dispatch. The canonical
+worktree reservation serializes this single dfl assignment; it does not require adapter-created
+per-assignment worktrees.
+
+**Step 1: Launch the dfl capability after the limited-profile preflight**
 
 Dispatch the `dry-fix-lead` capability through the invocation form the caller's adapter
 defines (`.claude/commands/track/dry-check.md` / `.agents/skills/track-dry-check/SKILL.md`).
@@ -116,6 +132,10 @@ never collapsed into a single branch:
   precondition: `cargo make track-commit-message` runs `sotp dry check-approved` and refuses
   to proceed while the DRY gate is Blocked.
 - **dfl `failed`**: report the tooling error. Stop and do not proceed to review.
+- **Limited Luna dfl incomplete output, timeout, or gate failure**: preserve evidence, stop the
+  run, restore and re-verify the checkpoint, reload Terra, and run exactly one fresh identical
+  retry. Do not apply a process-retry allowance, continue partial output, or launch another Terra
+  execution. If the boundary cannot be verified, stop before dispatch or report the blocker.
 - **`bin/sotp dry check-approved` non-zero on `completed` path**: this is a post-loop
   verification failure. Re-run the dfl loop or investigate the discrepancy before declaring
   the gate passed.

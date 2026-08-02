@@ -62,6 +62,20 @@ Provider / model resolution for the reviewer and the fixer is owned by the CLI
 (`bin/sotp review local` reads `capabilities.reviewer` from `.harness/config/agent-profiles.json`
 internally). The workflow does not branch on provider identity.
 
+**Step 1b: Apply the limited-profile recovery boundary to direct fixer dispatches**
+
+When the resolved `review-fix-lead` profile is the limited `gpt-5.6-luna` + `max` lane, this
+workflow is itself an applicable Luna dispatch surface and must execute the shared preflight in
+`.harness/workflows/track/implement.md` Step 3 before each fixer assignment: quiesce all other
+source writers, reserve the canonical current-track worktree (a coordination lock, not an
+adapter-created per-assignment worktree), checkpoint the baseline/branch/worktree and prepared
+artifacts, and stop any running Terra assignment before reloading Luna. The fixer run is fresh and
+must not overlap or reuse another session. On incomplete output, timeout, or gate failure, preserve
+the evidence and partial diff, restore and re-verify the checkpoint, reload Terra, and run the same
+assignment exactly once with identical input, completion condition, and gates. Record the retry and
+model-regression-candidate result; do not invoke a runtime fallback or a second execution. A direct
+review invocation that cannot establish this boundary stops before dispatch.
+
 **Reviewer session resume (automatic).** A round resumes the prior provider session recorded
 under its track × scope × round-type × diff-base key whenever a valid entry exists — typically
 the fix → re-review loop within one review cycle. A later cycle has a new diff base after its
@@ -137,10 +151,10 @@ The CLI auto-injects the scope file list and severity policy. Do NOT hand-author
 `.harness/config/review-scope.json` receive the policy reference automatically via
 `bin/sotp review local`.
 
-**Step 4: Launch review-fix-lead fixers (parallel, fast round)**
+**Step 4: Launch review-fix-lead fixers (parallel for Terra; serialized for limited Luna)**
 
-For each `required` scope, launch one `review-fix-lead` capability invocation in parallel via
-the provider-agnostic wrapper:
+For each `required` scope, launch one `review-fix-lead` capability invocation via the
+provider-agnostic wrapper:
 
 ```
 cargo make track-local-review-fix -- --scope {scope} \
@@ -148,28 +162,30 @@ cargo make track-local-review-fix -- --scope {scope} \
   --round-type fast
 ```
 
-Dispatch is a single wave: launch every `required` scope's fixer before waiting on any of
-them. Serializing scopes — waiting for one scope's round to finish before launching another
-scope's round — is a workflow violation. The only ordering constraints in this workflow are:
+With the ordinary Terra profile, dispatch is a single wave: launch every `required` scope's fixer
+before waiting on any of them. With the limited Luna profile, the canonical-worktree reservation
+from Step 1b is an explicit exception: launch exactly one required scope's fast fixer and, when it
+completes, immediately run that scope's final fixer under the same reservation (Step 5). Wait for
+the scope's complete fast → final lifecycle, including any one permitted Terra retry and evidence
+recording, before releasing the reservation and launching the next scope. This serialization is
+required to prevent overlapping source writes; it is not a workaround for build-lock contention.
+The only ordering constraints in this workflow are:
 
 1. Within one scope, `fast` precedes `final` (Step 5).
 2. The DRY fixpoint (DFP) and this review fixpoint must not run concurrently
    (`full-cycle.md` orders DFP before Review).
 
-No cross-scope ordering constraint exists for the initial wave. A
+No cross-scope ordering constraint exists for the ordinary Terra initial wave. The limited Luna
+exception instead requires the complete fast → final lifecycle for one scope before the next scope
+starts. A
 `blocked_cross_scope` terminal status is the recovery exception: resolve that dependency, then
 relaunch the affected scope as specified below.
 
-The initial wave is unconditional. Serializing scopes to avoid a failure the orchestrator can
-recover from manually is never permitted, and every interference between concurrent fixers is
-such a failure: build-lock contention, a fixer's CI run observing another scope's in-flight edit,
-and anything else a relaunch or an orchestrator-run gate resolves are recoverable failures, not
-ordering constraints — the orchestrator's own authoritative `cargo make ci` run settles the tree
-regardless of what a concurrent fixer reported. When unsure, the orchestrator must establish that
-no manual recovery exists before withholding any scope from the wave; anticipated interference
-never qualifies.
+The Terra initial wave is unconditional. For the limited Luna profile, the Step 1b reservation
+and serialized dispatch are unconditional; no concurrent fixer may write the canonical worktree.
+The orchestrator's authoritative `cargo make ci` run still settles the tree after all scopes.
 
-`blocked_cross_scope` does not license serializing the initial wave. It is a terminal status a
+For the Terra initial wave, `blocked_cross_scope` does not license serializing the initial wave. It is a terminal status a
 scope reports *after* it has been dispatched, and its handling — resolve the dependency, then
 relaunch that scope — is itself the manual recovery this rule requires.
 
@@ -317,9 +333,11 @@ All five gates must pass before the workflow reports readiness.
   enforce byte matching.
 - **Fixer `blocked_cross_scope`**: fix the cross-scope dependencies from the orchestrator
   context, then relaunch the affected scope.
-- **Fixer `failed` / timeout**: for an ADR-scoped finding requiring an ADR edit with a recorded round, enter
-  the guardian lane before any retry. Otherwise relaunch (up to 2 retries). If retries also
-  fail, report to the user and ask for a decision.
+- **Fixer `failed` / timeout**: for an ADR-scoped finding requiring an ADR edit with a recorded
+  round, enter the guardian lane before any retry. Otherwise the ordinary Terra process may be
+  relaunched (up to 2 retries). For a limited Luna assignment, once the assignment has started and
+  yields incomplete output, timeout, or gate failure, do not use this process allowance: perform
+  only the one explicit Terra recovery in Step 1b. If that retry also fails, stop and report.
 - **`cargo make ci` failure**: fix the CI failure (format, clippy, test), re-run, and continue
   the workflow. CI failure does not reset the review loop.
 - **`bin/sotp review check-approved` non-zero**: diagnose — stale hash (re-stage and re-run
