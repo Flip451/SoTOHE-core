@@ -9,15 +9,24 @@ fn capability(value: &str) -> CapabilityName {
 }
 
 fn load_profiles(contents: &str) -> AgentProfiles {
+    load_profiles_result(contents).expect("test profile loads")
+}
+
+fn load_profiles_result(contents: &str) -> Result<AgentProfiles, AgentProfilesError> {
     let directory = tempfile::tempdir().expect("test directory is created");
     let path = directory.path().join("agent-profiles.json");
     fs::write(&path, contents).expect("test profile is written");
-    AgentProfiles::load(directory.path(), &path).expect("test profile loads")
+    AgentProfiles::load(directory.path(), &path)
 }
 
 const CODEX_PROFILE: &str = r#"{
     "schema_version": 1,
-    "providers": { "codex": { "label": "Codex CLI" } },
+    "providers": {
+        "codex": {
+            "label": "Codex CLI",
+            "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"]
+        }
+    },
     "capabilities": {
         "reviewer": {
             "provider": "codex",
@@ -73,7 +82,7 @@ fn test_resolve_execution_missing_fast_effort_returns_error() {
     let profiles = load_profiles(
         r#"{
             "schema_version": 1,
-            "providers": { "codex": { "label": "Codex CLI" } },
+            "providers": { "codex": { "label": "Codex CLI", "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"] } },
             "capabilities": {
                 "reviewer": {
                     "provider": "codex",
@@ -97,7 +106,7 @@ fn test_resolve_execution_missing_final_effort_returns_error() {
     let profiles = load_profiles(
         r#"{
             "schema_version": 1,
-            "providers": { "codex": { "label": "Codex CLI" } },
+            "providers": { "codex": { "label": "Codex CLI", "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"] } },
             "capabilities": {
                 "reviewer": {
                     "provider": "codex",
@@ -117,11 +126,36 @@ fn test_resolve_execution_missing_final_effort_returns_error() {
 }
 
 #[test]
+fn test_provider_without_effort_list_is_rejected() {
+    let result = load_profiles_result(
+        r#"{
+            "schema_version": 1,
+            "providers": { "codex": { "label": "Codex CLI" } },
+            "capabilities": {
+                "implementer": {
+                    "provider": "codex",
+                    "model": "gpt-5.6-terra",
+                    "reasoning_effort": "high",
+                    "execution_mode": "orchestrator-output"
+                }
+            }
+        }"#,
+    );
+
+    assert!(matches!(result, Err(AgentProfilesError::Parse(_))));
+}
+
+#[test]
 fn test_resolve_execution_unsupported_provider_effort_returns_error() {
     let profiles = load_profiles(
         r#"{
             "schema_version": 1,
-            "providers": { "gemini": { "label": "Gemini CLI" } },
+            "providers": {
+                "gemini": {
+                    "label": "Gemini CLI",
+                    "supported_reasoning_efforts": ["low", "medium", "high"]
+                }
+            },
             "capabilities": {
                 "researcher": {
                     "provider": "gemini",
@@ -141,6 +175,35 @@ fn test_resolve_execution_unsupported_provider_effort_returns_error() {
 }
 
 #[test]
+fn test_resolve_execution_codex_max_returns_provider_cli() {
+    let profiles = load_profiles(
+        r#"{
+            "schema_version": 1,
+            "providers": {
+                "codex": {
+                    "label": "Codex CLI",
+                    "supported_reasoning_efforts": ["max"]
+                }
+            },
+            "capabilities": {
+                "implementer": {
+                    "provider": "codex",
+                    "model": "gpt-5.6-luna",
+                    "reasoning_effort": "max",
+                    "execution_mode": "orchestrator-output"
+                }
+            }
+        }"#,
+    );
+
+    assert!(matches!(
+        profiles.resolve_execution(&capability("implementer"), RoundType::Final),
+        Ok(ResolvedExecution::ProviderCli { provider, effort, .. })
+            if provider.as_str() == "codex" && effort == ReasoningEffort::Max
+    ));
+}
+
+#[test]
 fn test_resolve_execution_claude_accepts_every_effort_level() {
     for (encoded, expected) in [
         ("low", ReasoningEffort::Low),
@@ -152,7 +215,12 @@ fn test_resolve_execution_claude_accepts_every_effort_level() {
         let profiles = load_profiles(&format!(
             r#"{{
                 "schema_version": 1,
-                "providers": {{ "claude": {{ "label": "Claude Code" }} }},
+                "providers": {{
+                    "claude": {{
+                        "label": "Claude Code",
+                        "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"]
+                    }}
+                }},
                 "capabilities": {{
                     "implementer": {{
                         "provider": "claude",
@@ -173,11 +241,98 @@ fn test_resolve_execution_claude_accepts_every_effort_level() {
 }
 
 #[test]
+fn test_resolve_execution_provider_declaration_rejects_undeclared_effort() {
+    let profiles = load_profiles(
+        r#"{
+            "schema_version": 1,
+            "providers": {
+                "claude": {
+                    "label": "Claude Code",
+                    "supported_reasoning_efforts": ["low"]
+                }
+            },
+            "capabilities": {
+                "implementer": {
+                    "provider": "claude",
+                    "model": "claude-opus-5",
+                    "reasoning_effort": "high",
+                    "execution_mode": "orchestrator-output"
+                }
+            }
+        }"#,
+    );
+
+    assert!(matches!(
+        profiles.resolve_execution(&capability("implementer"), RoundType::Final),
+        Err(AgentProfilesError::UnsupportedEffort(provider, ReasoningEffort::High))
+            if provider.as_str() == "claude"
+    ));
+}
+
+#[test]
+fn test_resolve_execution_explicit_empty_provider_effort_list_rejects_all_efforts() {
+    let profiles = load_profiles(
+        r#"{
+            "schema_version": 1,
+            "providers": {
+                "codex": {
+                    "label": "Codex CLI",
+                    "supported_reasoning_efforts": []
+                }
+            },
+            "capabilities": {
+                "implementer": {
+                    "provider": "codex",
+                    "model": "gpt-5.6-luna",
+                    "reasoning_effort": "max",
+                    "execution_mode": "orchestrator-output"
+                }
+            }
+        }"#,
+    );
+
+    assert!(matches!(
+        profiles.resolve_execution(&capability("implementer"), RoundType::Final),
+        Err(AgentProfilesError::UnsupportedEffort(provider, ReasoningEffort::Max))
+            if provider.as_str() == "codex"
+    ));
+}
+
+#[test]
+fn test_resolve_execution_custom_provider_declares_max_returns_provider_cli() {
+    let profiles = load_profiles(
+        r#"{
+            "schema_version": 1,
+            "providers": {
+                "custom": {
+                    "label": "Custom CLI",
+                    "supported_reasoning_efforts": ["max"]
+                }
+            },
+            "capabilities": {
+                "implementer": {
+                    "provider": "custom",
+                    "model": "custom-reasoner",
+                    "reasoning_effort": "max",
+                    "execution_mode": "orchestrator-output"
+                }
+            }
+        }"#,
+    );
+
+    assert!(matches!(
+        profiles.resolve_execution(&capability("implementer"), RoundType::Final),
+        Ok(ResolvedExecution::ProviderCli { provider, effort, .. })
+            if provider.as_str() == "custom" && effort == ReasoningEffort::Max
+    ));
+}
+
+#[test]
 fn test_resolve_execution_pr_reviewer_is_hosted_service_exempt() {
     let profiles = load_profiles(
         r#"{
             "schema_version": 1,
-            "providers": { "codex": { "label": "Codex CLI" } },
+            "providers": { "codex": { "label": "Codex CLI", "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"] } },
             "capabilities": {
                 "pr-reviewer": {
                     "provider": "codex",
@@ -198,7 +353,7 @@ fn test_capability_config_final_effort_alias_maps_to_typed_accessor() {
     let profiles = load_profiles(
         r#"{
             "schema_version": 1,
-            "providers": { "codex": { "label": "Codex CLI" } },
+            "providers": { "codex": { "label": "Codex CLI", "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"] } },
             "capabilities": {
                 "dry-checker": {
                     "provider": "codex",
@@ -268,6 +423,44 @@ fn test_committed_profiles_subprocess_entries_resolve_explicit_effort() {
 }
 
 #[test]
+fn test_committed_profiles_limited_rollout_resolves_luna_max_and_preserves_terra() {
+    let manifest_dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
+    let workspace_root = manifest_dir
+        .parent()
+        .and_then(std::path::Path::parent)
+        .expect("infrastructure crate is nested under the workspace");
+    let profiles = AgentProfiles::load(workspace_root, &workspace_root.join(AGENT_PROFILES_PATH))
+        .expect("committed profile loads");
+
+    for capability_name in ["implementer", "review-fix-lead", "dry-fix-lead"] {
+        assert!(matches!(
+            profiles.resolve_execution(&capability(capability_name), RoundType::Final),
+            Ok(ResolvedExecution::ProviderCli { provider, model, effort })
+                if provider.as_str() == "codex"
+                    && model.as_str() == "gpt-5.6-luna"
+                    && effort == ReasoningEffort::Max
+        ));
+    }
+
+    for (capability_name, expected_effort) in [
+        ("spec-designer", ReasoningEffort::High),
+        ("impl-planner", ReasoningEffort::High),
+        ("researcher", ReasoningEffort::High),
+        ("dry-checker", ReasoningEffort::XHigh),
+        ("obligation-fulfillment-verifier", ReasoningEffort::XHigh),
+        ("waiver-verifier", ReasoningEffort::XHigh),
+    ] {
+        assert!(matches!(
+            profiles.resolve_execution(&capability(capability_name), RoundType::Final),
+            Ok(ResolvedExecution::ProviderCli { provider, model, effort })
+                if provider.as_str() == "codex"
+                    && model.as_str() == "gpt-5.6-terra"
+                    && effort == expected_effort
+        ));
+    }
+}
+
+#[test]
 fn test_committed_and_default_profiles_resolve_full_cli_effort_contract() {
     let manifest_dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
     let workspace_root = manifest_dir
@@ -331,7 +524,7 @@ fn test_resolve_execution_non_pr_reviewer_missing_final_effort_returns_error() {
     let profiles = load_profiles(
         r#"{
             "schema_version": 1,
-            "providers": { "codex": { "label": "Codex CLI" } },
+            "providers": { "codex": { "label": "Codex CLI", "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"] } },
             "capabilities": {
                 "implementer": {
                     "provider": "codex",
