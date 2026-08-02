@@ -4,5 +4,5 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CommandTraceDriver | primary_adapter | add | — | 🟡 | 🔵 |
+| CommandTraceDriver | primary_adapter | add | — | 🔵 | 🔵 |
 

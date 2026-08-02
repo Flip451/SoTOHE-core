@@ -88,12 +88,12 @@
       },
       "key": {
         "waived_reason_hash": "8b42a10437df745679341848615e69c55134ba90e89005d542fe3418535c7ec2",
-        "declaration_hash": "0bd0d8a1b5164dec8fb189873706bbb06e71becc898836bce90aa6c63233387a",
+        "declaration_hash": "ca607317a4b3b8cd5f8fa4c8c0c3b3ffbf6694a26a0dc812a1b67bd91aeede39",
         "anchor_text_hash": "e8372367836888c48ae6c6884d835ad2cb235a64da700bb711dbd7fc03b9273c"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "docs: Some(DocString(\"Constructor errors with explicit owners: SotpCommandIdentity::try_new produces EmptyCommandIdentity; CommandExitCode::try_new produces ZeroExitCode; CommandExecutionMetric::new produces ZeroExecutions or FailureCountExceedsExecutions; CommandFailureRateBasisPoints::try_new produces FailureRateOutOfRange.\"))"
+        "citation": "TypeEntry ... docs: Some(DocString(\"Constructor errors with explicit owners: SotpCommandIdentity::try_new produces EmptyCommandIdentity; CommandExitCode::try_new accepts u8 and produces ZeroExitCode only for zero, while values outside 0..=255 are unrepresentable at the API boundary; CommandExecutionMetric::new produces ZeroExecutions or FailureCountExceedsExecutions; CommandFailureRateBasisPoints::try_new produces FailureRateOutOfRange.\"))"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -112,12 +112,12 @@
       },
       "key": {
         "waived_reason_hash": "618d89a9a9d76aa914afafc7ff05ddfd1bdbdb4dc471d5059c9a8c645261013f",
-        "declaration_hash": "0bd0d8a1b5164dec8fb189873706bbb06e71becc898836bce90aa6c63233387a",
+        "declaration_hash": "ca607317a4b3b8cd5f8fa4c8c0c3b3ffbf6694a26a0dc812a1b67bd91aeede39",
         "anchor_text_hash": "886b259b72d31a9481887873baede5471f2b81415aad543979b98bd24b8f0528"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "各コマンド実行について、コマンド identity、所要時間、および exit 結果をローカル JSONL 記録へ残す。"
+        "citation": "\"CommandTraceValueError only represents in-memory validation failures\""
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },

@@ -45,6 +45,7 @@
       "id": "T006",
       "description": "Delete the old infrastructure `TelemetryReportOutput`, modify `TelemetryReport::aggregate`, add the layer-unique `TelemetryReportSnapshot` read model, and update `FsTelemetryReportAdapter` parser-to-usecase conversion for persisted command metrics and fail-open malformed- and unknown-schema-record skip reporting, with focused aggregation-path tests. IN-03, OUT-01, CN-01, CN-04, AC-02, AC-03.",
       "status": "done",
+      "commit_hash": "1dc7b80fca414e70b70705d5313ffec72ceefed6",
       "depends_on": [
         "T003",
         "T005"
@@ -52,8 +53,8 @@
     },
     {
       "id": "T007",
-      "description": "Implement the primary `CommandTraceDriver` that submits a typed completed-command record to the usecase service and maps the result to the existing command outcome. IN-01, IN-02, CN-01, CN-03, AC-01, AC-03.",
-      "status": "todo",
+      "description": "Update `CommandTraceDriver::handle(outcome, record) -> CommandOutcome` to invoke local trace recording and render trace diagnostics; add focused success/failure regression tests. IN-02, AC-01, AC-03.",
+      "status": "done",
       "depends_on": [
         "T002"
       ]
@@ -136,7 +137,7 @@
         "id": "S5",
         "title": "Tracing composition",
         "description": [
-          "Build the primary driver and wire the complete local tracing dependency graph before entrypoint use. IN-01, IN-02, IN-04, OUT-01, CN-01, CN-02, CN-03, AC-01, AC-03, AC-04."
+          "Build the primary driver and wire the complete local tracing dependency graph before entrypoint use. IN-02, IN-04, OUT-01, CN-01, CN-02, CN-03, AC-01, AC-03, AC-04."
         ],
         "task_ids": [
           "T007",

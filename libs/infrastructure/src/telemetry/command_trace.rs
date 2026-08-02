@@ -275,7 +275,7 @@ impl From<CommandTraceRecord> for JsonCommandTraceRecord {
         let result = match record.result {
             CommandExecutionResult::Success => JsonCommandExitResult::Success,
             CommandExecutionResult::Failure(exit_code) => {
-                JsonCommandExitResult::Failure { exit_code: exit_code.value() }
+                JsonCommandExitResult::Failure { exit_code: i32::from(exit_code.value()) }
             }
         };
 

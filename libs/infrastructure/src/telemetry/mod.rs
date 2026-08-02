@@ -19,6 +19,8 @@ pub mod report;
 pub mod report_adapter;
 pub mod writer;
 
+mod report_command_trace;
+
 pub use config::TelemetryConfig;
 pub use report::{
     PhaseDurationSummary, TelemetryErrorEntry, TelemetryHookBlockEntry, TelemetryReport,

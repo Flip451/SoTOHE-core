@@ -14,11 +14,12 @@ use domain::TrackId;
 use serde::Deserialize;
 use thiserror::Error;
 use usecase::telemetry::command_trace::{
-    CommandDurationMillis, CommandExecutionCount, CommandExecutionMetric, CommandExitCode,
-    SotpCommandIdentity, TelemetrySkippedLineCount,
+    CommandDurationMillis, CommandExecutionCount, CommandExecutionMetric, SotpCommandIdentity,
+    TelemetrySkippedLineCount,
 };
 
 use crate::telemetry::TelemetryEvent;
+use crate::telemetry::report_command_trace::decode;
 use crate::track::symlink_guard::reject_symlinks_below;
 
 // ---------------------------------------------------------------------------
@@ -42,68 +43,6 @@ pub struct TelemetryReportSnapshot {
     pub skipped_lines: TelemetrySkippedLineCount,
     /// Per-command execution metrics parsed from persisted command records.
     pub command_metrics: Vec<CommandExecutionMetric>,
-}
-
-#[derive(Debug, Deserialize)]
-#[serde(deny_unknown_fields)]
-struct PersistedCommandTraceRecord {
-    #[serde(default)]
-    schema_version: PersistedCommandTraceSchemaVersion,
-    command: String,
-    duration_ms: u64,
-    result: PersistedCommandTraceResult,
-}
-
-/// Field omission predates schema versioning and is accepted for backward compatibility.
-/// An explicit null remains malformed: only concrete unsigned values deserialize.
-#[derive(Debug, Default)]
-enum PersistedCommandTraceSchemaVersion {
-    #[default]
-    Absent,
-    Present(u32),
-}
-
-impl<'de> Deserialize<'de> for PersistedCommandTraceSchemaVersion {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        u32::deserialize(deserializer).map(Self::Present)
-    }
-}
-
-#[derive(Debug, Deserialize)]
-#[serde(untagged)]
-enum PersistedCommandTraceResult {
-    Success(PersistedCommandTraceSuccess),
-    Failure(PersistedCommandTraceFailure),
-}
-
-#[derive(Debug, Deserialize)]
-#[serde(deny_unknown_fields)]
-struct PersistedCommandTraceSuccess {
-    #[serde(rename = "status")]
-    _status: PersistedCommandTraceSuccessStatus,
-}
-
-#[derive(Debug, Deserialize)]
-enum PersistedCommandTraceSuccessStatus {
-    #[serde(rename = "success")]
-    Success,
-}
-
-#[derive(Debug, Deserialize)]
-#[serde(deny_unknown_fields)]
-struct PersistedCommandTraceFailure {
-    #[serde(rename = "status")]
-    _status: PersistedCommandTraceFailureStatus,
-    exit_code: i32,
-}
-
-#[derive(Debug, Deserialize)]
-enum PersistedCommandTraceFailureStatus {
-    #[serde(rename = "failure")]
-    Failure,
 }
 
 /// Per-phase aggregated duration in the telemetry report.
@@ -419,45 +358,15 @@ impl TelemetryReport {
                             }
                             _ => {}
                         },
-                        Err(_) => {
-                            match serde_json::from_slice::<PersistedCommandTraceRecord>(&line) {
-                                Ok(record) => {
-                                    if matches!(
-                                        record.schema_version,
-                                        PersistedCommandTraceSchemaVersion::Present(version)
-                                            if !is_known_schema_version(version)
-                                    ) {
-                                        skipped_lines = skipped_lines.saturating_add(1);
-                                        continue;
-                                    }
-                                    let command = match SotpCommandIdentity::try_new(record.command)
-                                    {
-                                        Ok(command) => command,
-                                        Err(_) => {
-                                            skipped_lines = skipped_lines.saturating_add(1);
-                                            continue;
-                                        }
-                                    };
-                                    let failed = match record.result {
-                                        PersistedCommandTraceResult::Success(_) => false,
-                                        PersistedCommandTraceResult::Failure(
-                                            PersistedCommandTraceFailure { exit_code, .. },
-                                        ) => {
-                                            if CommandExitCode::try_new(exit_code).is_err() {
-                                                skipped_lines = skipped_lines.saturating_add(1);
-                                                continue;
-                                            }
-                                            true
-                                        }
-                                    };
-                                    let entry = command_map.entry(command).or_insert((0, 0, 0));
-                                    entry.0 = entry.0.saturating_add(1);
-                                    entry.1 = entry.1.saturating_add(u64::from(failed));
-                                    entry.2 = entry.2.saturating_add(record.duration_ms);
-                                }
-                                Err(_) => skipped_lines = skipped_lines.saturating_add(1),
+                        Err(_) => match decode(&line, KNOWN_SCHEMA_VERSIONS) {
+                            Some(record) => {
+                                let entry = command_map.entry(record.command).or_insert((0, 0, 0));
+                                entry.0 = entry.0.saturating_add(1);
+                                entry.1 = entry.1.saturating_add(u64::from(record.failed));
+                                entry.2 = entry.2.saturating_add(record.duration_ms);
                             }
-                        }
+                            None => skipped_lines = skipped_lines.saturating_add(1),
+                        },
                     }
                 }
             }
@@ -815,6 +724,19 @@ mod tests {
         let malformed_command = r#"{"command":"","duration_ms":80,"result":{"status":"success"}}"#;
         let tmp = TempDir::new().unwrap();
         write_jsonl(tmp.path(), "t", &[COMMAND_SUCCESS_LINE, malformed_command]);
+
+        let report = TelemetryReport::new(tmp.path().to_path_buf());
+        let output = report.aggregate(&track_id("t")).unwrap();
+
+        assert_eq!(*output.skipped_lines.as_ref(), 1);
+        assert_eq!(output.command_metrics.len(), 1);
+    }
+
+    #[test]
+    fn test_aggregate_out_of_range_command_exit_code_is_skipped_and_counted() {
+        let out_of_range_failure = r#"{"command":"track plan","duration_ms":80,"result":{"status":"failure","exit_code":256}}"#;
+        let tmp = TempDir::new().unwrap();
+        write_jsonl(tmp.path(), "t", &[COMMAND_SUCCESS_LINE, out_of_range_failure]);
 
         let report = TelemetryReport::new(tmp.path().to_path_buf());
         let output = report.aggregate(&track_id("t")).unwrap();

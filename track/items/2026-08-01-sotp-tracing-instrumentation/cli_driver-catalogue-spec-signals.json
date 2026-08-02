@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "9f8721a78b818840727d1337d96862fa6a82935f8180b5112169382ec49af0f8",
+  "catalogue_declaration_hash": "2d0df89e5aa1e2cfd888bcf8c2aa247eff0ee2e92efd6f889e887e6938e78654",
   "signals": [
     {
       "type_name": "CommandTraceDriver",
       "signal": "blue",
-      "entry_hash": "613844ff824f9cce38570a2a01209fada3c244e2a2ce82036fc30c005d248611"
+      "entry_hash": "9b283f744618c8f483961a75fa37df946f976842298569b261023f806dc36389"
     }
   ]
 }

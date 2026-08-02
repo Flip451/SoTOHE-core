@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "03d224c73d97cf00df1637a98b7ac705f04ba9707c2dc9197aa19e682301d087",
+  "catalogue_declaration_hash": "dabdb145434bfbe01ac696857c1e94a06532fe81cdc03d787f735b28e4a5d074",
   "signals": [
     {
       "type_name": "CommandDurationMillis",
@@ -25,7 +25,7 @@
     {
       "type_name": "CommandExitCode",
       "signal": "blue",
-      "entry_hash": "25aac33211a7fdaa5c074ad5d8172f3d74eb6bb4ee0d50d719bb26dacf1cd0c7"
+      "entry_hash": "b560620f02b10e71abecf1b68233c29e2cd78133e72d60403c2e1419974aa648"
     },
     {
       "type_name": "CommandFailureRateBasisPoints",
@@ -45,7 +45,7 @@
     {
       "type_name": "CommandTraceValueError",
       "signal": "blue",
-      "entry_hash": "289aca0c600916241e244e744096045ece4b4a852f088f6edd9b7ba19bc2e03f"
+      "entry_hash": "1405dab21306fbd9dbcf6cab1ba2bae5943696086123116036c7a7c64a85de90"
     },
     {
       "type_name": "CommandTraceWriteError",

@@ -12,6 +12,8 @@ use usecase::telemetry::TelemetryReportOutput;
 
 use crate::render::CommandOutcome;
 
+pub mod command_trace;
+
 // ---------------------------------------------------------------------------
 // Input types
 // ---------------------------------------------------------------------------

@@ -22,6 +22,10 @@
           "name": "handle",
           "params": [
             {
+              "name": "outcome",
+              "ty": "CommandOutcome"
+            },
+            {
               "name": "record",
               "ty": "usecase::telemetry::CommandTraceRecord"
             }
@@ -39,7 +43,7 @@
   "types": {
     "CommandTraceDriver": {
       "action": "add",
-      "docs": "Primary adapter used by the common sotp entrypoint; it accepts an already typed completed-command record, invokes CommandTraceService, and maps the result to CommandOutcome without exposing infrastructure.",
+      "docs": "Primary adapter that locally records one already-completed command. Its usecase dependency retains the typed Result<(), CommandTraceWriteError> boundary. The driver consumes that typed result and always returns CommandOutcome: a trace-write failure is rendered into stderr without changing the completed command's stdout or original exit_code, so tracing failure remains visible without replacing the command's behavioral result or leaking infrastructure types.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -55,10 +59,6 @@
         "PrimaryAdapter": {}
       },
       "spec_refs": [
-        {
-          "anchor": "IN-01",
-          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
-        },
         {
           "anchor": "IN-02",
           "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"

@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-01T16:54:47Z",
-  "declaration_hash": "03d224c73d97cf00df1637a98b7ac705f04ba9707c2dc9197aa19e682301d087",
-  "implementation_input_hash": "b92ae4f29ae063fd75b3bc6c6ab45be2adff0e827c67b232d720af2f90856a2c",
+  "generated_at": "2026-08-02T00:14:09Z",
+  "declaration_hash": "dabdb145434bfbe01ac696857c1e94a06532fe81cdc03d787f735b28e4a5d074",
+  "implementation_input_hash": "d7b6a314673762bea3df1ab552a4d862c0775f0f667570a0ada3ff561aa4226a",
   "signals": [
     {
       "type_name": "CommandDurationMillis",

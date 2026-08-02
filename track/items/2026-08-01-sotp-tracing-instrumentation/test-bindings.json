@@ -249,6 +249,19 @@
       "kind": "voluntary_binding",
       "edge_id": {"entry_key": "TelemetryReportSnapshot", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "AC-02"}},
       "tests": [{"layer": "infrastructure", "module_path": "infrastructure::telemetry::report_adapter::tests", "test_name": "aggregate_converts_persisted_command_metrics_to_usecase_output"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CommandTraceDriver", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "IN-02"}},
+      "tests": [{"layer": "cli_driver", "module_path": "cli_driver::telemetry::command_trace::tests", "test_name": "test_command_trace_driver_success_submits_one_record_and_preserves_outcome"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CommandTraceDriver", "anchor_id": {"file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json", "element_id": "AC-01"}},
+      "tests": [
+        {"layer": "cli_driver", "module_path": "cli_driver::telemetry::command_trace::tests", "test_name": "test_command_trace_driver_success_submits_one_record_and_preserves_outcome"},
+        {"layer": "cli_driver", "module_path": "cli_driver::telemetry::command_trace::tests", "test_name": "test_command_trace_driver_write_failure_preserves_command_failure_outcome"}
+      ]
     }
   ]
 }

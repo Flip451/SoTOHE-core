@@ -61,7 +61,7 @@
           "params": [
             {
               "name": "value",
-              "ty": "i32"
+              "ty": "u8"
             }
           ],
           "returns": "Result<Self, CommandTraceValueError>"
@@ -72,7 +72,7 @@
           "name": "value",
           "params": [],
           "receiver": "&self",
-          "returns": "i32"
+          "returns": "u8"
         }
       ],
       "type_name": "CommandExitCode"
@@ -599,7 +599,7 @@
     },
     "CommandExitCode": {
       "action": "add",
-      "docs": "Validated non-zero process exit code used by CommandExecutionResult::Failure; try_new produces only CommandTraceValueError::ZeroExitCode.",
+      "docs": "CLI-representable failed-command exit code in the inclusive range 1..=255. Its private core::num::NonZeroU8 representation makes zero and values outside the u8 range unrepresentable; try_new accepts u8 and produces only CommandTraceValueError::ZeroExitCode.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -724,7 +724,7 @@
     },
     "CommandTraceValueError": {
       "action": "add",
-      "docs": "Constructor errors with explicit owners: SotpCommandIdentity::try_new produces EmptyCommandIdentity; CommandExitCode::try_new produces ZeroExitCode; CommandExecutionMetric::new produces ZeroExecutions or FailureCountExceedsExecutions; CommandFailureRateBasisPoints::try_new produces FailureRateOutOfRange.",
+      "docs": "Constructor errors with explicit owners: SotpCommandIdentity::try_new produces EmptyCommandIdentity; CommandExitCode::try_new accepts u8 and produces ZeroExitCode only for zero, while values outside 0..=255 are unrepresentable at the API boundary; CommandExecutionMetric::new produces ZeroExecutions or FailureCountExceedsExecutions; CommandFailureRateBasisPoints::try_new produces FailureRateOutOfRange.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",

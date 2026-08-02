@@ -1,5 +1,6 @@
 //! Typed values for a completed `sotp` command trace.
 
+use std::num::NonZeroU8;
 use std::sync::Arc;
 
 use thiserror::Error;
@@ -124,25 +125,21 @@ impl CommandFailureRateBasisPoints {
 
 /// A validated non-zero exit code for a failed command.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct CommandExitCode(i32);
+pub struct CommandExitCode(NonZeroU8);
 
 impl CommandExitCode {
-    /// Creates a failed-command exit code from a non-zero value.
+    /// Creates a CLI-representable failed-command exit code from a non-zero value.
     ///
     /// # Errors
     /// Returns [`CommandTraceValueError::ZeroExitCode`] when `value` is zero.
-    pub fn try_new(value: i32) -> Result<Self, CommandTraceValueError> {
-        if value == 0 {
-            return Err(CommandTraceValueError::ZeroExitCode);
-        }
-
-        Ok(Self(value))
+    pub fn try_new(value: u8) -> Result<Self, CommandTraceValueError> {
+        NonZeroU8::new(value).map(Self).ok_or(CommandTraceValueError::ZeroExitCode)
     }
 
     /// Returns the exit code.
     #[must_use]
-    pub fn value(&self) -> i32 {
-        self.0
+    pub fn value(&self) -> u8 {
+        self.0.get()
     }
 }
 
@@ -322,7 +319,7 @@ mod tests {
         SotpCommandIdentity::try_new(value.to_owned())
     }
 
-    fn exit_code(value: i32) -> Result<CommandExitCode, CommandTraceValueError> {
+    fn exit_code(value: u8) -> Result<CommandExitCode, CommandTraceValueError> {
         CommandExitCode::try_new(value)
     }
 
@@ -440,9 +437,9 @@ mod tests {
 
     #[test]
     fn test_command_exit_code_nonzero_retains_value() -> Result<(), CommandTraceValueError> {
-        let exit_code = exit_code(17)?;
+        let exit_code = exit_code(u8::MAX)?;
 
-        assert_eq!(exit_code.value(), 17);
+        assert_eq!(exit_code.value(), u8::MAX);
         Ok(())
     }
 

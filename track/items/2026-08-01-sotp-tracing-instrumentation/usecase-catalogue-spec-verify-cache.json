@@ -171,11 +171,11 @@
       }
     },
     {
-      "claim_hash": "25aac33211a7fdaa5c074ad5d8172f3d74eb6bb4ee0d50d719bb26dacf1cd0c7",
+      "claim_hash": "b560620f02b10e71abecf1b68233c29e2cd78133e72d60403c2e1419974aa648",
       "evidence_hash": "7d442a8ba6b078174131cac5825c183427295e92bdc20170d3064381163593a3",
       "verdict": {
         "kind": "pass",
-        "citation": "exit 結果をローカル JSONL 記録へ残す"
+        "citation": "各コマンド実行について、コマンド identity、所要時間、および exit 結果をローカル JSONL 記録へ残す。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -363,7 +363,7 @@
       }
     },
     {
-      "claim_hash": "289aca0c600916241e244e744096045ece4b4a852f088f6edd9b7ba19bc2e03f",
+      "claim_hash": "1405dab21306fbd9dbcf6cab1ba2bae5943696086123116036c7a7c64a85de90",
       "evidence_hash": "f92832f5450d69a09850f4956fad3ba679b857fc835c4266b0c10df3e15394c3",
       "verdict": {
         "kind": "pass",
@@ -387,7 +387,7 @@
       }
     },
     {
-      "claim_hash": "289aca0c600916241e244e744096045ece4b4a852f088f6edd9b7ba19bc2e03f",
+      "claim_hash": "1405dab21306fbd9dbcf6cab1ba2bae5943696086123116036c7a7c64a85de90",
       "evidence_hash": "7d442a8ba6b078174131cac5825c183427295e92bdc20170d3064381163593a3",
       "verdict": {
         "kind": "pass",
