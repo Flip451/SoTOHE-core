@@ -246,6 +246,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [codex reviewer runtime の bootstrap 解決リンク（resolve & link）配備](2026-07-18-1359-codex-resolve-and-link-provisioning.md) | Proposed | 2026-07-18 |
 | [.claude/agents の description に capability exec 経由を明記する](2026-07-21-1522-agent-md-capability-exec-routing.md) | Proposed | 2026-07-21 |
 | [Codex 正規入口の整備](2026-07-22-1149-codex-merge-done-adr-entrypoints.md) | Proposed | 2026-07-22 |
+| [reasoning effort に max 段を追加し、限定レーンを Luna Max へ移行する](2026-08-02-0151-codex-reasoning-effort-max.md) | Proposed | 2026-08-02 |
 
 ### テスト・CI ツーリング
 
