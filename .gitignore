@@ -88,6 +88,9 @@ track/items/**/*-graph-d*/
 track/items/**/.commit_hash
 track/items/**/.commit_hash.tmp
 
+# --- Base-merge sync stamp (local operational state written by clean-merge cleanup) ---
+track/items/**/.sync-base.json
+
 # --- Provider session resume cache (runtime session state, not version-controlled) ---
 track/items/**/.provider-sessions/
 
