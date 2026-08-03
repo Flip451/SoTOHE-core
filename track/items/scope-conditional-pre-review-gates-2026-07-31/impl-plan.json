@@ -168,7 +168,8 @@
     {
       "id": "T030",
       "description": "`apps/cli-driver/src/phase_command.rs` の `CommandOutcome`、`PhaseCommandDriver`、`PhaseCommandInput`、`PhaseIdArg` と関連 tests を catalogue shape に適応する。IN-04、IN-11、CN-03、AC-02、AC-03、AC-13。",
-      "status": "in_progress",
+      "status": "done",
+      "commit_hash": "9e07ef30fc507e2b696cfafd235da663116c1b68",
       "depends_on": [
         "T035"
       ]
@@ -192,7 +193,7 @@
     {
       "id": "T036",
       "description": "`apps/cli-composition/src/phase_command.rs` に `PhaseCompositionRoot` を追加し、phase configuration loader、phase service、phase driver の wiring と module registration、および composition-boundary tests を実装する。IN-04、AC-02、AC-03。",
-      "status": "todo",
+      "status": "in_progress",
       "depends_on": [
         "T029",
         "T035",

@@ -5,5 +5,5 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | CapabilityCompositionRoot | composition_root | reference | — | 🔵 | 🔵 |
-| PhaseCompositionRoot | composition_root | add | — | 🟡 | 🔵 |
+| PhaseCompositionRoot | composition_root | add | — | 🔵 | 🔵 |
 

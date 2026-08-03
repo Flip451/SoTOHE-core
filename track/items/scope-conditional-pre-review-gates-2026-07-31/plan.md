@@ -9,7 +9,7 @@ GO-03 → T018、T019、T020、T021、T022、T023。
 GO-04 → T018、T020、T021、T022、T023。
 GO-05 → T017、T018、T019、T020、T021、T022。
 
-## Tasks (21/24 resolved)
+## Tasks (22/24 resolved)
 
 ### S0 — 確定済みの履歴 task
 
@@ -44,8 +44,8 @@ GO-05 → T017、T018、T019、T020、T021、T022。
 - [x] **T035**: `libs/usecase/src/phase_command.rs` の phase enter orchestration、host-bearing `PhaseEnterCommand`、enter outcome、shared service / interactor、`ProgramExecutionRecord` と関連 tests を catalogue shape に適応する。IN-02、IN-11、CN-03、AC-02、AC-13。 (`6d04e3ced70556127af5ae7e577b88e374fc4e93`)
 - [x] **T028**: `libs/usecase/src/pre_review_command.rs` を refined execution record、pre-review-specific configuration error、dispatch outcome / explanation consumer shape に適応し、success と first-failure dispatch tests を更新する。IN-05、CN-01、CN-03、AC-05、AC-07。 (`4a05480da7f57adcde5364474da509b474d92932`)
 - [x] **T029**: `libs/infrastructure/src/operator_command_config.rs` の phase command configuration loader、command DTO 群、phase DTO / declaration DTO、`decode_phase_command_config` を更新し、phase DTO decode / invalid-config tests を更新する。IN-01、IN-03、AC-01。 (`22b098d16aa6ca63fd48ff24475501f06d57d791`)
-- [~] **T030**: `apps/cli-driver/src/phase_command.rs` の `CommandOutcome`、`PhaseCommandDriver`、`PhaseCommandInput`、`PhaseIdArg` と関連 tests を catalogue shape に適応する。IN-04、IN-11、CN-03、AC-02、AC-03、AC-13。
-- [ ] **T036**: `apps/cli-composition/src/phase_command.rs` に `PhaseCompositionRoot` を追加し、phase configuration loader、phase service、phase driver の wiring と module registration、および composition-boundary tests を実装する。IN-04、AC-02、AC-03。
+- [x] **T030**: `apps/cli-driver/src/phase_command.rs` の `CommandOutcome`、`PhaseCommandDriver`、`PhaseCommandInput`、`PhaseIdArg` と関連 tests を catalogue shape に適応する。IN-04、IN-11、CN-03、AC-02、AC-03、AC-13。 (`9e07ef30fc507e2b696cfafd235da663116c1b68`)
+- [~] **T036**: `apps/cli-composition/src/phase_command.rs` に `PhaseCompositionRoot` を追加し、phase configuration loader、phase service、phase driver の wiring と module registration、および composition-boundary tests を実装する。IN-04、AC-02、AC-03。
 - [ ] **T031**: `apps/cli/src/main.rs` の top-level `CliCommand`、`Phase` variant、dispatch arm と、`apps/cli/src/commands/phase.rs` の `PhaseCommand`、`PhaseEnterArgs`、`PhaseIdArgs`、validate args、`execute`、`execute_with_driver`、`input_from_command`、関連 tests を catalogue shape に適応する。IN-04、IN-11、AC-03、AC-13。
 - [x] **T032**: `libs/usecase/src/capability_exec.rs` の `CapabilityExecRequest`、`CapabilityExecInteractor`、`CapabilityExecService`、`apps/cli-driver/src/capability.rs` の `CapabilityExecDriverInput` と `CapabilityDriver`、`apps/cli-composition/src/capability.rs` の `CapabilityCompositionRoot`、`apps/cli/src/commands/capability.rs` の `CapabilityExecArgs` と `into_driver_input` を catalogue shape に適応する。`.harness/config/phase-commands.json` の phase writer argv と dispatch tests を更新する。IN-01、IN-04、IN-09、IN-10、IN-11、CN-01、AC-01、AC-03、AC-11、AC-12、AC-13。 (`539602a5ba3f6ec65fb5bac5f6375d0713213b74`)
 - [x] **T033**: `libs/infrastructure/src/operator_command_config.rs` の pre-review-gate configuration decode を更新し、pre-review DTO / review-scope decode / invalid-config tests を更新する。IN-05、AC-05。 (`6e009564fda3e9c247e6e76c81d8932b5494739c`)

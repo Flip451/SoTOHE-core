@@ -7603,6 +7603,149 @@
           "test_name": "test_phase_id_arg_invalid_transport_value_is_rejected"
         }
       ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "1e9dd19cd5192a41880ad093a170fe63aab6fa40de5a2c6d146eaeb1b7df4b97",
+        "declaration_hash": "7c2ca22c7bff8509ebe4daf2116e098f806b61f2d236130927ad84f085dd6479",
+        "anchor_text_hash": "3a64b29a92e9e9eeaf1a9ea27e22587c95af88cf00d71369188fd9b70d334f36"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(validation.exit_code, 0); ... assert!(explanation.contains(\"phase example (output limit: 1048576 bytes)\")); ... assert!(pre_entry_position < writer_position, \"pre-entry runs before the writer\"); ... assert_eq!(outcome.exit_code, 1); ... stderr.contains(\"phase command blocked at sequence 1: [\\\"false\\\"]; outcome: exited with 1\"); ... contains(\"command timeout is outside the supported range: 3601\")"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::phase_command::tests",
+          "test_name": "test_phase_composition_root_valid_config_exposes_all_phase_operations"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::phase_command::tests",
+          "test_name": "test_phase_composition_root_second_pre_entry_failure_records_prior_success_and_stops_remaining_commands_and_writer"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::phase_command::tests",
+          "test_name": "test_phase_composition_root_invalid_config_renders_validation_failure"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "3ddbfba99a231244ac278bad15bdecf9355318b49ae611e5c34eeb0be324fe7f",
+        "declaration_hash": "7c2ca22c7bff8509ebe4daf2116e098f806b61f2d236130927ad84f085dd6479",
+        "anchor_text_hash": "edb4e92dab097edf9daf4986f7e535467ff8962fca5911e37dec2e1756d33671"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(pre_entry_position < writer_position, \"pre-entry runs before the writer\"); ... assert!(!stdout.contains(\"remaining-should-not-run\")); ... assert!(!stdout.contains(\"writer-should-not-run\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::phase_command::tests",
+          "test_name": "test_phase_composition_root_valid_config_exposes_all_phase_operations"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::phase_command::tests",
+          "test_name": "test_phase_composition_root_second_pre_entry_failure_records_prior_success_and_stops_remaining_commands_and_writer"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "8250a8b61a68299de8ac25835959ee261ccc875aa053dbb74753ac04781653a2",
+        "declaration_hash": "7c2ca22c7bff8509ebe4daf2116e098f806b61f2d236130927ad84f085dd6479",
+        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(explanation.contains(r#\"pre-entry 0: [\"printf\",\"pre-entry\\\\n\"] (timeout: 1s)\"#)); assert!(explanation.contains(r#\"writer: [\"printf\",\"writer\\\\n\"] (timeout: 1s)\"#)); assert!(pre_entry_position < writer_position, \"pre-entry runs before the writer\"); assert!(explanation.stdout.expect(\"default timeout explanation is rendered\").contains(r#\"writer: [\"printf\",\"default-timeout-writer\\\\n\"] (timeout: 3600s)\"#)); assert!(outcome.stdout.as_deref().expect(\"captured stdout reaches the configured limit\").len(), 1_048_576); assert_eq!(captured_stderr.len(), 1_048_576);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::phase_command::tests",
+          "test_name": "test_phase_composition_root_valid_config_exposes_all_phase_operations"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::phase_command::tests",
+          "test_name": "test_phase_composition_root_second_pre_entry_failure_records_prior_success_and_stops_remaining_commands_and_writer"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::phase_command::tests",
+          "test_name": "test_phase_composition_root_invalid_config_renders_validation_failure"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::phase_command::tests",
+          "test_name": "test_phase_composition_root_omitted_timeout_renders_default_in_explain_and_enters"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::phase_command::tests",
+          "test_name": "test_phase_composition_root_zero_timeout_renders_validation_failure"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::phase_command::tests",
+          "test_name": "test_phase_composition_root_timed_out_writer_renders_auditable_outcome"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::phase_command::tests",
+          "test_name": "test_phase_composition_root_output_limited_writer_renders_auditable_outcome"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::phase_command::tests",
+          "test_name": "test_phase_composition_root_stderr_limited_writer_renders_auditable_outcome"
+        }
+      ]
     }
   ]
 }

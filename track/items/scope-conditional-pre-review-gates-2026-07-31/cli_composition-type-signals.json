@@ -1,15 +1,15 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-03T04:12:22Z",
+  "generated_at": "2026-08-03T14:47:13Z",
   "declaration_hash": "696e7052429b656e8ace7a86f16719be9d27c4e27b17fa42fc8e15ac76d6bbea",
-  "implementation_input_hash": "478c4efec1bd20ee46f180f21e80bcf2ae3cc12b78012e98e1a5b3204eb2130e",
+  "implementation_input_hash": "e808dd3026771c675bd4abc89b08193265c6cef62593fb396d2bc74c5ef85ec9",
   "signals": [
     {
       "type_name": "PhaseCompositionRoot",
       "kind_tag": "composition_root",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Debug",
         "Default"
       ]
