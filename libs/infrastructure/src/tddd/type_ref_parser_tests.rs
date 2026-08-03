@@ -298,6 +298,23 @@ fn test_parse_type_ref_preserving_spelling_rejects_nonlexical_array_length_expre
 }
 
 #[test]
+fn test_parse_type_ref_preserving_spelling_rejects_named_array_length() {
+    let result = parse_type_ref_with_generics_preserving_spelling(
+        "[u8; LEN]",
+        &no_local,
+        100,
+        &HashMap::new(),
+        &mut |_| 101,
+        &[],
+    );
+    let error = match result {
+        Err(error) => error,
+        Ok(value) => panic!("named array length unexpectedly parsed: {value:?}"),
+    };
+    assert!(error.contains("array length expressions"), "error: {error}");
+}
+
+#[test]
 fn test_parse_generic_bound_preserves_leading_colon() {
     for (source, expected) in
         [("::std::clone::Clone", "::std::clone::Clone"), ("::Clone", "::Clone")]
@@ -335,6 +352,40 @@ fn test_parse_generic_bound_rejects_unsupported_array_length_expression() {
         Ok(value) => panic!("method-call array length in bound unexpectedly parsed: {value:?}"),
     };
     assert!(error.contains("array length expressions"), "error: {error}");
+}
+
+#[test]
+fn test_parse_generic_bound_rejects_named_array_length() {
+    let result = parse_generic_bound_with_generics_preserving_spelling(
+        "Trait<[u8; LEN]>",
+        &no_local,
+        100,
+        &HashMap::new(),
+        &mut |_| 101,
+        &[],
+    );
+    let error = match result {
+        Err(error) => error,
+        Ok(value) => panic!("named array length in bound unexpectedly parsed: {value:?}"),
+    };
+    assert!(error.contains("array length expressions"), "error: {error}");
+}
+
+#[test]
+fn test_parse_generic_bound_rejects_type_macro() {
+    let result = parse_generic_bound_with_generics_preserving_spelling(
+        "Trait<ty!()>",
+        &no_local,
+        100,
+        &HashMap::new(),
+        &mut |_| 101,
+        &[],
+    );
+    let error = match result {
+        Err(error) => error,
+        Ok(value) => panic!("type macro in bound unexpectedly parsed: {value:?}"),
+    };
+    assert!(error.contains("type macros"), "error: {error}");
 }
 
 #[test]

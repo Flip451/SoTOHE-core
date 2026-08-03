@@ -107,6 +107,7 @@ where
         .map_err(|e| format!("syn parse error for `{type_ref_str}`: {e}"))?;
     reject_anonymous_const_blocks_in_type(&syn_type)?;
     if preserve_prelude_spelling {
+        reject_unsupported_type_macros_in_type(&syn_type)?;
         reject_unsupported_array_lengths_in_type(&syn_type)?;
         reject_unsupported_const_arguments_in_type(&syn_type)?;
     }
@@ -141,6 +142,7 @@ pub(crate) fn validate_const_arguments_in_type_ref(
     let syntax: syn::Type = syn::parse_str(type_ref_str)
         .map_err(|e| format!("invalid type syntax '{type_ref_str}': {e}"))?;
     reject_anonymous_const_blocks_in_type(&syntax)?;
+    reject_unsupported_type_macros_in_type(&syntax)?;
     reject_unsupported_const_arguments_in_type(&syntax)
 }
 
@@ -156,6 +158,7 @@ pub(crate) fn validate_lexical_generic_bound(
     let syn_bound: syn::TypeParamBound = syn::parse_str(bound_str)
         .map_err(|e| format!("invalid bound syntax '{bound_str}': {e}"))?;
     reject_anonymous_const_blocks_in_bound(&syn_bound)?;
+    reject_unsupported_type_macros_in_bound(&syn_bound)?;
     reject_unsupported_array_lengths_in_bound(&syn_bound)?;
     reject_unsupported_const_arguments_in_bound(&syn_bound)
 }
@@ -228,6 +231,7 @@ where
         syn::parse_str(bound_str).map_err(|e| format!("syn parse error for `{bound_str}`: {e}"))?;
     reject_anonymous_const_blocks_in_bound(&syn_bound)?;
     if preserve_prelude_spelling {
+        reject_unsupported_type_macros_in_bound(&syn_bound)?;
         reject_unsupported_array_lengths_in_bound(&syn_bound)?;
         reject_unsupported_const_arguments_in_bound(&syn_bound)?;
     }
@@ -290,14 +294,54 @@ fn reject_anonymous_const_blocks_in_bound(syntax: &syn::TypeParamBound) -> Resul
     reject_if_anonymous_const_block_found(visitor.found)
 }
 
+/// Rejects type macros in lexical comparison paths. `syn` can identify the
+/// macro invocation but cannot expand it; converting it to `<unknown_type>`
+/// would make distinct expanded types compare equal.
+#[derive(Default)]
+struct UnsupportedTypeMacroVisitor {
+    found: bool,
+}
+
+impl<'ast> Visit<'ast> for UnsupportedTypeMacroVisitor {
+    fn visit_type_macro(&mut self, node: &'ast syn::TypeMacro) {
+        self.found = true;
+        syn::visit::visit_type_macro(self, node);
+    }
+}
+
+fn reject_unsupported_type_macros_in_type(syntax: &syn::Type) -> Result<(), String> {
+    let mut visitor = UnsupportedTypeMacroVisitor::default();
+    visitor.visit_type(syntax);
+    reject_if_unsupported_type_macro_found(visitor.found)
+}
+
+fn reject_unsupported_type_macros_in_bound(syntax: &syn::TypeParamBound) -> Result<(), String> {
+    let mut visitor = UnsupportedTypeMacroVisitor::default();
+    visitor.visit_type_param_bound(syntax);
+    reject_if_unsupported_type_macro_found(visitor.found)
+}
+
+fn reject_if_unsupported_type_macro_found(found: bool) -> Result<(), String> {
+    if found {
+        Err(
+            "type macros are not supported by lexical type comparison because their expansion cannot be represented"
+                .to_owned(),
+        )
+    } else {
+        Ok(())
+    }
+}
+
 /// Rejects array-length expressions whose spelling cannot be compared safely
 /// against rustdoc's normalized representation.
 ///
 /// The lexical adapter deliberately accepts only the expression forms already
-/// handled by [`super::helpers::array_len_to_string`]: integer literals, plain
-/// constant paths, parenthesized forms, and the supported binary operators.
-/// Method calls (for example `10usize.pow(2)`), unary expressions, casts, and
-/// other expressions are rejected instead of being rendered as a lossy marker.
+/// handled by [`super::helpers::array_len_to_string`]: integer literals,
+/// parenthesized forms, and the supported binary operators. Named constants
+/// are rejected because rustdoc may evaluate them while the catalogue has no
+/// value environment with which to reproduce that normalization. Method calls
+/// (for example `10usize.pow(2)`), unary expressions, casts, and other
+/// expressions are rejected instead of being rendered as a lossy marker.
 #[derive(Default)]
 struct UnsupportedArrayLengthVisitor {
     found: bool,
@@ -315,15 +359,7 @@ impl<'ast> Visit<'ast> for UnsupportedArrayLengthVisitor {
 fn is_supported_array_length_expr(expr: &syn::Expr) -> bool {
     match expr {
         syn::Expr::Lit(lit) => matches!(lit.lit, syn::Lit::Int(_)),
-        syn::Expr::Path(path) => {
-            path.qself.is_none()
-                && path.path.leading_colon.is_none()
-                && path
-                    .path
-                    .segments
-                    .iter()
-                    .all(|segment| matches!(segment.arguments, syn::PathArguments::None))
-        }
+        syn::Expr::Path(_) => false,
         syn::Expr::Paren(paren) => is_supported_array_length_expr(&paren.expr),
         syn::Expr::Binary(binary) => {
             matches!(
