@@ -1,0 +1,270 @@
+{
+  "schema_version": 1,
+  "layer": "cli",
+  "entries": [
+    {
+      "claim_hash": "a740518dec1ddd5aebe89e42e959008e40906961da8588df046f9f9151031e33",
+      "evidence_hash": "4a9aabc45eb2e4eb545a5469ad85106162bd6d824a37a5fe9d2fc14528d9188d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp signal report` を追加し、`adr_user`、`spec_adr`、`catalog_spec`、`impl_catalog` の 4 chain における Yellow / Red 信号の発生箇所を報告する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/cli-types.json",
+          "section_key": "types",
+          "entry_key": "SignalCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "`sotp signal report` を追加し、`adr_user`、`spec_adr`、`catalog_spec`、`impl_catalog` の 4 chain における Yellow / Red 信号の発生箇所を報告する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a740518dec1ddd5aebe89e42e959008e40906961da8588df046f9f9151031e33",
+      "evidence_hash": "55e8e58e0763db0818a133ccf47c4e86cad123b896bc61d5354388b88527cdb1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp signal report` を実行すると、発生単位 signal 成果物がある chain ではその成果物を用い、chain ⓪・①では正規の入力成果物からメモリ上で導出して、4 chain の Yellow / Red occurrence が報告される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/cli-types.json",
+          "section_key": "types",
+          "entry_key": "SignalCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`sotp signal report` を実行すると、発生単位 signal 成果物がある chain ではその成果物を用い、chain ⓪・①では正規の入力成果物からメモリ上で導出して、4 chain の Yellow / Red occurrence が報告される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a740518dec1ddd5aebe89e42e959008e40906961da8588df046f9f9151031e33",
+      "evidence_hash": "e6dce33c355f043c9b2e0a0089e61df36d731f48ddabe7d3eb022bd9e3495af8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp signal report --chain <id>` は指定した chain の occurrence のみを報告し、Yellow / Red 選択を指定した実行は選択した色の occurrence のみを報告する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/cli-types.json",
+          "section_key": "types",
+          "entry_key": "SignalCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "`sotp signal report --chain <id>` は指定した chain の occurrence のみを報告し、Yellow / Red 選択を指定した実行は選択した色の occurrence のみを報告する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c3aae65efb7f4720f1908e5110147fa4f148fc31728f8ed904e0a692a79f9f92",
+      "evidence_hash": "1017bb3ec4bdf6d512d78a0d89a3aaf95ad6537953759ad31978d52125f27456",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`--chain <id>` による chain 選択と、Yellow / Red の選択による結果の絞り込みを提供する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/cli-types.json",
+          "section_key": "types",
+          "entry_key": "SignalReportArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "`--chain <id>` による chain 選択と、Yellow / Red の選択による結果の絞り込みを提供する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c3aae65efb7f4720f1908e5110147fa4f148fc31728f8ed904e0a692a79f9f92",
+      "evidence_hash": "e6dce33c355f043c9b2e0a0089e61df36d731f48ddabe7d3eb022bd9e3495af8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp signal report --chain <id>` は指定した chain の occurrence のみを報告し、Yellow / Red 選択を指定した実行は選択した色の occurrence のみを報告する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/cli-types.json",
+          "section_key": "types",
+          "entry_key": "SignalReportArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "`sotp signal report --chain <id>` は指定した chain の occurrence のみを報告し、Yellow / Red 選択を指定した実行は選択した色の occurrence のみを報告する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "63525f000fda0320d0ef82e60ac65d8d6590f07e4cd7f4cd79cf72b089d56319",
+      "evidence_hash": "1017bb3ec4bdf6d512d78a0d89a3aaf95ad6537953759ad31978d52125f27456",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`--chain <id>` による chain 選択と、Yellow / Red の選択による結果の絞り込みを提供する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/cli-types.json",
+          "section_key": "types",
+          "entry_key": "SignalReportChainArg"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "`--chain <id>` による chain 選択と、Yellow / Red の選択による結果の絞り込みを提供する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "63525f000fda0320d0ef82e60ac65d8d6590f07e4cd7f4cd79cf72b089d56319",
+      "evidence_hash": "e6dce33c355f043c9b2e0a0089e61df36d731f48ddabe7d3eb022bd9e3495af8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp signal report --chain <id>` は指定した chain の occurrence のみを報告し、Yellow / Red 選択を指定した実行は選択した色の occurrence のみを報告する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/cli-types.json",
+          "section_key": "types",
+          "entry_key": "SignalReportChainArg"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "`sotp signal report --chain <id>` は指定した chain の occurrence のみを報告し、Yellow / Red 選択を指定した実行は選択した色の occurrence のみを報告する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6449d2938628f0759e3a52ad6280eafc9e0c0267b5bbf1a42cbbbe7e8204999f",
+      "evidence_hash": "1017bb3ec4bdf6d512d78a0d89a3aaf95ad6537953759ad31978d52125f27456",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Yellow / Red の選択による結果の絞り込みを提供する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/cli-types.json",
+          "section_key": "types",
+          "entry_key": "SignalReportOnlyArg"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "`--chain <id>` による chain 選択と、Yellow / Red の選択による結果の絞り込みを提供する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6449d2938628f0759e3a52ad6280eafc9e0c0267b5bbf1a42cbbbe7e8204999f",
+      "evidence_hash": "e6dce33c355f043c9b2e0a0089e61df36d731f48ddabe7d3eb022bd9e3495af8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Yellow / Red 選択を指定した実行は選択した色の occurrence のみを報告する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/cli-types.json",
+          "section_key": "types",
+          "entry_key": "SignalReportOnlyArg"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "`sotp signal report --chain <id>` は指定した chain の occurrence のみを報告し、Yellow / Red 選択を指定した実行は選択した色の occurrence のみを報告する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "26be632a93d593fc2ef742c1f34587cb433f5eb6d7c7ef6620152a67c7062926",
+      "evidence_hash": "4a9aabc45eb2e4eb545a5469ad85106162bd6d824a37a5fe9d2fc14528d9188d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp signal report` を追加し、`adr_user`、`spec_adr`、`catalog_spec`、`impl_catalog` の 4 chain における Yellow / Red 信号の発生箇所を報告する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::signal::execute"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "`sotp signal report` を追加し、`adr_user`、`spec_adr`、`catalog_spec`、`impl_catalog` の 4 chain における Yellow / Red 信号の発生箇所を報告する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "26be632a93d593fc2ef742c1f34587cb433f5eb6d7c7ef6620152a67c7062926",
+      "evidence_hash": "55e8e58e0763db0818a133ccf47c4e86cad123b896bc61d5354388b88527cdb1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp signal report` を実行すると、発生単位 signal 成果物がある chain ではその成果物を用い、chain ⓪・①では正規の入力成果物からメモリ上で導出して、4 chain の Yellow / Red occurrence が報告される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::signal::execute"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`sotp signal report` を実行すると、発生単位 signal 成果物がある chain ではその成果物を用い、chain ⓪・①では正規の入力成果物からメモリ上で導出して、4 chain の Yellow / Red occurrence が報告される。"
+        }
+      }
+    }
+  ]
+}

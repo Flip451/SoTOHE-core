@@ -2,13 +2,16 @@
   "schema_version": 1,
   "providers": {
     "claude": {
-      "label": "Claude Code"
+      "label": "Claude Code",
+      "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"]
     },
     "codex": {
-      "label": "Codex CLI"
+      "label": "Codex CLI",
+      "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"]
     },
     "gemini": {
-      "label": "Gemini CLI"
+      "label": "Gemini CLI",
+      "supported_reasoning_efforts": ["low", "medium", "high"]
     }
   },
   "capabilities": {

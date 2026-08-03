@@ -36,6 +36,23 @@ impl SignalCompositionRoot {
         self.signal_driver_with_ports(adapter.clone(), adapter.clone(), adapter, gate_config)
     }
 
+    /// Build the fully wired signal-report driver.
+    #[must_use]
+    pub fn signal_report_driver(&self) -> cli_driver::signal_report::SignalReportDriver {
+        let source: Arc<dyn usecase::signal_report::SignalReportSourcePort> =
+            Arc::new(infrastructure::signal_report::SystemSignalReportSourceAdapter::new());
+        self.signal_report_driver_with_source(source)
+    }
+
+    fn signal_report_driver_with_source(
+        &self,
+        source: Arc<dyn usecase::signal_report::SignalReportSourcePort>,
+    ) -> cli_driver::signal_report::SignalReportDriver {
+        let service: Arc<dyn usecase::signal_report::SignalReportService> =
+            Arc::new(usecase::signal_report::SignalReportInteractor::new(source));
+        cli_driver::signal_report::SignalReportDriver::new(service)
+    }
+
     fn signal_driver_with_ports(
         &self,
         port: Arc<dyn usecase::signal_service::SignalCommandPort>,

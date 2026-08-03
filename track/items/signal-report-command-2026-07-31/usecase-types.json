@@ -1,0 +1,894 @@
+{
+  "crate_name": "usecase",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "domain::NonEmptyString"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "SignalReportEntryId"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "domain::NonEmptyString"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "SignalReportReference"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "domain::NonEmptyString"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "SignalReportReason"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "domain::review_v2::types::FilePath"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "SignalReportLocation"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "source",
+              "ty": "std::sync::Arc<dyn SignalReportSourcePort>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "SignalReportInteractor"
+    }
+  ],
+  "layer": "usecase",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "SignalReportChain",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "SignalReportChain",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "SignalReportChain",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "SignalReportChain",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "SignalReportChain",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "SignalReportChain",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "for_type": "SignalReportLevel",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "SignalReportLevel",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "SignalReportLevel",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "SignalReportLevel",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "SignalReportLevel",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "SignalReportLevel",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "for_type": "SignalReportChainSelection",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "SignalReportChainSelection",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "SignalReportChainSelection",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "SignalReportChainSelection",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "SignalReportChainSelection",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "SignalReportLevelSelection",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "SignalReportLevelSelection",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "SignalReportLevelSelection",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "SignalReportLevelSelection",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "SignalReportLevelSelection",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "SignalReportEntryId",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "SignalReportEntryId",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "SignalReportEntryId",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "SignalReportEntryId",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "SignalReportEntryId",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "SignalReportReference",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "SignalReportReference",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "SignalReportReference",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "SignalReportReference",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "SignalReportReference",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "SignalReportReason",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "SignalReportReason",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "SignalReportReason",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "SignalReportReason",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "SignalReportReason",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "SignalReportLocation",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "SignalReportLocation",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "SignalReportLocation",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "SignalReportLocation",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "SignalReportLocation",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "SignalReportQuery",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "SignalReportQuery",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "SignalReportQuery",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "SignalReportQuery",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "SignalReportQuery",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "SignalReportOccurrence",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "SignalReportOccurrence",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "SignalReportOccurrence",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "SignalReportOccurrence",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "SignalReportOutput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "SignalReportOutput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "SignalReportOutput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "SignalReportOutput",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "SignalReportError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "SignalReportError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "SignalReportError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "SignalReportInteractor",
+      "trait_ref": "SignalReportService"
+    }
+  ],
+  "traits": {
+    "SignalReportService": {
+      "action": "add",
+      "docs": "Add the SignalReportService application-service contract. GO-01, AC-01.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "report",
+          "params": [
+            {
+              "name": "query",
+              "ty": "SignalReportQuery"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<SignalReportOutput, SignalReportError>"
+        }
+      ],
+      "module_path": "signal_report",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "GO-01",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
+    "SignalReportSourcePort": {
+      "action": "add",
+      "docs": "Add the synchronous driven port for the report occurrence source. The one-shot CLI command, primary driver, and use-case path are synchronous and own no async runtime, so load intentionally performs its finite local signal-artifact and canonical-input reads on the invoking thread. IN-04, CN-01, AC-04.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "load",
+          "params": [
+            {
+              "name": "chain",
+              "ty": "SignalReportChain"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<Vec<SignalReportOccurrence>, SignalReportError>"
+        }
+      ],
+      "module_path": "signal_report",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    }
+  },
+  "types": {
+    "SignalReportChain": {
+      "action": "add",
+      "docs": "Usecase-scoped application-boundary selector with no domain invariant or meaning outside report orchestration. IN-01, AC-03.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "AdrUser",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "SpecAdr",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "CatalogSpec",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ImplCatalog",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "signal_report",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "SignalReportChainSelection": {
+      "action": "add",
+      "docs": "Usecase-scoped selection value used only by SignalReportQuery; the enum excludes an empty selection. IN-03, AC-03.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "All",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "One",
+            "payload": {
+              "fields": [
+                "SignalReportChain"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "signal_report",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "SignalReportEntryId": {
+      "action": "add",
+      "docs": "Usecase boundary newtype over domain::NonEmptyString preventing entry-id cross-slot substitution. IN-02, AC-02.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "signal_report",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "SignalReportError": {
+      "action": "add",
+      "docs": "Add the report boundary error taxonomy. CN-01, AC-04.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "SourceUnavailable",
+            "payload": {
+              "fields": [
+                "SignalReportChain"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidOccurrence",
+            "payload": {
+              "fields": [
+                "SignalReportChain"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "signal_report",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-01",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "SignalReportInteractor": {
+      "action": "add",
+      "docs": "Add SignalReportInteractor as the SignalReportService implementation. GO-01, AC-01.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "signal_report",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "GO-01",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "SignalReportLevel": {
+      "action": "add",
+      "docs": "Usecase-scoped finite report severity value. IN-03, AC-03.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Yellow",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Red",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "signal_report",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "SignalReportLevelSelection": {
+      "action": "add",
+      "docs": "Usecase-scoped finite level-selection value whose enum excludes empty combinations. IN-03, AC-03.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "YellowOnly",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "RedOnly",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "YellowAndRed",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "signal_report",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "SignalReportLocation": {
+      "action": "add",
+      "docs": "Usecase boundary newtype over domain::FilePath preventing location cross-slot substitution. IN-02, AC-02.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "signal_report",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "SignalReportOccurrence": {
+      "action": "add",
+      "docs": "Usecase boundary Dto for a typed occurrence row; it owns no decision or invariant. IN-02, CN-02, AC-02.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "chain",
+              "ty": "SignalReportChain"
+            },
+            {
+              "name": "level",
+              "ty": "SignalReportLevel"
+            },
+            {
+              "name": "entry_id",
+              "ty": "SignalReportEntryId"
+            },
+            {
+              "name": "reference",
+              "ty": "SignalReportReference"
+            },
+            {
+              "name": "reason",
+              "ty": "SignalReportReason"
+            },
+            {
+              "name": "location",
+              "ty": "SignalReportLocation"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "signal_report",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "SignalReportOutput": {
+      "action": "add",
+      "docs": "Usecase boundary Dto for report output; it owns no independent invariant or behavior. GO-01, AC-01.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "occurrences",
+              "ty": "Vec<SignalReportOccurrence>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "signal_report",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "GO-01",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "SignalReportQuery": {
+      "action": "add",
+      "docs": "Add SignalReportQuery with typed chain and level selections. IN-03, AC-03.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "chain",
+              "ty": "SignalReportChainSelection"
+            },
+            {
+              "name": "levels",
+              "ty": "SignalReportLevelSelection"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "signal_report",
+      "role": {
+        "Query": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "SignalReportReason": {
+      "action": "add",
+      "docs": "Usecase boundary newtype over domain::NonEmptyString preventing reason cross-slot substitution. IN-02, AC-02.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "signal_report",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "SignalReportReference": {
+      "action": "add",
+      "docs": "Usecase boundary newtype over domain::NonEmptyString preventing reference cross-slot substitution. IN-02, AC-02.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "signal_report",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        }
+      ]
+    }
+  }
+}

@@ -256,20 +256,48 @@ fn is_safe_path_component(name: &str) -> bool {
 /// - a layer id or catalogue_file contains unsafe path characters, or
 /// - two enabled layers resolve to the same `catalogue_file` value.
 pub fn parse_tddd_layers(json: &str) -> Result<Vec<TdddLayerBinding>, TdddLayerParseError> {
+    validate_architecture_rules_version(json).map_err(TdddLayerParseError::Json)?;
+
     #[derive(Deserialize)]
+    #[serde(deny_unknown_fields)]
     struct Root {
+        #[allow(dead_code)]
+        version: u32,
+        // These top-level blocks are owned by other architecture checks. Keep
+        // them explicit so this decoder rejects misspelled top-level keys
+        // without duplicating parsers for configuration it does not consume.
+        #[serde(default)]
+        #[allow(dead_code)]
+        module_limits: Option<serde_json::Value>,
+        #[serde(default)]
+        #[allow(dead_code)]
+        canonical_modules: Option<serde_json::Value>,
+        #[serde(default)]
+        #[allow(dead_code)]
+        extra_dirs: Option<serde_json::Value>,
         layers: Vec<Layer>,
     }
 
     #[derive(Deserialize)]
+    #[serde(deny_unknown_fields)]
+    #[allow(dead_code)]
     struct Layer {
         #[serde(rename = "crate")]
         crate_name: String,
+        #[serde(default)]
+        path: Option<String>,
+        #[serde(default)]
+        may_depend_on: Vec<String>,
+        #[serde(default)]
+        deny_reason: Option<String>,
+        #[serde(default)]
+        verify: Option<serde_json::Value>,
         #[serde(default)]
         tddd: Option<TdddBlock>,
     }
 
     #[derive(Deserialize, Default)]
+    #[serde(deny_unknown_fields)]
     struct TdddBlock {
         #[serde(default)]
         enabled: bool,
@@ -282,15 +310,22 @@ pub fn parse_tddd_layers(json: &str) -> Result<Vec<TdddLayerBinding>, TdddLayerP
     }
 
     #[derive(Deserialize, Default)]
+    #[serde(deny_unknown_fields)]
     struct CatalogueSpecSignalBlock {
         #[serde(default)]
         enabled: bool,
     }
 
     #[derive(Deserialize)]
+    #[serde(deny_unknown_fields)]
+    #[allow(dead_code)]
     struct SchemaExportBlock {
         #[serde(default)]
         targets: Vec<String>,
+        #[serde(default)]
+        method: Option<String>,
+        #[serde(default)]
+        notes: Option<String>,
     }
 
     let root: Root = serde_json::from_str(json)?;
@@ -378,38 +413,83 @@ pub fn find_binding<'a>(
 /// origin trait filter for Interactor / SecondaryAdapter) are active in the
 /// verify and signal-evaluation paths.
 ///
-/// When the `layers` key is absent from an otherwise valid JSON object, the
-/// field defaults to `[]` (via `#[serde(default)]`) and an empty `HashSet`
-/// is returned — consistent with graceful degradation for IN-10 suppression.
-///
 /// # Errors
 ///
-/// Returns `serde_json::Error` when `json` is not valid JSON.
+/// Returns `serde_json::Error` when `json` is not valid JSON or does not
+/// contain the mandatory `layers` key.
 pub fn parse_workspace_crate_names(
     json: &str,
 ) -> Result<std::collections::HashSet<String>, serde_json::Error> {
+    validate_architecture_rules_version(json)?;
+
     #[derive(serde::Deserialize)]
+    #[serde(deny_unknown_fields)]
     struct Root {
+        #[allow(dead_code)]
+        version: u32,
+        // These blocks are intentionally not interpreted by the workspace
+        // crate-name reader, but must still be named to fail closed on a
+        // misspelled top-level architecture-rules key.
         #[serde(default)]
+        #[allow(dead_code)]
+        module_limits: Option<serde_json::Value>,
+        #[serde(default)]
+        #[allow(dead_code)]
+        canonical_modules: Option<serde_json::Value>,
+        #[serde(default)]
+        #[allow(dead_code)]
+        extra_dirs: Option<serde_json::Value>,
         layers: Vec<Layer>,
     }
 
     #[derive(serde::Deserialize)]
+    #[serde(deny_unknown_fields)]
+    #[allow(dead_code)]
     struct Layer {
         #[serde(rename = "crate")]
         crate_name: String,
+        #[serde(default)]
+        path: Option<String>,
+        #[serde(default)]
+        may_depend_on: Vec<String>,
+        #[serde(default)]
+        deny_reason: Option<String>,
+        #[serde(default)]
+        verify: Option<serde_json::Value>,
+        #[serde(default)]
+        tddd: Option<serde_json::Value>,
     }
 
     let root: Root = serde_json::from_str(json)?;
+    if root.layers.is_empty() {
+        return Err(<serde_json::Error as serde::de::Error>::custom(
+            "architecture-rules.json must define a non-empty 'layers' array",
+        ));
+    }
     Ok(root.layers.into_iter().map(|l| l.crate_name).collect())
+}
+
+fn validate_architecture_rules_version(json: &str) -> Result<(), serde_json::Error> {
+    #[derive(Deserialize)]
+    struct VersionEnvelope {
+        version: u32,
+    }
+
+    let envelope: VersionEnvelope = serde_json::from_str(json)?;
+    if envelope.version != 2 {
+        return Err(<serde_json::Error as serde::de::Error>::custom(format!(
+            "architecture-rules.json version {} is not supported (expected 2)",
+            envelope.version
+        )));
+    }
+    Ok(())
 }
 
 /// Loads workspace crate names from `architecture-rules.json` at `path`.
 ///
-/// Returns an empty set when the file does not exist (no symlink at the leaf),
-/// so callers that tolerate missing files degrade gracefully to "no workspace
-/// crates known" (IN-10 checks are suppressed rather than causing a hard error).
-/// Any other I/O error or JSON parse failure is returned as `Err`.
+/// Fails closed when the file does not exist: without the configuration the
+/// IN-10 reverse checks cannot be trusted. Any I/O error or JSON parse failure
+/// is returned as `Err`.
 ///
 /// # Errors
 ///
@@ -419,17 +499,22 @@ pub fn load_workspace_crate_names(
     path: &Path,
     trusted_root: &Path,
 ) -> Result<std::collections::HashSet<String>, LoadTdddLayersError> {
-    match crate::track::symlink_guard::reject_symlinks_below(path, trusted_root) {
+    let (path, trusted_root) = confined_rules_path(path, trusted_root)
+        .map_err(|source| LoadTdddLayersError::Io { path: path.to_path_buf(), source })?;
+    match crate::track::symlink_guard::reject_symlinks_below(&path, &trusted_root) {
         Ok(true) => {
-            let content = std::fs::read_to_string(path)
+            let content = crate::capability_exec::bounded_read_utf8_file(&path)
                 .map_err(|e| LoadTdddLayersError::Io { path: path.to_path_buf(), source: e })?;
             parse_workspace_crate_names(&content)
-                .map_err(|e| LoadTdddLayersError::Parse(TdddLayerParseError::Json(e)))
+                .map_err(|error| LoadTdddLayersError::Parse(TdddLayerParseError::Json(error)))
         }
-        Ok(false) => {
-            // File genuinely absent — degrade to empty (IN-10 suppressed).
-            Ok(std::collections::HashSet::new())
-        }
+        Ok(false) => Err(LoadTdddLayersError::Io {
+            path: path.to_path_buf(),
+            source: std::io::Error::new(
+                std::io::ErrorKind::NotFound,
+                "architecture-rules.json not found; workspace crates cannot be determined",
+            ),
+        }),
         Err(e) => Err(LoadTdddLayersError::Io { path: path.to_path_buf(), source: e }),
     }
 }
@@ -468,9 +553,11 @@ pub fn load_tddd_layers(
     path: &Path,
     trusted_root: &Path,
 ) -> Result<Vec<TdddLayerBinding>, LoadTdddLayersError> {
-    match crate::track::symlink_guard::reject_symlinks_below(path, trusted_root) {
+    let (path, trusted_root) = confined_rules_path(path, trusted_root)
+        .map_err(|source| LoadTdddLayersError::Io { path: path.to_path_buf(), source })?;
+    match crate::track::symlink_guard::reject_symlinks_below(&path, &trusted_root) {
         Ok(true) => {
-            let content = std::fs::read_to_string(path)
+            let content = crate::capability_exec::bounded_read_utf8_file(&path)
                 .map_err(|e| LoadTdddLayersError::Io { path: path.to_path_buf(), source: e })?;
             parse_tddd_layers(&content).map_err(LoadTdddLayersError::Parse)
         }
@@ -489,6 +576,45 @@ pub fn load_tddd_layers(
     }
 }
 
+/// Resolves an architecture-rules path under the canonical workspace root
+/// without following a candidate symlink for the actual read. This prevents a
+/// caller from selecting an unrelated rules file before the shared component
+/// symlink guard runs.
+fn confined_rules_path(
+    path: &Path,
+    trusted_root: &Path,
+) -> Result<(PathBuf, PathBuf), std::io::Error> {
+    crate::track::symlink_guard::reject_symlinks_up_to_root(trusted_root)?;
+    let canonical_root = trusted_root.canonicalize().map_err(|error| {
+        std::io::Error::new(
+            error.kind(),
+            format!("failed to canonicalize trusted root {}: {error}", trusted_root.display()),
+        )
+    })?;
+    let absolute_path =
+        if path.is_absolute() { path.to_path_buf() } else { std::env::current_dir()?.join(path) };
+    let lexical_path = crate::verify::path_safety::lexical_normalize(&absolute_path);
+    if !lexical_path.starts_with(&canonical_root) {
+        return Err(path_outside_trusted_root(&lexical_path, &canonical_root));
+    }
+    match lexical_path.canonicalize() {
+        Ok(canonical_path) if canonical_path.starts_with(&canonical_root) => {}
+        Ok(canonical_path) => {
+            return Err(path_outside_trusted_root(&canonical_path, &canonical_root));
+        }
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
+        Err(error) => return Err(error),
+    }
+    Ok((lexical_path, canonical_root))
+}
+
+fn path_outside_trusted_root(path: &Path, trusted_root: &Path) -> std::io::Error {
+    std::io::Error::new(
+        std::io::ErrorKind::InvalidInput,
+        format!("path {} is outside trusted root {}", path.display(), trusted_root.display()),
+    )
+}
+
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::indexing_slicing, clippy::panic)]
 mod tests {
@@ -497,6 +623,7 @@ mod tests {
     #[test]
     fn test_parse_tddd_layers_enabled_only_returned() {
         let json = r#"{
+          "version": 2,
           "layers": [
             { "crate": "domain", "tddd": { "enabled": true, "catalogue_file": "domain-types.json" } },
             { "crate": "usecase", "tddd": { "enabled": false } },
@@ -512,6 +639,7 @@ mod tests {
     #[test]
     fn test_parse_tddd_layers_default_catalogue_file_uses_crate_name() {
         let json = r#"{
+          "version": 2,
           "layers": [
             { "crate": "my-layer", "tddd": { "enabled": true } }
           ]
@@ -524,6 +652,7 @@ mod tests {
     #[test]
     fn test_parse_tddd_layers_baseline_and_rendered_derived_from_stem() {
         let json = r#"{
+          "version": 2,
           "layers": [
             { "crate": "domain", "tddd": { "enabled": true, "catalogue_file": "domain-types.json" } }
           ]
@@ -706,6 +835,7 @@ mod tests {
     #[test]
     fn test_parse_tddd_layers_default_targets_is_crate_name() {
         let json = r#"{
+          "version": 2,
           "layers": [
             { "crate": "domain", "tddd": { "enabled": true } }
           ]
@@ -717,6 +847,7 @@ mod tests {
     #[test]
     fn test_parse_tddd_layers_explicit_targets_preserved() {
         let json = r#"{
+          "version": 2,
           "layers": [
             {
               "crate": "domain",
@@ -734,6 +865,7 @@ mod tests {
     #[test]
     fn test_parse_tddd_layers_duplicate_catalogue_rejected() {
         let json = r#"{
+          "version": 2,
           "layers": [
             { "crate": "a", "tddd": { "enabled": true, "catalogue_file": "shared.json" } },
             { "crate": "b", "tddd": { "enabled": true, "catalogue_file": "shared.json" } }
@@ -752,7 +884,7 @@ mod tests {
 
     #[test]
     fn test_parse_tddd_layers_empty_layers_rejected() {
-        let json = r#"{ "layers": [] }"#;
+        let json = r#"{ "version": 2, "layers": [] }"#;
         let err = parse_tddd_layers(json).unwrap_err();
         assert!(matches!(err, TdddLayerParseError::MissingLayers));
     }
@@ -769,6 +901,33 @@ mod tests {
         assert!(matches!(parse_tddd_layers(json).unwrap_err(), TdddLayerParseError::Json(_)));
     }
 
+    #[test]
+    fn test_parse_tddd_layers_rejects_unknown_top_level_configuration() {
+        let json = r#"{
+          "version": 2,
+          "layers": [{ "crate": "domain", "tddd": { "enabled": true } }],
+          "modul_limits": { "max_lines": 700 }
+        }"#;
+
+        assert!(matches!(parse_tddd_layers(json), Err(TdddLayerParseError::Json(_))));
+    }
+
+    #[test]
+    fn test_parse_tddd_layers_rejects_misspelled_catalogue_spec_signal_field() {
+        let json = r#"{
+          "version": 2,
+          "layers": [{
+            "crate": "domain",
+            "tddd": {
+              "enabled": true,
+              "catalogue_spec_signal": { "enabld": true }
+            }
+          }]
+        }"#;
+
+        assert!(matches!(parse_tddd_layers(json), Err(TdddLayerParseError::Json(_))));
+    }
+
     // --- catalogue_spec_signal_enabled() accessor (T018) ---
 
     #[test]
@@ -776,6 +935,7 @@ mod tests {
         // When `tddd.catalogue_spec_signal` is omitted, the accessor must return
         // `false` (opt-in semantics per ADR §D5.4).
         let json = r#"{
+          "version": 2,
           "layers": [
             { "crate": "domain", "tddd": { "enabled": true } }
           ]
@@ -789,6 +949,7 @@ mod tests {
         // When `tddd.catalogue_spec_signal.enabled = true`, the accessor must
         // return `true`.
         let json = r#"{
+          "version": 2,
           "layers": [
             {
               "crate": "domain",
@@ -807,6 +968,7 @@ mod tests {
     fn test_parse_tddd_layers_catalogue_spec_signal_enabled_false_explicit() {
         // Explicit `enabled: false` is equivalent to the absent-subblock default.
         let json = r#"{
+          "version": 2,
           "layers": [
             {
               "crate": "domain",
@@ -846,6 +1008,7 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let rules_path = dir.path().join("architecture-rules.json");
         let json = r#"{
+          "version": 2,
           "layers": [
             { "crate": "domain", "tddd": { "enabled": true, "catalogue_file": "domain-types.json" } },
             { "crate": "usecase", "tddd": { "enabled": true, "catalogue_file": "usecase-types.json" } }
@@ -861,6 +1024,25 @@ mod tests {
     }
 
     #[test]
+    fn test_load_tddd_layers_oversized_rules_returns_typed_io_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let rules_path = dir.path().join("architecture-rules.json");
+        std::fs::File::create(&rules_path)
+            .unwrap()
+            .set_len(crate::capability_exec::MAX_CAPABILITY_EXEC_TEXT_BYTES + 1)
+            .unwrap();
+
+        let err = load_tddd_layers(&rules_path, dir.path()).unwrap_err();
+
+        match err {
+            LoadTdddLayersError::Io { source, .. } => {
+                assert_eq!(source.kind(), std::io::ErrorKind::InvalidData);
+            }
+            other => panic!("expected typed Io error for oversized rules, got {other:?}"),
+        }
+    }
+
+    #[test]
     fn test_load_tddd_layers_missing_file_fails_closed() {
         // An absent architecture-rules.json is a hard error — no synthetic fallback.
         let dir = tempfile::tempdir().unwrap();
@@ -871,6 +1053,19 @@ mod tests {
             matches!(err, LoadTdddLayersError::Io { .. }),
             "expected Io error for absent architecture-rules.json, got: {err:?}"
         );
+    }
+
+    #[test]
+    fn test_load_tddd_layers_outside_trusted_root_fails_closed() {
+        let trusted_root = tempfile::tempdir().unwrap();
+        let outside_root = tempfile::tempdir().unwrap();
+        let rules_path = outside_root.path().join("architecture-rules.json");
+        std::fs::write(&rules_path, r#"{"layers":[{"crate":"domain"}]}"#).unwrap();
+
+        assert!(matches!(
+            load_tddd_layers(&rules_path, trusted_root.path()),
+            Err(LoadTdddLayersError::Io { .. })
+        ));
     }
 
     #[cfg(unix)]
@@ -901,6 +1096,7 @@ mod tests {
         let real = dir.path().join("real-rules.json");
         let link = dir.path().join("architecture-rules.json");
         let json = r#"{
+          "version": 2,
           "layers": [
             { "crate": "domain", "tddd": { "enabled": true, "catalogue_file": "domain-types.json" } }
           ]
@@ -923,6 +1119,7 @@ mod tests {
         // All layers must be returned — both tddd-enabled and disabled — because
         // the set is used for IN-10 workspace-origin filtering, not TDDD routing.
         let json = r#"{
+          "version": 2,
           "layers": [
             { "crate": "domain", "tddd": { "enabled": true, "catalogue_file": "domain-types.json" } },
             { "crate": "usecase", "tddd": { "enabled": false } },
@@ -937,19 +1134,15 @@ mod tests {
     }
 
     #[test]
-    fn test_parse_workspace_crate_names_empty_layers_returns_empty_set() {
-        let json = r#"{ "layers": [] }"#;
-        let names = parse_workspace_crate_names(json).unwrap();
-        assert!(names.is_empty());
+    fn test_parse_workspace_crate_names_empty_layers_fails_closed() {
+        let json = r#"{ "version": 2, "layers": [] }"#;
+        assert!(parse_workspace_crate_names(json).is_err());
     }
 
     #[test]
-    fn test_parse_workspace_crate_names_absent_layers_key_returns_empty_set() {
-        // `layers` defaults to `[]` via `#[serde(default)]`, so a missing key
-        // does not error — it returns an empty set.
+    fn test_parse_workspace_crate_names_absent_layers_key_fails_closed() {
         let json = r#"{}"#;
-        let names = parse_workspace_crate_names(json).unwrap();
-        assert!(names.is_empty());
+        assert!(parse_workspace_crate_names(json).is_err());
     }
 
     #[test]
@@ -958,18 +1151,41 @@ mod tests {
         assert!(result.is_err());
     }
 
+    #[test]
+    fn test_parse_workspace_crate_names_rejects_unknown_top_level_configuration() {
+        let json = r#"{
+          "version": 2,
+          "layers": [{ "crate": "domain" }],
+          "layerz": []
+        }"#;
+
+        assert!(parse_workspace_crate_names(json).is_err());
+    }
+
     // --- load_workspace_crate_names() (Finding 2 / IN-10 fix) ---
 
     #[test]
-    fn test_load_workspace_crate_names_returns_empty_on_absent_file() {
-        // When architecture-rules.json is absent, the function must degrade
-        // gracefully to an empty set (IN-10 checks suppressed rather than
-        // causing a hard error).
+    fn test_load_workspace_crate_names_missing_file_fails_closed() {
         let dir = tempfile::tempdir().unwrap();
         let path = dir.path().join("architecture-rules.json");
 
-        let names = load_workspace_crate_names(&path, dir.path()).unwrap();
-        assert!(names.is_empty(), "absent file must yield empty set, got {names:?}");
+        assert!(matches!(
+            load_workspace_crate_names(&path, dir.path()),
+            Err(LoadTdddLayersError::Io { .. })
+        ));
+    }
+
+    #[test]
+    fn test_load_workspace_crate_names_outside_trusted_root_fails_closed() {
+        let trusted_root = tempfile::tempdir().unwrap();
+        let outside_root = tempfile::tempdir().unwrap();
+        let rules_path = outside_root.path().join("architecture-rules.json");
+        std::fs::write(&rules_path, r#"{"layers":[{"crate":"domain"}]}"#).unwrap();
+
+        assert!(matches!(
+            load_workspace_crate_names(&rules_path, trusted_root.path()),
+            Err(LoadTdddLayersError::Io { .. })
+        ));
     }
 
     #[test]
@@ -977,6 +1193,7 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let path = dir.path().join("architecture-rules.json");
         let json = r#"{
+          "version": 2,
           "layers": [
             { "crate": "domain" },
             { "crate": "usecase", "tddd": { "enabled": false } },

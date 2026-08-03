@@ -216,6 +216,12 @@ If the briefing asks for:
 - Do not run `git add`, `git commit`, or `git push`.
 - Do not modify `review.json` directly.
 - Do not edit `<layer>-types.json` directly — the `type-designer` capability owns catalogue files.
+- Do not edit `batch-plan.json` — the `impl-planner` capability is its sole writer. Although
+  the file classifies into the impl-plan scope, it sits **outside this capability's resolved
+  write boundary** (the boundary is the writable file set, not the scope). A finding requiring
+  an estimate or batch change therefore terminates as `blocked_cross_scope`, with the finding
+  and `impl-planner` named as the required owner in the report; the calling orchestrator's
+  recovery is to dispatch impl-planner and relaunch the scope review.
 - Use `bin/sotp` (not `./bin/sotp` and not absolute paths) in all command references.
 - Use `cargo make` wrappers (e.g. `cargo make ci-rust`), not `*-local` tasks directly.
 

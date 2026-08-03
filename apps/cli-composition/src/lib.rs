@@ -11,6 +11,7 @@
 
 mod adr_baseline;
 mod arch;
+mod batch_plan;
 mod capability;
 mod catalog;
 mod codex_runtime;
@@ -77,6 +78,7 @@ pub use telemetry::TelemetryReportInput;
 
 pub use adr_baseline::AdrBaselineCompositionRoot;
 pub use arch::ArchCompositionRoot;
+pub use batch_plan::BatchPlanCompositionRoot;
 pub use capability::CapabilityCompositionRoot;
 pub use catalog::CatalogCompositionRoot;
 pub use codex_runtime::CodexRuntimeCompositionRoot;

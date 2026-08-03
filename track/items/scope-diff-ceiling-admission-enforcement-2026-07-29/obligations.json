@@ -1,0 +1,1281 @@
+{
+  "track_id": "scope-diff-ceiling-admission-enforcement-2026-07-29",
+  "obligations": [
+    {
+      "id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:new"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/domain-types.json",
+        "section_key": "types",
+        "entry_key": "ImplPlanDocument"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "DomainService"
+      },
+      "brief": "Author a logic_result test covering 'method:new' of ImplPlanDocument",
+      "declaration_hash": "8723f7348e639547f697b0259203927d141a49907a26d54cd55bea04b818092d",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-10"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-10"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-21"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:schema_version"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/domain-types.json",
+        "section_key": "types",
+        "entry_key": "ImplPlanDocument"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "DomainService"
+      },
+      "brief": "Author a logic_result test covering 'method:schema_version' of ImplPlanDocument",
+      "declaration_hash": "8723f7348e639547f697b0259203927d141a49907a26d54cd55bea04b818092d",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-10"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-10"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-21"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:tasks"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/domain-types.json",
+        "section_key": "types",
+        "entry_key": "ImplPlanDocument"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "DomainService"
+      },
+      "brief": "Author a logic_result test covering 'method:tasks' of ImplPlanDocument",
+      "declaration_hash": "8723f7348e639547f697b0259203927d141a49907a26d54cd55bea04b818092d",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-10"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-10"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-21"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:plan"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/domain-types.json",
+        "section_key": "types",
+        "entry_key": "ImplPlanDocument"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "DomainService"
+      },
+      "brief": "Author a logic_result test covering 'method:plan' of ImplPlanDocument",
+      "declaration_hash": "8723f7348e639547f697b0259203927d141a49907a26d54cd55bea04b818092d",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-10"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-10"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-21"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:all_tasks_resolved"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/domain-types.json",
+        "section_key": "types",
+        "entry_key": "ImplPlanDocument"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "DomainService"
+      },
+      "brief": "Author a logic_result test covering 'method:all_tasks_resolved' of ImplPlanDocument",
+      "declaration_hash": "8723f7348e639547f697b0259203927d141a49907a26d54cd55bea04b818092d",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-10"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-10"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-21"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:unresolved_task_ids"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/domain-types.json",
+        "section_key": "types",
+        "entry_key": "ImplPlanDocument"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "DomainService"
+      },
+      "brief": "Author a logic_result test covering 'method:unresolved_task_ids' of ImplPlanDocument",
+      "declaration_hash": "8723f7348e639547f697b0259203927d141a49907a26d54cd55bea04b818092d",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-10"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-10"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-21"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:settled_task_ids"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/domain-types.json",
+        "section_key": "types",
+        "entry_key": "ImplPlanDocument"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "DomainService"
+      },
+      "brief": "Author a logic_result test covering 'method:settled_task_ids' of ImplPlanDocument",
+      "declaration_hash": "8723f7348e639547f697b0259203927d141a49907a26d54cd55bea04b818092d",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-10"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-10"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-21"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:in_progress_task_ids"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/domain-types.json",
+        "section_key": "types",
+        "entry_key": "ImplPlanDocument"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "DomainService"
+      },
+      "brief": "Author a logic_result test covering 'method:in_progress_task_ids' of ImplPlanDocument",
+      "declaration_hash": "8723f7348e639547f697b0259203927d141a49907a26d54cd55bea04b818092d",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-10"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-10"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-21"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:next_open_task"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/domain-types.json",
+        "section_key": "types",
+        "entry_key": "ImplPlanDocument"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "DomainService"
+      },
+      "brief": "Author a logic_result test covering 'method:next_open_task' of ImplPlanDocument",
+      "declaration_hash": "8723f7348e639547f697b0259203927d141a49907a26d54cd55bea04b818092d",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-10"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-10"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-21"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:apply_transition"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/domain-types.json",
+        "section_key": "types",
+        "entry_key": "ImplPlanDocument"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "DomainService"
+      },
+      "brief": "Author a logic_result test covering 'method:apply_transition' of ImplPlanDocument",
+      "declaration_hash": "8723f7348e639547f697b0259203927d141a49907a26d54cd55bea04b818092d",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-10"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-10"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-21"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:apply_transition_by_status"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/domain-types.json",
+        "section_key": "types",
+        "entry_key": "ImplPlanDocument"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "DomainService"
+      },
+      "brief": "Author a logic_result test covering 'method:apply_transition_by_status' of ImplPlanDocument",
+      "declaration_hash": "8723f7348e639547f697b0259203927d141a49907a26d54cd55bea04b818092d",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-10"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-10"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-21"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:transition_for"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/domain-types.json",
+        "section_key": "types",
+        "entry_key": "ImplPlanDocument"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "DomainService"
+      },
+      "brief": "Author a logic_result test covering 'method:transition_for' of ImplPlanDocument",
+      "declaration_hash": "8723f7348e639547f697b0259203927d141a49907a26d54cd55bea04b818092d",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-10"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-10"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-21"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ImplPlanDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:add_task"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/domain-types.json",
+        "section_key": "types",
+        "entry_key": "ImplPlanDocument"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "DomainService"
+      },
+      "brief": "Author a logic_result test covering 'method:add_task' of ImplPlanDocument",
+      "declaration_hash": "8723f7348e639547f697b0259203927d141a49907a26d54cd55bea04b818092d",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-10"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-10"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-21"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "domain::batch_plan::check_batch_plan",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/domain-types.json",
+        "section_key": "functions",
+        "entry_key": "domain::batch_plan::check_batch_plan"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of domain::batch_plan::check_batch_plan",
+      "declaration_hash": "09e71be61272018c3ab41def7e5a95291d57b4af724323b484d7362777dc28d7",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-06"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-07"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-06"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-07"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-08"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-03"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-21"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-24"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-25"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "domain::batch_plan::evaluate_admission",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/domain-types.json",
+        "section_key": "functions",
+        "entry_key": "domain::batch_plan::evaluate_admission"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of domain::batch_plan::evaluate_admission",
+      "declaration_hash": "5dffabcd1f13ff0788589aecc94319a2456a405ca421a4a8ac68dc3d587b5141",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-10"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-11"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-10"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-11"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-12"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "CN-03"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-23"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-21"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-24"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "BatchPlanCheckInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "BatchPlanCheckInteractor"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      },
+      "brief": "Author a result test covering 'entry' of BatchPlanCheckInteractor",
+      "declaration_hash": "23dde6c29223874f520749c52b5bc29444e89810683af0d7b3d5c65c2393d129",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-06"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-07"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-06"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-07"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-08"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "TaskOperationInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "TaskOperationInteractor"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      },
+      "brief": "Author a result test covering 'entry' of TaskOperationInteractor",
+      "declaration_hash": "01df50096fc37e48db538f4838be67cb6c98deaf83535831a7272feac47ed17f",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-10"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "CN-10"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-23"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-26"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-27"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "BatchPlanCheckService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:check"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "BatchPlanCheckService"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      },
+      "brief": "Author a result test covering 'trait_method:check' of BatchPlanCheckService",
+      "declaration_hash": "8e6e3d5e7e37bd3ac1802d386f8715492e29506bb469b70b1fa64adcd5e1a4a3",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-06"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-07"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-06"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-07"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "BatchPlanReaderPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:read"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "BatchPlanReaderPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:read' of BatchPlanReaderPort",
+      "declaration_hash": "9ac49b003adf688f1c663c8c01c9c2facb0a3682111fbf3cb816c2053a8831c2",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-01"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-05"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "CommitRecordVerifierPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:verify_commit_record"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "CommitRecordVerifierPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:verify_commit_record' of CommitRecordVerifierPort",
+      "declaration_hash": "0472fdfd3aca2adb5fa9aac163b46f7e8fcbc9abb5d5d9aedd0c60add60dd5fa",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-22"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-28"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-29"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "PlannedTaskReaderPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:read_planned_tasks"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "PlannedTaskReaderPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:read_planned_tasks' of PlannedTaskReaderPort",
+      "declaration_hash": "6548815b0b857caac23b6f8cdeba888e308a289c1fce62a1f94fd602f3728a76",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-07"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-07"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-21"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-24"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ScopeConfigReaderPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:read"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "ScopeConfigReaderPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:read' of ScopeConfigReaderPort",
+      "declaration_hash": "3f513f4859864ff0dab32315802c8d8b362a584d84ceb6ec0b2110dfb1eeaf67",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-06"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-08"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ScopeDiffMeasurePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:measure_scope_diff"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "ScopeDiffMeasurePort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:measure_scope_diff' of ScopeDiffMeasurePort",
+      "declaration_hash": "2011fd1565081b3218f735c7de89ee31f7b7a849490088eeaa3acad00c6914d3",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-10"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-14"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-17"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "CN-05"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "TaskOperationService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:transition_task"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "TaskOperationService"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      },
+      "brief": "Author a result test covering 'trait_method:transition_task' of TaskOperationService",
+      "declaration_hash": "1dffdcb2f96dc19adce3240c85b1df4fbf5122f3e5b99b4e8e5bcc5c4fa2394e",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-10"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-23"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-26"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-27"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "TaskOperationService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:add_task"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "TaskOperationService"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      },
+      "brief": "Author a result test covering 'trait_method:add_task' of TaskOperationService",
+      "declaration_hash": "1dffdcb2f96dc19adce3240c85b1df4fbf5122f3e5b99b4e8e5bcc5c4fa2394e",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-10"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-23"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-26"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-27"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "TaskOperationService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:set_override"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "TaskOperationService"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      },
+      "brief": "Author a result test covering 'trait_method:set_override' of TaskOperationService",
+      "declaration_hash": "1dffdcb2f96dc19adce3240c85b1df4fbf5122f3e5b99b4e8e5bcc5c4fa2394e",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-10"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-23"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-26"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-27"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "TaskOperationService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:clear_override"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "TaskOperationService"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      },
+      "brief": "Author a result test covering 'trait_method:clear_override' of TaskOperationService",
+      "declaration_hash": "1dffdcb2f96dc19adce3240c85b1df4fbf5122f3e5b99b4e8e5bcc5c4fa2394e",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-10"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-23"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-26"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-27"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "infrastructure::batch_plan_codec::decode",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/infrastructure-types.json",
+        "section_key": "functions",
+        "entry_key": "infrastructure::batch_plan_codec::decode"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of infrastructure::batch_plan_codec::decode",
+      "declaration_hash": "6d3eb1d9cfa8e286a47963daecf97acbad186b33112f77f568cf566a04b9ba99",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "FsBatchPlanReader",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::batch_plan::ports::BatchPlanReaderPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "FsBatchPlanReader"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::batch_plan::ports::BatchPlanReaderPort' of FsBatchPlanReader",
+      "declaration_hash": "146844950e2d3d2f36e3326e0bf62d525138911bbac845c819ce44ec22b89f7b",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-01"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-05"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "GitScopeDiffMeasurer",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::batch_plan::ports::ScopeDiffMeasurePort"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "GitScopeDiffMeasurer"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::batch_plan::ports::ScopeDiffMeasurePort' of GitScopeDiffMeasurer",
+      "declaration_hash": "61109d5cb0f522559552e8238cbd76bf82bf8a7b612e5a6ca0622b30b03eedbd",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-10"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-14"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-17"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "CN-05"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "FsPlannedTaskReader",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::batch_plan::ports::PlannedTaskReaderPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "FsPlannedTaskReader"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::batch_plan::ports::PlannedTaskReaderPort' of FsPlannedTaskReader",
+      "declaration_hash": "bacdd85ff87f47f4488467be82ed4dd4a0c84e7fb2eadb2b05eca4111dde055d",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-07"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-07"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-21"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-24"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "FsReviewScopeConfigReader",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::batch_plan::ports::ScopeConfigReaderPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "FsReviewScopeConfigReader"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::batch_plan::ports::ScopeConfigReaderPort' of FsReviewScopeConfigReader",
+      "declaration_hash": "f910c7e27385107d80429b8f19836feaf7f8501a80aa9b9886dd50f25b23fbea",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-06"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-08"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "LazyBranchReader",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::track_resolution::BranchReaderPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "LazyBranchReader"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::track_resolution::BranchReaderPort' of LazyBranchReader",
+      "declaration_hash": "7e3db81799b9b15841d72271f5d15f229b7e8e388fefe87ce4dc8c0addc90516",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-05"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "CN-09"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "GitCommitRecordVerifier",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::task_ops::ports::CommitRecordVerifierPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "GitCommitRecordVerifier"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::task_ops::ports::CommitRecordVerifierPort' of GitCommitRecordVerifier",
+      "declaration_hash": "82cba986bfb65b4d784beedecc8a338eda238bab783de329eca466ec45f6c247",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-22"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-28"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-29"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::batch_plan::execute",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::batch_plan::execute"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::batch_plan::execute",
+      "declaration_hash": "6efdd6b553196cac19f52d112aec642163520265d54b4bd31e4dd55b39d5aed3",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "IN-06"
+        },
+        {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json",
+          "element_id": "AC-06"
+        }
+      ]
+    }
+  ]
+}

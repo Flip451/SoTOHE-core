@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "track_id": "scope-diff-ceiling-admission-enforcement-2026-07-29",
+  "entries": {
+    "T001": [
+      { "layer": "domain", "entry_key": "LineCount" },
+      { "layer": "domain", "entry_key": "ScopeCeiling" },
+      { "layer": "domain", "entry_key": "IndivisibilityJustification" },
+      { "layer": "domain", "entry_key": "TaskDecomposition" },
+      { "layer": "domain", "entry_key": "ScopeLineEstimate" },
+      { "layer": "domain", "entry_key": "TaskEstimate" },
+      { "layer": "domain", "entry_key": "BatchId" },
+      { "layer": "domain", "entry_key": "BatchDeclaration" },
+      { "layer": "domain", "entry_key": "MeasuredScopeDiff" },
+      { "layer": "domain", "entry_key": "BatchPlanValidationError" }
+    ],
+    "T002": [
+      { "layer": "domain", "entry_key": "BatchPlanDocument" }
+    ],
+    "T019": [
+      { "layer": "domain", "entry_key": "TrackTask" },
+      { "layer": "domain", "entry_key": "ValidationError" }
+    ],
+    "T020": [
+      { "layer": "infrastructure", "entry_key": "ImplPlanTaskDto" }
+    ],
+    "T003": [
+      { "layer": "domain", "entry_key": "BatchPlanGateViolation" },
+      { "layer": "domain", "entry_key": "BatchPlanGateOutcome" },
+      { "layer": "domain", "entry_key": "NonEmptyGateViolations" },
+      { "layer": "domain", "entry_key": "domain::batch_plan::check_batch_plan" },
+      { "layer": "domain", "entry_key": "ReviewScopeConfig" }
+    ],
+    "T004": [
+      { "layer": "domain", "entry_key": "AdmissionDecision" },
+      { "layer": "domain", "entry_key": "AdmissionRejection" },
+      { "layer": "domain", "entry_key": "AdmissionEvaluationError" },
+      { "layer": "domain", "entry_key": "NonZeroLineCount" },
+      { "layer": "domain", "entry_key": "domain::batch_plan::evaluate_admission" }
+    ],
+    "T005": [
+      { "layer": "usecase", "entry_key": "BatchPlanReaderPort" },
+      { "layer": "usecase", "entry_key": "PlannedTaskReaderPort" },
+      { "layer": "usecase", "entry_key": "PlanArtifactReadError" },
+      { "layer": "usecase", "entry_key": "ScopeConfigReaderPort" },
+      { "layer": "usecase", "entry_key": "ScopeConfigReadError" },
+      { "layer": "usecase", "entry_key": "ScopeDiffMeasurePort" },
+      { "layer": "usecase", "entry_key": "ScopeDiffMeasureError" }
+    ],
+    "T006": [
+      { "layer": "usecase", "entry_key": "BatchPlanCheckService" },
+      { "layer": "usecase", "entry_key": "BatchPlanCheckCommand" },
+      { "layer": "usecase", "entry_key": "BatchPlanCheckError" },
+      { "layer": "usecase", "entry_key": "BatchPlanCheckInteractor" },
+      { "layer": "usecase", "entry_key": "BatchPlanCheckOutput" },
+      { "layer": "usecase", "entry_key": "BatchPlanViolationOutput" },
+      { "layer": "usecase", "entry_key": "NonEmptyViolationOutputs" }
+    ],
+    "T007": [
+      { "layer": "infrastructure", "entry_key": "BatchPlanDocumentDto" },
+      { "layer": "infrastructure", "entry_key": "TaskEstimateDto" },
+      { "layer": "infrastructure", "entry_key": "ScopeLineEstimateDto" },
+      { "layer": "infrastructure", "entry_key": "BatchDeclarationDto" },
+      { "layer": "infrastructure", "entry_key": "BatchPlanCodecError" },
+      { "layer": "infrastructure", "entry_key": "infrastructure::batch_plan_codec::decode" }
+    ],
+    "T008": [
+      { "layer": "infrastructure", "entry_key": "FsBatchPlanReader" },
+      { "layer": "infrastructure", "entry_key": "FsPlannedTaskReader" }
+    ],
+    "T009": [
+      { "layer": "infrastructure", "entry_key": "FsReviewScopeConfigReader" },
+      { "layer": "infrastructure", "entry_key": "GitScopeDiffMeasurer" }
+    ],
+    "T010": [
+      { "layer": "cli_driver", "entry_key": "BatchPlanDriver" },
+      { "layer": "cli_driver", "entry_key": "BatchPlanInput" }
+    ],
+    "T011": [
+      { "layer": "usecase", "entry_key": "BranchReaderPort" },
+      { "layer": "infrastructure", "entry_key": "LazyBranchReader" },
+      { "layer": "cli_composition", "entry_key": "BatchPlanCompositionRoot" }
+    ],
+    "T012": [
+      { "layer": "cli", "entry_key": "BatchPlanCheckArgs" },
+      { "layer": "cli", "entry_key": "BatchPlanCommand" },
+      { "layer": "cli", "entry_key": "CliCommand" },
+      { "layer": "cli", "entry_key": "cli::commands::batch_plan::execute" }
+    ],
+    "T018": [
+      { "layer": "domain", "entry_key": "ImplPlanDocument" },
+      { "layer": "usecase", "entry_key": "TaskOperationService" },
+      { "layer": "usecase", "entry_key": "TaskOperationInteractor" },
+      { "layer": "usecase", "entry_key": "TaskTransitionOutcome" },
+      { "layer": "usecase", "entry_key": "AdmissionRejectionOutput" },
+      { "layer": "usecase", "entry_key": "TransitionTaskUseCase" }
+    ],
+    "T021": [
+      { "layer": "domain", "entry_key": "BatchPlanGateViolation" },
+      { "layer": "domain", "entry_key": "AdmissionEvaluationError" },
+      { "layer": "domain", "entry_key": "ImplPlanDocument" },
+      { "layer": "domain", "entry_key": "TaskStatusKind" },
+      { "layer": "domain", "entry_key": "domain::batch_plan::check_batch_plan" },
+      { "layer": "domain", "entry_key": "domain::batch_plan::evaluate_admission" },
+      { "layer": "usecase", "entry_key": "BatchPlanViolationOutput" }
+    ],
+    "T022": [
+      { "layer": "domain", "entry_key": "AdmissionRejection" },
+      { "layer": "usecase", "entry_key": "AdmissionRejectionOutput" }
+    ],
+    "T024": [
+      { "layer": "domain", "entry_key": "BatchPlanValidationError" },
+      { "layer": "domain", "entry_key": "TaskEstimate" }
+    ],
+    "T026": [
+      { "layer": "usecase", "entry_key": "CommitRecordVerifierPort" },
+      { "layer": "usecase", "entry_key": "CommitRecordVerifyError" }
+    ],
+    "T027": [
+      { "layer": "domain", "entry_key": "TaskTransition" },
+      { "layer": "usecase", "entry_key": "TaskOperationInteractor" },
+      { "layer": "infrastructure", "entry_key": "GitCommitRecordVerifier" }
+    ]
+  }
+}

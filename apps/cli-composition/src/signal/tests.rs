@@ -4,8 +4,17 @@
 
 use crate::signal::SignalCompositionRoot;
 use cli_driver::signal::{SignalGateName as DriverSignalGateName, SignalInput};
-use domain::{ChainGateEntry, SignalGateMatrix, Strictness, verify::VerifyOutcome};
+use cli_driver::signal_report::{
+    SignalReportChainFilter, SignalReportInput, SignalReportLevelFilter,
+};
+use domain::review_v2::types::FilePath;
+use domain::{ChainGateEntry, NonEmptyString, SignalGateMatrix, Strictness, verify::VerifyOutcome};
 use std::sync::{Arc, Mutex};
+use usecase::signal_report::{
+    SignalReportChain, SignalReportEntryId, SignalReportError, SignalReportLevel,
+    SignalReportLocation, SignalReportOccurrence, SignalReportReason, SignalReportReference,
+    SignalReportSourcePort,
+};
 use usecase::signal_service::{
     ResolvedSignalChainCommand, SignalActiveTrackResolverPort, SignalChainExecutionReport,
     SignalCommandPort, SignalCommandPortError, SignalGateConfigError, SignalGateConfigPort,
@@ -69,6 +78,104 @@ fn test_signal_composition_root_constructs_wired_driver() {
         outcome.stderr
     );
     assert_eq!(outcome.exit_code, 1);
+}
+
+#[test]
+fn test_signal_composition_root_constructs_signal_report_driver_without_dispatch() {
+    let root = SignalCompositionRoot::new();
+
+    let _driver = root.signal_report_driver();
+}
+
+struct StubSignalReportSource {
+    occurrences: Vec<SignalReportOccurrence>,
+}
+
+impl SignalReportSourcePort for StubSignalReportSource {
+    fn load(
+        &self,
+        chain: SignalReportChain,
+    ) -> Result<Vec<SignalReportOccurrence>, SignalReportError> {
+        Ok(self
+            .occurrences
+            .iter()
+            .filter(|occurrence| occurrence.chain == chain)
+            .cloned()
+            .collect())
+    }
+}
+
+fn signal_report_occurrence(
+    chain: SignalReportChain,
+    level: SignalReportLevel,
+    entry_id: &str,
+    reference: &str,
+    reason: &str,
+    location: &str,
+) -> SignalReportOccurrence {
+    SignalReportOccurrence {
+        chain,
+        level,
+        entry_id: SignalReportEntryId::new(NonEmptyString::try_new(entry_id).unwrap()),
+        reference: SignalReportReference::new(NonEmptyString::try_new(reference).unwrap()),
+        reason: SignalReportReason::new(NonEmptyString::try_new(reason).unwrap()),
+        location: SignalReportLocation::new(FilePath::new(location).unwrap()),
+    }
+}
+
+#[test]
+fn test_signal_composition_root_signal_report_driver_renders_yellow_and_red_block_causes() {
+    let root = SignalCompositionRoot::new();
+    let driver = root.signal_report_driver_with_source(Arc::new(StubSignalReportSource {
+        occurrences: vec![
+            signal_report_occurrence(
+                SignalReportChain::AdrUser,
+                SignalReportLevel::Yellow,
+                "D1",
+                "chat_segment:signal-report",
+                "user evidence remains unresolved",
+                "knowledge/adr/2026-07-29-0839-signal-report-command.md",
+            ),
+            signal_report_occurrence(
+                SignalReportChain::ImplCatalog,
+                SignalReportLevel::Red,
+                "SignalCompositionRoot",
+                "cli_composition-types.json#GO-01",
+                "missing implementation reference blocks the gate",
+                "apps/cli-composition/src/signal/mod.rs",
+            ),
+        ],
+    }));
+
+    let outcome = driver.handle(SignalReportInput {
+        chain: SignalReportChainFilter::All,
+        levels: SignalReportLevelFilter::YellowAndRed,
+    });
+
+    assert_eq!(outcome.exit_code, 0);
+    assert_eq!(outcome.stderr, None);
+    let output = outcome.stdout.as_deref().expect("report output must be rendered");
+    assert!(output.contains("chain=adr_user level=yellow entry_id=D1"));
+    assert!(output.contains("reason=user evidence remains unresolved"));
+    assert!(output.contains("chain=impl_catalog level=red entry_id=SignalCompositionRoot"));
+    assert!(output.contains("reason=missing implementation reference blocks the gate"));
+}
+
+#[test]
+fn test_signal_report_driver_factory_is_wiring_only() {
+    let source = include_str!("mod.rs");
+
+    for wired_component in [
+        "SystemSignalReportSourceAdapter::new()",
+        "SignalReportInteractor::new(source)",
+        "SignalReportDriver::new(service)",
+    ] {
+        assert!(
+            source.contains(wired_component),
+            "signal-report factory must wire {wired_component}"
+        );
+    }
+    assert!(!source.contains(".handle("), "signal composition must not dispatch a driver");
 }
 
 #[test]
@@ -476,6 +583,7 @@ fn test_signal_composition_root_public_api_exposes_only_driver_factory() {
         vec![
             "pub fn new() -> Self {",
             "pub fn signal_driver(&self) -> cli_driver::signal::SignalDriver {",
+            "pub fn signal_report_driver(&self) -> cli_driver::signal_report::SignalReportDriver {",
         ]
     );
 

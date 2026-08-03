@@ -1,6 +1,6 @@
 ---
 name: track-impl-plan
-description: Use when Codex is asked to author the track's impl-plan.json, task-coverage.json, and task-contract.json via the impl-planner capability (Phase 3).
+description: Use when Codex is asked to author the track's impl-plan.json, task-coverage.json, task-contract.json, and batch-plan.json via the impl-planner capability (Phase 3).
 ---
 
 # Track-Impl-Plan (Codex skill)
@@ -19,8 +19,9 @@ or failure-recovery procedures here.
 ### (2) Sandbox constraint
 
 - Requires `--sandbox workspace-write`: the impl-planner capability writes `impl-plan.json`,
-  `task-coverage.json`, and `task-contract.json` to the working tree. `plan.md` is a derived
-  read-only view this capability must not write.
+  `task-coverage.json`, `task-contract.json`, and `batch-plan.json` (it is the sole writer of
+  all four) to the working tree. `plan.md` is a derived read-only view this capability must
+  not write.
 
 ### (3) Sub-workflow and capability invocation
 
@@ -35,5 +36,5 @@ or failure-recovery procedures here.
 
 ### (4) Reporting format
 
-- On successful completion, print: `IMPL_PLAN_STATUS: completed — impl-plan.json written, coverage gate passed`
-- On gate failure or block, print: `IMPL_PLAN_STATUS: blocked — <reason>`
+- On successful completion, print: `IMPL_PLAN_STATUS: completed — impl-plan.json written, coverage and batch-plan gates passed`
+- On gate failure or block (either gate), print: `IMPL_PLAN_STATUS: blocked — <reason>`

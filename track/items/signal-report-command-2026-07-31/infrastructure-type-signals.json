@@ -1,0 +1,17 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-08-01T04:43:52Z",
+  "declaration_hash": "d6523c2a35ce1acd6fdb5f297e749b43d371add54b3c32ce0e8c352c9faa9b35",
+  "implementation_input_hash": "3eab36961524fa3a381513921d06e2ed16e9d3fa15447666747bff170827366c",
+  "signals": [
+    {
+      "type_name": "SystemSignalReportSourceAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "usecase::signal_report::SignalReportSourcePort"
+      ]
+    }
+  ]
+}

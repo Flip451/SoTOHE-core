@@ -1,0 +1,132 @@
+{
+  "crate_name": "cli_driver",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "check_service",
+              "ty": "std::sync::Arc<dyn usecase::batch_plan::BatchPlanCheckService>"
+            }
+          ],
+          "returns": "BatchPlanDriver"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [
+            {
+              "name": "input",
+              "ty": "BatchPlanInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "CommandOutcome"
+        }
+      ],
+      "type_name": "BatchPlanDriver"
+    }
+  ],
+  "layer": "cli_driver",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "BatchPlanInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "BatchPlanInput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "BatchPlanDriver",
+      "trait_ref": "core::fmt::Debug"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "BatchPlanDriver": {
+      "action": "add",
+      "docs": "Primary adapter for the batch-plan command family: passes the driver input to the injected gate service and renders the returned output DTO as a CommandOutcome. Type-design: exactly one injected service and one invocation per request — the track context travels into the use case unresolved rather than being resolved here first, so the adapter drives no second interactor. It renders the usecase output DTO only and destructures no domain value object, keeping the domain out of this layer. Each violation is reported with its own figures rather than a count (R11); Debug is hand-written because the struct holds Arc<dyn Service>. IN-06, IN-07, AC-06, AC-07.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "batch_plan",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    },
+    "BatchPlanInput": {
+      "action": "add",
+      "docs": "Typed input for the batch-plan command family, carrying the track context unresolved. Type-design: track_id is Option because neither the bin nor the driver decides anything about it — the flag passes straight through to the use case, which owns resolution and validation into a domain identifier, so the bin needs no working-directory read and the driver drives no second interactor. It stays a raw transport String at this surface (R9 transport-boundary case, mirroring the existing command drivers); items_dir travels here rather than through construction so the composition root stays a zero-argument wiring accessor. IN-06, AC-06.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Check",
+            "payload": {
+              "fields": [
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "items_dir",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "batch_plan",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    }
+  }
+}

@@ -283,9 +283,12 @@ fn open_append_no_follow(path: &Path) -> std::io::Result<File> {
 
 /// Serializes a `TelemetryEvent` to `JSON\n` bytes.
 fn build_line(event: &TelemetryEvent) -> Result<Vec<u8>, TelemetryWriteError> {
-    let json = serde_json::to_string(event)
+    // Materialize through Value so every event object has canonical JSON key
+    // order before its JSONL delimiter is added.
+    let value = serde_json::to_value(event)
         .map_err(|e| TelemetryWriteError::Serialize { message: e.to_string() })?;
-    let mut bytes = json.into_bytes();
+    let mut bytes = serde_json::to_vec(&value)
+        .map_err(|e| TelemetryWriteError::Serialize { message: e.to_string() })?;
     bytes.push(b'\n');
     Ok(bytes)
 }
@@ -452,6 +455,28 @@ mod tests {
         assert!(!content.is_empty(), "telemetry.jsonl must not be empty after write");
         // Must end with newline (JSONL convention).
         assert!(content.ends_with('\n'), "line must end with newline");
+    }
+
+    #[test]
+    fn test_build_line_with_populated_event_produces_canonical_stable_jsonl() {
+        let event = TelemetryEvent::TrackSubcommand {
+            schema_version: 1,
+            track_id: "test-track-2026".to_string(),
+            command: "track full-cycle".to_string(),
+            exit_code: 7,
+            duration_ms: 1_234,
+            timestamp: "2026-08-02T03:04:05Z".to_string(),
+        };
+
+        let first = build_line(&event).unwrap();
+        let second = build_line(&event).unwrap();
+
+        assert_eq!(first, second, "identical telemetry events must produce identical bytes");
+        assert_eq!(first.last(), Some(&b'\n'), "JSONL output must retain its newline delimiter");
+        assert_eq!(
+            first,
+            b"{\"command\":\"track full-cycle\",\"duration_ms\":1234,\"event_type\":\"TrackSubcommand\",\"exit_code\":7,\"schema_version\":1,\"timestamp\":\"2026-08-02T03:04:05Z\",\"track_id\":\"test-track-2026\"}\n"
+        );
     }
 
     #[cfg(unix)]

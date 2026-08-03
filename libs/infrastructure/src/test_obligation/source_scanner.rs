@@ -26,6 +26,7 @@ use domain::tddd::test_obligation::errors::TestSourceScanError;
 use domain::tddd::test_obligation::hashes::TestBodySpanHash;
 use domain::tddd::test_obligation::ports::TestSourceScannerPort;
 
+use crate::lexical_path::lexical_normalize;
 use crate::test_obligation::diagnostic;
 use crate::track::symlink_guard::reject_symlinks_below;
 
@@ -65,23 +66,32 @@ impl SynTestSourceScanner {
 
 fn guarded_workspace_root(workspace_root: &Path) -> Result<PathBuf, TestSourceScanError> {
     reject_parent_dir_workspace_root(workspace_root)?;
-    let root = absolutize_lexical(workspace_root);
+    let root = absolutize_lexical(workspace_root)?;
     reject_symlinked_workspace_root_chain(&root)?;
     // Keep the trusted-root anchor lexical. `canonicalize()` follows symlinked
     // ancestors and can silently re-anchor the scanner on the target tree.
     Ok(root)
 }
 
+/// Refuses a workspace root the caller wrote with a `..` step.
+///
+/// The root is the caller's own argument and has no repository-relative name to
+/// report it by — naming it would print the very host path this convention keeps
+/// out of diagnostics — so the refusal states what was wrong and nothing else.
 fn reject_parent_dir_workspace_root(workspace_root: &Path) -> Result<(), TestSourceScanError> {
     if workspace_root.components().any(|component| component == Component::ParentDir) {
-        return Err(TestSourceScanError::Io(diagnostic(&format!(
-            "refusing to use test-source workspace root with parent-dir component: {}",
-            workspace_root.display()
-        ))));
+        return Err(TestSourceScanError::Io(diagnostic(
+            "the test-source workspace root was refused (it contains a parent-dir component)",
+        )));
     }
     Ok(())
 }
 
+/// Refuses a workspace root reached through a symlink, or one whose components
+/// cannot be inspected.
+///
+/// Neither the offending component nor the stat failure is named: both render
+/// absolute host paths, and the caller supplied the root they would describe.
 fn reject_symlinked_workspace_root_chain(root: &Path) -> Result<(), TestSourceScanError> {
     let mut ancestors: Vec<&Path> = root.ancestors().collect();
     ancestors.reverse();
@@ -91,16 +101,15 @@ fn reject_symlinked_workspace_root_chain(root: &Path) -> Result<(), TestSourceSc
         }
         match component.symlink_metadata() {
             Ok(meta) if meta.file_type().is_symlink() => {
-                return Err(TestSourceScanError::Io(diagnostic(&format!(
-                    "refusing to use symlinked test-source workspace root component: {}",
-                    component.display()
-                ))));
+                return Err(TestSourceScanError::Io(diagnostic(
+                    "the test-source workspace root was refused (rejected as a symlink)",
+                )));
             }
             Ok(_) => {}
             Err(source) => {
                 return Err(TestSourceScanError::Io(diagnostic(&format!(
-                    "cannot stat test-source workspace root component {}: {source}",
-                    component.display()
+                    "the test-source workspace root was refused ({})",
+                    crate::sanitized_failure::io_classification(&source)
                 ))));
             }
         }
@@ -109,7 +118,19 @@ fn reject_symlinked_workspace_root_chain(root: &Path) -> Result<(), TestSourceSc
 }
 
 fn parse_module_path_segments(module_path: &str) -> Result<Vec<&str>, TestSourceScanError> {
+    // Bounded before the string is split, so an oversized path is refused rather
+    // than measured by the work it would cause.
+    if module_path.len() > MAX_MODULE_PATH_BYTES {
+        return Err(TestSourceScanError::Io(diagnostic(
+            "the test module path was refused (longer than a module path can be)",
+        )));
+    }
     let segments: Vec<&str> = module_path.split("::").collect();
+    if segments.len() > MAX_MODULE_PATH_SEGMENTS {
+        return Err(TestSourceScanError::Io(diagnostic(
+            "the test module path was refused (more segments than a module path can name)",
+        )));
+    }
     for segment in &segments {
         if !safe_module_path_segment(segment) {
             return Err(TestSourceScanError::Io(diagnostic(&format!(
@@ -133,30 +154,146 @@ fn safe_module_path_segment(segment: &str) -> bool {
     matches!(components.next(), Some(Component::Normal(_))) && components.next().is_none()
 }
 
-fn absolutize_lexical(path: &Path) -> PathBuf {
+/// Resolves `path` to an absolute lexical form.
+///
+/// # Errors
+///
+/// Returns [`TestSourceScanError::Io`] when a relative root cannot be made
+/// absolute. Continuing with the relative path would drop the absolute trust
+/// anchor every containment check below rests on, so there is no fallback.
+fn absolutize_lexical(path: &Path) -> Result<PathBuf, TestSourceScanError> {
+    absolutize_lexical_from(path, std::env::current_dir())
+}
+
+/// The body of [`absolutize_lexical`], with the working directory supplied so the
+/// failure lane can be exercised without breaking the process's own.
+fn absolutize_lexical_from(
+    path: &Path,
+    current_dir: std::io::Result<PathBuf>,
+) -> Result<PathBuf, TestSourceScanError> {
     let absolute = if path.is_absolute() {
         path.to_path_buf()
     } else {
-        std::env::current_dir().map(|cwd| cwd.join(path)).unwrap_or_else(|_| path.to_path_buf())
+        let cwd = current_dir.map_err(|error| {
+            TestSourceScanError::Io(diagnostic(&format!(
+                "the workspace root could not be resolved ({})",
+                crate::sanitized_failure::io_classification(&error)
+            )))
+        })?;
+        cwd.join(path)
     };
-    lexical_normalize(&absolute)
+    Ok(lexical_normalize(&absolute))
 }
 
-fn lexical_normalize(path: &Path) -> PathBuf {
-    let mut components: Vec<Component<'_>> = Vec::new();
-    for component in path.components() {
-        match component {
-            Component::ParentDir => match components.last() {
-                Some(Component::Normal(_)) => {
-                    components.pop();
-                }
-                _ => components.push(component),
-            },
-            Component::CurDir => {}
-            _ => components.push(component),
+/// The most a module path may occupy.
+///
+/// Rust's own limits are far below this — a path naming a test module runs to a
+/// few dozen bytes — so a real one never meets it, while a caller-supplied string
+/// cannot drive the candidate generation below into arbitrary work.
+const MAX_MODULE_PATH_BYTES: usize = 4096;
+
+/// The most segments a module path may name, for the same reason: candidate
+/// generation is quadratic in the segment count, which is harmless only while the
+/// count is bounded.
+const MAX_MODULE_PATH_SEGMENTS: usize = 64;
+
+/// The most a Rust source file this scanner will parse can occupy.
+///
+/// Well above anything in this workspace — the largest module here is a few
+/// hundred kilobytes — so a real file is never refused, while a file that could
+/// exhaust memory before `syn` ever sees it is.
+const MAX_TEST_SOURCE_BYTES: u64 = 8 * 1024 * 1024;
+
+/// Reads a candidate, refusing anything that is not a regular file within the cap.
+///
+/// Returns `Ok(None)` only when the candidate is absent: the path is speculative
+/// and most candidates do not exist, so the scan moves on to the next one. Any
+/// other outcome is an error rather than a skip, because a candidate that exists
+/// but cannot be read as source would otherwise let the scan pass over a bound
+/// test and report it missing.
+///
+/// # Errors
+///
+/// Returns [`TestSourceScanError::Io`] for a candidate that is not a regular
+/// file, one above the cap, or a read that fails — named relatively and
+/// classified.
+fn read_bounded_source(
+    file: &Path,
+    workspace_root: &Path,
+) -> Result<Option<String>, TestSourceScanError> {
+    let metadata = match std::fs::symlink_metadata(file) {
+        Ok(metadata) => metadata,
+        Err(e) if e.kind() == ErrorKind::NotFound => return Ok(None),
+        Err(e) => {
+            return Err(TestSourceScanError::Io(diagnostic(&format!(
+                "cannot read test source '{}': {}",
+                candidate_identity(file, workspace_root),
+                crate::sanitized_failure::io_classification(&e)
+            ))));
         }
+    };
+    // Refused rather than skipped, because only absence may be skipped: a
+    // candidate that exists but cannot be read as source would otherwise let the
+    // scan pass over a bound test and report it missing. The check happens on the
+    // metadata, so a FIFO is settled before anything opens it and blocks.
+    if !metadata.file_type().is_file() {
+        return Err(TestSourceScanError::Io(diagnostic(&format!(
+            "cannot read test source '{}': not a regular file",
+            candidate_identity(file, workspace_root)
+        ))));
     }
-    components.iter().collect()
+    if metadata.len() > MAX_TEST_SOURCE_BYTES {
+        return Err(TestSourceScanError::Io(diagnostic(&format!(
+            "cannot read test source '{}': larger than a source file this scanner parses",
+            candidate_identity(file, workspace_root)
+        ))));
+    }
+
+    // Bounded regardless of the metadata: the file may grow between the two.
+    let handle = match std::fs::File::open(file) {
+        Ok(handle) => handle,
+        Err(e) if e.kind() == ErrorKind::NotFound => return Ok(None),
+        Err(e) => {
+            return Err(TestSourceScanError::Io(diagnostic(&format!(
+                "cannot read test source '{}': {}",
+                candidate_identity(file, workspace_root),
+                crate::sanitized_failure::io_classification(&e)
+            ))));
+        }
+    };
+    use std::io::Read as _;
+    let mut content = String::new();
+    handle.take(MAX_TEST_SOURCE_BYTES.saturating_add(1)).read_to_string(&mut content).map_err(
+        |e| {
+            TestSourceScanError::Io(diagnostic(&format!(
+                "cannot read test source '{}': {}",
+                candidate_identity(file, workspace_root),
+                crate::sanitized_failure::io_classification(&e)
+            )))
+        },
+    )?;
+    if content.len() as u64 > MAX_TEST_SOURCE_BYTES {
+        return Err(TestSourceScanError::Io(diagnostic(&format!(
+            "cannot read test source '{}': larger than a source file this scanner parses",
+            candidate_identity(file, workspace_root)
+        ))));
+    }
+
+    Ok(Some(content))
+}
+
+/// Names a candidate by its path relative to the workspace root.
+///
+/// The absolute path describes the machine the scan ran on; the relative one
+/// describes the repository, which is what a caller can act on. A candidate that
+/// does not sit under the root has no relative name, and reporting the absolute
+/// one is exactly what must not happen, so it is named by what it was looked up
+/// as instead.
+fn candidate_identity(file: &Path, workspace_root: &Path) -> String {
+    file.strip_prefix(workspace_root).map_or_else(
+        |_| "a path outside the workspace".to_owned(),
+        |relative| relative.display().to_string(),
+    )
 }
 
 fn guard_candidate_file(
@@ -165,18 +302,18 @@ fn guard_candidate_file(
 ) -> Result<Option<PathBuf>, TestSourceScanError> {
     let guarded_file = lexical_normalize(file);
     if !guarded_file.starts_with(workspace_root) {
-        return Err(TestSourceScanError::Io(diagnostic(&format!(
-            "test source path {} escapes workspace root {}",
-            file.display(),
-            workspace_root.display()
-        ))));
+        return Err(TestSourceScanError::Io(diagnostic(
+            "test source path escapes the workspace root",
+        )));
     }
     match reject_symlinks_below(&guarded_file, workspace_root) {
         Ok(true) => Ok(Some(guarded_file)),
         Ok(false) => Ok(None),
+        // The guard's own message renders the absolute component it refused.
         Err(source) => Err(TestSourceScanError::Io(diagnostic(&format!(
-            "refusing to read test source {}: {source}",
-            guarded_file.display()
+            "refusing to read test source {}: {}",
+            candidate_identity(&guarded_file, workspace_root),
+            crate::sanitized_failure::io_classification(&source)
         )))),
     }
 }
@@ -339,18 +476,11 @@ impl TestSourceScannerPort for SynTestSourceScanner {
                 let Some(file) = guard_candidate_file(&candidate.path, &workspace_root)? else {
                     continue;
                 };
-                let content = match std::fs::read_to_string(&file) {
-                    Ok(content) => content,
+                let Some(content) = read_bounded_source(&file, &workspace_root)? else {
                     // A candidate can disappear between the symlink check and
                     // the read. It is still only a speculative path, so allow
                     // the remaining candidates to provide the bound test.
-                    Err(e) if e.kind() == ErrorKind::NotFound => continue,
-                    Err(e) => {
-                        return Err(TestSourceScanError::Io(diagnostic(&format!(
-                            "cannot read test source '{}': {e}",
-                            file.display()
-                        ))));
-                    }
+                    continue;
                 };
                 if let Some(body) =
                     scan_body_in_file(&content, test_name, &candidate.inline_modules)?
@@ -373,7 +503,7 @@ impl TestSourceScannerPort for SynTestSourceScanner {
 }
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used, clippy::panic)]
+#[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
     use domain::tddd::layer_id::LayerId;
     use domain::tddd::test_obligation::ids::{TestFunctionName, TestModulePath};
@@ -563,6 +693,170 @@ fn test_external_module() {
             panic!("expected IO guard error");
         };
         assert!(message.as_str().contains("refusing to read test source"));
+        // The refusal names the candidate by its repository-relative path and
+        // classifies the cause; neither the absolute candidate, the workspace root,
+        // nor the guard's own path-bearing message may reach a caller.
+        assert!(
+            message.as_str().contains("libs/domain/src/user.rs"),
+            "names the candidate relatively: {}",
+            message.as_str()
+        );
+        assert!(
+            message.as_str().contains("rejected as a symlink"),
+            "classified: {}",
+            message.as_str()
+        );
+        assert!(
+            !message.as_str().contains(&dir.path().display().to_string()),
+            "no absolute path may reach the caller: {}",
+            message.as_str()
+        );
+    }
+
+    #[test]
+    fn test_a_relative_root_is_refused_when_the_working_directory_cannot_be_read() {
+        // Continuing with the relative path would drop the absolute anchor every
+        // containment check below rests on, so there is no fallback. The cwd is
+        // supplied rather than broken for real, which would derail the whole run.
+        let err = absolutize_lexical_from(
+            Path::new("relative/root"),
+            Err(std::io::Error::from(std::io::ErrorKind::PermissionDenied)),
+        )
+        .expect_err("a relative root with no working directory must be refused");
+
+        let TestSourceScanError::Io(message) = err else {
+            panic!("expected IO guard error");
+        };
+        assert!(
+            message.as_str().contains("workspace root could not be resolved"),
+            "{}",
+            message.as_str()
+        );
+        assert!(message.as_str().contains("permission denied"), "{}", message.as_str());
+
+        // An absolute root never consults the working directory, so its failure
+        // cannot reach that lane at all.
+        assert_eq!(
+            absolutize_lexical_from(
+                Path::new("/repo/./root"),
+                Err(std::io::Error::from(std::io::ErrorKind::PermissionDenied)),
+            )
+            .unwrap(),
+            PathBuf::from("/repo/root")
+        );
+    }
+
+    #[test]
+    fn test_a_module_path_past_its_budget_is_refused_before_candidates_are_built() {
+        // At the budget: accepted, so the refusal follows the excess and not the
+        // shape of the path.
+        let at_budget = vec!["m"; MAX_MODULE_PATH_SEGMENTS].join("::");
+        assert_eq!(parse_module_path_segments(&at_budget).unwrap().len(), MAX_MODULE_PATH_SEGMENTS);
+
+        // One segment past it: refused. Candidate generation is quadratic in the
+        // segment count, so this is the bound that keeps it harmless.
+        let too_many = vec!["m"; MAX_MODULE_PATH_SEGMENTS + 1].join("::");
+        let err = parse_module_path_segments(&too_many)
+            .expect_err("a module path past the segment budget must be refused");
+        let TestSourceScanError::Io(message) = err else {
+            panic!("expected IO guard error");
+        };
+        assert!(message.as_str().contains("more segments"), "{}", message.as_str());
+
+        // And the byte budget, which bounds the string before it is even split.
+        let too_long = "m".repeat(MAX_MODULE_PATH_BYTES + 1);
+        let err = parse_module_path_segments(&too_long)
+            .expect_err("a module path past the byte budget must be refused");
+        let TestSourceScanError::Io(message) = err else {
+            panic!("expected IO guard error");
+        };
+        assert!(message.as_str().contains("longer than"), "{}", message.as_str());
+    }
+
+    #[test]
+    fn test_a_candidate_outside_the_workspace_is_refused_without_naming_either_path() {
+        let dir = tempfile::tempdir().unwrap();
+        let outside = tempfile::tempdir().unwrap();
+
+        let err = guard_candidate_file(&outside.path().join("user.rs"), dir.path())
+            .expect_err("a candidate outside the workspace root must be refused");
+
+        let TestSourceScanError::Io(message) = err else {
+            panic!("expected IO guard error");
+        };
+        assert!(
+            message.as_str().contains("escapes the workspace root"),
+            "got: {}",
+            message.as_str()
+        );
+        assert!(
+            !message.as_str().contains(&dir.path().display().to_string())
+                && !message.as_str().contains(&outside.path().display().to_string()),
+            "neither path may reach the caller: {}",
+            message.as_str()
+        );
+    }
+
+    #[test]
+    fn test_a_candidate_larger_than_the_scanner_parses_is_refused() {
+        let dir = tempfile::tempdir().unwrap();
+        let file = dir.path().join("libs/domain/src/user.rs");
+        std::fs::create_dir_all(file.parent().unwrap()).unwrap();
+        // A sparse file one byte past the cap: `set_len` reserves the length
+        // without writing the bytes, so the oversize case is exercised for real at
+        // no I/O cost.
+        std::fs::File::create(&file).unwrap().set_len(MAX_TEST_SOURCE_BYTES + 1).unwrap();
+
+        let err = read_bounded_source(&file, dir.path())
+            .expect_err("a candidate past the cap must be refused");
+
+        let TestSourceScanError::Io(message) = err else {
+            panic!("expected IO guard error");
+        };
+        assert!(
+            message.as_str().contains("larger than a source file this scanner parses"),
+            "got: {}",
+            message.as_str()
+        );
+        assert!(
+            message.as_str().contains("libs/domain/src/user.rs"),
+            "names the candidate relatively: {}",
+            message.as_str()
+        );
+
+        // A file inside the cap still reads, so the refusal follows the size and
+        // not the fixture.
+        std::fs::write(&file, "x".repeat(64)).unwrap();
+        assert_eq!(
+            read_bounded_source(&file, dir.path()).unwrap().map(|content| content.len()),
+            Some(64)
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_a_candidate_that_is_not_a_regular_file_is_refused_rather_than_opened() {
+        // Opening a FIFO blocks until a writer arrives, so the type is settled
+        // from the metadata first. Refused rather than skipped: a candidate that
+        // exists but cannot be read must not let the scan report the test missing.
+        let dir = tempfile::tempdir().unwrap();
+        let file = dir.path().join("libs/domain/src/user.rs");
+        std::fs::create_dir_all(file.parent().unwrap()).unwrap();
+        rustix::fs::mkfifoat(rustix::fs::CWD, &file, rustix::fs::Mode::from_raw_mode(0o600))
+            .unwrap();
+
+        let err =
+            read_bounded_source(&file, dir.path()).expect_err("a FIFO candidate must be refused");
+
+        let TestSourceScanError::Io(message) = err else {
+            panic!("expected IO guard error");
+        };
+        assert!(message.as_str().contains("not a regular file"), "got: {}", message.as_str());
+        assert!(
+            message.as_str().contains("libs/domain/src/user.rs"),
+            "names the candidate relatively: {}",
+            message.as_str()
+        );
     }
 
     #[cfg(unix)]
@@ -583,7 +877,15 @@ fn test_external_module() {
         let TestSourceScanError::Io(message) = err else {
             panic!("expected IO guard error");
         };
-        assert!(message.as_str().contains("symlinked test-source workspace root"));
+        assert!(message.as_str().contains("workspace root was refused"), "{}", message.as_str());
+        assert!(message.as_str().contains("rejected as a symlink"), "{}", message.as_str());
+        // The root is the caller's own argument: naming it, or the component the
+        // guard refused, would print the host path this reports around.
+        assert!(
+            !message.as_str().contains(&dir.path().display().to_string()),
+            "no absolute path may reach the caller: {}",
+            message.as_str()
+        );
     }
 
     #[cfg(unix)]
@@ -600,7 +902,13 @@ fn test_external_module() {
         let TestSourceScanError::Io(message) = err else {
             panic!("expected IO guard error");
         };
-        assert!(message.as_str().contains("symlinked test-source workspace root component"));
+        assert!(message.as_str().contains("workspace root was refused"), "{}", message.as_str());
+        assert!(message.as_str().contains("rejected as a symlink"), "{}", message.as_str());
+        assert!(
+            !message.as_str().contains(&dir.path().display().to_string()),
+            "no absolute path may reach the caller: {}",
+            message.as_str()
+        );
     }
 
     #[test]
@@ -614,7 +922,14 @@ fn test_external_module() {
         let TestSourceScanError::Io(message) = err else {
             panic!("expected IO guard error");
         };
-        assert!(message.as_str().contains("parent-dir component"));
+        assert!(message.as_str().contains("workspace root was refused"), "{}", message.as_str());
+        assert!(message.as_str().contains("parent-dir component"), "{}", message.as_str());
+        assert!(
+            !message.as_str().contains(&dir.path().display().to_string()),
+            "no absolute path may reach the caller: {}",
+            message.as_str()
+        );
+        let _ = &root;
     }
 
     #[test]

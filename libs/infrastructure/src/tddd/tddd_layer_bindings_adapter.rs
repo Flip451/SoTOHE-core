@@ -16,6 +16,7 @@ use domain::tddd::catalogue_v2::{
     TdddLayerBinding as DomainTdddLayerBinding, TdddLayerBindingsError, TdddLayerBindingsPort,
 };
 
+use crate::capability_exec::bounded_read_utf8_file;
 use crate::track::symlink_guard::reject_symlinks_below;
 use crate::verify::tddd_layers::parse_tddd_layers;
 
@@ -72,7 +73,7 @@ impl TdddLayerBindingsPort for FsTdddLayerBindingsAdapter {
         let content = match reject_symlinks_below(&rules_path, workspace_root) {
             Ok(true) => {
                 // File present and not a symlink — read it.
-                std::fs::read_to_string(&rules_path)
+                bounded_read_utf8_file(&rules_path)
                     .map_err(|e| TdddLayerBindingsError::LoadFailed { reason: e.to_string() })?
             }
             Ok(false) => {
@@ -128,6 +129,7 @@ impl TdddLayerBindingsPort for FsTdddLayerBindingsAdapter {
 #[allow(clippy::unwrap_used, clippy::indexing_slicing)]
 mod tests {
     use super::*;
+    use crate::capability_exec::MAX_CAPABILITY_EXEC_TEXT_BYTES;
 
     #[test]
     fn test_load_absent_arch_rules_fails_closed() {
@@ -152,6 +154,23 @@ mod tests {
         assert!(
             matches!(err, TdddLayerBindingsError::LoadFailed { .. }),
             "expected LoadFailed, got: {err}"
+        );
+    }
+
+    #[test]
+    fn test_load_oversized_arch_rules_returns_load_failed() {
+        let adapter = FsTdddLayerBindingsAdapter::new();
+        let tmp = tempfile::tempdir().unwrap();
+        std::fs::File::create(tmp.path().join("architecture-rules.json"))
+            .unwrap()
+            .set_len(MAX_CAPABILITY_EXEC_TEXT_BYTES.saturating_add(1))
+            .unwrap();
+
+        let err = adapter.load(tmp.path(), None).unwrap_err();
+
+        assert!(
+            matches!(err, TdddLayerBindingsError::LoadFailed { .. }),
+            "expected oversized rules to fail closed, got: {err}"
         );
     }
 

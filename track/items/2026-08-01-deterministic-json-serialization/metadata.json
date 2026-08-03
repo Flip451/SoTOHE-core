@@ -1,0 +1,13 @@
+{
+  "schema_version": 6,
+  "id": "2026-08-01-deterministic-json-serialization",
+  "title": "Deterministic JSON Serialization",
+  "branch": "track/2026-08-01-deterministic-json-serialization",
+  "created_at": "2026-08-01T04:28:34Z",
+  "updated_at": "2026-08-01T04:28:34Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "develop",
+    "merge_target": "develop",
+    "merge_method": "merge"
+  }
+}

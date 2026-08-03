@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "493b24f1e7e6a72d125a1c95b8f60585595b3104bd7014c3f75f27066e3e7ff8",
+  "signals": [
+    {
+      "type_name": "SignalReportChain",
+      "signal": "blue",
+      "entry_hash": "9942cccbb975b257b76675f5c10d57198422b55040f790e0a5d71ab5cbbd0d9f"
+    },
+    {
+      "type_name": "SignalReportChainSelection",
+      "signal": "blue",
+      "entry_hash": "28ac94b7ee0f3a21624d6e192d2f2af857af1ff5bfa26e33c3888f868749e293"
+    },
+    {
+      "type_name": "SignalReportEntryId",
+      "signal": "blue",
+      "entry_hash": "73262b244d05e754d61cde317e00152d2ce18d0b06b6c349f82ce512d5c0b651"
+    },
+    {
+      "type_name": "SignalReportError",
+      "signal": "blue",
+      "entry_hash": "a3ec1090e4a6482f1e31198893126adb0129ac81a1e4cb3817e799c72e95384f"
+    },
+    {
+      "type_name": "SignalReportInteractor",
+      "signal": "blue",
+      "entry_hash": "7e2c05e2001e0433734540060bd6d17fce2644465a14ed8e961985a6d7f17edf"
+    },
+    {
+      "type_name": "SignalReportLevel",
+      "signal": "blue",
+      "entry_hash": "84d6b5be020452e94f261a866b890245fa201ea18a68d856aa4457a80818b0a4"
+    },
+    {
+      "type_name": "SignalReportLevelSelection",
+      "signal": "blue",
+      "entry_hash": "ed51d24c1aa527ee9f190fcebe4a15f4ec7718f7e826fab34596ff78f622d72e"
+    },
+    {
+      "type_name": "SignalReportLocation",
+      "signal": "blue",
+      "entry_hash": "09e3ef008e16a4136c899c069311d0e2da6f1f7260f6cade351785e09ce99551"
+    },
+    {
+      "type_name": "SignalReportOccurrence",
+      "signal": "blue",
+      "entry_hash": "5a445ec2a67b14aba70f2f0546e12c514f6f547ec58e5e5fd884d4bb81c198f2"
+    },
+    {
+      "type_name": "SignalReportOutput",
+      "signal": "blue",
+      "entry_hash": "1b00308ca86a8a7959edaad9b8472da25cae4eeec16c4f60e457dbe32c728348"
+    },
+    {
+      "type_name": "SignalReportQuery",
+      "signal": "blue",
+      "entry_hash": "29036279a4aadfacc898cf09fafc6275264e60ab96ea1f482a5e86d8c9ab5b88"
+    },
+    {
+      "type_name": "SignalReportReason",
+      "signal": "blue",
+      "entry_hash": "77bf23e89a366fe2e11bd040fa4ffe321c9443e5a08a1923d5304ed4275c78f7"
+    },
+    {
+      "type_name": "SignalReportReference",
+      "signal": "blue",
+      "entry_hash": "1f5a40db113f4e98ca3a0229ed6bf92f9857aea2377195adcf25bb6884b25557"
+    },
+    {
+      "type_name": "SignalReportService",
+      "signal": "blue",
+      "entry_hash": "2c19fe786d6877ed35ffac3f64615dd84ed1d67d7587e07c5d7969b47a752c42"
+    },
+    {
+      "type_name": "SignalReportSourcePort",
+      "signal": "blue",
+      "entry_hash": "2adb02105b4bbfa64ef3d0fdba582d777f51cecd505d03aa7610e66264ba7de7"
+    }
+  ]
+}

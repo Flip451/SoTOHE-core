@@ -224,7 +224,9 @@ impl TestBindingsArtifactPort for JsonTestBindingsCodec {
             )));
         }
         let dto = TestBindingsDocumentDto::from_domain(doc);
-        let json = serde_json::to_string_pretty(&dto)
+        let value = serde_json::to_value(&dto)
+            .map_err(|e| diagnostic(&format!("failed to encode test-bindings artifact: {e}")))?;
+        let json = serde_json::to_string_pretty(&value)
             .map_err(|e| diagnostic(&format!("failed to encode test-bindings artifact: {e}")))?;
         std::fs::write(&path, json).map_err(|e| {
             diagnostic(&format!("failed to write test-bindings artifact {}: {e}", path.display()))
@@ -458,6 +460,34 @@ mod tests {
         ]);
         codec.save(&doc).unwrap();
         assert_eq!(codec.load(doc.track_id()).unwrap(), Some(doc));
+    }
+
+    #[test]
+    fn test_codec_save_canonicalizes_keys_and_is_byte_stable() {
+        let dir = tempfile::tempdir().unwrap();
+        let codec = JsonTestBindingsCodec::new(dir.path().to_path_buf());
+        let doc = document(vec![TestBindingRecord::Fulfillment {
+            obligation_id: obligation_id(),
+            tests: tests(),
+        }]);
+        let artifact = dir.path().join(doc.track_id().as_ref()).join(BINDINGS_ARTIFACT);
+
+        codec.save(&doc).unwrap();
+        let first = std::fs::read_to_string(&artifact).unwrap();
+        codec.save(&doc).unwrap();
+        let second = std::fs::read_to_string(&artifact).unwrap();
+
+        assert_eq!(first, second, "test-binding encoding must not churn JSON bytes");
+        assert!(
+            first.starts_with("{\n  \"records\":"),
+            "test-binding document keys must be canonicalized: {first}"
+        );
+        let record = &first[first.find("\"kind\"").unwrap()..];
+        assert!(
+            record.find("\"kind\"").unwrap() < record.find("\"obligation_id\"").unwrap()
+                && record.find("\"obligation_id\"").unwrap() < record.find("\"tests\"").unwrap(),
+            "test-binding record keys must be recursively canonicalized: {record}"
+        );
     }
 
     #[test]

@@ -11,8 +11,16 @@ use crate::{
     TaskTransition, TrackTask, TransitionError, ValidationError,
 };
 
-/// The current schema version for `impl-plan.json`.
-pub const IMPL_PLAN_SCHEMA_VERSION: u32 = 1;
+/// The current schema version for `impl-plan.json`, and the single definition of
+/// it: the codec writes this version and every in-memory document reports it.
+///
+/// Version 2 adds each task's declared dependencies (ADR 2026-07-29-0358 §D1).
+/// Version 1 stays readable at the codec boundary and needs no retroactive
+/// migration, but it is a wire format only — a decoded schema-1 plan becomes an
+/// ordinary current-version document that declares no dependencies, so there is
+/// no version for a consumer to branch on and no way for the value a document
+/// reports to disagree with the value encoding it produces.
+pub const IMPL_PLAN_SCHEMA_VERSION: u32 = 2;
 
 /// Aggregate root for `track/items/<id>/impl-plan.json`.
 ///
@@ -80,6 +88,32 @@ impl ImplPlanDocument {
     #[must_use]
     pub fn unresolved_task_ids(&self) -> Vec<&TaskId> {
         self.tasks.iter().filter(|t| !t.status().is_resolved()).map(|t| t.id()).collect()
+    }
+
+    /// Returns the IDs of tasks whose work is settled: committed, which is the
+    /// traced status carrying the commit hash, or skipped and therefore never to
+    /// be committed at all.
+    ///
+    /// A task marked done with no commit recorded is deliberately excluded: work
+    /// that is not on the branch has not been delivered, so a batch waiting on
+    /// it is still waiting.
+    #[must_use]
+    pub fn settled_task_ids(&self) -> std::collections::BTreeSet<TaskId> {
+        self.tasks
+            .iter()
+            .filter(|task| task.status().is_settled())
+            .map(|task| task.id().clone())
+            .collect()
+    }
+
+    /// Returns the IDs of tasks currently in progress.
+    #[must_use]
+    pub fn in_progress_task_ids(&self) -> std::collections::BTreeSet<TaskId> {
+        self.tasks
+            .iter()
+            .filter(|task| *task.status() == TaskStatus::InProgress)
+            .map(|task| task.id().clone())
+            .collect()
     }
 
     /// Returns the first task that is in `Todo` or `InProgress` status, if any.
@@ -160,16 +194,40 @@ impl ImplPlanDocument {
         target_status: &str,
         commit_hash: Option<crate::CommitHash>,
     ) -> Result<(), DomainError> {
+        let transition = self.transition_for(task_id, target_status, commit_hash)?;
+        self.apply_transition(task_id, transition)
+    }
+
+    /// Resolves the transition a target status names for `task_id`, without
+    /// applying it.
+    ///
+    /// Takes `&self` and mutates nothing, so a caller that must know what a
+    /// transition would be — which status it enters, for instance — can ask
+    /// instead of restating the table. `apply_transition_by_status` resolves
+    /// through this same method, so there is one table and no second copy of it
+    /// can drift away.
+    ///
+    /// Target strings: `"todo"`, `"in_progress"`, `"done"`, `"skipped"`.
+    ///
+    /// # Errors
+    ///
+    /// Returns `TransitionError::TaskNotFound` if the task does not exist.
+    /// Returns `ValidationError::UnsupportedTargetStatus` if the status string is
+    /// unrecognised or incompatible with the task's current state.
+    pub fn transition_for(
+        &self,
+        task_id: &TaskId,
+        target_status: &str,
+        commit_hash: Option<crate::CommitHash>,
+    ) -> Result<TaskTransition, DomainError> {
         let current_status = self
             .tasks
             .iter()
             .find(|t| t.id() == task_id)
             .ok_or_else(|| TransitionError::TaskNotFound { task_id: task_id.to_string() })?
-            .status()
-            .clone();
+            .status();
 
-        let transition = resolve_transition(&current_status, target_status, commit_hash)?;
-        self.apply_transition(task_id, transition)
+        resolve_transition(current_status, target_status, commit_hash)
     }
 
     /// Adds a new task (in `Todo` status) and appends it to the end of the
@@ -327,12 +385,21 @@ fn resolve_transition(
 #[allow(clippy::indexing_slicing, clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
     use crate::{
-        DomainError, PlanSection, PlanView, TaskId, TrackTask, ValidationError,
-        impl_plan::ImplPlanDocument,
+        DomainError, NonEmptyString, PlanSection, PlanView, TaskId, TaskStatus, TrackTask,
+        ValidationError, impl_plan::ImplPlanDocument,
     };
 
     fn task(id: &str, desc: &str) -> TrackTask {
         TrackTask::new(TaskId::try_new(id).unwrap(), desc).unwrap()
+    }
+
+    fn dependent_task(id: &str, desc: &str, depends_on: &[&str]) -> TrackTask {
+        TrackTask::with_dependencies(
+            TaskId::try_new(id).unwrap(),
+            NonEmptyString::try_new(desc).unwrap(),
+            TaskStatus::Todo,
+            depends_on.iter().map(|d| TaskId::try_new(*d).unwrap()).collect(),
+        )
     }
 
     fn section(id: &str, title: &str, task_ids: &[&str]) -> PlanSection {
@@ -356,7 +423,7 @@ mod tests {
         let tasks = vec![task("T001", "First"), task("T002", "Second")];
         let p = plan(&["T001", "T002"]);
         let doc = ImplPlanDocument::new(tasks, p).unwrap();
-        assert_eq!(doc.schema_version(), 1);
+        assert_eq!(doc.schema_version(), 2);
         assert_eq!(doc.tasks().len(), 2);
         assert_eq!(doc.plan().sections().len(), 1);
     }
@@ -477,9 +544,14 @@ mod tests {
     // --- accessors ---
 
     #[test]
-    fn test_schema_version_is_1() {
+    fn test_a_fresh_document_reports_the_current_schema_version() {
         let doc = ImplPlanDocument::new(vec![task("T001", "task")], plan(&["T001"])).unwrap();
-        assert_eq!(doc.schema_version(), 1);
+
+        // Pinned twice on purpose: against the constant, so the two can never
+        // drift apart, and against the literal, so moving the constant is a
+        // deliberate edit here rather than a silent one.
+        assert_eq!(doc.schema_version(), crate::IMPL_PLAN_SCHEMA_VERSION);
+        assert_eq!(doc.schema_version(), 2, "schema 2 is the current impl-plan.json version");
     }
 
     #[test]
@@ -822,5 +894,240 @@ mod tests {
         let task_ids: Vec<&str> =
             doc.plan().sections()[0].task_ids().iter().map(|id| id.as_ref()).collect();
         assert_eq!(task_ids, vec!["T001", new_id.as_ref(), "T002"]);
+    }
+
+    // --- validation: declared dependencies ---
+
+    #[test]
+    fn test_new_keeps_the_dependencies_each_task_declares() {
+        let tasks = vec![task("T001", "A"), dependent_task("T002", "B", &["T001"])];
+        let doc = ImplPlanDocument::new(tasks, plan(&["T001", "T002"])).unwrap();
+
+        assert_eq!(doc.tasks()[0].depends_on(), &[] as &[TaskId]);
+        assert_eq!(doc.tasks()[1].depends_on(), &[TaskId::try_new("T001").unwrap()]);
+    }
+
+    #[test]
+    fn test_new_rejects_a_dependency_on_a_task_the_plan_does_not_contain() {
+        let tasks = vec![task("T001", "A"), dependent_task("T002", "B", &["T404"])];
+        let err = ImplPlanDocument::new(tasks, plan(&["T001", "T002"])).unwrap_err();
+
+        assert!(
+            matches!(
+                err,
+                DomainError::Validation(ValidationError::UnknownDependencyReference {
+                    ref task_id,
+                    ref dependency,
+                }) if task_id.as_ref() == "T002" && dependency.as_ref() == "T404"
+            ),
+            "unexpected error: {err:?}"
+        );
+    }
+
+    #[test]
+    fn test_new_rejects_a_cycle_in_the_declared_dependencies() {
+        let tasks = vec![
+            dependent_task("T001", "A", &["T003"]),
+            dependent_task("T002", "B", &["T001"]),
+            dependent_task("T003", "C", &["T002"]),
+        ];
+        let err = ImplPlanDocument::new(tasks, plan(&["T001", "T002", "T003"])).unwrap_err();
+
+        let DomainError::Validation(ValidationError::DependencyCycle { task_ids }) = err else {
+            panic!("a dependency cycle must be rejected: {err:?}");
+        };
+        let on_cycle: Vec<&str> = task_ids.iter().map(TaskId::as_ref).collect();
+        assert_eq!(on_cycle, vec!["T001", "T003", "T002"]);
+    }
+
+    #[test]
+    fn test_new_rejects_a_task_that_declares_itself_as_a_dependency() {
+        let tasks = vec![dependent_task("T001", "A", &["T001"])];
+        let err = ImplPlanDocument::new(tasks, plan(&["T001"])).unwrap_err();
+
+        let DomainError::Validation(ValidationError::DependencyCycle { task_ids }) = err else {
+            panic!("a self-reference must be rejected: {err:?}");
+        };
+        assert_eq!(task_ids, vec![TaskId::try_new("T001").unwrap()]);
+    }
+
+    #[test]
+    fn test_new_rejects_a_plan_order_that_places_a_task_before_its_dependency() {
+        let tasks = vec![dependent_task("T001", "A", &["T002"]), task("T002", "B")];
+        // T001 depends on T002 but the plan hands T001 out first.
+        let err = ImplPlanDocument::new(tasks, plan(&["T001", "T002"])).unwrap_err();
+
+        assert!(
+            matches!(
+                err,
+                DomainError::Validation(ValidationError::PlanOrderViolatesDependency {
+                    ref task_id,
+                    ref dependency,
+                }) if task_id.as_ref() == "T001" && dependency.as_ref() == "T002"
+            ),
+            "unexpected error: {err:?}"
+        );
+    }
+
+    #[test]
+    fn test_new_accepts_a_plan_order_that_is_a_linear_extension_of_the_declared_dependencies() {
+        let tasks = vec![
+            task("T001", "A"),
+            dependent_task("T002", "B", &["T001"]),
+            dependent_task("T003", "C", &["T001", "T002"]),
+        ];
+        // Section order continues the plan order, so a dependency may live in an
+        // earlier section.
+        let sections =
+            vec![section("S1", "First", &["T001"]), section("S2", "Rest", &["T002", "T003"])];
+
+        let doc = ImplPlanDocument::new(tasks, PlanView::new(vec![], sections)).unwrap();
+
+        assert_eq!(doc.tasks().len(), 3);
+    }
+
+    // --- settled / in-progress classification ---
+
+    fn task_with_status(id: &str, status: TaskStatus) -> TrackTask {
+        TrackTask::with_dependencies(
+            TaskId::try_new(id).unwrap(),
+            NonEmptyString::try_new(format!("task {id}")).unwrap(),
+            status,
+            Vec::new(),
+        )
+    }
+
+    fn commit_hash() -> crate::CommitHash {
+        crate::CommitHash::try_new("a1b2c3d4e5f60718293a4b5c6d7e8f9012345678").unwrap()
+    }
+
+    #[test]
+    fn test_only_committed_or_skipped_work_counts_as_settled() {
+        let tasks = vec![
+            task_with_status("T001", TaskStatus::DoneTraced { commit_hash: commit_hash() }),
+            task_with_status("T002", TaskStatus::Skipped),
+            // Marked done with no commit recorded: the work is not on the branch,
+            // so it has not been delivered.
+            task_with_status("T003", TaskStatus::DonePending),
+            task_with_status("T004", TaskStatus::InProgress),
+            task_with_status("T005", TaskStatus::Todo),
+        ];
+        let doc =
+            ImplPlanDocument::new(tasks, plan(&["T001", "T002", "T003", "T004", "T005"])).unwrap();
+
+        assert_eq!(
+            doc.settled_task_ids(),
+            [TaskId::try_new("T001").unwrap(), TaskId::try_new("T002").unwrap()]
+                .into_iter()
+                .collect::<std::collections::BTreeSet<TaskId>>()
+        );
+    }
+
+    #[test]
+    fn test_in_progress_ids_name_the_tasks_currently_under_way() {
+        let tasks = vec![
+            task_with_status("T001", TaskStatus::InProgress),
+            task_with_status("T002", TaskStatus::Todo),
+            task_with_status("T003", TaskStatus::DonePending),
+            task_with_status("T004", TaskStatus::InProgress),
+        ];
+        let doc = ImplPlanDocument::new(tasks, plan(&["T001", "T002", "T003", "T004"])).unwrap();
+
+        assert_eq!(
+            doc.in_progress_task_ids(),
+            [TaskId::try_new("T001").unwrap(), TaskId::try_new("T004").unwrap()]
+                .into_iter()
+                .collect::<std::collections::BTreeSet<TaskId>>()
+        );
+        // The two classifications never overlap: a task under way is not settled.
+        assert!(doc.settled_task_ids().is_empty());
+    }
+
+    #[test]
+    fn test_transition_for_resolves_the_same_table_the_applier_uses() {
+        use crate::{TaskStatusKind, TaskTransition};
+
+        // Every source status against every target, resolved and applied side by
+        // side. `transition_for` agreeing with `apply_transition_by_status` on each
+        // pair is what makes the table single: a caller that needs to know the
+        // transition asks instead of restating it.
+        let statuses = [
+            TaskStatus::Todo,
+            TaskStatus::InProgress,
+            TaskStatus::DonePending,
+            TaskStatus::DoneTraced { commit_hash: commit_hash() },
+            TaskStatus::Skipped,
+        ];
+        let id = TaskId::try_new("T001").unwrap();
+
+        for status in &statuses {
+            for target in ["todo", "in_progress", "done", "skipped", "nonsense"] {
+                let resolved = doc_with(status).transition_for(&id, target, Some(commit_hash()));
+                let mut applier = doc_with(status);
+                let applied = applier.apply_transition_by_status(&id, target, Some(commit_hash()));
+
+                assert_eq!(
+                    resolved.is_ok(),
+                    applied.is_ok(),
+                    "{status:?} -> {target} must be resolvable exactly when it is appliable"
+                );
+                if let Ok(transition) = resolved {
+                    // Resolution mutates nothing, so the same document answers twice
+                    // and still reports the status it started with.
+                    let untouched = doc_with(status);
+                    assert_eq!(untouched.tasks()[0].status(), status);
+                    assert_eq!(
+                        untouched.transition_for(&id, target, Some(commit_hash())).unwrap(),
+                        transition,
+                        "resolution is pure and repeatable"
+                    );
+                }
+            }
+        }
+
+        // Entering `in_progress` is what the admission guard keys on, and exactly
+        // three source statuses reach it.
+        let entering: Vec<&TaskStatus> = statuses
+            .iter()
+            .filter(|status| {
+                doc_with(status)
+                    .transition_for(&id, "in_progress", None)
+                    .is_ok_and(|t| t.target_kind() == TaskStatusKind::InProgress)
+            })
+            .collect();
+        assert_eq!(
+            entering,
+            vec![
+                &TaskStatus::Todo,
+                &TaskStatus::DonePending,
+                &TaskStatus::DoneTraced { commit_hash: commit_hash() }
+            ]
+        );
+        assert_eq!(
+            doc_with(&TaskStatus::Todo).transition_for(&id, "in_progress", None).unwrap(),
+            TaskTransition::Start
+        );
+        assert_eq!(
+            doc_with(&TaskStatus::DoneTraced { commit_hash: commit_hash() })
+                .transition_for(&id, "in_progress", None)
+                .unwrap(),
+            TaskTransition::Reopen
+        );
+    }
+
+    #[test]
+    fn test_transition_for_reports_a_task_it_does_not_hold() {
+        let doc = doc_with(&TaskStatus::Todo);
+
+        let error =
+            doc.transition_for(&TaskId::try_new("T404").unwrap(), "in_progress", None).unwrap_err();
+
+        assert!(error.to_string().contains("T404"), "unexpected: {error}");
+    }
+
+    /// A one-task document holding `status`.
+    fn doc_with(status: &TaskStatus) -> ImplPlanDocument {
+        ImplPlanDocument::new(vec![task_with_status("T001", status.clone())], plan(&["T001"]))
+            .unwrap()
     }
 }

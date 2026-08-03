@@ -3,6 +3,7 @@
 The reviewer's role is **executable-plan soundness review** of
 `track/items/<track-id>/impl-plan.json` (Phase 3 SSoT), `task-coverage.json`
 (spec ↔ task mapping), `task-contract.json` (task ↔ catalogue-entry attribution),
+`batch-plan.json` (per-task per-scope estimates + ordered batch declaration),
 and any `observations.md`. Rendered views such as `plan.md` are
 review-operational context generated from the SSoT, not impl-plan scope/hash
 inputs. The impl-plan converts spec elements + type-contract changes into a
@@ -11,8 +12,13 @@ implementation effort, broken ordering, or coverage gaps that surface only after
 partial implementation.
 
 **Mechanical checks** (schema validation, `task-coverage` binary gate, task ID
-uniqueness, status transitions) are handled by `cargo make verify-*` /
-`bin/sotp track transition` / `bin/sotp task-contract coverage`, not the reviewer.
+uniqueness, status transitions, batch-plan structural conformance via
+`bin/sotp batch-plan check`) are handled by `cargo make verify-*` /
+`bin/sotp track transition` / `bin/sotp task-contract coverage` /
+`bin/sotp batch-plan check`, not the reviewer. The machinery checks structure
+only; the **semantic validity** of indivisibility justifications and batch
+composition is deliberately this reviewer's lane — no LLM judgment sits in the
+gate path.
 
 ## What to report
 
@@ -60,9 +66,38 @@ specific `task_id` or `section.id`, or quote the offending text.
 - **batch-size infeasibility**: a single task whose described work would
   *definitely* exceed the per-scope diff ceiling
   (`.harness/config/review-scope.json`: `default_diff_ceiling_lines` or
-  per-group override) by a multiple — flag as "split candidate". Do not flag
-  tasks merely close to the ceiling; the actual-diff guard handles that
-  advisorily.
+  per-group override) by a multiple — flag as "split candidate". Exception: do
+  not flag an over-ceiling task that carries a non-empty indivisibility
+  justification you judge valid — that is the designed single-exemption lane;
+  review the justification itself under the category below instead. Do not
+  flag tasks merely close to the ceiling. **Temporal boundary**: this category
+  applies only to tasks whose implementation has NOT started (`todo`). The
+  ceiling concept exists in the planning and admission domains only; once a
+  task is `in_progress` or done, no review route may apply a line-ceiling lens
+  to it.
+- **implausible indivisibility justification**: a `batch-plan.json` task whose
+  over-ceiling estimate carries a justification that does not actually argue
+  indivisibility — e.g., it names convenience or schedule rather than a reason
+  the task cannot be split at a behavior boundary, or the described work
+  visibly contains independently verifiable behavior units that could stand as
+  separate tasks. Quote the justification text. **Same temporal boundary as
+  above**: judge justifications only for tasks not yet started. For a task
+  whose implementation has started or completed, diff growth from review fixes
+  and obligation-mandated tests is the legitimate consequence of correct
+  behaviour — never report it as 超過 or demand a retroactive justification.
+- **unsound batch composition**: an ordered `batches[]` declaration that is
+  structurally valid but semantically unsound — e.g., a batch grouping tasks
+  whose per-scope estimate sum leaves no room for the estimates' stated
+  uncertainty, a batch mixing tasks so a declared dependency's consumer sits in
+  practice before its producer's verifiable completion, or an ordering that
+  defers the sole validation-bearing task after everything it validates has
+  already merged.
+- **pre-implementation split proposal**: when a task bundles multiple
+  *independently verifiable behavior units* (each unit testable on its own
+  through the spec's acceptance criteria), propose the split **before
+  implementation starts**, naming the units and the anchor each would cover.
+  This is the one forward-looking category: it exists so ceiling pressure is
+  answered by task-boundary splits, not post-hoc justifications.
 - **out_of_scope leak into a task**: a task that implements behaviour the spec
   explicitly excludes via `scope.out_of_scope[]`.
 - **observations.md mandate without trigger**: an `AC-NN` worded as "must be
@@ -71,6 +106,14 @@ specific `task_id` or `section.id`, or quote the offending text.
 
 ## What NOT to report
 
+- Ceiling- or size-derived findings against a task whose implementation has
+  started or completed (`in_progress` / any done state) — the ceiling concept
+  belongs to the planning and admission domains, and review-fix / DFP diff
+  growth is the legitimate consequence of correct behaviour, never 超過. This
+  covers batch-size infeasibility, indivisibility-justification validity,
+  estimate-sum headroom concerns, and retroactive split demands alike; the one
+  forward-looking split lane is the pre-implementation category above, and it
+  closes when implementation starts.
 - Missing `GO-NN` mappings in `task-coverage.json` — the schema has no `goal`
   section; goal traceability belongs to `impl-plan.json` `plan.summary`
 - Task attributions for `action: reference` catalogue entries in
@@ -78,8 +121,9 @@ specific `task_id` or `section.id`, or quote the offending text.
 - Task description wording nits / sentence-length preferences
 - Re-ordering suggestions when the existing order is plausibly valid and the
   alternative is purely stylistic
-- Suggested task splits when the actual-diff guard has not yet flagged
-  overflow and the description fits within one scope's ceiling
+- Suggested task splits for a task whose estimates fit within every touched
+  scope's ceiling AND whose description does not bundle independently
+  verifiable behavior units — splitting there is purely stylistic
 - New tasks that should be added to cover hypothetical edge cases not in spec
   — that is spec expansion, not impl-plan refinement
 - Status / `commit_hash` validation (CI / `bin/sotp track` enforce this)

@@ -8,11 +8,12 @@
 ## Mission
 
 Run the autonomous feature-batch implement → DRY check → task completion → review → commit loop for the current
-track. The default consumption unit is the **feature batch**: all `todo` / `in_progress` tasks
-are implemented in dependency order into the same working tree without intermediate commits,
-then a single DFP + review pass + commit close the batch. The batch is split only when adding
-the next task would cause some layer's cumulative diff to exceed its per-scope ceiling
-(configured in `.harness/config/review-scope.json`). Requires being on a `track/<id>` branch.
+track. The consumption unit is the **declared batch**: the batches declared in
+`track/items/<id>/batch-plan.json` `batches[]` are consumed in declaration order — each
+batch's member tasks are implemented in dependency order into the same working tree without
+intermediate commits, then a single DFP + review pass + commit close the batch. This workflow
+performs no batch composition of its own: sizing, ceilings, and admission are planning- and
+admission-domain concerns, not execution concerns. Requires being on a `track/<id>` branch.
 
 Sub-workflows used:
 
@@ -24,12 +25,13 @@ Sub-workflows used:
 ## Inputs
 
 - **Current branch** — must match `track/<id>`. If not, stop and suggest switching.
-- **`impl-plan.json`** — task list with status and per-task scope hints.
-- **`.harness/config/review-scope.json`** — per-scope diff ceilings SSoT:
-  - `default_diff_ceiling_lines: Option<u32>` — global default.
-  - Per-group `diff_ceiling_lines: Option<u32>` — per-scope override.
-  When both are absent for a scope, treat that scope as unconstrained (no ceiling).
-  `ScopeName::Other` never has a ceiling.
+- **`impl-plan.json`** — task list with status and declared dependencies.
+- **`batch-plan.json`** — the declared ordered `batches[]` (read-only here; impl-planner is its
+  sole writer). Absence on the active track is an error (fail-closed) — admission refuses every
+  transition into work without it, so there is no declaration-less execution lane. A track
+  planned before this artifact existed re-enters by declaring its REMAINING work only (the
+  unsettled-task declaration domain): the impl-planner issues a batch-plan covering the open
+  tasks, and settled history stays undeclared per the non-retroactivity constraint.
 - **`spec.md`, `plan.md`, `metadata.json`** — task context for the implement sub-workflow.
 
 ## Sequence
@@ -39,59 +41,48 @@ Sub-workflows used:
 Read every sub-workflow definition referenced in this workflow and extract their decision points
 into a concrete execution plan. Treat them as a state machine to execute, not background reading.
 
-**Step 0a: Load per-scope diff ceilings**
+**Step 0a: Load the declared batches**
 
-Read `.harness/config/review-scope.json`. Load `default_diff_ceiling_lines` and per-group
-`diff_ceiling_lines` values. When both are absent for a scope, treat it as unconstrained.
+Read `track/items/<id>/batch-plan.json` and take `batches[]` as the execution sequence,
+in declaration order. This workflow composes no batches and re-runs no Phase 3
+structural check: the declared composition already passed `bin/sotp batch-plan check`.
+Per-transition admission — the machine judgment on every entry into work — still fires
+at Step 1 and may reject a member at runtime; the workflow's only response is the unit
+split described there. It never re-composes or merges batches.
 
-**Step 0b: Plan the batches**
+When `batch-plan.json` is absent: this is an error on every active track — stop and
+route to Phase 3 (impl-planner) instead of composing batches here. A track planned
+before the artifact existed re-enters the same way, declaring its remaining unsettled
+work only (settled history stays undeclared per the non-retroactivity constraint).
 
-Walk the impl-plan `tasks` array in declared order, skipping tasks with `done` + non-null
-`commit_hash`, or `skipped`. Carry `done` with null `commit_hash` forward as **DonePending**
-(implementation complete, but still participates in DFP, Review, Commit, and post-commit
-task hash backfill).
-Group the remaining `todo` / `in_progress` / DonePending tasks into batches by greedy
-accumulation:
+Select the current batch: the first batch in declaration order that still has a member task
+not yet `done`-with-`commit_hash` (skip `skipped` members). Within it, carry a `done` member
+with null `commit_hash` forward as **DonePending** (implementation complete, but still
+participates in DFP, Review, Commit, and post-commit task hash backfill).
 
-1. Start a new (empty) batch.
-2. For the next task in order, estimate its per-scope diff contribution by classifying the
-   task description's listed files through `.harness/config/review-scope.json` patterns.
-   Do not infer scope from file extension alone: markdown under `.claude/**` / `.harness/**`
-   is `harness-policy`; `knowledge/adr/**` and `knowledge/research/**` are `adr`;
-   `track/items/<track-id>/spec.json` is `spec`;
-   `track/items/<track-id>/*-types.json` are `types`;
-   `track/items/<track-id>/impl-plan.json` / `task-coverage.json` / `task-contract.json` /
-   `observations.md` are `impl-plan`. Rendered views (`spec.md`, `plan.md`,
-   `contract-map.md`) are review-operational: they carry no scope and do not
-   participate in scope hashes.
-   For DonePending tasks, use the already-accumulated working-tree diff.
-3. If this task's own contribution would exceed a configured ceiling for a layer whose current
-   batch cumulative diff is still **zero**, and the current batch is non-empty, close the current
-   batch and re-evaluate the task in a fresh batch. If the task still exceeds the ceiling as a
-   singleton, emit it as an over-ceiling singleton batch and log the overflow (advisory, not
-   a hard halt).
-4. If adding this task would cause a layer's **already-non-zero** cumulative diff in the current
-   batch to exceed its ceiling, close the current batch and start a new one.
-5. **Continuation rule**: if the next task only touches layers whose cumulative diff in
-   the current batch is still zero, and the task's own contribution stays within those layers'
-   ceilings, the ceiling of any other already-touched layer is irrelevant — append the task.
-6. Repeat until all remaining tasks are placed.
+**Step 0b: Order tasks inside the batch by implementation dependencies**
 
-The planner is a heuristic, not a binary gate. When sizing is uncertain, bias toward fewer /
-larger batches.
-
-**Step 0c: Order tasks inside a batch by implementation dependencies**
-
-Within a batch, run `implement` in dependency order for `todo` / `in_progress` tasks only
-(lower-layer first, then upper layers). DonePending tasks keep their position for downstream
-gates. The order is encoded in the impl-plan sections.
+Within the batch, run `implement` in dependency order for `todo` / `in_progress` tasks only,
+honouring the `depends_on` edges declared in `impl-plan.json` (lower-layer first where no
+edge dictates otherwise). DonePending tasks keep their position for downstream gates.
 
 ### Execution (per batch)
 
 **Step 1: Implement (batch-scoped)**
 
 Invoke the `implement` workflow (`.harness/workflows/track/implement.md`) over every `todo`
-task in this batch in Step 0c order. For an `in_progress` task, first check whether its
+task in this batch in Step 0b order. Each task enters implementation through its
+`todo → in_progress` transition; if the transition's admission judgment **rejects** a later
+member (e.g. the ceiling would be exceeded by its estimate on top of the prior contribution),
+apply the runtime split: close the current execution unit at that task boundary — the
+already-admitted prefix proceeds through DFP → Review → Commit as this unit — and the
+rejected member starts the next execution unit (which re-attempts its transition against the
+post-commit baseline). Runtime may only split a declared batch this way, never merge batches.
+From the split onward, every later per-batch step (Step 1d done-marking, Step 3 commit and
+hash backfill) operates on the **admitted execution unit's task set**, not the full declared
+batch; the rejected member stays `todo` and is untouched until its own unit.
+
+For an `in_progress` task, first check whether its
 working-tree implementation already exists (a prior standalone `/track:implement` hands tasks
 off `in_progress` without transitioning them): if the task's implementation is already present
 and CI passes, skip re-implementation and carry it forward like a DonePending task; only
@@ -106,27 +97,10 @@ step, ADR 2026-07-23-0240 D1). The `implement` workflow's Step 4 authors binding
 against those obligations per batch; this workflow adds no enrollment decision of its own,
 and the commit gate's `sotp test-obligation check` fail-closes if the artifacts are missing.
 
-**Step 1b: Actual-diff guard (advisory ceiling visibility)**
-
-Measure the **actual** per-scope diff against the ceilings loaded in Step 0a. This is run at
-two points:
-
-- After implementation finishes and before DFP.
-- After DFP returns `skipped` / `completed` and before Review.
-
-Procedure:
-
-1. Compute `additions + deletions` for each configured scope by intersecting the scope's file
-   list (`bin/sotp review files --scope <scope>`) with the union of:
-   - `git diff --numstat <batch-base> --` (tracked committed, staged, and unstaged changes
-     relative to the batch-base commit — the HEAD at which the current batch started).
-   - Untracked additions from `git ls-files --others --exclude-standard` (counted as additions
-     for their full file line count with zero deletions).
-2. Compare each scope's actual line count to its `diff_ceiling_for_scope` value. Skip
-   comparisons for scopes with no ceiling.
-3. If any scope's actual diff exceeds its ceiling: **log the overflow (scope name, actual count,
-   ceiling value) and continue**. The ceiling is advisory; do not halt, revert, or require user
-   judgment. Record the overflow for future impl-plan refinement if useful.
+No actual-diff measurement happens in this workflow: the ceiling concept exists only in the
+planning and admission domains. Once implementation has started, diff growth — including
+growth from review fixes and DRY fixes — is never measured against or treated as exceeding a
+ceiling; actual measurement is read only as an admission baseline, never here.
 
 **Step 1c: DRY fix phase (DFP, once per batch)**
 
@@ -135,18 +109,16 @@ accumulated batch diff. DFP runs **before** Review (RFP) and is loosely coupled 
 
 Branch on the dfl terminal state (four mutually-exclusive outcomes):
 
-- **`skipped`**: treat as equivalent to `completed`. Re-run Step 1b as the post-DFP/pre-review
-  guard before proceeding to Review (Step 2).
-- **`completed`**: DRY gate Approved. Re-run Step 1b, then proceed to Review (Step 2).
+- **`skipped`**: treat as equivalent to `completed`; proceed to Review (Step 2).
+- **`completed`**: DRY gate Approved; proceed to Review (Step 2).
 - **`blocked`**: halt the batch loop immediately. Surface unresolved DRY violation pairs
   (`bin/sotp dry results --track-id <id> --filter violation`). Do NOT proceed to Review or
   Commit. Escalate for manual resolution.
 - **`failed`**: stop the loop and report the error. Do NOT proceed.
 
-**Post-DFP R2 repeat.** The Step 1b guard measures diff size only, so it cannot see a DFP edit
-that relocates a type across a layer boundary or reimplements dependency-layer logic. On the
-`completed` path, dfl edited the working tree after the `implement` workflow's Step 5
-verification ran, so before proceeding to Review repeat the pre-review verification required by
+**Post-DFP R2 repeat.** On the `completed` path, dfl edited the working tree after the
+`implement` workflow's Step 5 verification ran, so before proceeding to Review repeat the
+pre-review verification required by
 `.harness/policies/implementation-delegation.md#R2. review 起動前に配置を検証する`. That policy
 owns the verification's steps; this workflow owns repeating it at every boundary where source is
 mutated between that verification and Review. The `skipped` path launches no dfl and mutates
@@ -165,15 +137,13 @@ Invoke the `review` workflow (`.harness/workflows/track/review.md`) once. Requir
 from `bin/sotp review results`, which auto-classifies the accumulated batch diff. Review must
 reach full-model `zero_findings` in every required scope.
 
-**Back-edge (RFP → DFP fixpoint)**: review fixes can reintroduce duplication and shift
-per-scope diff totals. After Review reaches `zero_findings`, re-run Step 1b, Step 1c (DFP),
-and the post-DFP Step 1b guard before returning to Review or Commit. On this back-edge the
-review fixers themselves mutated source, so the Step 1c R2 repeat applies unconditionally —
-perform it after the post-DFP Step 1b guard and before returning to Review, whatever the
-back-edge DFP's terminal state. Iterate until the same
-pass has Step 1b measurements recorded at both mutation boundaries, the DRY gate stays
-Approved, and review stays `zero_findings` with no new edits. Ceiling overflow remains
-advisory and does not block convergence.
+**Back-edge (RFP → DFP fixpoint)**: review fixes can reintroduce duplication. After Review
+reaches `zero_findings`, re-run Step 1c (DFP) before returning to Review or Commit. On this
+back-edge the review fixers themselves mutated source, so the Step 1c R2 repeat applies
+unconditionally — perform it before returning to Review, whatever the back-edge DFP's terminal
+state. Iterate until the DRY gate stays Approved and review stays `zero_findings` with no new
+edits. Diff growth introduced by review fixes or DRY fixes is never treated as a ceiling
+overrun (the ceiling concept does not exist in this domain).
 
 **Step 3: Commit (single commit per batch)**
 
@@ -188,7 +158,8 @@ The `commit` workflow enforces the track-aware gates as hard preconditions via
 A `blocked` DFP or failing test-obligation gate cannot be committed past.
 
 **Orchestrator post-commit task hash recording**: after the commit succeeds, the orchestrator
-backfills the single commit hash on every task in this batch (including DonePending tasks) with:
+backfills the single commit hash on every task in this execution unit — the admitted task set
+when a runtime split occurred, otherwise the declared batch — including DonePending tasks, with:
 
 ```
 bin/sotp track transition <task_id> done --commit-hash <hash>

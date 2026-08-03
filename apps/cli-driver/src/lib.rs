@@ -12,6 +12,7 @@
 
 pub mod adr_baseline;
 pub mod arch;
+pub mod batch_plan;
 pub mod capability;
 pub mod catalog_gen;
 pub mod codex_runtime;
@@ -32,6 +33,7 @@ pub mod render;
 pub mod review;
 pub mod semantic_dup;
 pub mod signal;
+pub mod signal_report;
 pub mod task_contract;
 pub mod telemetry;
 pub mod template_conventions;

@@ -253,7 +253,11 @@ impl ObligationsArtifactPort for JsonObligationsCodec {
             )));
         }
         let dto = ObligationsDocumentDto::from_domain(doc);
-        let json = serde_json::to_string_pretty(&dto)
+        // Materialize the DTO as a JSON value before writing so recursively
+        // nested objects receive the canonical map-key order as well.
+        let value = serde_json::to_value(&dto)
+            .map_err(|e| diagnostic(&format!("failed to encode obligations artifact: {e}")))?;
+        let json = serde_json::to_string_pretty(&value)
             .map_err(|e| diagnostic(&format!("failed to encode obligations artifact: {e}")))?;
         std::fs::write(&path, json).map_err(|e| {
             diagnostic(&format!("failed to write obligations artifact {}: {e}", path.display()))
@@ -600,6 +604,29 @@ mod tests {
         codec.save(&doc).unwrap();
         let loaded = codec.load(doc.track_id()).unwrap();
         assert_eq!(loaded, Some(doc));
+    }
+
+    #[test]
+    fn test_obligations_writer_populated_document_returns_canonical_deterministic_bytes() {
+        let dir = tempfile::tempdir().unwrap();
+        let codec = JsonObligationsCodec::new(dir.path().to_path_buf());
+        let doc = sample_document();
+        let path = dir.path().join(doc.track_id().as_ref()).join(OBLIGATIONS_ARTIFACT);
+
+        codec.save(&doc).unwrap();
+        let first = std::fs::read(&path).unwrap();
+        codec.save(&doc).unwrap();
+        let second = std::fs::read(path).unwrap();
+        let json = std::str::from_utf8(&first).unwrap();
+
+        assert_eq!(first, second);
+        assert!(json.starts_with("{\n  \"obligations\":"), "root keys must be canonical: {json}");
+        assert!(
+            json.contains(
+                "\"id\": {\n        \"entry_key\": \"domain::User\",\n        \"item_identifier\": \"invariant:non_empty\",\n        \"obligation_kind\": \"boundary\""
+            ),
+            "nested obligation keys must be canonical: {json}"
+        );
     }
 
     // IN-05 / CN-04: the trusted items root itself must not be a symlink.

@@ -121,6 +121,22 @@ fn build_branch_reader(
         Err(_) => None,
     }
 }
+/// Wires the task-operation interactor together with the admission
+/// collaborators every transition is judged through and the verifier every
+/// recorded commit hash is checked by.
+fn build_task_operation_interactor(
+    store: Arc<infrastructure::track::fs_store::FsTrackStore>,
+    branch_reader: Option<Arc<dyn usecase::track_resolution::BranchReaderPort>>,
+) -> usecase::task_ops::TaskOperationInteractor<infrastructure::track::fs_store::FsTrackStore> {
+    usecase::task_ops::TaskOperationInteractor::new(
+        store,
+        branch_reader,
+        Arc::new(infrastructure::batch_plan_reader::FsBatchPlanReader::new()),
+        Arc::new(infrastructure::scope_diff_measure::GitScopeDiffMeasurer::new()),
+        Arc::new(infrastructure::review_scope_config_reader::FsReviewScopeConfigReader::new()),
+        Arc::new(infrastructure::commit_record_verifier::GitCommitRecordVerifier::new()),
+    )
+}
 fn sync_views_to_stdout(project_root: &Path, track_id: &str) -> Vec<String> {
     match infrastructure::track::render::sync_rendered_views(project_root, Some(track_id)) {
         Ok(changed) => changed
@@ -198,8 +214,7 @@ impl TrackCompositionRoot {
         let project_root = resolve_project_root(&repo_dir)?;
         let store = Arc::new(FsTrackStore::new(items_dir.clone()));
         let branch_reader = build_branch_reader(&project_root);
-        let service =
-            usecase::task_ops::TaskOperationInteractor::new(Arc::clone(&store), branch_reader);
+        let service = build_task_operation_interactor(Arc::clone(&store), branch_reader);
         let cmd = usecase::task_ops::TaskTransitionCommand {
             items_dir,
             track_id: effective_track_id.clone(),
@@ -207,9 +222,19 @@ impl TrackCompositionRoot {
             target_status: target_status.clone(),
             commit_hash,
         };
-        let output = service
+        let outcome = service
             .transition_task(cmd)
             .map_err(|err| CompositionError::Usecase(format!("transition failed: {err}")))?;
+        let output = match outcome {
+            usecase::task_ops::TaskTransitionOutcome::Transitioned(output) => output,
+            // A refused start of work is a verdict, not a failure of the
+            // command: the task stays where it was and the reason is reported.
+            usecase::task_ops::TaskTransitionOutcome::Rejected(rejection) => {
+                return Ok(CommandOutcome::failure(Some(format!(
+                    "[BLOCKED] {task_id}: {rejection}"
+                ))));
+            }
+        };
         let mut lines = vec![format!(
             "[OK] {}: transitioned to {} (track status: {})",
             task_id, target_status, output.derived_status,
@@ -337,8 +362,7 @@ impl TrackCompositionRoot {
         let project_root = resolve_project_root(&repo_dir)?;
         let store = Arc::new(FsTrackStore::new(items_dir.clone()));
         let branch_reader = build_branch_reader(&project_root);
-        let service =
-            usecase::task_ops::TaskOperationInteractor::new(Arc::clone(&store), branch_reader);
+        let service = build_task_operation_interactor(Arc::clone(&store), branch_reader);
         let after_task_id = match after {
             Some(ref a)
                 if a.strip_prefix('T').is_some_and(|digits| {
@@ -392,8 +416,7 @@ impl TrackCompositionRoot {
         let project_root = resolve_project_root(&repo_dir)?;
         let store = Arc::new(FsTrackStore::new(items_dir.clone()));
         let branch_reader = build_branch_reader(&project_root);
-        let service =
-            usecase::task_ops::TaskOperationInteractor::new(Arc::clone(&store), branch_reader);
+        let service = build_task_operation_interactor(Arc::clone(&store), branch_reader);
         let cmd = usecase::task_ops::SetOverrideCommand {
             items_dir,
             track_id: effective_track_id.clone(),
@@ -426,8 +449,7 @@ impl TrackCompositionRoot {
         let project_root = resolve_project_root(&repo_dir)?;
         let store = Arc::new(FsTrackStore::new(items_dir.clone()));
         let branch_reader = build_branch_reader(&project_root);
-        let service =
-            usecase::task_ops::TaskOperationInteractor::new(Arc::clone(&store), branch_reader);
+        let service = build_task_operation_interactor(Arc::clone(&store), branch_reader);
         let cmd = usecase::task_ops::ClearOverrideCommand {
             items_dir,
             track_id: effective_track_id.clone(),
@@ -626,6 +648,88 @@ mod tests {
         assert!(
             items_dir.join("new-track").join("metadata.json").is_file(),
             "track init must bootstrap track/items and write metadata"
+        );
+    }
+
+    #[test]
+    fn test_track_init_date_prefixed_ids_create_sorted_item_directories() {
+        let root = tempfile::tempdir().unwrap();
+        let items_dir = root.path().join("track").join("items");
+        let config_dir = root.path().join(".harness").join("config");
+        std::fs::create_dir_all(&config_dir).unwrap();
+        std::fs::write(
+            config_dir.join("branch-strategy.json"),
+            r#"{
+  "base_branch": "main",
+  "merge_target": "main",
+  "merge_method": "merge"
+}"#,
+        )
+        .unwrap();
+        std::fs::write(
+            root.path().join("architecture-rules.json"),
+            include_str!("../../../../architecture-rules.json"),
+        )
+        .unwrap();
+
+        let composition = crate::track::TrackCompositionRoot::new();
+        for (track_id, title) in [
+            ("2026-07-01-earlier-track", "Earlier Track"),
+            ("2026-07-31-later-track", "Later Track"),
+        ] {
+            let outcome = composition
+                .track_init(items_dir.clone(), track_id.to_owned(), title.to_owned())
+                .unwrap();
+            assert_eq!(outcome.exit_code, 0);
+            assert!(
+                items_dir.join(track_id).join("metadata.json").is_file(),
+                "date-prefixed track ID must remain the item-directory name"
+            );
+        }
+
+        let mut listed_ids = std::fs::read_dir(&items_dir)
+            .unwrap()
+            .map(|entry| entry.unwrap().file_name().into_string().unwrap())
+            .collect::<Vec<_>>();
+        listed_ids.sort_unstable();
+
+        assert_eq!(
+            listed_ids,
+            ["2026-07-01-earlier-track", "2026-07-31-later-track"],
+            "ascending item-directory listing must put the earlier date first"
+        );
+    }
+
+    #[test]
+    fn test_track_init_suffix_form_id_preserves_item_directory() {
+        let root = tempfile::tempdir().unwrap();
+        let items_dir = root.path().join("track").join("items");
+        let config_dir = root.path().join(".harness").join("config");
+        std::fs::create_dir_all(&config_dir).unwrap();
+        std::fs::write(
+            config_dir.join("branch-strategy.json"),
+            r#"{
+  "base_branch": "main",
+  "merge_target": "main",
+  "merge_method": "merge"
+}"#,
+        )
+        .unwrap();
+        std::fs::write(
+            root.path().join("architecture-rules.json"),
+            include_str!("../../../../architecture-rules.json"),
+        )
+        .unwrap();
+
+        let track_id = "legacy-suffix-track-2026-07-31";
+        let outcome = crate::track::TrackCompositionRoot::new()
+            .track_init(items_dir.clone(), track_id.to_owned(), "Legacy Suffix Track".to_owned())
+            .unwrap();
+
+        assert_eq!(outcome.exit_code, 0);
+        assert!(
+            items_dir.join(track_id).join("metadata.json").is_file(),
+            "a suffix-form ID must remain the item-directory name"
         );
     }
 

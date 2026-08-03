@@ -8,7 +8,8 @@
 ## Mission
 
 Author the implementation plan for the current track — `track/items/<id>/impl-plan.json`,
-`task-coverage.json`, and `task-contract.json` — via the `impl-planner` capability (Phase 3). The workflow is
+`task-coverage.json`, `task-contract.json`, and `batch-plan.json` — via the `impl-planner`
+capability (Phase 3; that capability is the sole writer of all four). The workflow is
 single-shot: invoke the capability once, receive its binary gate verdict, and return. Re-invocation
 on ERROR is the caller's responsibility (`plan` workflow). The `impl-planner` capability owns
 all file writes and gate evaluation internally.
@@ -55,9 +56,11 @@ from the dispatcher's resolution; adding a hand-picked path here would make an u
 document an input and would leave a zero-document resolution non-authoritative.
 
 The capability owns writing `track/items/<track-id>/impl-plan.json`,
-`track/items/<track-id>/task-coverage.json`, and `track/items/<track-id>/task-contract.json`,
-and evaluating the task-coverage binary gate
-(OK / ERROR). The workflow does not duplicate these steps.
+`track/items/<track-id>/task-coverage.json`, `track/items/<track-id>/task-contract.json`, and
+`track/items/<track-id>/batch-plan.json`, and evaluating both binary gates — the
+task-coverage gate (`bin/sotp verify plan-artifact-refs`) and the batch-plan structural gate
+(`bin/sotp batch-plan check`). Phase 3 passes only when both are OK. The workflow does not
+duplicate these steps.
 
 **Step 3: Receive and surface the gate verdict**
 
@@ -71,6 +74,7 @@ task count, and any gate error details to the caller without re-reading the outp
 | `spec.json` exists | ERROR if absent |
 | At least one `<layer>-types.json` exists per TDDD-enabled layer | ERROR if absent |
 | Capability task-coverage binary gate | OK / ERROR |
+| Capability batch-plan structural gate (`bin/sotp batch-plan check`) | OK / ERROR |
 
 ## Failure / recovery
 
@@ -78,15 +82,16 @@ task count, and any gate error details to the caller without re-reading the outp
 - **Missing type catalogues**: stop and instruct the caller to run the `type-design` workflow first.
 - **Capability execution failure**: retry up to 2 times (transient tooling errors). If retries
   also fail, report to the caller and stop.
-- **Capability returns ERROR (task-coverage gate)**: surface the gate error details to the
-  caller. The caller (`plan` workflow) applies the loop rule (re-invoke `impl-planner` in the
-  same phase). The `max_retry` guard is enforced by the caller.
+- **Capability returns ERROR (task-coverage or batch-plan gate)**: surface the gate error
+  details to the caller. The caller (`plan` workflow) applies the loop rule (re-invoke
+  `impl-planner` in the same phase). The `max_retry` guard is enforced by the caller.
 
 ## Outputs
 
 - `track/items/<id>/impl-plan.json` (written by the capability)
 - `track/items/<id>/task-coverage.json` (written by the capability)
 - `track/items/<id>/task-contract.json` (written by the capability)
+- `track/items/<id>/batch-plan.json` (written by the capability — its sole writer)
 - Binary gate verdict: **OK** or **ERROR** + error details
 - Task count (surfaced to caller from capability output)
 - No commit is created by this workflow

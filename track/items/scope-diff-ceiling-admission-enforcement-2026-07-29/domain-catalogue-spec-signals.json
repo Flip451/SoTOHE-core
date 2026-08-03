@@ -1,0 +1,136 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "190a7d7afc7a8c9790c9c883f0223ad343e97babed38193152774dc6be502017",
+  "signals": [
+    {
+      "type_name": "AdmissionDecision",
+      "signal": "blue",
+      "entry_hash": "bd6053234be534cc896924f4c917643ae0e89b5fb2b6cc367f66da4ebad8fe95"
+    },
+    {
+      "type_name": "AdmissionEvaluationError",
+      "signal": "blue",
+      "entry_hash": "c4709afd73518138459b9867f477691a2d9ae814c68d3d2312b8b36319a5c68d"
+    },
+    {
+      "type_name": "AdmissionRejection",
+      "signal": "blue",
+      "entry_hash": "9940ce2782f29227c5d55ba90398107209550c9753ff3d8be522e8deae4bd6a2"
+    },
+    {
+      "type_name": "BatchDeclaration",
+      "signal": "blue",
+      "entry_hash": "c68b1c7efa85382b7b31fa1f39e3beaf30e3bac11df04be4453cf3c8b70a935d"
+    },
+    {
+      "type_name": "BatchId",
+      "signal": "blue",
+      "entry_hash": "9e32edf5f8fb54c36e21d78c62011ea76f108a08af8dbe5c101485ac5ef97250"
+    },
+    {
+      "type_name": "BatchPlanDocument",
+      "signal": "blue",
+      "entry_hash": "c5a05ec4b345c696ebe3aa265fdf711f88222858c4d1d3c91f1931e77026dd00"
+    },
+    {
+      "type_name": "BatchPlanGateOutcome",
+      "signal": "blue",
+      "entry_hash": "636bfedeeaa91d5be944c75de8eee52d819cc95e142178973dd188993883d19f"
+    },
+    {
+      "type_name": "BatchPlanGateViolation",
+      "signal": "blue",
+      "entry_hash": "5e533342e9ac4ab7b89e9aa47d22c3c124ce6b0b0ec5fb75c3eab0a344308a3d"
+    },
+    {
+      "type_name": "BatchPlanValidationError",
+      "signal": "blue",
+      "entry_hash": "509c4e4f02a8965f4bda6e3aae849af8ecbc61c30786b1bdf4bd819ed0df4f20"
+    },
+    {
+      "type_name": "ImplPlanDocument",
+      "signal": "blue",
+      "entry_hash": "23b262a098a2b9804614666a8727fc7c6e49c6adda8410ea2defe82a2e79fb3c"
+    },
+    {
+      "type_name": "IndivisibilityJustification",
+      "signal": "blue",
+      "entry_hash": "af259ce0caad105b347e34e0b58c74ca32ffabf25681848a7da554f273b5fc64"
+    },
+    {
+      "type_name": "LineCount",
+      "signal": "blue",
+      "entry_hash": "79aaba102d5cf36a694bec3cbea8ba5a4e3e5d5296c5fa150cc8178cee224a6b"
+    },
+    {
+      "type_name": "MeasuredScopeDiff",
+      "signal": "blue",
+      "entry_hash": "ae642187e4dd614562066730d3333c9087bcdbc07778ce8f866e775af342678c"
+    },
+    {
+      "type_name": "NonEmptyGateViolations",
+      "signal": "blue",
+      "entry_hash": "d0ea2677333bb36104d69a380877bc882030b9fd8c55530e08dd7d8e2e24de20"
+    },
+    {
+      "type_name": "NonZeroLineCount",
+      "signal": "blue",
+      "entry_hash": "aba951bb7b2c0151d32e7e3dd59098ad3f65badee835ede3bc1111cf25a1c8f1"
+    },
+    {
+      "type_name": "ReviewScopeConfig",
+      "signal": "blue",
+      "entry_hash": "f760fa8264e3757e42c975c382e71075c4e1474e3b752cb182aa169f85ce0659"
+    },
+    {
+      "type_name": "ScopeCeiling",
+      "signal": "blue",
+      "entry_hash": "e6fb32f1094ad8528ccac2a75b50caba9a826d633a5945c3607960daca495d7c"
+    },
+    {
+      "type_name": "ScopeLineEstimate",
+      "signal": "blue",
+      "entry_hash": "924862c1d18441b24bf8934a1665ef4c5a329592094eaebd0cd4f6d4a75dde89"
+    },
+    {
+      "type_name": "TaskDecomposition",
+      "signal": "blue",
+      "entry_hash": "b3ecde71263acea8fae2caf39fd8080e4f639341ad7fdeede9982adb9430b614"
+    },
+    {
+      "type_name": "TaskEstimate",
+      "signal": "blue",
+      "entry_hash": "be453c01cf77176a43163f0be8327fde12c7d5acd480a0170366daceb3cf80d7"
+    },
+    {
+      "type_name": "TaskStatusKind",
+      "signal": "blue",
+      "entry_hash": "fcd32213b7f347dd682ba4d6ad833f1dcda6519a39671c7fb9da78c3016c938e"
+    },
+    {
+      "type_name": "TaskTransition",
+      "signal": "blue",
+      "entry_hash": "8ab834bc990bd1f341d48e74aa5ed55af7826e97c9e711e113dfa7a8165999f0"
+    },
+    {
+      "type_name": "TrackTask",
+      "signal": "blue",
+      "entry_hash": "341e22266024f70d733fb0e0adffffb1fea7e4cf3105705b6ad2dff5d18db3e4"
+    },
+    {
+      "type_name": "ValidationError",
+      "signal": "blue",
+      "entry_hash": "d04c79978f024ad947e7e537845b6caebe63b81c8a21598e26d342cce3d4d1d4"
+    },
+    {
+      "type_name": "domain::batch_plan::check_batch_plan",
+      "signal": "blue",
+      "entry_hash": "3d7e0dd8b9a7c0238e18a47503258694ce69d54bab521ac38f3be5a37e3c2a5d"
+    },
+    {
+      "type_name": "domain::batch_plan::evaluate_admission",
+      "signal": "blue",
+      "entry_hash": "6918b9d6d5dd5ca33e28359a758bb7f741fa077710fe4c5689a25adae0938c5b"
+    }
+  ]
+}

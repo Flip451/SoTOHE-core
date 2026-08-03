@@ -544,7 +544,7 @@ dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-cli-featu
 
 [tasks.ci-track-local]
 private = true
-description = "[internal] Run track-aware CI gates (task-contract coverage + check liveness + ADR-baseline freeze + signal chains spec/catalogue/impl + test-obligation check). Assumes a track/<id> branch context — fails closed on base branch / non-track branches by design."
+description = "[internal] Run local early-detection track-aware CI gates (task-contract coverage + check liveness + ADR-baseline freeze + signal chains spec/catalogue/impl + test-obligation check). Remote CI plus branch protection enforce merge eligibility. Assumes a track/<id> branch context — fails closed on base branch / non-track branches by design."
 dependencies = ["task-contract-coverage-local", "task-contract-check-local", "adr-baseline-check-commit-local", "verify-spec-states-current-local", "signal-check-impl-catalog-local", "verify-catalogue-spec-refs-local", "check-catalogue-spec-signals-local", "test-obligation-check-local"]
 
 [tasks.ci-rust-container]
@@ -727,7 +727,7 @@ command = "docker"
 args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "ci-local"]
 
 [tasks.ci-track]
-description = "[gate] Run track-aware CI gates (docker compose). Assumes a track/<id> branch context."
+description = "[gate] Run local early-detection track-aware CI gates (docker compose). Remote CI plus branch protection enforce merge eligibility. Assumes a track/<id> branch context."
 dependencies = ["prepare-local-cache-dirs"]
 command = "docker"
 args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "ci-track-local"]
@@ -845,6 +845,11 @@ private = true
 description = "[internal] Liveness gate (`sotp task-contract check`): verifies in_progress/done attributed entries have Blue impl_catalog signals (Yellow allowed for todo-only). Active track auto-resolved by CLI. Mirrors `task-contract-check` (public wrapper) without the refresh dependency — CI containers lack nightly, and signal artifacts are committed by `track-commit-message` (same reasoning as `task-contract-coverage-local`)."
 command = "cargo"
 args = ["run", "--quiet", "-p", "cli", "--", "task-contract", "check"]
+
+[tasks.batch-plan-check]
+description = "[verify] Run the Phase 3 batch-plan structural check for the active track (declared per-scope estimate sums vs resolved ceilings, batch/task structure, dependency batch order). Standalone by design: intentionally not chained into ci-track or the commit gate — admission enforcement lives on the task-transition path, and post-implementation diff growth is never re-checked against ceilings."
+command = "bin/sotp"
+args = ["batch-plan", "check"]
 
 [tasks.test-obligation-check-local]
 private = true

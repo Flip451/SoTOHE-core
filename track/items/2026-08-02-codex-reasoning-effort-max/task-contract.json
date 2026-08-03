@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "track_id": "2026-08-02-codex-reasoning-effort-max",
+  "entries": {
+    "T001": [
+      {
+        "layer": "usecase",
+        "entry_key": "ReasoningEffort"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "AgentProfiles"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "AgentProfilesError"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "ResolvedExecution"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "ReasoningEffortDto"
+      }
+    ],
+    "T005": [],
+    "T006": [],
+    "T004": [],
+    "T003": [],
+    "T002": [
+      {
+        "layer": "infrastructure",
+        "entry_key": "CapabilityConfigDto"
+      }
+    ]
+  }
+}

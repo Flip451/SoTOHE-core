@@ -117,6 +117,18 @@ impl std::fmt::Display for SymlinkRejected {
 
 impl std::error::Error for SymlinkRejected {}
 
+/// Reports whether `error` is this module's symlink refusal.
+///
+/// The downcast is the discrimination this module's payload exists for: neither
+/// [`std::io::ErrorKind::InvalidInput`] nor the rendered message identifies a
+/// refusal on its own, since the filesystem raises that kind for any malformed
+/// path and an inspection failure renders the inspected path into its own text.
+/// A caller that must tell a refusal apart — to report why without repeating the
+/// path — asks here.
+pub(crate) fn is_symlink_rejection(error: &std::io::Error) -> bool {
+    error.get_ref().is_some_and(|inner| inner.is::<SymlinkRejected>())
+}
+
 /// Builds this module's rejection for the symlink at `component`.
 fn symlink_rejection(component: &Path) -> std::io::Error {
     std::io::Error::new(

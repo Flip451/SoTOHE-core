@@ -1,0 +1,162 @@
+{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "sotp generated JSON serialization determinism",
+  "goal": [
+    {
+      "id": "GO-01",
+      "text": "Ensure that every JSON artifact generated or updated by sotp, with review.json prioritized, has a deterministic key order so identical logical content produces an identical byte sequence.",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-29-0839-deterministic-json-serialization.md",
+          "anchor": "D1"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IN-01",
+        "text": "Apply deterministic serialization to every JSON artifact that sotp generates or updates, prioritizing review.json.",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-29-0839-deterministic-json-serialization.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-02",
+        "text": "Make repeated serialization of identical logical JSON content yield identical bytes, eliminating key-order-only diff and freshness-check churn.",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-29-0839-deterministic-json-serialization.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-03",
+        "text": "Permit a one-time key-order-only rearrangement when an active track's generated JSON artifacts are regenerated under the deterministic behavior.",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-29-0839-deterministic-json-serialization.md",
+            "anchor": "D1"
+          }
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "id": "OS-01",
+        "text": "Selecting the concrete deterministic-serialization mechanism.",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-29-0839-deterministic-json-serialization.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-02",
+        "text": "Bulk reserializing JSON artifacts belonging to completed tracks.",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-29-0839-deterministic-json-serialization.md",
+            "anchor": "D1"
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "id": "CN-01",
+      "text": "The behavior must be implementation-mechanism-neutral; the implementation track selects how deterministic serialization is achieved without weakening the byte-identical result.",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-29-0839-deterministic-json-serialization.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-02",
+      "text": "Migration effects are limited to the key order of regenerated artifacts on active tracks; completed-track artifacts must remain untouched.",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-29-0839-deterministic-json-serialization.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-03",
+      "text": "This track introduces no artifact-size or serialization-latency requirement; any performance reassessment is a separate future ADR decision and does not change the deterministic-byte acceptance criteria.",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-29-0839-deterministic-json-serialization.md",
+          "anchor": "D1"
+        }
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "text": "For each sotp JSON artifact-generation or update path, two writes from identical logical JSON content produce byte-identical output.",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-29-0839-deterministic-json-serialization.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-02",
+      "text": "review.json is covered by the deterministic behavior and does not produce a diff when only serialization is repeated for unchanged logical content.",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-29-0839-deterministic-json-serialization.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-03",
+      "text": "Regenerating an active track's JSON artifacts may produce a one-time diff that changes key order only; subsequent unchanged regenerations produce no byte-level churn.",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-29-0839-deterministic-json-serialization.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-04",
+      "text": "The implementation does not regenerate or rewrite JSON artifacts for completed tracks solely to normalize key order.",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-29-0839-deterministic-json-serialization.md",
+          "anchor": "D1"
+        }
+      ]
+    }
+  ],
+  "related_conventions": [
+    {
+      "file": "knowledge/conventions/coding-principles.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/prefer-type-safe-abstractions.md",
+      "anchor": "Rule"
+    }
+  ],
+  "signals": {
+    "blue": 13,
+    "yellow": 0,
+    "red": 0
+  }
+}

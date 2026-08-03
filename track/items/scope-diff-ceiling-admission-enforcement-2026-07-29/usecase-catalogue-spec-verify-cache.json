@@ -1,0 +1,1782 @@
+{
+  "schema_version": 1,
+  "layer": "usecase",
+  "entries": [
+    {
+      "claim_hash": "79c60059fd1e1d015b7881177c225cc4daae69ab13596c14e37c55e43af4040a",
+      "evidence_hash": "a36553b773468155e8afd40fabadf2c2f47ccd898e53f349ef403942e7068b65",
+      "verdict": {
+        "kind": "pass",
+        "citation": "候補タスクが現在 batch（`batch-plan.json` の宣言順で最先行の、未 commit の member を残す batch）の member であることを要求し、後続 batch のタスクは現在 batch の commit 成立まで遷移を拒否する。宣言に不在の settle 済みタスクは member ではないため Reopen も拒否され、再開には impl-planner が当該タスクを現在 batch の member として宣言し直すこと（宣言の更新が先、遷移が後）が必要である。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "AdmissionRejectionOutput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-09",
+          "text_label": "`bin/sotp track transition` の in_progress へ入るすべての遷移に membership 検査を組み込む。対象は todo からの着手（Start）と done からの再開（Reopen）の双方であり、候補タスクが現在 batch（`batch-plan.json` の宣言順で最先行の、未 commit の member を残す batch）の member であることを要求し、後続 batch のタスクは現在 batch の commit 成立まで遷移を拒否する。宣言に不在の settle 済みタスクは member ではないため Reopen も拒否され、再開には impl-planner が当該タスクを現在 batch の member として宣言し直すこと（宣言の更新が先、遷移が後）が必要である。すでに閉じた batch の member の Reopen も現在 batch でないため同じく拒否される。skipped からの再開は ResetToTodo → Start を経るため既存の判定対象であり、追加の判定点を要しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "79c60059fd1e1d015b7881177c225cc4daae69ab13596c14e37c55e43af4040a",
+      "evidence_hash": "fe21877e227da9e580b0d988448a076149759312fa091267a9ff4d5b84eedf8a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "先行寄与が 0 でない scope で合計が ceiling を超えるなら遷移を拒否して現在 batch をそのタスク境界で早期に閉じる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "AdmissionRejectionOutput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-10",
+          "text_label": "同遷移に実測ガードを組み込む。候補タスクが見積りを申告する scope ごとに、先行寄与（HEAD 起点の実測 per-scope diff + 現在 in_progress の member の申告見積りの和）に候補タスクの申告見積りを加えた合計を resolved ceiling と比較する。先行寄与が 0 の scope では見積りの大小によらず admit し、先行寄与が 0 でない scope で合計が ceiling を超えるなら遷移を拒否して現在 batch をそのタスク境界で早期に閉じる。候補が積み増さない scope は照合対象外であり、その scope の既超過は遷移を妨げない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "79c60059fd1e1d015b7881177c225cc4daae69ab13596c14e37c55e43af4040a",
+      "evidence_hash": "66c2f1e0b75dbae5b1f2942d4e0faf979af317f065d8830159c4ccf2b0c14f65",
+      "verdict": {
+        "kind": "pass",
+        "citation": "現在 batch（宣言順で最先行の、未 commit の member を残す batch）に属さないタスクの todo → in_progress 遷移が拒否され"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "AdmissionRejectionOutput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-10",
+          "text_label": "現在 batch（宣言順で最先行の、未 commit の member を残す batch）に属さないタスクの todo → in_progress 遷移が拒否され、後続 batch のタスクは現在 batch の commit 成立後に遷移できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "79c60059fd1e1d015b7881177c225cc4daae69ab13596c14e37c55e43af4040a",
+      "evidence_hash": "7d1d0c87ceb7837599b360b0e7e84b3fdcceb452428f7fe7d724184a4a97f7a0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "先行寄与が 0 でない scope で「先行寄与 + 候補タスクの申告見積り」が resolved ceiling を超える場合に遷移が拒否される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "AdmissionRejectionOutput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-12",
+          "text_label": "先行寄与が 0 でない scope で「先行寄与 + 候補タスクの申告見積り」が resolved ceiling を超える場合に遷移が拒否される。候補タスクが見積りを申告しない scope は照合対象外であり、その scope の既超過は遷移を妨げない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "79c60059fd1e1d015b7881177c225cc4daae69ab13596c14e37c55e43af4040a",
+      "evidence_hash": "961f2dbce1da968ef17ae6f95edffe20e0ffad14f2779a842038595cf31e4bb0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "AC-10（現在 batch 非 member の拒否）、AC-11（先行寄与 0 の scope の admit）、AC-12（先行寄与ありの合計超過による拒否）、AC-13（見積り欠落の error）、AC-23（未実在 scope 名の error）の各判定が Reopen 候補に対しても同じ結果で適用される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "AdmissionRejectionOutput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-27",
+          "text_label": "宣言済みタスクの Reopen が Start と同一の判定式で判定される: AC-10（現在 batch 非 member の拒否）、AC-11（先行寄与 0 の scope の admit）、AC-12（先行寄与ありの合計超過による拒否）、AC-13（見積り欠落の error）、AC-23（未実在 scope 名の error）の各判定が Reopen 候補に対しても同じ結果で適用される。したがって宣言済み settle 済みタスクの Reopen は、その所属 batch が現在 batch である場合に限り通り、すでに閉じた batch の member であれば拒否される。判定式は変わらず、広がるのは判定対象の遷移集合のみである。"
+        }
+      }
+    },
+    {
+      "claim_hash": "422fc8698da63379d3baadf9c6fad7896f93c9f8ea1e26f718958df8301a60fa",
+      "evidence_hash": "b37a6e46c2e61d04067a1e3d5768cf0bf32d08ac8e339b479b2db31f0ba7ce51",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Phase 3 の終端 gate として、宣言された各 batch について member task 見積りの per-scope Σ（`production_lines + test_lines`）を `diff_ceiling_for_scope` の解決値と照合する binary check を追加する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "BatchPlanCheckCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "Phase 3 の終端 gate として、宣言された各 batch について member task 見積りの per-scope Σ（`production_lines + test_lines`）を `diff_ceiling_for_scope` の解決値と照合する binary check を追加する。超過は fail-closed で Phase 3 を完了させず、免除は当該 scope の寄与者が理由付き超過タスク 1 件のみの場合に限る。超過は scope 別に判定し、同じ batch でも他 scope の Σ は通常どおり検査する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "422fc8698da63379d3baadf9c6fad7896f93c9f8ea1e26f718958df8301a60fa",
+      "evidence_hash": "124fd9e53dd13fb3a968f9e2349cd276d067b5be9d2104dcec09e2d544526c63",
+      "verdict": {
+        "kind": "pass",
+        "citation": "宣言された batch の per-scope Σ が resolved ceiling を超える `batch-plan.json` に対し、Phase 3 の binary check が fail-closed で ERROR を返す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "BatchPlanCheckCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "宣言された batch の per-scope Σ が resolved ceiling を超える `batch-plan.json` に対し、Phase 3 の binary check が fail-closed で ERROR を返す。当該 scope の寄与者が非空の分解不能理由を持つタスク 1 件のみである場合は通す。同じ batch の他 scope の Σ は通常どおり検査される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f8506613404ed2ecc9c4e2445de8bc15223d1bf3452cc7bfa1a9e4b8713aae14",
+      "evidence_hash": "b37a6e46c2e61d04067a1e3d5768cf0bf32d08ac8e339b479b2db31f0ba7ce51",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Phase 3 の終端 gate として、宣言された各 batch について member task 見積りの per-scope Σ（`production_lines + test_lines`）を `diff_ceiling_for_scope` の解決値と照合する binary check を追加する。超過は fail-closed で Phase 3 を完了させず、免除は当該 scope の寄与者が理由付き超過タスク 1 件のみの場合に限る。超過は scope 別に判定し、同じ batch でも他 scope の Σ は通常どおり検査する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "BatchPlanCheckError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "Phase 3 の終端 gate として、宣言された各 batch について member task 見積りの per-scope Σ（`production_lines + test_lines`）を `diff_ceiling_for_scope` の解決値と照合する binary check を追加する。超過は fail-closed で Phase 3 を完了させず、免除は当該 scope の寄与者が理由付き超過タスク 1 件のみの場合に限る。超過は scope 別に判定し、同じ batch でも他 scope の Σ は通常どおり検査する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f8506613404ed2ecc9c4e2445de8bc15223d1bf3452cc7bfa1a9e4b8713aae14",
+      "evidence_hash": "814fd50af36666bbcb6af7cfbc049b31721dc7529805489155dac6b732621da9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "導入後の active track で `batch-plan.json` が欠落している場合は error になる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "BatchPlanCheckError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "既存成果物との互換が読み取り側で保たれ（schema 1 の `impl-plan.json` が引き続き decode でき、active でない track の registry / views 描画が壊れない）、既存 track 成果物が再検証されない。gate 系の検証対象は active track に限られ、導入後の active track で `batch-plan.json` が欠落している場合は error になる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f8506613404ed2ecc9c4e2445de8bc15223d1bf3452cc7bfa1a9e4b8713aae14",
+      "evidence_hash": "124fd9e53dd13fb3a968f9e2349cd276d067b5be9d2104dcec09e2d544526c63",
+      "verdict": {
+        "kind": "pass",
+        "citation": "宣言された batch の per-scope Σ が resolved ceiling を超える `batch-plan.json` に対し、Phase 3 の binary check が fail-closed で ERROR を返す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "BatchPlanCheckError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "宣言された batch の per-scope Σ が resolved ceiling を超える `batch-plan.json` に対し、Phase 3 の binary check が fail-closed で ERROR を返す。当該 scope の寄与者が非空の分解不能理由を持つタスク 1 件のみである場合は通す。同じ batch の他 scope の Σ は通常どおり検査される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f97266a8951bc64945c04823c93c0c54438c57dc59fec4a0c191e81c1d38f5db",
+      "evidence_hash": "b37a6e46c2e61d04067a1e3d5768cf0bf32d08ac8e339b479b2db31f0ba7ce51",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Phase 3 の終端 gate として、宣言された各 batch について member task 見積りの per-scope Σ（`production_lines + test_lines`）を `diff_ceiling_for_scope` の解決値と照合する binary check を追加する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "BatchPlanCheckInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "Phase 3 の終端 gate として、宣言された各 batch について member task 見積りの per-scope Σ（`production_lines + test_lines`）を `diff_ceiling_for_scope` の解決値と照合する binary check を追加する。超過は fail-closed で Phase 3 を完了させず、免除は当該 scope の寄与者が理由付き超過タスク 1 件のみの場合に限る。超過は scope 別に判定し、同じ batch でも他 scope の Σ は通常どおり検査する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f97266a8951bc64945c04823c93c0c54438c57dc59fec4a0c191e81c1d38f5db",
+      "evidence_hash": "ad044a24bd9e64f1446a89b3482e2ea5aa0363d48eb18993c2ba48f1f0c50637",
+      "verdict": {
+        "kind": "pass",
+        "citation": "同 gate が cross-file の構造検査もあわせて行う"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "BatchPlanCheckInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "同 gate が cross-file の構造検査もあわせて行う: `impl-plan.json` の未 settle タスク（todo / in_progress）がそれぞれちょうど 1 つの batch に属す / 見積りと batch member の task id が実在のタスクを指す / 依存元と依存先の双方が宣言に含まれる（したがって双方が未 settle の）依存辺について、依存先タスクの所属 batch が依存元タスクの所属 batch と同一であるか `batches[]` の宣言順でそれより先行する / 超過タスクがその超過 scope について batch 内唯一の寄与者である / 見積りが宣言する main scope 名が review scope 設定の設定済み scope 集合に実在する。無所属の検査は未 settle タスクにのみ適用し、settle 済みタスクがどの batch にも属さないことは違反として報告しない。task id の実在検査は settle 状態を問わず宣言されたすべての id に適用する。依存辺の検査の入力は `impl-plan.json` の依存宣言と `batches[]` のみであり、`batch-plan.json` 側に新しい宣言フィールドを要求しない。依存を宣言していないタスク対は検査の対象外である。いずれかの端が settle 済みで宣言に含まれない依存辺も順序検査の対象外とし、無検査で通す — 宣言に不在の端は所属 batch を解決する手段がなく、また settle 済みの端は既に delivered であって「後続 batch」になり得ないため、この除外によって順序保証は失われない。scope 名の照合では、実在しない名前を fail-closed で拒否し graceful skip を設けない。予約名 `other` は暗黙 scope として常に有効である。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f97266a8951bc64945c04823c93c0c54438c57dc59fec4a0c191e81c1d38f5db",
+      "evidence_hash": "124fd9e53dd13fb3a968f9e2349cd276d067b5be9d2104dcec09e2d544526c63",
+      "verdict": {
+        "kind": "pass",
+        "citation": "宣言された batch の per-scope Σ が resolved ceiling を超える `batch-plan.json` に対し、Phase 3 の binary check が fail-closed で ERROR を返す。当該 scope の寄与者が非空の分解不能理由を持つタスク 1 件のみである場合は通す。同じ batch の他 scope の Σ は通常どおり検査される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "BatchPlanCheckInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "宣言された batch の per-scope Σ が resolved ceiling を超える `batch-plan.json` に対し、Phase 3 の binary check が fail-closed で ERROR を返す。当該 scope の寄与者が非空の分解不能理由を持つタスク 1 件のみである場合は通す。同じ batch の他 scope の Σ は通常どおり検査される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f97266a8951bc64945c04823c93c0c54438c57dc59fec4a0c191e81c1d38f5db",
+      "evidence_hash": "066ac434f24eeed8fec277e7f1ba298088024a7eed5fe45b3a7bdbac54505a4f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "cross-file 構造違反のそれぞれ — どの batch にも属さない未 settle タスク、実在しないタスクを指す task id、依存元と依存先の双方が宣言に含まれ、依存先の所属 batch が依存元タスクの所属 batch より後にある依存辺、超過タスクがその超過 scope の唯一の寄与者でない batch、設定済み scope 集合に存在しない main scope 名を宣言する見積り — について、同 check が ERROR を返す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "BatchPlanCheckInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "cross-file 構造違反のそれぞれ — どの batch にも属さない未 settle タスク、実在しないタスクを指す task id、依存元と依存先の双方が宣言に含まれ、依存先の所属 batch が依存元タスクの所属 batch より後にある依存辺、超過タスクがその超過 scope の唯一の寄与者でない batch、設定済み scope 集合に存在しない main scope 名を宣言する見積り — について、同 check が ERROR を返す。どの batch にも属さない settle 済みタスクは同 check の結果を変えない。実在しない task id は宣言が指すタスクの settle 状態を問わず ERROR になる。依存を宣言していないタスク対の batch 割当と、いずれかの端が settle 済みで宣言に含まれない依存辺は、いずれも同 check の結果を変えない。予約名 `other` を宣言する見積りは scope 名の照合で ERROR にならない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f97266a8951bc64945c04823c93c0c54438c57dc59fec4a0c191e81c1d38f5db",
+      "evidence_hash": "aee51e5b7039a93c2ee15154052d037c426db95ca2dacd9edbd04507b10804ab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "この 2 通りについては Σ の照合が行われず、その scope の合計値の大小が Phase 3 gate の結果を変えない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "BatchPlanCheckInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "ceiling が解決されない状態が、設定済みで per-scope 上限も global 既定も持たない scope と予約名 `other` の 2 通りに限られる。この 2 通りについては Σ の照合が行われず、その scope の合計値の大小が Phase 3 gate の結果を変えない。設定済み scope 集合に存在しない名前から「照合されない」状態に至る第 3 の経路は存在せず、その名前は AC-07 の照合で ERROR になる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "94a10a0f9cc85aa9724179c10c3e510b8d8c73f1a1f1af4ff122bd5756968413",
+      "evidence_hash": "b37a6e46c2e61d04067a1e3d5768cf0bf32d08ac8e339b479b2db31f0ba7ce51",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Phase 3 の終端 gate として、宣言された各 batch について member task 見積りの per-scope Σ（`production_lines + test_lines`）を `diff_ceiling_for_scope` の解決値と照合する binary check を追加する。超過は fail-closed で Phase 3 を完了させず、免除は当該 scope の寄与者が理由付き超過タスク 1 件のみの場合に限る。超過は scope 別に判定し、同じ batch でも他 scope の Σ は通常どおり検査する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "BatchPlanCheckOutput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "Phase 3 の終端 gate として、宣言された各 batch について member task 見積りの per-scope Σ（`production_lines + test_lines`）を `diff_ceiling_for_scope` の解決値と照合する binary check を追加する。超過は fail-closed で Phase 3 を完了させず、免除は当該 scope の寄与者が理由付き超過タスク 1 件のみの場合に限る。超過は scope 別に判定し、同じ batch でも他 scope の Σ は通常どおり検査する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "94a10a0f9cc85aa9724179c10c3e510b8d8c73f1a1f1af4ff122bd5756968413",
+      "evidence_hash": "124fd9e53dd13fb3a968f9e2349cd276d067b5be9d2104dcec09e2d544526c63",
+      "verdict": {
+        "kind": "pass",
+        "citation": "宣言された batch の per-scope Σ が resolved ceiling を超える `batch-plan.json` に対し、Phase 3 の binary check が fail-closed で ERROR を返す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "BatchPlanCheckOutput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "宣言された batch の per-scope Σ が resolved ceiling を超える `batch-plan.json` に対し、Phase 3 の binary check が fail-closed で ERROR を返す。当該 scope の寄与者が非空の分解不能理由を持つタスク 1 件のみである場合は通す。同じ batch の他 scope の Σ は通常どおり検査される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "35c7b593eab28dca245187ff645a7b6ab9f2349cbd84e91e6a3a4a57e10ba887",
+      "evidence_hash": "b37a6e46c2e61d04067a1e3d5768cf0bf32d08ac8e339b479b2db31f0ba7ce51",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Phase 3 の終端 gate として、宣言された各 batch について member task 見積りの per-scope Σ（`production_lines + test_lines`）を `diff_ceiling_for_scope` の解決値と照合する binary check を追加する。超過は fail-closed で Phase 3 を完了させず、免除は当該 scope の寄与者が理由付き超過タスク 1 件のみの場合に限る。超過は scope 別に判定し、同じ batch でも他 scope の Σ は通常どおり検査する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "BatchPlanViolationOutput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "Phase 3 の終端 gate として、宣言された各 batch について member task 見積りの per-scope Σ（`production_lines + test_lines`）を `diff_ceiling_for_scope` の解決値と照合する binary check を追加する。超過は fail-closed で Phase 3 を完了させず、免除は当該 scope の寄与者が理由付き超過タスク 1 件のみの場合に限る。超過は scope 別に判定し、同じ batch でも他 scope の Σ は通常どおり検査する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "35c7b593eab28dca245187ff645a7b6ab9f2349cbd84e91e6a3a4a57e10ba887",
+      "evidence_hash": "ad044a24bd9e64f1446a89b3482e2ea5aa0363d48eb18993c2ba48f1f0c50637",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`impl-plan.json` の未 settle タスク（todo / in_progress）がそれぞれちょうど 1 つの batch に属す / 見積りと batch member の task id が実在のタスクを指す / 依存元と依存先の双方が宣言に含まれる（したがって双方が未 settle の）依存辺について、依存先タスクの所属 batch が依存元タスクの所属 batch と同一であるか `batches[]` の宣言順でそれより先行する / 超過タスクがその超過 scope について batch 内唯一の寄与者である / 見積りが宣言する main scope 名が review scope 設定の設定済み scope 集合に実在する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "BatchPlanViolationOutput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "同 gate が cross-file の構造検査もあわせて行う: `impl-plan.json` の未 settle タスク（todo / in_progress）がそれぞれちょうど 1 つの batch に属す / 見積りと batch member の task id が実在のタスクを指す / 依存元と依存先の双方が宣言に含まれる（したがって双方が未 settle の）依存辺について、依存先タスクの所属 batch が依存元タスクの所属 batch と同一であるか `batches[]` の宣言順でそれより先行する / 超過タスクがその超過 scope について batch 内唯一の寄与者である / 見積りが宣言する main scope 名が review scope 設定の設定済み scope 集合に実在する。無所属の検査は未 settle タスクにのみ適用し、settle 済みタスクがどの batch にも属さないことは違反として報告しない。task id の実在検査は settle 状態を問わず宣言されたすべての id に適用する。依存辺の検査の入力は `impl-plan.json` の依存宣言と `batches[]` のみであり、`batch-plan.json` 側に新しい宣言フィールドを要求しない。依存を宣言していないタスク対は検査の対象外である。いずれかの端が settle 済みで宣言に含まれない依存辺も順序検査の対象外とし、無検査で通す — 宣言に不在の端は所属 batch を解決する手段がなく、また settle 済みの端は既に delivered であって「後続 batch」になり得ないため、この除外によって順序保証は失われない。scope 名の照合では、実在しない名前を fail-closed で拒否し graceful skip を設けない。予約名 `other` は暗黙 scope として常に有効である。"
+        }
+      }
+    },
+    {
+      "claim_hash": "35c7b593eab28dca245187ff645a7b6ab9f2349cbd84e91e6a3a4a57e10ba887",
+      "evidence_hash": "124fd9e53dd13fb3a968f9e2349cd276d067b5be9d2104dcec09e2d544526c63",
+      "verdict": {
+        "kind": "pass",
+        "citation": "宣言された batch の per-scope Σ が resolved ceiling を超える `batch-plan.json` に対し、Phase 3 の binary check が fail-closed で ERROR を返す。当該 scope の寄与者が非空の分解不能理由を持つタスク 1 件のみである場合は通す。同じ batch の他 scope の Σ は通常どおり検査される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "BatchPlanViolationOutput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "宣言された batch の per-scope Σ が resolved ceiling を超える `batch-plan.json` に対し、Phase 3 の binary check が fail-closed で ERROR を返す。当該 scope の寄与者が非空の分解不能理由を持つタスク 1 件のみである場合は通す。同じ batch の他 scope の Σ は通常どおり検査される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "35c7b593eab28dca245187ff645a7b6ab9f2349cbd84e91e6a3a4a57e10ba887",
+      "evidence_hash": "066ac434f24eeed8fec277e7f1ba298088024a7eed5fe45b3a7bdbac54505a4f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "どの batch にも属さない未 settle タスク、実在しないタスクを指す task id、依存元と依存先の双方が宣言に含まれ、依存先の所属 batch が依存元タスクの所属 batch より後にある依存辺、超過タスクがその超過 scope の唯一の寄与者でない batch、設定済み scope 集合に存在しない main scope 名を宣言する見積り — について、同 check が ERROR を返す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "BatchPlanViolationOutput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "cross-file 構造違反のそれぞれ — どの batch にも属さない未 settle タスク、実在しないタスクを指す task id、依存元と依存先の双方が宣言に含まれ、依存先の所属 batch が依存元タスクの所属 batch より後にある依存辺、超過タスクがその超過 scope の唯一の寄与者でない batch、設定済み scope 集合に存在しない main scope 名を宣言する見積り — について、同 check が ERROR を返す。どの batch にも属さない settle 済みタスクは同 check の結果を変えない。実在しない task id は宣言が指すタスクの settle 状態を問わず ERROR になる。依存を宣言していないタスク対の batch 割当と、いずれかの端が settle 済みで宣言に含まれない依存辺は、いずれも同 check の結果を変えない。予約名 `other` を宣言する見積りは scope 名の照合で ERROR にならない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "35c7b593eab28dca245187ff645a7b6ab9f2349cbd84e91e6a3a4a57e10ba887",
+      "evidence_hash": "aee51e5b7039a93c2ee15154052d037c426db95ca2dacd9edbd04507b10804ab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "設定済み scope 集合に存在しない名前から「照合されない」状態に至る第 3 の経路は存在せず、その名前は AC-07 の照合で ERROR になる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "BatchPlanViolationOutput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "ceiling が解決されない状態が、設定済みで per-scope 上限も global 既定も持たない scope と予約名 `other` の 2 通りに限られる。この 2 通りについては Σ の照合が行われず、その scope の合計値の大小が Phase 3 gate の結果を変えない。設定済み scope 集合に存在しない名前から「照合されない」状態に至る第 3 の経路は存在せず、その名前は AC-07 の照合で ERROR になる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b509a4f16bf41efe1dde254cbb591d46afa5ac6b2359009a17fde1ee4978d9ec",
+      "evidence_hash": "032b684617147b7908220c571b6c30548caea06250737a91e80a685d7ac260a1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "満たさない記録は error として拒否し状態を一切書き換えない — `impl-plan.json` は遷移前のまま残り、部分適用も graceful skip も生じない。repository の読み取り自体が失敗して検証を実行できない場合も同じく error とし、検証せずに記録する経路を設けない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CommitRecordVerifyError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-22",
+          "text_label": "commit hash を書くタスク状態遷移に記録時の repository 照合を組み込む。対象は hash を伴う完了記録（`Complete`）と後からの埋め戻し（`BackfillHash`）の双方であり、記録経路による例外は設けない。与えられた hash が当該 repository に commit object として実在し、かつ HEAD の祖先であることを要求する。満たさない記録は error として拒否し状態を一切書き換えない — `impl-plan.json` は遷移前のまま残り、部分適用も graceful skip も生じない。repository の読み取り自体が失敗して検証を実行できない場合も同じく error とし、検証せずに記録する経路を設けない。hash を伴わない完了記録は照合の対象外である（記録すべき値が存在せず、その done は従来どおり未 settle である）。照合は repository の読み取りを要するため usecase の port と、track 成果物が置かれた repository を items_dir 起点で解決する infrastructure adapter が担い、domain は I/O を持たず検証結果を入力として受け取る。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b509a4f16bf41efe1dde254cbb591d46afa5ac6b2359009a17fde1ee4978d9ec",
+      "evidence_hash": "f758bd115cf20e6ed6e85f6f99be77ec8da4ecc823727b29df105cb16a2827a4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実在するが HEAD の祖先でない hash、および repository の読み取り自体が失敗して検証を実行できない場合のそれぞれについて、hash を伴う完了記録（`Complete`）と埋め戻し（`BackfillHash`）の双方が error になり"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CommitRecordVerifyError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-28",
+          "text_label": "形式は well-formed だが当該 repository に commit object として実在しない hash、実在するが HEAD の祖先でない hash、および repository の読み取り自体が失敗して検証を実行できない場合のそれぞれについて、hash を伴う完了記録（`Complete`）と埋め戻し（`BackfillHash`）の双方が error になり、永続化された `impl-plan.json` が遷移前と byte 単位で不変である。部分適用も、検証を実行できないことを理由に無検査で記録する graceful skip も存在しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8ff2a2b585e33fad48ad979235f6d615a27c02db3769c125f3ae58a1092b80da",
+      "evidence_hash": "b37a6e46c2e61d04067a1e3d5768cf0bf32d08ac8e339b479b2db31f0ba7ce51",
+      "verdict": {
+        "kind": "pass",
+        "citation": "超過は scope 別に判定し、同じ batch でも他 scope の Σ は通常どおり検査する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "NonEmptyViolationOutputs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "Phase 3 の終端 gate として、宣言された各 batch について member task 見積りの per-scope Σ（`production_lines + test_lines`）を `diff_ceiling_for_scope` の解決値と照合する binary check を追加する。超過は fail-closed で Phase 3 を完了させず、免除は当該 scope の寄与者が理由付き超過タスク 1 件のみの場合に限る。超過は scope 別に判定し、同じ batch でも他 scope の Σ は通常どおり検査する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8ff2a2b585e33fad48ad979235f6d615a27c02db3769c125f3ae58a1092b80da",
+      "evidence_hash": "124fd9e53dd13fb3a968f9e2349cd276d067b5be9d2104dcec09e2d544526c63",
+      "verdict": {
+        "kind": "pass",
+        "citation": "当該 scope の寄与者が非空の分解不能理由を持つタスク 1 件のみである場合は通す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "NonEmptyViolationOutputs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "宣言された batch の per-scope Σ が resolved ceiling を超える `batch-plan.json` に対し、Phase 3 の binary check が fail-closed で ERROR を返す。当該 scope の寄与者が非空の分解不能理由を持つタスク 1 件のみである場合は通す。同じ batch の他 scope の Σ は通常どおり検査される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8ff2a2b585e33fad48ad979235f6d615a27c02db3769c125f3ae58a1092b80da",
+      "evidence_hash": "066ac434f24eeed8fec277e7f1ba298088024a7eed5fe45b3a7bdbac54505a4f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "cross-file 構造違反のそれぞれ — どの batch にも属さない未 settle タスク、実在しないタスクを指す task id、依存元と依存先の双方が宣言に含まれ、依存先の所属 batch が依存元タスクの所属 batch より後にある依存辺、超過タスクがその超過 scope の唯一の寄与者でない batch、設定済み scope 集合に存在しない main scope 名を宣言する見積り — について、同 check が ERROR を返す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "NonEmptyViolationOutputs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "cross-file 構造違反のそれぞれ — どの batch にも属さない未 settle タスク、実在しないタスクを指す task id、依存元と依存先の双方が宣言に含まれ、依存先の所属 batch が依存元タスクの所属 batch より後にある依存辺、超過タスクがその超過 scope の唯一の寄与者でない batch、設定済み scope 集合に存在しない main scope 名を宣言する見積り — について、同 check が ERROR を返す。どの batch にも属さない settle 済みタスクは同 check の結果を変えない。実在しない task id は宣言が指すタスクの settle 状態を問わず ERROR になる。依存を宣言していないタスク対の batch 割当と、いずれかの端が settle 済みで宣言に含まれない依存辺は、いずれも同 check の結果を変えない。予約名 `other` を宣言する見積りは scope 名の照合で ERROR にならない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ac123800040223ff956c0c64f30e388f834af39f6e7e1cd77c8bea35699bce4e",
+      "evidence_hash": "b201244cd4cf43bf195d409a404b70aaf0886be11929d946b3a4b78bd2285128",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`track/items/<id>/batch-plan.json` を Phase 3 の第 4 の終端計画成果物として新設する。書き手は impl-planner のみ（1 file = 1 writer）で、admission を判定する CLI は読むだけである。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PlanArtifactReadError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "`track/items/<id>/batch-plan.json` を Phase 3 の第 4 の終端計画成果物として新設する。書き手は impl-planner のみ（1 file = 1 writer）で、admission を判定する CLI は読むだけである。Phase 3 の authoring は task 分解 → spec カバレッジ → 契約帰属 → 見積り → batch 編成の依存順に進み、各ファイルを一回書きで完結させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ac123800040223ff956c0c64f30e388f834af39f6e7e1cd77c8bea35699bce4e",
+      "evidence_hash": "814fd50af36666bbcb6af7cfbc049b31721dc7529805489155dac6b732621da9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "導入後の active track で `batch-plan.json` が欠落している場合は error になる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PlanArtifactReadError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "既存成果物との互換が読み取り側で保たれ（schema 1 の `impl-plan.json` が引き続き decode でき、active でない track の registry / views 描画が壊れない）、既存 track 成果物が再検証されない。gate 系の検証対象は active track に限られ、導入後の active track で `batch-plan.json` が欠落している場合は error になる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ac123800040223ff956c0c64f30e388f834af39f6e7e1cd77c8bea35699bce4e",
+      "evidence_hash": "ad044a24bd9e64f1446a89b3482e2ea5aa0363d48eb18993c2ba48f1f0c50637",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`impl-plan.json` の依存宣言と `batches[]` のみであり、`batch-plan.json` 側に新しい宣言フィールドを要求しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PlanArtifactReadError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "同 gate が cross-file の構造検査もあわせて行う: `impl-plan.json` の未 settle タスク（todo / in_progress）がそれぞれちょうど 1 つの batch に属す / 見積りと batch member の task id が実在のタスクを指す / 依存元と依存先の双方が宣言に含まれる（したがって双方が未 settle の）依存辺について、依存先タスクの所属 batch が依存元タスクの所属 batch と同一であるか `batches[]` の宣言順でそれより先行する / 超過タスクがその超過 scope について batch 内唯一の寄与者である / 見積りが宣言する main scope 名が review scope 設定の設定済み scope 集合に実在する。無所属の検査は未 settle タスクにのみ適用し、settle 済みタスクがどの batch にも属さないことは違反として報告しない。task id の実在検査は settle 状態を問わず宣言されたすべての id に適用する。依存辺の検査の入力は `impl-plan.json` の依存宣言と `batches[]` のみであり、`batch-plan.json` 側に新しい宣言フィールドを要求しない。依存を宣言していないタスク対は検査の対象外である。いずれかの端が settle 済みで宣言に含まれない依存辺も順序検査の対象外とし、無検査で通す — 宣言に不在の端は所属 batch を解決する手段がなく、また settle 済みの端は既に delivered であって「後続 batch」になり得ないため、この除外によって順序保証は失われない。scope 名の照合では、実在しない名前を fail-closed で拒否し graceful skip を設けない。予約名 `other` は暗黙 scope として常に有効である。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ac123800040223ff956c0c64f30e388f834af39f6e7e1cd77c8bea35699bce4e",
+      "evidence_hash": "066ac434f24eeed8fec277e7f1ba298088024a7eed5fe45b3a7bdbac54505a4f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "cross-file 構造違反のそれぞれ — どの batch にも属さない未 settle タスク、実在しないタスクを指す task id、依存元と依存先の双方が宣言に含まれ、依存先の所属 batch が依存元タスクの所属 batch より後にある依存辺、超過タスクがその超過 scope の唯一の寄与者でない batch、設定済み scope 集合に存在しない main scope 名を宣言する見積り — について、同 check が ERROR を返す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PlanArtifactReadError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "cross-file 構造違反のそれぞれ — どの batch にも属さない未 settle タスク、実在しないタスクを指す task id、依存元と依存先の双方が宣言に含まれ、依存先の所属 batch が依存元タスクの所属 batch より後にある依存辺、超過タスクがその超過 scope の唯一の寄与者でない batch、設定済み scope 集合に存在しない main scope 名を宣言する見積り — について、同 check が ERROR を返す。どの batch にも属さない settle 済みタスクは同 check の結果を変えない。実在しない task id は宣言が指すタスクの settle 状態を問わず ERROR になる。依存を宣言していないタスク対の batch 割当と、いずれかの端が settle 済みで宣言に含まれない依存辺は、いずれも同 check の結果を変えない。予約名 `other` を宣言する見積りは scope 名の照合で ERROR にならない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6bba66f1e1c1ee2306d0037fac668e22859727636d32d5314770393d85429daa",
+      "evidence_hash": "b37a6e46c2e61d04067a1e3d5768cf0bf32d08ac8e339b479b2db31f0ba7ce51",
+      "verdict": {
+        "kind": "pass",
+        "citation": "member task 見積りの per-scope Σ（`production_lines + test_lines`）を `diff_ceiling_for_scope` の解決値と照合する binary check を追加する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "ScopeConfigReadError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "Phase 3 の終端 gate として、宣言された各 batch について member task 見積りの per-scope Σ（`production_lines + test_lines`）を `diff_ceiling_for_scope` の解決値と照合する binary check を追加する。超過は fail-closed で Phase 3 を完了させず、免除は当該 scope の寄与者が理由付き超過タスク 1 件のみの場合に限る。超過は scope 別に判定し、同じ batch でも他 scope の Σ は通常どおり検査する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6bba66f1e1c1ee2306d0037fac668e22859727636d32d5314770393d85429daa",
+      "evidence_hash": "aee51e5b7039a93c2ee15154052d037c426db95ca2dacd9edbd04507b10804ab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ceiling が解決されない状態が、設定済みで per-scope 上限も global 既定も持たない scope と予約名 `other` の 2 通りに限られる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "ScopeConfigReadError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "ceiling が解決されない状態が、設定済みで per-scope 上限も global 既定も持たない scope と予約名 `other` の 2 通りに限られる。この 2 通りについては Σ の照合が行われず、その scope の合計値の大小が Phase 3 gate の結果を変えない。設定済み scope 集合に存在しない名前から「照合されない」状態に至る第 3 の経路は存在せず、その名前は AC-07 の照合で ERROR になる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d3b70d389302c1b157ea46677027e4e05b03d50a802ae0b1667d1533fe1bf02a",
+      "evidence_hash": "36de3c230caf1c89f725db2d8afdcfdaed93d43e2193fcfb2a14cc473188aec5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "scope の行数 = additions + deletions（base 起点の committed / staged / unstaged を合算）、untracked ファイルは全行数を additions として計上、scope 分類は既存の review scope 分類機構を再利用する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "ScopeDiffMeasureError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-14",
+          "text_label": "scope 行数の数え方の正本を workflow 散文から CLI 実装へ移す。定義は既存の実測ガードのものをそのまま採用する: scope の行数 = additions + deletions（base 起点の committed / staged / unstaged を合算）、untracked ファイルは全行数を additions として計上、scope 分類は既存の review scope 分類機構を再利用する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d3b70d389302c1b157ea46677027e4e05b03d50a802ae0b1667d1533fe1bf02a",
+      "evidence_hash": "f0b16ad6cb2e190124ccd9edc7ebef2f843844b7b4b7c1b45e9fdfd260ee7aac",
+      "verdict": {
+        "kind": "pass",
+        "citation": "scope 行数の算出が CLI 側に存在し、additions + deletions の合算、untracked ファイルの全行 additions 計上、既存 review scope 分類機構の再利用という定義で動作する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "ScopeDiffMeasureError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-17",
+          "text_label": "scope 行数の算出が CLI 側に存在し、additions + deletions の合算、untracked ファイルの全行 additions 計上、既存 review scope 分類機構の再利用という定義で動作する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "fe2b9d4d2b9d889e9d88eec8a5a41664f89a566233f1bfeb6c9eaee6307b23ee",
+      "evidence_hash": "a36553b773468155e8afd40fabadf2c2f47ccd898e53f349ef403942e7068b65",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp track transition` の in_progress へ入るすべての遷移に membership 検査を組み込む。対象は todo からの着手（Start）と done からの再開（Reopen）の双方であり、候補タスクが現在 batch（`batch-plan.json` の宣言順で最先行の、未 commit の member を残す batch）の member であることを要求し、後続 batch のタスクは現在 batch の commit 成立まで遷移を拒否する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TaskOperationInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-09",
+          "text_label": "`bin/sotp track transition` の in_progress へ入るすべての遷移に membership 検査を組み込む。対象は todo からの着手（Start）と done からの再開（Reopen）の双方であり、候補タスクが現在 batch（`batch-plan.json` の宣言順で最先行の、未 commit の member を残す batch）の member であることを要求し、後続 batch のタスクは現在 batch の commit 成立まで遷移を拒否する。宣言に不在の settle 済みタスクは member ではないため Reopen も拒否され、再開には impl-planner が当該タスクを現在 batch の member として宣言し直すこと（宣言の更新が先、遷移が後）が必要である。すでに閉じた batch の member の Reopen も現在 batch でないため同じく拒否される。skipped からの再開は ResetToTodo → Start を経るため既存の判定対象であり、追加の判定点を要しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "fe2b9d4d2b9d889e9d88eec8a5a41664f89a566233f1bfeb6c9eaee6307b23ee",
+      "evidence_hash": "fe21877e227da9e580b0d988448a076149759312fa091267a9ff4d5b84eedf8a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "同遷移に実測ガードを組み込む。候補タスクが見積りを申告する scope ごとに、先行寄与（HEAD 起点の実測 per-scope diff + 現在 in_progress の member の申告見積りの和）に候補タスクの申告見積りを加えた合計を resolved ceiling と比較する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TaskOperationInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-10",
+          "text_label": "同遷移に実測ガードを組み込む。候補タスクが見積りを申告する scope ごとに、先行寄与（HEAD 起点の実測 per-scope diff + 現在 in_progress の member の申告見積りの和）に候補タスクの申告見積りを加えた合計を resolved ceiling と比較する。先行寄与が 0 の scope では見積りの大小によらず admit し、先行寄与が 0 でない scope で合計が ceiling を超えるなら遷移を拒否して現在 batch をそのタスク境界で早期に閉じる。候補が積み増さない scope は照合対象外であり、その scope の既超過は遷移を妨げない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "fe2b9d4d2b9d889e9d88eec8a5a41664f89a566233f1bfeb6c9eaee6307b23ee",
+      "evidence_hash": "c0188369b660bb2cf7e9f5ff9db301aee3e08825ea3b8d160462c09421b9549f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "admission 判定はタスク状態遷移の単一経路上に置き、どの workflow / capability から到達しても迂回できない状態を保つ。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TaskOperationInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-10",
+          "text_label": "admission 判定はタスク状態遷移の単一経路上に置き、どの workflow / capability から到達しても迂回できない状態を保つ。implementer 側の着手前 precondition が、遷移を経ない実装 dispatch という迂回経路を塞ぐ。"
+        }
+      }
+    },
+    {
+      "claim_hash": "fe2b9d4d2b9d889e9d88eec8a5a41664f89a566233f1bfeb6c9eaee6307b23ee",
+      "evidence_hash": "ce7db4290c3c3597e07a0360c3e428b7063eb0d072e11cb8056628eb9b8b6736",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`batch-plan.json` 上の見積りが設定済み scope 集合に存在しない main scope 名を宣言しているタスクについて、in_progress へ入る遷移（Start / Reopen のいずれも）が error になる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TaskOperationInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-23",
+          "text_label": "`batch-plan.json` 上の見積りが設定済み scope 集合に存在しない main scope 名を宣言しているタスクについて、in_progress へ入る遷移（Start / Reopen のいずれも）が error になる。この error は見積り欠落と同格であり、ceiling 未解決として全 admit に落とす縮退も graceful skip も存在しない。予約名 `other` を宣言する見積りはこの判定で error にならない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "fe2b9d4d2b9d889e9d88eec8a5a41664f89a566233f1bfeb6c9eaee6307b23ee",
+      "evidence_hash": "7e491e8cd12b3b65cfbe171bfee36beecbcf2de2f3aeb6f200b005ed06ee5362",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`batch-plan.json` の宣言に不在の settle 済みタスクについて、done → in_progress（Reopen）が拒否される。拒否は fail-closed であり、宣言に不在であることを理由に無判定で通す graceful skip は存在しない。再開が通るのは impl-planner が当該タスクを現在 batch の member として宣言し直した後に限る。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TaskOperationInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-26",
+          "text_label": "`batch-plan.json` の宣言に不在の settle 済みタスクについて、done → in_progress（Reopen）が拒否される。拒否は fail-closed であり、宣言に不在であることを理由に無判定で通す graceful skip は存在しない。再開が通るのは impl-planner が当該タスクを現在 batch の member として宣言し直した後に限る。skipped からの再開は ResetToTodo → Start を経る既存の判定対象であり、この判定点の追加を要しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "fe2b9d4d2b9d889e9d88eec8a5a41664f89a566233f1bfeb6c9eaee6307b23ee",
+      "evidence_hash": "961f2dbce1da968ef17ae6f95edffe20e0ffad14f2779a842038595cf31e4bb0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "宣言済みタスクの Reopen が Start と同一の判定式で判定される: AC-10（現在 batch 非 member の拒否）、AC-11（先行寄与 0 の scope の admit）、AC-12（先行寄与ありの合計超過による拒否）、AC-13（見積り欠落の error）、AC-23（未実在 scope 名の error）の各判定が Reopen 候補に対しても同じ結果で適用される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TaskOperationInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-27",
+          "text_label": "宣言済みタスクの Reopen が Start と同一の判定式で判定される: AC-10（現在 batch 非 member の拒否）、AC-11（先行寄与 0 の scope の admit）、AC-12（先行寄与ありの合計超過による拒否）、AC-13（見積り欠落の error）、AC-23（未実在 scope 名の error）の各判定が Reopen 候補に対しても同じ結果で適用される。したがって宣言済み settle 済みタスクの Reopen は、その所属 batch が現在 batch である場合に限り通り、すでに閉じた batch の member であれば拒否される。判定式は変わらず、広がるのは判定対象の遷移集合のみである。"
+        }
+      }
+    },
+    {
+      "claim_hash": "4d49b063426ee76f5197274ec3f3956fdf38343e345f12de9cc4b2b453ac6587",
+      "evidence_hash": "a36553b773468155e8afd40fabadf2c2f47ccd898e53f349ef403942e7068b65",
+      "verdict": {
+        "kind": "pass",
+        "citation": "候補タスクが現在 batch（`batch-plan.json` の宣言順で最先行の、未 commit の member を残す batch）の member であることを要求し、後続 batch のタスクは現在 batch の commit 成立まで遷移を拒否する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TaskTransitionOutcome"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-09",
+          "text_label": "`bin/sotp track transition` の in_progress へ入るすべての遷移に membership 検査を組み込む。対象は todo からの着手（Start）と done からの再開（Reopen）の双方であり、候補タスクが現在 batch（`batch-plan.json` の宣言順で最先行の、未 commit の member を残す batch）の member であることを要求し、後続 batch のタスクは現在 batch の commit 成立まで遷移を拒否する。宣言に不在の settle 済みタスクは member ではないため Reopen も拒否され、再開には impl-planner が当該タスクを現在 batch の member として宣言し直すこと（宣言の更新が先、遷移が後）が必要である。すでに閉じた batch の member の Reopen も現在 batch でないため同じく拒否される。skipped からの再開は ResetToTodo → Start を経るため既存の判定対象であり、追加の判定点を要しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "4d49b063426ee76f5197274ec3f3956fdf38343e345f12de9cc4b2b453ac6587",
+      "evidence_hash": "fe21877e227da9e580b0d988448a076149759312fa091267a9ff4d5b84eedf8a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "先行寄与が 0 の scope では見積りの大小によらず admit し、先行寄与が 0 でない scope で合計が ceiling を超えるなら遷移を拒否して現在 batch をそのタスク境界で早期に閉じる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TaskTransitionOutcome"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-10",
+          "text_label": "同遷移に実測ガードを組み込む。候補タスクが見積りを申告する scope ごとに、先行寄与（HEAD 起点の実測 per-scope diff + 現在 in_progress の member の申告見積りの和）に候補タスクの申告見積りを加えた合計を resolved ceiling と比較する。先行寄与が 0 の scope では見積りの大小によらず admit し、先行寄与が 0 でない scope で合計が ceiling を超えるなら遷移を拒否して現在 batch をそのタスク境界で早期に閉じる。候補が積み増さない scope は照合対象外であり、その scope の既超過は遷移を妨げない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "4d49b063426ee76f5197274ec3f3956fdf38343e345f12de9cc4b2b453ac6587",
+      "evidence_hash": "66c2f1e0b75dbae5b1f2942d4e0faf979af317f065d8830159c4ccf2b0c14f65",
+      "verdict": {
+        "kind": "pass",
+        "citation": "現在 batch（宣言順で最先行の、未 commit の member を残す batch）に属さないタスクの todo → in_progress 遷移が拒否され"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TaskTransitionOutcome"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-10",
+          "text_label": "現在 batch（宣言順で最先行の、未 commit の member を残す batch）に属さないタスクの todo → in_progress 遷移が拒否され、後続 batch のタスクは現在 batch の commit 成立後に遷移できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "4d49b063426ee76f5197274ec3f3956fdf38343e345f12de9cc4b2b453ac6587",
+      "evidence_hash": "7d1d0c87ceb7837599b360b0e7e84b3fdcceb452428f7fe7d724184a4a97f7a0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "先行寄与が 0 でない scope で「先行寄与 + 候補タスクの申告見積り」が resolved ceiling を超える場合に遷移が拒否される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TaskTransitionOutcome"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-12",
+          "text_label": "先行寄与が 0 でない scope で「先行寄与 + 候補タスクの申告見積り」が resolved ceiling を超える場合に遷移が拒否される。候補タスクが見積りを申告しない scope は照合対象外であり、その scope の既超過は遷移を妨げない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "4d49b063426ee76f5197274ec3f3956fdf38343e345f12de9cc4b2b453ac6587",
+      "evidence_hash": "961f2dbce1da968ef17ae6f95edffe20e0ffad14f2779a842038595cf31e4bb0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "AC-10（現在 batch 非 member の拒否）、AC-11（先行寄与 0 の scope の admit）、AC-12（先行寄与ありの合計超過による拒否）、AC-13（見積り欠落の error）、AC-23（未実在 scope 名の error）の各判定が Reopen 候補に対しても同じ結果で適用される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TaskTransitionOutcome"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-27",
+          "text_label": "宣言済みタスクの Reopen が Start と同一の判定式で判定される: AC-10（現在 batch 非 member の拒否）、AC-11（先行寄与 0 の scope の admit）、AC-12（先行寄与ありの合計超過による拒否）、AC-13（見積り欠落の error）、AC-23（未実在 scope 名の error）の各判定が Reopen 候補に対しても同じ結果で適用される。したがって宣言済み settle 済みタスクの Reopen は、その所属 batch が現在 batch である場合に限り通り、すでに閉じた batch の member であれば拒否される。判定式は変わらず、広がるのは判定対象の遷移集合のみである。"
+        }
+      }
+    },
+    {
+      "claim_hash": "df43ced3b9d6cbb01bc1fd806d39c7462bf3c31a55b83005d6f7c0a86d52f68a",
+      "evidence_hash": "b37a6e46c2e61d04067a1e3d5768cf0bf32d08ac8e339b479b2db31f0ba7ce51",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Phase 3 の終端 gate として、宣言された各 batch について member task 見積りの per-scope Σ（`production_lines + test_lines`）を `diff_ceiling_for_scope` の解決値と照合する binary check を追加する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "BatchPlanCheckService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "Phase 3 の終端 gate として、宣言された各 batch について member task 見積りの per-scope Σ（`production_lines + test_lines`）を `diff_ceiling_for_scope` の解決値と照合する binary check を追加する。超過は fail-closed で Phase 3 を完了させず、免除は当該 scope の寄与者が理由付き超過タスク 1 件のみの場合に限る。超過は scope 別に判定し、同じ batch でも他 scope の Σ は通常どおり検査する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "df43ced3b9d6cbb01bc1fd806d39c7462bf3c31a55b83005d6f7c0a86d52f68a",
+      "evidence_hash": "ad044a24bd9e64f1446a89b3482e2ea5aa0363d48eb18993c2ba48f1f0c50637",
+      "verdict": {
+        "kind": "pass",
+        "citation": "同 gate が cross-file の構造検査もあわせて行う: `impl-plan.json` の未 settle タスク（todo / in_progress）がそれぞれちょうど 1 つの batch に属す / 見積りと batch member の task id が実在のタスクを指す / 依存元と依存先の双方が宣言に含まれる（したがって双方が未 settle の）依存辺について、依存先タスクの所属 batch が依存元タスクの所属 batch と同一であるか `batches[]` の宣言順でそれより先行する / 超過タスクがその超過 scope について batch 内唯一の寄与者である / 見積りが宣言する main scope 名が review scope 設定の設定済み scope 集合に実在する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "BatchPlanCheckService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "同 gate が cross-file の構造検査もあわせて行う: `impl-plan.json` の未 settle タスク（todo / in_progress）がそれぞれちょうど 1 つの batch に属す / 見積りと batch member の task id が実在のタスクを指す / 依存元と依存先の双方が宣言に含まれる（したがって双方が未 settle の）依存辺について、依存先タスクの所属 batch が依存元タスクの所属 batch と同一であるか `batches[]` の宣言順でそれより先行する / 超過タスクがその超過 scope について batch 内唯一の寄与者である / 見積りが宣言する main scope 名が review scope 設定の設定済み scope 集合に実在する。無所属の検査は未 settle タスクにのみ適用し、settle 済みタスクがどの batch にも属さないことは違反として報告しない。task id の実在検査は settle 状態を問わず宣言されたすべての id に適用する。依存辺の検査の入力は `impl-plan.json` の依存宣言と `batches[]` のみであり、`batch-plan.json` 側に新しい宣言フィールドを要求しない。依存を宣言していないタスク対は検査の対象外である。いずれかの端が settle 済みで宣言に含まれない依存辺も順序検査の対象外とし、無検査で通す — 宣言に不在の端は所属 batch を解決する手段がなく、また settle 済みの端は既に delivered であって「後続 batch」になり得ないため、この除外によって順序保証は失われない。scope 名の照合では、実在しない名前を fail-closed で拒否し graceful skip を設けない。予約名 `other` は暗黙 scope として常に有効である。"
+        }
+      }
+    },
+    {
+      "claim_hash": "df43ced3b9d6cbb01bc1fd806d39c7462bf3c31a55b83005d6f7c0a86d52f68a",
+      "evidence_hash": "124fd9e53dd13fb3a968f9e2349cd276d067b5be9d2104dcec09e2d544526c63",
+      "verdict": {
+        "kind": "pass",
+        "citation": "宣言された batch の per-scope Σ が resolved ceiling を超える `batch-plan.json` に対し、Phase 3 の binary check が fail-closed で ERROR を返す。当該 scope の寄与者が非空の分解不能理由を持つタスク 1 件のみである場合は通す。同じ batch の他 scope の Σ は通常どおり検査される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "BatchPlanCheckService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "宣言された batch の per-scope Σ が resolved ceiling を超える `batch-plan.json` に対し、Phase 3 の binary check が fail-closed で ERROR を返す。当該 scope の寄与者が非空の分解不能理由を持つタスク 1 件のみである場合は通す。同じ batch の他 scope の Σ は通常どおり検査される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "df43ced3b9d6cbb01bc1fd806d39c7462bf3c31a55b83005d6f7c0a86d52f68a",
+      "evidence_hash": "066ac434f24eeed8fec277e7f1ba298088024a7eed5fe45b3a7bdbac54505a4f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 batch にも属さない未 settle タスク、実在しないタスクを指す task id、依存元と依存先の双方が宣言に含まれ、依存先の所属 batch が依存元タスクの所属 batch より後にある依存辺、超過タスクがその超過 scope の唯一の寄与者でない batch、設定済み scope 集合に存在しない main scope 名を宣言する見積り — について、同 check が ERROR を返す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "BatchPlanCheckService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "cross-file 構造違反のそれぞれ — どの batch にも属さない未 settle タスク、実在しないタスクを指す task id、依存元と依存先の双方が宣言に含まれ、依存先の所属 batch が依存元タスクの所属 batch より後にある依存辺、超過タスクがその超過 scope の唯一の寄与者でない batch、設定済み scope 集合に存在しない main scope 名を宣言する見積り — について、同 check が ERROR を返す。どの batch にも属さない settle 済みタスクは同 check の結果を変えない。実在しない task id は宣言が指すタスクの settle 状態を問わず ERROR になる。依存を宣言していないタスク対の batch 割当と、いずれかの端が settle 済みで宣言に含まれない依存辺は、いずれも同 check の結果を変えない。予約名 `other` を宣言する見積りは scope 名の照合で ERROR にならない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "262b520d21cc53f6446a2f58286ed800e44029964083971d4620e7b9bd1531d3",
+      "evidence_hash": "b201244cd4cf43bf195d409a404b70aaf0886be11929d946b3a4b78bd2285128",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`track/items/<id>/batch-plan.json` を Phase 3 の第 4 の終端計画成果物として新設する。書き手は impl-planner のみ（1 file = 1 writer）で、admission を判定する CLI は読むだけである。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "BatchPlanReaderPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "`track/items/<id>/batch-plan.json` を Phase 3 の第 4 の終端計画成果物として新設する。書き手は impl-planner のみ（1 file = 1 writer）で、admission を判定する CLI は読むだけである。Phase 3 の authoring は task 分解 → spec カバレッジ → 契約帰属 → 見積り → batch 編成の依存順に進み、各ファイルを一回書きで完結させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "262b520d21cc53f6446a2f58286ed800e44029964083971d4620e7b9bd1531d3",
+      "evidence_hash": "8bfbb4a44c03d16f707d4ce292a447b6392217fa2b71aa6e3258b041a77b36d9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`track/items/<id>/batch-plan.json` が Phase 3 の計画成果物として存在し、その書き手が impl-planner に限定されている（peer capability 契約の writes-forbidden 列に列挙され、admission を判定する CLI は読み取りのみ行う）。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "BatchPlanReaderPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`track/items/<id>/batch-plan.json` が Phase 3 の計画成果物として存在し、その書き手が impl-planner に限定されている（peer capability 契約の writes-forbidden 列に列挙され、admission を判定する CLI は読み取りのみ行う）。"
+        }
+      }
+    },
+    {
+      "claim_hash": "262b520d21cc53f6446a2f58286ed800e44029964083971d4620e7b9bd1531d3",
+      "evidence_hash": "814fd50af36666bbcb6af7cfbc049b31721dc7529805489155dac6b732621da9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存成果物との互換が読み取り側で保たれ（schema 1 の `impl-plan.json` が引き続き decode でき、active でない track の registry / views 描画が壊れない）"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "BatchPlanReaderPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "既存成果物との互換が読み取り側で保たれ（schema 1 の `impl-plan.json` が引き続き decode でき、active でない track の registry / views 描画が壊れない）、既存 track 成果物が再検証されない。gate 系の検証対象は active track に限られ、導入後の active track で `batch-plan.json` が欠落している場合は error になる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b749246ac374bcb7d78236b365f26a9f0f1e4475045453b911b7ebdda4ecd1ce",
+      "evidence_hash": "814fd50af36666bbcb6af7cfbc049b31721dc7529805489155dac6b732621da9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "gate 系の検証対象は active track に限られ"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "BranchReaderPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "既存成果物との互換が読み取り側で保たれ（schema 1 の `impl-plan.json` が引き続き decode でき、active でない track の registry / views 描画が壊れない）、既存 track 成果物が再検証されない。gate 系の検証対象は active track に限られ、導入後の active track で `batch-plan.json` が欠落している場合は error になる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b749246ac374bcb7d78236b365f26a9f0f1e4475045453b911b7ebdda4ecd1ce",
+      "evidence_hash": "2f82925a7b0573a432f285e47826c03648c9644ba700aea8ab5fd2e63a2bdb3e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新 gate は導入後の active track にのみ適用し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "BranchReaderPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-09",
+          "text_label": "遡及なし。新 gate は導入後の active track にのみ適用し、active track での `batch-plan.json` 欠落は error とする。既存 track 成果物は歴史記録として再検証しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c6e4915d6beece77a3f7d82b9ba740af01f3d77951748b02c2fa1b842e39e22f",
+      "evidence_hash": "032b684617147b7908220c571b6c30548caea06250737a91e80a685d7ac260a1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "照合は repository の読み取りを要するため usecase の port と、track 成果物が置かれた repository を items_dir 起点で解決する infrastructure adapter が担い、domain は I/O を持たず検証結果を入力として受け取る。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "CommitRecordVerifierPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-22",
+          "text_label": "commit hash を書くタスク状態遷移に記録時の repository 照合を組み込む。対象は hash を伴う完了記録（`Complete`）と後からの埋め戻し（`BackfillHash`）の双方であり、記録経路による例外は設けない。与えられた hash が当該 repository に commit object として実在し、かつ HEAD の祖先であることを要求する。満たさない記録は error として拒否し状態を一切書き換えない — `impl-plan.json` は遷移前のまま残り、部分適用も graceful skip も生じない。repository の読み取り自体が失敗して検証を実行できない場合も同じく error とし、検証せずに記録する経路を設けない。hash を伴わない完了記録は照合の対象外である（記録すべき値が存在せず、その done は従来どおり未 settle である）。照合は repository の読み取りを要するため usecase の port と、track 成果物が置かれた repository を items_dir 起点で解決する infrastructure adapter が担い、domain は I/O を持たず検証結果を入力として受け取る。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c6e4915d6beece77a3f7d82b9ba740af01f3d77951748b02c2fa1b842e39e22f",
+      "evidence_hash": "f758bd115cf20e6ed6e85f6f99be77ec8da4ecc823727b29df105cb16a2827a4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "repository の読み取り自体が失敗して検証を実行できない場合のそれぞれについて、hash を伴う完了記録（`Complete`）と埋め戻し（`BackfillHash`）の双方が error になり"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "CommitRecordVerifierPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-28",
+          "text_label": "形式は well-formed だが当該 repository に commit object として実在しない hash、実在するが HEAD の祖先でない hash、および repository の読み取り自体が失敗して検証を実行できない場合のそれぞれについて、hash を伴う完了記録（`Complete`）と埋め戻し（`BackfillHash`）の双方が error になり、永続化された `impl-plan.json` が遷移前と byte 単位で不変である。部分適用も、検証を実行できないことを理由に無検査で記録する graceful skip も存在しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c6e4915d6beece77a3f7d82b9ba740af01f3d77951748b02c2fa1b842e39e22f",
+      "evidence_hash": "96f42364bc8042784632f7b7deb790c79b96f5ce627d9319d125a49770752b75",
+      "verdict": {
+        "kind": "pass",
+        "citation": "当該 repository に実在し HEAD の祖先である hash は、`Complete` / `BackfillHash` のいずれの経路でも従来どおり記録される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "CommitRecordVerifierPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-29",
+          "text_label": "当該 repository に実在し HEAD の祖先である hash は、`Complete` / `BackfillHash` のいずれの経路でも従来どおり記録される。hash を伴わない完了記録は照合の対象外であり、従来どおり記録されてその done は未 settle のままである。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8c533d4d2ee4b3f94da4b8cfe658d4c2eeaa1cbd6c3358c827ad96d3693edc26",
+      "evidence_hash": "ad044a24bd9e64f1446a89b3482e2ea5aa0363d48eb18993c2ba48f1f0c50637",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`impl-plan.json` の未 settle タスク（todo / in_progress）がそれぞれちょうど 1 つの batch に属す"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "PlannedTaskReaderPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "同 gate が cross-file の構造検査もあわせて行う: `impl-plan.json` の未 settle タスク（todo / in_progress）がそれぞれちょうど 1 つの batch に属す / 見積りと batch member の task id が実在のタスクを指す / 依存元と依存先の双方が宣言に含まれる（したがって双方が未 settle の）依存辺について、依存先タスクの所属 batch が依存元タスクの所属 batch と同一であるか `batches[]` の宣言順でそれより先行する / 超過タスクがその超過 scope について batch 内唯一の寄与者である / 見積りが宣言する main scope 名が review scope 設定の設定済み scope 集合に実在する。無所属の検査は未 settle タスクにのみ適用し、settle 済みタスクがどの batch にも属さないことは違反として報告しない。task id の実在検査は settle 状態を問わず宣言されたすべての id に適用する。依存辺の検査の入力は `impl-plan.json` の依存宣言と `batches[]` のみであり、`batch-plan.json` 側に新しい宣言フィールドを要求しない。依存を宣言していないタスク対は検査の対象外である。いずれかの端が settle 済みで宣言に含まれない依存辺も順序検査の対象外とし、無検査で通す — 宣言に不在の端は所属 batch を解決する手段がなく、また settle 済みの端は既に delivered であって「後続 batch」になり得ないため、この除外によって順序保証は失われない。scope 名の照合では、実在しない名前を fail-closed で拒否し graceful skip を設けない。予約名 `other` は暗黙 scope として常に有効である。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8c533d4d2ee4b3f94da4b8cfe658d4c2eeaa1cbd6c3358c827ad96d3693edc26",
+      "evidence_hash": "066ac434f24eeed8fec277e7f1ba298088024a7eed5fe45b3a7bdbac54505a4f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "cross-file 構造違反のそれぞれ — どの batch にも属さない未 settle タスク、実在しないタスクを指す task id、依存元と依存先の双方が宣言に含まれ、依存先の所属 batch が依存元タスクの所属 batch より後にある依存辺、超過タスクがその超過 scope の唯一の寄与者でない batch、設定済み scope 集合に存在しない main scope 名を宣言する見積り — について、同 check が ERROR を返す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "PlannedTaskReaderPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "cross-file 構造違反のそれぞれ — どの batch にも属さない未 settle タスク、実在しないタスクを指す task id、依存元と依存先の双方が宣言に含まれ、依存先の所属 batch が依存元タスクの所属 batch より後にある依存辺、超過タスクがその超過 scope の唯一の寄与者でない batch、設定済み scope 集合に存在しない main scope 名を宣言する見積り — について、同 check が ERROR を返す。どの batch にも属さない settle 済みタスクは同 check の結果を変えない。実在しない task id は宣言が指すタスクの settle 状態を問わず ERROR になる。依存を宣言していないタスク対の batch 割当と、いずれかの端が settle 済みで宣言に含まれない依存辺は、いずれも同 check の結果を変えない。予約名 `other` を宣言する見積りは scope 名の照合で ERROR にならない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8c533d4d2ee4b3f94da4b8cfe658d4c2eeaa1cbd6c3358c827ad96d3693edc26",
+      "evidence_hash": "97351d2ef276ebeb29381626a8ca3cd53d267ea8d3acfccb63bdf24b7cbb5232",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`batch-plan.json` が宣言を要求する対象を未 settle のタスク（todo / in_progress）に限る。settle 済みのタスク — commit 記録を伴う done、または skipped。commit 記録のない done は未 settle であり要求対象に含まれる — の宣言は任意とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "PlannedTaskReaderPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-21",
+          "text_label": "`batch-plan.json` が宣言を要求する対象を未 settle のタスク（todo / in_progress）に限る。settle 済みのタスク — commit 記録を伴う done、または skipped。commit 記録のない done は未 settle であり要求対象に含まれる — の宣言は任意とする。settle の判定は遷移時の admission が用いる既存の定義をそのまま使い、新しい状態概念を導入しない。任意は免除ではなく、宣言された settle 済みタスクは見積り Σ の照合・単独寄与者免除・task id の実在検査の対象として未 settle タスクと同じに扱う。宣言を禁止しない理由は、現在 batch の解決が settle 済み member が宣言に残っていることを前提に成立しており、禁止すると commit ごとに Phase 3 の終端成果物を書き換える必要が生じる点にある。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8c533d4d2ee4b3f94da4b8cfe658d4c2eeaa1cbd6c3358c827ad96d3693edc26",
+      "evidence_hash": "7c66cb5b1e78e59af558336640b0e7b07f5e3fcb411c984363b1bd3d1d972f52",
+      "verdict": {
+        "kind": "pass",
+        "citation": "残作業のみを宣言する `batch-plan.json`（settle 済みタスクの宣言を一切含まず、未 settle タスクだけを batch に編成したもの）が Phase 3 の binary check を通過し、その宣言に含まれる todo タスクの in_progress 遷移が membership 検査で拒否されない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "PlannedTaskReaderPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-24",
+          "text_label": "残作業のみを宣言する `batch-plan.json`（settle 済みタスクの宣言を一切含まず、未 settle タスクだけを batch に編成したもの）が Phase 3 の binary check を通過し、その宣言に含まれる todo タスクの in_progress 遷移が membership 検査で拒否されない。settle 済みタスクが宣言に不在であること自体は、Phase 3 gate の判定結果も、宣言に含まれるタスクの遷移の admission も error にしない。不在の settle 済みタスク自身の再入（Reopen）はこの主張の対象外であり、AC-26 の判定（拒否）に従う。`batch-plan.json` 自体の不在は従来どおり error のままである。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0ea8fc52fa1b103b6a3ef9c5b5a32bda2e3497a1a3c6a836b84df9284c0113bf",
+      "evidence_hash": "b37a6e46c2e61d04067a1e3d5768cf0bf32d08ac8e339b479b2db31f0ba7ce51",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Phase 3 の終端 gate として、宣言された各 batch について member task 見積りの per-scope Σ（`production_lines + test_lines`）を `diff_ceiling_for_scope` の解決値と照合する binary check を追加する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "ScopeConfigReaderPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "Phase 3 の終端 gate として、宣言された各 batch について member task 見積りの per-scope Σ（`production_lines + test_lines`）を `diff_ceiling_for_scope` の解決値と照合する binary check を追加する。超過は fail-closed で Phase 3 を完了させず、免除は当該 scope の寄与者が理由付き超過タスク 1 件のみの場合に限る。超過は scope 別に判定し、同じ batch でも他 scope の Σ は通常どおり検査する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0ea8fc52fa1b103b6a3ef9c5b5a32bda2e3497a1a3c6a836b84df9284c0113bf",
+      "evidence_hash": "aee51e5b7039a93c2ee15154052d037c426db95ca2dacd9edbd04507b10804ab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "設定済みで per-scope 上限も global 既定も持たない scope と予約名 `other` の 2 通りに限られる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "ScopeConfigReaderPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "ceiling が解決されない状態が、設定済みで per-scope 上限も global 既定も持たない scope と予約名 `other` の 2 通りに限られる。この 2 通りについては Σ の照合が行われず、その scope の合計値の大小が Phase 3 gate の結果を変えない。設定済み scope 集合に存在しない名前から「照合されない」状態に至る第 3 の経路は存在せず、その名前は AC-07 の照合で ERROR になる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e6da3114ceb3a4518d2ccde0348fba5ab306c718a8607974749591f22860c2d4",
+      "evidence_hash": "fe21877e227da9e580b0d988448a076149759312fa091267a9ff4d5b84eedf8a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "同遷移に実測ガードを組み込む。候補タスクが見積りを申告する scope ごとに、先行寄与（HEAD 起点の実測 per-scope diff + 現在 in_progress の member の申告見積りの和）を"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "ScopeDiffMeasurePort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-10",
+          "text_label": "同遷移に実測ガードを組み込む。候補タスクが見積りを申告する scope ごとに、先行寄与（HEAD 起点の実測 per-scope diff + 現在 in_progress の member の申告見積りの和）に候補タスクの申告見積りを加えた合計を resolved ceiling と比較する。先行寄与が 0 の scope では見積りの大小によらず admit し、先行寄与が 0 でない scope で合計が ceiling を超えるなら遷移を拒否して現在 batch をそのタスク境界で早期に閉じる。候補が積み増さない scope は照合対象外であり、その scope の既超過は遷移を妨げない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e6da3114ceb3a4518d2ccde0348fba5ab306c718a8607974749591f22860c2d4",
+      "evidence_hash": "36de3c230caf1c89f725db2d8afdcfdaed93d43e2193fcfb2a14cc473188aec5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "scope 行数の数え方の正本を workflow 散文から CLI 実装へ移す。定義は既存の実測ガードのものをそのまま採用する: scope の行数 = additions + deletions（base 起点の committed / staged / unstaged を合算）、untracked ファイルは全行数を additions として計上、scope 分類は既存の review scope 分類機構を再利用する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "ScopeDiffMeasurePort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-14",
+          "text_label": "scope 行数の数え方の正本を workflow 散文から CLI 実装へ移す。定義は既存の実測ガードのものをそのまま採用する: scope の行数 = additions + deletions（base 起点の committed / staged / unstaged を合算）、untracked ファイルは全行数を additions として計上、scope 分類は既存の review scope 分類機構を再利用する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e6da3114ceb3a4518d2ccde0348fba5ab306c718a8607974749591f22860c2d4",
+      "evidence_hash": "f0b16ad6cb2e190124ccd9edc7ebef2f843844b7b4b7c1b45e9fdfd260ee7aac",
+      "verdict": {
+        "kind": "pass",
+        "citation": "scope 行数の算出が CLI 側に存在し、additions + deletions の合算、untracked ファイルの全行 additions 計上、既存 review scope 分類機構の再利用という定義で動作する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "ScopeDiffMeasurePort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-17",
+          "text_label": "scope 行数の算出が CLI 側に存在し、additions + deletions の合算、untracked ファイルの全行 additions 計上、既存 review scope 分類機構の再利用という定義で動作する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e6da3114ceb3a4518d2ccde0348fba5ab306c718a8607974749591f22860c2d4",
+      "evidence_hash": "f55f82bc13d835b5a544f567919eb7962a557c5a5996043591be97bee5570bfb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "admission の実測 baseline は per-track の commit 記録に依存し、それが欠落・破損・HEAD の非祖先である場合は base branch へ縮退する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "ScopeDiffMeasurePort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-05",
+          "text_label": "admission の実測 baseline は per-track の commit 記録に依存し、それが欠落・破損・HEAD の非祖先である場合は base branch へ縮退する。縮退は review 対象が広がる安全側であり、本 track が課す遷移判定（何を admit / 拒否するか）はこの縮退の影響を受けない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "470af3adbf4ec94cad0a73a73c8c10dd2afb563edfc37e4b149d092a4db7d52b",
+      "evidence_hash": "a36553b773468155e8afd40fabadf2c2f47ccd898e53f349ef403942e7068b65",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp track transition` の in_progress へ入るすべての遷移に membership 検査を組み込む。対象は todo からの着手（Start）と done からの再開（Reopen）の双方であり、候補タスクが現在 batch（`batch-plan.json` の宣言順で最先行の、未 commit の member を残す batch）の member であることを要求し、後続 batch のタスクは現在 batch の commit 成立まで遷移を拒否する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TaskOperationService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-09",
+          "text_label": "`bin/sotp track transition` の in_progress へ入るすべての遷移に membership 検査を組み込む。対象は todo からの着手（Start）と done からの再開（Reopen）の双方であり、候補タスクが現在 batch（`batch-plan.json` の宣言順で最先行の、未 commit の member を残す batch）の member であることを要求し、後続 batch のタスクは現在 batch の commit 成立まで遷移を拒否する。宣言に不在の settle 済みタスクは member ではないため Reopen も拒否され、再開には impl-planner が当該タスクを現在 batch の member として宣言し直すこと（宣言の更新が先、遷移が後）が必要である。すでに閉じた batch の member の Reopen も現在 batch でないため同じく拒否される。skipped からの再開は ResetToTodo → Start を経るため既存の判定対象であり、追加の判定点を要しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "470af3adbf4ec94cad0a73a73c8c10dd2afb563edfc37e4b149d092a4db7d52b",
+      "evidence_hash": "66c2f1e0b75dbae5b1f2942d4e0faf979af317f065d8830159c4ccf2b0c14f65",
+      "verdict": {
+        "kind": "pass",
+        "citation": "現在 batch（宣言順で最先行の、未 commit の member を残す batch）に属さないタスクの todo → in_progress 遷移が拒否され、後続 batch のタスクは現在 batch の commit 成立後に遷移できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TaskOperationService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-10",
+          "text_label": "現在 batch（宣言順で最先行の、未 commit の member を残す batch）に属さないタスクの todo → in_progress 遷移が拒否され、後続 batch のタスクは現在 batch の commit 成立後に遷移できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "470af3adbf4ec94cad0a73a73c8c10dd2afb563edfc37e4b149d092a4db7d52b",
+      "evidence_hash": "ce7db4290c3c3597e07a0360c3e428b7063eb0d072e11cb8056628eb9b8b6736",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`batch-plan.json` 上の見積りが設定済み scope 集合に存在しない main scope 名を宣言しているタスクについて、in_progress へ入る遷移（Start / Reopen のいずれも）が error になる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TaskOperationService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-23",
+          "text_label": "`batch-plan.json` 上の見積りが設定済み scope 集合に存在しない main scope 名を宣言しているタスクについて、in_progress へ入る遷移（Start / Reopen のいずれも）が error になる。この error は見積り欠落と同格であり、ceiling 未解決として全 admit に落とす縮退も graceful skip も存在しない。予約名 `other` を宣言する見積りはこの判定で error にならない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "470af3adbf4ec94cad0a73a73c8c10dd2afb563edfc37e4b149d092a4db7d52b",
+      "evidence_hash": "7e491e8cd12b3b65cfbe171bfee36beecbcf2de2f3aeb6f200b005ed06ee5362",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`batch-plan.json` の宣言に不在の settle 済みタスクについて、done → in_progress（Reopen）が拒否される。拒否は fail-closed であり、宣言に不在であることを理由に無判定で通す graceful skip は存在しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TaskOperationService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-26",
+          "text_label": "`batch-plan.json` の宣言に不在の settle 済みタスクについて、done → in_progress（Reopen）が拒否される。拒否は fail-closed であり、宣言に不在であることを理由に無判定で通す graceful skip は存在しない。再開が通るのは impl-planner が当該タスクを現在 batch の member として宣言し直した後に限る。skipped からの再開は ResetToTodo → Start を経る既存の判定対象であり、この判定点の追加を要しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "470af3adbf4ec94cad0a73a73c8c10dd2afb563edfc37e4b149d092a4db7d52b",
+      "evidence_hash": "961f2dbce1da968ef17ae6f95edffe20e0ffad14f2779a842038595cf31e4bb0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "宣言済みタスクの Reopen が Start と同一の判定式で判定される: AC-10（現在 batch 非 member の拒否）、AC-11（先行寄与 0 の scope の admit）、AC-12（先行寄与ありの合計超過による拒否）、AC-13（見積り欠落の error）、AC-23（未実在 scope 名の error）の各判定が Reopen 候補に対しても同じ結果で適用される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TaskOperationService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-27",
+          "text_label": "宣言済みタスクの Reopen が Start と同一の判定式で判定される: AC-10（現在 batch 非 member の拒否）、AC-11（先行寄与 0 の scope の admit）、AC-12（先行寄与ありの合計超過による拒否）、AC-13（見積り欠落の error）、AC-23（未実在 scope 名の error）の各判定が Reopen 候補に対しても同じ結果で適用される。したがって宣言済み settle 済みタスクの Reopen は、その所属 batch が現在 batch である場合に限り通り、すでに閉じた batch の member であれば拒否される。判定式は変わらず、広がるのは判定対象の遷移集合のみである。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c2f044043613bad7cd084b8b8735fa47544812557815a87c8bacc07bb18c54ad",
+      "evidence_hash": "c0188369b660bb2cf7e9f5ff9db301aee3e08825ea3b8d160462c09421b9549f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "admission 判定はタスク状態遷移の単一経路上に置き、どの workflow / capability から到達しても迂回できない状態を保つ。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TransitionTaskUseCase"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-10",
+          "text_label": "admission 判定はタスク状態遷移の単一経路上に置き、どの workflow / capability から到達しても迂回できない状態を保つ。implementer 側の着手前 precondition が、遷移を経ない実装 dispatch という迂回経路を塞ぐ。"
+        }
+      }
+    }
+  ]
+}

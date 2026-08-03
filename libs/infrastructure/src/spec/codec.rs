@@ -342,7 +342,10 @@ fn signal_counts_from_dto(dto: SignalCountsDto) -> SignalCounts {
 /// Returns `SpecCodecError::InvalidField` if any file path is not valid UTF-8.
 pub fn encode(doc: &SpecDocument) -> Result<String, SpecCodecError> {
     let dto = spec_document_to_dto(doc)?;
-    Ok(serde_json::to_string_pretty(&dto)?)
+    // Serialize through Value so nested requirement and reference objects use
+    // the canonical key order before pretty-printing.
+    let value = serde_json::to_value(&dto)?;
+    Ok(serde_json::to_string_pretty(&value)?)
 }
 
 fn spec_document_to_dto(doc: &SpecDocument) -> Result<SpecDocumentDto, SpecCodecError> {
@@ -1083,6 +1086,20 @@ mod tests {
         let doc = decode(MINIMAL_JSON).unwrap();
         let json = encode(&doc).unwrap();
         assert!(json.contains('\n'));
+    }
+
+    #[test]
+    fn test_encode_identical_spec_returns_deterministic_json_bytes() {
+        let doc = decode(FULL_JSON).unwrap();
+
+        let first = encode(&doc).unwrap();
+        let second = encode(&doc).unwrap();
+
+        assert_eq!(first, second);
+        assert!(
+            first.contains("\"scope\": {\n    \"in_scope\": [\n      {\n        \"adr_refs\":"),
+            "nested requirement keys must be canonicalized: {first}"
+        );
     }
 
     #[test]

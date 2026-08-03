@@ -104,14 +104,22 @@ pub(super) fn save_trigger_state(state: &TriggerState) -> Result<(), Composition
         })?;
     }
     guard_trigger_state_path(&path, &root)?;
-    let json = serde_json::to_string_pretty(state).map_err(|e| {
-        CompositionError::Infrastructure(format!("failed to serialize trigger state: {e}"))
-    })?;
+    let json = serialize_trigger_state(state)?;
     fs::write(&path, json).map_err(|e| {
         CompositionError::Infrastructure(format!("failed to write {}: {e}", path.display()))
     })?;
     println!("[OK] Saved trigger state to {}", path.display());
     Ok(())
+}
+
+/// Serializes trigger state with canonical key order before it is persisted.
+fn serialize_trigger_state(state: &TriggerState) -> Result<String, CompositionError> {
+    let value = serde_json::to_value(state).map_err(|e| {
+        CompositionError::Infrastructure(format!("failed to serialize trigger state: {e}"))
+    })?;
+    serde_json::to_string_pretty(&value).map_err(|e| {
+        CompositionError::Infrastructure(format!("failed to serialize trigger state: {e}"))
+    })
 }
 
 pub(super) fn load_trigger_state(track_id: &str) -> Result<Option<TriggerState>, CompositionError> {
@@ -785,7 +793,10 @@ mod tests {
     use infrastructure::gh_cli::{GhClient, GhError, PrCheckRecord};
 
     use super::test_support::poll_review_for_cycle;
-    use super::{PollReviewResult, guard_trigger_state_path, trigger_state_path_under_root};
+    use super::{
+        PollReviewResult, TriggerState, guard_trigger_state_path, serialize_trigger_state,
+        trigger_state_path_under_root,
+    };
 
     // ------------------------------------------------------------------
     // Minimal fake GhClient for poll tests
@@ -907,6 +918,32 @@ mod tests {
         let error = trigger_state_path_under_root(sandbox.path(), "../outside").unwrap_err();
 
         assert!(error.to_string().contains("invalid trigger-state track ID"));
+    }
+
+    #[test]
+    fn test_save_trigger_state_with_populated_state_produces_canonical_stable_json() {
+        let state = TriggerState {
+            pr_number: "1234".to_owned(),
+            trigger_timestamp: "2026-08-02T03:04:05Z".to_owned(),
+            head_hash: Some("0123456789abcdef".to_owned()),
+            track_id: "test-track-2026".to_owned(),
+        };
+
+        let first = serialize_trigger_state(&state).unwrap();
+        let second = serialize_trigger_state(&state).unwrap();
+
+        assert_eq!(first, second, "identical trigger states must produce identical bytes");
+        assert_eq!(
+            first,
+            concat!(
+                "{\n",
+                "  \"head_hash\": \"0123456789abcdef\",\n",
+                "  \"pr_number\": \"1234\",\n",
+                "  \"track_id\": \"test-track-2026\",\n",
+                "  \"trigger_timestamp\": \"2026-08-02T03:04:05Z\"\n",
+                "}"
+            )
+        );
     }
 
     // ------------------------------------------------------------------

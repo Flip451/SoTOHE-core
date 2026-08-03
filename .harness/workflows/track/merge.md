@@ -43,6 +43,13 @@ every protected source (every source with a ledger record), from its protection-
 its current terminal bytes, with per-record provenance and the adjacent diff for every
 `non-semantic-fix` record. This audit is required even when every terminal diff is empty.
 
+The `/track:merge` invocation is the single approval for the normal merge path. The terminal
+audit is a factual presentation and an adjudication/recovery gate, not a second yes/no merge
+confirmation: when it completes cleanly, continue directly to Step 2 without asking for another
+approval. A user decision is required only when the audit reveals a real misclassification, a
+post-outcome head-OID mismatch invalidates that audit, or the strict-gate triage routes a
+guardian-confirmed admitted draft into its recovery procedure.
+
 If the user adjudicates a record as a misclassified semantic change, complete the corrective
 restoration route before continuing. Any audit-triggered mutation, including an adoption or
 rejection recovery, invalidates the presentation: re-run the required review / commit / push /
@@ -56,6 +63,10 @@ Immediately before invoking the wrapper, re-resolve the PR head OID (`gh pr view
 --json headRefOid`) and verify it still equals the Step 0-verified OID whose bytes the Step 1
 audit presented. A mismatch means the audited bytes are no longer the merge candidate: abort
 without invoking the wrapper and re-invoke this workflow from Step 0 for a fresh audit.
+
+After that clean audit and head-OID verification, invoke the wrapper without an additional
+confirmation prompt. It waits for remote CI to become green and then merges; a failing check or
+timeout still stops the workflow fail-closed.
 
 The current wrapper re-fetches the remote ref while polling and merging without binding the
 audited OID, so a head change inside that window is not rejected mechanically. This residual

@@ -6,6 +6,9 @@ extern crate self as infrastructure;
 pub mod adr_baseline;
 pub mod adr_decision;
 pub mod agent_profiles;
+pub mod batch_plan_codec;
+pub mod batch_plan_reader;
+pub mod branch_reader;
 pub mod branch_strategy;
 pub use branch_strategy::{
     BranchStrategyConfigError, JsonConfigBranchStrategyAdapter, SnapshotBranchStrategyAdapter,
@@ -15,6 +18,7 @@ pub mod capability_exec;
 pub mod code_profile_builder;
 pub mod codex_common;
 pub mod codex_runtime;
+pub mod commit_record_verifier;
 pub mod conventions;
 pub mod conventions_resolve;
 pub mod demo;
@@ -26,20 +30,26 @@ pub mod git_cli;
 pub mod impl_catalog_signal_reader;
 pub mod impl_plan_codec;
 pub mod impl_plan_reader;
+mod lexical_path;
+pub mod planned_task_reader;
 pub mod pr;
 pub mod pr_review;
 pub mod provider_session;
 pub mod ref_verify;
+pub mod review_scope_config_reader;
 pub mod review_v2;
+mod sanitized_failure;
 pub mod schema_export;
 pub mod schema_export_codec;
 #[cfg(test)]
 mod schema_export_tests;
+pub mod scope_diff_measure;
 #[cfg(feature = "semantic-dup")]
 pub mod semantic_dup;
 pub mod shell;
 pub mod signal;
 pub mod signal_layer_reader;
+pub mod signal_report;
 pub mod spec;
 pub mod task_contract_codec;
 pub mod task_contract_reader;
@@ -50,6 +60,7 @@ pub mod template_conventions;
 pub mod template_export;
 pub mod test_obligation;
 pub mod track;
+pub(crate) mod track_artifact;
 pub use dry_check::noop_approval::NoOpDryApprovalService;
 pub use dry_check::recording_agent::RecordingDryAgent;
 pub use git_cli::workflow_adapter::FsGitWorkflowAdapter;
@@ -73,6 +84,56 @@ pub use ref_verify::{
     FsRefVerifyAggregateAdapter, FsRefVerifyCheckApprovedAdapter, FsRefVerifyRunAdapter,
 };
 pub use verify_adapter::FsVerifyAdapter;
+
+/// Discovers the repository the items directory belongs to, without letting the
+/// ambient Git environment name a different one, and returns the canonical
+/// anchor it was discovered from.
+///
+/// Anchoring on the argument rather than on the process working directory keeps
+/// one command reading one tree: a call that names `--items-dir` takes its
+/// track artifacts, its configuration and its measured diff from the repository
+/// that directory sits in, not from wherever the process happens to stand. The
+/// isolation closes the other half of the same question — inheriting `GIT_DIR`
+/// would let one repository answer for another — and the anchor comes back with
+/// the repository so the caller can check that what git found actually encloses
+/// the directory it asked about.
+///
+/// There is deliberately no non-isolated counterpart: every consumer of this
+/// discovery decides a gate, and a lane that inherited the environment would be
+/// the one an attacker aims at.
+///
+/// Every component of the supplied path — the items directory and each of its
+/// ancestors — is refused if it is a symlink, before the path is canonicalised:
+/// resolving first would follow any of them into whichever tree it points at.
+///
+/// # Errors
+///
+/// Returns an error when a component of the supplied path is a symlink, when the
+/// items directory cannot be resolved on disk, or when no git repository
+/// encloses it.
+pub(crate) fn discover_isolated_repo_for_items_dir(
+    items_dir: &std::path::Path,
+) -> Result<(crate::git_cli::SystemGitRepo, std::path::PathBuf), std::io::Error> {
+    // Each failure is returned with its cause intact and no path written into it.
+    // Callers report these to an operator, and a rendered path would both leak the
+    // checkout location and bury the distinction between the three causes: the
+    // guard's refusal keeps its own payload, the filesystem's error keeps its kind,
+    // and an absent repository is its own type.
+    crate::track::symlink_guard::reject_symlinks_up_to_root(items_dir)?;
+    let anchor = items_dir.canonicalize()?;
+    let repo = crate::git_cli::SystemGitRepo::discover_from_isolated(&anchor).map_err(|error| {
+        crate::sanitized_failure::sanitized_io_error(match error {
+            // `rev-parse --show-toplevel` exiting nonzero is how git reports that
+            // nothing encloses the directory. Only this command gives that outcome
+            // that meaning, so only this call site states it; git failing to run,
+            // or answering with an empty root, is a different fault and keeps its
+            // own classification.
+            crate::git_cli::GitError::CommandFailed { .. } => "no enclosing git repository",
+            other => crate::sanitized_failure::git_classification(&other),
+        })
+    })?;
+    Ok((repo, anchor))
+}
 
 pub(crate) fn resolve_items_dir_under_current_repo(
     items_dir: &std::path::Path,

@@ -50,8 +50,10 @@ are resolved.
 
 **Step 2: Create track branch**
 
-Derive `<track-id>` from the feature name: kebab-case ASCII + date suffix `YYYY-MM-DD` from
-`date -u +"%Y-%m-%d"`. Then create and switch to the track branch:
+Derive `<track-id>` from the feature name as `<YYYY-MM-DD>-<feature-slug>`: obtain the date
+prefix from `date -u +"%Y-%m-%d"`, convert the feature name to a kebab-case ASCII slug, and
+concatenate them in that order. For example, on 2026-07-31 the feature slug `example-track`
+derives `2026-07-31-example-track`. Then create and switch to the track branch:
 
 ```
 bin/sotp track branch create --items-dir track/items '<track-id>'

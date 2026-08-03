@@ -657,7 +657,7 @@ fn resolve_reviewer_fails_closed_when_reviewer_capability_missing() {
         dir.path(),
         r#"{
   "schema_version": 1,
-  "providers": { "codex": { "label": "Codex CLI" } },
+  "providers": { "codex": { "label": "Codex CLI", "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"] } },
   "capabilities": {}
 }"#,
     );
@@ -679,7 +679,12 @@ fn resolve_reviewer_fails_closed_when_provider_is_unsupported() {
         dir.path(),
         r#"{
   "schema_version": 1,
-  "providers": { "gemini": { "label": "Gemini CLI" } },
+  "providers": {
+    "gemini": {
+      "label": "Gemini CLI",
+      "supported_reasoning_efforts": ["low", "medium", "high"]
+    }
+  },
   "capabilities": {
     "reviewer": { "provider": "gemini", "model": "gemini-2.5-pro", "reasoning_effort": "high", "execution_mode": "typed-pipeline" }
   }
@@ -702,7 +707,12 @@ fn resolve_reviewer_succeeds_for_codex_provider() {
         dir.path(),
         r#"{
   "schema_version": 1,
-  "providers": { "codex": { "label": "Codex CLI" } },
+  "providers": {
+    "codex": {
+      "label": "Codex CLI",
+      "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"]
+    }
+  },
   "capabilities": {
     "reviewer": { "provider": "codex", "model": "gpt-5.4", "reasoning_effort": "high", "execution_mode": "typed-pipeline" }
   }
@@ -723,7 +733,12 @@ fn resolve_reviewer_succeeds_for_claude_provider() {
         dir.path(),
         r#"{
   "schema_version": 1,
-  "providers": { "claude": { "label": "Claude Code" } },
+  "providers": {
+    "claude": {
+      "label": "Claude Code",
+      "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"]
+    }
+  },
   "capabilities": {
     "reviewer": { "provider": "claude", "model": "claude-sonnet-4-6", "reasoning_effort": "high", "execution_mode": "typed-pipeline" }
   }
@@ -745,7 +760,12 @@ fn resolve_reviewer_fast_round_uses_fast_model_from_codex_provider() {
         dir.path(),
         r#"{
   "schema_version": 1,
-  "providers": { "codex": { "label": "Codex CLI" } },
+  "providers": {
+    "codex": {
+      "label": "Codex CLI",
+      "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"]
+    }
+  },
   "capabilities": {
     "reviewer": { "provider": "codex", "model": "gpt-5.4", "fast_model": "gpt-5.4-mini", "reasoning_effort": "xhigh", "fast_reasoning_effort": "low", "execution_mode": "typed-pipeline" }
   }
@@ -771,8 +791,14 @@ fn resolve_reviewer_fast_round_mixed_provider_selects_fast_provider() {
         r#"{
   "schema_version": 1,
   "providers": {
-    "claude": { "label": "Claude Code" },
-    "codex": { "label": "Codex CLI" }
+    "claude": {
+      "label": "Claude Code",
+      "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"]
+    },
+    "codex": {
+      "label": "Codex CLI",
+      "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"]
+    }
   },
   "capabilities": {
     "reviewer": {

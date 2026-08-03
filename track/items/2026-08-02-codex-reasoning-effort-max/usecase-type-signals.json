@@ -1,0 +1,14 @@
+{
+  "declaration_hash": "030157e83809a91548f2c3bb6b4b2d9f44e83e1b7f965013ba8c3d4369e84860",
+  "generated_at": "2026-08-02T04:29:58Z",
+  "implementation_input_hash": "37e5c36d7497e81e17e7958a34d2b46d33acb66486ae51ab9ff61103b566a9fc",
+  "schema_version": 3,
+  "signals": [
+    {
+      "found_type": true,
+      "kind_tag": "enum",
+      "signal": "blue",
+      "type_name": "ReasoningEffort"
+    }
+  ]
+}

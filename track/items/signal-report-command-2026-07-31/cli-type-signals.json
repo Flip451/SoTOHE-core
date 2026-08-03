@@ -1,0 +1,64 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-08-01T05:13:13Z",
+  "declaration_hash": "5e52dd353b2ec567a7652b6d050734da05faa39c4b187488b341a84170f79084",
+  "implementation_input_hash": "f1bf340ae6490f152e66ffd08f560e6e8e6786ee0abf6caa3acaaf8a2e0168d9",
+  "signals": [
+    {
+      "type_name": "SignalCommand",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Debug",
+        "FromArgMatches",
+        "Subcommand"
+      ]
+    },
+    {
+      "type_name": "SignalReportArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Args",
+        "Debug",
+        "FromArgMatches"
+      ]
+    },
+    {
+      "type_name": "SignalReportChainArg",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Copy",
+        "Debug",
+        "Eq",
+        "PartialEq",
+        "ValueEnum"
+      ]
+    },
+    {
+      "type_name": "SignalReportOnlyArg",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Copy",
+        "Debug",
+        "Eq",
+        "PartialEq",
+        "ValueEnum"
+      ]
+    },
+    {
+      "type_name": "cli::commands::signal::execute",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

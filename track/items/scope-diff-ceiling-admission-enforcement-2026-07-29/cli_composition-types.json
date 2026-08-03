@@ -1,0 +1,67 @@
+{
+  "crate_name": "cli_composition",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "batch_plan_driver",
+          "params": [],
+          "receiver": "&self",
+          "returns": "cli_driver::batch_plan::BatchPlanDriver"
+        }
+      ],
+      "type_name": "BatchPlanCompositionRoot"
+    }
+  ],
+  "layer": "cli_composition",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "BatchPlanCompositionRoot",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "BatchPlanCompositionRoot",
+      "trait_ref": "core::default::Default"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "BatchPlanCompositionRoot": {
+      "action": "add",
+      "docs": "Composition root for the batch-plan command family: constructs the batch-plan reader, planned-task reader, scope-config reader and branch-reader adapters, injects the resolve interactor and those readers into the gate interactor, and hands that single service to the driver. Type-design: construction and injection only — it declares no adapter of its own, so no port implementation lives in this layer. Pure DI: batch_plan_driver takes no argument and returns no error, because the items directory travels with the driver input and each adapter resolves paths per call. IN-06, AC-06.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "batch_plan",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/spec.json"
+        }
+      ]
+    }
+  }
+}

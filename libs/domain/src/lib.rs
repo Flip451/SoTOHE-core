@@ -4,6 +4,7 @@
 pub mod adr_baseline;
 pub mod adr_decision;
 pub mod auto_phase;
+pub mod batch_plan;
 pub mod branch_strategy;
 pub mod chain;
 mod decision;
@@ -125,8 +126,8 @@ pub use template_export::{
 };
 pub use timestamp::Timestamp;
 pub use track::{
-    StatusOverride, StatusOverrideKind, TaskStatus, TaskStatusKind, TaskTransition, TrackMetadata,
-    TrackStatus, TrackTask, derive_track_status,
+    FrozenTrackStatus, StatusOverride, StatusOverrideKind, TaskStatus, TaskStatusKind,
+    TaskTransition, TrackMetadata, TrackStatus, TrackTask, derive_track_status,
 };
 
 #[cfg(test)]

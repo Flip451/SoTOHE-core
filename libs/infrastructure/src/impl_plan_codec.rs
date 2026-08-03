@@ -1,14 +1,26 @@
 //! Serde codec for `impl-plan.json` (ImplPlanDocument SSoT).
 //!
 //! Schema version 1: introduced by ADR 2026-04-19-1242 §D1.4.
+//! Schema version 2 adds each task's declared dependencies; both versions are
+//! read and the current version is written, so an existing schema-1 plan keeps
+//! decoding and simply declares no dependencies (IN-19, AC-05, AC-21).
+//!
+//! The current version has one definition, [`domain::IMPL_PLAN_SCHEMA_VERSION`],
+//! which this codec writes and every decoded document reports. Schema 1 is a
+//! read-only wire format and does not survive decoding as a document version.
 //! All DTOs are defined locally with `deny_unknown_fields` to enforce
 //! the strict schema boundary at every nesting level.
 
 use domain::{
-    CommitHash, DomainError, ImplPlanDocument, PlanSection, PlanView, TaskId, TaskStatus,
-    TrackTask, ValidationError,
+    CommitHash, DomainError, IMPL_PLAN_SCHEMA_VERSION, ImplPlanDocument, NonEmptyString,
+    PlanSection, PlanView, TaskId, TaskStatus, TrackTask, ValidationError,
 };
 use serde::{Deserialize, Serialize};
+use serde_json::{Map, Value};
+
+/// The oldest wire schema [`decode`] still reads. It is a read-only legacy
+/// format: no document is ever written at this version.
+const OLDEST_READABLE_SCHEMA_VERSION: u32 = 1;
 
 // ---------------------------------------------------------------------------
 // Error type
@@ -20,7 +32,9 @@ pub enum ImplPlanCodecError {
     #[error("JSON error: {0}")]
     Json(#[from] serde_json::Error),
 
-    #[error("unsupported schema_version: expected 1, got {0}")]
+    #[error(
+        "unsupported schema_version: expected {OLDEST_READABLE_SCHEMA_VERSION} or {IMPL_PLAN_SCHEMA_VERSION}, got {0}"
+    )]
     UnsupportedSchemaVersion(u32),
 
     #[error("validation error: {0}")]
@@ -43,7 +57,51 @@ impl From<ValidationError> for ImplPlanCodecError {
 // DTOs (all with deny_unknown_fields for strict schema enforcement)
 // ---------------------------------------------------------------------------
 
-/// Top-level DTO for `impl-plan.json` (schema_version 1).
+/// Version envelope used to select the strict DTO for the declared wire schema.
+#[derive(Deserialize)]
+struct SchemaVersionEnvelope {
+    schema_version: u32,
+    #[serde(flatten)]
+    _remaining_fields: Map<String, Value>,
+}
+
+/// Top-level DTO for schema-version 1 `impl-plan.json` documents.
+///
+/// Schema 1 has no dependency-declaration field, so its task DTO intentionally
+/// does not include `depends_on`. This lets `deny_unknown_fields` reject a
+/// schema-2 field that is incorrectly supplied under schema version 1.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct ImplPlanDocumentV1Dto {
+    #[serde(rename = "schema_version")]
+    _schema_version: u32,
+    #[serde(default)]
+    tasks: Vec<ImplPlanTaskV1Dto>,
+    plan: ImplPlanPlanDto,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct ImplPlanTaskV1Dto {
+    id: String,
+    description: String,
+    status: String,
+    commit_hash: Option<String>,
+}
+
+impl From<ImplPlanTaskV1Dto> for ImplPlanTaskDto {
+    fn from(dto: ImplPlanTaskV1Dto) -> Self {
+        Self {
+            id: dto.id,
+            description: dto.description,
+            status: dto.status,
+            commit_hash: dto.commit_hash,
+            depends_on: Vec::new(),
+        }
+    }
+}
+
+/// Top-level DTO for schema-version 2 `impl-plan.json` documents.
 ///
 /// `deny_unknown_fields` rejects unrecognised fields at every nesting level
 /// to enforce the schema contract at the codec boundary.
@@ -60,6 +118,11 @@ pub struct ImplPlanDocumentDto {
 ///
 /// `deny_unknown_fields` rejects unrecognised fields to enforce the schema
 /// contract at this nesting level.
+///
+/// `depends_on` is what schema 2 adds (IN-19, AC-21). Within schema 2, its serde
+/// default makes an omitted list equivalent to an empty one; the empty case is
+/// not written back out. Its element type is the domain task identifier through
+/// a field codec rather than a raw `String`.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ImplPlanTaskDto {
@@ -68,6 +131,30 @@ pub struct ImplPlanTaskDto {
     pub status: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub commit_hash: Option<String>,
+    #[serde(
+        default,
+        skip_serializing_if = "Vec::is_empty",
+        serialize_with = "serialize_task_ids",
+        deserialize_with = "deserialize_task_ids"
+    )]
+    pub depends_on: Vec<TaskId>,
+}
+
+fn serialize_task_ids<S>(task_ids: &[TaskId], serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: serde::Serializer,
+{
+    serializer.collect_seq(task_ids.iter().map(TaskId::as_ref))
+}
+
+fn deserialize_task_ids<'de, D>(deserializer: D) -> Result<Vec<TaskId>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    use serde::de::Error as _;
+
+    let raw = Vec::<String>::deserialize(deserializer)?;
+    raw.into_iter().map(|id| TaskId::try_new(id).map_err(D::Error::custom)).collect()
 }
 
 /// DTO for the `plan` field in `impl-plan.json`.
@@ -104,20 +191,31 @@ pub struct ImplPlanSectionDto {
 
 /// Deserializes an `impl-plan.json` string into an [`ImplPlanDocument`].
 ///
+/// Both schema versions are accepted: a schema-1 document declares no task
+/// dependencies and reads as declaring none (IN-19, AC-05, AC-21).
+///
 /// # Errors
 ///
 /// Returns `ImplPlanCodecError::Json` if the JSON is malformed.
-/// Returns `ImplPlanCodecError::UnsupportedSchemaVersion` if `schema_version != 1`.
-/// Returns `ImplPlanCodecError::Validation` if any domain type construction fails.
+/// Returns `ImplPlanCodecError::UnsupportedSchemaVersion` if `schema_version`
+/// is neither 1 nor 2.
+/// Returns `ImplPlanCodecError::Validation` if any domain type construction
+/// fails, including the declared-dependency invariants the plan document
+/// enforces (IN-20, AC-22).
 pub fn decode(json: &str) -> Result<ImplPlanDocument, ImplPlanCodecError> {
-    let dto: ImplPlanDocumentDto = serde_json::from_str(json)?;
-
-    if dto.schema_version != 1 {
-        return Err(ImplPlanCodecError::UnsupportedSchemaVersion(dto.schema_version));
-    }
-
-    let tasks = tasks_from_dtos(dto.tasks)?;
-    let plan = plan_from_dto(dto.plan)?;
+    let envelope: SchemaVersionEnvelope = serde_json::from_str(json)?;
+    let (tasks, plan) = match envelope.schema_version {
+        OLDEST_READABLE_SCHEMA_VERSION => {
+            let dto: ImplPlanDocumentV1Dto = serde_json::from_str(json)?;
+            let tasks = tasks_from_dtos(dto.tasks.into_iter().map(Into::into).collect())?;
+            (tasks, plan_from_dto(dto.plan)?)
+        }
+        IMPL_PLAN_SCHEMA_VERSION => {
+            let dto: ImplPlanDocumentDto = serde_json::from_str(json)?;
+            (tasks_from_dtos(dto.tasks)?, plan_from_dto(dto.plan)?)
+        }
+        version => return Err(ImplPlanCodecError::UnsupportedSchemaVersion(version)),
+    };
 
     Ok(ImplPlanDocument::new(tasks, plan)?)
 }
@@ -127,7 +225,10 @@ fn tasks_from_dtos(dtos: Vec<ImplPlanTaskDto>) -> Result<Vec<TrackTask>, ImplPla
         .map(|t| {
             let task_id = TaskId::try_new(&t.id)?;
             let status = parse_task_status(&t.status, t.commit_hash.as_deref())?;
-            TrackTask::with_status(task_id, t.description, status).map_err(|e| e.into())
+            let description = NonEmptyString::try_new(t.description).map_err(|_| {
+                ImplPlanCodecError::Validation("task description is empty".to_owned())
+            })?;
+            Ok(TrackTask::with_dependencies(task_id, description, status, t.depends_on))
         })
         .collect()
 }
@@ -201,11 +302,17 @@ fn plan_section_from_dto(dto: ImplPlanSectionDto) -> Result<PlanSection, ImplPla
 /// Returns `ImplPlanCodecError::Json` if serialization fails.
 pub fn encode(doc: &ImplPlanDocument) -> Result<String, ImplPlanCodecError> {
     let dto = impl_plan_to_dto(doc);
-    Ok(serde_json::to_string_pretty(&dto)?)
+    // Serialize through Value so every object, including nested plan entries,
+    // is canonicalized before pretty-printing.
+    let value = serde_json::to_value(&dto)?;
+    Ok(serde_json::to_string_pretty(&value)?)
 }
 
 fn impl_plan_to_dto(doc: &ImplPlanDocument) -> ImplPlanDocumentDto {
     ImplPlanDocumentDto {
+        // The writer always emits the current wire schema, whatever version the
+        // document was read from (IN-19, AC-21) — and that is the same version
+        // the document itself reports, because there is one definition of it.
         schema_version: doc.schema_version(),
         tasks: doc.tasks().iter().map(task_to_dto).collect(),
         plan: plan_to_dto(doc.plan()),
@@ -227,6 +334,7 @@ fn task_to_dto(task: &TrackTask) -> ImplPlanTaskDto {
         description: task.description().to_owned(),
         status,
         commit_hash,
+        depends_on: task.depends_on().to_vec(),
     }
 }
 
@@ -288,7 +396,7 @@ mod tests {
     #[test]
     fn test_decode_minimal_json_succeeds() {
         let doc = decode(MINIMAL_JSON).unwrap();
-        assert_eq!(doc.schema_version(), 1);
+        assert_eq!(doc.schema_version(), IMPL_PLAN_SCHEMA_VERSION);
         assert!(doc.tasks().is_empty());
         assert!(doc.plan().sections().is_empty());
     }
@@ -311,12 +419,22 @@ mod tests {
 
     #[test]
     fn test_decode_with_unsupported_schema_version_returns_error() {
-        let json = r#"{"schema_version": 2, "plan": {"summary": [], "sections": []}}"#;
+        let json = r#"{"schema_version": 3, "plan": {"summary": [], "sections": []}}"#;
         let err = decode(json).unwrap_err();
         assert!(
-            matches!(err, ImplPlanCodecError::UnsupportedSchemaVersion(2)),
+            matches!(err, ImplPlanCodecError::UnsupportedSchemaVersion(3)),
             "unexpected error: {err}"
         );
+    }
+
+    #[test]
+    fn test_decode_accepts_both_schema_one_and_schema_two() {
+        for version in [1, 2] {
+            let json = format!(
+                r#"{{"schema_version": {version}, "plan": {{"summary": [], "sections": []}}}}"#
+            );
+            assert!(decode(&json).is_ok(), "schema_version {version} must decode");
+        }
     }
 
     #[test]
@@ -452,7 +570,7 @@ mod tests {
         let doc = ImplPlanDocument::new(vec![], PlanView::new(vec![], vec![])).unwrap();
         let json = encode(&doc).unwrap();
         let parsed: serde_json::Value = serde_json::from_str(&json).unwrap();
-        assert_eq!(parsed["schema_version"], 1);
+        assert_eq!(parsed["schema_version"], 2);
     }
 
     #[test]
@@ -460,6 +578,20 @@ mod tests {
         let doc = decode(MINIMAL_JSON).unwrap();
         let json = encode(&doc).unwrap();
         assert!(json.contains('\n'));
+    }
+
+    #[test]
+    fn test_encode_identical_plan_returns_deterministic_json_bytes() {
+        let doc = decode(FULL_JSON).unwrap();
+
+        let first = encode(&doc).unwrap();
+        let second = encode(&doc).unwrap();
+
+        assert_eq!(first, second);
+        assert!(
+            first.contains("\"plan\": {\n    \"sections\": [\n      {\n        \"description\":"),
+            "nested plan object keys must be canonicalized: {first}"
+        );
     }
 
     // --- round-trip tests ---
@@ -518,10 +650,257 @@ mod tests {
     }
 
     #[test]
-    fn test_encode_schema_version_is_always_1() {
+    fn test_encode_writes_schema_two_even_for_a_document_read_as_schema_one() {
+        // FULL_JSON declares schema_version 1.
         let doc = decode(FULL_JSON).unwrap();
         let json = encode(&doc).unwrap();
         let parsed: serde_json::Value = serde_json::from_str(&json).unwrap();
-        assert_eq!(parsed["schema_version"], 1);
+        assert_eq!(parsed["schema_version"], 2);
+    }
+
+    #[test]
+    fn test_a_document_reports_the_version_encoding_it_writes_whichever_version_it_was_read_from() {
+        // The failure this pins: a document reporting one version through its
+        // public API while producing another on the wire, which would let a
+        // consumer reading the reported version select the wrong contract.
+        for source in [MINIMAL_JSON, FULL_JSON] {
+            let doc = decode(source).unwrap();
+            let encoded = encode(&doc).unwrap();
+            let written: serde_json::Value = serde_json::from_str(&encoded).unwrap();
+
+            assert_eq!(
+                written["schema_version"].as_u64().unwrap(),
+                u64::from(doc.schema_version()),
+                "reported version must be the version written: {encoded}"
+            );
+            assert_eq!(doc.schema_version(), IMPL_PLAN_SCHEMA_VERSION);
+            // And re-reading what was written reports the same version again,
+            // so the property survives a round trip rather than only the write.
+            assert_eq!(decode(&encoded).unwrap().schema_version(), doc.schema_version());
+        }
+    }
+
+    #[test]
+    fn test_a_schema_two_document_reports_schema_two() {
+        let json = r#"{
+          "schema_version": 2,
+          "tasks": [
+            {"id": "T001", "description": "First", "status": "todo"},
+            {"id": "T002", "description": "Second", "status": "todo", "depends_on": ["T001"]}
+          ],
+          "plan": {"summary": [], "sections": [
+            {"id": "S1", "title": "Impl", "description": [], "task_ids": ["T001", "T002"]}
+          ]}
+        }"#;
+
+        let doc = decode(json).unwrap();
+
+        assert_eq!(doc.schema_version(), 2);
+    }
+
+    #[test]
+    fn test_a_schema_one_document_reads_as_a_current_version_document() {
+        // The decided read compatibility: schema 1 is a wire format the codec
+        // still accepts, not a document version that survives decoding. Nothing
+        // branches on the reported value, so a decoded legacy plan is an
+        // ordinary current-version document declaring no dependencies.
+        let doc = decode(FULL_JSON).unwrap();
+
+        assert_eq!(doc.schema_version(), 2, "a schema-1 read does not preserve the wire version");
+        assert!(doc.tasks().iter().all(|task| task.depends_on().is_empty()));
+    }
+
+    // --- declared task dependencies (schema 2) ---
+
+    #[test]
+    fn test_decode_reads_a_schema_one_task_as_declaring_no_dependency() {
+        let doc = decode(FULL_JSON).unwrap();
+
+        assert!(doc.tasks().iter().all(|task| task.depends_on().is_empty()));
+    }
+
+    #[test]
+    fn test_decode_reads_a_schema_one_task_document_that_carries_no_depends_on_key() {
+        // A schema-1 task entry has no depends_on field; the schema-1 DTO
+        // translates it to the domain's undeclared-dependency state (AC-05, AC-21).
+        let json = r#"{
+          "schema_version": 1,
+          "tasks": [
+            {"id": "T001", "description": "First", "status": "todo"},
+            {"id": "T002", "description": "Second", "status": "done", "commit_hash": "a1b2c3d"}
+          ],
+          "plan": {"summary": [], "sections": [
+            {"id": "S1", "title": "Impl", "description": [], "task_ids": ["T001", "T002"]}
+          ]}
+        }"#;
+
+        let doc = decode(json).unwrap();
+
+        assert_eq!(doc.tasks().len(), 2);
+        assert!(doc.tasks()[0].depends_on().is_empty());
+        assert!(doc.tasks()[1].depends_on().is_empty());
+    }
+
+    #[test]
+    fn test_decode_rejects_dependency_field_in_schema_one_document() {
+        let json = r#"{
+          "schema_version": 1,
+          "tasks": [
+            {"id": "T001", "description": "First", "status": "todo", "depends_on": []}
+          ],
+          "plan": {"summary": [], "sections": [
+            {"id": "S1", "title": "Impl", "description": [], "task_ids": ["T001"]}
+          ]}
+        }"#;
+
+        let err = decode(json).unwrap_err();
+
+        assert!(matches!(err, ImplPlanCodecError::Json(_)), "unexpected error: {err}");
+    }
+
+    #[test]
+    fn test_decode_reads_an_explicit_empty_dependency_list_as_declaring_nothing() {
+        let json = r#"{
+          "schema_version": 2,
+          "tasks": [
+            {"id": "T001", "description": "First", "status": "todo", "depends_on": []}
+          ],
+          "plan": {"summary": [], "sections": [
+            {"id": "S1", "title": "Impl", "description": [], "task_ids": ["T001"]}
+          ]}
+        }"#;
+
+        let doc = decode(json).unwrap();
+
+        assert!(
+            doc.tasks()[0].depends_on().is_empty(),
+            "an empty list is the same unstated state as an omitted one"
+        );
+        // And it round-trips as an omission rather than as an empty array.
+        let parsed: serde_json::Value = serde_json::from_str(&encode(&doc).unwrap()).unwrap();
+        assert!(parsed["tasks"][0].get("depends_on").is_none());
+    }
+
+    #[test]
+    fn test_decode_reads_the_dependencies_a_schema_two_task_declares() {
+        let json = r#"{
+          "schema_version": 2,
+          "tasks": [
+            {"id": "T001", "description": "First", "status": "todo"},
+            {"id": "T002", "description": "Second", "status": "todo", "depends_on": ["T001"]}
+          ],
+          "plan": {"summary": [], "sections": [
+            {"id": "S1", "title": "Impl", "description": [], "task_ids": ["T001", "T002"]}
+          ]}
+        }"#;
+
+        let doc = decode(json).unwrap();
+
+        assert!(doc.tasks()[0].depends_on().is_empty());
+        assert_eq!(doc.tasks()[1].depends_on(), &[TaskId::try_new("T001").unwrap()]);
+    }
+
+    #[test]
+    fn test_decode_rejects_a_declared_dependency_the_plan_does_not_contain() {
+        let json = r#"{
+          "schema_version": 2,
+          "tasks": [
+            {"id": "T001", "description": "First", "status": "todo", "depends_on": ["T404"]}
+          ],
+          "plan": {"summary": [], "sections": [
+            {"id": "S1", "title": "Impl", "description": [], "task_ids": ["T001"]}
+          ]}
+        }"#;
+
+        let err = decode(json).unwrap_err();
+
+        assert!(
+            matches!(err, ImplPlanCodecError::Validation(ref message) if message.contains("T404")),
+            "unexpected error: {err}"
+        );
+    }
+
+    #[test]
+    fn test_decode_rejects_a_cycle_in_declared_dependencies() {
+        let json = r#"{
+          "schema_version": 2,
+          "tasks": [
+            {"id": "T001", "description": "First", "status": "todo", "depends_on": ["T002"]},
+            {"id": "T002", "description": "Second", "status": "todo", "depends_on": ["T001"]}
+          ],
+          "plan": {"summary": [], "sections": [
+            {"id": "S1", "title": "Impl", "description": [], "task_ids": ["T001", "T002"]}
+          ]}
+        }"#;
+
+        let err = decode(json).unwrap_err();
+
+        assert!(
+            matches!(err, ImplPlanCodecError::Validation(ref message) if message.contains("cycle")),
+            "unexpected error: {err}"
+        );
+    }
+
+    #[test]
+    fn test_decode_rejects_a_self_dependency() {
+        let json = r#"{
+          "schema_version": 2,
+          "tasks": [
+            {"id": "T001", "description": "First", "status": "todo", "depends_on": ["T001"]}
+          ],
+          "plan": {"summary": [], "sections": [
+            {"id": "S1", "title": "Impl", "description": [], "task_ids": ["T001"]}
+          ]}
+        }"#;
+
+        let err = decode(json).unwrap_err();
+
+        assert!(
+            matches!(err, ImplPlanCodecError::Validation(ref message) if message.contains("cycle")),
+            "unexpected error: {err}"
+        );
+    }
+
+    #[test]
+    fn test_decode_rejects_plan_order_that_precedes_a_declared_dependency() {
+        let json = r#"{
+          "schema_version": 2,
+          "tasks": [
+            {"id": "T001", "description": "First", "status": "todo", "depends_on": ["T002"]},
+            {"id": "T002", "description": "Second", "status": "todo"}
+          ],
+          "plan": {"summary": [], "sections": [
+            {"id": "S1", "title": "Impl", "description": [], "task_ids": ["T001", "T002"]}
+          ]}
+        }"#;
+
+        let err = decode(json).unwrap_err();
+
+        assert!(
+            matches!(err, ImplPlanCodecError::Validation(ref message) if message.contains("before its declared dependency")),
+            "unexpected error: {err}"
+        );
+    }
+
+    #[test]
+    fn test_encode_omits_an_empty_dependency_list_and_writes_a_declared_one() {
+        let json = r#"{
+          "schema_version": 2,
+          "tasks": [
+            {"id": "T001", "description": "First", "status": "todo"},
+            {"id": "T002", "description": "Second", "status": "todo", "depends_on": ["T001"]}
+          ],
+          "plan": {"summary": [], "sections": [
+            {"id": "S1", "title": "Impl", "description": [], "task_ids": ["T001", "T002"]}
+          ]}
+        }"#;
+        let doc = decode(json).unwrap();
+
+        let encoded = encode(&doc).unwrap();
+        let parsed: serde_json::Value = serde_json::from_str(&encoded).unwrap();
+
+        assert!(parsed["tasks"][0].get("depends_on").is_none(), "encoded as: {encoded}");
+        assert_eq!(parsed["tasks"][1]["depends_on"], serde_json::json!(["T001"]));
+        assert_eq!(decode(&encoded).unwrap().tasks()[1].depends_on().len(), 1);
     }
 }

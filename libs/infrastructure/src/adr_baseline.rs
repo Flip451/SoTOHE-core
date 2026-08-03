@@ -96,7 +96,9 @@ pub enum AdrBaselineCodecError {
 pub fn encode_ledger_entry(
     entry: &AdrBaselineLedgerEntry,
 ) -> Result<String, AdrBaselineCodecError> {
-    serde_json::to_string(&dto_from_entry(entry))
+    let value = serde_json::to_value(dto_from_entry(entry))
+        .map_err(|error| AdrBaselineCodecError::Json(diagnostic(&error.to_string())))?;
+    serde_json::to_string(&value)
         .map_err(|error| AdrBaselineCodecError::Json(diagnostic(&error.to_string())))
 }
 

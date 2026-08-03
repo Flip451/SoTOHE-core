@@ -311,7 +311,10 @@ impl CatalogueDocumentCodec {
     /// is kept for API completeness).
     pub fn encode(doc: &CatalogueDocument) -> Result<String, CatalogueDocumentCodecError> {
         let dto = domain_to_dto(doc)?;
-        let json = serde_json::to_string_pretty(&dto)?;
+        // Serialize through Value so every object, including nested catalogue
+        // entry maps, uses the canonical key order before pretty-printing.
+        let value = serde_json::to_value(&dto)?;
+        let json = serde_json::to_string_pretty(&value)?;
         Ok(json)
     }
 }
@@ -351,7 +354,7 @@ mod tests {
         CrateName, FunctionName, FunctionPath, ModulePath, TraitName, TypeName,
     };
     use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, FunctionRole};
-    use domain::tddd::catalogue_v2::{DeletionRecord, TypeRef, WherePredicateDecl};
+    use domain::tddd::catalogue_v2::{BoundOp, DeletionRecord, TypeRef, WherePredicateDecl};
 
     fn minimal_v5_json(crate_name: &str, layer: &str) -> String {
         format!(
@@ -497,6 +500,37 @@ mod tests {
         assert_eq!(value["schema_version"], SCHEMA_VERSION);
         let decoded = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
         assert_eq!(decoded.schema_version(), SCHEMA_VERSION);
+    }
+
+    #[test]
+    fn test_encode_canonicalizes_json_keys_and_is_byte_stable() {
+        let document = usecase_function_doc_with_where_predicate(
+            "canonical_order",
+            WherePredicateDecl {
+                lhs: TypeRef::new("T".to_owned()).unwrap(),
+                rhs: vec![TypeRef::new("Clone".to_owned()).unwrap()],
+                operator: BoundOp::Bound,
+            },
+        );
+
+        let first = CatalogueDocumentCodec::encode(&document).unwrap();
+        let second = CatalogueDocumentCodec::encode(&document).unwrap();
+
+        assert_eq!(first, second, "catalogue encoding must not churn JSON bytes");
+        assert!(
+            first.starts_with(
+                "{\n  \"crate_name\": \"usecase\",\n  \"functions\": {\n    \"usecase::canonical_order\": {\n      \"action\": \"add\","
+            ),
+            "catalogue keys must use canonical order: {first}"
+        );
+        let entry = &first[first.find("\"usecase::canonical_order\"").unwrap()..];
+        let action = entry.find("\"action\"").unwrap();
+        let informal_grounds = entry.find("\"informal_grounds\"").unwrap();
+        let where_predicates = entry.find("\"where_predicates\"").unwrap();
+        assert!(
+            action < informal_grounds && informal_grounds < where_predicates,
+            "catalogue entry keys must be recursively canonicalized: {entry}"
+        );
     }
 
     #[test]
@@ -1947,29 +1981,20 @@ mod tests {
         let doc = CatalogueDocumentCodec::decode(mixed_trait_with_default_impl_json(), "usecase")
             .unwrap();
         let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
-        // The required method must NOT carry has_default_impl in the rendered JSON.
-        // The provided method MUST carry it.
+        let methods = serde_json::from_str::<serde_json::Value>(&encoded).unwrap()["traits"]
+            ["MixedTrait"]["methods"]
+            .as_array()
+            .unwrap()
+            .clone();
+        let provided = methods.iter().find(|method| method["name"] == "provided").unwrap();
         assert!(
-            encoded.contains("\"name\": \"provided\""),
-            "expected 'provided' method in encoded JSON: {encoded}"
+            provided["has_default_impl"].as_bool().unwrap(),
+            "provided method must contain has_default_impl=true: {provided}"
         );
-        let provided_idx = encoded.find("\"name\": \"provided\"").unwrap();
-        let provided_slice = &encoded[provided_idx..];
-        let next_method_idx =
-            provided_slice[1..].find("\"name\":").map_or(provided_slice.len(), |i| i + 1);
-        let provided_block = &provided_slice[..next_method_idx];
+        let required = methods.iter().find(|method| method["name"] == "required").unwrap();
         assert!(
-            provided_block.contains("\"has_default_impl\": true"),
-            "provided method block must contain has_default_impl=true: {provided_block}"
-        );
-        let required_idx = encoded.find("\"name\": \"required\"").unwrap();
-        let required_slice = &encoded[required_idx..];
-        let next_after_required =
-            required_slice[1..].find("\"name\":").map_or(required_slice.len(), |i| i + 1);
-        let required_block = &required_slice[..next_after_required];
-        assert!(
-            !required_block.contains("has_default_impl"),
-            "required method block must omit has_default_impl when false: {required_block}"
+            required.get("has_default_impl").is_none(),
+            "required method must omit has_default_impl when false: {required}"
         );
     }
 

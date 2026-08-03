@@ -1,14 +1,31 @@
 use std::fs;
 use std::path::{Path, PathBuf};
-use std::process::{Command, Output};
+use std::process::{Command, Output, Stdio};
 
 use serde::Deserialize;
 use thiserror::Error;
 use usecase::git_workflow::DiagnosticText;
 use usecase::track_resolution::{BranchReadError, BranchReaderPort};
 
+pub(crate) mod bounded;
+pub(crate) mod isolation;
 pub(crate) mod show;
 pub mod workflow_adapter;
+
+// The bounded runner and the isolation helpers are this adapter's, and their
+// callers reach them by the module path they always used; only the files they
+// live in changed.
+pub(crate) use bounded::{
+    collect_bounded_git_output, spawn_bounded_git_child, terminate_bounded_git_child,
+};
+pub(crate) use isolation::{
+    isolated_bounded_git_output, without_history_rewrites, without_repository_selection,
+};
+
+/// `rev-parse --show-toplevel` returns a filesystem path, which can validly be
+/// longer than the compact protocol replies accepted by verification probes.
+/// This remains bounded while accommodating supported long checkout roots.
+const MAX_DISCOVERY_GIT_OUTPUT_BYTES: usize = 16 * 1024;
 
 /// Typed error for [`SystemGitRepo::sync_current_branch`].
 ///
@@ -138,14 +155,45 @@ impl SystemGitRepo {
     /// (e.g. `start_dir` is not inside a git repository), or the root path
     /// returned by git is empty.
     pub fn discover_from(start_dir: &Path) -> Result<Self, GitError> {
-        let output = guarded_git_command()
+        Self::discover_with(guarded_git_command(), start_dir)
+    }
+
+    /// Discovers the repository enclosing `start_dir` without letting the
+    /// ambient environment name a different one.
+    ///
+    /// [`Self::discover_from`] keeps the caller's environment, and this lane is
+    /// separate rather than a change to it: an operator who has exported
+    /// `GIT_DIR` means it for the workflow commands, but a check whose verdict
+    /// decides what is written into the tree under `start_dir` must be about
+    /// that tree and no other. `GIT_DIR` disables discovery outright, so without
+    /// this lane such a check can answer about one repository while its result
+    /// is recorded into another.
+    ///
+    /// # Errors
+    ///
+    /// The same failures as [`Self::discover_from`]: git cannot be spawned, the
+    /// command fails because nothing encloses `start_dir`, or the root returned
+    /// is empty.
+    pub(crate) fn discover_from_isolated(start_dir: &Path) -> Result<Self, GitError> {
+        let mut command = guarded_git_command();
+        without_repository_selection(&mut command);
+        Self::discover_with(command, start_dir)
+    }
+
+    fn discover_with(mut command: Command, start_dir: &Path) -> Result<Self, GitError> {
+        command
             .args(["rev-parse", "--show-toplevel"])
             .current_dir(start_dir)
-            .output()
-            .map_err(|source| GitError::Spawn {
-                command: "rev-parse --show-toplevel".to_owned(),
-                source,
-            })?;
+            .stdin(Stdio::null())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped());
+        let child = spawn_bounded_git_child(&mut command).map_err(|source| GitError::Spawn {
+            command: "rev-parse --show-toplevel".to_owned(),
+            source,
+        })?;
+        let output = collect_bounded_git_output(child, MAX_DISCOVERY_GIT_OUTPUT_BYTES).map_err(
+            |source| GitError::Spawn { command: "rev-parse --show-toplevel".to_owned(), source },
+        )?;
         if !output.status.success() {
             let stderr = String::from_utf8_lossy(&output.stderr).trim().to_owned();
             let code = output.status.code().unwrap_or(-1);
@@ -601,10 +649,11 @@ mod tests {
 
     use usecase::track_resolution::{BranchReadError, BranchReaderPort};
 
+    use super::isolation::REPOSITORY_SELECTING_GIT_ENV;
     use super::{
         GUARDED_GIT_ENV, GUARDED_GIT_VALUE, SyncError, SystemGitRepo, classify_sync_failure,
         collect_track_branch_claims, guarded_git_command, load_explicit_track_branch,
-        load_explicit_track_branch_from_items_dir, resolve_repo_path,
+        load_explicit_track_branch_from_items_dir, resolve_repo_path, without_repository_selection,
     };
 
     use crate::verify::test_support::run_git;
@@ -741,6 +790,125 @@ mod tests {
         let repo = SystemGitRepo::discover_from(&nested).unwrap();
 
         assert_eq!(repo.root(), dir.path());
+    }
+
+    #[test]
+    fn system_git_repo_discover_from_accepts_a_root_longer_than_the_verifier_limit() {
+        let dir = tempfile::tempdir().unwrap();
+        let mut root = dir.path().to_path_buf();
+        for index in 0..16 {
+            root.push(format!(
+                "long-checkout-component-{index:02}-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+            ));
+        }
+        assert!(
+            root.as_os_str().len() > 1024,
+            "the fixture must exceed the compact verifier-response limit"
+        );
+        fs::create_dir_all(&root).unwrap();
+        run_git(&root, &["init"]);
+
+        let repo = SystemGitRepo::discover_from(&root)
+            .expect("repository discovery must accept a valid long checkout root");
+
+        assert_eq!(repo.root(), root);
+    }
+
+    /// The environment is applied to the command rather than to the test
+    /// process: `std::env::set_var` is unsafe and this crate forbids unsafe
+    /// code, and an inherited variable reaches git as exactly this — an entry in
+    /// the child's environment.
+    /// One repository with a commit of its own, so the two fixtures have
+    /// distinguishable histories.
+    fn repo_with_a_commit(message: &str) -> tempfile::TempDir {
+        let repo = tempfile::tempdir().unwrap();
+        run_git(repo.path(), &["init"]);
+        run_git(repo.path(), &["config", "user.email", "fixture@example.com"]);
+        run_git(repo.path(), &["config", "user.name", "fixture"]);
+        run_git(repo.path(), &["commit", "--allow-empty", "-m", message]);
+        repo
+    }
+
+    fn head_in(command: &mut super::Command, dir: &std::path::Path) -> String {
+        let output =
+            command.args(["rev-parse", "HEAD"]).current_dir(dir).output().expect("git must run");
+        assert!(output.status.success(), "the fixture must have a resolvable HEAD");
+        String::from_utf8(output.stdout).unwrap().trim().to_owned()
+    }
+
+    #[test]
+    fn test_a_repository_selecting_environment_cannot_redirect_the_isolated_discovery() {
+        let elsewhere = repo_with_a_commit("a history of its own");
+        let here = repo_with_a_commit("the tree that is asked about");
+        let nested = here.path().join("track/items");
+        fs::create_dir_all(&nested).unwrap();
+
+        let elsewhere_head = head_in(&mut guarded_git_command(), elsewhere.path());
+        let here_head = head_in(&mut guarded_git_command(), here.path());
+        assert_ne!(elsewhere_head, here_head, "the fixtures must have distinct histories");
+
+        // The hazard, first-hand: with `GIT_DIR` naming another repository, a
+        // command run inside this one answers with that one's history, and the
+        // root discovered is no longer this tree's.
+        let mut inheriting = guarded_git_command();
+        inheriting.env("GIT_DIR", elsewhere.path().join(".git"));
+        assert_eq!(
+            head_in(&mut inheriting, &nested),
+            elsewhere_head,
+            "the control must show that GIT_DIR redirects an inheriting command"
+        );
+        let mut inheriting_discovery = guarded_git_command();
+        inheriting_discovery.env("GIT_DIR", elsewhere.path().join(".git"));
+        let hijacked = SystemGitRepo::discover_with(inheriting_discovery, &nested).unwrap();
+        assert_ne!(
+            hijacked.root().canonicalize().unwrap(),
+            here.path().canonicalize().unwrap(),
+            "the control must show that GIT_DIR displaces the discovered root"
+        );
+
+        // The isolated lane clears it, so the same environment gets this tree's
+        // repository and this tree's history.
+        let mut isolated = guarded_git_command();
+        isolated.env("GIT_DIR", elsewhere.path().join(".git"));
+        without_repository_selection(&mut isolated);
+        let discovered = SystemGitRepo::discover_with(isolated, &nested).unwrap();
+        assert_eq!(
+            discovered.root().canonicalize().unwrap(),
+            here.path().canonicalize().unwrap(),
+            "an isolated discovery must answer about the tree it was started from"
+        );
+
+        let mut isolated_head = guarded_git_command();
+        isolated_head.env("GIT_DIR", elsewhere.path().join(".git"));
+        without_repository_selection(&mut isolated_head);
+        assert_eq!(
+            head_in(&mut isolated_head, discovered.root()),
+            here_head,
+            "an isolated command must read this repository's history"
+        );
+    }
+
+    #[test]
+    fn test_the_isolated_discovery_clears_every_repository_selecting_variable() {
+        // The lane is only as good as its list, and a variable added to the list
+        // without being cleared here would be a silent hole.
+        let mut command = guarded_git_command();
+        without_repository_selection(&mut command);
+
+        for variable in REPOSITORY_SELECTING_GIT_ENV {
+            assert!(
+                command
+                    .get_envs()
+                    .any(|(key, value)| key == OsStr::new(variable) && value.is_none()),
+                "an isolated discovery must not inherit {variable}"
+            );
+        }
+        assert!(
+            command.get_envs().any(|(key, value)| {
+                key == OsStr::new(GUARDED_GIT_ENV) && value == Some(OsStr::new(GUARDED_GIT_VALUE))
+            }),
+            "isolation must not drop the guard marker the hooks read"
+        );
     }
 
     #[test]

@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "03c29801682d16bdab42649ca2a11e107904f3b82568dd6a8f5c36e88583f03f",
+  "signals": [
+    {
+      "type_name": "AdmissionRejectionOutput",
+      "signal": "blue",
+      "entry_hash": "79c60059fd1e1d015b7881177c225cc4daae69ab13596c14e37c55e43af4040a"
+    },
+    {
+      "type_name": "BatchPlanCheckCommand",
+      "signal": "blue",
+      "entry_hash": "422fc8698da63379d3baadf9c6fad7896f93c9f8ea1e26f718958df8301a60fa"
+    },
+    {
+      "type_name": "BatchPlanCheckError",
+      "signal": "blue",
+      "entry_hash": "f8506613404ed2ecc9c4e2445de8bc15223d1bf3452cc7bfa1a9e4b8713aae14"
+    },
+    {
+      "type_name": "BatchPlanCheckInteractor",
+      "signal": "blue",
+      "entry_hash": "f97266a8951bc64945c04823c93c0c54438c57dc59fec4a0c191e81c1d38f5db"
+    },
+    {
+      "type_name": "BatchPlanCheckOutput",
+      "signal": "blue",
+      "entry_hash": "94a10a0f9cc85aa9724179c10c3e510b8d8c73f1a1f1af4ff122bd5756968413"
+    },
+    {
+      "type_name": "BatchPlanViolationOutput",
+      "signal": "blue",
+      "entry_hash": "35c7b593eab28dca245187ff645a7b6ab9f2349cbd84e91e6a3a4a57e10ba887"
+    },
+    {
+      "type_name": "CommitRecordVerifyError",
+      "signal": "blue",
+      "entry_hash": "b509a4f16bf41efe1dde254cbb591d46afa5ac6b2359009a17fde1ee4978d9ec"
+    },
+    {
+      "type_name": "NonEmptyViolationOutputs",
+      "signal": "blue",
+      "entry_hash": "8ff2a2b585e33fad48ad979235f6d615a27c02db3769c125f3ae58a1092b80da"
+    },
+    {
+      "type_name": "PlanArtifactReadError",
+      "signal": "blue",
+      "entry_hash": "ac123800040223ff956c0c64f30e388f834af39f6e7e1cd77c8bea35699bce4e"
+    },
+    {
+      "type_name": "ScopeConfigReadError",
+      "signal": "blue",
+      "entry_hash": "6bba66f1e1c1ee2306d0037fac668e22859727636d32d5314770393d85429daa"
+    },
+    {
+      "type_name": "ScopeDiffMeasureError",
+      "signal": "blue",
+      "entry_hash": "d3b70d389302c1b157ea46677027e4e05b03d50a802ae0b1667d1533fe1bf02a"
+    },
+    {
+      "type_name": "TaskOperationInteractor",
+      "signal": "blue",
+      "entry_hash": "fe2b9d4d2b9d889e9d88eec8a5a41664f89a566233f1bfeb6c9eaee6307b23ee"
+    },
+    {
+      "type_name": "TaskTransitionOutcome",
+      "signal": "blue",
+      "entry_hash": "4d49b063426ee76f5197274ec3f3956fdf38343e345f12de9cc4b2b453ac6587"
+    },
+    {
+      "type_name": "BatchPlanCheckService",
+      "signal": "blue",
+      "entry_hash": "df43ced3b9d6cbb01bc1fd806d39c7462bf3c31a55b83005d6f7c0a86d52f68a"
+    },
+    {
+      "type_name": "BatchPlanReaderPort",
+      "signal": "blue",
+      "entry_hash": "262b520d21cc53f6446a2f58286ed800e44029964083971d4620e7b9bd1531d3"
+    },
+    {
+      "type_name": "BranchReaderPort",
+      "signal": "blue",
+      "entry_hash": "b749246ac374bcb7d78236b365f26a9f0f1e4475045453b911b7ebdda4ecd1ce"
+    },
+    {
+      "type_name": "CommitRecordVerifierPort",
+      "signal": "blue",
+      "entry_hash": "c6e4915d6beece77a3f7d82b9ba740af01f3d77951748b02c2fa1b842e39e22f"
+    },
+    {
+      "type_name": "PlannedTaskReaderPort",
+      "signal": "blue",
+      "entry_hash": "8c533d4d2ee4b3f94da4b8cfe658d4c2eeaa1cbd6c3358c827ad96d3693edc26"
+    },
+    {
+      "type_name": "ScopeConfigReaderPort",
+      "signal": "blue",
+      "entry_hash": "0ea8fc52fa1b103b6a3ef9c5b5a32bda2e3497a1a3c6a836b84df9284c0113bf"
+    },
+    {
+      "type_name": "ScopeDiffMeasurePort",
+      "signal": "blue",
+      "entry_hash": "e6da3114ceb3a4518d2ccde0348fba5ab306c718a8607974749591f22860c2d4"
+    },
+    {
+      "type_name": "TaskOperationService",
+      "signal": "blue",
+      "entry_hash": "470af3adbf4ec94cad0a73a73c8c10dd2afb563edfc37e4b149d092a4db7d52b"
+    },
+    {
+      "type_name": "TransitionTaskUseCase",
+      "signal": "blue",
+      "entry_hash": "c2f044043613bad7cd084b8b8735fa47544812557815a87c8bacc07bb18c54ad"
+    }
+  ]
+}

@@ -1,0 +1,198 @@
+{
+  "schema_version": 1,
+  "layer": "cli",
+  "entries": [
+    {
+      "claim_hash": "f0ecf8e17102d94fc642e52ae5189b64c6627ec93aa442bf3c5bd3e3cd7e5ae3",
+      "evidence_hash": "b37a6e46c2e61d04067a1e3d5768cf0bf32d08ac8e339b479b2db31f0ba7ce51",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Phase 3 の終端 gate として、宣言された各 batch について member task 見積りの per-scope Σ（`production_lines + test_lines`）を `diff_ceiling_for_scope` の解決値と照合する binary check を追加する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/cli-types.json",
+          "section_key": "types",
+          "entry_key": "BatchPlanCheckArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "Phase 3 の終端 gate として、宣言された各 batch について member task 見積りの per-scope Σ（`production_lines + test_lines`）を `diff_ceiling_for_scope` の解決値と照合する binary check を追加する。超過は fail-closed で Phase 3 を完了させず、免除は当該 scope の寄与者が理由付き超過タスク 1 件のみの場合に限る。超過は scope 別に判定し、同じ batch でも他 scope の Σ は通常どおり検査する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f0ecf8e17102d94fc642e52ae5189b64c6627ec93aa442bf3c5bd3e3cd7e5ae3",
+      "evidence_hash": "124fd9e53dd13fb3a968f9e2349cd276d067b5be9d2104dcec09e2d544526c63",
+      "verdict": {
+        "kind": "pass",
+        "citation": "宣言された batch の per-scope Σ が resolved ceiling を超える `batch-plan.json` に対し、Phase 3 の binary check が fail-closed で ERROR を返す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/cli-types.json",
+          "section_key": "types",
+          "entry_key": "BatchPlanCheckArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "宣言された batch の per-scope Σ が resolved ceiling を超える `batch-plan.json` に対し、Phase 3 の binary check が fail-closed で ERROR を返す。当該 scope の寄与者が非空の分解不能理由を持つタスク 1 件のみである場合は通す。同じ batch の他 scope の Σ は通常どおり検査される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "fb66ec9be3c4407453965bf84110e0b7ef4b89386b9f31c98c0474ff3d0799ae",
+      "evidence_hash": "b37a6e46c2e61d04067a1e3d5768cf0bf32d08ac8e339b479b2db31f0ba7ce51",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Phase 3 の終端 gate として、宣言された各 batch について member task 見積りの per-scope Σ（`production_lines + test_lines`）を `diff_ceiling_for_scope` の解決値と照合する binary check を追加する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/cli-types.json",
+          "section_key": "types",
+          "entry_key": "BatchPlanCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "Phase 3 の終端 gate として、宣言された各 batch について member task 見積りの per-scope Σ（`production_lines + test_lines`）を `diff_ceiling_for_scope` の解決値と照合する binary check を追加する。超過は fail-closed で Phase 3 を完了させず、免除は当該 scope の寄与者が理由付き超過タスク 1 件のみの場合に限る。超過は scope 別に判定し、同じ batch でも他 scope の Σ は通常どおり検査する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "fb66ec9be3c4407453965bf84110e0b7ef4b89386b9f31c98c0474ff3d0799ae",
+      "evidence_hash": "124fd9e53dd13fb3a968f9e2349cd276d067b5be9d2104dcec09e2d544526c63",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Phase 3 の binary check が fail-closed で ERROR を返す"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/cli-types.json",
+          "section_key": "types",
+          "entry_key": "BatchPlanCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "宣言された batch の per-scope Σ が resolved ceiling を超える `batch-plan.json` に対し、Phase 3 の binary check が fail-closed で ERROR を返す。当該 scope の寄与者が非空の分解不能理由を持つタスク 1 件のみである場合は通す。同じ batch の他 scope の Σ は通常どおり検査される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cdc615749b589ee12d44cf11a4737c2a7002f8c291507a0ea4bd4a45ba364007",
+      "evidence_hash": "b37a6e46c2e61d04067a1e3d5768cf0bf32d08ac8e339b479b2db31f0ba7ce51",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Phase 3 の終端 gate として、宣言された各 batch について member task 見積りの per-scope Σ（`production_lines + test_lines`）を `diff_ceiling_for_scope` の解決値と照合する binary check を追加する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CliCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "Phase 3 の終端 gate として、宣言された各 batch について member task 見積りの per-scope Σ（`production_lines + test_lines`）を `diff_ceiling_for_scope` の解決値と照合する binary check を追加する。超過は fail-closed で Phase 3 を完了させず、免除は当該 scope の寄与者が理由付き超過タスク 1 件のみの場合に限る。超過は scope 別に判定し、同じ batch でも他 scope の Σ は通常どおり検査する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cdc615749b589ee12d44cf11a4737c2a7002f8c291507a0ea4bd4a45ba364007",
+      "evidence_hash": "124fd9e53dd13fb3a968f9e2349cd276d067b5be9d2104dcec09e2d544526c63",
+      "verdict": {
+        "kind": "pass",
+        "citation": "宣言された batch の per-scope Σ が resolved ceiling を超える `batch-plan.json` に対し、Phase 3 の binary check が fail-closed で ERROR を返す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CliCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "宣言された batch の per-scope Σ が resolved ceiling を超える `batch-plan.json` に対し、Phase 3 の binary check が fail-closed で ERROR を返す。当該 scope の寄与者が非空の分解不能理由を持つタスク 1 件のみである場合は通す。同じ batch の他 scope の Σ は通常どおり検査される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c47d27e6e867602ec35560f3acb0ded3a24c9b2ae4d876453f806f5bdc8278fe",
+      "evidence_hash": "b37a6e46c2e61d04067a1e3d5768cf0bf32d08ac8e339b479b2db31f0ba7ce51",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Phase 3 の終端 gate として、宣言された各 batch について member task 見積りの per-scope Σ（`production_lines + test_lines`）を `diff_ceiling_for_scope` の解決値と照合する binary check を追加する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::batch_plan::execute"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "Phase 3 の終端 gate として、宣言された各 batch について member task 見積りの per-scope Σ（`production_lines + test_lines`）を `diff_ceiling_for_scope` の解決値と照合する binary check を追加する。超過は fail-closed で Phase 3 を完了させず、免除は当該 scope の寄与者が理由付き超過タスク 1 件のみの場合に限る。超過は scope 別に判定し、同じ batch でも他 scope の Σ は通常どおり検査する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c47d27e6e867602ec35560f3acb0ded3a24c9b2ae4d876453f806f5bdc8278fe",
+      "evidence_hash": "124fd9e53dd13fb3a968f9e2349cd276d067b5be9d2104dcec09e2d544526c63",
+      "verdict": {
+        "kind": "pass",
+        "citation": "宣言された batch の per-scope Σ が resolved ceiling を超える `batch-plan.json` に対し、Phase 3 の binary check が fail-closed で ERROR を返す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-diff-ceiling-admission-enforcement-2026-07-29/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::batch_plan::execute"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "宣言された batch の per-scope Σ が resolved ceiling を超える `batch-plan.json` に対し、Phase 3 の binary check が fail-closed で ERROR を返す。当該 scope の寄与者が非空の分解不能理由を持つタスク 1 件のみである場合は通す。同じ batch の他 scope の Σ は通常どおり検査される。"
+        }
+      }
+    }
+  ]
+}

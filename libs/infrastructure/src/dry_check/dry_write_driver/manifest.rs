@@ -106,8 +106,10 @@ pub(super) fn write_manifest(sidecar: &Path, manifest: &IndexManifest) -> Result
                 .map_err(|e| format!("failed to create manifest parent dir: {e}"))?;
         }
     }
-    let json = serde_json::to_string(manifest)
-        .map_err(|e| format!("failed to serialize manifest: {e}"))?;
+    let value =
+        serde_json::to_value(manifest).map_err(|e| format!("failed to serialize manifest: {e}"))?;
+    let json =
+        serde_json::to_string(&value).map_err(|e| format!("failed to serialize manifest: {e}"))?;
     reject_manifest_path_symlinks(sidecar, "manifest")?;
     atomic_write_file(sidecar, json.as_bytes())
         .map_err(|e| format!("failed to write manifest {}: {e}", sidecar.display()))
@@ -247,6 +249,30 @@ mod tests {
 
         assert_eq!(read_back.embedding_model_id, EMBEDDING_MODEL_ID);
         assert_eq!(read_back.files.get("src/a.rs"), Some(&"hash1".to_owned()));
+    }
+
+    #[test]
+    fn test_write_manifest_canonicalizes_keys_and_is_byte_stable() {
+        let dir = tempfile::tempdir().unwrap();
+        let sidecar = dir.path().join("db.manifest");
+        let mut manifest = IndexManifest::empty(EMBEDDING_MODEL_ID);
+        manifest.files.insert("src/z.rs".to_owned(), "hash-z".to_owned());
+        manifest.files.insert("src/a.rs".to_owned(), "hash-a".to_owned());
+
+        write_manifest(&sidecar, &manifest).unwrap();
+        let first = std::fs::read_to_string(&sidecar).unwrap();
+        write_manifest(&sidecar, &manifest).unwrap();
+        let second = std::fs::read_to_string(&sidecar).unwrap();
+
+        assert_eq!(first, second, "manifest encoding must not churn JSON bytes");
+        assert!(
+            first.starts_with("{\"embedding_model_id\":"),
+            "manifest top-level keys must be canonicalized: {first}"
+        );
+        assert!(
+            first.find("src/a.rs").unwrap() < first.find("src/z.rs").unwrap(),
+            "manifest file keys must be recursively canonicalized: {first}"
+        );
     }
 
     #[cfg(unix)]

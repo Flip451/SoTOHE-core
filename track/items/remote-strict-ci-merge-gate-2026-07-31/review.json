@@ -1,0 +1,512 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2b9c01989185915d5b01537a0c897a37b0cda578e88f7cd38d1c8f61a3464615",
+          "at": "2026-07-31T12:28:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2b9c01989185915d5b01537a0c897a37b0cda578e88f7cd38d1c8f61a3464615",
+          "at": "2026-07-31T12:32:30Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4a2bba2e80ee6b93efcac6413d61433e0e7a6290075d59accbed48ec16809cba",
+          "at": "2026-07-31T12:27:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-02 and CN-02 require eliminating duplicate confirmation prompts from both the workflow and the adapter, but AC-05 only verifies the workflow. An implementation that leaves an adapter confirmation prompt would satisfy every acceptance criterion while violating the stated goal and ADR D2, so GO-02 lacks complete deterministic acceptance coverage.",
+              "severity": "P1",
+              "file": "track/items/remote-strict-ci-merge-gate-2026-07-31/spec.json",
+              "line": 168,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:4a2bba2e80ee6b93efcac6413d61433e0e7a6290075d59accbed48ec16809cba",
+          "at": "2026-07-31T12:31:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe735f85ab3d40ff6310fe655b11c0a44f7db0bca4f861ef4bd509f504f2fdce",
+          "at": "2026-07-31T12:33:00Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
+          "at": "2026-07-31T11:44:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
+          "at": "2026-07-31T11:47:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:452d51231cfa0b228ff165c52e8110a2d2c95dccf04f90ded89896b0475283ec",
+          "at": "2026-07-31T13:36:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:452d51231cfa0b228ff165c52e8110a2d2c95dccf04f90ded89896b0475283ec",
+          "at": "2026-07-31T13:43:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ed41e0a92262bcb083a9793944f1d45fe0ef0fb17d57c55c81b0d72f866b761e",
+          "at": "2026-07-31T14:19:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new categorical statement says user interaction is required only for terminal-audit misclassification or admitted-draft recovery, but this SSoT later requires a post-outcome head-OID mismatch to stop and be surfaced for corrective user adjudication (lines 151–154). The same omission is repeated in the Claude adapter at lines 13–14, conflicting with its broader requirement at lines 26–29 to retain genuine adjudication cases. Add the audit-invalidating head-OID incident to the exceptions, or qualify the statement as applying only before wrapper invocation; otherwise providers can interpret the new no-prompt rule as suppressing a required fail-closed adjudication path.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/merge.md",
+              "line": 49,
+              "category": "harness-policy"
+            }
+          ],
+          "hash": "rvw1:sha256:ed41e0a92262bcb083a9793944f1d45fe0ef0fb17d57c55c81b0d72f866b761e",
+          "at": "2026-07-31T14:23:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:87a09db9c0bbe616a1b285f09edabae2530118610fe593390587370209eee9c5",
+          "at": "2026-07-31T14:26:03Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001–T004 descriptions do not name concrete target files or symbols, so an executor must invent the implementation boundaries. T002 also omits the external branch-protection authorization/configuration boundary and its evidence hand-off.",
+              "severity": "P1",
+              "file": "track/items/remote-strict-ci-merge-gate-2026-07-31/impl-plan.json",
+              "line": 6,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "Task descriptions T001–T004 restate upstream behavior and rationale instead of using only target + operation + anchor cites, contrary to the no-upstream-restatement policy.",
+              "severity": "P1",
+              "file": "track/items/remote-strict-ci-merge-gate-2026-07-31/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Plan sections S1–S4 repeat the spec behavior contract in prose. These sections should contain only executable planning information and anchors, not upstream behavior restatements.",
+              "severity": "P1",
+              "file": "track/items/remote-strict-ci-merge-gate-2026-07-31/impl-plan.json",
+              "line": 37,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "impl-plan.plan has no summary or goal traceability for GO-01 and GO-02. Goal mappings are intentionally excluded from task-coverage.json, so the required SSoT location is missing.",
+              "severity": "P1",
+              "file": "track/items/remote-strict-ci-merge-gate-2026-07-31/impl-plan.json",
+              "line": 31,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:c32f3ed16f15d2bf094b419b4df1c4d3d7c4af356347f063523a4956d4b19731",
+          "at": "2026-07-31T12:28:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9bfe0ec406c26fc98e3207608d7345da86accce879adb6b3d064398cd9b81c71",
+          "at": "2026-07-31T12:37:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001's only implementation target is `.github/workflows/ci.yml`, which the current review classifier assigns to `other`, but its estimate is attributed to `harness-policy`; T004 repeats this mismatch for its workflow contribution. Consequently B1/B3 do not represent the scopes actually touched. Attribute those contributions to `other` (retaining `cli` for T004), or name genuine harness-policy targets.",
+              "severity": "P1",
+              "file": "track/items/remote-strict-ci-merge-gate-2026-07-31/batch-plan.json",
+              "line": 9,
+              "category": "unsound batch composition"
+            },
+            {
+              "message": "T002 says to record the rule response and failed-PR evidence handoff but names no file, symbol, or durable evidence destination. Its sole `harness-policy` estimate likewise has no corresponding target, leaving the executor to invent the task boundary. Name the exact recording artifact/symbol while retaining the administrator-authority handoff.",
+              "severity": "P1",
+              "file": "track/items/remote-strict-ci-merge-gate-2026-07-31/impl-plan.json",
+              "line": 12,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "B3 defers T004—the only task explicitly adding regression cases for AC-01 through AC-05—until after B1/B2 have committed the producer work. T004 also bundles independently verifiable remote-CI (AC-01/02/04), branch-protection (AC-03), and confirmation-free merge (AC-05) units. Split those validation units and place each with its corresponding producer task so every batch is verifiable before commit.",
+              "severity": "P1",
+              "file": "track/items/remote-strict-ci-merge-gate-2026-07-31/batch-plan.json",
+              "line": 65,
+              "category": "unsound batch composition / pre-implementation split proposal"
+            }
+          ],
+          "hash": "rvw1:sha256:9bfe0ec406c26fc98e3207608d7345da86accce879adb6b3d064398cd9b81c71",
+          "at": "2026-07-31T12:44:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "B1 groups T004 with its declared prerequisite T001, so the CI evidence/regression task can be admitted before T001's workflow change is verifiably complete. Move T004 to a later batch.",
+              "severity": "P1",
+              "file": "track/items/remote-strict-ci-merge-gate-2026-07-31/batch-plan.json",
+              "line": 75,
+              "category": "unsound batch composition"
+            },
+            {
+              "message": "B2 groups T005 with its declared prerequisite T002, so branch-protection evidence can be handled before the administrator handoff/configuration task completes. Move T005 to a later batch.",
+              "severity": "P1",
+              "file": "track/items/remote-strict-ci-merge-gate-2026-07-31/batch-plan.json",
+              "line": 79,
+              "category": "unsound batch composition"
+            },
+            {
+              "message": "B3 groups T006 with its declared prerequisite T003, so merge-flow regression validation can be admitted before the workflow/adapter change is verifiably complete. Move T006 to a later batch.",
+              "severity": "P1",
+              "file": "track/items/remote-strict-ci-merge-gate-2026-07-31/batch-plan.json",
+              "line": 83,
+              "category": "unsound batch composition"
+            }
+          ],
+          "hash": "rvw1:sha256:1b8ee2a1d99418db477d88fd0c7f8b3aff4762b74e4a80752c3a94e14ea2f1b7",
+          "at": "2026-07-31T12:47:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 bundles independently verifiable behavior units: implementing the remote strict track-aware gate and fail-closed unresolved-track behavior (AC-01/AC-02), and preserving the local early-detection path (AC-04). Split these into separate pre-implementation tasks with distinct validation obligations.",
+              "severity": "P1",
+              "file": "track/items/remote-strict-ci-merge-gate-2026-07-31/impl-plan.json",
+              "line": 6,
+              "category": "pre-implementation split proposal"
+            }
+          ],
+          "hash": "rvw1:sha256:87016245fc5793c5b6607425db2583d6cd3df7a12a0f1975ae428219b8547b8f",
+          "at": "2026-07-31T12:50:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3e381481814c7755eeb2593abd9a89546a0114049e04d6518f3b4fcc9b89ffab",
+          "at": "2026-07-31T12:54:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3e381481814c7755eeb2593abd9a89546a0114049e04d6518f3b4fcc9b89ffab",
+          "at": "2026-07-31T12:56:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d46a3949f1de78a7dbb953be0217fc19fe8f124044131f0e9ce83e8658a6ad97",
+          "at": "2026-07-31T13:16:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d46a3949f1de78a7dbb953be0217fc19fe8f124044131f0e9ce83e8658a6ad97",
+          "at": "2026-07-31T13:18:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d46a3949f1de78a7dbb953be0217fc19fe8f124044131f0e9ce83e8658a6ad97",
+          "at": "2026-07-31T13:21:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d795d44d4218f9a8e35e3e0f0021d361badd896ede9cdaffa9b271553a2cbb8d",
+          "at": "2026-07-31T13:37:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d795d44d4218f9a8e35e3e0f0021d361badd896ede9cdaffa9b271553a2cbb8d",
+          "at": "2026-07-31T13:43:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9516fc0ad01216f74908210a54fb52d685762943a6135cb0d5b970b415124886",
+          "at": "2026-07-31T14:05:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9516fc0ad01216f74908210a54fb52d685762943a6135cb0d5b970b415124886",
+          "at": "2026-07-31T14:07:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:58c2c2e332fa79979e8f4a140327fdc5ef2781da7067238a802fec3ca529775c",
+          "at": "2026-07-31T14:19:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:58c2c2e332fa79979e8f4a140327fdc5ef2781da7067238a802fec3ca529775c",
+          "at": "2026-07-31T14:23:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:17a745749297cca58d1d8c34116b51775738a61dd6a4fde88f3cf8016505c912",
+          "at": "2026-07-31T14:31:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:17a745749297cca58d1d8c34116b51775738a61dd6a4fde88f3cf8016505c912",
+          "at": "2026-07-31T14:33:37Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:164c45e98880fe829393dd71d970d655f386c3371d2c7f12f4932ca76a2ea44b",
+          "at": "2026-07-31T11:20:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:164c45e98880fe829393dd71d970d655f386c3371d2c7f12f4932ca76a2ea44b",
+          "at": "2026-07-31T11:22:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7444b2430f355932f82ff469acaacdd5c4d0d83b4b23c2ceb49bcc6dbe0aa58b",
+          "at": "2026-07-31T12:01:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7444b2430f355932f82ff469acaacdd5c4d0d83b4b23c2ceb49bcc6dbe0aa58b",
+          "at": "2026-07-31T12:04:29Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `preserves_track_gates` test only inspects dependency names and never validates the `ci-track` task's `script`. Therefore it would still pass if the ADR-baseline gate (`bin/sotp adr-baseline check-commit`) were removed or replaced with a no-op, so it does not fully prove that the exported local early-detection route preserves its gates.",
+              "severity": "P1",
+              "file": "apps/cli/tests/consumer_scaffold_host_first.rs",
+              "line": 615,
+              "category": "missing regression coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:affae12a4982c183f2524c8d4c208467f7aec1444a899543b32a976b072ee9a0",
+          "at": "2026-07-31T13:37:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aa36e2cb6a9bd18b4f1085fb22b3afb64616509284a54c3ee841642e11806943",
+          "at": "2026-07-31T13:40:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The regression does not prove that the exported `ci-track` task remains publicly invocable. Adding `private = true` or disabling the task would leave every assertion here passing, while `cargo make ci-track` would reject the route unless explicitly overridden. This permits AC-04 to regress despite a green test; assert that the task is public/enabled or verify non-executing task resolution.",
+              "severity": "P1",
+              "file": "apps/cli/tests/consumer_scaffold_host_first.rs",
+              "line": 615,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:aa36e2cb6a9bd18b4f1085fb22b3afb64616509284a54c3ee841642e11806943",
+          "at": "2026-07-31T13:44:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`task_toml_optional_value` does not parse TOML semantics: it only recognizes the exact spelling `key = ` and returns an unparsed value. Valid declarations such as `private=true` are therefore treated as absent, while `private = true # reason` compares unequal to `Some(\"true\")`. In either case both availability assertions pass even though cargo-make treats `ci-track` as private/disabled, so AC-04 can still regress. Parse these flags as TOML booleans or validate task resolution through cargo-make.",
+              "severity": "P1",
+              "file": "apps/cli/tests/consumer_scaffold_host_first.rs",
+              "line": 103,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:56d37f09a5ee90af7f2b0f494ed9bb6320346622f04123a3fc945c1f4a535142",
+          "at": "2026-07-31T13:48:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2f3a0aab9c91ee791b49d52b857b5ffedb61bce15061ffd0a52ff2aba93e5459",
+          "at": "2026-07-31T13:51:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "API-error and timeout tests assert only ExitCode::FAILURE, not that merge_pr was never called. They therefore do not fully lock down the required fail-closed behavior; add empty merge_calls assertions to both tests.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/pr_tests.rs",
+              "line": 218,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:42b139f2f20d27171018c71ac08c311771bb35588777d7501cb5ae252d201e95",
+          "at": "2026-07-31T14:19:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a8bd346573be6d1456449f76a355c83443111f8fc8c426a04e2f0c21a9423568",
+          "at": "2026-07-31T14:21:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a8bd346573be6d1456449f76a355c83443111f8fc8c426a04e2f0c21a9423568",
+          "at": "2026-07-31T14:23:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aa3ca052dafed5f545cb05777b63319581bd32df508883bf4dcc913b9f375dcc",
+          "at": "2026-07-31T14:45:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aa3ca052dafed5f545cb05777b63319581bd32df508883bf4dcc913b9f375dcc",
+          "at": "2026-07-31T14:47:25Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:168f21efca7ef2d05af430cfaa40fd9bec6da32637f0e8cd968d56ae5ebd09a7",
+          "at": "2026-07-31T12:28:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:168f21efca7ef2d05af430cfaa40fd9bec6da32637f0e8cd968d56ae5ebd09a7",
+          "at": "2026-07-31T12:31:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d2ca9d1feca60816ec658cb49808ced5103bcca8a8dcc74261c200dff0ed3820",
+          "at": "2026-07-31T13:16:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d2ca9d1feca60816ec658cb49808ced5103bcca8a8dcc74261c200dff0ed3820",
+          "at": "2026-07-31T13:22:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1394996deca4b4de296dde90a1b59e83ba55938a553b5feb0a481f6ba8c97f63",
+          "at": "2026-07-31T13:37:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1394996deca4b4de296dde90a1b59e83ba55938a553b5feb0a481f6ba8c97f63",
+          "at": "2026-07-31T13:42:58Z"
+        }
+      ]
+    }
+  }
+}
