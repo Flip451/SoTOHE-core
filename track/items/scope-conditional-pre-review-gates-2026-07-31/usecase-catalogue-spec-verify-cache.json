@@ -2331,7 +2331,7 @@
       }
     },
     {
-      "claim_hash": "76ad84753e14ce50b05e4d5cb953b32ed580341e070b2098115f0579e7d5bef8",
+      "claim_hash": "5f8df3ee532e1258498db049a4b9ce1d9671c8d29b7b37a08b552bbba767adcf",
       "evidence_hash": "5f06457592cbea35eca821280789c39a156cb9dbfbc96ac3cb37d83239bba370",
       "verdict": {
         "kind": "pass",
@@ -2355,7 +2355,7 @@
       }
     },
     {
-      "claim_hash": "76ad84753e14ce50b05e4d5cb953b32ed580341e070b2098115f0579e7d5bef8",
+      "claim_hash": "5f8df3ee532e1258498db049a4b9ce1d9671c8d29b7b37a08b552bbba767adcf",
       "evidence_hash": "5766f2233e51df7dd5a39554022688b7364647b79f00722e6c78f0cde48989fa",
       "verdict": {
         "kind": "pass",
@@ -2379,7 +2379,7 @@
       }
     },
     {
-      "claim_hash": "76ad84753e14ce50b05e4d5cb953b32ed580341e070b2098115f0579e7d5bef8",
+      "claim_hash": "5f8df3ee532e1258498db049a4b9ce1d9671c8d29b7b37a08b552bbba767adcf",
       "evidence_hash": "fcf6947ce3a1288ef78c920282154efdd8d7a5123976adbe3f41e1fd6b4540a2",
       "verdict": {
         "kind": "pass",
@@ -2403,7 +2403,7 @@
       }
     },
     {
-      "claim_hash": "76ad84753e14ce50b05e4d5cb953b32ed580341e070b2098115f0579e7d5bef8",
+      "claim_hash": "5f8df3ee532e1258498db049a4b9ce1d9671c8d29b7b37a08b552bbba767adcf",
       "evidence_hash": "b49fb65c90adaab174287b910af03a5d2c7e928cd33ff55fd2b16efaa3957c33",
       "verdict": {
         "kind": "pass",
@@ -2427,7 +2427,7 @@
       }
     },
     {
-      "claim_hash": "76ad84753e14ce50b05e4d5cb953b32ed580341e070b2098115f0579e7d5bef8",
+      "claim_hash": "5f8df3ee532e1258498db049a4b9ce1d9671c8d29b7b37a08b552bbba767adcf",
       "evidence_hash": "eed55e184aa24849ff134ac46577b3efe86f7cc48072dacbfa95545682b2805d",
       "verdict": {
         "kind": "pass",
@@ -3291,7 +3291,7 @@
       }
     },
     {
-      "claim_hash": "ef48f76e3f91f0bcc370bc1ee1aaa02c9ca2c4dc65366f8246217332391bd75c",
+      "claim_hash": "b654ae7cb255d804e33ea67b163389f2e4a7fabe32e2bb17b5ac53767e032d3a",
       "evidence_hash": "c600677df01b23fc21e331a509de2c22f16a0ef63e6ef1cb2ef604999640d2bb",
       "verdict": {
         "kind": "pass",
@@ -3315,11 +3315,35 @@
       }
     },
     {
-      "claim_hash": "ef48f76e3f91f0bcc370bc1ee1aaa02c9ca2c4dc65366f8246217332391bd75c",
+      "claim_hash": "b654ae7cb255d804e33ea67b163389f2e4a7fabe32e2bb17b5ac53767e032d3a",
+      "evidence_hash": "e9f8e82c5561af5f9ded63ec8b3220fe37f99b81c0352e8256321e704ba538f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "config を消費する invocation surface は caller-supplied optional host を受け取り、値が present の場合だけ configured writer の `capability exec` invocation の dispatch boundary でその `--host` と値を追加して forward できる。保存・解決された literal argv の他の要素は変更しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "ProgramExecutionRecord"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-11",
+          "text_label": "operator-owned command config は provider host または `--host` を保持しない。config を消費する invocation surface は caller-supplied optional host を受け取り、値が present の場合だけ configured writer の `capability exec` invocation の dispatch boundary でその `--host` と値を追加して forward できる。保存・解決された literal argv の他の要素は変更しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b654ae7cb255d804e33ea67b163389f2e4a7fabe32e2bb17b5ac53767e032d3a",
       "evidence_hash": "3a5e9bfe0d346bd4954b8a1b5e75e3144ca58519d0d0207e5f5861d453dfc660",
       "verdict": {
         "kind": "pass",
-        "citation": "失敗した argv と outcome を operator が識別できる形で返す。"
+        "citation": "pre-entry または scope command が non-zero を返した場合、dispatcher は後続 command、writer、または reviewer を起動せず、失敗した argv と outcome を operator が識別できる形で返す。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -3339,7 +3363,7 @@
       }
     },
     {
-      "claim_hash": "ef48f76e3f91f0bcc370bc1ee1aaa02c9ca2c4dc65366f8246217332391bd75c",
+      "claim_hash": "b654ae7cb255d804e33ea67b163389f2e4a7fabe32e2bb17b5ac53767e032d3a",
       "evidence_hash": "574c686246d7577d3ab00fe3d015a1ba12dac480d60fd748ff40da6e914bd3dc",
       "verdict": {
         "kind": "pass",
@@ -3359,6 +3383,30 @@
           "section": "acceptance_criteria",
           "element_id": "AC-03",
           "text_label": "validate、explain、enter の CLI outcome により、operator は展開後の writer/pre-entry argv、実行順、default 3,600-second timeout または explicit timeout、その positive-integer / 3,600-second 上限、stdout/stderr 各 1 MiB (1,048,576-byte) capture limit、validation failure、first failing command、および output-limit または timeout outcome を監査できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b654ae7cb255d804e33ea67b163389f2e4a7fabe32e2bb17b5ac53767e032d3a",
+      "evidence_hash": "7d00562f1197f62211fcda52438425b296bc3d85ad921bcac89edccfb67b5aa1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "invocation surface に optional host が supplied の場合だけ、configured writer の `capability exec` invocation に dispatch boundary でその `--host` と値を追加して forward し、omitted の場合は追加しない。その他の configured literal argv 要素は変更しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "ProgramExecutionRecord"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-13",
+          "text_label": "operator-owned config には provider host または `--host` を保存しない。invocation surface に optional host が supplied の場合だけ、configured writer の `capability exec` invocation に dispatch boundary でその `--host` と値を追加して forward し、omitted の場合は追加しない。その他の configured literal argv 要素は変更しない。"
         }
       }
     },

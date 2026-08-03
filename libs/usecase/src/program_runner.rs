@@ -69,6 +69,7 @@ pub trait ProgramRunnerPort: Send + Sync {
 pub struct ProgramExecutionRecord {
     pub sequence_index: CommandSequenceIndex,
     pub command: ConfiguredCommand,
+    pub invoked_argv: CommandArgv,
     pub outcome: ProgramRunOutcome,
 }
 
@@ -137,13 +138,13 @@ mod tests {
     };
 
     fn record(outcome: ProgramRunOutcome) -> ProgramExecutionRecord {
+        let command =
+            ConfiguredCommand::try_new(vec![CommandArgument::try_new("command".to_owned())], None)
+                .unwrap();
         ProgramExecutionRecord {
             sequence_index: crate::operator_command::CommandSequenceIndex::new(0),
-            command: ConfiguredCommand::try_new(
-                vec![CommandArgument::try_new("command".to_owned())],
-                None,
-            )
-            .unwrap(),
+            invoked_argv: command.argv().clone(),
+            command,
             outcome,
         }
     }
@@ -163,6 +164,7 @@ mod tests {
         match classified {
             ClassifiedProgramExecutionRecord::Succeeded(success) => {
                 assert_eq!(success.as_ref().sequence_index.as_usize(), 0);
+                assert_eq!(success.as_ref().invoked_argv, *success.as_ref().command.argv());
             }
             ClassifiedProgramExecutionRecord::Failed(failure) => {
                 panic!("expected successful execution record, got {failure:?}");

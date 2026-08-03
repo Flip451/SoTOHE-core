@@ -17,7 +17,7 @@
         "role": "Interactor"
       },
       "brief": "Author a result test covering 'entry' of PhaseCommandInteractor",
-      "declaration_hash": "5e60400c38e8ce6bc29af9c8cbf158c0245a1f632a4256c4a25d5a4fb20014db",
+      "declaration_hash": "59b9b02233c16b7203c8267e95ff69498ce6921606e6211c834052d51c26d10c",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",

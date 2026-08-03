@@ -3078,17 +3078,8 @@
       "kind": {
         "kind": "struct",
         "shape": {
-          "fields": [
-            {
-              "name": "config_loader",
-              "ty": "Arc<dyn PhaseCommandConfigLoaderPort>"
-            },
-            {
-              "name": "runner",
-              "ty": "Arc<dyn ProgramRunnerPort>"
-            }
-          ],
-          "has_stripped_fields": false,
+          "fields": [],
+          "has_stripped_fields": true,
           "kind": "plain"
         }
       },
@@ -3614,7 +3605,7 @@
     },
     "ProgramExecutionRecord": {
       "action": "add",
-      "docs": "Command-execution record (IN-04, CN-03).",
+      "docs": "Program execution audit record (IN-04, IN-11, AC-03, AC-13).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -3627,6 +3618,10 @@
             {
               "name": "command",
               "ty": "ConfiguredCommand"
+            },
+            {
+              "name": "invoked_argv",
+              "ty": "CommandArgv"
             },
             {
               "name": "outcome",
@@ -3648,11 +3643,19 @@
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         },
         {
+          "anchor": "IN-11",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
           "anchor": "CN-03",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         },
         {
           "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-13",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]

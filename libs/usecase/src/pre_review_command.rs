@@ -208,12 +208,13 @@ impl PreReviewCommandDispatchService for PreReviewCommandDispatchInteractor {
             .ok_or_else(|| PreReviewCommandDispatchError::UnknownScope(scope.clone()))?;
         let mut completed = Vec::new();
         for (position, configured) in commands.iter().cloned().enumerate() {
+            let invoked_argv = configured.argv().clone();
             let outcome = self.runner.run(ProgramInvocation {
                 // A configured command owns its complete argument contract. In
                 // particular, the signal commands in the default matrix are
                 // intentionally argless, so appending review-local arguments
                 // would fail before the gate can execute.
-                argv: configured.argv().clone(),
+                argv: invoked_argv.clone(),
                 repository_root: command.repository_root.clone(),
                 timeout: configured.timeout(),
                 stdout_limit: OutputCaptureLimitBytes::one_mebibyte(),
@@ -221,6 +222,7 @@ impl PreReviewCommandDispatchService for PreReviewCommandDispatchInteractor {
             })?;
             let record = ProgramExecutionRecord {
                 sequence_index: CommandSequenceIndex::new(position),
+                invoked_argv,
                 command: configured,
                 outcome,
             };
@@ -433,9 +435,11 @@ mod tests {
     }
 
     fn failed_record(outcome: ProgramRunOutcome) -> FailedProgramExecutionRecord {
+        let command = command("fail");
         let record = ProgramExecutionRecord {
             sequence_index: crate::operator_command::CommandSequenceIndex::new(0),
-            command: command("fail"),
+            invoked_argv: command.argv().clone(),
+            command,
             outcome,
         };
         match record.classify() {

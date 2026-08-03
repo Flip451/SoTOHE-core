@@ -5,7 +5,7 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | ClassifiedProgramExecutionRecord | enum | add | Succeeded, Failed | 🔵 | 🔵 |
-| PhaseCommandEnterOutcome | enum | add | Completed, Blocked | 🟡 | 🔵 |
+| PhaseCommandEnterOutcome | enum | add | Completed, Blocked | 🔵 | 🔵 |
 | PreReviewCommandDispatchOutcome | enum | add | ReadyForReview, Blocked | 🔵 | 🔵 |
 | ProgramOutputStream | enum | add | Stdout, Stderr | 🔵 | 🔵 |
 | ProgramRunOutcome | enum | add | Exited, TimedOut, OutputLimitExceeded | 🔵 | 🔵 |
@@ -43,7 +43,7 @@
 | ConfiguredCommandValidationError | error_type | add | Argv, Timeout, PersistedHostArgument | 🔵 | 🔵 |
 | CurrentReviewTrackResolveError | error_type | add | ResolveFailed | 🔵 | 🔵 |
 | PhaseCommandConfigValidationError | error_type | add | InvalidSchemaVersion, DuplicateDeclaration | 🔵 | 🔵 |
-| PhaseCommandEnterError | error_type | add | Config, UnknownPhase, Runner | 🟡 | 🔵 |
+| PhaseCommandEnterError | error_type | add | Config, UnknownPhase, Runner | 🔵 | 🔵 |
 | PhaseCommandExplainError | error_type | add | Config, UnknownPhase | 🔵 | 🔵 |
 | PreReviewCommandConfigValidationError | error_type | add | InvalidSchemaVersion, DuplicateScope | 🔵 | 🔵 |
 | PreReviewCommandDispatchError | error_type | add | Config, UnknownScope, TrackResolution, TrackMismatch, Runner | 🔵 | 🔵 |
@@ -63,7 +63,7 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | CapabilityExecService | application_service | reference | fn execute(&self, request: CapabilityExecRequest) -> Result<CapabilityDispatchOutcome, CapabilityExecError> | 🔵 | 🔵 |
-| PhaseCommandService | application_service | add | fn validate(&self, command: PhaseValidateCommand) -> Result<(), CommandConfigLoadError>, fn explain(&self, query: PhaseExplainQuery) -> Result<PhaseCommandExplanation, PhaseCommandExplainError>, fn enter(&self, command: PhaseEnterCommand) -> Result<PhaseCommandEnterOutcome, PhaseCommandEnterError> | 🟡 | 🔵 |
+| PhaseCommandService | application_service | add | fn validate(&self, command: PhaseValidateCommand) -> Result<(), CommandConfigLoadError>, fn explain(&self, query: PhaseExplainQuery) -> Result<PhaseCommandExplanation, PhaseCommandExplainError>, fn enter(&self, command: PhaseEnterCommand) -> Result<PhaseCommandEnterOutcome, PhaseCommandEnterError> | 🔵 | 🔵 |
 | PreReviewCommandDispatchService | application_service | add | fn dispatch(&self, command: PreReviewCommandDispatchCommand) -> Result<PreReviewCommandDispatchOutcome, PreReviewCommandDispatchError> | 🔵 | 🔵 |
 
 ## Interactors
@@ -71,7 +71,7 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | CapabilityExecInteractor | interactor | reference | — | 🔵 | 🔵 |
-| PhaseCommandInteractor | interactor | add | — | 🟡 | 🔵 |
+| PhaseCommandInteractor | interactor | add | — | 🔵 | 🔵 |
 | PreReviewCommandDispatchInteractor | interactor | add | — | 🔵 | 🔵 |
 | PreReviewCommandGatedReviewInteractor | interactor | add | — | 🔵 | 🔵 |
 
@@ -91,7 +91,7 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | CapabilityExecRequest | command | modify | — | 🔵 | 🔵 |
-| PhaseEnterCommand | command | add | — | 🟡 | 🔵 |
+| PhaseEnterCommand | command | add | — | 🔵 | 🔵 |
 | PhaseValidateCommand | command | add | — | 🔵 | 🔵 |
 | PreReviewCommandDispatchCommand | command | add | — | 🔵 | 🔵 |
 

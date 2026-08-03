@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-03T09:27:17Z",
-  "declaration_hash": "b7e7d4142458376c2e954eae27dc2d67c9e5f1e43384e3f0393ef1bf438c778b",
-  "implementation_input_hash": "2d750cfb29d7378f7e1f8d384026e7ff829d1a650144ccb5197007f86560f9c6",
+  "generated_at": "2026-08-03T12:28:47Z",
+  "declaration_hash": "e8bd71f2d0a2301dd41f17f79f96ac5497e83824682e259f124bc7edbe43977a",
+  "implementation_input_hash": "7db490248f0ae7cbbeacdafaee4dc19f032cc89342f7e7dea35228ff42c6c184",
   "signals": [
     {
       "type_name": "CapabilityExecRequest",
@@ -280,9 +280,9 @@
     {
       "type_name": "PhaseCommandEnterError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Debug",
         "Display",
         "Error",
@@ -293,9 +293,9 @@
     {
       "type_name": "PhaseCommandEnterOutcome",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -329,24 +329,24 @@
     {
       "type_name": "PhaseCommandInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "PhaseCommandService"
       ]
     },
     {
       "type_name": "PhaseCommandService",
       "kind_tag": "application_service",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "PhaseEnterCommand",
       "kind_tag": "command",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",

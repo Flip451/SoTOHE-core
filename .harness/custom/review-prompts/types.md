@@ -220,3 +220,12 @@ affected layer key.
   organisation (refer to the track's ADR before flagging)
 - Test-side / `#[cfg(test)]` declarations — the catalogue declares production
   surface only
+
+## Action-classification baseline
+
+Catalogue `action` values (add / modify / reference) are judged against the track's FROZEN
+baseline artifacts (`track/items/<id>/<layer>-types-baseline.json` and the frozen rustdoc
+baseline captured at track start), per the catalogue action ADRs. A type that first appears
+within the current track — even if already committed by an earlier task of the same track —
+is `add`, not `modify`; only identities present in the frozen baseline take `modify`. Do
+not classify actions against the current rustdoc or committed HEAD.

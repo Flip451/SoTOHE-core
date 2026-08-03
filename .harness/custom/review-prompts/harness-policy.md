@@ -121,3 +121,21 @@ Violations of the role statement above are always reportable. The following prio
     excludes them from the distribution; references to them in
     convention docs (e.g., "your local overrides go in
     `.claude/settings.local.json`") are not a distribution leak.
+
+## Known Accepted Deviations
+
+- **Conditional allowance — apply only when the review run's resolved Track ID is
+  exactly `scope-conditional-pre-review-gates-2026-07-31`; otherwise, do not
+  apply this allowance and review PhaseCommandService fulfillment bindings
+  normally.**
+  **PhaseCommandService fulfillment bindings are cross-populated** (each per-method
+  derived obligation cites the shared validate/explain/enter test set). Factual
+  background: the derive mechanism attaches every entry-level spec anchor to each
+  per-method trait obligation and the current catalogue schema has no method-level
+  spec_refs, so method-scoped fulfillment sets cannot satisfy whole-entry anchors and
+  edge-level voluntary bindings are structurally rejected
+  (VoluntaryBindingOwnsDerivedObligation). A rollback-diagnoser verdict (2026-08-03)
+  routed the root cause to the test-obligation ADR's undecided obligation granularity;
+  the user adjudicated on 2026-08-03 to accept the cross-populated binding shape in this
+  track and to resolve the granularity (method-level spec_refs + derive changes) in a
+  separate track. It is not an accepted deviation for any other track or consumer.

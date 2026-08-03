@@ -56,8 +56,8 @@
       {"layer": "usecase", "entry_key": "CapturedProgramOutput"},
       {"layer": "usecase", "entry_key": "ClassifiedProgramExecutionRecord"},
       {"layer": "usecase", "entry_key": "FailedProgramExecutionRecord"},
-      {"layer": "usecase", "entry_key": "ProgramExecutionRecord"},
       {"layer": "usecase", "entry_key": "ProgramExitCode"},
+      {"layer": "usecase", "entry_key": "ProgramExecutionRecord"},
       {"layer": "usecase", "entry_key": "ProgramInvocation"},
       {"layer": "usecase", "entry_key": "ProgramOutputStream"},
       {"layer": "usecase", "entry_key": "ProgramRunOutcome"},
@@ -149,6 +149,7 @@
       {"layer": "usecase", "entry_key": "PhaseExplainQuery"}
     ],
     "T035": [
+      {"layer": "usecase", "entry_key": "ProgramExecutionRecord"},
       {"layer": "usecase", "entry_key": "PhaseCommandEnterError"},
       {"layer": "usecase", "entry_key": "PhaseCommandEnterOutcome"},
       {"layer": "usecase", "entry_key": "PhaseCommandInteractor"},

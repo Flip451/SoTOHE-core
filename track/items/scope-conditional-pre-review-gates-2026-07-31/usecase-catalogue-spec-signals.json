@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "b7e7d4142458376c2e954eae27dc2d67c9e5f1e43384e3f0393ef1bf438c778b",
+  "catalogue_declaration_hash": "e8bd71f2d0a2301dd41f17f79f96ac5497e83824682e259f124bc7edbe43977a",
   "signals": [
     {
       "type_name": "CapabilityExecInteractor",
@@ -140,7 +140,7 @@
     {
       "type_name": "PhaseCommandInteractor",
       "signal": "blue",
-      "entry_hash": "76ad84753e14ce50b05e4d5cb953b32ed580341e070b2098115f0579e7d5bef8"
+      "entry_hash": "5f8df3ee532e1258498db049a4b9ce1d9671c8d29b7b37a08b552bbba767adcf"
     },
     {
       "type_name": "PhaseEnterCommand",
@@ -200,7 +200,7 @@
     {
       "type_name": "ProgramExecutionRecord",
       "signal": "blue",
-      "entry_hash": "ef48f76e3f91f0bcc370bc1ee1aaa02c9ca2c4dc65366f8246217332391bd75c"
+      "entry_hash": "b654ae7cb255d804e33ea67b163389f2e4a7fabe32e2bb17b5ac53767e032d3a"
     },
     {
       "type_name": "ProgramExitCode",

@@ -2454,6 +2454,93 @@
     },
     {
       "edge_id": {
+        "entry_key": "ClassifiedProgramExecutionRecord",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ClassifiedProgramExecutionRecord",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "812500a3977990e3cbc386153a313287ef1807094d57a4de16efe228a0e0a8de",
+        "declaration_hash": "65b9bf34f56fdf86b20a06fe2f707be06d64da958f71923a1ecd8bb76c8b135b",
+        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "ClassifiedProgramExecutionRecord::Succeeded(success) => { assert_eq!(success.as_ref().sequence_index.as_usize(), 0); assert_eq!(success.as_ref().invoked_argv, *success.as_ref().command.argv()); }\nClassifiedProgramExecutionRecord::Failed(failure) => { assert!(matches!(failure.as_ref().outcome, ProgramRunOutcome::Exited { ref exit_code, .. } if exit_code.as_i32() != 0)); }\nassert!(matches!(failure.as_ref().outcome, ProgramRunOutcome::TimedOut { .. }));\nassert!(matches!(failure.as_ref().outcome, ProgramRunOutcome::OutputLimitExceeded { .. }));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::program_runner::tests",
+          "test_name": "test_program_execution_record_classify_zero_exit_returns_succeeded"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::program_runner::tests",
+          "test_name": "test_program_execution_record_classify_non_zero_exit_returns_non_zero_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::program_runner::tests",
+          "test_name": "test_program_execution_record_classify_timeout_returns_timed_out_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::program_runner::tests",
+          "test_name": "test_program_execution_record_classify_output_limit_returns_output_limit_failure"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ClassifiedProgramExecutionRecord",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ClassifiedProgramExecutionRecord",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "248a414d545bc1906a667e7574ce56ba7ee44e63b30383331fbc2af524c5ed0b",
+        "declaration_hash": "65b9bf34f56fdf86b20a06fe2f707be06d64da958f71923a1ecd8bb76c8b135b",
+        "anchor_text_hash": "6166df4e5cb8aa348e839dc9faf6fdda9446f5782ff3880dec49513621a1e600"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "match classified {\n    ClassifiedProgramExecutionRecord::Failed(failure) => {\n        assert!(matches!(\n            failure.as_ref().outcome,\n            ProgramRunOutcome::Exited { ref exit_code, .. } if exit_code.as_i32() != 0\n        ));\n    }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::program_runner::tests",
+          "test_name": "test_program_execution_record_classify_non_zero_exit_returns_non_zero_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::program_runner::tests",
+          "test_name": "test_program_execution_record_classify_timeout_returns_timed_out_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::program_runner::tests",
+          "test_name": "test_program_execution_record_classify_output_limit_returns_output_limit_failure"
+        }
+      ]
+    },
+    {
+      "edge_id": {
         "entry_key": "CommandArgument",
         "anchor_id": {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -3190,6 +3277,606 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::operator_command_config::tests",
           "test_name": "test_current_track_resolver_accepts_track_branch_and_rejects_other_branch"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "FailedProgramExecutionRecord",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FailedProgramExecutionRecord",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "bdc97bd0e5451866b47c2b373bf35738874b71cf056ddd382a03f1747512fe9f",
+        "declaration_hash": "b51f682cface9ab77f6646acf9f5453bfb8df6e9acbde83dc18d81b94cfe640e",
+        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(failure.as_ref().outcome, ProgramRunOutcome::TimedOut { .. }));\n\nassert!(matches!(failure.as_ref().outcome, ProgramRunOutcome::OutputLimitExceeded { .. }));\n\nassert_eq!(failed.as_ref().sequence_index.as_usize(), 1);\nassert!(matches!(\n    failed.as_ref().outcome,\n    ProgramRunOutcome::Exited { ref exit_code, .. } if exit_code.as_i32() == 1\n));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::program_runner::tests",
+          "test_name": "test_program_execution_record_classify_non_zero_exit_returns_non_zero_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::program_runner::tests",
+          "test_name": "test_program_execution_record_classify_timeout_returns_timed_out_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::program_runner::tests",
+          "test_name": "test_program_execution_record_classify_output_limit_returns_output_limit_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_pre_entry_failure_stops_writer_and_remaining_commands"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "FailedProgramExecutionRecord",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FailedProgramExecutionRecord",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "c32dd861c436e3c2f5f2a47254c5beadeda1f0c537ea4a70308b9379218fc9ae",
+        "declaration_hash": "b51f682cface9ab77f6646acf9f5453bfb8df6e9acbde83dc18d81b94cfe640e",
+        "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let classified = record(ProgramRunOutcome::Exited {\n            exit_code: ProgramExitCode::new(1),\n            output: output(),\n        })\n        .classify();\n\n        match classified {\n            ClassifiedProgramExecutionRecord::Failed(failure) => {\n                assert!(matches!(\n                    failure.as_ref().outcome,\n                    ProgramRunOutcome::Exited { ref exit_code, .. } if exit_code.as_i32() != 0\n                ));\n            }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::program_runner::tests",
+          "test_name": "test_program_execution_record_classify_non_zero_exit_returns_non_zero_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::program_runner::tests",
+          "test_name": "test_program_execution_record_classify_timeout_returns_timed_out_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::program_runner::tests",
+          "test_name": "test_program_execution_record_classify_output_limit_returns_output_limit_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_command::tests",
+          "test_name": "test_pre_review_command_dispatch_returns_first_failure_with_completed_successes"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "FailedProgramExecutionRecord",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FailedProgramExecutionRecord",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "bdc97bd0e5451866b47c2b373bf35738874b71cf056ddd382a03f1747512fe9f",
+        "declaration_hash": "b51f682cface9ab77f6646acf9f5453bfb8df6e9acbde83dc18d81b94cfe640e",
+        "anchor_text_hash": "6166df4e5cb8aa348e839dc9faf6fdda9446f5782ff3880dec49513621a1e600"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(failed.as_ref().command.argv().arguments().first().map(CommandArgument::as_str), Some(\"fail\"));\n                assert_eq!(\n                    failed\n                        .as_ref()\n                        .invoked_argv\n                        .arguments()\n                        .iter()\n                        .map(CommandArgument::as_str)\n                        .collect::<Vec<_>>(),\n                    vec![\"fail\"]\n                );\n                assert!(matches!(\n                    failed.as_ref().outcome,\n                    ProgramRunOutcome::Exited { ref exit_code, .. } if exit_code.as_i32() == 1\n                ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::program_runner::tests",
+          "test_name": "test_program_execution_record_classify_non_zero_exit_returns_non_zero_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::program_runner::tests",
+          "test_name": "test_program_execution_record_classify_timeout_returns_timed_out_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::program_runner::tests",
+          "test_name": "test_program_execution_record_classify_output_limit_returns_output_limit_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_pre_entry_failure_stops_writer_and_remaining_commands"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewCommandDispatchOutcome",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewCommandDispatchOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "f4074bc2f97a3f11a2ad59daededf65107d7fa45e7de8e6a0d3e1741a46a7a4d",
+        "declaration_hash": "7b3fe8ecede5c6e1bce6abe977e1b6e27cac35d493afd2fb1e1d7e1b18168dc1",
+        "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "`assert!(matches!(outcome, PreReviewCommandDispatchOutcome::ReadyForReview { records } if records.len() == 4))` and `match outcome { PreReviewCommandDispatchOutcome::Blocked { completed, failed } => { assert_eq!(completed.len(), 1); assert!(matches!(failed.as_ref().outcome, ProgramRunOutcome::Exited { ref exit_code, .. } if exit_code.as_i32() != 0));`"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_command::tests",
+          "test_name": "test_pre_review_command_dispatch_returns_first_failure_with_completed_successes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_command::tests",
+          "test_name": "test_pre_review_command_dispatch_returns_successful_records_in_declaration_order"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewCommandDispatchOutcome",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewCommandDispatchOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "f4074bc2f97a3f11a2ad59daededf65107d7fa45e7de8e6a0d3e1741a46a7a4d",
+        "declaration_hash": "7b3fe8ecede5c6e1bce6abe977e1b6e27cac35d493afd2fb1e1d7e1b18168dc1",
+        "anchor_text_hash": "3503592124957ba7751cc28fe43d9a296d963b754b236386592298f341297962"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(*runner.0.lock().unwrap(), vec![vec![\"bin/sotp\", \"signal\", \"calc-impl-catalog\"], vec![\"bin/sotp\", \"signal\", \"check-impl-catalog\", \"--gate\", \"commit\"], vec![\"bin/sotp\", \"task-contract\", \"coverage\"], vec![\"bin/sotp\", \"task-contract\", \"check\"]]); ... assert_eq!(*runner.0.lock().unwrap(), vec![vec![\"first\"], vec![\"fail\"],]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_command::tests",
+          "test_name": "test_pre_review_command_dispatch_returns_first_failure_with_completed_successes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_command::tests",
+          "test_name": "test_pre_review_command_dispatch_returns_successful_records_in_declaration_order"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewCommandDispatchOutcome",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewCommandDispatchOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "73253b9e1614eeacbd27a0396239a686e5e291ce7f60ffd83ef8e03e411e8193",
+        "declaration_hash": "7b3fe8ecede5c6e1bce6abe977e1b6e27cac35d493afd2fb1e1d7e1b18168dc1",
+        "anchor_text_hash": "6166df4e5cb8aa348e839dc9faf6fdda9446f5782ff3880dec49513621a1e600"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n                    failed.as_ref().outcome,\n                    ProgramRunOutcome::Exited { ref exit_code, .. } if exit_code.as_i32() != 0\n                ));\n                let failed_argv: Vec<&str> = failed\n                    .as_ref()\n                    .command\n                    .argv()\n                    .arguments()\n                    .iter()\n                    .map(CommandArgument::as_str)\n                    .collect();\n                assert_eq!(failed_argv, [\"fail\"]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_command::tests",
+          "test_name": "test_pre_review_command_dispatch_returns_first_failure_with_completed_successes"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewCommandDispatchOutcome",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewCommandDispatchOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "f4074bc2f97a3f11a2ad59daededf65107d7fa45e7de8e6a0d3e1741a46a7a4d",
+        "declaration_hash": "7b3fe8ecede5c6e1bce6abe977e1b6e27cac35d493afd2fb1e1d7e1b18168dc1",
+        "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(\n            matches!(outcome, PreReviewCommandDispatchOutcome::ReadyForReview { records } if records.len() == 4)\n        );\n        assert_eq!(\n            *runner.0.lock().unwrap(),\n            vec![\n                vec![\"bin/sotp\", \"signal\", \"calc-impl-catalog\"],\n                vec![\"bin/sotp\", \"signal\", \"check-impl-catalog\", \"--gate\", \"commit\"],\n                vec![\"bin/sotp\", \"task-contract\", \"coverage\"],\n                vec![\"bin/sotp\", \"task-contract\", \"check\"],\n            ]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_command::tests",
+          "test_name": "test_pre_review_command_dispatch_returns_first_failure_with_completed_successes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_command::tests",
+          "test_name": "test_pre_review_command_dispatch_returns_successful_records_in_declaration_order"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ProgramExecutionRecord",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ProgramExecutionRecord",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "5a5391e8e7a98c8479648d53b1e00badb9a2806ab5f3f0932ad20414bc62023a",
+        "declaration_hash": "fc02c5833cea75a5eef71f8a3ed0a32ac2cc27176dac3fae0301b5cf4267f669",
+        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(failed.as_ref().sequence_index.as_usize(), 1);\nassert_eq!(\n    failed.as_ref().command.argv().arguments().first().map(CommandArgument::as_str),\n    Some(\"fail\")\n);\nassert_eq!(\n    failed\n        .as_ref()\n        .invoked_argv\n        .arguments()\n        .iter()\n        .map(CommandArgument::as_str)\n        .collect::<Vec<_>>(),\n    vec![\"fail\"]\n);\nassert!(matches!(\n    failed.as_ref().outcome,\n    ProgramRunOutcome::Exited { ref exit_code, .. } if exit_code.as_i32() == 1\n));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_propagates_configured_timeouts_and_capture_limits"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_timed_out_command_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_output_limited_pre_entry_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_pre_entry_failure_stops_writer_and_remaining_commands"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ProgramExecutionRecord",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-11"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ProgramExecutionRecord",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-11"
+      },
+      "key": {
+        "bound_tests_set_hash": "d4e6a094f12d4dae2e1fb8b1d9bdb9ff9f86d360af48f07b9a9d1b995cb4f4dd",
+        "declaration_hash": "fc02c5833cea75a5eef71f8a3ed0a32ac2cc27176dac3fae0301b5cf4267f669",
+        "anchor_text_hash": "ebe6fab89b5c121c6f2179eebc761a3372cfefe75713d1d4dce322e9302354e6"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(argv_values(writer_invocation),\n            vec![\"bin/sotp\", \"capability\", \"exec\", \"implementer\", \"briefing.md\", \"--host\", \"codex\",]);\n        assert_eq!(\n            writer.argv().arguments().iter().map(CommandArgument::as_str).collect::<Vec<_>>(),\n            vec![\"bin/sotp\", \"capability\", \"exec\", \"implementer\", \"briefing.md\"]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_appends_supplied_host_only_to_capability_exec_writer"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_omitted_host_preserves_writer_argv"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ProgramExecutionRecord",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-13"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ProgramExecutionRecord",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-13"
+      },
+      "key": {
+        "bound_tests_set_hash": "d4e6a094f12d4dae2e1fb8b1d9bdb9ff9f86d360af48f07b9a9d1b995cb4f4dd",
+        "declaration_hash": "fc02c5833cea75a5eef71f8a3ed0a32ac2cc27176dac3fae0301b5cf4267f669",
+        "anchor_text_hash": "05e6e189bc377aa5f6c10e51bb69aa449a5cbd9f6ac58595389e164fcacefeea"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(argv_values(writer_invocation), vec![\"bin/sotp\", \"capability\", \"exec\", \"implementer\", \"briefing.md\", \"--host\", \"codex\",]);\n        assert_eq!(\n            writer.argv().arguments().iter().map(CommandArgument::as_str).collect::<Vec<_>>(),\n            vec![\"bin/sotp\", \"capability\", \"exec\", \"implementer\", \"briefing.md\"]\n        );\n\n        assert_eq!(\n            argv_values(writer_invocation),\n            vec![\"bin/sotp\", \"capability\", \"exec\", \"implementer\"]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_appends_supplied_host_only_to_capability_exec_writer"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_omitted_host_preserves_writer_argv"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ProgramExecutionRecord",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ProgramExecutionRecord",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "0cfee559a5c16eae8eebb64fcf057962717aef81a73862dc01f8e308c148906b",
+        "declaration_hash": "fc02c5833cea75a5eef71f8a3ed0a32ac2cc27176dac3fae0301b5cf4267f669",
+        "anchor_text_hash": "6166df4e5cb8aa348e839dc9faf6fdda9446f5782ff3880dec49513621a1e600"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            runner.invocations().iter().map(argv_values).collect::<Vec<_>>(),\n            vec![vec![\"first\"], vec![\"fail\"]]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_pre_entry_failure_stops_writer_and_remaining_commands"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_timed_out_command_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_output_limited_pre_entry_as_blocked_outcome"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ProgramExecutionRecord",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ProgramExecutionRecord",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "5200812907a7d0ee092823a64942144b9783516cf41b12748cfcf13cda44b4db",
+        "declaration_hash": "fc02c5833cea75a5eef71f8a3ed0a32ac2cc27176dac3fae0301b5cf4267f669",
+        "anchor_text_hash": "3a64b29a92e9e9eeaf1a9ea27e22587c95af88cf00d71369188fd9b70d334f36"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"assert_eq!(failed.as_ref().sequence_index.as_usize(), 1);\" ... \"assert_eq!(failed.as_ref().command.argv().arguments().first().map(CommandArgument::as_str), Some(\\\"fail\\\"))\" ... \"assert_eq!(failed.as_ref().invoked_argv.arguments().iter().map(CommandArgument::as_str).collect::<Vec<_>>(), vec![\\\"fail\\\"]);\" ... \"assert!(matches!(failed.as_ref().outcome, ProgramRunOutcome::Exited { ref exit_code, .. } if exit_code.as_i32() == 1))\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_runs_pre_entry_commands_sequentially_at_repository_root"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_pre_entry_failure_stops_writer_and_remaining_commands"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_timed_out_command_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_output_limited_pre_entry_as_blocked_outcome"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SuccessfulProgramExecutionRecord",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SuccessfulProgramExecutionRecord",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "8fbc3e7e40f0cf538ea51960ae461ef00088f23d3de510b265e012c0ceef3639",
+        "declaration_hash": "18645628c7ca4798c96a0205321288ddcd31949c592802a2e10172a3c311b4db",
+        "anchor_text_hash": "edb4e92dab097edf9daf4986f7e535467ff8962fca5911e37dec2e1756d33671"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "ClassifiedProgramExecutionRecord::Succeeded(success) => {\n                assert_eq!(success.as_ref().sequence_index.as_usize(), 0);\n                assert_eq!(success.as_ref().invoked_argv, *success.as_ref().command.argv());\n            }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::program_runner::tests",
+          "test_name": "test_program_execution_record_classify_zero_exit_returns_succeeded"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_runs_pre_entry_commands_sequentially_at_repository_root"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_appends_supplied_host_only_to_capability_exec_writer"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SuccessfulProgramExecutionRecord",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SuccessfulProgramExecutionRecord",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "4a9f52c0aa6edc6df9f3c070df7516e3c4b01c3f3eb435d40cb16964101db106",
+        "declaration_hash": "18645628c7ca4798c96a0205321288ddcd31949c592802a2e10172a3c311b4db",
+        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(success.as_ref().sequence_index.as_usize(), 0);\n                assert_eq!(success.as_ref().invoked_argv, *success.as_ref().command.argv());\n...\nassert_eq!(invocations.iter().map(argv_values).collect::<Vec<_>>(),\n            vec![vec![\"first\"], vec![\"second\"], vec![\"writer\"]]"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::program_runner::tests",
+          "test_name": "test_program_execution_record_classify_zero_exit_returns_succeeded"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_propagates_configured_timeouts_and_capture_limits"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_runs_pre_entry_commands_sequentially_at_repository_root"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "SuccessfulProgramExecutionRecord",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SuccessfulProgramExecutionRecord",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "5e3652d37e354f5f09235a65feb2665e285d746a2775a7eb61647c6338c49015",
+        "declaration_hash": "18645628c7ca4798c96a0205321288ddcd31949c592802a2e10172a3c311b4db",
+        "anchor_text_hash": "6166df4e5cb8aa348e839dc9faf6fdda9446f5782ff3880dec49513621a1e600"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n                    failed.as_ref().outcome,\n                    ProgramRunOutcome::Exited { ref exit_code, .. } if exit_code.as_i32() != 0\n                ));\n                let failed_argv: Vec<&str> = failed\n                    .as_ref()\n                    .command\n                    .argv()\n                    .arguments()\n                    .iter()\n                    .map(CommandArgument::as_str)\n                    .collect();\n                assert_eq!(failed_argv, [\"fail\"]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::program_runner::tests",
+          "test_name": "test_program_execution_record_classify_zero_exit_returns_succeeded"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_command::tests",
+          "test_name": "test_pre_review_command_dispatch_returns_first_failure_with_completed_successes"
         }
       ]
     },
@@ -4398,6 +5085,2276 @@
           "layer": "usecase",
           "module_path": "usecase::phase_command::tests",
           "test_name": "test_phase_command_explanation_preserves_observable_expanded_commands_and_limits"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandInteractor",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "GO-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "7bf4f73a33a1d3714d3ddcac4d1ccb094ab0e3f5e1f8f130fdeb43596e7d3265",
+        "declaration_hash": "59b9b02233c16b7203c8267e95ff69498ce6921606e6211c834052d51c26d10c",
+        "anchor_text_hash": "beab4883c958af4d33c14aaa4b4beccef6f734e2af42f16d4b57f3031107ca6f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            invocations.iter().map(argv_values).collect::<Vec<_>>(),\n            vec![vec![\"first\"], vec![\"second\"], vec![\"writer\"]]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_runs_pre_entry_commands_sequentially_at_repository_root"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_pre_entry_failure_stops_writer_and_remaining_commands"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_propagates_configured_timeouts_and_capture_limits"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_timed_out_command_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_output_limited_pre_entry_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_appends_supplied_host_only_to_capability_exec_writer"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_omitted_host_preserves_writer_argv"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandInteractor",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "7bf4f73a33a1d3714d3ddcac4d1ccb094ab0e3f5e1f8f130fdeb43596e7d3265",
+        "declaration_hash": "59b9b02233c16b7203c8267e95ff69498ce6921606e6211c834052d51c26d10c",
+        "anchor_text_hash": "ef72acacfb5dc440638dcb1eca6898bd3db2fbdd6150c1af28c56c8594a8958d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"vec![vec![\"first\"], vec![\"second\"], vec![\"writer\"]]\"; \"invocations.iter().all(|invocation| invocation.repository_root == Path::new(\"/repository\"))\"; \"vec![vec![\"first\"], vec![\"fail\"]]\"; \"invocations.iter().all(|invocation| { invocation.stdout_limit.as_usize() == 1_048_576 && invocation.stderr_limit.as_usize() == 1_048_576 })\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_runs_pre_entry_commands_sequentially_at_repository_root"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_pre_entry_failure_stops_writer_and_remaining_commands"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_propagates_configured_timeouts_and_capture_limits"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_timed_out_command_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_output_limited_pre_entry_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_appends_supplied_host_only_to_capability_exec_writer"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_omitted_host_preserves_writer_argv"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandInteractor",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "7bf4f73a33a1d3714d3ddcac4d1ccb094ab0e3f5e1f8f130fdeb43596e7d3265",
+        "declaration_hash": "59b9b02233c16b7203c8267e95ff69498ce6921606e6211c834052d51c26d10c",
+        "anchor_text_hash": "40dc60e9383fe78e784c70d0531f18bc574b03cbaa5710618f0fcdf56d3382f7"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(argv_values(writer_invocation), vec![\"bin/sotp\", \"capability\", \"exec\", \"implementer\", \"briefing.md\", \"--host\", \"codex\",]); assert_eq!(writer.argv().arguments().iter().map(CommandArgument::as_str).collect::<Vec<_>>(), vec![\"bin/sotp\", \"capability\", \"exec\", \"implementer\", \"briefing.md\"]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_runs_pre_entry_commands_sequentially_at_repository_root"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_pre_entry_failure_stops_writer_and_remaining_commands"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_propagates_configured_timeouts_and_capture_limits"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_timed_out_command_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_output_limited_pre_entry_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_appends_supplied_host_only_to_capability_exec_writer"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_omitted_host_preserves_writer_argv"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandInteractor",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "7bf4f73a33a1d3714d3ddcac4d1ccb094ab0e3f5e1f8f130fdeb43596e7d3265",
+        "declaration_hash": "59b9b02233c16b7203c8267e95ff69498ce6921606e6211c834052d51c26d10c",
+        "anchor_text_hash": "edb4e92dab097edf9daf4986f7e535467ff8962fca5911e37dec2e1756d33671"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(invocations.iter().map(argv_values).collect::<Vec<_>>(), vec![vec![\"first\"], vec![\"second\"], vec![\"writer\"]]); ... assert_eq!(runner.invocations().iter().map(argv_values).collect::<Vec<_>>(), vec![vec![\"first\"], vec![\"fail\"]]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_runs_pre_entry_commands_sequentially_at_repository_root"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_pre_entry_failure_stops_writer_and_remaining_commands"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_propagates_configured_timeouts_and_capture_limits"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_timed_out_command_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_output_limited_pre_entry_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_appends_supplied_host_only_to_capability_exec_writer"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_omitted_host_preserves_writer_argv"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandInteractor",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "7bf4f73a33a1d3714d3ddcac4d1ccb094ab0e3f5e1f8f130fdeb43596e7d3265",
+        "declaration_hash": "59b9b02233c16b7203c8267e95ff69498ce6921606e6211c834052d51c26d10c",
+        "anchor_text_hash": "fa7e4f00724359c580b35833faf745f970a7f203d8fbd44a502a13e850af54b9"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(argv_values(writer_invocation), vec![\"bin/sotp\", \"capability\", \"exec\", \"implementer\", \"briefing.md\", \"--host\", \"codex\",]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_runs_pre_entry_commands_sequentially_at_repository_root"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_pre_entry_failure_stops_writer_and_remaining_commands"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_propagates_configured_timeouts_and_capture_limits"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_timed_out_command_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_output_limited_pre_entry_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_appends_supplied_host_only_to_capability_exec_writer"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_omitted_host_preserves_writer_argv"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "GO-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:validate"
+      },
+      "key": {
+        "bound_tests_set_hash": "d5dd9d95fc38a31ab25238bdd81eaa39c870a93c1b0dac94bc0726dc9aaa0ba6",
+        "declaration_hash": "d06d763b8e510b16d00c63de1a2f1d1d3d90fd0b3ae5d4c6ee416e0661cf3227",
+        "anchor_text_hash": "beab4883c958af4d33c14aaa4b4beccef6f734e2af42f16d4b57f3031107ca6f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            invocations.iter().map(argv_values).collect::<Vec<_>>(),\n            vec![vec![\"first\"], vec![\"second\"], vec![\"writer\"]]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_returns_success_and_loader_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_invalid_configuration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_all_declared_invalid_configurations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_explain_returns_selected_declaration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_runs_pre_entry_commands_sequentially_at_repository_root"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_pre_entry_failure_stops_writer_and_remaining_commands"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_invalid_configuration_returns_auditable_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_propagates_configured_timeouts_and_capture_limits"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_timed_out_command_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_output_limited_pre_entry_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_appends_supplied_host_only_to_capability_exec_writer"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_omitted_host_preserves_writer_argv"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:validate"
+      },
+      "key": {
+        "bound_tests_set_hash": "d5dd9d95fc38a31ab25238bdd81eaa39c870a93c1b0dac94bc0726dc9aaa0ba6",
+        "declaration_hash": "d06d763b8e510b16d00c63de1a2f1d1d3d90fd0b3ae5d4c6ee416e0661cf3227",
+        "anchor_text_hash": "ef72acacfb5dc440638dcb1eca6898bd3db2fbdd6150c1af28c56c8594a8958d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            invocations.iter().map(argv_values).collect::<Vec<_>>(),\n            vec![vec![\"first\"], vec![\"second\"], vec![\"writer\"]]\n        );\n\nassert_eq!(\n            runner.invocations().iter().map(argv_values).collect::<Vec<_>>(),\n            vec![vec![\"first\"], vec![\"fail\"]]\n        );\n\nassert!(invocations.iter().all(|invocation| {\n            invocation.stdout_limit.as_usize() == 1_048_576\n                && invocation.stderr_limit.as_usize() == 1_048_576\n        }));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_returns_success_and_loader_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_invalid_configuration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_all_declared_invalid_configurations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_explain_returns_selected_declaration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_runs_pre_entry_commands_sequentially_at_repository_root"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_pre_entry_failure_stops_writer_and_remaining_commands"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_invalid_configuration_returns_auditable_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_propagates_configured_timeouts_and_capture_limits"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_timed_out_command_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_output_limited_pre_entry_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_appends_supplied_host_only_to_capability_exec_writer"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_omitted_host_preserves_writer_argv"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:validate"
+      },
+      "key": {
+        "bound_tests_set_hash": "d5dd9d95fc38a31ab25238bdd81eaa39c870a93c1b0dac94bc0726dc9aaa0ba6",
+        "declaration_hash": "d06d763b8e510b16d00c63de1a2f1d1d3d90fd0b3ae5d4c6ee416e0661cf3227",
+        "anchor_text_hash": "3a64b29a92e9e9eeaf1a9ea27e22587c95af88cf00d71369188fd9b70d334f36"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(explanation.phase_id.as_str(), \"phase-one\"); ... assert_eq!(pre_entry_records.len(), 2); ... assert_eq!(writer_record.as_ref().sequence_index.as_usize(), 2); ... assert!(matches!(validate(\"/invalid-schema\"), Err(CommandConfigLoadError::Invalid(...)))); ... PhaseCommandEnterOutcome::Blocked { completed, failed }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_returns_success_and_loader_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_invalid_configuration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_all_declared_invalid_configurations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_explain_returns_selected_declaration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_runs_pre_entry_commands_sequentially_at_repository_root"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_pre_entry_failure_stops_writer_and_remaining_commands"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_invalid_configuration_returns_auditable_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_propagates_configured_timeouts_and_capture_limits"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_timed_out_command_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_output_limited_pre_entry_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_appends_supplied_host_only_to_capability_exec_writer"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_omitted_host_preserves_writer_argv"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:validate"
+      },
+      "key": {
+        "bound_tests_set_hash": "d5dd9d95fc38a31ab25238bdd81eaa39c870a93c1b0dac94bc0726dc9aaa0ba6",
+        "declaration_hash": "d06d763b8e510b16d00c63de1a2f1d1d3d90fd0b3ae5d4c6ee416e0661cf3227",
+        "anchor_text_hash": "edb4e92dab097edf9daf4986f7e535467ff8962fca5911e37dec2e1756d33671"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            invocations.iter().map(argv_values).collect::<Vec<_>>(),\n            vec![vec![\"first\"], vec![\"second\"], vec![\"writer\"]]\n        );\n\n... \n\nassert_eq!(\n            runner.invocations().iter().map(argv_values).collect::<Vec<_>>(),\n            vec![vec![\"first\"], vec![\"fail\"]]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_returns_success_and_loader_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_invalid_configuration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_all_declared_invalid_configurations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_explain_returns_selected_declaration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_runs_pre_entry_commands_sequentially_at_repository_root"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_pre_entry_failure_stops_writer_and_remaining_commands"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_invalid_configuration_returns_auditable_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_propagates_configured_timeouts_and_capture_limits"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_timed_out_command_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_output_limited_pre_entry_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_appends_supplied_host_only_to_capability_exec_writer"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_omitted_host_preserves_writer_argv"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:validate"
+      },
+      "key": {
+        "bound_tests_set_hash": "d5dd9d95fc38a31ab25238bdd81eaa39c870a93c1b0dac94bc0726dc9aaa0ba6",
+        "declaration_hash": "d06d763b8e510b16d00c63de1a2f1d1d3d90fd0b3ae5d4c6ee416e0661cf3227",
+        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(invocations.iter().map(argv_values).collect::<Vec<_>>(), vec![vec![\"first\"], vec![\"second\"], vec![\"writer\"]]); ... assert_eq!(pre_entry.timeout.as_secs(), 42); assert_eq!(writer.timeout.as_secs(), 3_600); ... invocation.stdout_limit.as_usize() == 1_048_576 && invocation.stderr_limit.as_usize() == 1_048_576 ... ProgramRunOutcome::TimedOut { .. } ... ProgramRunOutcome::OutputLimitExceeded { stream: ProgramOutputStream::Stderr, .. }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_returns_success_and_loader_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_invalid_configuration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_all_declared_invalid_configurations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_explain_returns_selected_declaration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_runs_pre_entry_commands_sequentially_at_repository_root"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_pre_entry_failure_stops_writer_and_remaining_commands"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_invalid_configuration_returns_auditable_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_propagates_configured_timeouts_and_capture_limits"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_timed_out_command_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_output_limited_pre_entry_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_appends_supplied_host_only_to_capability_exec_writer"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_omitted_host_preserves_writer_argv"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:validate"
+      },
+      "key": {
+        "bound_tests_set_hash": "d5dd9d95fc38a31ab25238bdd81eaa39c870a93c1b0dac94bc0726dc9aaa0ba6",
+        "declaration_hash": "d06d763b8e510b16d00c63de1a2f1d1d3d90fd0b3ae5d4c6ee416e0661cf3227",
+        "anchor_text_hash": "05b8094316a1aacabb4bec26100b679daf53d5554267297214266776d1838398"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(runner.invocations().is_empty());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_returns_success_and_loader_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_invalid_configuration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_all_declared_invalid_configurations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_explain_returns_selected_declaration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_runs_pre_entry_commands_sequentially_at_repository_root"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_pre_entry_failure_stops_writer_and_remaining_commands"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_invalid_configuration_returns_auditable_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_propagates_configured_timeouts_and_capture_limits"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_timed_out_command_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_output_limited_pre_entry_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_appends_supplied_host_only_to_capability_exec_writer"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_omitted_host_preserves_writer_argv"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "GO-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:explain"
+      },
+      "key": {
+        "bound_tests_set_hash": "d5dd9d95fc38a31ab25238bdd81eaa39c870a93c1b0dac94bc0726dc9aaa0ba6",
+        "declaration_hash": "d06d763b8e510b16d00c63de1a2f1d1d3d90fd0b3ae5d4c6ee416e0661cf3227",
+        "anchor_text_hash": "beab4883c958af4d33c14aaa4b4beccef6f734e2af42f16d4b57f3031107ca6f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            invocations.iter().map(argv_values).collect::<Vec<_>>(),\n            vec![vec![\"first\"], vec![\"second\"], vec![\"writer\"]]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_returns_success_and_loader_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_invalid_configuration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_all_declared_invalid_configurations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_explain_returns_selected_declaration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_runs_pre_entry_commands_sequentially_at_repository_root"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_pre_entry_failure_stops_writer_and_remaining_commands"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_invalid_configuration_returns_auditable_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_propagates_configured_timeouts_and_capture_limits"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_timed_out_command_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_output_limited_pre_entry_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_appends_supplied_host_only_to_capability_exec_writer"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_omitted_host_preserves_writer_argv"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:explain"
+      },
+      "key": {
+        "bound_tests_set_hash": "d5dd9d95fc38a31ab25238bdd81eaa39c870a93c1b0dac94bc0726dc9aaa0ba6",
+        "declaration_hash": "d06d763b8e510b16d00c63de1a2f1d1d3d90fd0b3ae5d4c6ee416e0661cf3227",
+        "anchor_text_hash": "ef72acacfb5dc440638dcb1eca6898bd3db2fbdd6150c1af28c56c8594a8958d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(invocations.iter().map(argv_values).collect::<Vec<_>>(), vec![vec![\"first\"], vec![\"second\"], vec![\"writer\"]]); assert!(invocations.iter().all(|invocation| invocation.repository_root == Path::new(\"/repository\"))); assert_eq!(runner.invocations().iter().map(argv_values).collect::<Vec<_>>(), vec![vec![\"first\"], vec![\"fail\"]]); invocation.stdout_limit.as_usize() == 1_048_576 && invocation.stderr_limit.as_usize() == 1_048_576"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_returns_success_and_loader_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_invalid_configuration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_all_declared_invalid_configurations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_explain_returns_selected_declaration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_runs_pre_entry_commands_sequentially_at_repository_root"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_pre_entry_failure_stops_writer_and_remaining_commands"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_invalid_configuration_returns_auditable_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_propagates_configured_timeouts_and_capture_limits"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_timed_out_command_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_output_limited_pre_entry_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_appends_supplied_host_only_to_capability_exec_writer"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_omitted_host_preserves_writer_argv"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:explain"
+      },
+      "key": {
+        "bound_tests_set_hash": "d5dd9d95fc38a31ab25238bdd81eaa39c870a93c1b0dac94bc0726dc9aaa0ba6",
+        "declaration_hash": "d06d763b8e510b16d00c63de1a2f1d1d3d90fd0b3ae5d4c6ee416e0661cf3227",
+        "anchor_text_hash": "3a64b29a92e9e9eeaf1a9ea27e22587c95af88cf00d71369188fd9b70d334f36"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(invocations.iter().map(argv_values).collect::<Vec<_>>(), vec![vec![\"first\"], vec![\"second\"], vec![\"writer\"]]); ... PhaseCommandEnterOutcome::Blocked { completed, failed } ... assert_eq!(failed.as_ref().command.argv().arguments().first().map(CommandArgument::as_str), Some(\"fail\"))"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_returns_success_and_loader_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_invalid_configuration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_all_declared_invalid_configurations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_explain_returns_selected_declaration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_runs_pre_entry_commands_sequentially_at_repository_root"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_pre_entry_failure_stops_writer_and_remaining_commands"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_invalid_configuration_returns_auditable_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_propagates_configured_timeouts_and_capture_limits"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_timed_out_command_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_output_limited_pre_entry_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_appends_supplied_host_only_to_capability_exec_writer"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_omitted_host_preserves_writer_argv"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:explain"
+      },
+      "key": {
+        "bound_tests_set_hash": "d5dd9d95fc38a31ab25238bdd81eaa39c870a93c1b0dac94bc0726dc9aaa0ba6",
+        "declaration_hash": "d06d763b8e510b16d00c63de1a2f1d1d3d90fd0b3ae5d4c6ee416e0661cf3227",
+        "anchor_text_hash": "edb4e92dab097edf9daf4986f7e535467ff8962fca5911e37dec2e1756d33671"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(invocations.iter().map(argv_values).collect::<Vec<_>>(), vec![vec![\"first\"], vec![\"second\"], vec![\"writer\"]]); assert!(invocations.iter().all(|invocation| invocation.repository_root == Path::new(\"/repository\"))); ... assert_eq!(runner.invocations().iter().map(argv_values).collect::<Vec<_>>(), vec![vec![\"first\"], vec![\"fail\"]]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_returns_success_and_loader_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_invalid_configuration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_all_declared_invalid_configurations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_explain_returns_selected_declaration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_runs_pre_entry_commands_sequentially_at_repository_root"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_pre_entry_failure_stops_writer_and_remaining_commands"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_invalid_configuration_returns_auditable_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_propagates_configured_timeouts_and_capture_limits"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_timed_out_command_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_output_limited_pre_entry_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_appends_supplied_host_only_to_capability_exec_writer"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_omitted_host_preserves_writer_argv"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:explain"
+      },
+      "key": {
+        "bound_tests_set_hash": "d5dd9d95fc38a31ab25238bdd81eaa39c870a93c1b0dac94bc0726dc9aaa0ba6",
+        "declaration_hash": "d06d763b8e510b16d00c63de1a2f1d1d3d90fd0b3ae5d4c6ee416e0661cf3227",
+        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(invocations.iter().map(argv_values).collect::<Vec<_>>(), vec![vec![\"first\"], vec![\"second\"], vec![\"writer\"]]); assert_eq!(pre_entry.timeout.as_secs(), 42); assert_eq!(writer.timeout.as_secs(), 3_600); invocation.stdout_limit.as_usize() == 1_048_576 && invocation.stderr_limit.as_usize() == 1_048_576; ProgramRunOutcome::TimedOut { .. }; ProgramRunOutcome::OutputLimitExceeded { stream: ProgramOutputStream::Stderr, .. }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_returns_success_and_loader_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_invalid_configuration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_all_declared_invalid_configurations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_explain_returns_selected_declaration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_runs_pre_entry_commands_sequentially_at_repository_root"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_pre_entry_failure_stops_writer_and_remaining_commands"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_invalid_configuration_returns_auditable_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_propagates_configured_timeouts_and_capture_limits"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_timed_out_command_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_output_limited_pre_entry_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_appends_supplied_host_only_to_capability_exec_writer"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_omitted_host_preserves_writer_argv"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:explain"
+      },
+      "key": {
+        "bound_tests_set_hash": "d5dd9d95fc38a31ab25238bdd81eaa39c870a93c1b0dac94bc0726dc9aaa0ba6",
+        "declaration_hash": "d06d763b8e510b16d00c63de1a2f1d1d3d90fd0b3ae5d4c6ee416e0661cf3227",
+        "anchor_text_hash": "05b8094316a1aacabb4bec26100b679daf53d5554267297214266776d1838398"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(validate(\"/invalid-schema\"), Err(CommandConfigLoadError::Invalid(CommandConfigValidationError::InvalidSchemaVersion { .. })))); assert!(matches!(validate(\"/duplicate\"), Err(CommandConfigLoadError::Invalid(CommandConfigValidationError::DuplicateDeclaration(_))))); assert!(matches!(validate(\"/empty-argv\"), Err(CommandConfigLoadError::Invalid(CommandConfigValidationError::EmptyArgv)))); assert!(matches!(validate(\"/excessive-timeout\"), Err(CommandConfigLoadError::Invalid(CommandConfigValidationError::TimeoutOutOfRange { .. })))); for root in [\"/recursive-writer\", \"/recursive-pre-entry\", \"/recursive-fix-local\"] { let result = validate(root); assert!(matches!(result, Err(CommandConfigLoadError::Invalid(CommandConfigValidationError::RecursiveInvocation { .. })))); } assert!(runner.invocations().is_empty());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_returns_success_and_loader_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_invalid_configuration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_all_declared_invalid_configurations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_explain_returns_selected_declaration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_runs_pre_entry_commands_sequentially_at_repository_root"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_pre_entry_failure_stops_writer_and_remaining_commands"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_invalid_configuration_returns_auditable_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_propagates_configured_timeouts_and_capture_limits"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_timed_out_command_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_output_limited_pre_entry_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_appends_supplied_host_only_to_capability_exec_writer"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_omitted_host_preserves_writer_argv"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "GO-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:enter"
+      },
+      "key": {
+        "bound_tests_set_hash": "d5dd9d95fc38a31ab25238bdd81eaa39c870a93c1b0dac94bc0726dc9aaa0ba6",
+        "declaration_hash": "d06d763b8e510b16d00c63de1a2f1d1d3d90fd0b3ae5d4c6ee416e0661cf3227",
+        "anchor_text_hash": "beab4883c958af4d33c14aaa4b4beccef6f734e2af42f16d4b57f3031107ca6f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            invocations.iter().map(argv_values).collect::<Vec<_>>(),\n            vec![vec![\"first\"], vec![\"second\"], vec![\"writer\"]]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_returns_success_and_loader_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_invalid_configuration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_all_declared_invalid_configurations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_explain_returns_selected_declaration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_runs_pre_entry_commands_sequentially_at_repository_root"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_pre_entry_failure_stops_writer_and_remaining_commands"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_invalid_configuration_returns_auditable_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_propagates_configured_timeouts_and_capture_limits"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_timed_out_command_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_output_limited_pre_entry_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_appends_supplied_host_only_to_capability_exec_writer"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_omitted_host_preserves_writer_argv"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:enter"
+      },
+      "key": {
+        "bound_tests_set_hash": "d5dd9d95fc38a31ab25238bdd81eaa39c870a93c1b0dac94bc0726dc9aaa0ba6",
+        "declaration_hash": "d06d763b8e510b16d00c63de1a2f1d1d3d90fd0b3ae5d4c6ee416e0661cf3227",
+        "anchor_text_hash": "ef72acacfb5dc440638dcb1eca6898bd3db2fbdd6150c1af28c56c8594a8958d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(invocations.iter().map(argv_values).collect::<Vec<_>>(), vec![vec![\"first\"], vec![\"second\"], vec![\"writer\"]]); assert!(invocations.iter().all(|invocation| invocation.repository_root == Path::new(\"/repository\"))); assert_eq!(runner.invocations().iter().map(argv_values).collect::<Vec<_>>(), vec![vec![\"first\"], vec![\"fail\"]]); assert!(invocations.iter().all(|invocation| { invocation.stdout_limit.as_usize() == 1_048_576 && invocation.stderr_limit.as_usize() == 1_048_576 }));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_returns_success_and_loader_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_invalid_configuration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_all_declared_invalid_configurations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_explain_returns_selected_declaration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_runs_pre_entry_commands_sequentially_at_repository_root"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_pre_entry_failure_stops_writer_and_remaining_commands"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_invalid_configuration_returns_auditable_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_propagates_configured_timeouts_and_capture_limits"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_timed_out_command_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_output_limited_pre_entry_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_appends_supplied_host_only_to_capability_exec_writer"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_omitted_host_preserves_writer_argv"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:enter"
+      },
+      "key": {
+        "bound_tests_set_hash": "d5dd9d95fc38a31ab25238bdd81eaa39c870a93c1b0dac94bc0726dc9aaa0ba6",
+        "declaration_hash": "d06d763b8e510b16d00c63de1a2f1d1d3d90fd0b3ae5d4c6ee416e0661cf3227",
+        "anchor_text_hash": "3a64b29a92e9e9eeaf1a9ea27e22587c95af88cf00d71369188fd9b70d334f36"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(invocations.iter().map(argv_values).collect::<Vec<_>>(), vec![vec![\"first\"], vec![\"second\"], vec![\"writer\"]]); ... assert_eq!(failed.as_ref().sequence_index.as_usize(), 1); ... Err(CommandConfigLoadError::Invalid(CommandConfigValidationError::TimeoutOutOfRange { .. })) ... assert_eq!(explanation.writer.argv().arguments().iter().map(CommandArgument::as_str).collect::<Vec<_>>(), [\"bin/sotp\", \"capability\", \"exec\", \"implementer\", \"briefing.md\"]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_returns_success_and_loader_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_invalid_configuration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_all_declared_invalid_configurations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_explain_returns_selected_declaration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_runs_pre_entry_commands_sequentially_at_repository_root"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_pre_entry_failure_stops_writer_and_remaining_commands"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_invalid_configuration_returns_auditable_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_propagates_configured_timeouts_and_capture_limits"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_timed_out_command_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_output_limited_pre_entry_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_appends_supplied_host_only_to_capability_exec_writer"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_omitted_host_preserves_writer_argv"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:enter"
+      },
+      "key": {
+        "bound_tests_set_hash": "d5dd9d95fc38a31ab25238bdd81eaa39c870a93c1b0dac94bc0726dc9aaa0ba6",
+        "declaration_hash": "d06d763b8e510b16d00c63de1a2f1d1d3d90fd0b3ae5d4c6ee416e0661cf3227",
+        "anchor_text_hash": "edb4e92dab097edf9daf4986f7e535467ff8962fca5911e37dec2e1756d33671"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            invocations.iter().map(argv_values).collect::<Vec<_>>(),\n            vec![vec![\"first\"], vec![\"second\"], vec![\"writer\"]]\n        );\n\nassert_eq!(\n            runner.invocations().iter().map(argv_values).collect::<Vec<_>>(),\n            vec![vec![\"first\"], vec![\"fail\"]]\n        );\n\nassert!(\n            invocations\n                .iter()\n                .all(|invocation| invocation.repository_root == Path::new(\"/repository\"))\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_returns_success_and_loader_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_invalid_configuration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_all_declared_invalid_configurations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_explain_returns_selected_declaration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_runs_pre_entry_commands_sequentially_at_repository_root"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_pre_entry_failure_stops_writer_and_remaining_commands"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_invalid_configuration_returns_auditable_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_propagates_configured_timeouts_and_capture_limits"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_timed_out_command_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_output_limited_pre_entry_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_appends_supplied_host_only_to_capability_exec_writer"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_omitted_host_preserves_writer_argv"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:enter"
+      },
+      "key": {
+        "bound_tests_set_hash": "d5dd9d95fc38a31ab25238bdd81eaa39c870a93c1b0dac94bc0726dc9aaa0ba6",
+        "declaration_hash": "d06d763b8e510b16d00c63de1a2f1d1d3d90fd0b3ae5d4c6ee416e0661cf3227",
+        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(pre_entry.timeout.as_secs(), 42); assert_eq!(writer.timeout.as_secs(), 3_600); assert!(invocations.iter().all(|invocation| {\n                invocation.stdout_limit.as_usize() == 1_048_576\n                    && invocation.stderr_limit.as_usize() == 1_048_576\n            }));\n\nassert_eq!(\n            invocations.iter().map(argv_values).collect::<Vec<_>>(),\n            vec![vec![\"first\"], vec![\"second\"], vec![\"writer\"]]\n        );\n\nassert_eq!(failed.as_ref().sequence_index.as_usize(), 1);\n\nassert!(matches!(\n                    failed.as_ref().outcome,\n                    ProgramRunOutcome::OutputLimitExceeded {\n                        stream: ProgramOutputStream::Stderr,\n                        ..\n                    }\n                ));\n\nassert!(matches!(failed.as_ref().outcome, ProgramRunOutcome::TimedOut { .. }));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_returns_success_and_loader_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_invalid_configuration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_all_declared_invalid_configurations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_explain_returns_selected_declaration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_runs_pre_entry_commands_sequentially_at_repository_root"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_pre_entry_failure_stops_writer_and_remaining_commands"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_invalid_configuration_returns_auditable_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_propagates_configured_timeouts_and_capture_limits"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_timed_out_command_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_output_limited_pre_entry_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_appends_supplied_host_only_to_capability_exec_writer"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_omitted_host_preserves_writer_argv"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:enter"
+      },
+      "key": {
+        "bound_tests_set_hash": "d5dd9d95fc38a31ab25238bdd81eaa39c870a93c1b0dac94bc0726dc9aaa0ba6",
+        "declaration_hash": "d06d763b8e510b16d00c63de1a2f1d1d3d90fd0b3ae5d4c6ee416e0661cf3227",
+        "anchor_text_hash": "05b8094316a1aacabb4bec26100b679daf53d5554267297214266776d1838398"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(runner.invocations().is_empty());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_returns_success_and_loader_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_invalid_configuration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_all_declared_invalid_configurations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_explain_returns_selected_declaration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_runs_pre_entry_commands_sequentially_at_repository_root"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_pre_entry_failure_stops_writer_and_remaining_commands"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_invalid_configuration_returns_auditable_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_propagates_configured_timeouts_and_capture_limits"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_timed_out_command_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_output_limited_pre_entry_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_appends_supplied_host_only_to_capability_exec_writer"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_omitted_host_preserves_writer_argv"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseEnterCommand",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseEnterCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "361441219a1c8fc739c4e5cbe39a9f2623fba6492094b7af6c8309178243d4af",
+        "declaration_hash": "d1db86060fa06bb98c7414145f7e135577c3ec7aa40e0f07f75017e33aa9e0a3",
+        "anchor_text_hash": "ef72acacfb5dc440638dcb1eca6898bd3db2fbdd6150c1af28c56c8594a8958d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            invocations.iter().map(argv_values).collect::<Vec<_>>(),\n            vec![vec![\"first\"], vec![\"second\"], vec![\"writer\"]]\n        );\n        assert!(\n            invocations\n                .iter()\n                .all(|invocation| invocation.repository_root == Path::new(\"/repository\"))\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_runs_pre_entry_commands_sequentially_at_repository_root"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseEnterCommand",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseEnterCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "8344e0bfbf210968d15e81fc4a60a8e4779f551539cb580324154137f0f1d20c",
+        "declaration_hash": "d1db86060fa06bb98c7414145f7e135577c3ec7aa40e0f07f75017e33aa9e0a3",
+        "anchor_text_hash": "edb4e92dab097edf9daf4986f7e535467ff8962fca5911e37dec2e1756d33671"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(\n            invocations\n                .iter()\n                .all(|invocation| invocation.repository_root == Path::new(\"/repository\"))\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_runs_pre_entry_commands_sequentially_at_repository_root"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_pre_entry_failure_stops_writer_and_remaining_commands"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseEnterCommand",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-11"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseEnterCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-11"
+      },
+      "key": {
+        "bound_tests_set_hash": "d4e6a094f12d4dae2e1fb8b1d9bdb9ff9f86d360af48f07b9a9d1b995cb4f4dd",
+        "declaration_hash": "d1db86060fa06bb98c7414145f7e135577c3ec7aa40e0f07f75017e33aa9e0a3",
+        "anchor_text_hash": "ebe6fab89b5c121c6f2179eebc761a3372cfefe75713d1d4dce322e9302354e6"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(argv_values(writer_invocation), vec![\"bin/sotp\", \"capability\", \"exec\", \"implementer\", \"briefing.md\", \"--host\", \"codex\",]);\n...\nassert_eq!(argv_values(writer_invocation), vec![\"bin/sotp\", \"capability\", \"exec\", \"implementer\"]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_appends_supplied_host_only_to_capability_exec_writer"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_omitted_host_preserves_writer_argv"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseEnterCommand",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-13"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseEnterCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-13"
+      },
+      "key": {
+        "bound_tests_set_hash": "d4e6a094f12d4dae2e1fb8b1d9bdb9ff9f86d360af48f07b9a9d1b995cb4f4dd",
+        "declaration_hash": "d1db86060fa06bb98c7414145f7e135577c3ec7aa40e0f07f75017e33aa9e0a3",
+        "anchor_text_hash": "05e6e189bc377aa5f6c10e51bb69aa449a5cbd9f6ac58595389e164fcacefeea"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(argv_values(writer_invocation), vec![\"bin/sotp\", \"capability\", \"exec\", \"implementer\", \"briefing.md\", \"--host\", \"codex\",]);\n\nassert_eq!(argv_values(writer_invocation), vec![\"bin/sotp\", \"capability\", \"exec\", \"implementer\"]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_appends_supplied_host_only_to_capability_exec_writer"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_omitted_host_preserves_writer_argv"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandEnterOutcome",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandEnterOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "5abd2f5962c9593665a38074a443e97bd172c8a249b7688347803144845b9c9b",
+        "declaration_hash": "ce3d7159cc6877a973d19c2bf7a41aedd8265db17fadf3e9fffa48b36181755c",
+        "anchor_text_hash": "ef72acacfb5dc440638dcb1eca6898bd3db2fbdd6150c1af28c56c8594a8958d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "PhaseCommandEnterOutcome::Completed { pre_entry_records, writer_record } => { assert_eq!(pre_entry_records.len(), 2); assert_eq!(writer_record.as_ref().sequence_index.as_usize(), 2); } ... PhaseCommandEnterOutcome::Blocked { completed, failed } => { assert_eq!(completed.len(), 1); assert_eq!(failed.as_ref().sequence_index.as_usize(), 1); } ... PhaseCommandEnterOutcome::Blocked { completed, failed } => { assert!(completed.is_empty()); ... assert!(matches!( failed.as_ref().outcome, ProgramRunOutcome::OutputLimitExceeded { stream: ProgramOutputStream::Stderr, .. } )); }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_runs_pre_entry_commands_sequentially_at_repository_root"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_pre_entry_failure_stops_writer_and_remaining_commands"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_output_limited_pre_entry_as_blocked_outcome"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandEnterOutcome",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandEnterOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "0ed65dd67946e36076c2d9eea7093b9ab8050697367703df704b6945c8e95b9d",
+        "declaration_hash": "ce3d7159cc6877a973d19c2bf7a41aedd8265db17fadf3e9fffa48b36181755c",
+        "anchor_text_hash": "6166df4e5cb8aa348e839dc9faf6fdda9446f5782ff3880dec49513621a1e600"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(failed.as_ref().command.argv().arguments().first().map(CommandArgument::as_str),\n                    Some(\"fail\")));\n                assert_eq!(\n                    failed\n                        .as_ref()\n                        .invoked_argv\n                        .arguments()\n                        .iter()\n                        .map(CommandArgument::as_str)\n                        .collect::<Vec<_>>(),\n                    vec![\"fail\"]\n                );\n                assert!(matches!(\n                    failed.as_ref().outcome,\n                    ProgramRunOutcome::Exited { ref exit_code, .. } if exit_code.as_i32() == 1\n                ));\n            }\n            PhaseCommandEnterOutcome::Completed { .. } => panic!(\"expected blocked enter outcome\"),\n        }\n        assert_eq!(\n            runner.invocations().iter().map(argv_values).collect::<Vec<_>>(),\n            vec![vec![\"first\"], vec![\"fail\"]]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_pre_entry_failure_stops_writer_and_remaining_commands"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandEnterOutcome",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandEnterOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "8344e0bfbf210968d15e81fc4a60a8e4779f551539cb580324154137f0f1d20c",
+        "declaration_hash": "ce3d7159cc6877a973d19c2bf7a41aedd8265db17fadf3e9fffa48b36181755c",
+        "anchor_text_hash": "edb4e92dab097edf9daf4986f7e535467ff8962fca5911e37dec2e1756d33671"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"vec![vec![\\\"first\\\"], vec![\\\"second\\\"], vec![\\\"writer\\\"]]\"; \"invocations.iter().all(|invocation| invocation.repository_root == Path::new(\\\"/repository\\\"))\"; \"vec![vec![\\\"first\\\"], vec![\\\"fail\\\"]]\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_runs_pre_entry_commands_sequentially_at_repository_root"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_pre_entry_failure_stops_writer_and_remaining_commands"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseEnterCommand",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "GO-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseEnterCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:GO-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "361441219a1c8fc739c4e5cbe39a9f2623fba6492094b7af6c8309178243d4af",
+        "declaration_hash": "d1db86060fa06bb98c7414145f7e135577c3ec7aa40e0f07f75017e33aa9e0a3",
+        "anchor_text_hash": "beab4883c958af4d33c14aaa4b4beccef6f734e2af42f16d4b57f3031107ca6f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            invocations.iter().map(argv_values).collect::<Vec<_>>(),\n            vec![vec![\"first\"], vec![\"second\"], vec![\"writer\"]]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_runs_pre_entry_commands_sequentially_at_repository_root"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandEnterOutcome",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandEnterOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "891a29c4aba0a1b292c26150d03bb8ee5a940d023b4840b39c574940dfedee82",
+        "declaration_hash": "ce3d7159cc6877a973d19c2bf7a41aedd8265db17fadf3e9fffa48b36181755c",
+        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(failed.as_ref().sequence_index.as_usize(), 1);\nassert_eq!(\n    failed.as_ref().command.argv().arguments().first().map(CommandArgument::as_str),\n    Some(\"fail\")\n);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_pre_entry_failure_stops_writer_and_remaining_commands"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_propagates_configured_timeouts_and_capture_limits"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_timed_out_command_as_blocked_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_output_limited_pre_entry_as_blocked_outcome"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandEnterError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "GO-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandEnterError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:GO-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "0fa65668f281a5d8372024a7c90dc8db535897d2ab1cc0f213164ed5ea6ff493",
+        "declaration_hash": "5305ff09185bddb7f5658b0db8dba96cc8285f02833af48e9dbc3a9ebb675a68",
+        "anchor_text_hash": "0203a405476f817ab74879ed006ba32454744fc289e4c38e0d204f4d9ddc995b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            service.enter(enter_command(None)),\n            Err(super::PhaseCommandEnterError::Config(CommandConfigLoadError::ReadFailed { .. }))\n        ));\n        assert!(runner.invocations().is_empty());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_config_error_without_starting_commands"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandEnterError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandEnterError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "0fa65668f281a5d8372024a7c90dc8db535897d2ab1cc0f213164ed5ea6ff493",
+        "declaration_hash": "5305ff09185bddb7f5658b0db8dba96cc8285f02833af48e9dbc3a9ebb675a68",
+        "anchor_text_hash": "3a64b29a92e9e9eeaf1a9ea27e22587c95af88cf00d71369188fd9b70d334f36"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "Err(super::PhaseCommandEnterError::Config(CommandConfigLoadError::ReadFailed { .. }))\n        ));\n        assert!(runner.invocations().is_empty());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_config_error_without_starting_commands"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandEnterError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandEnterError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "200217a63aeaf7831e30e1bb5fc3a07ec775741296bf6e722e95b52a8e52582c",
+        "declaration_hash": "5305ff09185bddb7f5658b0db8dba96cc8285f02833af48e9dbc3a9ebb675a68",
+        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "Err(super::PhaseCommandEnterError::Config(CommandConfigLoadError::Invalid(\n                CommandConfigValidationError::TimeoutOutOfRange { .. }\n            )))"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_invalid_configuration_returns_auditable_error"
         }
       ]
     }
