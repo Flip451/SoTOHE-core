@@ -2576,6 +2576,35 @@
           "hash": "rvw1:sha256:86a2e459ba5b58826971f800147929db5a46c7e722a0e7a3f870e58608399159",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T13:21:27Z",
+          "findings": [
+            {
+              "category": "test coverage",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 541,
+              "message": "Add a regression test creating same-named `refs/tags/<base>` and `refs/heads/<base>` refs, then verify the merge resolves the branch commit. Existing tests only cover the unambiguous case and would not detect a future reintroduction of the tag-precedence bug.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:abed3281950f854439a19f4cc8bc2cc54c0a183820700f561ec04f505117cf07",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T13:29:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:066c53f11a813db13edbe8948e5b21fd22b8c9168449b76975c5ce405d74d76d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T13:33:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:066c53f11a813db13edbe8948e5b21fd22b8c9168449b76975c5ce405d74d76d",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -2976,6 +3005,20 @@
           "at": "2026-08-03T13:07:56Z",
           "findings": [],
           "hash": "rvw1:sha256:8bd611d9fa5299890575823108cbaff7eb537e0bc7b4d0c4f667236ed5416ab9",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T13:20:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b440ca3dc4870c0affe4d996a00be0a7d1047a1e6986466703a6f0e4a3918e62",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T13:23:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b440ca3dc4870c0affe4d996a00be0a7d1047a1e6986466703a6f0e4a3918e62",
           "type": "final",
           "verdict": "zero_findings"
         }

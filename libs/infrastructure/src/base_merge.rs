@@ -535,7 +535,10 @@ fn resolve_base_commit(
     repository_root: &Path,
     source: &BaseBranchName,
 ) -> Result<CommitHash, BaseMergeGitError> {
-    let revision = format!("{}^{{commit}}", source.as_str());
+    // Qualify as a heads ref: the documented ambiguous-ref precedence checks
+    // refs/tags/<name> before refs/heads/<name>, so an unqualified name could
+    // resolve a same-named tag instead of the snapshot branch.
+    let revision = format!("refs/heads/{}^{{commit}}", source.as_str());
     let output = isolated_bounded_git_output(
         repository_root,
         &["rev-parse", "--verify", revision.as_str()],
@@ -916,6 +919,27 @@ mod tests {
             adapter.load_direction(fixture.path()),
             Err(BaseMergeContextError::Unavailable(_))
         ));
+    }
+
+    #[test]
+    fn test_fs_base_merge_git_resolves_snapshot_branch_when_tag_has_same_name() {
+        let fixture = setup_repository("adapter-test", "develop");
+        let root = fixture.path();
+        let direction = FsBaseMergeContextAdapter::new().load_direction(root).unwrap();
+        let branch_commit = current_commit(root, "refs/heads/develop^{commit}");
+
+        git(root, &["tag", "develop", "refs/heads/track/adapter-test"]);
+        let tag_commit = current_commit(root, "refs/tags/develop^{commit}");
+        assert_ne!(branch_commit, tag_commit, "the fixture must contain distinct refs");
+
+        let outcome = FsBaseMergeGitAdapter::new().merge_base(root, &direction).unwrap();
+
+        assert_eq!(
+            outcome,
+            BaseMergeAttemptOutcome::Clean {
+                base_commit: CommitHash::try_new(branch_commit).unwrap()
+            }
+        );
     }
 
     #[test]
