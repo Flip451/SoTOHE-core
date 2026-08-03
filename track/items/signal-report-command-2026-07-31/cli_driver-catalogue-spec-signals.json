@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "f686024f7a77eacc159ba7297bfec4f546b67b8f30ae498df3648597e5147295",
+  "signals": [
+    {
+      "type_name": "SignalDriver",
+      "signal": "blue",
+      "entry_hash": "6f8562e8f0fc9586fccef022dd670a9eaad967fbe72836ead778c73bf274e454"
+    },
+    {
+      "type_name": "SignalReportChainFilter",
+      "signal": "blue",
+      "entry_hash": "cea53d696ca14c8db3bf83d30ab8614bff555be650c01322e8eb4d6740f5b487"
+    },
+    {
+      "type_name": "SignalReportDriver",
+      "signal": "blue",
+      "entry_hash": "143c606557c66e25e18a6de9e1d7d03e1e9e966acf612f0d239740a4b6df8cc2"
+    },
+    {
+      "type_name": "SignalReportInput",
+      "signal": "blue",
+      "entry_hash": "29e8cba843033e89f0d8b3ff73bd11aeba5d6cfe5471fd8e3844cf815bf05248"
+    },
+    {
+      "type_name": "SignalReportLevelFilter",
+      "signal": "blue",
+      "entry_hash": "46a814e4a76b8f580e289b4455874b120bb4550c2f563f7d1093d96d16b72824"
+    }
+  ]
+}

@@ -345,6 +345,26 @@ mod tests {
         temp
     }
 
+    fn materialize_active_track_metadata(workspace_root: &Path) {
+        let metadata_path =
+            workspace_root.join("track/items").join(OBLIGATION_TRACK_ID).join("metadata.json");
+        fs::create_dir_all(metadata_path.parent().unwrap()).unwrap();
+        let metadata = serde_json::json!({
+            "schema_version": 6,
+            "id": OBLIGATION_TRACK_ID,
+            "branch": format!("track/{OBLIGATION_TRACK_ID}"),
+            "title": "CLI test-obligation fixture",
+            "created_at": "2026-08-01T00:00:00Z",
+            "updated_at": "2026-08-01T00:00:00Z",
+            "branch_strategy_snapshot": {
+                "base_branch": "develop",
+                "merge_target": "develop",
+                "merge_method": "merge",
+            },
+        });
+        fs::write(metadata_path, serde_json::to_string_pretty(&metadata).unwrap()).unwrap();
+    }
+
     fn fixture_root(workspace_root: &Path) -> TestObligationCompositionRoot {
         TestObligationCompositionRoot::new(
             workspace_root.to_path_buf(),
@@ -628,6 +648,7 @@ mod tests {
             "cli-types.json",
         ]);
         let workspace_root = temp.path().join("workspace");
+        materialize_active_track_metadata(&workspace_root);
         let expected_artifact =
             workspace_root.join("track/items").join(OBLIGATION_TRACK_ID).join("obligations.json");
 
@@ -654,6 +675,7 @@ mod tests {
             "test-bindings.json",
         ]);
         let workspace_root = temp.path().join("workspace");
+        materialize_active_track_metadata(&workspace_root);
 
         let derive_exit = execute_derive_with(
             &TestObligationDeriveArgs { track_id: Some(OBLIGATION_TRACK_ID.to_owned()) },

@@ -127,6 +127,7 @@ mod tests {
     use crate::verify::test_support::{git_init, run_git};
 
     const ARCH_RULES: &str = r#"{
+      "version": 2,
       "layers": [
         { "crate": "domain", "tddd": { "enabled": true, "catalogue_file": "domain-types.json" } },
         { "crate": "usecase", "tddd": { "enabled": true, "catalogue_file": "usecase-types.json" } },
@@ -135,6 +136,7 @@ mod tests {
     }"#;
 
     const ARCH_RULES_CUSTOM_CATALOGUE: &str = r#"{
+      "version": 2,
       "layers": [
         { "crate": "domain", "tddd": { "enabled": true, "catalogue_file": "custom-types.json" } }
       ]

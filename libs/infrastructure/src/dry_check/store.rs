@@ -219,7 +219,9 @@ impl FsDryCheckStore {
 
     /// Serialize `doc` to pretty JSON and write it atomically.
     fn write_doc(&self, doc: &DryCheckJsonV1) -> Result<(), DryCheckWriterError> {
-        let json = serde_json::to_string_pretty(doc)
+        let value = serde_json::to_value(doc)
+            .map_err(|e| DryCheckWriterError::Codec { detail: format!("serialize: {e}") })?;
+        let json = serde_json::to_string_pretty(&value)
             .map_err(|e| DryCheckWriterError::Codec { detail: format!("serialize: {e}") })?;
         atomic_write_file(&self.path, json.as_bytes()).map_err(|e| DryCheckWriterError::Io {
             path: self.path.display().to_string(),
@@ -406,6 +408,7 @@ fn validate_unit_interval_f64(value: f64, field: &str) -> Result<f32, String> {
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::indexing_slicing, clippy::panic)]
 mod tests {
+    use super::super::codec::{DryCheckJsonV1, DryCheckRecordDto, DryCheckVerdictDto};
     use domain::CommitHash;
     use domain::dry_check::{
         DryCheckConfigFingerprint, DryCheckEntry, DryCheckPairKey, DryCheckReader,
@@ -415,7 +418,7 @@ mod tests {
     use domain::review_v2::FilePath;
     use domain::semantic_dup::{SimilarityScore, SimilarityThreshold};
 
-    use super::FsDryCheckStore;
+    use super::{CURRENT_SCHEMA_VERSION, FsDryCheckStore};
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
@@ -633,6 +636,63 @@ mod tests {
         store.append_record(&entry).unwrap();
 
         assert!(path.exists(), "file should exist after first append");
+    }
+
+    #[test]
+    fn test_write_doc_canonicalizes_keys_and_is_byte_stable() {
+        let dir = tempfile::tempdir().unwrap();
+        let store = store_in(&dir);
+        let doc = DryCheckJsonV1 {
+            schema_version: CURRENT_SCHEMA_VERSION,
+            records: vec![DryCheckRecordDto {
+                low_path: "src/a.rs".to_owned(),
+                low_hash: "a".repeat(64),
+                high_path: "src/b.rs".to_owned(),
+                high_hash: "b".repeat(64),
+                changed_path: "src/a.rs".to_owned(),
+                verdict: DryCheckVerdictDto::Violation {
+                    refactor_proposal: "Extract a helper.".to_owned(),
+                },
+                similarity_score: 0.9,
+                threshold: 0.8,
+                base_commit: "abcdef1234567".to_owned(),
+                rationale: "Test rationale.".to_owned(),
+                recorded_at: "2026-06-01T00:00:00Z".to_owned(),
+                config_fingerprint: "c".repeat(64),
+            }],
+        };
+
+        store.write_doc(&doc).unwrap();
+        let first = std::fs::read_to_string(dir.path().join("dry-check.json")).unwrap();
+        store.write_doc(&doc).unwrap();
+        let second = std::fs::read_to_string(dir.path().join("dry-check.json")).unwrap();
+
+        assert_eq!(first, second, "dry-check encoding must not churn JSON bytes");
+        assert!(
+            first.starts_with("{\n  \"records\": ["),
+            "dry-check envelope keys must be canonicalized: {first}"
+        );
+        let record = &first[first.find("\"base_commit\"").unwrap()..];
+        let base_commit = record.find("\"base_commit\"").unwrap();
+        let changed_path = record.find("\"changed_path\"").unwrap();
+        let config_fingerprint = record.find("\"config_fingerprint\"").unwrap();
+        let high_hash = record.find("\"high_hash\"").unwrap();
+        let low_hash = record.find("\"low_hash\"").unwrap();
+        let verdict = record.find("\"verdict\"").unwrap();
+        assert!(
+            base_commit < changed_path
+                && changed_path < config_fingerprint
+                && config_fingerprint < high_hash
+                && high_hash < low_hash
+                && low_hash < verdict,
+            "dry-check record keys must be recursively canonicalized: {record}"
+        );
+        let verdict_object = &record[verdict..];
+        assert!(
+            verdict_object.find("\"violation\"").unwrap()
+                < verdict_object.find("\"refactor_proposal\"").unwrap(),
+            "nested violation verdict keys must be canonicalized: {verdict_object}"
+        );
     }
 
     #[test]

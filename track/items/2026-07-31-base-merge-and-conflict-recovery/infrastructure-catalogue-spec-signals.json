@@ -1,66 +1,66 @@
 {
-  "schema_version": 1,
   "catalogue_declaration_hash": "fde4ce9cc8119297588cdce1cf5a1dbf44a423e41ec7310da930b4c9214a2501",
+  "schema_version": 1,
   "signals": [
     {
-      "type_name": "EvaluateSignalsError",
+      "entry_hash": "abb3a2aeb883ad5defb7133cb00229a66a3adea8e009177b4d3491f27a88cf61",
       "signal": "blue",
-      "entry_hash": "abb3a2aeb883ad5defb7133cb00229a66a3adea8e009177b4d3491f27a88cf61"
+      "type_name": "EvaluateSignalsError"
     },
     {
-      "type_name": "FsBaseMergeCleanupAdapter",
+      "entry_hash": "e96afe31da24165b2729d5259f8d5ad49bba3ab12b795ad6b98ffbb1776804a3",
       "signal": "blue",
-      "entry_hash": "e96afe31da24165b2729d5259f8d5ad49bba3ab12b795ad6b98ffbb1776804a3"
+      "type_name": "FsBaseMergeCleanupAdapter"
     },
     {
-      "type_name": "FsBaseMergeContextAdapter",
+      "entry_hash": "74388bee5f36d04c6599db58332fbc16d7b652953969c019d74d1f1c639ac82c",
       "signal": "blue",
-      "entry_hash": "74388bee5f36d04c6599db58332fbc16d7b652953969c019d74d1f1c639ac82c"
+      "type_name": "FsBaseMergeContextAdapter"
     },
     {
-      "type_name": "FsBaseMergeGitAdapter",
+      "entry_hash": "702b8a1a7249e444b5a5a562f9fa46aa03201f2d47c7dace0b841dc270871ed4",
       "signal": "blue",
-      "entry_hash": "702b8a1a7249e444b5a5a562f9fa46aa03201f2d47c7dace0b841dc270871ed4"
+      "type_name": "FsBaseMergeGitAdapter"
     },
     {
-      "type_name": "FsGitStashAdapter",
+      "entry_hash": "fd641ee1e5607f90728e97f5b24ee29399c4c6560b7e5d8c8affb766b6d76aed",
       "signal": "blue",
-      "entry_hash": "fd641ee1e5607f90728e97f5b24ee29399c4c6560b7e5d8c8affb766b6d76aed"
+      "type_name": "FsGitStashAdapter"
     },
     {
-      "type_name": "SyncBaseRecord",
+      "entry_hash": "cffe1a62718dbadc8527c5dd5e1b58f1d992b5438ed744c0eda5f93b7a331d5c",
       "signal": "blue",
-      "entry_hash": "cffe1a62718dbadc8527c5dd5e1b58f1d992b5438ed744c0eda5f93b7a331d5c"
+      "type_name": "SyncBaseRecord"
     },
     {
-      "type_name": "SyncBaseRecordSchemaVersion",
+      "entry_hash": "25c47dfcc0072c1ebb06e881fffc78c4a8f967c9a7ad7799312b64aa50e832db",
       "signal": "blue",
-      "entry_hash": "25c47dfcc0072c1ebb06e881fffc78c4a8f967c9a7ad7799312b64aa50e832db"
+      "type_name": "SyncBaseRecordSchemaVersion"
     },
     {
-      "type_name": "TypeSignalsExecutorAdapter",
+      "entry_hash": "1e657dd622d3dba16705867ff63c48d67329feb42d68ed5498e7c037b95d567a",
       "signal": "blue",
-      "entry_hash": "1e657dd622d3dba16705867ff63c48d67329feb42d68ed5498e7c037b95d567a"
+      "type_name": "TypeSignalsExecutorAdapter"
     },
     {
-      "type_name": "infrastructure::tddd::type_signals_codec::baseline_hash",
+      "entry_hash": "b98eed6fba2e0efcce99c4d5c6ec71d2cfba31549a71ece8212d369fbd707088",
       "signal": "blue",
-      "entry_hash": "b98eed6fba2e0efcce99c4d5c6ec71d2cfba31549a71ece8212d369fbd707088"
+      "type_name": "infrastructure::tddd::type_signals_codec::baseline_hash"
     },
     {
-      "type_name": "infrastructure::tddd::type_signals_codec::decode",
+      "entry_hash": "82dd3fc43d3702abfe53568d8901aa20e5dd205eb4fa0d2295d678566ea359f9",
       "signal": "blue",
-      "entry_hash": "82dd3fc43d3702abfe53568d8901aa20e5dd205eb4fa0d2295d678566ea359f9"
+      "type_name": "infrastructure::tddd::type_signals_codec::decode"
     },
     {
-      "type_name": "infrastructure::tddd::type_signals_codec::encode",
+      "entry_hash": "33d8d2f6a5b643acc5cdebf91b24513d99116d407af5fea72e891bf55aa077bd",
       "signal": "blue",
-      "entry_hash": "33d8d2f6a5b643acc5cdebf91b24513d99116d407af5fea72e891bf55aa077bd"
+      "type_name": "infrastructure::tddd::type_signals_codec::encode"
     },
     {
-      "type_name": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+      "entry_hash": "4f27d6b97bc22e8eae0aa09f4a6e4f20f4cbb3226badfd965a3c32671511a552",
       "signal": "blue",
-      "entry_hash": "4f27d6b97bc22e8eae0aa09f4a6e4f20f4cbb3226badfd965a3c32671511a552"
+      "type_name": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
     }
   ]
 }

@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "layer": "domain",
+  "entries": [
+    {
+      "claim_hash": "346a7a731590997fc781cc48b1ea730dce47345fbec4a3cd728c33ca31409971",
+      "evidence_hash": "3ee1a40d72809a038c87c493395dd541b16427f8d063d233fd1a9ce9f0906107",
+      "verdict": {
+        "kind": "pass",
+        "citation": "対象ファイル位置"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/domain-types.json",
+          "section_key": "types",
+          "entry_key": "FilePath"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "選択条件に一致する occurrence を、診断に必要な entry id、参照文字列、判定理由、対象ファイル位置とともに欠落なく報告する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "db0318853470312add25825e32de0d693081c2f606973ce458b6703ff1f0c14b",
+      "evidence_hash": "3ee1a40d72809a038c87c493395dd541b16427f8d063d233fd1a9ce9f0906107",
+      "verdict": {
+        "kind": "pass",
+        "citation": "診断に必要な entry id、参照文字列、判定理由、対象ファイル位置とともに欠落なく報告する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/signal-report-command-2026-07-31/domain-types.json",
+          "section_key": "types",
+          "entry_key": "NonEmptyString"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "選択条件に一致する occurrence を、診断に必要な entry id、参照文字列、判定理由、対象ファイル位置とともに欠落なく報告する。"
+        }
+      }
+    }
+  ]
+}

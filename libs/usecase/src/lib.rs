@@ -64,6 +64,7 @@ pub mod semantic_dup_driver;
 pub mod semantic_verdict_core;
 pub mod signal;
 pub mod signal_gate;
+pub mod signal_report;
 pub mod signal_service;
 pub mod skill_compliance;
 pub mod spec_adr_signal;

@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "track_id": "signal-report-command-2026-07-31",
+  "entries": {
+    "T001": [
+      {"layer": "domain", "entry_key": "FilePath"}, {"layer": "domain", "entry_key": "NonEmptyString"},
+      {"layer": "usecase", "entry_key": "SignalReportChain"}, {"layer": "usecase", "entry_key": "SignalReportChainSelection"},
+      {"layer": "usecase", "entry_key": "SignalReportEntryId"}, {"layer": "usecase", "entry_key": "SignalReportError"},
+      {"layer": "usecase", "entry_key": "SignalReportInteractor"}, {"layer": "usecase", "entry_key": "SignalReportLevel"},
+      {"layer": "usecase", "entry_key": "SignalReportLevelSelection"}, {"layer": "usecase", "entry_key": "SignalReportLocation"},
+      {"layer": "usecase", "entry_key": "SignalReportOccurrence"}, {"layer": "usecase", "entry_key": "SignalReportOutput"},
+      {"layer": "usecase", "entry_key": "SignalReportQuery"}, {"layer": "usecase", "entry_key": "SignalReportReason"},
+      {"layer": "usecase", "entry_key": "SignalReportReference"}, {"layer": "usecase", "entry_key": "SignalReportService"},
+      {"layer": "usecase", "entry_key": "SignalReportSourcePort"}
+    ],
+    "T002": [
+      {"layer": "infrastructure", "entry_key": "SystemSignalReportSourceAdapter"}
+    ],
+    "T003": [
+      {"layer": "cli_driver", "entry_key": "SignalReportChainFilter"}, {"layer": "cli_driver", "entry_key": "SignalReportInput"},
+      {"layer": "cli_driver", "entry_key": "SignalReportLevelFilter"}
+    ],
+    "T004": [{"layer": "cli_driver", "entry_key": "SignalReportDriver"}],
+    "T005": [
+      {"layer": "cli", "entry_key": "SignalCommand"},
+      {"layer": "cli", "entry_key": "SignalReportArgs"}, {"layer": "cli", "entry_key": "SignalReportChainArg"},
+      {"layer": "cli", "entry_key": "SignalReportOnlyArg"}
+    ],
+    "T008": [
+      {"layer": "cli", "entry_key": "cli::commands::signal::execute"}
+    ],
+    "T006": [
+      {"layer": "cli_driver", "entry_key": "SignalDriver"}, {"layer": "cli_composition", "entry_key": "SignalCompositionRoot"}
+    ],
+    "T007": []
+  }
+}

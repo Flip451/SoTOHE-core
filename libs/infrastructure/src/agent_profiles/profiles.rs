@@ -141,7 +141,7 @@ impl AgentProfiles {
         }
         .ok_or_else(|| AgentProfilesError::EffortMissing(capability.clone(), round_type))?
         .into_domain();
-        if !supports_effort(&provider, effort) {
+        if !self.supports_effort(&provider, effort) {
             return Err(AgentProfilesError::UnsupportedEffort(provider, effort));
         }
 
@@ -213,13 +213,14 @@ impl CapabilityConfigDto {
     }
 }
 
-fn supports_effort(provider: &ProviderName, effort: ReasoningEffort) -> bool {
-    match provider.as_str() {
-        "codex" => !matches!(effort, ReasoningEffort::Max),
-        "claude" => true,
-        "gemini" => {
-            matches!(effort, ReasoningEffort::Low | ReasoningEffort::Medium | ReasoningEffort::High)
-        }
-        _ => false,
+impl AgentProfiles {
+    fn supports_effort(&self, provider: &ProviderName, effort: ReasoningEffort) -> bool {
+        self.providers.get(provider.as_str()).is_some_and(|metadata| {
+            metadata
+                .supported_reasoning_efforts
+                .iter()
+                .copied()
+                .any(|declared_effort| declared_effort.into_domain() == effort)
+        })
     }
 }

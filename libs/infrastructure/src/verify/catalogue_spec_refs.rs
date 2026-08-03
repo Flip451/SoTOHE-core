@@ -458,6 +458,7 @@ mod tests {
 }"#;
 
     const ARCH_RULES_WITH_DOMAIN: &str = r#"{
+  "version": 2,
   "layers": [
     {
       "crate": "domain",

@@ -82,6 +82,7 @@ impl TypeSignalsExecutorAdapter {
         let targets_json_array: serde_json::Value =
             serde_json::Value::Array(b.targets.iter().map(|t| serde_json::json!(t)).collect());
         let rules_value = serde_json::json!({
+            "version": 2,
             "layers": [{
                 "crate": b.layer_id,
                 "tddd": {

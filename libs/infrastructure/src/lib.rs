@@ -50,6 +50,7 @@ pub mod semantic_dup;
 pub mod shell;
 pub mod signal;
 pub mod signal_layer_reader;
+pub mod signal_report;
 pub mod spec;
 pub mod task_contract_codec;
 pub mod task_contract_reader;

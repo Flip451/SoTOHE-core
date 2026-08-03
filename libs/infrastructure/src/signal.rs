@@ -825,6 +825,23 @@ mod tests {
         let persisted_after_calc = std::fs::read_to_string(&spec_path).unwrap();
         let persisted_document: Value = serde_json::from_str(&persisted_after_calc).unwrap();
         assert!(persisted_document.get("signals").is_some());
+        assert!(
+            persisted_after_calc.starts_with("{\n  \"acceptance_criteria\":"),
+            "signal calculation must persist canonical JSON keys: {persisted_after_calc}"
+        );
+
+        let repeated_calc = adapter
+            .execute(ResolvedSignalChainCommand::CalcSpecAdr {
+                spec_json_path: Some(spec_path.clone()),
+                workspace_root: Some(workspace.path().to_path_buf()),
+            })
+            .unwrap();
+        assert!(!repeated_calc.outcome.has_errors());
+        assert_eq!(
+            std::fs::read_to_string(&spec_path).unwrap(),
+            persisted_after_calc,
+            "repeated signal calculation must not churn JSON bytes"
+        );
 
         let check = adapter
             .execute(ResolvedSignalChainCommand::CheckSpecAdr {

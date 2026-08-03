@@ -779,6 +779,7 @@ mod tests {
     /// `domain-types.json`.
     fn write_domain_tddd_rules(dir: &Path) {
         let content = r#"{
+  "version": 2,
   "layers": [
     {
       "crate": "domain",

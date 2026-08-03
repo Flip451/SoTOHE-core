@@ -279,7 +279,11 @@ pub(super) fn write_catalogue(
 ) -> Result<(), CatalogError> {
     catalogue_present(path, trusted_root)?;
     validate_catalogue_schema_version(path, value)?;
-    let mut text = serde_json::to_string_pretty(value)
+    // Re-enter the canonical Value boundary before serializing so raw draft
+    // mutations and nested catalogue objects retain deterministic key order.
+    let value = serde_json::to_value(value)
+        .map_err(|err| schema_error(format!("failed to canonicalize {}: {err}", path.display())))?;
+    let mut text = serde_json::to_string_pretty(&value)
         .map_err(|err| schema_error(format!("failed to serialize {}: {err}", path.display())))?;
     text.push('\n');
     std::fs::write(path, text)
@@ -493,6 +497,47 @@ mod tests {
     }
 
     #[test]
+    fn test_write_catalogue_canonicalizes_json_keys_and_is_byte_stable() {
+        let temp = tempfile::tempdir().unwrap();
+        let path = temp.path().join("domain-types.json");
+        let value = serde_json::json!({
+            "types": {
+                "Example": {
+                    "zebra": "last",
+                    "alpha": "first"
+                }
+            },
+            "schema_version": SCHEMA_VERSION,
+            "layer": "domain",
+            "functions": {},
+            "crate_name": "domain",
+            "traits": {}
+        });
+        std::fs::write(&path, "{}").unwrap();
+
+        write_catalogue(&path, temp.path(), &value).unwrap();
+        let first = std::fs::read(&path).unwrap();
+        write_catalogue(&path, temp.path(), &value).unwrap();
+        let second = std::fs::read(&path).unwrap();
+
+        assert_eq!(first, second, "catalogue writes must not churn JSON bytes");
+        let text = String::from_utf8(second).unwrap();
+        assert!(
+            text.starts_with(
+                "{\n  \"crate_name\": \"domain\",\n  \"functions\": {},\n  \"layer\": \"domain\","
+            ),
+            "catalogue writer must canonicalize JSON keys: {text}"
+        );
+        assert!(
+            text.contains(
+                "\"types\": {\n    \"Example\": {\n      \"alpha\": \"first\",\n      \"zebra\": \"last\""
+            ),
+            "catalogue writer must recursively canonicalize nested JSON keys: {text}"
+        );
+        assert!(text.ends_with('\n'), "catalogue writer must preserve the trailing newline");
+    }
+
+    #[test]
     fn test_insert_entry_rejects_duplicate() {
         let mut document =
             serde_json::json!({ "types": { "Foo": {} }, "traits": {}, "functions": {} });
@@ -544,7 +589,7 @@ mod tests {
 
     fn single_domain_binding() -> Vec<TdddLayerBinding> {
         crate::verify::tddd_layers::parse_tddd_layers(
-            r#"{"layers":[{"crate":"domain","tddd":{"enabled":true,"catalogue_file":"domain-types.json"}}]}"#,
+            r#"{"version":2,"layers":[{"crate":"domain","tddd":{"enabled":true,"catalogue_file":"domain-types.json"}}]}"#,
         )
         .unwrap()
     }

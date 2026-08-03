@@ -232,6 +232,7 @@ mod tests {
         write_file(
             &project_root.join("architecture-rules.json"),
             r#"{
+                "version": 2,
                 "layers": [
                     {
                         "crate": "domain",

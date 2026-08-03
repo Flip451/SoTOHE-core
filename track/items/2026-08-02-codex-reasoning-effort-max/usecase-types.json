@@ -1,0 +1,103 @@
+{
+  "crate_name": "usecase",
+  "functions": {},
+  "layer": "usecase",
+  "schema_version": 5,
+  "traits": {},
+  "types": {
+    "ReasoningEffort": {
+      "action": "reference",
+      "docs": "Baseline-identical finite capability-dispatch effort vocabulary.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Low",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Medium",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "High",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "XHigh",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Max",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "capability_exec::values",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-02-codex-reasoning-effort-max/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-02-codex-reasoning-effort-max/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-02-codex-reasoning-effort-max/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-02-codex-reasoning-effort-max/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-02-codex-reasoning-effort-max/spec.json"
+        }
+      ]
+    }
+  },
+  "trait_impls": [
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "ReasoningEffort"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "ReasoningEffort"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::marker::Copy",
+      "for_type": "ReasoningEffort"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "ReasoningEffort"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "ReasoningEffort"
+    }
+  ]
+}

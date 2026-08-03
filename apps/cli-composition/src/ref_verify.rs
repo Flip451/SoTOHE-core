@@ -295,7 +295,7 @@ mod tests {
     fn write_architecture_rules_no_tddd(project_root: &Path) {
         std::fs::write(
             project_root.join("architecture-rules.json"),
-            r#"{"layers":[{"crate":"placeholder-no-tddd"}]}"#,
+            r#"{"version":2,"layers":[{"crate":"placeholder-no-tddd"}]}"#,
         )
         .unwrap();
     }
@@ -318,7 +318,7 @@ mod tests {
         // use underscores — `"test-domain"` would be rejected by the catalogue codec.
         std::fs::write(
             project_root.join("architecture-rules.json"),
-            r#"{"layers":[{"crate":"placeholder_no_tddd"},{"crate":"test_domain","tddd":{"enabled":true}}]}"#,
+            r#"{"version":2,"layers":[{"crate":"placeholder_no_tddd"},{"crate":"test_domain","tddd":{"enabled":true}}]}"#,
         )
         .unwrap();
 
@@ -446,7 +446,12 @@ mod tests {
             config_dir.join("agent-profiles.json"),
             r#"{
   "schema_version": 1,
-  "providers": { "claude": { "label": "Claude Code" } },
+  "providers": {
+    "claude": {
+      "label": "Claude Code",
+      "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"]
+    }
+  },
   "capabilities": {
     "ref-verifier-chain1": {
       "provider": "claude",
@@ -786,6 +791,7 @@ exit 64
         std::fs::write(
             project_root.join("architecture-rules.json"),
             r#"{
+  "version": 2,
   "layers": [
     {
       "crate": "domain",

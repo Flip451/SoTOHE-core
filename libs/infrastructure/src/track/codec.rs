@@ -220,6 +220,8 @@ pub fn decode(json: &str) -> Result<(TrackMetadata, DocumentMeta), CodecError> {
 /// Returns `CodecError` on JSON serialization failure.
 pub fn encode(track: &TrackMetadata, meta: &DocumentMeta) -> Result<String, CodecError> {
     let doc = document_from_track_metadata(track, meta);
+    // Serialize through serde_json::Value so its default key-sorted object map
+    // canonicalizes every object before pretty-printing it.
     let mut value = serde_json::to_value(&doc)?;
     // Preserve `branch: null` for planning-only tracks (schema_version 6 + no branch).
     if track.branch().is_none() {
@@ -383,6 +385,32 @@ mod tests {
         let (track2, meta2) = decode(&json).unwrap();
         assert_eq!(track, track2);
         assert_eq!(meta.schema_version, meta2.schema_version);
+    }
+
+    #[test]
+    fn test_encode_identical_metadata_returns_deterministic_json_bytes() {
+        let (track, meta) = decode(sample_json_v6()).unwrap();
+
+        let first = encode(&track, &meta).unwrap();
+        let second = encode(&track, &meta).unwrap();
+
+        assert_eq!(first, second);
+        assert_eq!(
+            first,
+            r#"{
+  "branch": null,
+  "branch_strategy_snapshot": {
+    "base_branch": "main",
+    "merge_method": "squash",
+    "merge_target": "main"
+  },
+  "created_at": "2026-03-11T00:00:00Z",
+  "id": "test-track",
+  "schema_version": 6,
+  "title": "Test Track",
+  "updated_at": "2026-03-11T00:00:00Z"
+}"#
+        );
     }
 
     #[test]

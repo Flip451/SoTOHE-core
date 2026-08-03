@@ -32,3 +32,84 @@ D2 の既裁定に従い、conflict hunk の選択だけを pre-gate 実行可�
   起動不能になるため。semantic authorship は designated writer に残し、レビュー・commit gate は維持する。
 - 追加適用: `spec-designer` / `type-designer` / `impl-planner` / `adr-editor` / `adr-diagnoser` の
   capability contract に `conflict-preparation` mode と即時 guardian/re-entry 条件を同期した。
+
+## 2026-08-03 — guarded base merge (develop 92142af7) の conflict 準備と D2 hunk 選択
+
+`bin/sotp track merge-base` が Conflicted を返し、unmerged path は
+`libs/infrastructure/src/tddd/type_signals_codec.rs` の 1 件のみだった。D2 例外に基づき
+orchestrator が既存 hunk の選択のみを行った。
+
+- 対象ファイル: `libs/infrastructure/src/tddd/type_signals_codec.rs`（`sample_doc()` fixture）
+- 選択した辺: HEAD（track 側）。`TypeSignalsCacheKey::new(CatalogueDeclarationHash,
+  ImplementationInputHash, BaselineHash)` + 空 signal リスト。
+- 理由: 現行の `TypeSignalsDocument::new` は `TypeSignalsCacheKey` を取るシグネチャであり、
+  develop 側 hunk（旧 positional 引数）はコンパイル不能。hunk 選択のみで意味追加なし。
+- 残余の base 由来ドリフト（conflict hunk なし）: (1) develop 追加の
+  `libs/infrastructure/src/signal_report/mod.rs` が旧 accessor
+  `document.declaration_hash()` / `document.implementation_input_hash()` を呼ぶ（現行 API は
+  `cache_key()` 経由）。(2) develop 追加の
+  `test_encode_canonicalizes_json_keys_and_is_byte_stable` は signal オブジェクトのキー順を
+  検査するため、空 signal fixture と両立しない。いずれも recover workflow の
+  normal implementer reconciliation 経路で再整合する。
+
+### merge-base 3 連続失敗（11:31/11:33/11:43Z）の診断
+
+canonical wrapper の再実行（11:59Z、Claude Code 環境）は成功し conflict 状態を確立した。
+`GIT_TRACE` / `GIT_TRACE2_EVENT` の捕捉により、reference-transaction hook（prepared /
+committed）は guarded トークンを認識して allow、merge は conflict で exit 1、adjudication は
+正しく `Conflicted` を返すことを確認した。
+
+- 失敗 3 回のエラー `guarded git merge failed`（`base_merge.rs:134`）は「merge 非ゼロ exit +
+  unmerged paths なし + MERGE_HEAD なし」の経路であり、merge が preflight で即座に失敗して
+  いたことを示す（所要 102-113ms）。
+- 失敗時刻に HookBlock テレメトリはなく（11:27/11:40/11:51 の HookBlock は別事象 —
+  トークンなしの直接 git ref 更新の遮断）、hook 拒否説は棄却。
+- 有力仮説: 旧オーケストレーション（Codex CLI）の workspace-write sandbox は `.git` への
+  書き込みを遮断するため、その環境内で走った merge-base は ref/index 書き込みで即失敗した。
+  環境依存であり、コード上の決定的欠陥ではない。
+- ただし adapter が git の stderr を握り潰す error observability の欠陥は実在する
+  （失敗理由が `guarded git merge failed` に潰れ、診断に外部トレースを要した）。実 hook 構成
+  での E2E 回帰テスト欠落と併せ、修理候補として別途裁定に付す。
+
+### base 由来ドリフトの再整合（conflict hunk なし・機械的 API 整合のみ）
+
+recover workflow の implementer reconciliation 経路を `bin/sotp capability exec implementer` で
+起動しようとしたが、旧 `bin/sotp` バイナリが merge で入った develop 版 `agent-profiles.json` の
+新フィールド `supported_reasoning_efforts` を解析できず、profile 解決が fail-closed した。
+`cargo make build-sotp` は workspace のコンパイル（当時 E0599 で失敗）を要するため、capability
+dispatch は再整合完了まで構造的に使用不能（循環）だった。このため orchestrator が以下の機械的
+整合のみを直接適用した（意味追加なし・全て既存 API / 既存 develop 内容への追従）:
+
+- `libs/infrastructure/src/signal_report/mod.rs`: develop 追加コードの旧 accessor 2 箇所を
+  `document.cache_key().declaration_hash()` / `document.cache_key().implementation_input_hash()`
+  に更新（比較セマンティクスは不変。baseline_hash 比較の追加はしない — 要否は post-merge の
+  通常 writer 判断に委ねる）。
+- 同ファイルのテストフィクスチャ `fresh_impl_catalog_signals`: schema_version 3→4、
+  `baseline_hash` フィールド追加（現行 decoder は必須・deny_unknown_fields）。
+- `libs/infrastructure/src/tddd/type_signals_codec.rs`: `sample_doc()` に develop 版の既存
+  `TypeSignal` フィクスチャを復元（develop 追加の canonical-JSON テストは signal のキー順を
+  検査するため空リストと両立しない）。同テストの先頭キー assertion を `declaration_hash` →
+  `baseline_hash` に更新（DTO への baseline_hash 追加によりソート順が変わったため）。
+
+適用後 `cargo check --workspace` clean、`type_signals_codec` / `signal_report` の 38 テスト全通過。
+
+### TDDD baseline の base-commit 再捕捉（impl_catalog chain の再整合）
+
+pre-review gate（`task-contract coverage` / `check`）が、merge で入った develop の新型
+（SignalReport* 系ほか）を「帰属なし entry」、develop が変更した既存型（TrackStatus ほか）を
+🔴 Mismatch として全 scope でブロックした。原因は track 開始時に捕捉した TDDD rustdoc
+baseline の陳腐化であり、conflict hunk のない base 由来ドリフトである。
+
+- 設計上の正規救済は clean-merge cleanup の「exact base commit からの baseline 置換」だが、
+  conflicted 経路では cleanup が commit 後まで走れない一方、commit gate（`track-commit-message`
+  の regen sequence）は signal を必ず再計算してブロックする — **conflicted 経路の gate 循環**。
+  これは本 track 成果物の dogfooding で発見された設計ギャップとして、error observability
+  欠陥と併せて修理裁定に付す。
+- 再整合は baseline-capture CLI の文書化された再捕捉手順（baseline 削除 → 再実行）で行った。
+  まず merged worktree から捕捉したところ、catalogue の `action=Add` 宣言と矛盾して
+  `ActionContradiction` で fail-closed した（本 track の型まで baseline に入るため）。正しくは
+  cleanup と同じ base 側のみの捕捉が必要で、scratchpad への使い捨て clone（base commit
+  92142af7 で detach）を `--source-workspace` に与えて再捕捉した。この clone は本 repo の
+  guarded 経路を一切迂回しない読み取り専用の rustdoc export 用である。
+- 再捕捉後、`signal calc-impl-catalog` / `task-contract coverage` / `task-contract check` は
+  すべて通過。catalogue・task-contract・impl-plan への編集は一切行っていない。

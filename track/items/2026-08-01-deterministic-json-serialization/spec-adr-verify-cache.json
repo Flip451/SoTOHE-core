@@ -1,0 +1,304 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "7d7bf7efe5420c55feb8f9127dc30fd91fc698978bb79618dcacc975ce4ad5ae",
+      "evidence_hash": "e9c108c555f61938361e263f70792134cc23fa807c1cc08c592cf5e90905f0be",
+      "verdict": {
+        "kind": "pass",
+        "citation": "review.json を最優先に、sotp が書き出す全 JSON 成果物を対象とする。いずれの方式でも「同一内容なら同一バイト列」を保証する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "Ensure that every JSON artifact generated or updated by sotp, with review.json prioritized, has a deterministic key order so identical logical content produces an identical byte sequence."
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-deterministic-json-serialization.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "ed52550953d7d8080c31fec5510a56df95a8ab7b5cc7f8043230df90080a485a",
+      "evidence_hash": "e9c108c555f61938361e263f70792134cc23fa807c1cc08c592cf5e90905f0be",
+      "verdict": {
+        "kind": "pass",
+        "citation": "sotp が生成する全 JSON を決定的なキー順で serialize する"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "Apply deterministic serialization to every JSON artifact that sotp generates or updates, prioritizing review.json."
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-deterministic-json-serialization.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "9a8164c399442de7bd0025f0f5bca6d8d880ff85874bc1049420db40bdc89c3b",
+      "evidence_hash": "e9c108c555f61938361e263f70792134cc23fa807c1cc08c592cf5e90905f0be",
+      "verdict": {
+        "kind": "pass",
+        "citation": "いずれの方式でも「同一内容なら同一バイト列」を保証する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "Make repeated serialization of identical logical JSON content yield identical bytes, eliminating key-order-only diff and freshness-check churn."
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-deterministic-json-serialization.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "c6c03f9dfbd5f59e657a5ef28534461d601ddf14f3722d54bfc0f95e41c2c3e7",
+      "evidence_hash": "e9c108c555f61938361e263f70792134cc23fa807c1cc08c592cf5e90905f0be",
+      "verdict": {
+        "kind": "pass",
+        "citation": "sotp が生成する全 JSON を決定的なキー順で serialize する"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "Permit a one-time key-order-only rearrangement when an active track's generated JSON artifacts are regenerated under the deterministic behavior."
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-deterministic-json-serialization.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "4003fce5e875c5bec6b326d9503de4cf8ddb96f5ea8c5e1d21451284bd2a9779",
+      "evidence_hash": "e9c108c555f61938361e263f70792134cc23fa807c1cc08c592cf5e90905f0be",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実装方式（IndexMap / BTreeMap への置換、または書き出し経路への canonical writer 挿入）は実装 track で選定する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-01",
+          "text_label": "Selecting the concrete deterministic-serialization mechanism."
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-deterministic-json-serialization.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "3e67685b397d53ff9bb6597cb7dd72acdebca56fd001a71f34835bbe211632d8",
+      "evidence_hash": "e9c108c555f61938361e263f70792134cc23fa807c1cc08c592cf5e90905f0be",
+      "verdict": {
+        "kind": "pass",
+        "citation": "review.json を最優先に、sotp が書き出す全 JSON 成果物を対象とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-02",
+          "text_label": "Bulk reserializing JSON artifacts belonging to completed tracks."
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-deterministic-json-serialization.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "953cb9f497a5ea955dcfc6a7c488bf67df8492d2e8a2cafbc0b27a11b2613398",
+      "evidence_hash": "e9c108c555f61938361e263f70792134cc23fa807c1cc08c592cf5e90905f0be",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実装方式（IndexMap / BTreeMap への置換、または書き出し経路への canonical writer 挿入）は実装 track で選定する。いずれの方式でも「同一内容なら同一バイト列」を保証する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "The behavior must be implementation-mechanism-neutral; the implementation track selects how deterministic serialization is achieved without weakening the byte-identical result."
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-deterministic-json-serialization.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "6d7d4d6b19485275023aee68c576ddac966ede8c295ed8d48ff42cfeb35b8d8a",
+      "evidence_hash": "e9c108c555f61938361e263f70792134cc23fa807c1cc08c592cf5e90905f0be",
+      "verdict": {
+        "kind": "pass",
+        "citation": "review.json を最優先に、sotp が書き出す全 JSON 成果物を対象とする。実装方式（IndexMap / BTreeMap への置換、または書き出し経路への canonical writer 挿入）は実装 track で選定する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "Migration effects are limited to the key order of regenerated artifacts on active tracks; completed-track artifacts must remain untouched."
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-deterministic-json-serialization.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "db79d7553a7f9db92140af4ce0470d7dae12caba30c3321d02d30d48b227590d",
+      "evidence_hash": "e9c108c555f61938361e263f70792134cc23fa807c1cc08c592cf5e90905f0be",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「同一内容なら同一バイト列」を保証する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "This track introduces no artifact-size or serialization-latency requirement; any performance reassessment is a separate future ADR decision and does not change the deterministic-byte acceptance criteria."
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-deterministic-json-serialization.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "7c1f3b16d50a7830b67094511a9ed353a63213c748f8ba46c7845c0edededb9e",
+      "evidence_hash": "e9c108c555f61938361e263f70792134cc23fa807c1cc08c592cf5e90905f0be",
+      "verdict": {
+        "kind": "pass",
+        "citation": "いずれの方式でも「同一内容なら同一バイト列」を保証する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "For each sotp JSON artifact-generation or update path, two writes from identical logical JSON content produce byte-identical output."
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-deterministic-json-serialization.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "810cacd6b89ee5b102c79e7b9606daeaa10a2a4fa481280f5aac42ed0fecc0f7",
+      "evidence_hash": "e9c108c555f61938361e263f70792134cc23fa807c1cc08c592cf5e90905f0be",
+      "verdict": {
+        "kind": "pass",
+        "citation": "いずれの方式でも「同一内容なら同一バイト列」を保証する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "review.json is covered by the deterministic behavior and does not produce a diff when only serialization is repeated for unchanged logical content."
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-deterministic-json-serialization.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "7ad6ec7848ab6ae621398180bebbc13a087cadbff289545f8426e6c6d00ab22b",
+      "evidence_hash": "e9c108c555f61938361e263f70792134cc23fa807c1cc08c592cf5e90905f0be",
+      "verdict": {
+        "kind": "pass",
+        "citation": "いずれの方式でも「同一内容なら同一バイト列」を保証する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "Regenerating an active track's JSON artifacts may produce a one-time diff that changes key order only; subsequent unchanged regenerations produce no byte-level churn."
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-deterministic-json-serialization.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "cb5cc8d7efdd6fd88c2f8a052d57858178f2ba138443d8e157eb009816eee1f0",
+      "evidence_hash": "e9c108c555f61938361e263f70792134cc23fa807c1cc08c592cf5e90905f0be",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「同一内容なら同一バイト列」を保証する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "The implementation does not regenerate or rewrite JSON artifacts for completed tracks solely to normalize key order."
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-deterministic-json-serialization.md",
+          "decision_id": "D1"
+        }
+      }
+    }
+  ]
+}

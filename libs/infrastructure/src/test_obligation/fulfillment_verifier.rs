@@ -231,7 +231,12 @@ mod tests {
 
     const CONFIG: &str = r#"{
         "schema_version": 1,
-        "providers": { "claude": { "label": "Claude" } },
+        "providers": {
+            "claude": {
+                "label": "Claude",
+                "supported_reasoning_efforts": ["low", "high"]
+            }
+        },
         "capabilities": {
             "obligation-fulfillment-verifier": {
                 "provider": "claude",
@@ -259,7 +264,12 @@ mod tests {
             &path,
             r#"{
                 "schema_version": 1,
-                "providers": { "codex": { "label": "Codex" } },
+                "providers": {
+                    "codex": {
+                        "label": "Codex",
+                        "supported_reasoning_efforts": ["high"]
+                    }
+                },
                 "capabilities": {
                     "obligation-fulfillment-verifier": {
                         "provider": "codex",
