@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "365804662ebaa0630e096fa73be152b6639ca6107e8f555bb25cdaeffc7dc092",
+  "catalogue_declaration_hash": "f06d1180c522a933152cc34e33eb34612b6ec2401883312ed40578d970932104",
   "signals": [
     {
       "type_name": "CapabilityExecInteractor",
@@ -40,7 +40,7 @@
     {
       "type_name": "CommandConfigLoadError",
       "signal": "blue",
-      "entry_hash": "7347d331971af490f7c53aa35afc40c7b9e0063faccbf79f6fa7f4008900ae97"
+      "entry_hash": "cdb007d4f75285fee14d648b9dc2ab8b4dcdfdf79604d73a04fb1c691122c977"
     },
     {
       "type_name": "CommandConfigSchemaVersion",
@@ -50,7 +50,7 @@
     {
       "type_name": "CommandConfigValidationError",
       "signal": "blue",
-      "entry_hash": "e8d4e5022d9f7e93abff9fbf270932f6de6d0b06955da5e955175e40fd513c4e"
+      "entry_hash": "997ed9d4a5058085d39076e1087ac7aa28f1f78f36f391e8d16fbfac47ceaf71"
     },
     {
       "type_name": "CommandDeclarationId",
@@ -80,12 +80,12 @@
     {
       "type_name": "ConfiguredCommand",
       "signal": "blue",
-      "entry_hash": "6300e9bece65776469689049dd610d4182ce5e1c84af1fc41ca9e84b49679908"
+      "entry_hash": "192a20315b904044f549e856716ea4ce444287b8ac167d230106d928607e764b"
     },
     {
       "type_name": "ConfiguredCommandValidationError",
       "signal": "blue",
-      "entry_hash": "14e7ad6da4eaa0d5955c279766bb329800d1d3a1a4624ba48c772bfd8aca1c64"
+      "entry_hash": "db9cbd65f6ac9bc9568e79e65121857f5d495490858d426cb450b70e0909b4c8"
     },
     {
       "type_name": "CurrentReviewTrackResolveError",
@@ -105,7 +105,7 @@
     {
       "type_name": "PhaseCommandConfig",
       "signal": "blue",
-      "entry_hash": "308dab41e136484e8365ce63639dc7b4884a756a9bcf9115ab50a955fd9bd8fb"
+      "entry_hash": "f38830815fbf3147bee886b162c760abd2413c772278024a016885560bdfe429"
     },
     {
       "type_name": "PhaseCommandConfigValidationError",
@@ -255,12 +255,12 @@
     {
       "type_name": "CurrentReviewTrackResolverPort",
       "signal": "blue",
-      "entry_hash": "ff4ba8d4eecfa1fd867115a34aa3f0cea6c2d6788a61074a538b8685bd16a07a"
+      "entry_hash": "d743ab19f804b20bdd68f9d3f6ff0ef9d21b195782bb0db6e71785b9769082d1"
     },
     {
       "type_name": "PhaseCommandConfigLoaderPort",
       "signal": "blue",
-      "entry_hash": "d8621a4279fdc7581ee5bf13293112005353c4b310970d24304a54bce5802455"
+      "entry_hash": "6054419a4325bd249f7c0f312ed657a6a44d00b10141729c6d60aa8e06ff8822"
     },
     {
       "type_name": "PhaseCommandService",
@@ -270,7 +270,7 @@
     {
       "type_name": "PreReviewCommandConfigLoaderPort",
       "signal": "blue",
-      "entry_hash": "8565dec2af6a2b1de9891c2526fa6aa73ef9055097c3f041e0b2b73ee09bcb95"
+      "entry_hash": "f1da1828c2002ec4f02b59378a03ae153b881f3a2c91eb4fb54fccbc27816a84"
     },
     {
       "type_name": "PreReviewCommandDispatchService",

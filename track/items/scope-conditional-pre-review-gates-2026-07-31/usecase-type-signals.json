@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-03T05:27:30Z",
-  "declaration_hash": "365804662ebaa0630e096fa73be152b6639ca6107e8f555bb25cdaeffc7dc092",
-  "implementation_input_hash": "1c9b9caca18397237eeba12f815be97d02046a51696a30b6aca5e99db68a012f",
+  "generated_at": "2026-08-03T08:01:03Z",
+  "declaration_hash": "f06d1180c522a933152cc34e33eb34612b6ec2401883312ed40578d970932104",
+  "implementation_input_hash": "a4c7383dc68cf50964b6dffd9b6613910580230137d4f78805ef42f36ecb8111",
   "signals": [
     {
       "type_name": "CapabilityExecRequest",
@@ -239,9 +239,9 @@
     {
       "type_name": "PhaseCommandConfig",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -251,15 +251,15 @@
     {
       "type_name": "PhaseCommandConfigLoaderPort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "PhaseCommandConfigValidationError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Debug",
         "Display",
         "Error"
@@ -268,9 +268,9 @@
     {
       "type_name": "PhaseCommandDeclaration",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -368,9 +368,9 @@
     {
       "type_name": "PhaseValidateCommand",
       "kind_tag": "command",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",

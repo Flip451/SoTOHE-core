@@ -163,8 +163,16 @@ impl ConfiguredCommand {
         arguments: Vec<CommandArgument>,
         timeout_seconds: Option<UnvalidatedTimeoutSeconds>,
     ) -> Result<Self, ConfiguredCommandValidationError> {
+        let argv = CommandArgv::try_new(arguments)?;
+        if argv.arguments().iter().any(|argument| {
+            let value = argument.as_str();
+            value == "--host" || value.starts_with("--host=")
+        }) {
+            return Err(ConfiguredCommandValidationError::PersistedHostArgument);
+        }
+
         Ok(Self {
-            argv: CommandArgv::try_new(arguments)?,
+            argv,
             timeout: match timeout_seconds {
                 Some(value) => CommandTimeoutSeconds::try_new(value)?,
                 None => CommandTimeoutSeconds::default_max(),
@@ -255,6 +263,8 @@ pub enum ConfiguredCommandValidationError {
     Argv(#[from] CommandArgvValidationError),
     #[error(transparent)]
     Timeout(#[from] CommandTimeoutValidationError),
+    #[error("persisted --host argument is forbidden")]
+    PersistedHostArgument,
 }
 
 #[derive(Debug, Error)]
@@ -281,6 +291,8 @@ pub enum CommandConfigValidationError {
     TimeoutOutOfRange { seconds: UnvalidatedTimeoutSeconds },
     #[error("recursive command invocation is forbidden")]
     RecursiveInvocation { prefix: Vec<CommandArgument> },
+    #[error("persisted --host argument is forbidden")]
+    PersistedHostArgument,
 }
 
 impl From<ConfiguredCommandValidationError> for CommandConfigValidationError {
@@ -295,6 +307,7 @@ impl From<ConfiguredCommandValidationError> for CommandConfigValidationError {
             ConfiguredCommandValidationError::Timeout(
                 CommandTimeoutValidationError::OutOfRange { seconds },
             ) => Self::TimeoutOutOfRange { seconds },
+            ConfiguredCommandValidationError::PersistedHostArgument => Self::PersistedHostArgument,
         }
     }
 }
@@ -366,6 +379,19 @@ mod tests {
     }
 
     #[test]
+    fn test_configured_command_persisted_host_argument_forms_are_rejected_and_convert() {
+        for arguments in [argv(&["writer", "--host", "codex"]), argv(&["writer", "--host=codex"])] {
+            let error = ConfiguredCommand::try_new(arguments, None).unwrap_err();
+
+            assert!(matches!(error, ConfiguredCommandValidationError::PersistedHostArgument));
+            assert!(matches!(
+                CommandConfigValidationError::from(error),
+                CommandConfigValidationError::PersistedHostArgument
+            ));
+        }
+    }
+
+    #[test]
     fn test_configured_command_rejects_lexical_sotp_aliases() {
         for executable in ["./bin/sotp", "bin/./sotp", "bin/../bin/sotp", "sotp"] {
             assert!(matches!(
@@ -409,6 +435,54 @@ mod tests {
         let command =
             ConfiguredCommand::try_new(argv(&["bin/sotp", "signal", "calc"]), None).unwrap();
         assert_eq!(command.timeout().as_secs(), 3_600);
+    }
+
+    #[test]
+    fn test_configured_command_preserves_supplied_literal_argv() {
+        let command = ConfiguredCommand::try_new(
+            argv(&["bin/sotp", "capability", "exec", "implementer", "briefing.md"]),
+            None,
+        )
+        .unwrap();
+
+        let actual: Vec<&str> =
+            command.argv().arguments().iter().map(CommandArgument::as_str).collect();
+        assert_eq!(actual, ["bin/sotp", "capability", "exec", "implementer", "briefing.md"]);
+    }
+
+    #[test]
+    fn test_configured_command_rejects_empty_argv_and_preserves_explicit_timeout() {
+        assert!(matches!(
+            ConfiguredCommand::try_new(Vec::new(), None),
+            Err(ConfiguredCommandValidationError::Argv(CommandArgvValidationError::Empty))
+        ));
+
+        let command = ConfiguredCommand::try_new(
+            argv(&["bin/sotp", "signal", "calc"]),
+            Some(UnvalidatedTimeoutSeconds::new(1_200)),
+        )
+        .unwrap();
+        assert_eq!(command.timeout().as_secs(), 1_200);
+
+        assert!(matches!(
+            ConfiguredCommand::try_new(
+                argv(&["bin/sotp", "signal", "calc"]),
+                Some(UnvalidatedTimeoutSeconds::new(0)),
+            ),
+            Err(ConfiguredCommandValidationError::Timeout(
+                CommandTimeoutValidationError::OutOfRange { .. }
+            ))
+        ));
+
+        assert!(matches!(
+            ConfiguredCommand::try_new(
+                argv(&["bin/sotp", "signal", "calc"]),
+                Some(UnvalidatedTimeoutSeconds::new(3_601)),
+            ),
+            Err(ConfiguredCommandValidationError::Timeout(
+                CommandTimeoutValidationError::OutOfRange { .. }
+            ))
+        ));
     }
 
     #[test]

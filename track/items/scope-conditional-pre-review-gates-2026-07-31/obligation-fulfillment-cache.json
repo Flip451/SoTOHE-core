@@ -3,6 +3,778 @@
   "entries": [
     {
       "edge_id": {
+        "entry_key": "PhaseCommandConfigLoaderPort",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandConfigLoaderPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load"
+      },
+      "key": {
+        "bound_tests_set_hash": "85755b781ddf22ff763d38b407597d83ebc609c73ca3e72bdc73158abc26fea0",
+        "declaration_hash": "be236a996bb83f88af9ccd3465f6c58ad9bd2055a67c020c248d38d17eaf4aaa",
+        "anchor_text_hash": "eb3acd9bc2b70f70d7e5b103ad0b2255c300e50456aaeadfd2f50815b79ff6cf"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            declaration.writer().argv().arguments().first().map(CommandArgument::as_str),\n            Some(\"second-writer\")\n        );\n        assert_eq!(declaration.writer().timeout().as_secs(), 3_600);\n        assert_eq!(\n            declaration\n                .pre_entry_commands()\n                .iter()\n                .filter_map(|command| command.argv().arguments().first())\n                .map(CommandArgument::as_str)\n                .collect::<Vec<_>>(),\n            vec![\"first-pre-entry\", \"second-pre-entry\"]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_config_loader_rejects_invalid_config_before_execution"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_config_loader_preserves_order_and_default_timeout_for_selected_root"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_validate_command_surfaces_loader_success_and_validation_failure"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandConfigLoaderPort",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandConfigLoaderPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load"
+      },
+      "key": {
+        "bound_tests_set_hash": "85755b781ddf22ff763d38b407597d83ebc609c73ca3e72bdc73158abc26fea0",
+        "declaration_hash": "be236a996bb83f88af9ccd3465f6c58ad9bd2055a67c020c248d38d17eaf4aaa",
+        "anchor_text_hash": "e44a2b38a1ce3bf278e618e41415dbd26068d287e4173facb0f0c39698f67474"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "for root in [\"/zero-timeout\", \"/excessive-timeout\"] {\n            assert!(matches!(\n                loader.load(Path::new(root)),\n                Err(crate::operator_command::CommandConfigLoadError::Invalid(\n                    CommandConfigValidationError::TimeoutOutOfRange { .. }\n                ))\n            ));\n        }\n        for root in [\"/recursive-writer\", \"/recursive-pre-entry\", \"/recursive-fix-local\"] {\n            assert!(matches!(\n                loader.load(Path::new(root)),\n                Err(crate::operator_command::CommandConfigLoadError::Invalid(\n                    CommandConfigValidationError::RecursiveInvocation { .. }\n                ))\n            ));\n        }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_config_loader_rejects_invalid_config_before_execution"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_config_loader_preserves_order_and_default_timeout_for_selected_root"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_validate_command_surfaces_loader_success_and_validation_failure"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandConfigLoaderPort",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandConfigLoaderPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load"
+      },
+      "key": {
+        "bound_tests_set_hash": "85755b781ddf22ff763d38b407597d83ebc609c73ca3e72bdc73158abc26fea0",
+        "declaration_hash": "be236a996bb83f88af9ccd3465f6c58ad9bd2055a67c020c248d38d17eaf4aaa",
+        "anchor_text_hash": "05b8094316a1aacabb4bec26100b679daf53d5554267297214266776d1838398"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            loader.load(Path::new(\"/invalid-schema\")),\n            Err(crate::operator_command::CommandConfigLoadError::Invalid(\n                CommandConfigValidationError::InvalidSchemaVersion { .. }\n            ))\n        ));\n        assert!(matches!(\n            loader.load(Path::new(\"/duplicate\")),\n            Err(crate::operator_command::CommandConfigLoadError::Invalid(\n                CommandConfigValidationError::DuplicateDeclaration(_)\n            ))\n        ));\n        assert!(matches!(\n            loader.load(Path::new(\"/empty-argv\")),\n            Err(crate::operator_command::CommandConfigLoadError::Invalid(\n                CommandConfigValidationError::EmptyArgv\n            ))\n        ));\n        for root in [\"/zero-timeout\", \"/excessive-timeout\"] {\n            assert!(matches!(\n                loader.load(Path::new(root)),\n                Err(crate::operator_command::CommandConfigLoadError::Invalid(\n                    CommandConfigValidationError::TimeoutOutOfRange { .. }\n                ))\n            ));\n        }\n        for root in [\"/recursive-writer\", \"/recursive-pre-entry\", \"/recursive-fix-local\"] {\n            assert!(matches!(\n                loader.load(Path::new(root)),\n                Err(crate::operator_command::CommandConfigLoadError::Invalid(\n                    CommandConfigValidationError::RecursiveInvocation { .. }\n                ))\n            ));\n        }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_config_loader_rejects_invalid_config_before_execution"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_config_loader_preserves_order_and_default_timeout_for_selected_root"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_validate_command_surfaces_loader_success_and_validation_failure"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandDeclaration",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandDeclaration",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "2da4fb79b57f85f6008dcf9c60b7f82b20554ec173b9dd5da8b69c8a49e15f09",
+        "declaration_hash": "da0e77702ed7af76a59d5dd5b6b63fede79df0072798a00042b2b869d1a51c1b",
+        "anchor_text_hash": "eb3acd9bc2b70f70d7e5b103ad0b2255c300e50456aaeadfd2f50815b79ff6cf"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(declaration.id().as_str(), \"phase-one\");\n        assert_eq!(declaration.writer(), &writer);\n        assert_eq!(declaration.pre_entry_commands(), &[first, second]);\n        assert_eq!(declaration.writer().timeout().as_secs(), 3_600);\n        assert_eq!(\n            declaration.pre_entry_commands().get(1).map(|command| command.timeout().as_secs()),\n            Some(45)\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_declaration_preserves_writer_and_pre_entry_order"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConfiguredCommand",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-11"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConfiguredCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-11"
+      },
+      "key": {
+        "bound_tests_set_hash": "759df55b185e90b83068d6b34661f297f6614a2404b9b41d1de1d0b28bf691b6",
+        "declaration_hash": "9a1815f059a46928d65101165749304522a8e8317db6e07d20e2c564faa4c30b",
+        "anchor_text_hash": "ebe6fab89b5c121c6f2179eebc761a3372cfefe75713d1d4dce322e9302354e6"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let error = ConfiguredCommand::try_new(arguments, None).unwrap_err();\n\n            assert!(matches!(error, ConfiguredCommandValidationError::PersistedHostArgument));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::operator_command::tests",
+          "test_name": "test_configured_command_persisted_host_argument_forms_are_rejected_and_convert"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConfiguredCommand",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-13"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConfiguredCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-13"
+      },
+      "key": {
+        "bound_tests_set_hash": "759df55b185e90b83068d6b34661f297f6614a2404b9b41d1de1d0b28bf691b6",
+        "declaration_hash": "9a1815f059a46928d65101165749304522a8e8317db6e07d20e2c564faa4c30b",
+        "anchor_text_hash": "05e6e189bc377aa5f6c10e51bb69aa449a5cbd9f6ac58595389e164fcacefeea"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(error, ConfiguredCommandValidationError::PersistedHostArgument));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::operator_command::tests",
+          "test_name": "test_configured_command_persisted_host_argument_forms_are_rejected_and_convert"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConfiguredCommandValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-11"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConfiguredCommandValidationError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-11"
+      },
+      "key": {
+        "bound_tests_set_hash": "759df55b185e90b83068d6b34661f297f6614a2404b9b41d1de1d0b28bf691b6",
+        "declaration_hash": "61bb4144685060fc926598ce5c79cda7fb14ffdf8452fbba35dfdc29801008f0",
+        "anchor_text_hash": "ebe6fab89b5c121c6f2179eebc761a3372cfefe75713d1d4dce322e9302354e6"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "for arguments in [argv(&[\"writer\", \"--host\", \"codex\"]), argv(&[\"writer\", \"--host=codex\"])] {\n            let error = ConfiguredCommand::try_new(arguments, None).unwrap_err();\n\n            assert!(matches!(error, ConfiguredCommandValidationError::PersistedHostArgument));\n            assert!(matches!(\n                CommandConfigValidationError::from(error),\n                CommandConfigValidationError::PersistedHostArgument\n            ));\n        }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::operator_command::tests",
+          "test_name": "test_configured_command_persisted_host_argument_forms_are_rejected_and_convert"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConfiguredCommandValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-13"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConfiguredCommandValidationError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-13"
+      },
+      "key": {
+        "bound_tests_set_hash": "759df55b185e90b83068d6b34661f297f6614a2404b9b41d1de1d0b28bf691b6",
+        "declaration_hash": "61bb4144685060fc926598ce5c79cda7fb14ffdf8452fbba35dfdc29801008f0",
+        "anchor_text_hash": "05e6e189bc377aa5f6c10e51bb69aa449a5cbd9f6ac58595389e164fcacefeea"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(error, ConfiguredCommandValidationError::PersistedHostArgument));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::operator_command::tests",
+          "test_name": "test_configured_command_persisted_host_argument_forms_are_rejected_and_convert"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandConfigValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-11"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandConfigValidationError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-11"
+      },
+      "key": {
+        "bound_tests_set_hash": "759df55b185e90b83068d6b34661f297f6614a2404b9b41d1de1d0b28bf691b6",
+        "declaration_hash": "0fdfbc3a8fd6e5fd6698087a7cbc19ae96c11610e8934d3ca5d8836222017e6b",
+        "anchor_text_hash": "ebe6fab89b5c121c6f2179eebc761a3372cfefe75713d1d4dce322e9302354e6"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(error, ConfiguredCommandValidationError::PersistedHostArgument));\n            assert!(matches!(\n                CommandConfigValidationError::from(error),\n                CommandConfigValidationError::PersistedHostArgument\n            ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::operator_command::tests",
+          "test_name": "test_configured_command_persisted_host_argument_forms_are_rejected_and_convert"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandConfigValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-13"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandConfigValidationError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-13"
+      },
+      "key": {
+        "bound_tests_set_hash": "759df55b185e90b83068d6b34661f297f6614a2404b9b41d1de1d0b28bf691b6",
+        "declaration_hash": "0fdfbc3a8fd6e5fd6698087a7cbc19ae96c11610e8934d3ca5d8836222017e6b",
+        "anchor_text_hash": "05e6e189bc377aa5f6c10e51bb69aa449a5cbd9f6ac58595389e164fcacefeea"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(error, ConfiguredCommandValidationError::PersistedHostArgument));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::operator_command::tests",
+          "test_name": "test_configured_command_persisted_host_argument_forms_are_rejected_and_convert"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandConfigLoadError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-11"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandConfigLoadError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-11"
+      },
+      "key": {
+        "bound_tests_set_hash": "c4622e57b32d7cad26e7f029ad1e70456a540f5d3c5b38ae94654e2f67726cd2",
+        "declaration_hash": "4895fbdf76b681693eb3ec58185283853f1f911f1356d1f552c5fd55a68b90ec",
+        "anchor_text_hash": "ebe6fab89b5c121c6f2179eebc761a3372cfefe75713d1d4dce322e9302354e6"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n                result,\n                Err(CommandConfigLoadError::Invalid(\n                    CommandConfigValidationError::PersistedHostArgument\n                ))\n            ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_loader_rejects_persisted_host_argument_as_invalid_config"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandConfigLoadError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-13"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandConfigLoadError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-13"
+      },
+      "key": {
+        "bound_tests_set_hash": "c4622e57b32d7cad26e7f029ad1e70456a540f5d3c5b38ae94654e2f67726cd2",
+        "declaration_hash": "4895fbdf76b681693eb3ec58185283853f1f911f1356d1f552c5fd55a68b90ec",
+        "anchor_text_hash": "05e6e189bc377aa5f6c10e51bb69aa449a5cbd9f6ac58595389e164fcacefeea"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "Err(CommandConfigLoadError::Invalid(\n                    CommandConfigValidationError::PersistedHostArgument\n                ))"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_loader_rejects_persisted_host_argument_as_invalid_config"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandConfig",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-11"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandConfig",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-11"
+      },
+      "key": {
+        "bound_tests_set_hash": "1bbe9edf2cd17b6907427b4507985d19ccf8c57d7abc61f8c3b1a9ef2172bbf8",
+        "declaration_hash": "ce90ee8781b4fca0b246dac625881302fe84fa8fba4d985a113fbcc3bd3603a6",
+        "anchor_text_hash": "ebe6fab89b5c121c6f2179eebc761a3372cfefe75713d1d4dce322e9302354e6"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "for configuration in [&persisted_host_writer, &persisted_host_pre_entry] {\n            assert!(matches!(\n                decode_config(configuration),\n                Err(crate::operator_command::CommandConfigLoadError::Invalid(\n                    CommandConfigValidationError::PersistedHostArgument\n                ))\n            ));\n        }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_config_rejects_persisted_host_in_writer_and_pre_entry"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_config_loader_rejects_invalid_config_before_execution"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandConfig",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-13"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandConfig",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-13"
+      },
+      "key": {
+        "bound_tests_set_hash": "1bbe9edf2cd17b6907427b4507985d19ccf8c57d7abc61f8c3b1a9ef2172bbf8",
+        "declaration_hash": "ce90ee8781b4fca0b246dac625881302fe84fa8fba4d985a113fbcc3bd3603a6",
+        "anchor_text_hash": "05e6e189bc377aa5f6c10e51bb69aa449a5cbd9f6ac58595389e164fcacefeea"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n                decode_config(configuration),\n                Err(crate::operator_command::CommandConfigLoadError::Invalid(\n                    CommandConfigValidationError::PersistedHostArgument\n                ))\n            ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_config_rejects_persisted_host_in_writer_and_pre_entry"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_config_loader_rejects_invalid_config_before_execution"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandDeclaration",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandDeclaration",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "2da4fb79b57f85f6008dcf9c60b7f82b20554ec173b9dd5da8b69c8a49e15f09",
+        "declaration_hash": "da0e77702ed7af76a59d5dd5b6b63fede79df0072798a00042b2b869d1a51c1b",
+        "anchor_text_hash": "05b8094316a1aacabb4bec26100b679daf53d5554267297214266776d1838398"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(declaration.id().as_str(), \"phase-one\");\n        assert_eq!(declaration.writer(), &writer);\n        assert_eq!(declaration.pre_entry_commands(), &[first, second]);\n        assert_eq!(declaration.writer().timeout().as_secs(), 3_600);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_declaration_preserves_writer_and_pre_entry_order"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandConfig",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandConfig",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "94532885cb6e1ae963dc1be42d7fec16ff1add2321e9afb53e9962f931064578",
+        "declaration_hash": "ce90ee8781b4fca0b246dac625881302fe84fa8fba4d985a113fbcc3bd3603a6",
+        "anchor_text_hash": "eb3acd9bc2b70f70d7e5b103ad0b2255c300e50456aaeadfd2f50815b79ff6cf"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(declaration.writer().timeout().as_secs(), 3_600); ... assert_eq!(declaration.pre_entry_commands().first().map(|command| command.timeout().as_secs()), Some(3_600)); ... assert_eq!(declaration.pre_entry_commands().iter().filter_map(|command| command.argv().arguments().first()).map(CommandArgument::as_str).collect::<Vec<_>>(), vec![\"first-pre-entry\", \"second-pre-entry\"]); ... assert!(matches!(loader.load(Path::new(\"/empty-argv\")), Err(crate::operator_command::CommandConfigLoadError::Invalid(CommandConfigValidationError::EmptyArgv)))); ... assert!(matches!(loader.load(Path::new(\"/persisted-host-writer\")), Err(crate::operator_command::CommandConfigLoadError::Invalid(CommandConfigValidationError::PersistedHostArgument))))"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_config_duplicate_declaration_id_is_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_config_preserves_canonical_writer_order_and_default_timeout"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_config_loader_rejects_invalid_config_before_execution"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandConfig",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandConfig",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "7ec2984b91e6270df5ddc932d9e9255b8ebd2674a4abadca9f1f554dff9dc9f5",
+        "declaration_hash": "ce90ee8781b4fca0b246dac625881302fe84fa8fba4d985a113fbcc3bd3603a6",
+        "anchor_text_hash": "e44a2b38a1ce3bf278e618e41415dbd26068d287e4173facb0f0c39698f67474"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "for root in [\"/recursive-writer\", \"/recursive-pre-entry\", \"/recursive-fix-local\"] {\n            assert!(matches!(\n                loader.load(Path::new(root)),\n                Err(crate::operator_command::CommandConfigLoadError::Invalid(\n                    CommandConfigValidationError::RecursiveInvocation { .. }\n                ))\n            ));\n        }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_config_duplicate_declaration_id_is_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_config_invalid_schema_is_rejected_and_converts"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_config_rejects_recursive_review_fix_local_prefix"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_config_loader_rejects_invalid_config_before_execution"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandConfig",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandConfig",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "7ec2984b91e6270df5ddc932d9e9255b8ebd2674a4abadca9f1f554dff9dc9f5",
+        "declaration_hash": "ce90ee8781b4fca0b246dac625881302fe84fa8fba4d985a113fbcc3bd3603a6",
+        "anchor_text_hash": "05b8094316a1aacabb4bec26100b679daf53d5554267297214266776d1838398"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(loader.load(Path::new(\"/invalid-schema\")), Err(crate::operator_command::CommandConfigLoadError::Invalid(CommandConfigValidationError::InvalidSchemaVersion { .. })))); ... assert!(matches!(loader.load(Path::new(\"/duplicate\")), Err(crate::operator_command::CommandConfigLoadError::Invalid(CommandConfigValidationError::DuplicateDeclaration(_))))); ... assert!(matches!(loader.load(Path::new(\"/empty-argv\")), Err(crate::operator_command::CommandConfigLoadError::Invalid(CommandConfigValidationError::EmptyArgv)))); ... for root in [\"/zero-timeout\", \"/excessive-timeout\"] { assert!(matches!(loader.load(Path::new(root)), Err(crate::operator_command::CommandConfigLoadError::Invalid(CommandConfigValidationError::TimeoutOutOfRange { .. })))); } ... for root in [\"/recursive-writer\", \"/recursive-pre-entry\", \"/recursive-fix-local\"] { assert!(matches!(loader.load(Path::new(root)), Err(crate::operator_command::CommandConfigLoadError::Invalid(CommandConfigValidationError::RecursiveInvocation { .. })))); }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_config_duplicate_declaration_id_is_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_config_invalid_schema_is_rejected_and_converts"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_config_rejects_recursive_review_fix_local_prefix"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_config_loader_rejects_invalid_config_before_execution"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandConfigValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandConfigValidationError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "ff2bb8df1c8799796c8fe567cf418ca6fab42b10d64e1b34701c964a73d6beff",
+        "declaration_hash": "09a3264098ded746f4881e9b2d7253b7d737fa1ffb5714957a0127a78254ab68",
+        "anchor_text_hash": "e44a2b38a1ce3bf278e618e41415dbd26068d287e4173facb0f0c39698f67474"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let error = PhaseCommandConfig::try_new(\n            CommandConfigSchemaVersion::new(1),\n            vec![declaration(\"phase-one\"), declaration(\"phase-one\")],\n        )\n        .unwrap_err();\n\n        assert!(matches!(\n            error,\n            PhaseCommandConfigValidationError::DuplicateDeclaration(id) if id.as_str() == \"phase-one\"\n        ));\n\nlet error = PhaseCommandConfig::try_new(CommandConfigSchemaVersion::new(2), Vec::new())\n            .unwrap_err();\n\n        assert!(matches!(\n            error.into_command_config_validation_error(),\n            CommandConfigValidationError::InvalidSchemaVersion { actual } if actual.as_u32() == 2\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_config_duplicate_declaration_id_is_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_config_invalid_schema_is_rejected_and_converts"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandConfigValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandConfigValidationError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "ff2bb8df1c8799796c8fe567cf418ca6fab42b10d64e1b34701c964a73d6beff",
+        "declaration_hash": "09a3264098ded746f4881e9b2d7253b7d737fa1ffb5714957a0127a78254ab68",
+        "anchor_text_hash": "05b8094316a1aacabb4bec26100b679daf53d5554267297214266776d1838398"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let error = PhaseCommandConfig::try_new(\n            CommandConfigSchemaVersion::new(1),\n            vec![declaration(\"phase-one\"), declaration(\"phase-one\")],\n        )\n        .unwrap_err();\n\n        assert!(matches!(\n            error,\n            PhaseCommandConfigValidationError::DuplicateDeclaration(id) if id.as_str() == \"phase-one\"\n        ));\n\nlet error = PhaseCommandConfig::try_new(CommandConfigSchemaVersion::new(2), Vec::new())\n            .unwrap_err();\n\n        assert!(matches!(\n            error.into_command_config_validation_error(),\n            CommandConfigValidationError::InvalidSchemaVersion { actual } if actual.as_u32() == 2\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_config_duplicate_declaration_id_is_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_config_invalid_schema_is_rejected_and_converts"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseValidateCommand",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseValidateCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "00a3847e430d3c7942ecd28c18d032491e5956a58959c1d2add335a55c243981",
+        "declaration_hash": "0574546e25233cdea9bcffc118c0ac4e7cbecafd0d353908c03e3c9c8f6c7576",
+        "anchor_text_hash": "3a64b29a92e9e9eeaf1a9ea27e22587c95af88cf00d71369188fd9b70d334f36"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let error = loader.load(&failure.repository_root).unwrap_err();\n        assert!(matches!(\n            error,\n            crate::operator_command::CommandConfigLoadError::Invalid(\n                CommandConfigValidationError::TimeoutOutOfRange { .. }\n            )\n        ));\n        assert!(error.to_string().contains(\"outside the supported range\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_validate_command_surfaces_loader_success_and_validation_failure"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseValidateCommand",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseValidateCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "00a3847e430d3c7942ecd28c18d032491e5956a58959c1d2add335a55c243981",
+        "declaration_hash": "0574546e25233cdea9bcffc118c0ac4e7cbecafd0d353908c03e3c9c8f6c7576",
+        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(loader.load(&success.repository_root).is_ok());\nlet error = loader.load(&failure.repository_root).unwrap_err();\nassert!(matches!(\n    error,\n    crate::operator_command::CommandConfigLoadError::Invalid(\n        CommandConfigValidationError::TimeoutOutOfRange { .. }\n    )\n));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_validate_command_surfaces_loader_success_and_validation_failure"
+        }
+      ]
+    },
+    {
+      "edge_id": {
         "entry_key": "PreReviewCommandDispatchInteractor",
         "anchor_id": {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -436,12 +1208,12 @@
       },
       "key": {
         "bound_tests_set_hash": "65ddbab808b1bc56bfd02c299ce01380e41b8335dcbb1b36f174c56106f42823",
-        "declaration_hash": "41038e6d501f9fe8f7e515fe66c2468a266a0e995411d90f44ae556ac0db94e1",
+        "declaration_hash": "2e52694d40b2a28a91bb58fb6610a91d659f03ec1f99537e71bc53fb39bcec72",
         "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(resolver.resolve(repo.path()).unwrap().as_ref(), \"example-track\");"
+        "citation": "assert_eq!(resolver.resolve(repo.path()).unwrap().as_ref(), \"example-track\");\n        assert!(matches!(\n            resolver.resolve(repo.path()),\n            Err(CurrentReviewTrackResolveError::ResolveFailed { .. })\n        ));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -477,12 +1249,12 @@
       },
       "key": {
         "bound_tests_set_hash": "65ddbab808b1bc56bfd02c299ce01380e41b8335dcbb1b36f174c56106f42823",
-        "declaration_hash": "41038e6d501f9fe8f7e515fe66c2468a266a0e995411d90f44ae556ac0db94e1",
+        "declaration_hash": "2e52694d40b2a28a91bb58fb6610a91d659f03ec1f99537e71bc53fb39bcec72",
         "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(resolver.resolve(repo.path()).unwrap().as_ref(), \"example-track\");\n        assert!(matches!(\n            resolver.resolve(repo.path()),\n            Err(CurrentReviewTrackResolveError::ResolveFailed { .. })\n        ));"
+        "citation": "assert_eq!(resolver.resolve(repo.path()).unwrap().as_ref(), \"example-track\");\nassert!(matches!(\n    resolver.resolve(repo.path()),\n    Err(CurrentReviewTrackResolveError::ResolveFailed { .. })\n));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -518,7 +1290,7 @@
       },
       "key": {
         "bound_tests_set_hash": "6183d51212e829f4e3226e8e033e62f3a3417a6b43177ea60f345b23a8fa7aae",
-        "declaration_hash": "7b618e83cfe4f27a015f59dfcde6833131efcf4cb5104add4bd33a1b7af7a894",
+        "declaration_hash": "014db4f1dd7685eb038c5c291813217fd433819adf2d9d0c53a06c88712d022d",
         "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb"
       },
       "verdict": {
@@ -569,12 +1341,12 @@
       },
       "key": {
         "bound_tests_set_hash": "6183d51212e829f4e3226e8e033e62f3a3417a6b43177ea60f345b23a8fa7aae",
-        "declaration_hash": "7b618e83cfe4f27a015f59dfcde6833131efcf4cb5104add4bd33a1b7af7a894",
+        "declaration_hash": "014db4f1dd7685eb038c5c291813217fd433819adf2d9d0c53a06c88712d022d",
         "anchor_text_hash": "e44a2b38a1ce3bf278e618e41415dbd26068d287e4173facb0f0c39698f67474"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "for invalid in [\n            command(&[], None),\n            command(&[\"bin/sotp\", \"phase\", \"enter\"], None),\n            command(&[\"bin/sotp\", \"review\", \"local\"], None),\n            command(&[\"bin/sotp\", \"review\", \"fix-local\"], None),\n            command(&[\"bin/sotp\", \"signal\"], Some(0)),\n            command(&[\"bin/sotp\", \"signal\"], Some(3_601)),\n        ] {\n            let config = PreReviewCommandConfigDto {\n                schema_version: CommandConfigSchemaVersionDto { version: 1 },\n                scopes: vec![PreReviewScopeCommandDeclarationDto {\n                    scope: ReviewScopeNameDto { value: \"implementation\".to_owned() },\n                    commands: vec![invalid],\n                }],\n            };\n            assert!(decode_pre_review_command_config(config).is_err());\n        }"
+        "citation": "`assert!(matches!(\n            decode_pre_review_command_config(duplicate),\n            Err(CommandConfigValidationError::DuplicateScope(_))\n        ));` and `command(&[], None),\n            command(&[\"bin/sotp\", \"phase\", \"enter\"], None),\n            command(&[\"bin/sotp\", \"review\", \"local\"], None),\n            command(&[\"bin/sotp\", \"review\", \"fix-local\"], None),\n            command(&[\"bin/sotp\", \"signal\"], Some(0)),\n            command(&[\"bin/sotp\", \"signal\"], Some(3_601)),` and `assert_eq!(commands[0].timeout().as_secs(), 3_600);`"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -620,63 +1392,12 @@
       },
       "key": {
         "bound_tests_set_hash": "6183d51212e829f4e3226e8e033e62f3a3417a6b43177ea60f345b23a8fa7aae",
-        "declaration_hash": "7b618e83cfe4f27a015f59dfcde6833131efcf4cb5104add4bd33a1b7af7a894",
+        "declaration_hash": "014db4f1dd7685eb038c5c291813217fd433819adf2d9d0c53a06c88712d022d",
         "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(argv, [\"bin/sotp\"]);\n        assert_eq!(commands[0].timeout().as_secs(), 3_600);"
-      },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
-      "bound_tests": [
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::operator_command_config::tests",
-          "test_name": "test_loaders_decode_valid_configuration_into_usecase_ports"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::operator_command_config::tests",
-          "test_name": "test_decode_rejects_duplicate_scope_empty_argv_timeout_and_recursion"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::operator_command_config::tests",
-          "test_name": "test_loader_rejects_unknown_schema_before_its_payload_shape"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::pre_review_command::tests",
-          "test_name": "test_pre_review_command_dispatch_returns_first_failure_with_completed_successes"
-        },
-        {
-          "layer": "cli_composition",
-          "module_path": "cli_composition::review_v2::tests",
-          "test_name": "review_run_local_public_entry_blocks_on_failing_pre_review_gate"
-        }
-      ]
-    },
-    {
-      "edge_id": {
-        "entry_key": "PreReviewCommandConfigLoaderPort",
-        "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-02"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "PreReviewCommandConfigLoaderPort",
-        "obligation_kind": "contract",
-        "item_identifier": "trait_method:load"
-      },
-      "key": {
-        "bound_tests_set_hash": "6183d51212e829f4e3226e8e033e62f3a3417a6b43177ea60f345b23a8fa7aae",
-        "declaration_hash": "7b618e83cfe4f27a015f59dfcde6833131efcf4cb5104add4bd33a1b7af7a894",
-        "anchor_text_hash": "ef72acacfb5dc440638dcb1eca6898bd3db2fbdd6150c1af28c56c8594a8958d"
-      },
-      "verdict": {
-        "kind": "fulfilled",
-        "citation": "let pre_review =\n            FsPreReviewCommandConfigLoader::new().load(repo.path(), &track_id).unwrap();\n...\nassert_eq!(argv, [\"bin/sotp\"]);"
+        "citation": "for invalid in [\n            command(&[], None),\n            command(&[\"bin/sotp\", \"phase\", \"enter\"], None),\n            command(&[\"bin/sotp\", \"review\", \"local\"], None),\n            command(&[\"bin/sotp\", \"review\", \"fix-local\"], None),\n            command(&[\"bin/sotp\", \"signal\"], Some(0)),\n            command(&[\"bin/sotp\", \"signal\"], Some(3_601)),\n        ] {"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -1212,7 +1933,7 @@
       },
       "key": {
         "bound_tests_set_hash": "b343882d1b12dfbd14c396dc3024e7ad2e6d2b2fde7e719fa1161ae97ee3485e",
-        "declaration_hash": "883f82032b0b73a05f6046083d41dcd5ed646698b6e36496d7af7782fb3337ed",
+        "declaration_hash": "b135d7b835c794a7b27eeee648ceaea8407246dc0ecd0c72b2cae664643877ea",
         "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb"
       },
       "verdict": {
@@ -1258,12 +1979,12 @@
       },
       "key": {
         "bound_tests_set_hash": "b343882d1b12dfbd14c396dc3024e7ad2e6d2b2fde7e719fa1161ae97ee3485e",
-        "declaration_hash": "883f82032b0b73a05f6046083d41dcd5ed646698b6e36496d7af7782fb3337ed",
+        "declaration_hash": "b135d7b835c794a7b27eeee648ceaea8407246dc0ecd0c72b2cae664643877ea",
         "anchor_text_hash": "e44a2b38a1ce3bf278e618e41415dbd26068d287e4173facb0f0c39698f67474"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "for invalid in [\n            command(&[], None),\n            command(&[\"bin/sotp\", \"phase\", \"enter\"], None),\n            command(&[\"bin/sotp\", \"review\", \"local\"], None),\n            command(&[\"bin/sotp\", \"review\", \"fix-local\"], None),\n            command(&[\"bin/sotp\", \"signal\"], Some(0)),\n            command(&[\"bin/sotp\", \"signal\"], Some(3_601)),\n        ] {\n            let config = PreReviewCommandConfigDto {\n                schema_version: CommandConfigSchemaVersionDto { version: 1 },\n                scopes: vec![PreReviewScopeCommandDeclarationDto {\n                    scope: ReviewScopeNameDto { value: \"implementation\".to_owned() },\n                    commands: vec![invalid],\n                }],\n            };\n            assert!(decode_pre_review_command_config(config).is_err());\n        }"
+        "citation": "for invalid in [\n            command(&[], None),\n            command(&[\"bin/sotp\", \"phase\", \"enter\"], None),\n            command(&[\"bin/sotp\", \"review\", \"local\"], None),\n            command(&[\"bin/sotp\", \"review\", \"fix-local\"], None),\n            command(&[\"bin/sotp\", \"signal\"], Some(0)),\n            command(&[\"bin/sotp\", \"signal\"], Some(3_601)),\n        ] { ... assert!(decode_pre_review_command_config(config).is_err()); }"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -1304,58 +2025,12 @@
       },
       "key": {
         "bound_tests_set_hash": "b343882d1b12dfbd14c396dc3024e7ad2e6d2b2fde7e719fa1161ae97ee3485e",
-        "declaration_hash": "883f82032b0b73a05f6046083d41dcd5ed646698b6e36496d7af7782fb3337ed",
+        "declaration_hash": "b135d7b835c794a7b27eeee648ceaea8407246dc0ecd0c72b2cae664643877ea",
         "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "FsPreReviewCommandConfigLoader::new().load(repo.path(), &track_id).unwrap(); ... assert_eq!(argv, [\"bin/sotp\"]); assert_eq!(commands[0].timeout().as_secs(), 3_600); ... assert!(matches!(FsPreReviewCommandConfigLoader::new().load(repo.path(), &track_id), Err(CommandConfigLoadError::DecodeFailed { .. }))) ... assert!(matches!(result, Err(CommandConfigLoadError::Invalid(CommandConfigValidationError::InvalidSchemaVersion { .. }))));"
-      },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
-      "bound_tests": [
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::operator_command_config::tests",
-          "test_name": "test_loaders_decode_valid_configuration_into_usecase_ports"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::operator_command_config::tests",
-          "test_name": "test_loaders_reject_malformed_and_symlinked_files"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::operator_command_config::tests",
-          "test_name": "test_decode_rejects_duplicate_scope_empty_argv_timeout_and_recursion"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::operator_command_config::tests",
-          "test_name": "test_loader_rejects_unknown_schema_before_its_payload_shape"
-        }
-      ]
-    },
-    {
-      "edge_id": {
-        "entry_key": "FsPreReviewCommandConfigLoader",
-        "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-02"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "FsPreReviewCommandConfigLoader",
-        "obligation_kind": "contract_conformance",
-        "item_identifier": "trait_impl:usecase::pre_review_command::PreReviewCommandConfigLoaderPort"
-      },
-      "key": {
-        "bound_tests_set_hash": "b343882d1b12dfbd14c396dc3024e7ad2e6d2b2fde7e719fa1161ae97ee3485e",
-        "declaration_hash": "883f82032b0b73a05f6046083d41dcd5ed646698b6e36496d7af7782fb3337ed",
-        "anchor_text_hash": "ef72acacfb5dc440638dcb1eca6898bd3db2fbdd6150c1af28c56c8594a8958d"
-      },
-      "verdict": {
-        "kind": "fulfilled",
-        "citation": "let pre_review =\n            FsPreReviewCommandConfigLoader::new().load(repo.path(), &track_id).unwrap();\n        let commands = pre_review\n            .commands_for(\n                &decode_scope(ReviewScopeNameDto { value: \"implementation\".to_owned() }).unwrap(),\n            )\n            .unwrap();\n        let argv: Vec<&str> =\n            commands[0].argv().arguments().iter().map(|argument| argument.as_str()).collect();\n        assert_eq!(argv, [\"bin/sotp\"]);"
+        "citation": "FsPreReviewCommandConfigLoader::new().load(repo.path(), &track_id).unwrap();\n...\nassert_eq!(argv, [\"bin/sotp\"]);\nassert_eq!(commands[0].timeout().as_secs(), 3_600);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -1660,12 +2335,12 @@
       },
       "key": {
         "bound_tests_set_hash": "65ddbab808b1bc56bfd02c299ce01380e41b8335dcbb1b36f174c56106f42823",
-        "declaration_hash": "a49ba4e758d5fe9aa9c404597b7eb0b115bd61519aea4eeca9a47e7d9a347f9f",
+        "declaration_hash": "afbd986cb6f31fee280f791b6d846a9da58f471d543d31f7cf6e38dd5d15e392",
         "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(resolver.resolve(repo.path()).unwrap().as_ref(), \"example-track\");\n        assert!(matches!(\n            resolver.resolve(repo.path()),\n            Err(CurrentReviewTrackResolveError::ResolveFailed { .. })\n        ));"
+        "citation": "assert_eq!(resolver.resolve(repo.path()).unwrap().as_ref(), \"example-track\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -1701,12 +2376,12 @@
       },
       "key": {
         "bound_tests_set_hash": "65ddbab808b1bc56bfd02c299ce01380e41b8335dcbb1b36f174c56106f42823",
-        "declaration_hash": "a49ba4e758d5fe9aa9c404597b7eb0b115bd61519aea4eeca9a47e7d9a347f9f",
+        "declaration_hash": "afbd986cb6f31fee280f791b6d846a9da58f471d543d31f7cf6e38dd5d15e392",
         "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(resolver.resolve(repo.path()).unwrap().as_ref(), \"example-track\");\n...\nassert!(matches!(\n    resolver.resolve(repo.path()),\n    Err(CurrentReviewTrackResolveError::ResolveFailed { .. })\n));"
+        "citation": "assert_eq!(resolver.resolve(repo.path()).unwrap().as_ref(), \"example-track\");\n        assert!(\n            Command::new(\"git\")\n                .args([\"checkout\", \"-qb\", \"ordinary\"])\n                .current_dir(repo.path())\n                .status()\n                .unwrap()\n                .success()\n        );\n        assert!(matches!(\n            resolver.resolve(repo.path()),\n            Err(CurrentReviewTrackResolveError::ResolveFailed { .. })\n        ));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -2147,6 +2822,221 @@
           "layer": "usecase",
           "module_path": "usecase::operator_command::tests",
           "test_name": "test_command_timeout_bounds_and_error_value_are_preserved"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConfiguredCommand",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConfiguredCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "aedc6de3bd2ce2ea0a8da40509e6f0904f1d8dd889d9ea5cd59266d8fc27ce8f",
+        "declaration_hash": "9a1815f059a46928d65101165749304522a8e8317db6e07d20e2c564faa4c30b",
+        "anchor_text_hash": "fa7e4f00724359c580b35833faf745f970a7f203d8fbd44a502a13e850af54b9"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(actual, [\"bin/sotp\", \"capability\", \"exec\", \"implementer\", \"briefing.md\"]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::operator_command::tests",
+          "test_name": "test_configured_command_persisted_host_argument_forms_are_rejected_and_convert"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_config_rejects_persisted_host_in_writer_and_pre_entry"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::operator_command::tests",
+          "test_name": "test_configured_command_preserves_supplied_literal_argv"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::operator_command::tests",
+          "test_name": "test_configured_command_rejects_empty_argv_and_preserves_explicit_timeout"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConfiguredCommand",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConfiguredCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "aa4d03b7be9a9eeed5b5f387087a8533a59c90ef3e82c43d4af9f9b4330d1a35",
+        "declaration_hash": "9a1815f059a46928d65101165749304522a8e8317db6e07d20e2c564faa4c30b",
+        "anchor_text_hash": "eb3acd9bc2b70f70d7e5b103ad0b2255c300e50456aaeadfd2f50815b79ff6cf"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let command =\n            ConfiguredCommand::try_new(argv(&[\"bin/sotp\", \"signal\", \"calc\"]), None).unwrap();\n        assert_eq!(command.timeout().as_secs(), 3_600); ... assert!(matches!(\n            ConfiguredCommand::try_new(Vec::new(), None),\n            Err(ConfiguredCommandValidationError::Argv(CommandArgvValidationError::Empty))\n        )); ... assert_eq!(actual, [\"bin/sotp\", \"capability\", \"exec\", \"implementer\", \"briefing.md\"]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::operator_command::tests",
+          "test_name": "test_configured_command_omitted_timeout_uses_one_hour_default"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::operator_command::tests",
+          "test_name": "test_command_timeout_bounds_and_error_value_are_preserved"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::operator_command::tests",
+          "test_name": "test_command_argv_appends_arguments_without_changing_prefix"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::operator_command::tests",
+          "test_name": "test_configured_command_rejects_empty_argv_and_preserves_explicit_timeout"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::operator_command::tests",
+          "test_name": "test_configured_command_preserves_supplied_literal_argv"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConfiguredCommand",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConfiguredCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "aedc6de3bd2ce2ea0a8da40509e6f0904f1d8dd889d9ea5cd59266d8fc27ce8f",
+        "declaration_hash": "9a1815f059a46928d65101165749304522a8e8317db6e07d20e2c564faa4c30b",
+        "anchor_text_hash": "40dc60e9383fe78e784c70d0531f18bc574b03cbaa5710618f0fcdf56d3382f7"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(actual, [\"bin/sotp\", \"capability\", \"exec\", \"implementer\", \"briefing.md\"]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::operator_command::tests",
+          "test_name": "test_configured_command_persisted_host_argument_forms_are_rejected_and_convert"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_config_rejects_persisted_host_in_writer_and_pre_entry"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::operator_command::tests",
+          "test_name": "test_configured_command_preserves_supplied_literal_argv"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::operator_command::tests",
+          "test_name": "test_configured_command_rejects_empty_argv_and_preserves_explicit_timeout"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConfiguredCommandValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConfiguredCommandValidationError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "b42a636afe8e0ac15b594e178b375fbceb13a18cb25e40042499667f86e7a87f",
+        "declaration_hash": "61bb4144685060fc926598ce5c79cda7fb14ffdf8452fbba35dfdc29801008f0",
+        "anchor_text_hash": "05b8094316a1aacabb4bec26100b679daf53d5554267297214266776d1838398"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            ConfiguredCommand::try_new(Vec::new(), None),\n            Err(ConfiguredCommandValidationError::Argv(CommandArgvValidationError::Empty))\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::operator_command::tests",
+          "test_name": "test_configured_command_rejects_empty_argv_and_preserves_explicit_timeout"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::operator_command::tests",
+          "test_name": "test_configured_command_persisted_host_argument_forms_are_rejected_and_convert"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::operator_command::tests",
+          "test_name": "test_configured_command_recursive_prefix_is_rejected"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConfiguredCommandValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConfiguredCommandValidationError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "5d2a2edfb237776f99b4077035b32164aedc6361ff4626c367fe6c5523932940",
+        "declaration_hash": "61bb4144685060fc926598ce5c79cda7fb14ffdf8452fbba35dfdc29801008f0",
+        "anchor_text_hash": "ca4264ace91339e8c6e987c4964bd99937e6d62d3b062c38cba5a5c8515d0f3a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            ConfiguredCommand::try_new(\n                argv(&[\"bin/sotp\", \"signal\", \"calc\"]),\n                Some(UnvalidatedTimeoutSeconds::new(0)),\n            ),\n            Err(ConfiguredCommandValidationError::Timeout(\n                CommandTimeoutValidationError::OutOfRange { .. }\n            ))\n        ));\n\n        assert!(matches!(\n            ConfiguredCommand::try_new(\n                argv(&[\"bin/sotp\", \"signal\", \"calc\"]),\n                Some(UnvalidatedTimeoutSeconds::new(3_601)),\n            ),\n            Err(ConfiguredCommandValidationError::Timeout(\n                CommandTimeoutValidationError::OutOfRange { .. }\n            ))\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::operator_command::tests",
+          "test_name": "test_configured_command_rejects_empty_argv_and_preserves_explicit_timeout"
         }
       ]
     },

@@ -438,6 +438,38 @@ mod tests {
     }
 
     #[test]
+    fn test_loader_rejects_persisted_host_argument_as_invalid_config() {
+        for argv in [r#"["bin/sotp", "--host", "codex"]"#, r#"["bin/sotp", "--host=codex"]"#] {
+            let repo = tempfile::tempdir().unwrap();
+            let config = repo.path().join(".harness/config");
+            fs::create_dir_all(&config).unwrap();
+            fs::write(
+                config.join("pre-review-gates.json"),
+                format!(
+                    r#"{{
+                        "schema_version": 1,
+                        "scopes": [{{
+                            "scope": "implementation",
+                            "commands": [{{"argv": {argv}, "timeout_seconds": null}}]
+                        }}]
+                    }}"#
+                ),
+            )
+            .unwrap();
+
+            let result = FsPreReviewCommandConfigLoader::new()
+                .load(repo.path(), &TrackId::try_new("example-track").unwrap());
+
+            assert!(matches!(
+                result,
+                Err(CommandConfigLoadError::Invalid(
+                    CommandConfigValidationError::PersistedHostArgument
+                ))
+            ));
+        }
+    }
+
+    #[test]
     fn test_loaders_decode_valid_configuration_into_usecase_ports() {
         let repo = tempfile::tempdir().unwrap();
         let config = repo.path().join(".harness/config");

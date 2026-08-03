@@ -137,7 +137,7 @@
         "role": "SecondaryPort"
       },
       "brief": "Author a contract test covering 'trait_method:resolve' of CurrentReviewTrackResolverPort",
-      "declaration_hash": "41038e6d501f9fe8f7e515fe66c2468a266a0e995411d90f44ae556ac0db94e1",
+      "declaration_hash": "2e52694d40b2a28a91bb58fb6610a91d659f03ec1f99537e71bc53fb39bcec72",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -146,10 +146,6 @@
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "AC-05"
-        },
-        {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-02"
         }
       ]
     },
@@ -169,7 +165,7 @@
         "role": "SecondaryPort"
       },
       "brief": "Author a contract test covering 'trait_method:load' of PhaseCommandConfigLoaderPort",
-      "declaration_hash": "0efcf782348988eef9c2efaa841ae28b736c61383369f958339c49d58a6c8309",
+      "declaration_hash": "be236a996bb83f88af9ccd3465f6c58ad9bd2055a67c020c248d38d17eaf4aaa",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -182,10 +178,6 @@
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "AC-01"
-        },
-        {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-02"
         }
       ]
     },
@@ -337,7 +329,7 @@
         "role": "SecondaryPort"
       },
       "brief": "Author a contract test covering 'trait_method:load' of PreReviewCommandConfigLoaderPort",
-      "declaration_hash": "7b618e83cfe4f27a015f59dfcde6833131efcf4cb5104add4bd33a1b7af7a894",
+      "declaration_hash": "014db4f1dd7685eb038c5c291813217fd433819adf2d9d0c53a06c88712d022d",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -350,10 +342,6 @@
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "AC-05"
-        },
-        {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-02"
         }
       ]
     },
@@ -501,7 +489,7 @@
         "role": "SecondaryPort"
       },
       "brief": "Author a contract_conformance test covering 'trait_impl:usecase::phase_command::PhaseCommandConfigLoaderPort' of FsPhaseCommandConfigLoader",
-      "declaration_hash": "e40e625c2c93c8221d6100aafa1013db50845abf0cfd1dd9abfabc7123dd6cbf",
+      "declaration_hash": "8e0c781c5865dc1f55870ccfb09fb7aa4b3fd03fd9d6bf6fdb1597a7a67001b9",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -514,10 +502,6 @@
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "AC-01"
-        },
-        {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-02"
         }
       ]
     },
@@ -537,7 +521,7 @@
         "role": "SecondaryPort"
       },
       "brief": "Author a contract_conformance test covering 'trait_impl:usecase::pre_review_command::PreReviewCommandConfigLoaderPort' of FsPreReviewCommandConfigLoader",
-      "declaration_hash": "883f82032b0b73a05f6046083d41dcd5ed646698b6e36496d7af7782fb3337ed",
+      "declaration_hash": "b135d7b835c794a7b27eeee648ceaea8407246dc0ecd0c72b2cae664643877ea",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -550,10 +534,6 @@
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "AC-05"
-        },
-        {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-02"
         }
       ]
     },
@@ -609,7 +589,7 @@
         "role": "SecondaryPort"
       },
       "brief": "Author a contract_conformance test covering 'trait_impl:usecase::pre_review_command::CurrentReviewTrackResolverPort' of GitCurrentReviewTrackResolver",
-      "declaration_hash": "a49ba4e758d5fe9aa9c404597b7eb0b115bd61519aea4eeca9a47e7d9a347f9f",
+      "declaration_hash": "afbd986cb6f31fee280f791b6d846a9da58f471d543d31f7cf6e38dd5d15e392",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -618,10 +598,6 @@
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "AC-05"
-        },
-        {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-02"
         }
       ]
     },

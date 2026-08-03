@@ -48,6 +48,7 @@ pub mod hook;
 pub mod hook_dispatch;
 pub mod merge_gate;
 pub mod operator_command;
+pub mod phase_command;
 pub mod pr;
 pub mod pr_review;
 pub mod pr_review_polling;

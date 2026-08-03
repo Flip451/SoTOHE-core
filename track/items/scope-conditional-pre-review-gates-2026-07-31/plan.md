@@ -9,7 +9,7 @@ GO-03 → T018、T019、T020、T021、T022、T023。
 GO-04 → T018、T020、T021、T022、T023。
 GO-05 → T017、T018、T019、T020、T021、T022。
 
-## Tasks (15/24 resolved)
+## Tasks (16/24 resolved)
 
 ### S0 — 確定済みの履歴 task
 
@@ -34,12 +34,12 @@ GO-05 → T017、T018、T019、T020、T021、T022。
 
 ### S2 — approved catalogue repair extension
 
-> T024–T036 は T001–T023 を reopen せず、approved catalogue が要求する source-shape repair と provider-neutral phase-writer configuration を file-exclusive に実装する。
+> `libs/{domain,usecase,infrastructure}/src/{task_contract,program_runner,operator_command,phase_command,pre_review_command}.rs` と `apps/{cli-driver,cli-composition}/src/{task_contract,phase_command}.rs` を catalogue shape に適応する。IN-01、IN-02、IN-03、IN-04、IN-05、IN-08、IN-11、AC-01、AC-02、AC-03、AC-04、AC-05、AC-07、AC-10、AC-13。
 
 - [x] **T024**: `libs/domain/src/task_contract.rs` と `apps/cli-driver/src/task_contract.rs` の blocked outcome を validated `NonEmptyVec` payload に適応し、`CommandOutcome` render boundary の空 payload 拒否を unit tests で確認する。IN-08、AC-10。 (`60e6c796627cc98404bccaa2421920b227df04eb`)
 - [x] **T025**: `libs/usecase/src/program_runner.rs` の execution record を success / failure の refined wrapper と分類 outcome に適応し、成功、非 zero、output-limit、timeout の record tests を更新する。IN-02、IN-03、IN-04、CN-02、CN-03、AC-02、AC-03、AC-04、AC-05。 (`0ef1e23f055292df748e70fed583e8d121cc303a`)
-- [~] **T026**: `libs/usecase/src/operator_command.rs` の validated argv / configured-command value objects と operation-specific configuration validation error vocabulary を catalogue shape に適応し、各 validation failure の tests を更新する。IN-01、IN-03、CN-01、AC-01、AC-04、AC-05。
-- [ ] **T027**: `libs/usecase/src/phase_command.rs` の phase command config / declaration / loader-port、configuration validation error、validate command を catalogue shape に適応し、configuration validation tests を更新する。IN-01、IN-11、CN-01、AC-01、AC-13。
+- [x] **T026**: `libs/usecase/src/operator_command.rs` の validated argv value objects と operation-specific configuration validation error vocabulary を catalogue shape に適応し、各 validation failure の tests を更新する。IN-01、IN-03、CN-01、AC-01、AC-04、AC-05。 (`35b7c8833adc405a82b54b977169e1dc4f2d8d6b`)
+- [~] **T027**: `libs/usecase/src/operator_command.rs` の `ConfiguredCommand` construction と configuration/load error vocabulary、および `libs/usecase/src/phase_command.rs` の phase command config / declaration / loader-port、configuration validation error、validate command を catalogue shape に適応し、configuration validation tests を更新する。IN-01、IN-11、CN-01、AC-01、AC-13。
 - [ ] **T034**: `libs/usecase/src/phase_command.rs` の phase explanation と explain query を catalogue shape に適応し、explain result tests を更新する。IN-04、AC-03。
 - [ ] **T035**: `libs/usecase/src/phase_command.rs` の phase enter orchestration、host-bearing `PhaseEnterCommand`、enter outcome、shared service / interactor を catalogue shape に適応し、dispatch-boundary host forwarding と関連 tests を更新する。IN-02、IN-11、CN-03、AC-02、AC-13。
 - [x] **T028**: `libs/usecase/src/pre_review_command.rs` を refined execution record、pre-review-specific configuration error、dispatch outcome / explanation consumer shape に適応し、success と first-failure dispatch tests を更新する。IN-05、CN-01、CN-03、AC-05、AC-07。 (`4a05480da7f57adcde5364474da509b474d92932`)

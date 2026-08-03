@@ -1,10 +1,143 @@
 {
   "track_id": "scope-conditional-pre-review-gates-2026-07-31",
   "records": [
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "PhaseCommandConfigLoaderPort",
+        "item_identifier": "trait_method:load",
+        "obligation_kind": "contract"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_config_loader_rejects_invalid_config_before_execution"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_config_loader_preserves_order_and_default_timeout_for_selected_root"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_validate_command_surfaces_loader_success_and_validation_failure"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "PhaseCommandDeclaration",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [{"layer": "usecase", "module_path": "usecase::phase_command::tests", "test_name": "test_phase_command_declaration_preserves_writer_and_pre_entry_order"}]
+    },
+    {"kind":"voluntary_binding","edge_id":{"entry_key":"ConfiguredCommand","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"IN-11"}},"tests":[{"layer":"usecase","module_path":"usecase::operator_command::tests","test_name":"test_configured_command_persisted_host_argument_forms_are_rejected_and_convert"}]},
+    {"kind":"voluntary_binding","edge_id":{"entry_key":"ConfiguredCommand","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"AC-13"}},"tests":[{"layer":"usecase","module_path":"usecase::operator_command::tests","test_name":"test_configured_command_persisted_host_argument_forms_are_rejected_and_convert"}]},
+    {"kind":"voluntary_binding","edge_id":{"entry_key":"ConfiguredCommandValidationError","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"IN-11"}},"tests":[{"layer":"usecase","module_path":"usecase::operator_command::tests","test_name":"test_configured_command_persisted_host_argument_forms_are_rejected_and_convert"}]},
+    {"kind":"voluntary_binding","edge_id":{"entry_key":"ConfiguredCommandValidationError","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"AC-13"}},"tests":[{"layer":"usecase","module_path":"usecase::operator_command::tests","test_name":"test_configured_command_persisted_host_argument_forms_are_rejected_and_convert"}]},
+    {"kind":"voluntary_binding","edge_id":{"entry_key":"CommandConfigValidationError","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"IN-11"}},"tests":[{"layer":"usecase","module_path":"usecase::operator_command::tests","test_name":"test_configured_command_persisted_host_argument_forms_are_rejected_and_convert"}]},
+    {"kind":"voluntary_binding","edge_id":{"entry_key":"CommandConfigValidationError","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"AC-13"}},"tests":[{"layer":"usecase","module_path":"usecase::operator_command::tests","test_name":"test_configured_command_persisted_host_argument_forms_are_rejected_and_convert"}]},
+    {"kind":"voluntary_binding","edge_id":{"entry_key":"CommandConfigLoadError","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"IN-11"}},"tests":[{"layer":"infrastructure","module_path":"infrastructure::operator_command_config::tests","test_name":"test_loader_rejects_persisted_host_argument_as_invalid_config"}]},
+    {"kind":"voluntary_binding","edge_id":{"entry_key":"CommandConfigLoadError","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"AC-13"}},"tests":[{"layer":"infrastructure","module_path":"infrastructure::operator_command_config::tests","test_name":"test_loader_rejects_persisted_host_argument_as_invalid_config"}]},
+    {"kind":"voluntary_binding","edge_id":{"entry_key":"PhaseCommandConfig","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"IN-11"}},"tests":[{"layer":"usecase","module_path":"usecase::phase_command::tests","test_name":"test_phase_command_config_rejects_persisted_host_in_writer_and_pre_entry"},{"layer":"usecase","module_path":"usecase::phase_command::tests","test_name":"test_phase_command_config_loader_rejects_invalid_config_before_execution"}]},
+    {"kind":"voluntary_binding","edge_id":{"entry_key":"PhaseCommandConfig","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"AC-13"}},"tests":[{"layer":"usecase","module_path":"usecase::phase_command::tests","test_name":"test_phase_command_config_rejects_persisted_host_in_writer_and_pre_entry"},{"layer":"usecase","module_path":"usecase::phase_command::tests","test_name":"test_phase_command_config_loader_rejects_invalid_config_before_execution"}]},
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "PhaseCommandDeclaration",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "tests": [{"layer": "usecase", "module_path": "usecase::phase_command::tests", "test_name": "test_phase_command_declaration_preserves_writer_and_pre_entry_order"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "PhaseCommandConfig",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [{"layer": "usecase", "module_path": "usecase::phase_command::tests", "test_name": "test_phase_command_config_duplicate_declaration_id_is_rejected"}, {"layer": "usecase", "module_path": "usecase::phase_command::tests", "test_name": "test_phase_command_config_preserves_canonical_writer_order_and_default_timeout"}, {"layer": "usecase", "module_path": "usecase::phase_command::tests", "test_name": "test_phase_command_config_loader_rejects_invalid_config_before_execution"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "PhaseCommandConfig",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "tests": [{"layer": "usecase", "module_path": "usecase::phase_command::tests", "test_name": "test_phase_command_config_duplicate_declaration_id_is_rejected"}, {"layer": "usecase", "module_path": "usecase::phase_command::tests", "test_name": "test_phase_command_config_invalid_schema_is_rejected_and_converts"}, {"layer": "usecase", "module_path": "usecase::phase_command::tests", "test_name": "test_phase_command_config_rejects_recursive_review_fix_local_prefix"}, {"layer": "usecase", "module_path": "usecase::phase_command::tests", "test_name": "test_phase_command_config_loader_rejects_invalid_config_before_execution"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "PhaseCommandConfig",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "tests": [{"layer": "usecase", "module_path": "usecase::phase_command::tests", "test_name": "test_phase_command_config_duplicate_declaration_id_is_rejected"}, {"layer": "usecase", "module_path": "usecase::phase_command::tests", "test_name": "test_phase_command_config_invalid_schema_is_rejected_and_converts"}, {"layer": "usecase", "module_path": "usecase::phase_command::tests", "test_name": "test_phase_command_config_rejects_recursive_review_fix_local_prefix"}, {"layer": "usecase", "module_path": "usecase::phase_command::tests", "test_name": "test_phase_command_config_loader_rejects_invalid_config_before_execution"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "PhaseCommandConfigValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "tests": [{"layer": "usecase", "module_path": "usecase::phase_command::tests", "test_name": "test_phase_command_config_duplicate_declaration_id_is_rejected"}, {"layer": "usecase", "module_path": "usecase::phase_command::tests", "test_name": "test_phase_command_config_invalid_schema_is_rejected_and_converts"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "PhaseCommandConfigValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "tests": [{"layer": "usecase", "module_path": "usecase::phase_command::tests", "test_name": "test_phase_command_config_duplicate_declaration_id_is_rejected"}, {"layer": "usecase", "module_path": "usecase::phase_command::tests", "test_name": "test_phase_command_config_invalid_schema_is_rejected_and_converts"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "PhaseValidateCommand",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "tests": [{"layer": "usecase", "module_path": "usecase::phase_command::tests", "test_name": "test_phase_validate_command_surfaces_loader_success_and_validation_failure"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "PhaseValidateCommand",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "tests": [{"layer": "usecase", "module_path": "usecase::phase_command::tests", "test_name": "test_phase_validate_command_surfaces_loader_success_and_validation_failure"}]
+    },
     {"kind":"fulfillment","obligation_id":{"entry_key":"PreReviewCommandDispatchInteractor","item_identifier":"entry","obligation_kind":"result"},"tests":[{"layer":"usecase","module_path":"usecase::pre_review_command::tests","test_name":"test_pre_review_command_dispatch_returns_first_failure_with_completed_successes"},{"layer":"usecase","module_path":"usecase::pre_review_command::tests","test_name":"test_pre_review_command_dispatch_returns_successful_records_in_declaration_order"}]},
     {"kind":"fulfillment","obligation_id":{"entry_key":"PreReviewCommandGatedReviewInteractor","item_identifier":"entry","obligation_kind":"result"},"tests":[{"layer":"usecase","module_path":"usecase::pre_review_command::tests","test_name":"test_pre_review_gated_review_runs_implementation_gates_in_order_and_stops_on_failure"},{"layer":"usecase","module_path":"usecase::pre_review_command::tests","test_name":"test_pre_review_gated_review_runs_all_implementation_gates_then_reviews_on_success"},{"layer":"usecase","module_path":"usecase::pre_review_command::tests","test_name":"test_pre_review_gated_review_rejects_invalid_configuration_without_reviewer_start"},{"layer":"usecase","module_path":"usecase::pre_review_command::tests","test_name":"test_pre_review_gated_review_allows_planning_scope_without_downstream_liveness_artifacts"}]},
     {"kind":"fulfillment","obligation_id":{"entry_key":"CurrentReviewTrackResolverPort","item_identifier":"trait_method:resolve","obligation_kind":"contract"},"tests":[{"layer":"infrastructure","module_path":"infrastructure::operator_command_config::tests","test_name":"test_current_track_resolver_accepts_track_branch_and_rejects_other_branch"},{"layer":"usecase","module_path":"usecase::pre_review_command::tests","test_name":"test_pre_review_command_dispatch_returns_first_failure_with_completed_successes"},{"layer":"cli_composition","module_path":"cli_composition::review_v2::tests","test_name":"review_run_local_public_entry_blocks_on_failing_pre_review_gate"}]},
-    {"kind":"waiver","edge_id":{"entry_key":"CurrentReviewTrackResolverPort","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"IN-02"}},"reason":"CurrentReviewTrackResolverPort resolves the current track only; it has no entry-relevant command-execution behavior for IN-02. Declaration-order execution, stop-on-nonzero, and runner invocation are enforced by PreReviewCommandDispatchInteractor and ProgramRunnerPort, covered by test_pre_review_command_dispatch_returns_successful_records_in_declaration_order and test_pre_review_gated_review_runs_implementation_gates_in_order_and_stops_on_failure. The resolver contract itself is verified on its IN-05 edges."},
     {"kind":"fulfillment","obligation_id":{"entry_key":"PreReviewCommandConfigLoaderPort","item_identifier":"trait_method:load","obligation_kind":"contract"},"tests":[{"layer":"infrastructure","module_path":"infrastructure::operator_command_config::tests","test_name":"test_loaders_decode_valid_configuration_into_usecase_ports"},{"layer":"infrastructure","module_path":"infrastructure::operator_command_config::tests","test_name":"test_decode_rejects_duplicate_scope_empty_argv_timeout_and_recursion"},{"layer":"infrastructure","module_path":"infrastructure::operator_command_config::tests","test_name":"test_loader_rejects_unknown_schema_before_its_payload_shape"},{"layer":"usecase","module_path":"usecase::pre_review_command::tests","test_name":"test_pre_review_command_dispatch_returns_first_failure_with_completed_successes"},{"layer":"cli_composition","module_path":"cli_composition::review_v2::tests","test_name":"review_run_local_public_entry_blocks_on_failing_pre_review_gate"}]},
     {"kind":"fulfillment","obligation_id":{"entry_key":"PreReviewCommandDispatchService","item_identifier":"trait_method:dispatch","obligation_kind":"result"},"tests":[{"layer":"usecase","module_path":"usecase::pre_review_command::tests","test_name":"test_pre_review_command_dispatch_returns_first_failure_with_completed_successes"},{"layer":"usecase","module_path":"usecase::pre_review_command::tests","test_name":"test_pre_review_command_dispatch_returns_successful_records_in_declaration_order"}]},
     {"kind":"fulfillment","obligation_id":{"entry_key":"ProgramRunnerPort","item_identifier":"trait_method:run","obligation_kind":"contract"},"tests":[{"layer":"infrastructure","module_path":"infrastructure::program_runner::tests","test_name":"test_program_runner_passes_literal_argv_without_shell_interpretation"},{"layer":"infrastructure","module_path":"infrastructure::program_runner::tests","test_name":"test_program_runner_uses_the_invocation_repository_root_as_cwd"},{"layer":"infrastructure","module_path":"infrastructure::program_runner::tests","test_name":"test_program_runner_terminates_timed_out_process"},{"layer":"infrastructure","module_path":"infrastructure::program_runner::tests","test_name":"test_program_runner_terminates_process_on_independent_output_limit"},{"layer":"infrastructure","module_path":"infrastructure::program_runner::tests","test_name":"test_program_runner_terminates_descendant_after_stderr_limit_when_leader_exits"},{"layer":"infrastructure","module_path":"infrastructure::program_runner::tests","test_name":"test_program_runner_allows_exact_capture_bound_and_rejects_one_byte_more"},{"layer":"infrastructure","module_path":"infrastructure::program_runner::tests","test_name":"test_program_runner_invocation_uses_one_hour_default_timeout"},{"layer":"infrastructure","module_path":"infrastructure::program_runner::tests","test_name":"test_program_runner_rejects_invalid_explicit_timeout_at_validation_boundary"}]},
@@ -12,7 +145,6 @@
     {"kind":"fulfillment","obligation_id":{"entry_key":"FsPreReviewCommandConfigLoader","item_identifier":"trait_impl:usecase::pre_review_command::PreReviewCommandConfigLoaderPort","obligation_kind":"contract_conformance"},"tests":[{"layer":"infrastructure","module_path":"infrastructure::operator_command_config::tests","test_name":"test_loaders_decode_valid_configuration_into_usecase_ports"},{"layer":"infrastructure","module_path":"infrastructure::operator_command_config::tests","test_name":"test_loaders_reject_malformed_and_symlinked_files"},{"layer":"infrastructure","module_path":"infrastructure::operator_command_config::tests","test_name":"test_decode_rejects_duplicate_scope_empty_argv_timeout_and_recursion"},{"layer":"infrastructure","module_path":"infrastructure::operator_command_config::tests","test_name":"test_loader_rejects_unknown_schema_before_its_payload_shape"}]},
     {"kind":"fulfillment","obligation_id":{"entry_key":"ProcessProgramRunner","item_identifier":"trait_impl:usecase::program_runner::ProgramRunnerPort","obligation_kind":"contract_conformance"},"tests":[{"layer":"infrastructure","module_path":"infrastructure::program_runner::tests","test_name":"test_program_runner_passes_literal_argv_without_shell_interpretation"},{"layer":"infrastructure","module_path":"infrastructure::program_runner::tests","test_name":"test_program_runner_uses_the_invocation_repository_root_as_cwd"},{"layer":"infrastructure","module_path":"infrastructure::program_runner::tests","test_name":"test_program_runner_terminates_timed_out_process"},{"layer":"infrastructure","module_path":"infrastructure::program_runner::tests","test_name":"test_program_runner_terminates_process_on_independent_output_limit"},{"layer":"infrastructure","module_path":"infrastructure::program_runner::tests","test_name":"test_program_runner_terminates_descendant_after_stderr_limit_when_leader_exits"},{"layer":"infrastructure","module_path":"infrastructure::program_runner::tests","test_name":"test_program_runner_allows_exact_capture_bound_and_rejects_one_byte_more"},{"layer":"infrastructure","module_path":"infrastructure::program_runner::tests","test_name":"test_program_runner_invocation_uses_one_hour_default_timeout"},{"layer":"infrastructure","module_path":"infrastructure::program_runner::tests","test_name":"test_program_runner_rejects_invalid_explicit_timeout_at_validation_boundary"}]},
     {"kind":"fulfillment","obligation_id":{"entry_key":"GitCurrentReviewTrackResolver","item_identifier":"trait_impl:usecase::pre_review_command::CurrentReviewTrackResolverPort","obligation_kind":"contract_conformance"},"tests":[{"layer":"infrastructure","module_path":"infrastructure::operator_command_config::tests","test_name":"test_current_track_resolver_accepts_track_branch_and_rejects_other_branch"},{"layer":"usecase","module_path":"usecase::pre_review_command::tests","test_name":"test_pre_review_command_dispatch_returns_first_failure_with_completed_successes"},{"layer":"cli_composition","module_path":"cli_composition::review_v2::tests","test_name":"review_run_local_public_entry_blocks_on_failing_pre_review_gate"}]},
-    {"kind":"waiver","edge_id":{"entry_key":"GitCurrentReviewTrackResolver","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"IN-02"}},"reason":"GitCurrentReviewTrackResolver implements current-track resolution only; it has no entry-relevant command-execution behavior for IN-02. Declaration-order execution, stop-on-nonzero, and runner invocation are enforced by PreReviewCommandDispatchInteractor and ProgramRunnerPort, covered by test_pre_review_command_dispatch_returns_successful_records_in_declaration_order and test_pre_review_gated_review_runs_implementation_gates_in_order_and_stops_on_failure. The resolver implementation is verified on its IN-05 edges."},
     {"kind":"waiver","edge_id":{"entry_key":"CapturedProgramOutput","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"AC-03"}},"reason":"CapturedProgramOutput is a types declaration; AC-03 is a cross-boundary promise, so no focused test can prove this declaration × anchor intersection without substituting its owning operation."},
     {"kind":"waiver","edge_id":{"entry_key":"CapturedProgramOutput","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"CN-02"}},"reason":"CapturedProgramOutput is a types declaration; CN-02 is a cross-boundary promise, so no focused test can prove this declaration × anchor intersection without substituting its owning operation."},
     {"kind":"waiver","edge_id":{"entry_key":"ClassifiedProgramExecutionRecord","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"AC-03"}},"reason":"ClassifiedProgramExecutionRecord is a types declaration; AC-03 is a cross-boundary promise, so no focused test can prove this declaration × anchor intersection without substituting its owning operation."},
@@ -75,18 +207,18 @@
     {"kind":"voluntary_binding","edge_id":{"entry_key":"CommandTimeoutValidationError","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"AC-03"}},"tests":[{"layer":"usecase","module_path":"usecase::operator_command::tests","test_name":"test_command_timeout_bounds_and_error_value_are_preserved"}]},
     {"kind":"waiver","edge_id":{"entry_key":"CommandTimeoutValidationError","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"CN-01"}},"reason":"CommandTimeoutValidationError is a types declaration; CN-01 is a cross-boundary promise, so no focused test can prove this declaration × anchor intersection without substituting its owning operation."},
     {"kind":"waiver","edge_id":{"entry_key":"CommandTimeoutValidationError","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"CN-02"}},"reason":"CommandTimeoutValidationError is a types declaration; CN-02 is a cross-boundary promise, so no focused test can prove this declaration × anchor intersection without substituting its owning operation."},
-    {"kind":"waiver","edge_id":{"entry_key":"ConfiguredCommand","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"AC-04"}},"reason":"ConfiguredCommand is a types declaration; AC-04 is a cross-boundary promise, so no focused test can prove this declaration × anchor intersection without substituting its owning operation."},
+    {"kind":"voluntary_binding","edge_id":{"entry_key":"ConfiguredCommand","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"AC-04"}},"tests":[{"layer":"usecase","module_path":"usecase::operator_command::tests","test_name":"test_configured_command_persisted_host_argument_forms_are_rejected_and_convert"},{"layer":"usecase","module_path":"usecase::phase_command::tests","test_name":"test_phase_command_config_rejects_persisted_host_in_writer_and_pre_entry"},{"layer":"usecase","module_path":"usecase::operator_command::tests","test_name":"test_configured_command_preserves_supplied_literal_argv"},{"layer":"usecase","module_path":"usecase::operator_command::tests","test_name":"test_configured_command_rejects_empty_argv_and_preserves_explicit_timeout"}]},
     {"kind":"waiver","edge_id":{"entry_key":"ConfiguredCommand","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"GO-01"}},"reason":"ConfiguredCommand is a types declaration; GO-01 is a cross-boundary promise, so no focused test can prove this declaration × anchor intersection without substituting its owning operation."},
-    {"kind":"waiver","edge_id":{"entry_key":"ConfiguredCommand","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"IN-01"}},"reason":"ConfiguredCommand is a types declaration; IN-01 is a cross-boundary promise, so no focused test can prove this declaration × anchor intersection without substituting its owning operation."},
-    {"kind":"waiver","edge_id":{"entry_key":"ConfiguredCommand","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"IN-03"}},"reason":"ConfiguredCommand is a types declaration; IN-03 is a cross-boundary promise, so no focused test can prove this declaration × anchor intersection without substituting its owning operation."},
+    {"kind":"voluntary_binding","edge_id":{"entry_key":"ConfiguredCommand","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"IN-01"}},"tests":[{"layer":"usecase","module_path":"usecase::operator_command::tests","test_name":"test_configured_command_omitted_timeout_uses_one_hour_default"},{"layer":"usecase","module_path":"usecase::operator_command::tests","test_name":"test_command_timeout_bounds_and_error_value_are_preserved"},{"layer":"usecase","module_path":"usecase::operator_command::tests","test_name":"test_command_argv_appends_arguments_without_changing_prefix"},{"layer":"usecase","module_path":"usecase::operator_command::tests","test_name":"test_configured_command_rejects_empty_argv_and_preserves_explicit_timeout"},{"layer":"usecase","module_path":"usecase::operator_command::tests","test_name":"test_configured_command_preserves_supplied_literal_argv"}]},
+    {"kind":"voluntary_binding","edge_id":{"entry_key":"ConfiguredCommand","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"IN-03"}},"tests":[{"layer":"usecase","module_path":"usecase::operator_command::tests","test_name":"test_configured_command_persisted_host_argument_forms_are_rejected_and_convert"},{"layer":"usecase","module_path":"usecase::phase_command::tests","test_name":"test_phase_command_config_rejects_persisted_host_in_writer_and_pre_entry"},{"layer":"usecase","module_path":"usecase::operator_command::tests","test_name":"test_configured_command_preserves_supplied_literal_argv"},{"layer":"usecase","module_path":"usecase::operator_command::tests","test_name":"test_configured_command_rejects_empty_argv_and_preserves_explicit_timeout"}]},
     {"kind":"waiver","edge_id":{"entry_key":"ConfiguredCommandDto","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"AC-01"}},"reason":"ConfiguredCommandDto is a types declaration; AC-01 is a cross-boundary promise, so no focused test can prove this declaration × anchor intersection without substituting its owning operation."},
     {"kind":"waiver","edge_id":{"entry_key":"ConfiguredCommandDto","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"AC-05"}},"reason":"ConfiguredCommandDto is a types declaration; AC-05 is a cross-boundary promise, so no focused test can prove this declaration × anchor intersection without substituting its owning operation."},
     {"kind":"waiver","edge_id":{"entry_key":"ConfiguredCommandDto","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"CN-01"}},"reason":"ConfiguredCommandDto is a types declaration; CN-01 is a cross-boundary promise, so no focused test can prove this declaration × anchor intersection without substituting its owning operation."},
     {"kind":"waiver","edge_id":{"entry_key":"ConfiguredCommandDto","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"IN-01"}},"reason":"ConfiguredCommandDto is a types declaration; IN-01 is a cross-boundary promise, so no focused test can prove this declaration × anchor intersection without substituting its owning operation."},
-    {"kind":"waiver","edge_id":{"entry_key":"ConfiguredCommandValidationError","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"AC-01"}},"reason":"ConfiguredCommandValidationError is a types declaration; AC-01 is a cross-boundary promise, so no focused test can prove this declaration × anchor intersection without substituting its owning operation."},
+    {"kind":"voluntary_binding","edge_id":{"entry_key":"ConfiguredCommandValidationError","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"AC-01"}},"tests":[{"layer":"usecase","module_path":"usecase::operator_command::tests","test_name":"test_configured_command_rejects_empty_argv_and_preserves_explicit_timeout"},{"layer":"usecase","module_path":"usecase::operator_command::tests","test_name":"test_configured_command_persisted_host_argument_forms_are_rejected_and_convert"},{"layer":"usecase","module_path":"usecase::operator_command::tests","test_name":"test_configured_command_recursive_prefix_is_rejected"}]},
     {"kind":"waiver","edge_id":{"entry_key":"ConfiguredCommandValidationError","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"AC-05"}},"reason":"ConfiguredCommandValidationError is a types declaration; AC-05 is a cross-boundary promise, so no focused test can prove this declaration × anchor intersection without substituting its owning operation."},
     {"kind":"waiver","edge_id":{"entry_key":"ConfiguredCommandValidationError","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"CN-01"}},"reason":"ConfiguredCommandValidationError is a types declaration; CN-01 is a cross-boundary promise, so no focused test can prove this declaration × anchor intersection without substituting its owning operation."},
-    {"kind":"waiver","edge_id":{"entry_key":"ConfiguredCommandValidationError","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"CN-02"}},"reason":"ConfiguredCommandValidationError is a types declaration; CN-02 is a cross-boundary promise, so no focused test can prove this declaration × anchor intersection without substituting its owning operation."},
+    {"kind":"voluntary_binding","edge_id":{"entry_key":"ConfiguredCommandValidationError","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"CN-02"}},"tests":[{"layer":"usecase","module_path":"usecase::operator_command::tests","test_name":"test_configured_command_rejects_empty_argv_and_preserves_explicit_timeout"}]},
     {"kind":"waiver","edge_id":{"entry_key":"ConfiguredCommandValidationError","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"IN-01"}},"reason":"ConfiguredCommandValidationError is a types declaration; IN-01 is a cross-boundary promise, so no focused test can prove this declaration × anchor intersection without substituting its owning operation."},
     {"kind":"voluntary_binding","edge_id":{"entry_key":"ContractedEntryRefDto","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"AC-08"}},"tests":[{"layer":"infrastructure","module_path":"infrastructure::task_contract_codec::tests","test_name":"test_decode_rejects_carrier_variant_attribution_targets"},{"layer":"infrastructure","module_path":"infrastructure::task_contract_codec::tests","test_name":"test_decode_rejects_eligibility_and_stale_lifecycle_attribution_targets"}]},
     {"kind":"voluntary_binding","edge_id":{"entry_key":"ContractedEntryRefDto","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"IN-07"}},"tests":[{"layer":"infrastructure","module_path":"infrastructure::task_contract_codec::tests","test_name":"test_decode_rejects_carrier_variant_attribution_targets"},{"layer":"infrastructure","module_path":"infrastructure::task_contract_codec::tests","test_name":"test_decode_rejects_eligibility_and_stale_lifecycle_attribution_targets"}]},

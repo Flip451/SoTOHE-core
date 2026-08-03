@@ -1488,7 +1488,7 @@
     },
     "CurrentReviewTrackResolverPort": {
       "action": "add",
-      "docs": "Synchronous repository-state track resolver for the sequential CLI path (IN-02, IN-05).",
+      "docs": "Synchronous repository-state track resolver for pre-review scope dispatch (IN-05, AC-05).",
       "informal_grounds": [],
       "methods": [
         {
@@ -1517,10 +1517,6 @@
         {
           "anchor": "AC-05",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "IN-02",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ],
       "supertrait_bounds": [
@@ -1530,7 +1526,7 @@
     },
     "PhaseCommandConfigLoaderPort": {
       "action": "add",
-      "docs": "Synchronous phase-config loader for the sequential CLI path (IN-02, AC-01).",
+      "docs": "Synchronous phase-config loader for config loading and validation (IN-01, CN-01, AC-01).",
       "informal_grounds": [],
       "methods": [
         {
@@ -1562,10 +1558,6 @@
         },
         {
           "anchor": "AC-01",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "IN-02",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ],
@@ -1656,7 +1648,7 @@
     },
     "PreReviewCommandConfigLoaderPort": {
       "action": "add",
-      "docs": "Synchronous pre-review-config loader for the sequential CLI path (IN-02, AC-05).",
+      "docs": "Synchronous pre-review-config loader for loading and validation (IN-05, CN-01, AC-05).",
       "informal_grounds": [],
       "methods": [
         {
@@ -1692,10 +1684,6 @@
         },
         {
           "anchor": "AC-05",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "IN-02",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ],
@@ -2125,7 +2113,7 @@
     },
     "CommandConfigLoadError": {
       "action": "add",
-      "docs": "Command-configuration loading failures (GO-03, AC-01, AC-05).",
+      "docs": "Command-configuration loading error (GO-03, CN-01, IN-11, AC-01, AC-05, AC-13).",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -2180,11 +2168,19 @@
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         },
         {
+          "anchor": "IN-11",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
           "anchor": "AC-01",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         },
         {
           "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-13",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]
@@ -2223,7 +2219,7 @@
     },
     "CommandConfigValidationError": {
       "action": "add",
-      "docs": "Shared public error boundary for phase and pre-review command-configuration validation (GO-03, CN-01, AC-01, AC-05).",
+      "docs": "Command-configuration validation error (GO-03, CN-01, IN-11, AC-01, AC-05, AC-13).",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -2311,6 +2307,12 @@
               ],
               "kind": "struct"
             }
+          },
+          {
+            "name": "PersistedHostArgument",
+            "payload": {
+              "kind": "unit"
+            }
           }
         ]
       },
@@ -2329,11 +2331,19 @@
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         },
         {
+          "anchor": "IN-11",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
           "anchor": "AC-01",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         },
         {
           "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-13",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]
@@ -2530,7 +2540,7 @@
     },
     "ConfiguredCommand": {
       "action": "add",
-      "docs": "Validated configured-command value (IN-01, IN-03, AC-04).",
+      "docs": "Configured command (IN-01, IN-03, IN-11, AC-04, AC-13).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -2559,14 +2569,22 @@
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         },
         {
+          "anchor": "IN-11",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
           "anchor": "AC-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-13",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]
     },
     "ConfiguredCommandValidationError": {
       "action": "add",
-      "docs": "Configured-command validation error.",
+      "docs": "Configured-command validation error (IN-01, CN-01, CN-02, IN-11, AC-01, AC-05, AC-13).",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -2588,6 +2606,12 @@
               ],
               "kind": "tuple"
             }
+          },
+          {
+            "name": "PersistedHostArgument",
+            "payload": {
+              "kind": "unit"
+            }
           }
         ]
       },
@@ -2599,6 +2623,10 @@
       "spec_refs": [
         {
           "anchor": "IN-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-11",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         },
         {
@@ -2615,6 +2643,10 @@
         },
         {
           "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-13",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]
@@ -2718,7 +2750,7 @@
     },
     "PhaseCommandConfig": {
       "action": "add",
-      "docs": "Validated phase-command configuration (IN-01, CN-01, AC-01).",
+      "docs": "Phase-command configuration (IN-01, CN-01, IN-11, AC-01, AC-13).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -2743,7 +2775,15 @@
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         },
         {
+          "anchor": "IN-11",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
           "anchor": "AC-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-13",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]

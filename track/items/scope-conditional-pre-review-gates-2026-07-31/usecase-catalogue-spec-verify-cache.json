@@ -579,7 +579,7 @@
       }
     },
     {
-      "claim_hash": "7347d331971af490f7c53aa35afc40c7b9e0063faccbf79f6fa7f4008900ae97",
+      "claim_hash": "cdb007d4f75285fee14d648b9dc2ab8b4dcdfdf79604d73a04fb1c691122c977",
       "evidence_hash": "2d1947e7251b3b41bd334fd9a540772c7a828fc41758b05a4aeccc4aebb29fcb",
       "verdict": {
         "kind": "pass",
@@ -603,7 +603,7 @@
       }
     },
     {
-      "claim_hash": "7347d331971af490f7c53aa35afc40c7b9e0063faccbf79f6fa7f4008900ae97",
+      "claim_hash": "cdb007d4f75285fee14d648b9dc2ab8b4dcdfdf79604d73a04fb1c691122c977",
       "evidence_hash": "fbef8ead42b1d6c5d92f7647463813d87f65da7bfc61396cd224712b31c31bd0",
       "verdict": {
         "kind": "pass",
@@ -627,11 +627,35 @@
       }
     },
     {
-      "claim_hash": "7347d331971af490f7c53aa35afc40c7b9e0063faccbf79f6fa7f4008900ae97",
+      "claim_hash": "cdb007d4f75285fee14d648b9dc2ab8b4dcdfdf79604d73a04fb1c691122c977",
+      "evidence_hash": "e9f8e82c5561af5f9ded63ec8b3220fe37f99b81c0352e8256321e704ba538f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "operator-owned command config は provider host または `--host` を保持しない。config を消費する invocation surface は caller-supplied optional host を受け取り、値が present の場合だけ configured writer の `capability exec` invocation の dispatch boundary でその `--host` と値を追加して forward できる。保存・解決された literal argv の他の要素は変更しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CommandConfigLoadError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-11",
+          "text_label": "operator-owned command config は provider host または `--host` を保持しない。config を消費する invocation surface は caller-supplied optional host を受け取り、値が present の場合だけ configured writer の `capability exec` invocation の dispatch boundary でその `--host` と値を追加して forward できる。保存・解決された literal argv の他の要素は変更しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cdb007d4f75285fee14d648b9dc2ab8b4dcdfdf79604d73a04fb1c691122c977",
       "evidence_hash": "213840898b304208d16ca9f4c31b455230724c7df0d5ddb01097e2edccd94861",
       "verdict": {
         "kind": "pass",
-        "citation": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに writer/pre-entry argv の先頭三要素が exactly ` [\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、または `[\"bin/sotp\", \"review\", \"fix-local\"]` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
+        "citation": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに writer/pre-entry argv の先頭三要素が exactly `[\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、または `[`bin/sotp`, `review`, `fix-local`]` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -651,7 +675,7 @@
       }
     },
     {
-      "claim_hash": "7347d331971af490f7c53aa35afc40c7b9e0063faccbf79f6fa7f4008900ae97",
+      "claim_hash": "cdb007d4f75285fee14d648b9dc2ab8b4dcdfdf79604d73a04fb1c691122c977",
       "evidence_hash": "2be761837adb9975072173a0841bff11b2278f47b3d588641d778b0f97663766",
       "verdict": {
         "kind": "pass",
@@ -671,6 +695,30 @@
           "section": "acceptance_criteria",
           "element_id": "AC-05",
           "text_label": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または configured argv の先頭三要素が exactly `[\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、もしくは `[\"bin/sotp\", \"review\", \"fix-local\"]` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cdb007d4f75285fee14d648b9dc2ab8b4dcdfdf79604d73a04fb1c691122c977",
+      "evidence_hash": "7d00562f1197f62211fcda52438425b296bc3d85ad921bcac89edccfb67b5aa1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "operator-owned config には provider host または `--host` を保存しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CommandConfigLoadError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-13",
+          "text_label": "operator-owned config には provider host または `--host` を保存しない。invocation surface に optional host が supplied の場合だけ、configured writer の `capability exec` invocation に dispatch boundary でその `--host` と値を追加して forward し、omitted の場合は追加しない。その他の configured literal argv 要素は変更しない。"
         }
       }
     },
@@ -747,7 +795,7 @@
       }
     },
     {
-      "claim_hash": "e8d4e5022d9f7e93abff9fbf270932f6de6d0b06955da5e955175e40fd513c4e",
+      "claim_hash": "997ed9d4a5058085d39076e1087ac7aa28f1f78f36f391e8d16fbfac47ceaf71",
       "evidence_hash": "2d1947e7251b3b41bd334fd9a540772c7a828fc41758b05a4aeccc4aebb29fcb",
       "verdict": {
         "kind": "pass",
@@ -771,11 +819,11 @@
       }
     },
     {
-      "claim_hash": "e8d4e5022d9f7e93abff9fbf270932f6de6d0b06955da5e955175e40fd513c4e",
+      "claim_hash": "997ed9d4a5058085d39076e1087ac7aa28f1f78f36f391e8d16fbfac47ceaf71",
       "evidence_hash": "fbef8ead42b1d6c5d92f7647463813d87f65da7bfc61396cd224712b31c31bd0",
       "verdict": {
         "kind": "pass",
-        "citation": "phase と pre-review config は schema version、declaration id の一意性、non-empty literal argv、および positive integer かつ 3,600 seconds 以下の per-command timeout を fail-closed に検証する。"
+        "citation": "schema version、declaration id の一意性、non-empty literal argv、および positive integer かつ 3,600 seconds 以下の per-command timeout を fail-closed に検証する。phase command config validation と pre-review config validation は、configured writer、pre-entry、pre-review argv のいずれにも shared finite exact-literal-prefix recursion denylist を適用し、先頭三要素が exactly ` [\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、または `[\"bin/sotp\", \"review\", \"fix-local\"]` である argv を configured command、writer、reviewer の起動前に non-zero で拒否する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -795,11 +843,35 @@
       }
     },
     {
-      "claim_hash": "e8d4e5022d9f7e93abff9fbf270932f6de6d0b06955da5e955175e40fd513c4e",
+      "claim_hash": "997ed9d4a5058085d39076e1087ac7aa28f1f78f36f391e8d16fbfac47ceaf71",
+      "evidence_hash": "e9f8e82c5561af5f9ded63ec8b3220fe37f99b81c0352e8256321e704ba538f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "operator-owned command config は provider host または `--host` を保持しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CommandConfigValidationError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-11",
+          "text_label": "operator-owned command config は provider host または `--host` を保持しない。config を消費する invocation surface は caller-supplied optional host を受け取り、値が present の場合だけ configured writer の `capability exec` invocation の dispatch boundary でその `--host` と値を追加して forward できる。保存・解決された literal argv の他の要素は変更しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "997ed9d4a5058085d39076e1087ac7aa28f1f78f36f391e8d16fbfac47ceaf71",
       "evidence_hash": "213840898b304208d16ca9f4c31b455230724c7df0d5ddb01097e2edccd94861",
       "verdict": {
         "kind": "pass",
-        "citation": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに writer/pre-entry argv の先頭三要素が exactly `［\"bin/sotp\", \"phase\", \"enter\"］`、`［\"bin/sotp\", \"review\", \"local\"］`、または `［\"bin/sotp\", \"review\", \"fix-local\"］` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
+        "citation": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに writer/pre-entry argv の先頭三要素が exactly `[\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、または `['bin/sotp', 'review', 'fix-local']` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -819,7 +891,7 @@
       }
     },
     {
-      "claim_hash": "e8d4e5022d9f7e93abff9fbf270932f6de6d0b06955da5e955175e40fd513c4e",
+      "claim_hash": "997ed9d4a5058085d39076e1087ac7aa28f1f78f36f391e8d16fbfac47ceaf71",
       "evidence_hash": "2be761837adb9975072173a0841bff11b2278f47b3d588641d778b0f97663766",
       "verdict": {
         "kind": "pass",
@@ -839,6 +911,30 @@
           "section": "acceptance_criteria",
           "element_id": "AC-05",
           "text_label": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または configured argv の先頭三要素が exactly `[\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、もしくは `[\"bin/sotp\", \"review\", \"fix-local\"]` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "997ed9d4a5058085d39076e1087ac7aa28f1f78f36f391e8d16fbfac47ceaf71",
+      "evidence_hash": "7d00562f1197f62211fcda52438425b296bc3d85ad921bcac89edccfb67b5aa1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "operator-owned config には provider host または `--host` を保存しない。invocation surface に optional host が supplied の場合だけ、configured writer の `capability exec` invocation に dispatch boundary でその `--host` と値を追加して forward し、omitted の場合は追加しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CommandConfigValidationError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-13",
+          "text_label": "operator-owned config には provider host または `--host` を保存しない。invocation surface に optional host が supplied の場合だけ、configured writer の `capability exec` invocation に dispatch boundary でその `--host` と値を追加して forward し、omitted の場合は追加しない。その他の configured literal argv 要素は変更しない。"
         }
       }
     },
@@ -1275,7 +1371,7 @@
       }
     },
     {
-      "claim_hash": "6300e9bece65776469689049dd610d4182ce5e1c84af1fc41ca9e84b49679908",
+      "claim_hash": "192a20315b904044f549e856716ea4ce444287b8ac167d230106d928607e764b",
       "evidence_hash": "a2dbdf2f0cad892e372d2d71fa987557ef6ce494a6c195ae71bd09280668a904",
       "verdict": {
         "kind": "pass",
@@ -1299,7 +1395,7 @@
       }
     },
     {
-      "claim_hash": "6300e9bece65776469689049dd610d4182ce5e1c84af1fc41ca9e84b49679908",
+      "claim_hash": "192a20315b904044f549e856716ea4ce444287b8ac167d230106d928607e764b",
       "evidence_hash": "d28cfa0cdb5eccf03844e008251a5e68fbc935d47cda27a0637e5834c472873d",
       "verdict": {
         "kind": "pass",
@@ -1323,11 +1419,11 @@
       }
     },
     {
-      "claim_hash": "6300e9bece65776469689049dd610d4182ce5e1c84af1fc41ca9e84b49679908",
+      "claim_hash": "192a20315b904044f549e856716ea4ce444287b8ac167d230106d928607e764b",
       "evidence_hash": "fcf6947ce3a1288ef78c920282154efdd8d7a5123976adbe3f41e1fd6b4540a2",
       "verdict": {
         "kind": "pass",
-        "citation": "config author/operator は公開 `bin/sotp` command の有効性と順序を所有し、engine は config に保存・解決された literal argv を書き換えず、subcommand grammar や command の意味論を解釈しない。"
+        "citation": "config author/operator は公開 `bin/sotp` command の有効性と順序を所有し"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1347,7 +1443,31 @@
       }
     },
     {
-      "claim_hash": "6300e9bece65776469689049dd610d4182ce5e1c84af1fc41ca9e84b49679908",
+      "claim_hash": "192a20315b904044f549e856716ea4ce444287b8ac167d230106d928607e764b",
+      "evidence_hash": "e9f8e82c5561af5f9ded63ec8b3220fe37f99b81c0352e8256321e704ba538f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "operator-owned command config は provider host または `--host` を保持しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "ConfiguredCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-11",
+          "text_label": "operator-owned command config は provider host または `--host` を保持しない。config を消費する invocation surface は caller-supplied optional host を受け取り、値が present の場合だけ configured writer の `capability exec` invocation の dispatch boundary でその `--host` と値を追加して forward できる。保存・解決された literal argv の他の要素は変更しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "192a20315b904044f549e856716ea4ce444287b8ac167d230106d928607e764b",
       "evidence_hash": "eed55e184aa24849ff134ac46577b3efe86f7cc48072dacbfa95545682b2805d",
       "verdict": {
         "kind": "pass",
@@ -1371,11 +1491,35 @@
       }
     },
     {
-      "claim_hash": "14e7ad6da4eaa0d5955c279766bb329800d1d3a1a4624ba48c772bfd8aca1c64",
+      "claim_hash": "192a20315b904044f549e856716ea4ce444287b8ac167d230106d928607e764b",
+      "evidence_hash": "7d00562f1197f62211fcda52438425b296bc3d85ad921bcac89edccfb67b5aa1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "operator-owned config には provider host または `--host` を保存しない。invocation surface に optional host が supplied の場合だけ、configured writer の `capability exec` invocation に dispatch boundary でその `--host` と値を追加して forward し、omitted の場合は追加しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "ConfiguredCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-13",
+          "text_label": "operator-owned config には provider host または `--host` を保存しない。invocation surface に optional host が supplied の場合だけ、configured writer の `capability exec` invocation に dispatch boundary でその `--host` と値を追加して forward し、omitted の場合は追加しない。その他の configured literal argv 要素は変更しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "db9cbd65f6ac9bc9568e79e65121857f5d495490858d426cb450b70e0909b4c8",
       "evidence_hash": "d28cfa0cdb5eccf03844e008251a5e68fbc935d47cda27a0637e5834c472873d",
       "verdict": {
         "kind": "pass",
-        "citation": "command ごとの明示 timeout または約 60 分の既定 timeout を宣言する"
+        "citation": "literal かつ non-empty な argv 配列で表す canonical writer 一件、同形式の ordered pre-entry command 群、ならびに command ごとの明示 timeout または約 60 分の既定 timeout を宣言する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1395,7 +1539,31 @@
       }
     },
     {
-      "claim_hash": "14e7ad6da4eaa0d5955c279766bb329800d1d3a1a4624ba48c772bfd8aca1c64",
+      "claim_hash": "db9cbd65f6ac9bc9568e79e65121857f5d495490858d426cb450b70e0909b4c8",
+      "evidence_hash": "e9f8e82c5561af5f9ded63ec8b3220fe37f99b81c0352e8256321e704ba538f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "operator-owned command config は provider host または `--host` を保持しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "ConfiguredCommandValidationError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-11",
+          "text_label": "operator-owned command config は provider host または `--host` を保持しない。config を消費する invocation surface は caller-supplied optional host を受け取り、値が present の場合だけ configured writer の `capability exec` invocation の dispatch boundary でその `--host` と値を追加して forward できる。保存・解決された literal argv の他の要素は変更しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "db9cbd65f6ac9bc9568e79e65121857f5d495490858d426cb450b70e0909b4c8",
       "evidence_hash": "fbef8ead42b1d6c5d92f7647463813d87f65da7bfc61396cd224712b31c31bd0",
       "verdict": {
         "kind": "pass",
@@ -1419,11 +1587,11 @@
       }
     },
     {
-      "claim_hash": "14e7ad6da4eaa0d5955c279766bb329800d1d3a1a4624ba48c772bfd8aca1c64",
+      "claim_hash": "db9cbd65f6ac9bc9568e79e65121857f5d495490858d426cb450b70e0909b4c8",
       "evidence_hash": "21d9371c5ac714d4a549a0fb8d87382c3bab75abdb2d63fe60fd48e84eaf8108",
       "verdict": {
         "kind": "pass",
-        "citation": "いずれかの output bound を超えた場合は当該 command を terminate し output-limit outcome の non-zero を返す。default timeout は 3,600 seconds とし、explicit timeout は positive integer かつ 3,600 seconds 以下に限る。timeout 時は当該 command を terminate し non-zero を返す。"
+        "citation": "explicit timeout は positive integer かつ 3,600 seconds 以下に限る。timeout 時は当該 command を terminate し non-zero を返す。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1443,11 +1611,11 @@
       }
     },
     {
-      "claim_hash": "14e7ad6da4eaa0d5955c279766bb329800d1d3a1a4624ba48c772bfd8aca1c64",
+      "claim_hash": "db9cbd65f6ac9bc9568e79e65121857f5d495490858d426cb450b70e0909b4c8",
       "evidence_hash": "213840898b304208d16ca9f4c31b455230724c7df0d5ddb01097e2edccd94861",
       "verdict": {
         "kind": "pass",
-        "citation": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに writer/pre-entry argv の先頭三要素が exactly `[\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、または ` [\"bin/sotp\", \"review\", \"fix-local\"]` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
+        "citation": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに writer/pre-entry argv の先頭三要素が exactly `[[\"bin/sotp\", \"phase\", \"enter\"], [\"bin/sotp\", \"review\", \"local\"], または [\"bin/sotp\", \"review\", \"fix-local\"]` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1467,11 +1635,11 @@
       }
     },
     {
-      "claim_hash": "14e7ad6da4eaa0d5955c279766bb329800d1d3a1a4624ba48c772bfd8aca1c64",
+      "claim_hash": "db9cbd65f6ac9bc9568e79e65121857f5d495490858d426cb450b70e0909b4c8",
       "evidence_hash": "2be761837adb9975072173a0841bff11b2278f47b3d588641d778b0f97663766",
       "verdict": {
         "kind": "pass",
-        "citation": "invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または configured argv の先頭三要素が exactly `["
+        "citation": "invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または configured argv の先頭三要素が exactly [\"bin/sotp\", \"phase\", \"enter\"]、[\"bin/sotp\", \"review\", \"local\"]、もしくは [\"bin/sotp\", \"review\", \"fix-local\"] である recursion は deterministically non-zero で拒否し"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1487,6 +1655,30 @@
           "section": "acceptance_criteria",
           "element_id": "AC-05",
           "text_label": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または configured argv の先頭三要素が exactly `[\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、もしくは `[\"bin/sotp\", \"review\", \"fix-local\"]` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "db9cbd65f6ac9bc9568e79e65121857f5d495490858d426cb450b70e0909b4c8",
+      "evidence_hash": "7d00562f1197f62211fcda52438425b296bc3d85ad921bcac89edccfb67b5aa1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "operator-owned config には provider host または `--host` を保存しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "ConfiguredCommandValidationError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-13",
+          "text_label": "operator-owned config には provider host または `--host` を保存しない。invocation surface に optional host が supplied の場合だけ、configured writer の `capability exec` invocation に dispatch boundary でその `--host` と値を追加して forward し、omitted の場合は追加しない。その他の configured literal argv 要素は変更しない。"
         }
       }
     },
@@ -1659,7 +1851,7 @@
       }
     },
     {
-      "claim_hash": "308dab41e136484e8365ce63639dc7b4884a756a9bcf9115ab50a955fd9bd8fb",
+      "claim_hash": "f38830815fbf3147bee886b162c760abd2413c772278024a016885560bdfe429",
       "evidence_hash": "d28cfa0cdb5eccf03844e008251a5e68fbc935d47cda27a0637e5834c472873d",
       "verdict": {
         "kind": "pass",
@@ -1683,7 +1875,7 @@
       }
     },
     {
-      "claim_hash": "308dab41e136484e8365ce63639dc7b4884a756a9bcf9115ab50a955fd9bd8fb",
+      "claim_hash": "f38830815fbf3147bee886b162c760abd2413c772278024a016885560bdfe429",
       "evidence_hash": "fbef8ead42b1d6c5d92f7647463813d87f65da7bfc61396cd224712b31c31bd0",
       "verdict": {
         "kind": "pass",
@@ -1707,11 +1899,35 @@
       }
     },
     {
-      "claim_hash": "308dab41e136484e8365ce63639dc7b4884a756a9bcf9115ab50a955fd9bd8fb",
+      "claim_hash": "f38830815fbf3147bee886b162c760abd2413c772278024a016885560bdfe429",
+      "evidence_hash": "e9f8e82c5561af5f9ded63ec8b3220fe37f99b81c0352e8256321e704ba538f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "operator-owned command config は provider host または `--host` を保持しない。config を消費する invocation surface は caller-supplied optional host を受け取り、値が present の場合だけ configured writer の `capability exec` invocation の dispatch boundary でその `--host` と値を追加して forward できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PhaseCommandConfig"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-11",
+          "text_label": "operator-owned command config は provider host または `--host` を保持しない。config を消費する invocation surface は caller-supplied optional host を受け取り、値が present の場合だけ configured writer の `capability exec` invocation の dispatch boundary でその `--host` と値を追加して forward できる。保存・解決された literal argv の他の要素は変更しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f38830815fbf3147bee886b162c760abd2413c772278024a016885560bdfe429",
       "evidence_hash": "213840898b304208d16ca9f4c31b455230724c7df0d5ddb01097e2edccd94861",
       "verdict": {
         "kind": "pass",
-        "citation": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに writer/pre-entry argv の先頭三要素が exactly `['bin/sotp', 'phase', 'enter']`、`['bin/sotp', 'review', 'local']`、または `['bin/sotp', 'review', 'fix-local']` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
+        "citation": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに writer/pre-entry argv の先頭三要素が exactly `["
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1727,6 +1943,30 @@
           "section": "acceptance_criteria",
           "element_id": "AC-01",
           "text_label": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに writer/pre-entry argv の先頭三要素が exactly `[\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、または `[\"bin/sotp\", \"review\", \"fix-local\"]` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f38830815fbf3147bee886b162c760abd2413c772278024a016885560bdfe429",
+      "evidence_hash": "7d00562f1197f62211fcda52438425b296bc3d85ad921bcac89edccfb67b5aa1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "operator-owned config には provider host または `--host` を保存しない。invocation surface に optional host が supplied の場合だけ、configured writer の `capability exec` invocation に dispatch boundary でその `--host` と値を追加して forward し、omitted の場合は追加しない。その他の configured literal argv 要素は変更しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PhaseCommandConfig"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-13",
+          "text_label": "operator-owned config には provider host または `--host` を保存しない。invocation surface に optional host が supplied の場合だけ、configured writer の `capability exec` invocation に dispatch boundary でその `--host` と値を追加して forward し、omitted の場合は追加しない。その他の configured literal argv 要素は変更しない。"
         }
       }
     },
@@ -3867,7 +4107,7 @@
       }
     },
     {
-      "claim_hash": "ff4ba8d4eecfa1fd867115a34aa3f0cea6c2d6788a61074a538b8685bd16a07a",
+      "claim_hash": "d743ab19f804b20bdd68f9d3f6ff0ef9d21b195782bb0db6e71785b9769082d1",
       "evidence_hash": "d2d038fd353544f17e7a06349e641179077a9bf3489237160b864e9f69642820",
       "verdict": {
         "kind": "pass",
@@ -3891,7 +4131,7 @@
       }
     },
     {
-      "claim_hash": "ff4ba8d4eecfa1fd867115a34aa3f0cea6c2d6788a61074a538b8685bd16a07a",
+      "claim_hash": "d743ab19f804b20bdd68f9d3f6ff0ef9d21b195782bb0db6e71785b9769082d1",
       "evidence_hash": "2be761837adb9975072173a0841bff11b2278f47b3d588641d778b0f97663766",
       "verdict": {
         "kind": "pass",
@@ -3915,31 +4155,7 @@
       }
     },
     {
-      "claim_hash": "ff4ba8d4eecfa1fd867115a34aa3f0cea6c2d6788a61074a538b8685bd16a07a",
-      "evidence_hash": "5766f2233e51df7dd5a39554022688b7364647b79f00722e6c78f0cde48989fa",
-      "verdict": {
-        "kind": "pass",
-        "citation": "phase engine は repository root を cwd として pre-entry command を宣言順に実行し"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
-          "section_key": "traits",
-          "entry_key": "CurrentReviewTrackResolverPort"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "in_scope",
-          "element_id": "IN-02",
-          "text_label": "phase engine は repository root を cwd として pre-entry command を宣言順に実行し、最初の non-zero で停止して残りと writer を起動せず、全 command が zero の場合だけ writer を一度実行する。stdout/stderr は bounded に捕捉する。"
-        }
-      }
-    },
-    {
-      "claim_hash": "d8621a4279fdc7581ee5bf13293112005353c4b310970d24304a54bce5802455",
+      "claim_hash": "6054419a4325bd249f7c0f312ed657a6a44d00b10141729c6d60aa8e06ff8822",
       "evidence_hash": "d28cfa0cdb5eccf03844e008251a5e68fbc935d47cda27a0637e5834c472873d",
       "verdict": {
         "kind": "pass",
@@ -3963,7 +4179,7 @@
       }
     },
     {
-      "claim_hash": "d8621a4279fdc7581ee5bf13293112005353c4b310970d24304a54bce5802455",
+      "claim_hash": "6054419a4325bd249f7c0f312ed657a6a44d00b10141729c6d60aa8e06ff8822",
       "evidence_hash": "fbef8ead42b1d6c5d92f7647463813d87f65da7bfc61396cd224712b31c31bd0",
       "verdict": {
         "kind": "pass",
@@ -3987,11 +4203,11 @@
       }
     },
     {
-      "claim_hash": "d8621a4279fdc7581ee5bf13293112005353c4b310970d24304a54bce5802455",
+      "claim_hash": "6054419a4325bd249f7c0f312ed657a6a44d00b10141729c6d60aa8e06ff8822",
       "evidence_hash": "213840898b304208d16ca9f4c31b455230724c7df0d5ddb01097e2edccd94861",
       "verdict": {
         "kind": "pass",
-        "citation": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに writer/pre-entry argv の先頭三要素が exactly `['bin/sotp', 'phase', 'enter']`、`['bin/sotp', 'review', 'local']`、または `['bin/sotp', 'review', 'fix-local']` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
+        "citation": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに writer/pre-entry argv の先頭三要素が exactly `([\"bin/sotp\", \"phase\", \"enter\"]、[\"bin/sotp\", \"review\", \"local\"]、または [\"bin/sotp\", \"review\", \"fix-local\"])` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -4007,30 +4223,6 @@
           "section": "acceptance_criteria",
           "element_id": "AC-01",
           "text_label": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに writer/pre-entry argv の先頭三要素が exactly `[\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、または `[\"bin/sotp\", \"review\", \"fix-local\"]` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
-        }
-      }
-    },
-    {
-      "claim_hash": "d8621a4279fdc7581ee5bf13293112005353c4b310970d24304a54bce5802455",
-      "evidence_hash": "5766f2233e51df7dd5a39554022688b7364647b79f00722e6c78f0cde48989fa",
-      "verdict": {
-        "kind": "pass",
-        "citation": "phase engine は repository root を cwd として pre-entry command を宣言順に実行し"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
-          "section_key": "traits",
-          "entry_key": "PhaseCommandConfigLoaderPort"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "in_scope",
-          "element_id": "IN-02",
-          "text_label": "phase engine は repository root を cwd として pre-entry command を宣言順に実行し、最初の non-zero で停止して残りと writer を起動せず、全 command が zero の場合だけ writer を一度実行する。stdout/stderr は bounded に捕捉する。"
         }
       }
     },
@@ -4179,7 +4371,7 @@
       }
     },
     {
-      "claim_hash": "8565dec2af6a2b1de9891c2526fa6aa73ef9055097c3f041e0b2b73ee09bcb95",
+      "claim_hash": "f1da1828c2002ec4f02b59378a03ae153b881f3a2c91eb4fb54fccbc27816a84",
       "evidence_hash": "d2d038fd353544f17e7a06349e641179077a9bf3489237160b864e9f69642820",
       "verdict": {
         "kind": "pass",
@@ -4203,7 +4395,7 @@
       }
     },
     {
-      "claim_hash": "8565dec2af6a2b1de9891c2526fa6aa73ef9055097c3f041e0b2b73ee09bcb95",
+      "claim_hash": "f1da1828c2002ec4f02b59378a03ae153b881f3a2c91eb4fb54fccbc27816a84",
       "evidence_hash": "fbef8ead42b1d6c5d92f7647463813d87f65da7bfc61396cd224712b31c31bd0",
       "verdict": {
         "kind": "pass",
@@ -4227,7 +4419,7 @@
       }
     },
     {
-      "claim_hash": "8565dec2af6a2b1de9891c2526fa6aa73ef9055097c3f041e0b2b73ee09bcb95",
+      "claim_hash": "f1da1828c2002ec4f02b59378a03ae153b881f3a2c91eb4fb54fccbc27816a84",
       "evidence_hash": "2be761837adb9975072173a0841bff11b2278f47b3d588641d778b0f97663766",
       "verdict": {
         "kind": "pass",
@@ -4247,30 +4439,6 @@
           "section": "acceptance_criteria",
           "element_id": "AC-05",
           "text_label": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または configured argv の先頭三要素が exactly `[\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、もしくは `[\"bin/sotp\", \"review\", \"fix-local\"]` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
-        }
-      }
-    },
-    {
-      "claim_hash": "8565dec2af6a2b1de9891c2526fa6aa73ef9055097c3f041e0b2b73ee09bcb95",
-      "evidence_hash": "5766f2233e51df7dd5a39554022688b7364647b79f00722e6c78f0cde48989fa",
-      "verdict": {
-        "kind": "pass",
-        "citation": "phase engine は repository root を cwd として pre-entry command を宣言順に実行し、最初の non-zero で停止して残りと writer を起動せず、全 command が zero の場合だけ writer を一度実行する。stdout/stderr は bounded に捕捉する。"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
-          "section_key": "traits",
-          "entry_key": "PreReviewCommandConfigLoaderPort"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "in_scope",
-          "element_id": "IN-02",
-          "text_label": "phase engine は repository root を cwd として pre-entry command を宣言順に実行し、最初の non-zero で停止して残りと writer を起動せず、全 command が zero の場合だけ writer を一度実行する。stdout/stderr は bounded に捕捉する。"
         }
       }
     },

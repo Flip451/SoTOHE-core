@@ -116,13 +116,14 @@
     },
     {
       "id": "T026",
-      "description": "`libs/usecase/src/operator_command.rs` の validated argv / configured-command value objects と operation-specific configuration validation error vocabulary を catalogue shape に適応し、各 validation failure の tests を更新する。IN-01、IN-03、CN-01、AC-01、AC-04、AC-05。",
-      "status": "in_progress"
+      "description": "`libs/usecase/src/operator_command.rs` の validated argv value objects と operation-specific configuration validation error vocabulary を catalogue shape に適応し、各 validation failure の tests を更新する。IN-01、IN-03、CN-01、AC-01、AC-04、AC-05。",
+      "status": "done",
+      "commit_hash": "35b7c8833adc405a82b54b977169e1dc4f2d8d6b"
     },
     {
       "id": "T027",
-      "description": "`libs/usecase/src/phase_command.rs` の phase command config / declaration / loader-port、configuration validation error、validate command を catalogue shape に適応し、configuration validation tests を更新する。IN-01、IN-11、CN-01、AC-01、AC-13。",
-      "status": "todo",
+      "description": "`libs/usecase/src/operator_command.rs` の `ConfiguredCommand` construction と configuration/load error vocabulary、および `libs/usecase/src/phase_command.rs` の phase command config / declaration / loader-port、configuration validation error、validate command を catalogue shape に適応し、configuration validation tests を更新する。IN-01、IN-11、CN-01、AC-01、AC-13。",
+      "status": "in_progress",
       "depends_on": [
         "T025"
       ]
@@ -245,7 +246,7 @@
         "id": "S2",
         "title": "approved catalogue repair extension",
         "description": [
-          "T024–T036 は T001–T023 を reopen せず、approved catalogue が要求する source-shape repair と provider-neutral phase-writer configuration を file-exclusive に実装する。"
+          "`libs/{domain,usecase,infrastructure}/src/{task_contract,program_runner,operator_command,phase_command,pre_review_command}.rs` と `apps/{cli-driver,cli-composition}/src/{task_contract,phase_command}.rs` を catalogue shape に適応する。IN-01、IN-02、IN-03、IN-04、IN-05、IN-08、IN-11、AC-01、AC-02、AC-03、AC-04、AC-05、AC-07、AC-10、AC-13。"
         ],
         "task_ids": [
           "T024",

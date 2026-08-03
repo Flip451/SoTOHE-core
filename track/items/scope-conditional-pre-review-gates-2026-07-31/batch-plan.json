@@ -12,7 +12,7 @@
     {"task_id": "T024", "scope_estimates": [{"scope": "domain", "production_lines": 110, "test_lines": 80}, {"scope": "cli_driver", "production_lines": 75, "test_lines": 55}], "oversize_justification": null},
     {"task_id": "T025", "scope_estimates": [{"scope": "usecase", "production_lines": 210, "test_lines": 100}], "oversize_justification": null},
     {"task_id": "T026", "scope_estimates": [{"scope": "usecase", "production_lines": 230, "test_lines": 100}], "oversize_justification": null},
-    {"task_id": "T027", "scope_estimates": [{"scope": "usecase", "production_lines": 70, "test_lines": 40}], "oversize_justification": null},
+    {"task_id": "T027", "scope_estimates": [{"scope": "usecase", "production_lines": 110, "test_lines": 60}], "oversize_justification": null},
     {"task_id": "T028", "scope_estimates": [{"scope": "usecase", "production_lines": 150, "test_lines": 40}], "oversize_justification": null},
     {"task_id": "T029", "scope_estimates": [{"scope": "infrastructure", "production_lines": 130, "test_lines": 90}], "oversize_justification": null},
     {"task_id": "T030", "scope_estimates": [{"scope": "cli_driver", "production_lines": 195, "test_lines": 185}], "oversize_justification": null},
@@ -26,7 +26,7 @@
   "batches": [
     {"id": "B1", "task_ids": ["T017", "T018", "T019", "T020", "T021", "T022", "T023"]},
     {"id": "B2", "task_ids": ["T024", "T025", "T028"]},
-    {"id": "B3", "task_ids": ["T026", "T029", "T027"]},
+    {"id": "B3", "task_ids": ["T026", "T027", "T029"]},
     {"id": "B4", "task_ids": ["T032", "T034", "T033"]},
     {"id": "B5", "task_ids": ["T035", "T030", "T036", "T031"]}
   ]

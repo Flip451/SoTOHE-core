@@ -24,8 +24,8 @@
 | CommandTimeoutSeconds | value_object | add | — | 🔵 | 🔵 |
 | ConfiguredCommand | value_object | add | — | 🔵 | 🔵 |
 | OutputCaptureLimitBytes | value_object | add | — | 🔵 | 🔵 |
-| PhaseCommandConfig | value_object | add | — | 🟡 | 🔵 |
-| PhaseCommandDeclaration | value_object | add | — | 🟡 | 🔵 |
+| PhaseCommandConfig | value_object | add | — | 🔵 | 🔵 |
+| PhaseCommandDeclaration | value_object | add | — | 🔵 | 🔵 |
 | PreReviewCommandConfig | value_object | add | — | 🔵 | 🔵 |
 | PreReviewScopeCommandDeclaration | value_object | add | — | 🔵 | 🔵 |
 | ProgramExitCode | value_object | add | — | 🔵 | 🔵 |
@@ -37,12 +37,12 @@
 |------|------|--------|---------|--------|----------|
 | CommandArgvValidationError | error_type | add | Empty, RecursiveInvocation | 🔵 | 🔵 |
 | CommandConfigLoadError | error_type | add | ReadFailed, DecodeFailed, Invalid | 🔵 | 🔵 |
-| CommandConfigValidationError | error_type | add | InvalidSchemaVersion, InvalidDeclarationId, InvalidReviewScope, DuplicateDeclaration, DuplicateScope, EmptyArgv, TimeoutOutOfRange, RecursiveInvocation | 🔵 | 🔵 |
+| CommandConfigValidationError | error_type | add | InvalidSchemaVersion, InvalidDeclarationId, InvalidReviewScope, DuplicateDeclaration, DuplicateScope, EmptyArgv, TimeoutOutOfRange, RecursiveInvocation, PersistedHostArgument | 🔵 | 🔵 |
 | CommandDeclarationIdValidationError | error_type | add | Empty | 🔵 | 🔵 |
 | CommandTimeoutValidationError | error_type | add | OutOfRange | 🔵 | 🔵 |
-| ConfiguredCommandValidationError | error_type | add | Argv, Timeout | 🔵 | 🔵 |
+| ConfiguredCommandValidationError | error_type | add | Argv, Timeout, PersistedHostArgument | 🔵 | 🔵 |
 | CurrentReviewTrackResolveError | error_type | add | ResolveFailed | 🔵 | 🔵 |
-| PhaseCommandConfigValidationError | error_type | add | InvalidSchemaVersion, DuplicateDeclaration | 🟡 | 🔵 |
+| PhaseCommandConfigValidationError | error_type | add | InvalidSchemaVersion, DuplicateDeclaration | 🔵 | 🔵 |
 | PhaseCommandEnterError | error_type | add | Config, UnknownPhase, Runner | 🟡 | 🔵 |
 | PhaseCommandExplainError | error_type | add | Config, UnknownPhase | 🟡 | 🔵 |
 | PreReviewCommandConfigValidationError | error_type | add | InvalidSchemaVersion, DuplicateScope | 🔵 | 🔵 |
@@ -54,7 +54,7 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | CurrentReviewTrackResolverPort | secondary_port | add | fn resolve(&self, repository_root: &std::path::Path) -> Result<domain::TrackId, CurrentReviewTrackResolveError> | 🔵 | 🔵 |
-| PhaseCommandConfigLoaderPort | secondary_port | add | fn load(&self, repository_root: &std::path::Path) -> Result<PhaseCommandConfig, CommandConfigLoadError> | 🟡 | 🔵 |
+| PhaseCommandConfigLoaderPort | secondary_port | add | fn load(&self, repository_root: &std::path::Path) -> Result<PhaseCommandConfig, CommandConfigLoadError> | 🔵 | 🔵 |
 | PreReviewCommandConfigLoaderPort | secondary_port | add | fn load(&self, repository_root: &std::path::Path, track_id: &domain::TrackId) -> Result<PreReviewCommandConfig, CommandConfigLoadError> | 🔵 | 🔵 |
 | ProgramRunnerPort | secondary_port | add | fn run(&self, invocation: ProgramInvocation) -> Result<ProgramRunOutcome, ProgramRunnerError> | 🔵 | 🔵 |
 
@@ -92,7 +92,7 @@
 |------|------|--------|---------|--------|----------|
 | CapabilityExecRequest | command | modify | — | 🔵 | 🔵 |
 | PhaseEnterCommand | command | add | — | 🟡 | 🔵 |
-| PhaseValidateCommand | command | add | — | 🟡 | 🔵 |
+| PhaseValidateCommand | command | add | — | 🔵 | 🔵 |
 | PreReviewCommandDispatchCommand | command | add | — | 🔵 | 🔵 |
 
 ## Queries
