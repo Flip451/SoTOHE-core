@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "1c58ac5db995b6829202c42634dee90f5b3518ca6f3d0229260c5b97752e0498",
+  "catalogue_declaration_hash": "b689bf0c1d67cd634ccb9e4758b4ddc7f0de76fbbbb7090f0b04a357d29b454e",
   "signals": [
     {
       "type_name": "GitCommand",
@@ -15,12 +15,17 @@
     {
       "type_name": "TrackCommand",
       "signal": "blue",
-      "entry_hash": "6d513129d681e58eeef766f95098ffd9088fc53dacb9861306e1aff5aca89da3"
+      "entry_hash": "534768f9825d6898e01508cf18bd4cc4be1f9500a0ee38bb547454e8de68ccc1"
     },
     {
       "type_name": "cli::commands::git::execute",
       "signal": "blue",
       "entry_hash": "7472049fdbc011ec18d4d6053f18b94eb2c47e81739d8b4199441b92ac470a41"
+    },
+    {
+      "type_name": "cli::commands::track::dispatch::dispatch_track_cmd_with_base_merge",
+      "signal": "blue",
+      "entry_hash": "b942ed8843bb365491be2c443dcfb149f64434df3381acd0ce9b1d7143eafa6b"
     }
   ]
 }

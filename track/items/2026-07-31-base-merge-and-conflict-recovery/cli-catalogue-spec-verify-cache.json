@@ -99,7 +99,7 @@
       }
     },
     {
-      "claim_hash": "6d513129d681e58eeef766f95098ffd9088fc53dacb9861306e1aff5aca89da3",
+      "claim_hash": "534768f9825d6898e01508cf18bd4cc4be1f9500a0ee38bb547454e8de68ccc1",
       "evidence_hash": "9c04c25ac8797b57a56b46079c14b00823ac3b1b860495b5d228d67b89b00db7",
       "verdict": {
         "kind": "pass",
@@ -123,7 +123,7 @@
       }
     },
     {
-      "claim_hash": "6d513129d681e58eeef766f95098ffd9088fc53dacb9861306e1aff5aca89da3",
+      "claim_hash": "534768f9825d6898e01508cf18bd4cc4be1f9500a0ee38bb547454e8de68ccc1",
       "evidence_hash": "b1ebe6f4e3ef241cee3ab49ab127483a283048c40c19b452348de4ac09005a15",
       "verdict": {
         "kind": "pass",
@@ -147,11 +147,11 @@
       }
     },
     {
-      "claim_hash": "6d513129d681e58eeef766f95098ffd9088fc53dacb9861306e1aff5aca89da3",
+      "claim_hash": "534768f9825d6898e01508cf18bd4cc4be1f9500a0ee38bb547454e8de68ccc1",
       "evidence_hash": "ed3a944687a361098c2ee196108b66f8ca2414acbd97373b59232d0c644c863c",
       "verdict": {
         "kind": "pass",
-        "citation": "Provide orchestrator-owned conflict recovery through the canonical recovery workflow, with both `/track:recover` and `$track-recover` adapters shipping as provider-framing-only entry points."
+        "citation": "Provide orchestrator-owned conflict recovery through the canonical recovery workflow"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -171,7 +171,7 @@
       }
     },
     {
-      "claim_hash": "6d513129d681e58eeef766f95098ffd9088fc53dacb9861306e1aff5aca89da3",
+      "claim_hash": "534768f9825d6898e01508cf18bd4cc4be1f9500a0ee38bb547454e8de68ccc1",
       "evidence_hash": "d5914c88f34ebe09359d33c2238a2158fe5f2350d2a22258922277f31f29cb76",
       "verdict": {
         "kind": "pass",
@@ -195,7 +195,7 @@
       }
     },
     {
-      "claim_hash": "6d513129d681e58eeef766f95098ffd9088fc53dacb9861306e1aff5aca89da3",
+      "claim_hash": "534768f9825d6898e01508cf18bd4cc4be1f9500a0ee38bb547454e8de68ccc1",
       "evidence_hash": "d1a8d3e43a11bbad62882da88d0ebfbaced67f21758977ebd741d2beb5bf6129",
       "verdict": {
         "kind": "pass",
@@ -219,7 +219,7 @@
       }
     },
     {
-      "claim_hash": "6d513129d681e58eeef766f95098ffd9088fc53dacb9861306e1aff5aca89da3",
+      "claim_hash": "534768f9825d6898e01508cf18bd4cc4be1f9500a0ee38bb547454e8de68ccc1",
       "evidence_hash": "c11596aa73c9d76385bd11d40c389db9cf0df6530af7fa89addda894842ed6c7",
       "verdict": {
         "kind": "pass",
@@ -243,7 +243,7 @@
       }
     },
     {
-      "claim_hash": "6d513129d681e58eeef766f95098ffd9088fc53dacb9861306e1aff5aca89da3",
+      "claim_hash": "534768f9825d6898e01508cf18bd4cc4be1f9500a0ee38bb547454e8de68ccc1",
       "evidence_hash": "9e9abe7181b71316e54964a1694e1196b70e7705e3e78b819044365c33947b16",
       "verdict": {
         "kind": "pass",
@@ -311,6 +311,54 @@
           "section": "acceptance_criteria",
           "element_id": "AC-06",
           "text_label": "A guarded stash records untracked track artifacts, and a successful guarded stash-pop restores them through the `bin/sotp git stash` command path without changing branch history, updating branch refs, or changing the active track branch; the stash-internal objects and `refs/stash` updates required by stash and stash-pop are permitted."
+        }
+      }
+    },
+    {
+      "claim_hash": "b942ed8843bb365491be2c443dcfb149f64434df3381acd0ce9b1d7143eafa6b",
+      "evidence_hash": "9c04c25ac8797b57a56b46079c14b00823ac3b1b860495b5d228d67b89b00db7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Provide a guarded base-merge operation that runs only when the current branch is the active `track/<id>` branch and its source is that track's branch-strategy snapshot base branch."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::track::dispatch::dispatch_track_cmd_with_base_merge"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "Provide a guarded base-merge operation that runs only when the current branch is the active `track/<id>` branch and its source is that track's branch-strategy snapshot base branch."
+        }
+      }
+    },
+    {
+      "claim_hash": "b942ed8843bb365491be2c443dcfb149f64434df3381acd0ce9b1d7143eafa6b",
+      "evidence_hash": "d5914c88f34ebe09359d33c2238a2158fe5f2350d2a22258922277f31f29cb76",
+      "verdict": {
+        "kind": "pass",
+        "citation": "A guarded base merge succeeds only from the currently active `track/<id>` branch and only when the requested source equals its branch-strategy snapshot base branch."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::track::dispatch::dispatch_track_cmd_with_base_merge"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "A guarded base merge succeeds only from the currently active `track/<id>` branch and only when the requested source equals its branch-strategy snapshot base branch."
         }
       }
     }

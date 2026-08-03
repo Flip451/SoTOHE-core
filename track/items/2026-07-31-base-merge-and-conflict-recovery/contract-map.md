@@ -415,6 +415,7 @@ subgraph cli["cli"]
     T20_cli_cli_TrackCommand_items_dir([items_dir])
   end
   F35_cli_cli_cli__commands__git__execute[[execute]]
+  F74_cli_cli_cli__commands__track__dispatch__dispatch_track_cmd_with_base_merge[[dispatch_track_cmd_with_base_merge]]
   end
 end
 T28_domain_domain_BaseBranchName_try_new --> T28_domain_domain_BaseBranchName__self
@@ -497,6 +498,7 @@ T33_cli_driver_cli_driver_TrackDriver_new --> T33_cli_driver_cli_driver_TrackDri
 T33_cli_driver_cli_driver_TrackDriver_handle_base_merge --o T36_cli_driver_cli_driver_BaseMergeInput__self
 T18_cli_cli_GitCommand_Stash --o T22_cli_cli_GitStashAction__self
 F35_cli_cli_cli__commands__git__execute --o T18_cli_cli_GitCommand__self
+F74_cli_cli_cli__commands__track__dispatch__dispatch_track_cmd_with_base_merge --o T20_cli_cli_TrackCommand__self
 class T28_domain_domain_BaseBranchName_try_new method_node
 class T28_domain_domain_BaseBranchName_as_str method_node
 class T28_domain_domain_BaseBranchName__self value_object
@@ -688,4 +690,6 @@ class T20_cli_cli_TrackCommand_items_dir method_node
 class T20_cli_cli_TrackCommand__self dto
 class F35_cli_cli_cli__commands__git__execute free_function
 class F35_cli_cli_cli__commands__git__execute function_node
+class F74_cli_cli_cli__commands__track__dispatch__dispatch_track_cmd_with_base_merge free_function
+class F74_cli_cli_cli__commands__track__dispatch__dispatch_track_cmd_with_base_merge function_node
 ```

@@ -3,6 +3,7 @@
 use std::fs;
 use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
 
 use super::{
     MAX_CLEANUP_FILE_BYTES, MAX_CLEANUP_TREE_BYTES, MAX_CLEANUP_TREE_DEPTH,
@@ -11,12 +12,11 @@ use super::{
 use crate::FsSymlinkGuard;
 use crate::tddd::baseline_rustdoc_codec::BaselineRustdocCodec;
 use crate::tddd::feature_declaration_adapter::FsTdddFeatureDeclarationAdapter;
-use crate::tddd::rustdoc_baseline_capture_adapter::RustdocBaselineCaptureAdapter;
 use crate::tddd::tddd_layer_bindings_adapter::FsTdddLayerBindingsAdapter;
 use crate::track::atomic_write::atomic_write_file;
 use crate::track::symlink_guard::{reject_symlinks_below, reject_symlinks_up_to_root};
 use domain::TrackId;
-use domain::tddd::catalogue_v2::TdddLayerBindingsPort;
+use domain::tddd::catalogue_v2::{RustdocBaselineCapturePort, TdddLayerBindingsPort};
 use usecase::base_merge::BaselineReplacementError;
 use usecase::baseline_capture::{
     BaselineCaptureInteractor, BaselineCaptureRequest, BaselineCaptureService,
@@ -64,14 +64,33 @@ pub(super) fn replace_tree(
 /// depth/entry limits. Missing paths are already in the desired state.
 pub(super) fn remove_tree_bounded(path: &Path, trusted_root: &Path) -> Result<(), String> {
     let mut budget = CleanupTraversalBudget::new();
-    remove_tree_at_depth(path, trusted_root, &mut budget, 0)
+    let mut snapshot = Vec::new();
+    collect_removal_snapshot(path, trusted_root, &mut budget, 0, &mut snapshot)?;
+    for entry in snapshot.into_iter().rev() {
+        remove_snapshot_entry(&entry, trusted_root)?;
+    }
+    Ok(())
 }
 
-fn remove_tree_at_depth(
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+enum RemovalEntryKind {
+    File,
+    Directory,
+    Symlink,
+}
+
+#[derive(Debug)]
+struct RemovalEntry {
+    path: PathBuf,
+    kind: RemovalEntryKind,
+}
+
+fn collect_removal_snapshot(
     path: &Path,
     trusted_root: &Path,
     budget: &mut CleanupTraversalBudget,
     depth: usize,
+    snapshot: &mut Vec<RemovalEntry>,
 ) -> Result<(), String> {
     budget.inspect_entry(path, depth)?;
     reject_symlinks_below(path, trusted_root)
@@ -81,21 +100,61 @@ fn remove_tree_at_depth(
         Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(()),
         Err(error) => return Err(format!("cannot inspect {}: {error}", path.display())),
     };
-    if metadata.file_type().is_symlink() || metadata.is_file() {
-        fs::remove_file(path)
-            .map_err(|error| format!("cannot remove {}: {error}", path.display()))?;
-        return Ok(());
-    }
-    if !metadata.is_dir() {
+    let kind = if metadata.file_type().is_symlink() {
+        RemovalEntryKind::Symlink
+    } else if metadata.is_file() {
+        if metadata.is_file() {
+            budget.file_limit(path, metadata.len())?;
+            budget.consume_file(path, metadata.len())?;
+        }
+        RemovalEntryKind::File
+    } else if metadata.is_dir() {
+        RemovalEntryKind::Directory
+    } else {
         return Err(format!("refusing non-regular removal target: {}", path.display()));
+    };
+    snapshot.push(RemovalEntry { path: path.to_path_buf(), kind });
+    if kind == RemovalEntryKind::Directory {
+        for entry in fs::read_dir(path).map_err(|error| {
+            format!("cannot enumerate removal target {}: {error}", path.display())
+        })? {
+            let entry =
+                entry.map_err(|error| format!("cannot enumerate removal target: {error}"))?;
+            collect_removal_snapshot(&entry.path(), trusted_root, budget, depth + 1, snapshot)?;
+        }
     }
-    for entry in fs::read_dir(path)
-        .map_err(|error| format!("cannot enumerate removal target {}: {error}", path.display()))?
-    {
-        let entry = entry.map_err(|error| format!("cannot enumerate removal target: {error}"))?;
-        remove_tree_at_depth(&entry.path(), trusted_root, budget, depth + 1)?;
+    Ok(())
+}
+
+fn remove_snapshot_entry(entry: &RemovalEntry, trusted_root: &Path) -> Result<(), String> {
+    let path = &entry.path;
+    reject_symlinks_below(path, trusted_root)
+        .map_err(|error| format!("cannot inspect removal target {}: {error}", path.display()))?;
+    let metadata = match fs::symlink_metadata(path) {
+        Ok(metadata) => metadata,
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(()),
+        Err(error) => return Err(format!("cannot inspect {}: {error}", path.display())),
+    };
+    let actual_kind = if metadata.file_type().is_symlink() {
+        RemovalEntryKind::Symlink
+    } else if metadata.is_file() {
+        RemovalEntryKind::File
+    } else if metadata.is_dir() {
+        RemovalEntryKind::Directory
+    } else {
+        return Err(format!("refusing non-regular removal target: {}", path.display()));
+    };
+    if actual_kind != entry.kind {
+        return Err(format!(
+            "removal target changed type during bounded cleanup: {}",
+            path.display()
+        ));
     }
-    fs::remove_dir(path).map_err(|error| format!("cannot remove {}: {error}", path.display()))
+    match actual_kind {
+        RemovalEntryKind::File | RemovalEntryKind::Symlink => fs::remove_file(path),
+        RemovalEntryKind::Directory => fs::remove_dir(path),
+    }
+    .map_err(|error| format!("cannot remove {}: {error}", path.display()))
 }
 
 #[derive(Debug)]
@@ -259,11 +318,12 @@ fn remove_baseline_files(track_dir: &Path) -> Result<(), String> {
 pub(super) fn capture_baselines_in_worktree(
     worktree: &Path,
     track_id: &str,
+    capture: Arc<dyn RustdocBaselineCapturePort>,
 ) -> Result<(), BaselineReplacementError> {
     let interactor = BaselineCaptureInteractor::new(
         std::sync::Arc::new(FsSymlinkGuard::new()),
         std::sync::Arc::new(FsTdddLayerBindingsAdapter::new()),
-        std::sync::Arc::new(RustdocBaselineCaptureAdapter::new()),
+        capture,
         std::sync::Arc::new(FsTdddFeatureDeclarationAdapter::new()),
     );
     interactor
@@ -334,6 +394,8 @@ fn sync_tree_at_depth(
     if !metadata.is_file() {
         return Err(format!("refusing non-regular staged baseline entry: {}", path.display()));
     }
+    budget.file_limit(path, metadata.len())?;
+    budget.consume_file(path, metadata.len())?;
     fs::File::open(path)
         .and_then(|file| file.sync_all())
         .map_err(|error| format!("cannot sync staged baseline file {}: {error}", path.display()))

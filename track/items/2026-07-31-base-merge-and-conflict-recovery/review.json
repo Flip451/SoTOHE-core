@@ -1,21 +1,35 @@
 {
   "schema_version": 2,
   "scopes": {
-    "cli_composition": {
+    "cli_driver": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1c15e00c9d57e3d1b6b7837e096db6b13217224842f46c7318b0141748f9dffc",
-          "at": "2026-08-01T09:10:15Z"
+          "hash": "rvw1:sha256:b88697ff93d0b7c96eb67320efde05617b09b66378eae3af512fc1c87dcae6fe",
+          "at": "2026-08-02T15:10:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b88697ff93d0b7c96eb67320efde05617b09b66378eae3af512fc1c87dcae6fe",
+          "at": "2026-08-02T15:23:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b88697ff93d0b7c96eb67320efde05617b09b66378eae3af512fc1c87dcae6fe",
+          "at": "2026-08-02T16:03:10Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1c15e00c9d57e3d1b6b7837e096db6b13217224842f46c7318b0141748f9dffc",
-          "at": "2026-08-01T09:15:53Z"
+          "hash": "rvw1:sha256:b88697ff93d0b7c96eb67320efde05617b09b66378eae3af512fc1c87dcae6fe",
+          "at": "2026-08-02T16:07:52Z"
         }
       ]
     },
@@ -64,6 +78,52 @@
           "findings": [],
           "hash": "rvw1:sha256:f4c5ceaf26616b5f9b7e182a23b788d2ca96c327cac272552ae124437b194a30",
           "at": "2026-08-01T09:36:03Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1c15e00c9d57e3d1b6b7837e096db6b13217224842f46c7318b0141748f9dffc",
+          "at": "2026-08-01T09:10:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1c15e00c9d57e3d1b6b7837e096db6b13217224842f46c7318b0141748f9dffc",
+          "at": "2026-08-01T09:15:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da102509466b2fe733307e2213cf6aca51a7accea2bad9deb422abc4df300705",
+          "at": "2026-08-02T15:10:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da102509466b2fe733307e2213cf6aca51a7accea2bad9deb422abc4df300705",
+          "at": "2026-08-02T15:23:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da102509466b2fe733307e2213cf6aca51a7accea2bad9deb422abc4df300705",
+          "at": "2026-08-02T15:58:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da102509466b2fe733307e2213cf6aca51a7accea2bad9deb422abc4df300705",
+          "at": "2026-08-02T16:01:19Z"
         }
       ]
     },
@@ -329,6 +389,929 @@
           "findings": [],
           "hash": "rvw1:sha256:7800fd895bf89456c54206de08aa9e76fef86688c473cb271014c0b4a24bfe5c",
           "at": "2026-08-02T10:23:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The newly added CLI bindings cite the removed test `test_track_command_merge_base_dispatches_snapshot_source_guard_failure_without_merge_success` at lines 162, 165, 166, and 169. The current test is `test_track_command_merge_base_dispatches_composition_root_guard_failure_without_merge_success`; update all affected bindings and refresh their verdicts.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 162,
+              "category": "missing-test-source"
+            },
+            {
+              "message": "The cleanup-adapter fulfillment and related existing edges now have stale frozen verdicts: the obligation check reports their bound test bodies changed since verdict freeze. Re-run host-owned evaluation; do not hand-edit verdict caches.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 151,
+              "category": "stale-verdict"
+            }
+          ],
+          "hash": "rvw1:sha256:6311123962732ad6f89c4a454025b83ee041df4543851f0367d7a8a32bbcb218",
+          "at": "2026-08-03T06:14:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `TrackCommand` bindings for AC-01 and AC-02 (lines 165–166) cite only `cli_driver::track::tests`. They omit the direct owning-layer CLI dispatch guard test `test_track_command_merge_base_dispatches_composition_root_guard_failure_without_merge_success`, which is already used for the same changed dispatch obligation. Add that CLI test to both command-level edges (retaining the driver tests where they cover the concrete guard details).",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 165,
+              "category": "insufficient-owning-layer-evidence"
+            }
+          ],
+          "hash": "rvw1:sha256:0c0c78afe7aedfc965ff4857b44d39fecb313eb739c14704bbf8bf7651cbd3d4",
+          "at": "2026-08-03T07:05:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5dd808d5f1b78efc3422129378e1129e53dab8aafb658541da21499b6c8b141d",
+          "at": "2026-08-03T07:13:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5dd808d5f1b78efc3422129378e1129e53dab8aafb658541da21499b6c8b141d",
+          "at": "2026-08-03T07:20:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5dd808d5f1b78efc3422129378e1129e53dab8aafb658541da21499b6c8b141d",
+          "at": "2026-08-03T08:05:11Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cb666be156be4e5a74c73e23d8220f63bb3db8b8a08be26761cbad58085b2412",
+          "at": "2026-07-31T22:47:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cb666be156be4e5a74c73e23d8220f63bb3db8b8a08be26761cbad58085b2412",
+          "at": "2026-07-31T22:50:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ccf80b721d965f8205f7454dbcd27c4ea12d2cfc166dd951f73cef9c2c11ea89",
+          "at": "2026-08-01T00:18:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ccf80b721d965f8205f7454dbcd27c4ea12d2cfc166dd951f73cef9c2c11ea89",
+          "at": "2026-08-01T00:21:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4b5cd74999751b16d7905643597f13b47efbfd4e85cba5d36ed91b5dac33d8d1",
+          "at": "2026-08-01T22:29:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4b5cd74999751b16d7905643597f13b47efbfd4e85cba5d36ed91b5dac33d8d1",
+          "at": "2026-08-01T22:32:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7bddfda3dd3200435c16ff2d56500f8c6dbb68984adf8d65dfff25502d5d34da",
+          "at": "2026-08-02T09:01:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7bddfda3dd3200435c16ff2d56500f8c6dbb68984adf8d65dfff25502d5d34da",
+          "at": "2026-08-02T10:16:16Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-06’s requirement that stash-pop “preserves the repository safety gates required for the restored worktree” does not identify which gates or observable checks establish compliance, leaving Phase 2/3 to invent the contract.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+              "line": 216,
+              "category": "acceptance criterion non-observable"
+            }
+          ],
+          "hash": "rvw1:sha256:d96c31dd688b8f7469f29f89ae0ebed068607ac107d385a51d8c936213fb97af",
+          "at": "2026-08-01T00:35:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d251b85b52d7071a8df8efebfa87e9383814697636ed8cdda82bb4009dfa5cee",
+          "at": "2026-08-01T00:38:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-06 contradicts IN-04 as written: a real `git stash` records stash commit objects and updates `refs/stash`, while a successful pop updates that ref again. Therefore stash/stash-pop cannot satisfy the blanket requirement to create no commit and update no ref. Clarify that branch history and branch refs must remain unchanged while permitting the stash-internal objects/ref required by D3.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+              "line": 216,
+              "category": "scope / acceptance_criteria contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d251b85b52d7071a8df8efebfa87e9383814697636ed8cdda82bb4009dfa5cee",
+          "at": "2026-08-01T00:41:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:99c34a083854c412260ecb88e8accdc3d671a36c78ab490dbb61a65cd3647484",
+          "at": "2026-08-01T00:44:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e5eb0df80593d31f3aabfdebd7984bbd743c1e8d5ed5d06b057148c3620c400d",
+          "at": "2026-08-01T00:46:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-04 requires post-merge cleanup after a conflict, while AC-12 and CN-07 explicitly prohibit clean-merge cleanup for conflict outcomes. The spec does not define whether AC-04 means the prohibited Views → Baseline → SyncBaseStamp sequence or a distinct recovery-only cleanup, leaving downstream implementation with contradictory behavior.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+              "line": 268,
+              "category": "scope / acceptance_criteria contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:cf55f964143a48775af8bb7867e30a610d65264264c0351727d92faefd7facc2",
+          "at": "2026-08-01T22:43:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-01 adds the requirement that cleanup use the exact merged base commit, but its cited decisions are the original ADR D1 and cleanup-state ADR D3. Those decisions establish cleanup and ordering, respectively; the exact-commit requirement is defined by cleanup-state ADR D1/D2, neither of which GO-01 cites. This leaves part of the goal unanchored to its cited decision set.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+              "line": 8,
+              "category": "goal not anchored to a decision"
+            }
+          ],
+          "hash": "rvw1:sha256:a57d774207e811b519ea738a4c88136676e307ff86d7882a22c19f035cdefe88",
+          "at": "2026-08-01T22:57:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d503c8c41ebe2072c29a376a70fcc3ff9bab869e78cd35d8e7c17a2d3e56d06f",
+          "at": "2026-08-01T23:08:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d503c8c41ebe2072c29a376a70fcc3ff9bab869e78cd35d8e7c17a2d3e56d06f",
+          "at": "2026-08-01T23:13:17Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2 stages the conflict resolution before verification/review, contradicting the canonical commit workflow’s required `implement → review → stage → commit` order. This can leave the review artifact unstaged and makes the recovery SSoT inconsistent with the guarded commit contract; defer staging to `/track:commit` or explicitly stage only after the final review.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 22,
+              "category": "responsibility-boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:750c5518ab89ef3cb947ebc55e2c3ed53d0ea2bcb5b545e5e0128bebd68789a7",
+          "at": "2026-08-02T15:10:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5de7355cfef51287379f9817e36512d2056ca39bb0830aa08f91f3dfda2296ad",
+          "at": "2026-08-02T15:12:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5de7355cfef51287379f9817e36512d2056ca39bb0830aa08f91f3dfda2296ad",
+          "at": "2026-08-02T15:23:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5de7355cfef51287379f9817e36512d2056ca39bb0830aa08f91f3dfda2296ad",
+          "at": "2026-08-02T16:09:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:commit` is invoked without a commit message, but its canonical workflow explicitly enters proposal-only mode and stops when the message is omitted. The guarded commit therefore never runs. Generate an explicit recovery commit message and pass it to the commit workflow.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 39,
+              "category": "command_wiring"
+            },
+            {
+              "message": "The workflow prohibits staging the resolved conflicts and claims the commit workflow owns staging, while `.harness/workflows/track/commit.md` requires a correct, non-empty staged diff during its pre-commit step and stops otherwise. Add guarded staging after final review and before invoking the commit workflow, or align the commit contract consistently.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 22,
+              "category": "command_wiring"
+            },
+            {
+              "message": "The Codex adapter categorically says not to create commits, contradicting the canonical recovery workflow's required guarded commit. Restrict the prohibition to direct Git operations and explicitly delegate commit creation to `$track-commit`.",
+              "severity": "P1",
+              "file": ".agents/skills/track-recover/SKILL.md",
+              "line": 13,
+              "category": "adapter_ssot_sync"
+            },
+            {
+              "message": "This authorizes the orchestrator to edit arbitrary conflicted track artifacts directly. Conflicts can include sole-writer artifacts such as `spec.json`, type catalogues, and implementation-plan files, or CLI-owned rendered views. Route those files through their designated writer/regeneration surfaces while the orchestrator coordinates recovery.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 22,
+              "category": "responsibility_boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:5de7355cfef51287379f9817e36512d2056ca39bb0830aa08f91f3dfda2296ad",
+          "at": "2026-08-02T16:18:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR conflicts are routed only through `adr-editor`, but every in-track ADR edit must also follow the lifecycle-specific guardian lane and be immediately judged or re-audited by `adr-diagnoser`. As written, recovery can proceed to review and commit after an unadjudicated ADR merge resolution. Route ADR conflicts through the complete two-box adjudication workflow.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 24,
+              "category": "responsibility_boundary"
+            },
+            {
+              "message": "The workflow does not order multiple conflicted SoT artifacts or reconverge an edited upstream phase before invoking its downstream writer. `.harness/policies/sot-reentry-sequencing.md` requires ADR → spec → catalogues → impl-plan descent, with the applicable signal, semantic-verification, and scoped-review convergence before each downstream restart. Specify that sequential re-entry instead of resolving all writers first and reviewing only afterward.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 23,
+              "category": "convention_contradiction"
+            },
+            {
+              "message": "The Codex adapter still categorically prohibits creating commits even though the canonical recovery workflow requires a guarded commit. A compliant Codex invocation must therefore block before completing recovery. Limit the prohibition to direct Git operations and explicitly delegate commit creation to `$track-commit`.",
+              "severity": "P1",
+              "file": ".agents/skills/track-recover/SKILL.md",
+              "line": 13,
+              "category": "adapter_ssot_sync"
+            }
+          ],
+          "hash": "rvw1:sha256:7ef5b988b2db67fc91aee5a8c8ebd6305cff15a9a0e92ffe752916ca888fdf53",
+          "at": "2026-08-02T16:29:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Codex adapter cannot execute its canonical workflow: recovery edits files, stages them, and creates a guarded commit, but this adapter omits the `workspace-write` requirement used by every other mutating track skill and categorically prohibits commit creation. Declare the required sandbox and prohibit only direct Git operations while delegating the guarded commit to `$track-commit`.",
+              "severity": "P1",
+              "file": ".agents/skills/track-recover/SKILL.md",
+              "line": 11,
+              "category": "adapter_ssot_sync"
+            },
+            {
+              "message": "Sequential reconvergence deadlocks when multiple SoT files are conflicted. The workflow keeps downstream writers halted until an upstream scoped review completes, but that review always runs `task-contract-check` and `track-active-gate`, which parse and refresh downstream spec/catalogue/plan artifacts. Conflict markers in any still-unresolved downstream JSON make those pre-gates fail before the upstream review can start. Define a sanctioned preliminary marker-resolution lane or a recovery-safe scoped review path before enforcing phase-by-phase reconvergence.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 25,
+              "category": "command_wiring"
+            }
+          ],
+          "hash": "rvw1:sha256:ae031aab073444e2c7f97a69f3ad646c00c966045f299e8bb86d9b93e0d0951b",
+          "at": "2026-08-02T16:33:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Codex adapter still cannot execute the canonical recovery workflow: recovery edits files, stages them, and creates a guarded commit, but the adapter omits the `workspace-write` requirement used by other mutating track skills and categorically prohibits commit creation. Declare the required sandbox and prohibit only direct Git operations while delegating the guarded commit to `$track-commit`.",
+              "severity": "P1",
+              "file": ".agents/skills/track-recover/SKILL.md",
+              "line": 11,
+              "category": "adapter_ssot_sync"
+            },
+            {
+              "message": "The preparation lane asks downstream writer capabilities to create parse-only preliminary artifacts before their upstream has reconverged. This directly contradicts `.harness/policies/sot-reentry-sequencing.md`, which requires a writer with an unmet prerequisite to return without editing, and the writer contracts expose no non-semantic marker-removal mode. Introduce a sanctioned recovery surface for preliminary conflict-marker removal or another executable route instead of bypassing writer prerequisites.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 27,
+              "category": "convention_contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:aa0404de0ff557ba898fea4c119738833d71410ba7badb1104041fedd4bd7541",
+          "at": "2026-08-02T16:36:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Multi-SoT conflicts still deadlock. Before an upstream scoped review can establish reconvergence, `track-local-review-fix` runs global `task-contract-check` and `track-active-gate` processing that parses downstream spec/catalogue/plan inputs. If one of those downstream files still contains conflict markers, the upstream review cannot start; yet this rule forbids preliminary marker removal and prohibits dispatching the downstream writer before upstream reconvergence. Provide a sanctioned recovery path that can make all pre-gate inputs parseable without treating downstream phases as reconverged.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 41,
+              "category": "command_wiring"
+            }
+          ],
+          "hash": "rvw1:sha256:88437192ad1ecd0d5df9bd8cd6ecb166c9d8a835a3eb77cf19a836e7c30eccb7",
+          "at": "2026-08-02T16:40:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This lane directly overwrites sole-writer SoT artifacts through a generic file utility. Atomicity does not transfer ownership: `CLAUDE.md` reserves spec, catalogues, and plan artifacts exclusively for their writer capabilities, and `sot-reentry-sequencing.md` permits no such marker-removal exception. Remove this orchestrator write path or establish a properly authorized recovery surface consistent with those ownership contracts.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 45,
+              "category": "responsibility_boundary"
+            },
+            {
+              "message": "Making downstream files syntactically parseable is insufficient to unblock an upstream scoped review. `track-local-review-fix` also runs `task-contract-check` and `track-active-gate`, including signal calculation, catalogue lint, and catalogue checks; a parseable but temporarily inconsistent hunk selection can still fail these gates. Because downstream writers remain halted until upstream reconvergence, recovery still has no route past such failures. Provide a recovery-safe scoped pre-gate or another path that handles structural and signal inconsistency, not only conflict markers.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 41,
+              "category": "command_wiring"
+            }
+          ],
+          "hash": "rvw1:sha256:11f570eb759efe965f15acb5c57e12a4d721b9003f6f39ed2975072517487e3e",
+          "at": "2026-08-02T16:46:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The workflow dispatches a `track-recover` capability that does not exist in `agent-profiles.json`, `.harness/capabilities/`, or the Claude agent surface. `track-recover` is only the command/skill currently executing this workflow, so Codex self-dispatches recursively while Claude has no dispatch target. Keep this lane in the current orchestrator or introduce a separately registered capability with both provider adapters.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 42,
+              "category": "capability_routing"
+            },
+            {
+              "message": "The preparation lane still gives a second writer authority over `spec.json`, catalogues, and plan artifacts through a generic atomic-file command. Declaring `track-recover` the lane owner does not override the repository's one-file/one-writer invariant or the re-entry policy's sole exception, and `file write-atomic` enforces neither artifact ownership nor allowed conflict-hunk content. Route these writes through their designated writers or formally change the governing ownership contract.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 46,
+              "category": "responsibility_boundary"
+            },
+            {
+              "message": "Syntactic and structural hunk selection still does not guarantee that the mandatory pre-review dependencies pass. `task-contract-check` and `track-active-gate` enforce catalogue attribution, liveness, signal, and catalogue consistency; a parseable selected version can remain Red or structurally inconsistent with non-conflicting upstream merge changes. Because the actual downstream writer remains halted, this lane has no recovery path when those semantic gates fail.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 49,
+              "category": "command_wiring"
+            }
+          ],
+          "hash": "rvw1:sha256:90ee0602854e06a411b8e311ce72fee69f4820a75b68c5e7d0ba315b3daed33e",
+          "at": "2026-08-02T16:49:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The operator handoff contradicts the governing recovery decision and ownership model. ADR D2 requires the orchestrator to complete conflict editing without handing it to the user, while `CLAUDE.md` reserves these SoT files to designated writers; calling this an “explicitly permitted” exception does not establish one in either policy. Route recovery through an authorized writer/recovery surface or formally amend the governing decision and ownership policy.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 44,
+              "category": "responsibility_boundary"
+            },
+            {
+              "message": "The Codex adapter now duplicates the workflow’s blocker recovery, operator handoff, edit limit, and downstream-writer state. The governing ADR and adapter/SSoT policy restrict adapters to provider invocation, tool constraints, and reporting; this behavior belongs only in the workflow SSoT and is also absent from the Claude adapter. Remove the duplicated recovery semantics from the skill.",
+              "severity": "P1",
+              "file": ".agents/skills/track-recover/SKILL.md",
+              "line": 18,
+              "category": "adapter_ssot_sync"
+            },
+            {
+              "message": "The operator is limited to syntactic and structural repair, but the mandatory pre-review dependencies require more than executability: `task-contract-check` enforces attribution/liveness and `track-active-gate` enforces signal and catalogue consistency. A parseable hunk selection can therefore still fail before the scoped reviewer launches, while the designated downstream writer remains halted and semantic repair is forbidden. Define a valid route for these non-parse gate failures.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 46,
+              "category": "command_wiring"
+            }
+          ],
+          "hash": "rvw1:sha256:71a130fc121562b728ef3cb72359671f908a67df56a0f7f31cdda77ecf6a346d",
+          "at": "2026-08-02T16:51:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The claimed “D2 conflict-edit exception” authorizes the orchestrator to edit sole-writer artifacts directly. D2 makes the orchestrator responsible for driving recovery, but does not override CLAUDE.md’s one-file/one-writer invariant; `.harness/policies/sot-reentry-sequencing.md` also says the only artifact-edit exception is an impl-plan task transition and requires a separate ADR for additional exceptions. Conflict hunks in ADR/spec/catalogue/plan artifacts must remain routed through their designated writers unless the governing policy is explicitly changed.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 44,
+              "category": "responsibility-boundary"
+            },
+            {
+              "message": "Limiting preparation to syntactic and structural executability does not make an upstream scoped review runnable. `track-local-review-fix` unconditionally runs `task-contract-check` and `track-active-gate`, whose attribution, signal, and catalogue checks can fail on semantically stale downstream artifacts. Because this workflow simultaneously forbids dispatching the downstream writer until upstream review converges, a merge conflicting in multiple SoT layers can deadlock. Recovery needs a sanctioned chain-limited review path or preparation capable of satisfying the actual pre-gates.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 46,
+              "category": "workflow-liveness"
+            },
+            {
+              "message": "The selective-staging path is not preserved by the referenced commit workflow. After `git add-from-file` excludes unrelated changes, `/track:commit` runs `cargo make track-commit-message`, whose first operation is `bin/sotp git add-all`; those excluded changes are therefore staged and committed. Use a commit surface that preserves the allowlist or remove the ineffective selective-staging promise.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 71,
+              "category": "command-wiring"
+            },
+            {
+              "message": "This provider-neutral workflow directly invokes the Claude-specific `/track:review` and `/track:commit` adapter surfaces. The paired Codex entry points use `$track-review`/`$track-commit`, so a Codex adapter following this SSoT cannot execute these instructions as written. Refer to the neutral review and commit workflows, leaving slash/skill invocation syntax in each provider adapter.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 58,
+              "category": "adapter-ssot"
+            }
+          ],
+          "hash": "rvw1:sha256:0b8f4eaed24edf61da0b5dcb26b50fbdd0c3e34f3674cb2792ae9883d7a980d9",
+          "at": "2026-08-02T16:56:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This new exception lets the orchestrator directly edit any SoT artifact, contradicting the current hard one-file/one-writer invariant in `CLAUDE.md` and, for ADR conflicts, `.harness/policies/pre-track-adr-authoring.md`, which requires `adr-editor` and explicitly forbids orchestrator edits. Selecting an existing conflict hunk still changes authoritative content. Route preparation through the designated writer or propagate an explicitly approved responsibility-model change across those governing contracts.",
+              "severity": "P1",
+              "file": ".harness/policies/sot-reentry-sequencing.md",
+              "line": 37,
+              "category": "responsibility-boundary"
+            },
+            {
+              "message": "This operational policy directly cites a date-identified ADR. `.harness/policies/pre-track-adr-authoring.md` explicitly includes policies/workflows among operational instruction documents and forbids references such as `knowledge/adr/YYYY-MM-DD-HHMM-slug.md`; the operational rule must be self-contained and use only a generic index reference for background.",
+              "severity": "P1",
+              "file": ".harness/policies/sot-reentry-sequencing.md",
+              "line": 37,
+              "category": "convention-contradiction"
+            },
+            {
+              "message": "The source-repair lane only promises that global pre-review inputs become executable/parseable, but the scoped-review wrapper requires `task-contract-check` and `track-active-gate` to exit successfully. Those gates can reject stale downstream attribution, signals, or catalogue structure even after conflict markers are removed. Because the workflow forbids dispatching that downstream writer until the upstream scoped review converges, a multi-layer SoT conflict can still deadlock. Provide a sanctioned chain-limited review path or a preparation lane capable of satisfying the actual pre-gates.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 43,
+              "category": "workflow-liveness"
+            },
+            {
+              "message": "The provider-neutral workflow now embeds both providers’ adapter invocation syntax (`/track:review`, `$track-review`, `/track:commit`, and `$track-commit`). The harness-policy adapter/SSoT rule requires provider-specific launch details to remain in the adapters; other workflow SSoTs refer to sub-workflows neutrally. Refer only to the canonical review and commit workflow contracts here and let each adapter choose its invocation surface.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 54,
+              "category": "adapter-ssot"
+            }
+          ],
+          "hash": "rvw1:sha256:8092670b2e298b51793e583c4921cf7ae70d2f7fac4dc7f548ebd292bdba6672",
+          "at": "2026-08-02T17:00:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The conflict exception authorizes the orchestrator to write spec, catalogue, and plan artifacts, but their capability SSoTs still declare exclusive ownership—for example, `impl-planner.md` says nothing else ever writes its four artifacts. Updating this policy and CLAUDE.md alone leaves contradictory runtime authority. Route hunk preparation through the designated writers or synchronize the exception across every affected capability contract.",
+              "severity": "P1",
+              "file": ".harness/policies/sot-reentry-sequencing.md",
+              "line": 37,
+              "category": "responsibility-boundary"
+            },
+            {
+              "message": "The ADR exception permits direct orchestrator hunk selection without an immediate `adr-diagnoser` verdict. The same policy still defines `adr-editor` as the writer, the orchestrator as dispatch-only, requires immediate diagnosis of ADR edits, and its checklist still rejects direct orchestrator editing. Since choosing an existing hunk can change which decision text survives, this bypasses the two-box guardian lane. Route the repair through editor/diagnoser or update the complete role and lifecycle contract.",
+              "severity": "P1",
+              "file": ".harness/policies/pre-track-adr-authoring.md",
+              "line": 23,
+              "category": "responsibility-boundary"
+            },
+            {
+              "message": "Sequential recovery can still deadlock on a conflict spanning multiple SoT layers. An upstream scoped review invokes `track-local-review-fix`, which unconditionally requires global task-contract and track-active gates to pass; those gates may require semantic downstream regeneration. The workflow forbids dispatching that downstream writer before upstream review converges and permits preparation only from existing hunks without adding meaning. A legitimate conflict needing generated attribution or catalogue repair therefore cannot start either side. Provide a sanctioned chain-limited review wrapper or preparation route that can satisfy the real pre-gates.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 43,
+              "category": "workflow-liveness"
+            },
+            {
+              "message": "The exception’s completion condition is inconsistent across the scoped SSoTs. CLAUDE.md and the ADR policy say to make gates merely executable, the sequencing policy ultimately requires them to pass, while the recovery workflow says both “until executable” and “make all pre-gates pass”; its Step 2 table only requires parseability. Providers can therefore disagree whether an executable-but-failing gate permits progression or requires fail-closed termination. Define one canonical pass condition and reference it consistently.",
+              "severity": "P1",
+              "file": "CLAUDE.md",
+              "line": 65,
+              "category": "state-transition-drift"
+            }
+          ],
+          "hash": "rvw1:sha256:e8ce3d62370d697666c1f2d9fec98d773d2d1b5f27f1101c8f61b80c2ac4a91c",
+          "at": "2026-08-03T00:54:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2 defines mutually exclusive preparation routes. Lines 41–44 require every affected designated writer to run `conflict-preparation` before ordered review, while lines 49–50 assign hunk selection to the orchestrator and explicitly forbid dispatching a downstream writer during preparation; the sequencing policy instead describes orchestrator-first with writer fallback. Consolidate these into one deterministic order.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 41,
+              "category": "state-transition-drift"
+            },
+            {
+              "message": "`conflict-preparation` is not wired as an executable capability branch. The sequencing policy still says a writer with an unconverged upstream returns without working, and spec-designer, type-designer, and impl-planner retain those unconditional prerequisites even though preparation is invoked before reconvergence. Their normal pipelines also mandate semantic authoring steps; type-designer explicitly forbids skipping its fixed pipeline, and impl-planner lacks permission to run the promised view regeneration. Define mode-specific prerequisites, pipeline, tools, and output contracts.",
+              "severity": "P1",
+              "file": ".harness/policies/sot-reentry-sequencing.md",
+              "line": 37,
+              "category": "capability-wiring"
+            },
+            {
+              "message": "Even a correctly dispatched preparation mode can only select existing hunks and regenerate derived artifacts. The global pre-review dependencies can require new cross-artifact attribution or other semantic reconciliation to pass, but normal downstream writers remain halted until the upstream scoped review converges, and that review cannot start until those global gates pass. A valid multi-SoT conflict can therefore still deadlock; provide a chain-limited review route or a sanctioned writer path capable of satisfying the actual pre-gates.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 42,
+              "category": "workflow-liveness"
+            },
+            {
+              "message": "The ADR exception still conflicts with this policy’s role model and checklist. Line 23 permits the orchestrator to edit an ADR hunk directly, while the role table reserves all edits for `adr-editor` and makes the orchestrator dispatch-only; the bad example and review checklist also continue to reject every direct orchestrator ADR edit. An immediate diagnoser verdict does not resolve the writer-ownership contradiction. Route preparation through `adr-editor` or update every role, example, and checklist statement with the same explicit exception.",
+              "severity": "P1",
+              "file": ".harness/policies/pre-track-adr-authoring.md",
+              "line": 23,
+              "category": "responsibility-boundary"
+            },
+            {
+              "message": "The preparation completion condition remains inconsistent. CLAUDE.md and parts of the workflow say gates need only become executable, the sequencing policy and workflow failure branch require them to pass, and the Step 2 gate table requires only parseability. Providers can therefore disagree whether an executable-but-failing gate permits progression or requires termination. Define one canonical condition and reference it consistently.",
+              "severity": "P1",
+              "file": "CLAUDE.md",
+              "line": 65,
+              "category": "gate-semantics"
+            }
+          ],
+          "hash": "rvw1:sha256:90a2117f6d105024e6471ef3fb8ea88a954fc87b3e30fbae26b14b7b66bb6944",
+          "at": "2026-08-03T01:03:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The recovery state machine fails closed when hunk-only preparation cannot satisfy every global pre-gate. A non-overlapping base change can invalidate task-contract or signal state without creating a conflict hunk in the affected artifact; conflict-preparation cannot repair it, while normal semantic re-entry is not reached. This breaks autonomous recovery for valid base merges. Permit ordered normal writer/implementer reconciliation of base-induced drift before requiring all global pre-gates to pass.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 48,
+              "category": "workflow_state_machine"
+            },
+            {
+              "message": "Conflict-preparation requires impl-planner to regenerate derived views, but its permission contract still allows only `verify plan-artifact-refs` and `batch-plan check`, while explicitly forbidding `plan.md`. A compliant planner therefore cannot execute the required view regeneration. Authorize `bin/sotp track views sync` and its generated side effects, or assign regeneration to another authorized surface.",
+              "severity": "P1",
+              "file": ".harness/capabilities/impl-planner.md",
+              "line": 114,
+              "category": "permission_contract"
+            },
+            {
+              "message": "This exception authorizes the orchestrator to edit ADR conflict hunks, contradicting adr-editor's operational SSoT claim that it performs every in-track ADR write and the recovery workflow's sole-writer prohibition. Hunk selection mutates the ADR, so the harness now defines two writers for the same file. Route preparation through adr-editor or consistently redefine the ownership boundary.",
+              "severity": "P1",
+              "file": ".harness/policies/pre-track-adr-authoring.md",
+              "line": 23,
+              "category": "responsibility_boundary"
+            },
+            {
+              "message": "CLAUDE.md is declared to be a pointer map, yet this line duplicates the conflict-preparation sequence, gate list, failure constraint, and re-entry rule from the sequencing policy and recovery workflow. This creates a second operational SSoT and can drift independently. Keep only the invariant and pointers to the canonical policy/workflow.",
+              "severity": "P1",
+              "file": "CLAUDE.md",
+              "line": 65,
+              "category": "ssot_duplication"
+            }
+          ],
+          "hash": "rvw1:sha256:02d79dcf901e0413c17932ee4b865a64616da8b645eb0f0b0fd5a863fdc34b3d",
+          "at": "2026-08-03T01:15:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new base-drift route requires a chain-limited review before global pre-gates, but the canonical single-scope review surface still invokes `track-local-review-fix`, whose unconditional dependencies are `task-contract-check` and `track-active-gate`. No sanctioned review surface bypassing those gates is defined, so this recovery branch cannot execute when either global gate is the blocker. Add an explicit guarded review route for this exception or change the gate ordering.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 49,
+              "category": "command_wiring"
+            },
+            {
+              "message": "`conflict-preparation` permits only existing-hunk resolution and derived regeneration, but the capability still declares its full 13-step semantic design pipeline mandatory with no skipped steps. Mandatory steps such as feature declaration and catalogue generation/annotation can write meaning outside the conflict hunks; running them violates the preparation boundary, while skipping them violates this pipeline contract. Define a separate preparation pipeline or explicitly exempt this mode from the normal 13-step pipeline.",
+              "severity": "P1",
+              "file": ".harness/capabilities/type-designer.md",
+              "line": 91,
+              "category": "mode_contract"
+            },
+            {
+              "message": "Although conflict-preparation now permits `bin/sotp track views sync`, the same ownership block still lists `plan.md` and every other non-owned track artifact as forbidden writes. `views sync` necessarily regenerates `plan.md` and other generated views, so the planner cannot follow the required command without violating its write boundary. Exempt CLI-generated view side effects, as the spec/type capability contracts do, or assign regeneration elsewhere.",
+              "severity": "P1",
+              "file": ".harness/capabilities/impl-planner.md",
+              "line": 107,
+              "category": "permission_contract"
+            }
+          ],
+          "hash": "rvw1:sha256:ed83d30eab564320ad6f7e7dd9952b31cc3fe591dc98bec9fff61e5ff8c9652b",
+          "at": "2026-08-03T01:23:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This now restricts adr-editor to “semantic authoring”, but trigger 3 still assigns non-semantic typo/reference-path fixes to it, and the policy forbids orchestrator ADR edits outside conflict preparation. This leaves ordinary non-semantic ADR fixes with contradictory ownership; retain adr-editor ownership for both semantic and non-semantic edits while documenting only the narrow conflict exception separately.",
+              "severity": "P1",
+              "file": ".harness/capabilities/adr-editor.md",
+              "line": 16,
+              "category": "responsibility_boundary"
+            },
+            {
+              "message": "The purported chain-limited route only runs `ref-verify run`, which evaluates both chains, and never reads `ref-verify results --chain <affected-chain>`. This contradicts the sequencing policy that unrelated-chain findings or stale-artifact enumeration failures must not block upstream convergence, so recovery can recreate the deadlock this exception is meant to resolve. Add the chain-scoped result check and prescribed abort handling.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 57,
+              "category": "command_wiring"
+            },
+            {
+              "message": "Calling the inner `review local` command directly bypasses `adr-baseline check-review`, which the canonical review workflow requires before every reviewer dispatch and which the Makefile wrapper explicitly delegates to that workflow. The D2 route can therefore record a scoped—including ADR—verdict without validating the init ledger and stored copies. Run `bin/sotp adr-baseline check-review --track-id <id>` before this raw review invocation; it is independent of the intentionally bypassed global pre-gates.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 58,
+              "category": "review_gate_bypass"
+            }
+          ],
+          "hash": "rvw1:sha256:8cdaf718a3fad45b53cf1b120c9f4b345d06d04e054aae23de674edbfb5aa8f6",
+          "at": "2026-08-03T01:40:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The D2-only route invokes `review local` with `tmp/reviewer-runtime/briefing-<affected-scope>.md` but never performs the canonical review workflow's Step 3 that creates or refreshes this ephemeral file. A fresh recovery session therefore fails when the file is absent, while an existing pre-merge file can supply stale design intent and review constraints. Build the affected-scope briefing from the current post-merge SoT using the canonical Step 3 contract before this direct invocation.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 61,
+              "category": "command_wiring"
+            }
+          ],
+          "hash": "rvw1:sha256:ed58baf7f102697d38d51d0339efdb4969b8fe801d93f46ff79ae8d6980597ff",
+          "at": "2026-08-03T01:44:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca79f3623a6a76a8d4961481c444d472e8b131cdd5795038dde80b117ad7f7d7",
+          "at": "2026-08-03T01:50:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The recovery SSoT now dispatches `adr-editor` in `conflict-preparation` mode, but the capability's Invocation contract does not define that trigger/mode (and still says it has four triggers). This leaves ADR conflict preparation outside the capability contract and makes the dispatch wiring ambiguous.",
+              "severity": "P1",
+              "file": ".harness/capabilities/adr-editor.md",
+              "line": 31,
+              "category": "command-wiring"
+            }
+          ],
+          "hash": "rvw1:sha256:8f7ad5b5e50e121853d7434a80bab3d8ccf17388115cd4ed757ed8580ceee94b",
+          "at": "2026-08-03T07:40:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The recovery workflow says to dispatch `adr-editor` for every ADR conflict, but the capability contract permits `conflict-preparation` only when existing-hunk selection still leaves the required pre-gates unparseable, and normal mode requires upstream re-convergence. Because the workflow does not condition this dispatch on that gate or specify the mode, it can launch an unauthorized normal ADR edit during a conflict; align the dispatch with the conditional `conflict-preparation` route.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 31,
+              "category": "command-wiring"
+            }
+          ],
+          "hash": "rvw1:sha256:a8b600915a7a423b28d185acfe2112d3218fbd90409ff8e4177889aa35da0ab6",
+          "at": "2026-08-03T07:42:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The D2 chain-limited review command omits the required `--track-id <id>` argument. `bin/sotp review local` requires track id, round type, and group, so this recovery route fails at argument parsing instead of running the scoped review.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 70,
+              "category": "command-wiring"
+            }
+          ],
+          "hash": "rvw1:sha256:e54e54021a3051761945adacf256add02f0140cb9a15cf1182199c9aabc3cc51",
+          "at": "2026-08-03T07:45:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `conflict-preparation` mode permits resolving existing `*-types.json` conflict hunks, but the capability’s Rules still restrict `Edit` on those files to `$todo`/post-generation annotation only. In the intended conflict path, the type-designer is therefore instructed both to resolve hunks and not to edit them; add an explicit conflict-preparation exception to the Rule.",
+              "severity": "P1",
+              "file": ".harness/capabilities/type-designer.md",
+              "line": 484,
+              "category": "responsibility-boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:6ead71fe5b1df003d258f9275b5f9861d97991673ac6c941816d0f3874fe565b",
+          "at": "2026-08-03T07:48:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The workflow requires `adr-diagnoser` only in the branch that dispatches `adr-editor`, but the permitted direct orchestrator hunk-selection path can resolve an ADR conflict before that dispatch. The governing ADR policy requires an immediate diagnoser verdict whenever an ADR is touched, so this path can bypass the guardian; make the verdict unconditional for every ADR hunk edit.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 34,
+              "category": "responsibility-boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:2b232e21b5fe1cf24ccbfefb1ab280083b39caffcfe866dd308db9d79fc466a7",
+          "at": "2026-08-03T07:50:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The recovery workflow’s `conflict-preparation` dispatch tells the orchestrator to provide only the affected path, existing hunks, and no-new-meaning instruction, but `adr-editor`’s invocation contract also requires the originating input verbatim, resolved `merge_target`, and the explicit working-tree-only/no-commit/no-snapshot instruction. The recovery dispatch is therefore incomplete and cannot reliably satisfy the editor contract.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 33,
+              "category": "command-wiring"
+            }
+          ],
+          "hash": "rvw1:sha256:bc48ee71d9ef575a6c58d0332b2c24bd27e4db4e87c88c8496592929e8ca1a7c",
+          "at": "2026-08-03T07:52:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:584b967e3d83eaa521710470dbd08053093e1d3689b25e0087bd4acce7f32b15",
+          "at": "2026-08-03T07:54:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The provider-neutral workflow hard-codes the Claude-style `/track:review` invocation and later `/track:commit` (line 104), while the Codex adapter requires `$track-review` and `$track-commit`. This leaks provider-specific invocation details into the workflow SSoT and can route Codex recovery through the wrong surface; leave the invocation spelling entirely to each adapter.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 90,
+              "category": "adapter-SSoT consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:584b967e3d83eaa521710470dbd08053093e1d3689b25e0087bd4acce7f32b15",
+          "at": "2026-08-03T08:01:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a429f14b9d5cc0b62fbd3a6391cbc848a1049dd772fdd99dfecf9cad7f7aa9f6",
+          "at": "2026-08-03T08:20:02Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cb8f9ae379b18b9e407779476218192f29de916f40bd4250d6cd301226c01fab",
+          "at": "2026-08-02T15:10:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The CLI guard-path test bypasses the production composition-root/driver path by constructing `BaseMergeInteractor` directly inside the dispatch test closure. It can pass even if `TrackCompositionRoot::new().track_driver().handle_base_merge(...)` is wired incorrectly, so the required CLI boundary coverage is incomplete.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/dispatch.rs",
+              "line": 314,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:cb8f9ae379b18b9e407779476218192f29de916f40bd4250d6cd301226c01fab",
+          "at": "2026-08-02T15:23:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0e47fb7460d0fc2c6f29acd62cf9a3e425e7d8144bce813d08f6dd3ebd669198",
+          "at": "2026-08-02T15:32:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0e47fb7460d0fc2c6f29acd62cf9a3e425e7d8144bce813d08f6dd3ebd669198",
+          "at": "2026-08-02T15:45:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The recovery conformance test only includes and validates the Claude adapter. AC-05 requires `/track:recover` and `$track-recover` to ship together, so `.agents/skills/track-recover/SKILL.md` could be missing or diverge from the canonical workflow while this test remains green. Include the Codex adapter and validate its canonical-workflow reference and provider-only constraints too.",
+              "severity": "P1",
+              "file": "apps/cli/tests/operational_reference_cutover.rs",
+              "line": 183,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:0e47fb7460d0fc2c6f29acd62cf9a3e425e7d8144bce813d08f6dd3ebd669198",
+          "at": "2026-08-02T15:51:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7c6c4daaa6456362ed1be814e82f1066aa90be8ed0e5e59e63e09e154738382c",
+          "at": "2026-08-02T15:56:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e9e0c8d3fcf1398df0bf793da04d082fa87f36e56fcf5161a5a8d7c3882ae8b",
+          "at": "2026-08-03T08:08:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e9e0c8d3fcf1398df0bf793da04d082fa87f36e56fcf5161a5a8d7c3882ae8b",
+          "at": "2026-08-03T08:12:08Z"
         }
       ]
     },
@@ -861,6 +1844,34 @@
           "findings": [],
           "hash": "rvw1:sha256:f0d0b9f051152d2b496a642bf9573550b241939d86147f45a6f5d21b8ed698d5",
           "at": "2026-08-02T06:29:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d78a764266916964d8983e8cd1a42c8f46b10546eab8fb2a6f1e6803fb24a28b",
+          "at": "2026-08-02T15:10:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d78a764266916964d8983e8cd1a42c8f46b10546eab8fb2a6f1e6803fb24a28b",
+          "at": "2026-08-02T15:23:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7efdac2ed4da15197444f091980a7ad2842d84635be2a3ab9b0f2d28299c8612",
+          "at": "2026-08-03T07:21:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7efdac2ed4da15197444f091980a7ad2842d84635be2a3ab9b0f2d28299c8612",
+          "at": "2026-08-03T07:26:27Z"
         }
       ]
     },
@@ -914,6 +1925,1011 @@
           "findings": [],
           "hash": "rvw1:sha256:cb333325ceeb1c35ab125d7cddd3fb82de2113433f49d6e699aaa96703fd45a4",
           "at": "2026-08-02T10:19:15Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4876ba1335b4aabaffe489b2eb447c815ca5d90938fd3fc8b06499b992ddab44",
+          "at": "2026-08-01T09:11:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The cache-hit path does not revalidate its input snapshot. Catalogue and baseline bytes are read before the potentially slow toolchain/source hash; if either changes during hashing, `current_key` can still match the old cache and this early return accepts stale signals. Re-read and compare all three authoritative inputs before returning `SkipEvaluation`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 181,
+              "category": "cache_freshness"
+            },
+            {
+              "message": "`ReevaluateWithoutExtraction` trusts any valid JSON at the shared Cargo rustdoc output path. That file is not bound to the recorded implementation hash or feature selection and may have been overwritten by another rustdoc or baseline-capture run. Source revalidation cannot prove the loaded JSON came from those sources, so incorrect signals can be persisted under a current three-hash key. Re-extract or validate a keyed rustdoc artifact before reuse.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 183,
+              "category": "io_boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:4876ba1335b4aabaffe489b2eb447c815ca5d90938fd3fc8b06499b992ddab44",
+          "at": "2026-08-01T09:24:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Revalidation checks the catalogue before the potentially slow second implementation/toolchain hash. If the catalogue changes while `hash_workspace_inputs` runs, its old declaration hash has already been accepted and no later catalogue read occurs, so a cache hit can return success—or evaluation can persist signals—using stale catalogue data. Compute the implementation hash before re-reading catalogue and baseline, or compare against a stable second full cache key.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/inputs.rs",
+              "line": 94,
+              "category": "cache_freshness"
+            }
+          ],
+          "hash": "rvw1:sha256:5b62c9c40aa3c35f8facba170b283a5746fb437bde807617470e00df344da37a",
+          "at": "2026-08-01T09:41:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The evaluator erases its failure stage into a string-only `EvaluateSignalsError`, so this adapter reconstructs `TypeSignalsExecutionError` by matching message prefixes. Errors outside the hard-coded prefixes are silently misclassified as `AuthoritativeInput`; for example, the evaluator creates `cannot create timestamp` as an evaluation error, but this branch maps it to `AuthoritativeInput`. Preserve the stage in a typed error and match its variants directly.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_executor_adapter.rs",
+              "line": 227,
+              "category": "error_classification"
+            }
+          ],
+          "hash": "rvw1:sha256:f25ee3287a51103a2974fafa9fc5c41bd218a3716bced8ccb1282d83726c16d3",
+          "at": "2026-08-01T09:52:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2345460ac1f9a1faf2b3ac12867fbc334277f1bc51b394b88cefc9b74d6c780f",
+          "at": "2026-08-01T11:45:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`architecture-rules.json` is checked with `is_file()` and then copied without rejecting a symlink. This allows the cleanup worktree to consume a file outside the trusted workspace, violating the infrastructure symlink boundary and potentially changing baseline-generation inputs. Use `symlink_metadata`/`reject_symlinks_below` before reading or copying.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 280,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "The sync-base stamp path itself is not checked for symlinks; `path.is_file()` and `read_to_string` follow an existing `.sync-base.json` symlink. The adapter should reject the leaf path before reading, consistent with the repository's real-file boundary convention.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 520,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "Baseline publication only moves/replaces files present in the newly generated replacement. Older `*-types-baseline.json` files whose bindings were removed remain in the active track, so the published state is not a complete replacement and can retain stale authoritative baseline artifacts.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 432,
+              "category": "adapter correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9f66b851d4b8457d87fb87c9ae3569fc3c92ef358b50f820504d6731fe15733f",
+          "at": "2026-08-02T09:01:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Baseline publication is not atomic as a complete replacement: it first renames every existing baseline away and then renames generated files into the live track one by one. Readers can observe a state with no baselines or only a subset of the new baselines between lines 445–485, contrary to the requirement that no partial replacement be exposed. Publish a complete staged directory atomically or otherwise provide an atomic visibility boundary.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 444,
+              "category": "adapter correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:0ac5e87c8fa4b7da78aa25bc260c69dc821003534e6af2db0422ed892aead346",
+          "at": "2026-08-02T09:24:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The adapter resolves `base_commit` and then merges the mutable source branch name in a separate Git invocation. If the source branch advances between those calls, the merge incorporates a different commit while the cleanup request records the earlier hash, violating exact-commit identity. Merge the resolved commit object or revalidate the resolved commit after the merge before reporting `Clean`.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 104,
+              "category": "exact commit identity"
+            },
+            {
+              "message": "`copy_cleanup_inputs` copies the current track into a worktree whose `track/items/<id>` directory may already contain files from the pinned base commit, but `copy_tree` only creates/overwrites source entries and never clears destination-only entries. Those stale base-commit files are then copied into the replacement and published over the active track, so the replacement is not an exact copy of the current cleanup inputs.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 299,
+              "category": "adapter correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c474a0245c2084acaf92860d177ee86626383e82553b6109026a31950eee92d2",
+          "at": "2026-08-02T09:31:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`copy_tree` validates symlinks only in the source tree. Existing destination components in the commit-pinned worktree are not checked, so a symlink from the base commit at `target_workspace/track/items/<id>` or below can be followed by `create_dir_all`/`fs::copy`, writing cleanup inputs outside the isolated worktree. Reject or safely replace destination symlinks before copying.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 303,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "`copy_tree` overlays the current track onto the already-populated pinned worktree without removing destination-only files. Files present in the base commit's track directory but absent from the current active track survive into the replacement and are atomically published, so the replacement can contain stale base-commit artifacts.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 299,
+              "category": "adapter correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:2c77c18094c380b00098d7214b6806270d5cbba0f89986b3f247a305e7c162b1",
+          "at": "2026-08-02T09:36:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The cleanup paths treat `track/items` as a trusted root without validating the root itself. `reject_symlinks_below` stops before its `trusted_root`, so a symlinked `track/items` can redirect baseline replacement and sync-stamp I/O outside the repository. Reject the trusted root (and its ancestors) before using it.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 169,
+              "category": "trusted-root violation"
+            },
+            {
+              "message": "The destination of the `architecture-rules.json` copy is not checked for symlinks. If the pinned worktree contains a symlink at that path, `fs::copy` follows it and can write outside the isolated worktree. Apply the destination symlink guard before copying.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 295,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "`remove_commit_pinned_worktree` suppresses failures from both spawning Git and collecting its output, while the cleanup operation can still return success. A failed removal can leave a registered/stale worktree and is an unpropagated infrastructure I/O failure; return it as a typed baseline isolation/cleanup error.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 268,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:c102570008a86d96599edeaf7eea7e42f395b92e36d923655a8305b96b1b6ca5",
+          "at": "2026-08-02T09:42:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "When directory exchange succeeds but cleanup of the old track fails, `publish_baseline_replacements` returns an error while leaving `replacement` as the recoverable prior track. The caller then unconditionally `remove_dir_all(&replacement)` whenever `result.is_err()`, deleting the only rollback copy and potentially destroying the prior valid baseline/track state. Preserve the replacement directory for post-exchange publish errors.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 228,
+              "category": "rollback/restoration"
+            }
+          ],
+          "hash": "rvw1:sha256:cfc974d0ee61022f198257728eebf2bb28bd0434b8a46ecc7021a27e1eb99fe5",
+          "at": "2026-08-02T09:53:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:deffe6c447c953240d350f6748a331421c1bda1a8d0f8da75bbd575e2116b5b3",
+          "at": "2026-08-02T09:59:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The bounded runner can return an error after `git merge` has already changed HEAD—for example when a large merge's diffstat exceeds the 8 KiB output limit or a post-merge hook exceeds the deadline. `merge_base` immediately maps that error to `BaseMergeGitError`, so the caller skips baseline regeneration and the sync stamp even though the base commit may already be incorporated. Suppress large output and re-adjudicate HEAD/MERGE_HEAD and conflict state after runner errors.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 105,
+              "category": "adapter correctness"
+            },
+            {
+              "message": "Baseline publication is not crash-durable: staged files are created with `fs::copy` without syncing them, and the `RENAME_EXCHANGE` is not followed by `sync_all` on `track_parent`. A power loss can therefore leave the later sync stamp durable while the baseline data or directory exchange is not. Sync staged files/directories and the parent around publication before reporting success.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 514,
+              "category": "crash consistency"
+            },
+            {
+              "message": "`collect_validated_baselines` directly calls `fs::read` without first rejecting a symlink at the generated baseline path. This follows a path that a build step or concurrent actor can redirect outside the pinned worktree, violating the crate's real-file boundary convention. Apply `reject_symlinks_below` plus an explicit `symlink_metadata().file_type().is_symlink()` rejection before reading.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 470,
+              "category": "symlink safety"
+            },
+            {
+              "message": "Cleanup failures are silently discarded: failed `remove_dir_all` calls are ignored, and `result?` returns before a simultaneous `remove_commit_pinned_worktree` failure is propagated. Generation or validation failures can consequently leave a registered worktree or a partial replacement containing track data while reporting only the original error. Combine and propagate cleanup/restoration failures through a typed error.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 229,
+              "category": "error handling"
+            },
+            {
+              "message": "The cleanup I/O is unbounded. `copy_tree` recursively traverses every track entry without depth, entry, or byte limits and passes every non-directory/non-symlink object to `fs::copy`, so a FIFO can block indefinitely; baseline and existing-stamp contents are also read wholly at lines 470 and 574. Reject non-regular entries and enforce traversal and read-size bounds.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 367,
+              "category": "unbounded I/O"
+            },
+            {
+              "message": "The new module contains 814 production lines before its `#[cfg(test)]` block, exceeding the configured 700-line maximum. `bin/sotp verify module-size` fails on this file, so the change cannot pass the repository gate. Split the cleanup, Git adapters, and sync-record codec into smaller modules.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 815,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:deffe6c447c953240d350f6748a331421c1bda1a8d0f8da75bbd575e2116b5b3",
+          "at": "2026-08-02T10:13:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The same 16 MiB limit is used for both each file and the entire staged tree. The current track's six baselines total 49,609,933 bytes, and `usecase-types-baseline.json` alone is 17,586,101 bytes. Validation at line 253 therefore rejects a real generated baseline, while replacement copying would also exhaust the aggregate budget. Clean-merge cleanup cannot complete; use separate realistic per-file and aggregate bounds.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/base_merge/cleanup_tree.rs",
+              "line": 79,
+              "category": "adapter correctness"
+            },
+            {
+              "message": "`has_unmerged_paths` asks Git to emit every conflicted filename through the 8 KiB bounded-output collector. A merge with enough conflicts makes this inspection itself fail, returning `BaseMergeGitError` instead of `Conflicted`, so canonical recovery is not entered. Use a quiet/status-only Git check and interpret its exit code without collecting path output.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 943,
+              "category": "conflict handling"
+            },
+            {
+              "message": "The entry budget is charged only after the baseline-name filter. Files ending in `-types-baseline.json` are skipped without decrementing `entries_remaining`, so an externally populated track directory can make this `read_dir` loop and subsequent cleanup traverse an unbounded number of entries despite `MAX_CLEANUP_TREE_ENTRIES`. Charge every directory entry before filtering.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge/cleanup_tree.rs",
+              "line": 153,
+              "category": "unbounded I/O"
+            }
+          ],
+          "hash": "rvw1:sha256:182c00a047a2ecbb83b0c8eb500ef8b4b2b0008a77f8830b3b780d93a28a0a18",
+          "at": "2026-08-02T10:50:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`replace_tree` calls `remove_dir_all` on the existing destination before applying any traversal budget. During `copy_cleanup_inputs`, that destination is the track directory checked out from the base commit, so a repository can trigger an unbounded recursive filesystem walk despite the adapter's entry/depth limits and potentially hang cleanup. Delete through a bounded walker or fail while leaving the worktree for recovery.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge/cleanup_tree.rs",
+              "line": 62,
+              "category": "unbounded I/O"
+            }
+          ],
+          "hash": "rvw1:sha256:19fa117b0ac212dccdc359e40a94209b793ebb3457b8661ec7b542ade830abde",
+          "at": "2026-08-02T11:00:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9ebfb6817f420fe3001cfa8363255cf2e85cf802e739c72d38a262f56d48a8bd",
+          "at": "2026-08-02T11:09:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3696350ce05bbeb668007a5e8ec8818afcbac50cb858db3ff2de18c256044e67",
+          "at": "2026-08-02T15:24:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3696350ce05bbeb668007a5e8ec8818afcbac50cb858db3ff2de18c256044e67",
+          "at": "2026-08-03T01:52:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "After the atomic exchange, `replacement` contains the complete prior track, but it is deleted before the final fallible parent-directory sync. A partial deletion or final sync failure therefore returns `Publish` after changing the authoritative baseline and potentially destroying the recoverable prior state. The earlier post-exchange sync failure likewise returns without restoring it. This violates CN-05/D1's preserve-or-restore-on-failure contract; retain the backup or restore it, surfacing `Restoration` if rollback fails.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 426,
+              "category": "state_consistency"
+            },
+            {
+              "message": "`nightly_toolchain_available` makes both end-to-end cleanup tests silently pass without assertions when nightly is unavailable. Because the repository's CI container lacks nightly, the exact-commit publication path and post-publication SyncBase failure path are not exercised there. Add a nightly CI lane or inject baseline capture so these tests always execute.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 810,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:3696350ce05bbeb668007a5e8ec8818afcbac50cb858db3ff2de18c256044e67",
+          "at": "2026-08-03T02:08:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The exchanged-out track is retained indefinitely as `.sotp-baseline-replacement-*` under `track/items`. Track snapshot collection enumerates every directory there and requires its directory name to match `metadata.json#id`; this backup contains the original track ID, so the next view regeneration fails on an ID mismatch. Direct retries can also accumulate unbounded full-track backups. Store a bounded recovery copy outside the enumerated items directory or restore/clean it safely.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 424,
+              "category": "filesystem_state"
+            },
+            {
+              "message": "After `RENAME_EXCHANGE` succeeds, a parent-directory sync failure returns `Publish` without exchanging the prior track back into the authoritative path. Keeping the old tree as a sibling preserves bytes for manual recovery but does not satisfy the required restoration path; the active baseline changed despite the baseline stage reporting failure, and production code never emits `BaselineReplacementError::Restoration`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 417,
+              "category": "state_consistency"
+            },
+            {
+              "message": "`nightly_toolchain_available` causes both end-to-end cleanup tests to return successfully without assertions when nightly is unavailable. The CI container lacks nightly, so exact-commit baseline publication and post-publication SyncBase failure are not exercised. Provide a nightly CI lane or inject baseline capture so these tests always run.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 802,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:9fa53d415b8d46bd80a01a53d5328fc43d40b6c58606683dc23dc87f86d4a269",
+          "at": "2026-08-03T02:20:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The production portion of `base_merge.rs` is 826 lines, exceeding the repository’s 700-line maximum for production modules. Extract the recovery/publication logic (or otherwise reduce the production module below the limit).",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 1,
+              "category": "module_size"
+            }
+          ],
+          "hash": "rvw1:sha256:2f73b77d718e639e39f7160cbc672b68f828d4cf26d75f3dfa97a1f8d009f723",
+          "at": "2026-08-03T02:47:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "After exchanging the active track and moving the prior track to `recovery_path`, failure to open `recovery_parent` returns directly as `Publish` without calling `restore_after_baseline_exchange`. A cleanup-stage failure therefore leaves the new track published instead of restoring the prior state; route this error through the restoration path with `Some(&recovery_path)`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 131,
+              "category": "failure_restoration"
+            }
+          ],
+          "hash": "rvw1:sha256:05779589da6269bf1984130dcd11df59a398e86725cc71c39f5e2e85d0cfafe2",
+          "at": "2026-08-03T02:51:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4b02509932a33f9bd5cad095ff1ce097290fc833085601688a050de27d597a03",
+          "at": "2026-08-03T02:53:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This cross-directory rename mutates both `track/items` and `track`, but the success path only fsyncs the destination (`track`). The source-directory removal is therefore not durable; after a crash, the replacement entry can reappear under `track/items` and be interpreted as an invalid track. Fsync both directories after forward and restoration renames.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 117,
+              "category": "durability"
+            },
+            {
+              "message": "Every successful publication allocates a new full-track recovery path, but no success path prunes or reuses prior recovery copies. These directories are also not gitignored, so normal cleanup leaves the worktree dirty and repeated merges consume unbounded disk despite the bounded-resource contract. Use a bounded recovery slot/lifecycle and remove it after it is no longer needed.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 69,
+              "category": "resource_bounds"
+            },
+            {
+              "message": "The new post-exchange restoration implementation has no test that exercises an actual restore or restoration failure. Existing failure coverage stops before the exchange, while the `Restoration` test merely constructs the error enum. Add fault-injected coverage for sync/move failures after exchange, successful rollback, and rollback failure.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 165,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:4b02509932a33f9bd5cad095ff1ce097290fc833085601688a050de27d597a03",
+          "at": "2026-08-03T03:00:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The idempotent same-commit path returns before pruning recovery copies. If a prior write successfully publishes `.sync-base.json` but `prune_recovery_copies` then fails, retrying the same request returns `Ok(())` at line 428 and permanently skips the required recovery cleanup; the same issue occurs whenever stale recovery copies accompany an already-matching stamp.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 428,
+              "category": "idempotence_cleanup"
+            }
+          ],
+          "hash": "rvw1:sha256:4b630b2a98121e4cbf802f72214dfc3fa7b2063ddfa46ebadb1cf0a080e8e01f",
+          "at": "2026-08-03T03:06:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ccc645debbf0b63a4ac914060e3c8f17557ecda890d863ce76c220862823b4c1",
+          "at": "2026-08-03T03:09:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Recovery ownership is determined with `starts_with(prefix)`, but valid track IDs can overlap: the prefix for `foo` also matches recovery copies belonging to `foo-bar`. Publishing or stamping `foo` can therefore delete `foo-bar`'s only recovery copy. Use an unambiguous per-track directory or exact encoded-owner comparison.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 209,
+              "category": "data_loss"
+            },
+            {
+              "message": "After moving the prior track across directories, the source directory (`track/items`) is fsynced before the destination (`track`). A crash between these fsyncs can persist the source removal without persisting the recovery entry, losing the recoverable prior track. The rollback path repeats this ordering. Persist the destination first, then the source, or avoid the cross-directory move.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 145,
+              "category": "durability"
+            },
+            {
+              "message": "The exchange is made durable while the prior track still occupies the replacement directory under `track/items`, and pruning runs before that directory is moved to recovery storage. A crash in this window leaves the replacement visible as another active-track directory; subsequent view regeneration enumerates it and fails on its mismatched metadata identity. Exchange directly with storage outside `track/items` or otherwise make this transition crash-atomic.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 103,
+              "category": "crash_consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:ccc645debbf0b63a4ac914060e3c8f17557ecda890d863ce76c220862823b4c1",
+          "at": "2026-08-03T03:19:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The SyncBase path deletes `recovery_root/<track_id>` without rejecting symlinks on `recovery_root` itself. `remove_recovery_copy` uses `remove_tree_bounded` with `recovery_root` as the trusted root, but `reject_symlinks_below` stops at that syntactic root; if `track/.sotp-baseline-recovery` is a symlink, the path can resolve outside the workspace and recursively delete an attacker-selected tree. Validate the recovery root with the up-to-root/symlink guard before removal.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 469,
+              "category": "symlink_not_rejected_at_boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:bc128e365c7f155e22fd4f09a24f605e9980a349193fe50b7389a83030a4d4b1",
+          "at": "2026-08-03T03:27:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f79db7de5bee7e724afdce89eb6a4bae180b4a1415dbdf902abd516f0fa7b05e",
+          "at": "2026-08-03T03:30:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "During rollback the prior track moves from the recovery slot back into the active directory, but this chain fsyncs the recovery directory—now containing the staged candidate—before the active directory. A crash or active-directory fsync failure between these calls can replace the durable backup without durably restoring the active entry, losing the prior track. Rollback must fsync the active destination before the recovery source.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 144,
+              "category": "durability"
+            },
+            {
+              "message": "Recovery validation and removal occur only after `atomic_write_file` has durably published the new sync-base record. If the recovery root is symlinked or otherwise non-removable, this call returns `Replacement` while `.sync-base.json` already advertises successful cleanup—the new symlink test exercises exactly this ordering. Validate the recovery boundary before publishing the authoritative stamp and avoid returning a cleanup failure after committing it.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 469,
+              "category": "fail_closed"
+            }
+          ],
+          "hash": "rvw1:sha256:f79db7de5bee7e724afdce89eb6a4bae180b4a1415dbdf902abd516f0fa7b05e",
+          "at": "2026-08-03T03:36:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:af8e45e213594bcc542a9c8eef46004d5b96d02d8b2fb81e7a6ad06f0e15d63b",
+          "at": "2026-08-03T03:39:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The recovery-slot deletion still happens after `atomic_write_file` makes `.sync-base.json` authoritative. `remove_recovery_copy` can then fail on permissions/I/O or exhaust its bounded traversal after already deleting part of the prior tree, returning `SyncBaseRecordError::Replacement` while the success stamp remains published and the recovery state may be partial. Commit the stamp only as part of a transaction that can restore the recovery tree, or make post-commit pruning non-failing maintenance.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 474,
+              "category": "atomicity"
+            }
+          ],
+          "hash": "rvw1:sha256:af8e45e213594bcc542a9c8eef46004d5b96d02d8b2fb81e7a6ad06f0e15d63b",
+          "at": "2026-08-03T03:45:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Recovery-slot deletion errors are caught and only printed with `eprintln!`, after which the adapter returns `Ok(())`. This silently accepts a cleanup-stage failure, leaves the prior track in place, and reports completed cleanup despite the briefing’s fail-closed requirement and typed error propagation contract.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 479,
+              "category": "non_fail_closed_cleanup"
+            }
+          ],
+          "hash": "rvw1:sha256:5e7d065055ef6b59bad32f69ff529b3072dafe82f89df93ededc0d645c9dfd5a",
+          "at": "2026-08-03T03:47:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8be5d114634fcb505c970c40749a5c0fef23ce5327dff395d513c373019de8fb",
+          "at": "2026-08-03T03:52:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track_parent` is opened without revalidating it as a real directory at the publication boundary. The earlier `track/items` check occurs before detached-worktree creation and baseline capture, so a symlink substitution during that interval makes `File::open` follow an external directory and `renameat_with(EXCHANGE)` mutate it outside the workspace. Revalidate the active parent immediately before use and open it through a non-following, trusted-root-anchored directory handle.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 44,
+              "category": "trusted-root"
+            },
+            {
+              "message": "`atomic_write_file` can return an error after it has already renamed the new `.sync-base.json` into place when opening or syncing the parent directory fails. This branch restores the recovery copy but never restores/removes the stamp, so the operation reports failure while the authoritative new record remains visible, including over a previous commit's record. Preserve and transactionally restore the prior stamp or distinguish and handle post-rename failures.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 472,
+              "category": "atomicity"
+            },
+            {
+              "message": "A successful SyncBase call leaves the complete prior track at `.sotp-baseline-recovery/.<track>.completed`; production invokes this method only once, so the cleanup on a later invocation normally never runs. These recovery trees are inside the Git worktree and are not ignored, leaving full untracked track copies after successful merges and accumulating bounded-but-large copies across track IDs. Store retained recovery outside the worktree or arrange durable, non-failing cleanup/ignore handling on success.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 140,
+              "category": "resource-lifecycle"
+            }
+          ],
+          "hash": "rvw1:sha256:8be5d114634fcb505c970c40749a5c0fef23ce5327dff395d513c373019de8fb",
+          "at": "2026-08-03T03:58:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "When SyncBase publication fails and `restore_staged_recovery_copy` also fails, the `StagedRecoveryCopy` is dropped while returning the error. Its `ExternalRecoveryDirectory::drop` unconditionally removes the external staging tree, destroying the only retained prior track exactly on the restoration-failure path instead of preserving recoverable state.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 140,
+              "category": "failure_restoration"
+            }
+          ],
+          "hash": "rvw1:sha256:1f9ba9826bc90f3564aab85b8b1cdcf00b29725cf59dee8a082f92913a7b942f",
+          "at": "2026-08-03T04:04:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The external recovery directory’s `Drop` implementation discards `remove_tree_bounded` failures. If post-SyncBase cleanup cannot delete the staged prior track, the operation still returns success and leaves unbounded recovery data behind, violating fail-closed cleanup and typed error propagation.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 144,
+              "category": "cleanup_error_swallowed"
+            }
+          ],
+          "hash": "rvw1:sha256:054795cbcbf2b75dcb918bac46f079c4d66b77f8f5340a5c23ff7fc0e600303e",
+          "at": "2026-08-03T04:07:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The production portion of `base_merge.rs` is now 758 lines, exceeding the repository’s 700-line maximum for production modules. Extract the SyncBase/recovery transaction logic into an infrastructure submodule or otherwise reduce the production portion below the limit.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 1,
+              "category": "module_size"
+            }
+          ],
+          "hash": "rvw1:sha256:a715fd9f082e91b0b5000d7cd5b76154cffe2694c40ae4abeb60bee7fd94f635",
+          "at": "2026-08-03T04:12:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:04b608c6e7c6f47ea20521959c0b98e84fe89c80b8819a0447d3cd0d3ccbb459",
+          "at": "2026-08-03T04:18:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "After moving the only recovery copy into the external staging directory, the code syncs only `trusted_root`, the source parent. It never syncs the staging directory containing the new entry or the external parent containing the newly created staging directory. A crash can therefore persist removal of the authoritative recovery slot without persisting its destination, losing the prior track before the SyncBase stamp is committed. Persist the destination directory hierarchy before syncing the source parent.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 186,
+              "category": "durability"
+            },
+            {
+              "message": "Using `workspace_root.parent()` as the staging location assumes that directory is writable and on the same filesystem as the repository. Valid repositories mounted as filesystem roots or placed in a parent the user cannot modify will make directory creation or `rename` fail with `EXDEV`/permission errors after baseline publication, preventing SyncBase from completing. Use an authorized, same-filesystem staging location or a durable copy protocol.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge/sync_base.rs",
+              "line": 79,
+              "category": "filesystem-portability"
+            },
+            {
+              "message": "`staged.cleanup()` performs a destructive bounded traversal and can fail after deleting part or all of the staged prior track—for example when the old track exceeds the entry limit or a later removal fails. The error path then restores the prior stamp and renames only whatever remains, so a reported failure no longer has a complete recoverable prior state. Validate before destructive cleanup, or commit the stamp and treat backup deletion as non-failing maintenance instead of attempting rollback after deletion begins.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge/sync_base.rs",
+              "line": 122,
+              "category": "atomicity"
+            }
+          ],
+          "hash": "rvw1:sha256:04b608c6e7c6f47ea20521959c0b98e84fe89c80b8819a0447d3cd0d3ccbb459",
+          "at": "2026-08-03T04:23:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca4717428d862c113697110eb56c9cdd0a365b2d6baa9eca14002389a85b2277",
+          "at": "2026-08-03T04:27:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "When `.sotp-baseline-recovery` is created for the first time, its parent (`track/`) is never fsynced. Syncing the new recovery directory itself does not durably persist its directory entry. A crash after the exchange can therefore leave the new active track durable while losing the recovery root containing the complete prior track. Fsync `track_root` after creating the recovery directory and propagate any failure before publication.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 224,
+              "category": "durability"
+            },
+            {
+              "message": "The recovery cleanup preflight is not byte-bounded: `sync_tree_at_depth` decrements only the entry/depth budget and never checks `metadata.len()` or consumes `bytes_remaining`. Consequently, an oversized stale recovery tree bypasses the 64 MiB per-file and 256 MiB total limits, is fsynced, and is subsequently deleted instead of failing closed as a resource-limit violation.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge/cleanup_tree.rs",
+              "line": 338,
+              "category": "bounded-io"
+            },
+            {
+              "message": "Preflighting the recovery tree does not make the following recursive deletion atomic. `remove_tree_bounded` can delete part of the backup and then fail—for example, upon reaching a non-writable nested directory. The error path then restores the previous stamp and renames this partially deleted tree back into the canonical recovery slot, so the supposedly recoverable prior state is corrupted. Avoid rolling back after destructive cleanup has begun, or use a cleanup strategy that cannot damage the recovery copy before commit.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge/sync_base.rs",
+              "line": 124,
+              "category": "failure-atomicity"
+            },
+            {
+              "message": "Successful staged-recovery cleanup removes the temporary directory but never fsyncs its parent. The method can therefore return success with the new SyncBase stamp durable while a crash resurrects the deleted staging directory and its old track data, leaving persistent untracked recovery state. Sync the recovery root after `remove_tree_bounded` succeeds.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 156,
+              "category": "durability"
+            }
+          ],
+          "hash": "rvw1:sha256:ca4717428d862c113697110eb56c9cdd0a365b2d6baa9eca14002389a85b2277",
+          "at": "2026-08-03T04:37:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3fa72226d0a76040d4bc6517f8890f41f873b24cc1b4e52eafd2f4280632efec",
+          "at": "2026-08-03T04:43:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`remove_tree_bounded` still enforces only depth and entry limits. Its regular-file branch deletes files without checking `metadata.len()` or consuming `bytes_remaining`. Direct callers such as the stale recovery-slot cleanup therefore erase oversized trees instead of rejecting the bounded-resource violation and preserving prior recovery state. Perform a complete byte-bounded preflight before destructive removal.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge/cleanup_tree.rs",
+              "line": 84,
+              "category": "bounded-io"
+            },
+            {
+              "message": "If staged cleanup fails after deleting any content—or at the final parent-directory fsync—the code restores the previous SyncBase stamp while leaving the recovery tree partial or entirely absent at its temporary path. The active track still contains the newly published baselines, so this produces an old or missing stamp with no complete recovery copy capable of restoring the corresponding prior state. The preflight does not make recursive deletion atomic; retain the newly committed stamp on pruning failure or redesign pruning so failure cannot destroy recovery before rollback.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge/sync_base.rs",
+              "line": 126,
+              "category": "failure-atomicity"
+            }
+          ],
+          "hash": "rvw1:sha256:3fa72226d0a76040d4bc6517f8890f41f873b24cc1b4e52eafd2f4280632efec",
+          "at": "2026-08-03T04:48:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "An existing recovery slot is recursively deleted before the new baseline preparation or publication succeeds. If this slot is the only preserved prior track from an earlier failure, any subsequent setup, validation, or generation failure irreversibly discards that rollback state, violating the fail-closed recovery guarantee.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 240,
+              "category": "data_corruption"
+            },
+            {
+              "message": "The temporary merge-worktree directory is created before recovery-root setup, but multiple subsequent `?` returns can exit without removing it. A malformed/symlinked/unwritable recovery root therefore leaks a filesystem directory on every failed cleanup attempt.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 204,
+              "category": "error_handling"
+            }
+          ],
+          "hash": "rvw1:sha256:f216948a07adf9e69c2eb4ee24df367db668d1d894d5c4d377311be3b62339bf",
+          "at": "2026-08-03T04:52:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "If atomic publication succeeds but its durability rollback fails, `publish_baseline_replacements` returns `Restoration` while `published` is still false. The subsequent cleanup therefore recursively deletes `replacement`, which may be the only preserved prior track after the failed exchange.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 315,
+              "category": "data_corruption"
+            },
+            {
+              "message": "When recovery cleanup fails after the SyncBase marker is written, the staged recovery copy is left only under a temporary name. A later idempotent call sees no canonical recovery slot and returns success without retrying or removing the orphan, causing failed cleanup state and recoverable copies to accumulate.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge/sync_base.rs",
+              "line": 121,
+              "category": "error_handling"
+            }
+          ],
+          "hash": "rvw1:sha256:adc12b1e030e906d778cb6789a26afc8629a28b55c5fa618b3acbde3da3518dc",
+          "at": "2026-08-03T04:56:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "When recovery cleanup fails after the SyncBase marker is written, the staged recovery copy is left only under a temporary name. A later idempotent call sees no canonical recovery slot and returns success without retrying or removing the orphan, so failed cleanup state and recoverable copies can accumulate indefinitely.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge/sync_base.rs",
+              "line": 121,
+              "category": "error_handling"
+            }
+          ],
+          "hash": "rvw1:sha256:ac7a0cc34e554f5cdf1fcc4ca17392f071259d192218f74fe1a81669fe42c0d6",
+          "at": "2026-08-03T04:59:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "If the SyncBase write fails, the code restores the canonical recovery slot and then cleans the temporary staging directory. If that cleanup fails, the empty pending directory remains; the next attempt sees both canonical and pending copies and permanently rejects the operation instead of reconciling the empty staging directory.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 181,
+              "category": "error_handling"
+            }
+          ],
+          "hash": "rvw1:sha256:cb82f91e719d303e790350ecf28a463627c7d6ec67270e215350664ae2f7ea18",
+          "at": "2026-08-03T05:01:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "If the SyncBase write fails, the code restores the canonical recovery slot and then cleans the temporary staging directory. If that cleanup fails, the pending directory remains; the next attempt sees both canonical and pending copies and permanently rejects the operation instead of reconciling the pending directory.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 181,
+              "category": "error_handling"
+            }
+          ],
+          "hash": "rvw1:sha256:9c09964ef1545449f2701c2d68be7e0c558f62f96a082f44c3a74196bd62830d",
+          "at": "2026-08-03T05:03:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "If the SyncBase write fails, the code restores the canonical recovery slot and then cleans the temporary staging directory. If that cleanup fails, the pending directory remains; the next attempt sees both canonical and pending copies and permanently rejects the operation instead of reconciling the pending directory.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 181,
+              "category": "error_handling"
+            }
+          ],
+          "hash": "rvw1:sha256:a5490e1f99415fcb5233e237ba9b437585e1e49f8fc020a7b912f13c4b2e8c47",
+          "at": "2026-08-03T05:05:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "When both canonical and pending recovery copies exist, failure to remove the pending copy is logged with `eprintln!` and converted to `Ok(None)`. SyncBase then proceeds and can report success while cleanup has failed and the duplicate remains indefinitely, violating the fail-closed/error-propagation requirement.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 184,
+              "category": "error_handling"
+            }
+          ],
+          "hash": "rvw1:sha256:2be72e67fade55c34da975ea8ff21144eeddaa9ed22d904966828e9e48c4780c",
+          "at": "2026-08-03T05:09:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aba2b4f9e45ce40e12344c0d549f71dd20111408c1d3559cc5041b777c07706c",
+          "at": "2026-08-03T05:12:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`remove_tree_bounded` validates its byte, entry, and depth budgets while deletion is already in progress. If a late entry exceeds a limit, earlier siblings have already been removed, so a resource-limit error can partially destroy the canonical recovery slot. Complete a non-destructive bounded traversal before removing anything.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge/cleanup_tree.rs",
+              "line": 86,
+              "category": "failure-atomicity"
+            },
+            {
+              "message": "After atomically exchanging the active baseline, a failure or crash before promoting `replacement` leaves the prior baseline at this deterministic staging path. The next invocation unconditionally rejects the occupied path, permanently blocking cleanup without manual intervention. Reconcile or adopt interrupted published transactions safely on restart.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 243,
+              "category": "recovery-state"
+            },
+            {
+              "message": "When both pending and canonical recovery directories exist, failure to remove the pending directory returns it as the sole staged copy even though the canonical slot was never staged. The caller can commit the new sync stamp and then clean only the pending directory, returning success while canonical recovery remains. Propagate reconciliation failure or track and clean both copies before allowing success.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 186,
+              "category": "recovery-state"
+            }
+          ],
+          "hash": "rvw1:sha256:aba2b4f9e45ce40e12344c0d549f71dd20111408c1d3559cc5041b777c07706c",
+          "at": "2026-08-03T05:18:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json` cannot distinguish the two interrupted states: it is present both in a fully prepared candidate before the exchange and in the prior active tree left at `replacement` after the exchange. A crash after `replace_tree` but before publication is therefore misclassified as a completed exchange, causing reconciliation to delete the canonical recovery slot and replace it with a candidate that was never active. Persist an explicit transaction phase and only promote the staging tree when the exchange is proven to have occurred.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 349,
+              "category": "recovery-state"
+            },
+            {
+              "message": "The bounded preflight is followed by a separate destructive traversal that carries no depth or entry budget. If the workspace tree changes between or during the passes, newly inserted content is recursively traversed and deleted without the validated limits, potentially causing unbounded recursion or partial deletion before a later failure. Keep the budget enforced during the destructive traversal or remove a fixed, isolated snapshot.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge/cleanup_tree.rs",
+              "line": 104,
+              "category": "resource-bound"
+            }
+          ],
+          "hash": "rvw1:sha256:6dedc4926f487e98da93f11beb476b3ad5c955c8d4e0f73e7bfd979373412b10",
+          "at": "2026-08-03T05:29:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The prepared-candidate phase marker is removed and that removal is synced before either parent directory containing the exchange is synced. A crash in this window can persist the marker deletion while losing the exchange, leaving the unpublished candidate at `replacement` without its marker. Startup then misclassifies it as the prior active tree and can delete the canonical recovery copy. Keep the marker until the exchange is durably committed, and preserve or recreate it whenever rollback leaves the candidate in staging.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 105,
+              "category": "recovery-state"
+            },
+            {
+              "message": "Recovery renames `replacement` to the canonical slot and syncs it before the active phase marker is removed. A crash after reconciliation returns but before marker removal leaves no `replacement`; the next invocation therefore hits the `!had_replacement` branch and permanently rejects an otherwise valid recovered state. Make marker cleanup part of the same recoverable transaction or recognize the canonical recovered slot on restart.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 261,
+              "category": "recovery-state"
+            },
+            {
+              "message": "The production portion of this module is 710 lines, exceeding the repository's hard maximum of 700; `bin/sotp verify module-size` fails on this file. Split the new recovery/publication helpers into the existing submodules so the architecture gate passes.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 711,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:d983b2420321f50deedd2902d5fe5f1d6ddada7d790af02aa1eeb72b54812a23",
+          "at": "2026-08-03T05:41:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "After the phase marker has been removed, failures syncing that removal call `restore_after_baseline_exchange`. If rollback succeeds but deleting the rolled-back candidate then fails, the candidate remains at `replacement` without its phase marker. The next invocation misclassifies it as the prior active tree and may replace the canonical recovery copy with an unpublished candidate. Recreate and persist the prepared marker after rollback, before attempting cleanup, so cleanup failure remains safely distinguishable.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 153,
+              "category": "recovery-state"
+            }
+          ],
+          "hash": "rvw1:sha256:d1220241ee258f42459e3eab140f2a65909119b379c90841db2258b75a388206",
+          "at": "2026-08-03T05:49:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The workspace denies `clippy::unwrap_used`, but this new test module uses `unwrap()` throughout without a local test-only allowance. Consequently an all-targets Clippy run will fail before these tests can pass; add the allowance used by `base_merge.rs::tests` or eliminate the unwraps.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 471,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:c40bd448dba23a2d710b39afae9e2e2ac1ce2ae72bf06f917b22588dec78d354",
+          "at": "2026-08-03T05:59:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:420e4a6488dc085cc28ba93e30851efdd3f372ff03f41fab56a7af23039065e9",
+          "at": "2026-08-03T06:07:34Z"
         }
       ]
     },
@@ -1225,475 +3241,56 @@
           "findings": [],
           "hash": "rvw1:sha256:4db8fe834b560edc79ab6e40754e8a17b81e778d6abf12411a5dd2444091656b",
           "at": "2026-08-02T10:19:50Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cb666be156be4e5a74c73e23d8220f63bb3db8b8a08be26761cbad58085b2412",
-          "at": "2026-07-31T22:47:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cb666be156be4e5a74c73e23d8220f63bb3db8b8a08be26761cbad58085b2412",
-          "at": "2026-07-31T22:50:51Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ccf80b721d965f8205f7454dbcd27c4ea12d2cfc166dd951f73cef9c2c11ea89",
-          "at": "2026-08-01T00:18:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ccf80b721d965f8205f7454dbcd27c4ea12d2cfc166dd951f73cef9c2c11ea89",
-          "at": "2026-08-01T00:21:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4b5cd74999751b16d7905643597f13b47efbfd4e85cba5d36ed91b5dac33d8d1",
-          "at": "2026-08-01T22:29:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4b5cd74999751b16d7905643597f13b47efbfd4e85cba5d36ed91b5dac33d8d1",
-          "at": "2026-08-01T22:32:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7bddfda3dd3200435c16ff2d56500f8c6dbb68984adf8d65dfff25502d5d34da",
-          "at": "2026-08-02T09:01:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7bddfda3dd3200435c16ff2d56500f8c6dbb68984adf8d65dfff25502d5d34da",
-          "at": "2026-08-02T10:16:16Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4876ba1335b4aabaffe489b2eb447c815ca5d90938fd3fc8b06499b992ddab44",
-          "at": "2026-08-01T09:11:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The cache-hit path does not revalidate its input snapshot. Catalogue and baseline bytes are read before the potentially slow toolchain/source hash; if either changes during hashing, `current_key` can still match the old cache and this early return accepts stale signals. Re-read and compare all three authoritative inputs before returning `SkipEvaluation`.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
-              "line": 181,
-              "category": "cache_freshness"
-            },
-            {
-              "message": "`ReevaluateWithoutExtraction` trusts any valid JSON at the shared Cargo rustdoc output path. That file is not bound to the recorded implementation hash or feature selection and may have been overwritten by another rustdoc or baseline-capture run. Source revalidation cannot prove the loaded JSON came from those sources, so incorrect signals can be persisted under a current three-hash key. Re-extract or validate a keyed rustdoc artifact before reuse.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
-              "line": 183,
-              "category": "io_boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:4876ba1335b4aabaffe489b2eb447c815ca5d90938fd3fc8b06499b992ddab44",
-          "at": "2026-08-01T09:24:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Revalidation checks the catalogue before the potentially slow second implementation/toolchain hash. If the catalogue changes while `hash_workspace_inputs` runs, its old declaration hash has already been accepted and no later catalogue read occurs, so a cache hit can return success—or evaluation can persist signals—using stale catalogue data. Compute the implementation hash before re-reading catalogue and baseline, or compare against a stable second full cache key.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/inputs.rs",
-              "line": 94,
-              "category": "cache_freshness"
-            }
-          ],
-          "hash": "rvw1:sha256:5b62c9c40aa3c35f8facba170b283a5746fb437bde807617470e00df344da37a",
-          "at": "2026-08-01T09:41:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The evaluator erases its failure stage into a string-only `EvaluateSignalsError`, so this adapter reconstructs `TypeSignalsExecutionError` by matching message prefixes. Errors outside the hard-coded prefixes are silently misclassified as `AuthoritativeInput`; for example, the evaluator creates `cannot create timestamp` as an evaluation error, but this branch maps it to `AuthoritativeInput`. Preserve the stage in a typed error and match its variants directly.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_signals_executor_adapter.rs",
-              "line": 227,
-              "category": "error_classification"
-            }
-          ],
-          "hash": "rvw1:sha256:f25ee3287a51103a2974fafa9fc5c41bd218a3716bced8ccb1282d83726c16d3",
-          "at": "2026-08-01T09:52:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2345460ac1f9a1faf2b3ac12867fbc334277f1bc51b394b88cefc9b74d6c780f",
-          "at": "2026-08-01T11:45:03Z"
+          "hash": "rvw1:sha256:a5247485b3477693efc7a6faae9736d12dd5135236ac637ad1d0883cd0163a3c",
+          "at": "2026-08-02T15:10:10Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`architecture-rules.json` is checked with `is_file()` and then copied without rejecting a symlink. This allows the cleanup worktree to consume a file outside the trusted workspace, violating the infrastructure symlink boundary and potentially changing baseline-generation inputs. Use `symlink_metadata`/`reject_symlinks_below` before reading or copying.",
+              "message": "T010's description names the sync-base record adapter but does not claim adding or updating `SyncBaseRecordSchemaVersion` or `SyncBaseRecord`, while `task-contract.json` attributes both catalogue entries to T010. This leaves the executable task boundary inconsistent with its contract attribution; explicitly include those DTO/schema types in T010 or move their ownership.",
               "severity": "P1",
-              "file": "libs/infrastructure/src/base_merge.rs",
-              "line": 280,
-              "category": "symlink not rejected at boundary"
-            },
-            {
-              "message": "The sync-base stamp path itself is not checked for symlinks; `path.is_file()` and `read_to_string` follow an existing `.sync-base.json` symlink. The adapter should reject the leaf path before reading, consistent with the repository's real-file boundary convention.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/base_merge.rs",
-              "line": 520,
-              "category": "symlink not rejected at boundary"
-            },
-            {
-              "message": "Baseline publication only moves/replaces files present in the newly generated replacement. Older `*-types-baseline.json` files whose bindings were removed remain in the active track, so the published state is not a complete replacement and can retain stale authoritative baseline artifacts.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/base_merge.rs",
-              "line": 432,
-              "category": "adapter correctness"
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/task-contract.json",
+              "line": 76,
+              "category": "task-contract attribution mismatch"
             }
           ],
-          "hash": "rvw1:sha256:9f66b851d4b8457d87fb87c9ae3569fc3c92ef358b50f820504d6731fe15733f",
-          "at": "2026-08-02T09:01:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Baseline publication is not atomic as a complete replacement: it first renames every existing baseline away and then renames generated files into the live track one by one. Readers can observe a state with no baselines or only a subset of the new baselines between lines 445–485, contrary to the requirement that no partial replacement be exposed. Publish a complete staged directory atomically or otherwise provide an atomic visibility boundary.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/base_merge.rs",
-              "line": 444,
-              "category": "adapter correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:0ac5e87c8fa4b7da78aa25bc260c69dc821003534e6af2db0422ed892aead346",
-          "at": "2026-08-02T09:24:15Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The adapter resolves `base_commit` and then merges the mutable source branch name in a separate Git invocation. If the source branch advances between those calls, the merge incorporates a different commit while the cleanup request records the earlier hash, violating exact-commit identity. Merge the resolved commit object or revalidate the resolved commit after the merge before reporting `Clean`.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/base_merge.rs",
-              "line": 104,
-              "category": "exact commit identity"
-            },
-            {
-              "message": "`copy_cleanup_inputs` copies the current track into a worktree whose `track/items/<id>` directory may already contain files from the pinned base commit, but `copy_tree` only creates/overwrites source entries and never clears destination-only entries. Those stale base-commit files are then copied into the replacement and published over the active track, so the replacement is not an exact copy of the current cleanup inputs.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/base_merge.rs",
-              "line": 299,
-              "category": "adapter correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:c474a0245c2084acaf92860d177ee86626383e82553b6109026a31950eee92d2",
-          "at": "2026-08-02T09:31:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`copy_tree` validates symlinks only in the source tree. Existing destination components in the commit-pinned worktree are not checked, so a symlink from the base commit at `target_workspace/track/items/<id>` or below can be followed by `create_dir_all`/`fs::copy`, writing cleanup inputs outside the isolated worktree. Reject or safely replace destination symlinks before copying.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/base_merge.rs",
-              "line": 303,
-              "category": "symlink not rejected at boundary"
-            },
-            {
-              "message": "`copy_tree` overlays the current track onto the already-populated pinned worktree without removing destination-only files. Files present in the base commit's track directory but absent from the current active track survive into the replacement and are atomically published, so the replacement can contain stale base-commit artifacts.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/base_merge.rs",
-              "line": 299,
-              "category": "adapter correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:2c77c18094c380b00098d7214b6806270d5cbba0f89986b3f247a305e7c162b1",
-          "at": "2026-08-02T09:36:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The cleanup paths treat `track/items` as a trusted root without validating the root itself. `reject_symlinks_below` stops before its `trusted_root`, so a symlinked `track/items` can redirect baseline replacement and sync-stamp I/O outside the repository. Reject the trusted root (and its ancestors) before using it.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/base_merge.rs",
-              "line": 169,
-              "category": "trusted-root violation"
-            },
-            {
-              "message": "The destination of the `architecture-rules.json` copy is not checked for symlinks. If the pinned worktree contains a symlink at that path, `fs::copy` follows it and can write outside the isolated worktree. Apply the destination symlink guard before copying.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/base_merge.rs",
-              "line": 295,
-              "category": "symlink not rejected at boundary"
-            },
-            {
-              "message": "`remove_commit_pinned_worktree` suppresses failures from both spawning Git and collecting its output, while the cleanup operation can still return success. A failed removal can leave a registered/stale worktree and is an unpropagated infrastructure I/O failure; return it as a typed baseline isolation/cleanup error.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/base_merge.rs",
-              "line": 268,
-              "category": "error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:c102570008a86d96599edeaf7eea7e42f395b92e36d923655a8305b96b1b6ca5",
-          "at": "2026-08-02T09:42:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "When directory exchange succeeds but cleanup of the old track fails, `publish_baseline_replacements` returns an error while leaving `replacement` as the recoverable prior track. The caller then unconditionally `remove_dir_all(&replacement)` whenever `result.is_err()`, deleting the only rollback copy and potentially destroying the prior valid baseline/track state. Preserve the replacement directory for post-exchange publish errors.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/base_merge.rs",
-              "line": 228,
-              "category": "rollback/restoration"
-            }
-          ],
-          "hash": "rvw1:sha256:cfc974d0ee61022f198257728eebf2bb28bd0434b8a46ecc7021a27e1eb99fe5",
-          "at": "2026-08-02T09:53:13Z"
+          "hash": "rvw1:sha256:a5247485b3477693efc7a6faae9736d12dd5135236ac637ad1d0883cd0163a3c",
+          "at": "2026-08-02T15:23:17Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:deffe6c447c953240d350f6748a331421c1bda1a8d0f8da75bbd575e2116b5b3",
-          "at": "2026-08-02T09:59:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The bounded runner can return an error after `git merge` has already changed HEAD—for example when a large merge's diffstat exceeds the 8 KiB output limit or a post-merge hook exceeds the deadline. `merge_base` immediately maps that error to `BaseMergeGitError`, so the caller skips baseline regeneration and the sync stamp even though the base commit may already be incorporated. Suppress large output and re-adjudicate HEAD/MERGE_HEAD and conflict state after runner errors.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/base_merge.rs",
-              "line": 105,
-              "category": "adapter correctness"
-            },
-            {
-              "message": "Baseline publication is not crash-durable: staged files are created with `fs::copy` without syncing them, and the `RENAME_EXCHANGE` is not followed by `sync_all` on `track_parent`. A power loss can therefore leave the later sync stamp durable while the baseline data or directory exchange is not. Sync staged files/directories and the parent around publication before reporting success.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/base_merge.rs",
-              "line": 514,
-              "category": "crash consistency"
-            },
-            {
-              "message": "`collect_validated_baselines` directly calls `fs::read` without first rejecting a symlink at the generated baseline path. This follows a path that a build step or concurrent actor can redirect outside the pinned worktree, violating the crate's real-file boundary convention. Apply `reject_symlinks_below` plus an explicit `symlink_metadata().file_type().is_symlink()` rejection before reading.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/base_merge.rs",
-              "line": 470,
-              "category": "symlink safety"
-            },
-            {
-              "message": "Cleanup failures are silently discarded: failed `remove_dir_all` calls are ignored, and `result?` returns before a simultaneous `remove_commit_pinned_worktree` failure is propagated. Generation or validation failures can consequently leave a registered worktree or a partial replacement containing track data while reporting only the original error. Combine and propagate cleanup/restoration failures through a typed error.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/base_merge.rs",
-              "line": 229,
-              "category": "error handling"
-            },
-            {
-              "message": "The cleanup I/O is unbounded. `copy_tree` recursively traverses every track entry without depth, entry, or byte limits and passes every non-directory/non-symlink object to `fs::copy`, so a FIFO can block indefinitely; baseline and existing-stamp contents are also read wholly at lines 470 and 574. Reject non-regular entries and enforce traversal and read-size bounds.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/base_merge.rs",
-              "line": 367,
-              "category": "unbounded I/O"
-            },
-            {
-              "message": "The new module contains 814 production lines before its `#[cfg(test)]` block, exceeding the configured 700-line maximum. `bin/sotp verify module-size` fails on this file, so the change cannot pass the repository gate. Split the cleanup, Git adapters, and sync-record codec into smaller modules.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/base_merge.rs",
-              "line": 815,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:deffe6c447c953240d350f6748a331421c1bda1a8d0f8da75bbd575e2116b5b3",
-          "at": "2026-08-02T10:13:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The same 16 MiB limit is used for both each file and the entire staged tree. The current track's six baselines total 49,609,933 bytes, and `usecase-types-baseline.json` alone is 17,586,101 bytes. Validation at line 253 therefore rejects a real generated baseline, while replacement copying would also exhaust the aggregate budget. Clean-merge cleanup cannot complete; use separate realistic per-file and aggregate bounds.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/base_merge/cleanup_tree.rs",
-              "line": 79,
-              "category": "adapter correctness"
-            },
-            {
-              "message": "`has_unmerged_paths` asks Git to emit every conflicted filename through the 8 KiB bounded-output collector. A merge with enough conflicts makes this inspection itself fail, returning `BaseMergeGitError` instead of `Conflicted`, so canonical recovery is not entered. Use a quiet/status-only Git check and interpret its exit code without collecting path output.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/base_merge.rs",
-              "line": 943,
-              "category": "conflict handling"
-            },
-            {
-              "message": "The entry budget is charged only after the baseline-name filter. Files ending in `-types-baseline.json` are skipped without decrementing `entries_remaining`, so an externally populated track directory can make this `read_dir` loop and subsequent cleanup traverse an unbounded number of entries despite `MAX_CLEANUP_TREE_ENTRIES`. Charge every directory entry before filtering.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/base_merge/cleanup_tree.rs",
-              "line": 153,
-              "category": "unbounded I/O"
-            }
-          ],
-          "hash": "rvw1:sha256:182c00a047a2ecbb83b0c8eb500ef8b4b2b0008a77f8830b3b780d93a28a0a18",
-          "at": "2026-08-02T10:50:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`replace_tree` calls `remove_dir_all` on the existing destination before applying any traversal budget. During `copy_cleanup_inputs`, that destination is the track directory checked out from the base commit, so a repository can trigger an unbounded recursive filesystem walk despite the adapter's entry/depth limits and potentially hang cleanup. Delete through a bounded walker or fail while leaving the worktree for recovery.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/base_merge/cleanup_tree.rs",
-              "line": 62,
-              "category": "unbounded I/O"
-            }
-          ],
-          "hash": "rvw1:sha256:19fa117b0ac212dccdc359e40a94209b793ebb3457b8661ec7b542ade830abde",
-          "at": "2026-08-02T11:00:46Z"
+          "hash": "rvw1:sha256:207183b12263acab80a1eaec35ae1da5c897f04c6a062e3353fb4560db73c371",
+          "at": "2026-08-02T15:38:24Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:9ebfb6817f420fe3001cfa8363255cf2e85cf802e739c72d38a262f56d48a8bd",
-          "at": "2026-08-02T11:09:11Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-06’s requirement that stash-pop “preserves the repository safety gates required for the restored worktree” does not identify which gates or observable checks establish compliance, leaving Phase 2/3 to invent the contract.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
-              "line": 216,
-              "category": "acceptance criterion non-observable"
-            }
-          ],
-          "hash": "rvw1:sha256:d96c31dd688b8f7469f29f89ae0ebed068607ac107d385a51d8c936213fb97af",
-          "at": "2026-08-01T00:35:56Z"
+          "hash": "rvw1:sha256:207183b12263acab80a1eaec35ae1da5c897f04c6a062e3353fb4560db73c371",
+          "at": "2026-08-02T15:44:27Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d251b85b52d7071a8df8efebfa87e9383814697636ed8cdda82bb4009dfa5cee",
-          "at": "2026-08-01T00:38:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-06 contradicts IN-04 as written: a real `git stash` records stash commit objects and updates `refs/stash`, while a successful pop updates that ref again. Therefore stash/stash-pop cannot satisfy the blanket requirement to create no commit and update no ref. Clarify that branch history and branch refs must remain unchanged while permitting the stash-internal objects/ref required by D3.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
-              "line": 216,
-              "category": "scope / acceptance_criteria contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:d251b85b52d7071a8df8efebfa87e9383814697636ed8cdda82bb4009dfa5cee",
-          "at": "2026-08-01T00:41:51Z"
+          "hash": "rvw1:sha256:290eb07ac1c81667997d576e9c6debdee801c2bb590096062f96c7f68bfc4527",
+          "at": "2026-08-03T06:09:07Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:99c34a083854c412260ecb88e8accdc3d671a36c78ab490dbb61a65cd3647484",
-          "at": "2026-08-01T00:44:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e5eb0df80593d31f3aabfdebd7984bbd743c1e8d5ed5d06b057148c3620c400d",
-          "at": "2026-08-01T00:46:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-04 requires post-merge cleanup after a conflict, while AC-12 and CN-07 explicitly prohibit clean-merge cleanup for conflict outcomes. The spec does not define whether AC-04 means the prohibited Views → Baseline → SyncBaseStamp sequence or a distinct recovery-only cleanup, leaving downstream implementation with contradictory behavior.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
-              "line": 268,
-              "category": "scope / acceptance_criteria contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:cf55f964143a48775af8bb7867e30a610d65264264c0351727d92faefd7facc2",
-          "at": "2026-08-01T22:43:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "GO-01 adds the requirement that cleanup use the exact merged base commit, but its cited decisions are the original ADR D1 and cleanup-state ADR D3. Those decisions establish cleanup and ordering, respectively; the exact-commit requirement is defined by cleanup-state ADR D1/D2, neither of which GO-01 cites. This leaves part of the goal unanchored to its cited decision set.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
-              "line": 8,
-              "category": "goal not anchored to a decision"
-            }
-          ],
-          "hash": "rvw1:sha256:a57d774207e811b519ea738a4c88136676e307ff86d7882a22c19f035cdefe88",
-          "at": "2026-08-01T22:57:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d503c8c41ebe2072c29a376a70fcc3ff9bab869e78cd35d8e7c17a2d3e56d06f",
-          "at": "2026-08-01T23:08:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d503c8c41ebe2072c29a376a70fcc3ff9bab869e78cd35d8e7c17a2d3e56d06f",
-          "at": "2026-08-01T23:13:17Z"
+          "hash": "rvw1:sha256:290eb07ac1c81667997d576e9c6debdee801c2bb590096062f96c7f68bfc4527",
+          "at": "2026-08-03T06:12:30Z"
         }
       ]
     }

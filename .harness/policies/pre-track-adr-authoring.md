@@ -20,7 +20,7 @@ ADR は track 内成果物ではなく **track 前段階** で author が作成�
 - **track 内成果物からの参照**: spec.json は ADR を構造化参照 (`AdrRef { file, anchor }`) で cite できる (SoT Chain ① spec → ADR)。**入庫済みの delta draft も cite できるが、入庫前の候補は cite できない** (下記裁定権節)。型カタログ (Phase 2) は spec を `spec_refs[]` で参照し、ADR を直接 cite することは SoT Chain のレイヤースキップになるので禁止 (`type catalogue → ADR` は逆流/スキップ)。impl-plan (Phase 3) も同様に spec / 型カタログ経由で参照し、ADR を直接 cite しない。逆方向 (ADR から track 内成果物への参照) は SoT Chain 逆流なので禁止。
 - **Phase 1+ の ADR 側修正 (delta 候補)**: Phase 1+ の探索的精緻化ループで下流 signal が 🔴 になって ADR 側の意味変更が必要になった場合、入力箱 ADR を in-place 編集せず、adr-editor が delta 候補を起草する (下記裁定権節の Phase 1+ 手順)。下流 spec の 🔴 は入庫済み delta draft を cite して解消する。
 - **終端処理**: track 終端で入力箱 ADR に不意の乖離 (byte 照合の不一致) があれば守護者トリアージへ送る。入庫済み delta draft は 🟡 のまま merge 段階の user 裁定へ進む。乖離があることだけを理由に同期の accept / revert を user に求めない。
-- **orchestrator による直接編集の禁止**: track 内での ADR 修正も含めて、orchestrator が `knowledge/adr/*.md` を直接編集してはならない。adr-editor capability を経由する (1 ファイル = 1 writer 原則)。
+- **orchestrator による直接編集の禁止**: track 内での ADR 修正も含めて、orchestrator が `knowledge/adr/*.md` を直接編集してはならない。adr-editor capability を経由する (1 ファイル = 1 writer 原則)。ただし active guarded base-merge conflict 中の既存 hunk 選択に限り、pre-gate 実行可能化の source-repair を許す。placeholder・意味追加は禁止し、適用直後に `adr-diagnoser` を実行し、上流再収束後に adr-editor を通常 mode で再実行する。
 - **運用指示文書からの特定 ADR 参照禁止**: 適用対象節が定義した運用指示文書の本文では、特定 ADR を直接 cite しない。運用指示文書は自己完結させ、ADR の背景知識を前提とせず動作・条件だけで読者が理解できる粒度で記述する。ADR の decision を workflow に反映する際は、その workflow 文章が ADR を指さなくても意味が通じるように書き直す。設計背景を残したい場合は、変更を持ち込んだ track の commit message / 該当 ADR 側 (Consequences / Related) に記述する。
   - 禁止形は日付 id で特定 ADR を名指すすべての書き方であり、file path 形に限らない。`knowledge/adr/YYYY-MM-DD-HHMM-slug.md`、`YYYY-MM-DD-HHMM-slug`、および `YYYY-MM-DD-HHMM` 単独形のいずれも該当する。
   - OK: 「`knowledge/adr/` 配下に事前 ADR を配置する」「ADR を参照する spec.json がある場合は…」のような generic / pattern description、および索引 (`knowledge/adr/README.md`) 経由の誘導。
@@ -43,7 +43,7 @@ ADR の意味は user に属する。track が ADR を扱う全期間につい�
 |---|---|---|
 | 書き手 | adr-editor | 編集の適用・delta 候補の起草改稿・user 裁定の実装編集 (すべて working tree のみ) |
 | 守護者 | adr-diagnoser | Phase 0 の編集ごとの決定保存判定 / Phase 1+ の delta 入庫三択判定と非意味的修正の分類 / user 裁定の実装編集の conformance 再監査 / 不意の乖離のトリアージ。決定を壊す提案には**保全代案または修正不要理由の提示義務**を負う (裸の差し止めで終わらない) |
-| 配達人 | orchestrator | dispatch・記録・運搬・verdict 準拠の routing のみ。意味の裁定・分類を行わない |
+| 配達人 | orchestrator | dispatch・記録・運搬・verdict 準拠の routing。conflict-preparation では既存 hunk の選択だけを行い、意味の裁定・分類を行わない |
 | 裁定者 | user | Phase 0 境界の承認と merge 段階の採用・棄却・監査 |
 
 ### Phase 0 — 裁定境界まで
@@ -99,7 +99,7 @@ ADR の意味は user に属する。track が ADR を扱う全期間につい�
 - Good: Phase 1 (spec) で signal 🔴 が ADR 側の意味変更を要求 → adr-editor が delta 候補を起草 → 入庫判定 (c) で決定修正提案として入庫 → spec が入庫済み draft を cite して 🔴 解消 → 🟡 のまま merge 段階で user が採用/棄却。
 - Good: 入庫判定が (b) — 決定を保つ代替文面が存在 → 候補を削除して代案を起点へ返す → 起点が代案で解決。
 - Bad: `/track:plan "feature X"` を実行、内部で ADR を自動生成 (spec に合わせて decision を後付けする rationalization の温床になる)。
-- Bad: orchestrator が `knowledge/adr/xxx.md` を直接書き換える (1 ファイル 1 writer 原則違反)。
+- Bad: conflict-preparation の限定条件を外れて orchestrator が `knowledge/adr/xxx.md` を意味編集する (1 ファイル 1 writer 原則違反)。
 - Bad: Phase 0 の review ループ中、編集のたびに刻印を打つ (承認前の中間刻印は、user 裁定の diff 基準を自己洗浄する行為)。
 - Bad: 裁定境界後に入力箱 ADR を in-place で意味編集する (freeze 違反。delta 候補として起草すべきもの)。
 - Bad: 入庫前の候補を spec が cite する (未判定の決定に下流を接続する行為)。
@@ -116,7 +116,7 @@ ADR の意味は user に属する。track が ADR を扱う全期間につい�
 - [ ] track 内成果物 (`track/items/<id>/` 配下) に ADR を配置していないか
 - [ ] ADR ファイルに `Status` / `approved` 等の状態フィールドを追加していないか
 - [ ] `/track:plan` 起動前に ADR が `knowledge/adr/` に存在するか (厳密モード条件を満たすか)
-- [ ] track 内の ADR 修正で orchestrator が直接編集せず adr-editor を経由しているか
+- [ ] track 内の通常 ADR 修正は adr-editor を経由し、conflict-preparation の直接 hunk 選択は限定条件・即時 diagnoser・再実行を満たしているか
 - [ ] Phase 0 の baseline review ループ中に ledger へ書き込んでいないか (中間刻印禁止)
 - [ ] user 承認後に ADR 文面へ修正が入る場合、前の承認を流用せず承認前の収束ループへ戻り、修正後の全文を再提示して再承認を得ているか
 - [ ] 裁定境界後に入力箱 ADR を in-place で意味編集していないか (意味変更は delta 候補へ)

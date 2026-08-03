@@ -10,12 +10,12 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| BaseMergeInput | dto | add | — | 🟡 | 🔵 |
+| BaseMergeInput | dto | add | — | 🔵 | 🔵 |
 
 ## Primary Adapters
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | GitDriver | primary_adapter | modify | — | 🟡 | 🔵 |
-| TrackDriver | primary_adapter | modify | — | 🟡 | 🔵 |
+| TrackDriver | primary_adapter | modify | — | 🔵 | 🔵 |
 

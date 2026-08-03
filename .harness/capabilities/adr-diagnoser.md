@@ -13,6 +13,11 @@ part of a binary gate's decision path and never writes a baseline, restores an A
 an ADR. The surrounding lane contract lives in
 `.harness/policies/pre-track-adr-authoring.md` §In-track 意味変更の裁定権.
 
+An ADR hunk selected during guarded base-merge `conflict-preparation` is still an applied edit:
+the orchestrator must obtain this capability's immediate judgment before any downstream
+re-entry. A decision-breaking or uncertain result fails closed and requires the normal ADR
+guardian route.
+
 1. **Edit judgment (Phase 0 収束ループ)** — for every in-place edit applied to an input-box
    ADR during the Phase 0 baseline-review loop, judge the applied edit (concrete diff)
    immediately after application: decision-preserving → retained; decision-breaking →

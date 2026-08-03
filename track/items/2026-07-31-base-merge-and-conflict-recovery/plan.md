@@ -6,7 +6,7 @@
 GO-01 → T001–T004, T010, and T011.
 GO-02 → T005–T009.
 
-## Tasks (7/11 resolved)
+## Tasks (10/11 resolved)
 
 ### S1 — Guarded base merge
 
@@ -14,16 +14,16 @@ GO-02 → T005–T009.
 
 - [x] **T001**: Add `BaseBranchName`, `BaseMergeDirection`, `BaseMergeDirectionError`, and `derive_base_merge_direction` in `libs/domain/src/branch_strategy.rs`, updating `TrackMetadata` in `libs/domain/src/track.rs`; add regression coverage. D1; IN-01. (`daf758c60802d14be799f267826bec46a2cd8782`)
 - [x] **T002**: Add `libs/usecase/src/base_merge.rs` with `BaseMergeContextPort`, `BaseMergeGitPort`, `BaseMergeCleanupPort`, `BaseMergeService`, `BaseMergeInteractor`, command, outcomes, and errors; export it from `libs/usecase/src/lib.rs` and add regression coverage. D1; IN-01; IN-02; OS-01; CN-01; CN-02; AC-01; AC-02; AC-03; AC-04. (`a5259acf836d40408c7940ef73798a2f76ba721e`)
-- [x] **T010**: Update `BaseMergeAttemptOutcome`, `BaseMergeError`, `BaseMergeCleanupRequest`, `PostMergeCleanupError`, `ViewsRegenerationError`, `BaselineReplacementError`, `SyncBaseRecordError`, the base-merge cleanup and git ports, and the sync-base record adapter with their regression coverage. D1; IN-02; IN-06; CN-05; CN-06; CN-07; AC-03; AC-10; AC-11; AC-12.
-- [x] **T003**: Add `FsBaseMergeContextAdapter` and `FsBaseMergeGitAdapter` in `libs/infrastructure/src/base_merge.rs`; export the module from `libs/infrastructure/src/lib.rs` and add focused adapter regression coverage. D1; IN-01; IN-02; OS-01; CN-01; AC-01; AC-02; AC-03; AC-04.
-- [ ] **T011**: Add `FsBaseMergeCleanupAdapter` in `libs/infrastructure/src/base_merge.rs` and focused cleanup adapter regression coverage. D1; IN-02; IN-06; CN-02; CN-05; CN-06; CN-07; AC-03; AC-04; AC-10; AC-11; AC-12.
-- [ ] **T004**: Add `BaseMergeInput` and `TrackDriver` handling in `apps/cli-driver/src/track.rs`, the `TrackCommand` variant and `execute` dispatch in `apps/cli/src/commands/track/{mod.rs,dispatch.rs}`, and `TrackCompositionRoot::track_driver` wiring in `apps/cli-composition/src/track/composition_root.rs`; add command regression coverage. D1; IN-01; OS-01; CN-01; AC-01; AC-02; AC-03; AC-04.
+- [x] **T010**: Update `BaseMergeAttemptOutcome`, `BaseMergeError`, `BaseMergeCleanupRequest`, `PostMergeCleanupError`, `ViewsRegenerationError`, `BaselineReplacementError`, `SyncBaseRecordError`, the base-merge cleanup and git ports, `SyncBaseRecordSchemaVersion` and `SyncBaseRecord` DTO/schema entries, and the sync-base record adapter with their regression coverage. D1; IN-02; IN-06; CN-05; CN-06; CN-07; AC-03; AC-10; AC-11; AC-12. (`80437ad2`)
+- [x] **T003**: Add `FsBaseMergeContextAdapter` and `FsBaseMergeGitAdapter` in `libs/infrastructure/src/base_merge.rs`; export the module from `libs/infrastructure/src/lib.rs` and add focused adapter regression coverage. D1; IN-01; IN-02; OS-01; CN-01; AC-01; AC-02; AC-03; AC-04. (`80437ad2`)
+- [x] **T011**: Add `FsBaseMergeCleanupAdapter` in `libs/infrastructure/src/base_merge.rs` and focused cleanup adapter regression coverage. D1; IN-02; IN-06; CN-02; CN-05; CN-06; CN-07; AC-03; AC-04; AC-10; AC-11; AC-12. (`80437ad2`)
+- [x] **T004**: Add `BaseMergeInput` and `TrackDriver` handling in `apps/cli-driver/src/track.rs`, the `TrackCommand` variant and `execute` dispatch in `apps/cli/src/commands/track/{mod.rs,dispatch.rs}`, and `TrackCompositionRoot::track_driver` wiring in `apps/cli-composition/src/track/composition_root.rs`; add command regression coverage. D1; IN-01; OS-01; CN-01; AC-01; AC-02; AC-03; AC-04.
 
 ### S2 — Conflict recovery and guarded stash
 
 > Add `.harness/workflows/track/recover.md`, its named Claude/Codex adapters, `libs/usecase/src/git_stash.rs`, and the named stash adapters in T006. D2; D3; IN-03; IN-04; AC-05; AC-06.
 
-- [ ] **T005**: Add `.harness/workflows/track/recover.md`, `.claude/commands/track/recover.md`, and `.agents/skills/track-recover/SKILL.md` for the `recover` command surface; add workflow/adapter conformance coverage. D2; IN-03; OS-02; CN-02; AC-04; AC-05.
+- [x] **T005**: Add `.harness/workflows/track/recover.md`, `.claude/commands/track/recover.md`, and `.agents/skills/track-recover/SKILL.md` for the `recover` command surface; add workflow/adapter conformance coverage. D2; IN-03; OS-02; CN-02; AC-04; AC-05.
 - [ ] **T006**: Add `libs/usecase/src/git_stash.rs` with `GitStashPort`, `GitStashService`, `GitStashInteractor`, command, and error; add `FsGitStashAdapter` in `libs/infrastructure/src/git_cli/stash_adapter.rs`, wire `GitDriver` and `GitStashInput` in `apps/cli-driver/src/git.rs`, and add `GitCommand`, `GitStashAction`, and `execute` integration in `apps/cli/src/commands/git.rs` with composition wiring in `apps/cli-composition/src/git.rs`; add regression coverage. D3; IN-04; AC-06.
 
 ### S3 — Baseline-hash-aware type signals

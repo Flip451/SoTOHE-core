@@ -5,22 +5,6 @@
   "schema_version": 5,
   "trait_impls": [
     {
-      "for_type": "BaseMergeInput",
-      "trait_ref": "core::fmt::Debug"
-    },
-    {
-      "for_type": "BaseMergeInput",
-      "trait_ref": "core::clone::Clone"
-    },
-    {
-      "for_type": "BaseMergeInput",
-      "trait_ref": "core::cmp::PartialEq"
-    },
-    {
-      "for_type": "BaseMergeInput",
-      "trait_ref": "core::cmp::Eq"
-    },
-    {
       "for_type": "GitStashInput",
       "trait_ref": "core::fmt::Debug"
     },

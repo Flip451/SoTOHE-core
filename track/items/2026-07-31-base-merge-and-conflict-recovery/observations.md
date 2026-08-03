@@ -18,3 +18,17 @@ Phase 3 再生成より先に完全な下流帰属を要求する循環を回避
   一体として再検証・正規化する。
 - G22 merge 後に `develop` を取り込み、gitignored な `bin/sotp` を `cargo make build-sotp` で再構築すれば、
   scope 条件付き gate によりこの workaround は不要になる。
+
+## 2026-08-03 — guarded base-merge conflict source-repair exception
+
+D2 の既裁定に従い、conflict hunk の選択だけを pre-gate 実行可能化のために許す source-repair
+境界を適用した。対象はこの workflow/policy 文書群のみで、placeholder・意味追加は行わない。
+
+- 対象ファイル: `.harness/workflows/track/recover.md`, `.harness/policies/sot-reentry-sequencing.md`,
+  `.harness/policies/pre-track-adr-authoring.md`, `CLAUDE.md`, `.agents/skills/track-recover/SKILL.md`
+- 選択した辺: 既存文書の conflict-recovery/one-writer 境界を、D2 限定の hunk 選択と上流再収束後の
+  designated-writer 再実行として明文化した。
+- 理由: `task-contract-check` / signal / `track-active-gate` が multi-SoT conflict の未解消入力で
+  起動不能になるため。semantic authorship は designated writer に残し、レビュー・commit gate は維持する。
+- 追加適用: `spec-designer` / `type-designer` / `impl-planner` / `adr-editor` / `adr-diagnoser` の
+  capability contract に `conflict-preparation` mode と即時 guardian/re-entry 条件を同期した。

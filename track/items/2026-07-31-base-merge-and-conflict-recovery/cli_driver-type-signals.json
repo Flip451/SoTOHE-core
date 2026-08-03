@@ -1,21 +1,15 @@
 {
   "schema_version": 4,
-  "generated_at": "2026-08-01T12:12:58Z",
-  "declaration_hash": "6a0d7d1bb14f8247fe50f5fc3066ff2a0775acc1c118f4430059195e797b0efb",
-  "implementation_input_hash": "ebc0c71312207b18f846f9a628a516e3db4c5c6fcb5c21b07bdea63c02f9ed8e",
+  "generated_at": "2026-08-02T15:03:50Z",
+  "declaration_hash": "40152f45c2c888785a0628d1205fc353a44e67a6e317c336062ae1fa572bc136",
+  "implementation_input_hash": "c063d4e5efa2710f39bf5483a0ed9e78d527287aeb553a97ea789a26fb90e53e",
   "baseline_hash": "1ed9aa28dd241bacf4b2773c9a0563343fed5ddf01dfa2d8c15bca1794581dc5",
   "signals": [
     {
       "type_name": "BaseMergeInput",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
-        "Clone",
-        "Debug",
-        "Eq",
-        "PartialEq"
-      ]
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "GitDriver",
@@ -39,7 +33,7 @@
     {
       "type_name": "TrackDriver",
       "kind_tag": "primary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     }
   ]

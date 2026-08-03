@@ -2165,13 +2165,13 @@
         "item_identifier": "trait_method:replace_baselines"
       },
       "key": {
-        "bound_tests_set_hash": "15ae5ccadedc2429529f0e7f351bb6adfe8a300c583bce8de07faafdae508123",
+        "bound_tests_set_hash": "7a1a9965ca787f6b7cc4abbd1a5f51e3c78e341e4a13b08f0c6db0232b939afa",
         "declaration_hash": "5ac6584703179f572ce269db7dfaa15713fe8a6223bbbc699bc96bf5f8e7dd9e",
         "anchor_text_hash": "c559fb6f4b5ad1f203c8e09b92c1767750c2f7613e52b36514d5a2bfa919ed24"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(*cleanup_calls.lock().unwrap(), vec![ CleanupCall { stage: CleanupStage::Views, request: cleanup_request() }, CleanupCall { stage: CleanupStage::Baseline, request: cleanup_request() }, CleanupCall { stage: CleanupStage::SyncBaseStamp, request: cleanup_request() }, ]); ... assert_eq!(current_commit(&worktree, \"HEAD^{commit}\"), expected_commit); ... assert_eq!(std::fs::read_to_string(&baseline).unwrap(), \"replacement-baseline\"); ... assert!(!stale_baseline.exists(), \"stale baseline must be removed from the replacement\"); ... assert_eq!(stamp.base_commit, stamp_request.base_commit);"
+        "citation": "assert_eq!(*cleanup_calls.lock().unwrap(), vec![ CleanupCall { stage: CleanupStage::Views, request: cleanup_request() }, CleanupCall { stage: CleanupStage::Baseline, request: cleanup_request() }, CleanupCall { stage: CleanupStage::SyncBaseStamp, request: cleanup_request() }, ]); ... assert_eq!(current_commit(&worktree, \"HEAD^{commit}\"), expected_commit); ... assert_eq!(std::fs::read_to_string(&baseline).unwrap(), \"replacement-baseline\"); ... assert_eq!(stamp.base_commit, stamp_request.base_commit);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -2221,7 +2221,7 @@
         "item_identifier": "trait_method:replace_baselines"
       },
       "key": {
-        "bound_tests_set_hash": "15ae5ccadedc2429529f0e7f351bb6adfe8a300c583bce8de07faafdae508123",
+        "bound_tests_set_hash": "7a1a9965ca787f6b7cc4abbd1a5f51e3c78e341e4a13b08f0c6db0232b939afa",
         "declaration_hash": "5ac6584703179f572ce269db7dfaa15713fe8a6223bbbc699bc96bf5f8e7dd9e",
         "anchor_text_hash": "8fa63a343c348aeac0df772579e983f222f64ff76b2f90fdc2bae85abf103a14"
       },
@@ -2277,13 +2277,13 @@
         "item_identifier": "trait_method:replace_baselines"
       },
       "key": {
-        "bound_tests_set_hash": "15ae5ccadedc2429529f0e7f351bb6adfe8a300c583bce8de07faafdae508123",
+        "bound_tests_set_hash": "7a1a9965ca787f6b7cc4abbd1a5f51e3c78e341e4a13b08f0c6db0232b939afa",
         "declaration_hash": "5ac6584703179f572ce269db7dfaa15713fe8a6223bbbc699bc96bf5f8e7dd9e",
         "anchor_text_hash": "ae93f16b8b5af6d307d274a5c694b4ac052045cff1123092ed79af420e71bad1"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(outcome, BaseMergeOutcome::Conflicted);\n        assert_eq!(git_calls.lock().unwrap().len(), 1);\n        assert!(cleanup_calls.lock().unwrap().is_empty());"
+        "citation": "assert_eq!(*cleanup_calls.lock().unwrap(), Vec::new());"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -2333,13 +2333,13 @@
         "item_identifier": "trait_method:replace_baselines"
       },
       "key": {
-        "bound_tests_set_hash": "15ae5ccadedc2429529f0e7f351bb6adfe8a300c583bce8de07faafdae508123",
+        "bound_tests_set_hash": "7a1a9965ca787f6b7cc4abbd1a5f51e3c78e341e4a13b08f0c6db0232b939afa",
         "declaration_hash": "5ac6584703179f572ce269db7dfaa15713fe8a6223bbbc699bc96bf5f8e7dd9e",
         "anchor_text_hash": "0701cfad6fdaeeb90c4bf352edab6dc4fe39450ed89a722db81c70f8c1600827"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(\n            *cleanup_calls.lock().unwrap(),\n            vec![\n                CleanupCall { stage: CleanupStage::Views, request: cleanup_request() },\n                CleanupCall { stage: CleanupStage::Baseline, request: cleanup_request() },\n                CleanupCall { stage: CleanupStage::SyncBaseStamp, request: cleanup_request() },\n            ]\n        );\n\n        assert!(cleanup_calls.lock().unwrap().is_empty());\n\n        assert_eq!(std::fs::read_to_string(&type_signals).unwrap(), \"preserved-cache\");"
+        "citation": "\"cleanup_calls.lock().unwrap(),\\n            vec![\\n                CleanupCall { stage: CleanupStage::Views, request: cleanup_request() },\\n                CleanupCall { stage: CleanupStage::Baseline, request: cleanup_request() },\\n                CleanupCall { stage: CleanupStage::SyncBaseStamp, request: cleanup_request() },\\n            ]\"; \"assert!(cleanup_calls.lock().unwrap().is_empty());\"; \"assert_eq!(std::fs::read_to_string(&type_signals).unwrap(), \\\"preserved-cache\\\");\""
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -2389,13 +2389,13 @@
         "item_identifier": "trait_method:replace_baselines"
       },
       "key": {
-        "bound_tests_set_hash": "15ae5ccadedc2429529f0e7f351bb6adfe8a300c583bce8de07faafdae508123",
+        "bound_tests_set_hash": "7a1a9965ca787f6b7cc4abbd1a5f51e3c78e341e4a13b08f0c6db0232b939afa",
         "declaration_hash": "5ac6584703179f572ce269db7dfaa15713fe8a6223bbbc699bc96bf5f8e7dd9e",
         "anchor_text_hash": "d5e6be0352d264e24422b08e522cd2fa714eb06575771f564fde0ddad0d1c7a0"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(state.active_baseline, \"prior-valid-baseline\");"
+        "citation": "assert!(match (failure, result) { ( BaselineFailure::Generation, Err(BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Baseline( BaselineReplacementError::Generation(detail), ))) => detail.as_str() == \"baseline generation failed\", ( BaselineFailure::Validation, Err(BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Baseline( BaselineReplacementError::Validation(detail), ))) => detail.as_str() == \"baseline validation failed\", ( BaselineFailure::Publish, Err(BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Baseline( BaselineReplacementError::Publish(detail), ))) => detail.as_str() == \"replacement publication failed\", _ => false, });\n            let state = state.lock().unwrap();\n            assert_eq!(state.active_baseline, \"prior-valid-baseline\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -2445,13 +2445,13 @@
         "item_identifier": "trait_method:write_sync_base_record"
       },
       "key": {
-        "bound_tests_set_hash": "15ae5ccadedc2429529f0e7f351bb6adfe8a300c583bce8de07faafdae508123",
+        "bound_tests_set_hash": "7a1a9965ca787f6b7cc4abbd1a5f51e3c78e341e4a13b08f0c6db0232b939afa",
         "declaration_hash": "5ac6584703179f572ce269db7dfaa15713fe8a6223bbbc699bc96bf5f8e7dd9e",
         "anchor_text_hash": "c559fb6f4b5ad1f203c8e09b92c1767750c2f7613e52b36514d5a2bfa919ed24"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(\n            *cleanup_calls.lock().unwrap(),\n            vec![\n                CleanupCall { stage: CleanupStage::Views, request: cleanup_request() },\n                CleanupCall { stage: CleanupStage::Baseline, request: cleanup_request() },\n                CleanupCall { stage: CleanupStage::SyncBaseStamp, request: cleanup_request() },\n            ]\n        );\n\nassert_eq!(std::fs::read_to_string(&baseline).unwrap(), \"replacement-baseline\");\nassert!(!stale_baseline.exists(), \"stale baseline must be removed from the replacement\");\nassert_eq!(stamp.base_commit, stamp_request.base_commit);"
+        "citation": "\"assert_eq!(\\n            *cleanup_calls.lock().unwrap(),\\n            vec![\\n                CleanupCall { stage: CleanupStage::Views, request: cleanup_request() },\\n                CleanupCall { stage: CleanupStage::Baseline, request: cleanup_request() },\\n                CleanupCall { stage: CleanupStage::SyncBaseStamp, request: cleanup_request() },\\n            ]\\n        );\" and \"assert_eq!(current_commit(&worktree, \\\"HEAD^{commit}\\\"), expected_commit);\" and \"assert_eq!(std::fs::read_to_string(&baseline).unwrap(), \\\"replacement-baseline\\\");\" and \"assert_eq!(stamp.base_commit, stamp_request.base_commit);\""
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -2501,13 +2501,13 @@
         "item_identifier": "trait_method:write_sync_base_record"
       },
       "key": {
-        "bound_tests_set_hash": "15ae5ccadedc2429529f0e7f351bb6adfe8a300c583bce8de07faafdae508123",
+        "bound_tests_set_hash": "7a1a9965ca787f6b7cc4abbd1a5f51e3c78e341e4a13b08f0c6db0232b939afa",
         "declaration_hash": "5ac6584703179f572ce269db7dfaa15713fe8a6223bbbc699bc96bf5f8e7dd9e",
         "anchor_text_hash": "8fa63a343c348aeac0df772579e983f222f64ff76b2f90fdc2bae85abf103a14"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(*cleanup_calls.lock().unwrap(), vec![ CleanupCall { stage: CleanupStage::Views, request: cleanup_request() }, CleanupCall { stage: CleanupStage::Baseline, request: cleanup_request() }, CleanupCall { stage: CleanupStage::SyncBaseStamp, request: cleanup_request() }, ]); ... assert_eq!(current_commit(&worktree, \"HEAD^{commit}\"), expected_commit); ... publish_baseline_replacements(&track_dir, &replacement).unwrap(); ... assert_eq!(std::fs::read_to_string(&baseline).unwrap(), \"replacement-baseline\"); ... write_sync_base_record_atomically(&stamp_request).unwrap(); ... assert_eq!(stamp.base_commit, stamp_request.base_commit);"
+        "citation": "assert_eq!(*cleanup_calls.lock().unwrap(), vec![ CleanupCall { stage: CleanupStage::Views, request: cleanup_request() }, CleanupCall { stage: CleanupStage::Baseline, request: cleanup_request() }, CleanupCall { stage: CleanupStage::SyncBaseStamp, request: cleanup_request() }, ]); ... assert_eq!(current_commit(&worktree, \"HEAD^{commit}\"), expected_commit); ... publish_baseline_replacements(&track_dir, &replacement).unwrap(); ... write_sync_base_record_atomically(&stamp_request).unwrap();"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -2557,13 +2557,13 @@
         "item_identifier": "trait_method:write_sync_base_record"
       },
       "key": {
-        "bound_tests_set_hash": "15ae5ccadedc2429529f0e7f351bb6adfe8a300c583bce8de07faafdae508123",
+        "bound_tests_set_hash": "7a1a9965ca787f6b7cc4abbd1a5f51e3c78e341e4a13b08f0c6db0232b939afa",
         "declaration_hash": "5ac6584703179f572ce269db7dfaa15713fe8a6223bbbc699bc96bf5f8e7dd9e",
         "anchor_text_hash": "ae93f16b8b5af6d307d274a5c694b4ac052045cff1123092ed79af420e71bad1"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(outcome, BaseMergeOutcome::Conflicted);\n        assert_eq!(git_calls.lock().unwrap().len(), 1);\n        assert!(cleanup_calls.lock().unwrap().is_empty());"
+        "citation": "assert!(cleanup_calls.lock().unwrap().is_empty());"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -2613,13 +2613,13 @@
         "item_identifier": "trait_method:write_sync_base_record"
       },
       "key": {
-        "bound_tests_set_hash": "15ae5ccadedc2429529f0e7f351bb6adfe8a300c583bce8de07faafdae508123",
+        "bound_tests_set_hash": "7a1a9965ca787f6b7cc4abbd1a5f51e3c78e341e4a13b08f0c6db0232b939afa",
         "declaration_hash": "5ac6584703179f572ce269db7dfaa15713fe8a6223bbbc699bc96bf5f8e7dd9e",
         "anchor_text_hash": "0701cfad6fdaeeb90c4bf352edab6dc4fe39450ed89a722db81c70f8c1600827"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "\"stage: CleanupStage::Views\", \"stage: CleanupStage::Baseline\", \"stage: CleanupStage::SyncBaseStamp\"; \"assert!(cleanup_calls.lock().unwrap().is_empty());\"; \"assert_eq!(std::fs::read_to_string(&type_signals).unwrap(), \\\"preserved-cache\\\");"
+        "citation": "\"cleanup_calls.lock().unwrap(),\\n            vec![\\n                CleanupCall { stage: CleanupStage::Views, request: cleanup_request() },\\n                CleanupCall { stage: CleanupStage::Baseline, request: cleanup_request() },\\n                CleanupCall { stage: CleanupStage::SyncBaseStamp, request: cleanup_request() },\\n            ]\"; \"assert!(cleanup_calls.lock().unwrap().is_empty());\"; \"assert_eq!(std::fs::read_to_string(&type_signals).unwrap(), \\\"preserved-cache\\\");\""
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -2669,13 +2669,13 @@
         "item_identifier": "trait_method:write_sync_base_record"
       },
       "key": {
-        "bound_tests_set_hash": "15ae5ccadedc2429529f0e7f351bb6adfe8a300c583bce8de07faafdae508123",
+        "bound_tests_set_hash": "7a1a9965ca787f6b7cc4abbd1a5f51e3c78e341e4a13b08f0c6db0232b939afa",
         "declaration_hash": "5ac6584703179f572ce269db7dfaa15713fe8a6223bbbc699bc96bf5f8e7dd9e",
         "anchor_text_hash": "d5e6be0352d264e24422b08e522cd2fa714eb06575771f564fde0ddad0d1c7a0"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(state.active_baseline, \"prior-valid-baseline\");"
+        "citation": "assert!(match (failure, result) {\n    (\n        BaselineFailure::Generation,\n        Err(BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Baseline(\n            BaselineReplacementError::Generation(detail),\n        ))),\n    ) => detail.as_str() == \"baseline generation failed\",\n    (\n        BaselineFailure::Validation,\n        Err(BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Baseline(\n            BaselineReplacementError::Validation(detail),\n        ))),\n    ) => detail.as_str() == \"baseline validation failed\",\n    (\n        BaselineFailure::Publish,\n        Err(BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Baseline(\n            BaselineReplacementError::Publish(detail),\n        ))),\n    ) => detail.as_str() == \"replacement publication failed\",\n    _ => false,\n});\nlet state = state.lock().unwrap();\nassert_eq!(state.active_baseline, \"prior-valid-baseline\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -7679,6 +7679,1518 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::base_merge::tests",
           "test_name": "test_sync_base_record_deserialize_rejects_unknown_schema_version"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsBaseMergeCleanupAdapter",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsBaseMergeCleanupAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::base_merge::BaseMergeCleanupPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "8ac3b88f9f8c8a6b05bdb17c013143e32665864d6481143c9dd93c7c77e4dbc4",
+        "declaration_hash": "c611885111258e65b0b8598f8e3714a0f2ed37bbdc818c4ec6d79ccd66877710",
+        "anchor_text_hash": "c559fb6f4b5ad1f203c8e09b92c1767750c2f7613e52b36514d5a2bfa919ed24"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(track_dir.join(\"plan.md\").is_file(), \"view regeneration must publish plan.md\"); assert!(published_baseline.contains(\"CleanupFixture\"), \"the published baseline must come from the requested commit\"); assert!(!published_baseline.contains(\"AdvancedDevelopOnlyMarker\"), \"the advanced develop branch must not be resolved after the merge commit is fixed\"); assert_eq!(record.base_commit.as_ref(), requested_base_commit);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_regenerates_views_replaces_pinned_baselines_and_preserves_type_signals"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_conflict_keeps_track_available_without_cleanup"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_writes_v1_idempotently_and_replaces_later_commit"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_rejects_malformed_or_non_regular_stamp_without_replacing_prior_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_rejects_invalid_isolated_fixture_and_preserves_prior_complete_track"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_validation_failure_preserves_prior_complete_track"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_publication_failure_preserves_prior_complete_track"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_restoration_failure_stays_typed_and_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_propagates_view_regeneration_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_base_merge_interactor_clean_merge_view_failure_preserves_baseline_and_sync_stamp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_base_merge_interactor_clean_merge_baseline_failure_preserves_baseline_and_sync_stamp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_base_merge_interactor_sync_stamp_failure_preserves_complete_published_track"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsBaseMergeCleanupAdapter",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsBaseMergeCleanupAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::base_merge::BaseMergeCleanupPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "8ac3b88f9f8c8a6b05bdb17c013143e32665864d6481143c9dd93c7c77e4dbc4",
+        "declaration_hash": "c611885111258e65b0b8598f8e3714a0f2ed37bbdc818c4ec6d79ccd66877710",
+        "anchor_text_hash": "ab5b95bd2bf1ac2a636655117378a08d874c0d9763dac951949ae62fddda6b5d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome, usecase::base_merge::BaseMergeOutcome::Conflicted);\nassert!(!track_dir.join(\".sync-base.json\").exists());\nassert!(!track_dir.join(\"plan.md\").exists());\nassert!(!track_dir.join(\"domain-types-baseline.json\").exists());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_regenerates_views_replaces_pinned_baselines_and_preserves_type_signals"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_conflict_keeps_track_available_without_cleanup"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_writes_v1_idempotently_and_replaces_later_commit"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_rejects_malformed_or_non_regular_stamp_without_replacing_prior_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_rejects_invalid_isolated_fixture_and_preserves_prior_complete_track"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_validation_failure_preserves_prior_complete_track"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_publication_failure_preserves_prior_complete_track"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_restoration_failure_stays_typed_and_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_propagates_view_regeneration_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_base_merge_interactor_clean_merge_view_failure_preserves_baseline_and_sync_stamp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_base_merge_interactor_clean_merge_baseline_failure_preserves_baseline_and_sync_stamp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_base_merge_interactor_sync_stamp_failure_preserves_complete_published_track"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsBaseMergeCleanupAdapter",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsBaseMergeCleanupAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::base_merge::BaseMergeCleanupPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "8ac3b88f9f8c8a6b05bdb17c013143e32665864d6481143c9dd93c7c77e4dbc4",
+        "declaration_hash": "c611885111258e65b0b8598f8e3714a0f2ed37bbdc818c4ec6d79ccd66877710",
+        "anchor_text_hash": "8fa63a343c348aeac0df772579e983f222f64ff76b2f90fdc2bae85abf103a14"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "adapter.regenerate_views(&request).unwrap();\n        assert!(track_dir.join(\"plan.md\").is_file(), \"view regeneration must publish plan.md\");\n        adapter.replace_baselines(&request).unwrap();\n\n        let published_baseline = std::fs::read_to_string(&prior_baseline).unwrap();\n        assert_ne!(published_baseline, \"prior-baseline\");\n        crate::tddd::baseline_rustdoc_codec::BaselineRustdocCodec::from_json(&published_baseline)\n            .unwrap();\n        assert!(\n            published_baseline.contains(\"CleanupFixture\"),\n            \"the published baseline must come from the requested commit\"\n        );\n        assert!(\n            !published_baseline.contains(\"AdvancedDevelopOnlyMarker\"),\n            \"the advanced develop branch must not be resolved after the merge commit is fixed\"\n        );\n        adapter.write_sync_base_record(&request).unwrap();\n        let record =\n            decode(&std::fs::read_to_string(track_dir.join(\".sync-base.json\")).unwrap()).unwrap();\n        assert_eq!(record.base_commit, request.base_commit);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_regenerates_views_replaces_pinned_baselines_and_preserves_type_signals"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_conflict_keeps_track_available_without_cleanup"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_writes_v1_idempotently_and_replaces_later_commit"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_rejects_malformed_or_non_regular_stamp_without_replacing_prior_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_rejects_invalid_isolated_fixture_and_preserves_prior_complete_track"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_validation_failure_preserves_prior_complete_track"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_publication_failure_preserves_prior_complete_track"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_restoration_failure_stays_typed_and_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_propagates_view_regeneration_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_base_merge_interactor_clean_merge_view_failure_preserves_baseline_and_sync_stamp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_base_merge_interactor_clean_merge_baseline_failure_preserves_baseline_and_sync_stamp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_base_merge_interactor_sync_stamp_failure_preserves_complete_published_track"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsBaseMergeCleanupAdapter",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsBaseMergeCleanupAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::base_merge::BaseMergeCleanupPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "8ac3b88f9f8c8a6b05bdb17c013143e32665864d6481143c9dd93c7c77e4dbc4",
+        "declaration_hash": "c611885111258e65b0b8598f8e3714a0f2ed37bbdc818c4ec6d79ccd66877710",
+        "anchor_text_hash": "ae93f16b8b5af6d307d274a5c694b4ac052045cff1123092ed79af420e71bad1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome, usecase::base_merge::BaseMergeOutcome::Conflicted);\n        assert!(track_dir.is_dir(), \"the conflicted track must remain available for recovery\");\n        assert!(!track_dir.join(\".sync-base.json\").exists());\n        assert!(!track_dir.join(\"plan.md\").exists());\n        assert!(!track_dir.join(\"domain-types-baseline.json\").exists());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_regenerates_views_replaces_pinned_baselines_and_preserves_type_signals"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_conflict_keeps_track_available_without_cleanup"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_writes_v1_idempotently_and_replaces_later_commit"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_rejects_malformed_or_non_regular_stamp_without_replacing_prior_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_rejects_invalid_isolated_fixture_and_preserves_prior_complete_track"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_validation_failure_preserves_prior_complete_track"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_publication_failure_preserves_prior_complete_track"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_restoration_failure_stays_typed_and_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_propagates_view_regeneration_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_base_merge_interactor_clean_merge_view_failure_preserves_baseline_and_sync_stamp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_base_merge_interactor_clean_merge_baseline_failure_preserves_baseline_and_sync_stamp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_base_merge_interactor_sync_stamp_failure_preserves_complete_published_track"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsBaseMergeCleanupAdapter",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsBaseMergeCleanupAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::base_merge::BaseMergeCleanupPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "8ac3b88f9f8c8a6b05bdb17c013143e32665864d6481143c9dd93c7c77e4dbc4",
+        "declaration_hash": "c611885111258e65b0b8598f8e3714a0f2ed37bbdc818c4ec6d79ccd66877710",
+        "anchor_text_hash": "92a7601808ae36e0d63a8e8e4e46f7ae285b3e663bc9b63579db5ea2ff17841a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(first_record.schema_version, SyncBaseRecordSchemaVersion::V1);\n        assert_eq!(first_record.track_id, first.track_id);\n        assert_eq!(first_record.base_branch, first.base_branch);\n        assert_eq!(first_record.base_commit, first.base_commit);\n\n        adapter.write_sync_base_record(&later).unwrap();\n\n        let record =\n            decode(&std::fs::read_to_string(track_dir.join(\".sync-base.json\")).unwrap()).unwrap();\n        assert_eq!(record.base_commit, later.base_commit);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_regenerates_views_replaces_pinned_baselines_and_preserves_type_signals"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_conflict_keeps_track_available_without_cleanup"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_writes_v1_idempotently_and_replaces_later_commit"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_rejects_malformed_or_non_regular_stamp_without_replacing_prior_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_rejects_invalid_isolated_fixture_and_preserves_prior_complete_track"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_validation_failure_preserves_prior_complete_track"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_publication_failure_preserves_prior_complete_track"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_restoration_failure_stays_typed_and_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_propagates_view_regeneration_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_base_merge_interactor_clean_merge_view_failure_preserves_baseline_and_sync_stamp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_base_merge_interactor_clean_merge_baseline_failure_preserves_baseline_and_sync_stamp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_base_merge_interactor_sync_stamp_failure_preserves_complete_published_track"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsBaseMergeCleanupAdapter",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsBaseMergeCleanupAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::base_merge::BaseMergeCleanupPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "8ac3b88f9f8c8a6b05bdb17c013143e32665864d6481143c9dd93c7c77e4dbc4",
+        "declaration_hash": "c611885111258e65b0b8598f8e3714a0f2ed37bbdc818c4ec6d79ccd66877710",
+        "anchor_text_hash": "10b98eec1056add45bb868001fad34b38c6acacf628f4a2ed3215b58620ad424"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(result.is_err(), \"malformed generated baselines must fail validation\"); assert_eq!(std::fs::read_to_string(&prior).unwrap(), \"prior-valid-baseline\"); assert_eq!(std::fs::read_to_string(track_dir.join(\"preserved-input.txt\")).unwrap(), \"prior-complete-track-input\"); assert!(track_dir.is_dir(), \"validation failure must not expose a partial replacement\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_regenerates_views_replaces_pinned_baselines_and_preserves_type_signals"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_conflict_keeps_track_available_without_cleanup"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_writes_v1_idempotently_and_replaces_later_commit"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_rejects_malformed_or_non_regular_stamp_without_replacing_prior_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_rejects_invalid_isolated_fixture_and_preserves_prior_complete_track"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_validation_failure_preserves_prior_complete_track"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_publication_failure_preserves_prior_complete_track"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_restoration_failure_stays_typed_and_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_propagates_view_regeneration_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_base_merge_interactor_clean_merge_view_failure_preserves_baseline_and_sync_stamp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_base_merge_interactor_clean_merge_baseline_failure_preserves_baseline_and_sync_stamp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_base_merge_interactor_sync_stamp_failure_preserves_complete_published_track"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsBaseMergeCleanupAdapter",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsBaseMergeCleanupAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::base_merge::BaseMergeCleanupPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "8ac3b88f9f8c8a6b05bdb17c013143e32665864d6481143c9dd93c7c77e4dbc4",
+        "declaration_hash": "c611885111258e65b0b8598f8e3714a0f2ed37bbdc818c4ec6d79ccd66877710",
+        "anchor_text_hash": "94cd89ee88ae29b2d2034ebc97ab9f63217d17250a55a77d97d2546302a8e43e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(record.base_commit.as_ref(), requested_base_commit); ... adapter.write_sync_base_record(&first).unwrap(); adapter.write_sync_base_record(&first).unwrap(); ... assert!(!track_dir.join(\".sync-base.json\").exists(), \"the SyncBase stage must not run after Views fails\"); ... assert!(!track_dir.join(\".sync-base.json\").exists(), \"the SyncBase stage must not run after Baseline fails\"); ... assert!(matches!(adapter.write_sync_base_record(&later), Err(SyncBaseRecordError::Replacement(_)))); ... assert!(matches!(adapter.write_sync_base_record(&request), Err(SyncBaseRecordError::Validation(_)))); ... assert!(matches!(adapter.write_sync_base_record(&request), Err(SyncBaseRecordError::Write(_))));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_regenerates_views_replaces_pinned_baselines_and_preserves_type_signals"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_conflict_keeps_track_available_without_cleanup"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_writes_v1_idempotently_and_replaces_later_commit"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_rejects_malformed_or_non_regular_stamp_without_replacing_prior_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_rejects_invalid_isolated_fixture_and_preserves_prior_complete_track"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_validation_failure_preserves_prior_complete_track"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_publication_failure_preserves_prior_complete_track"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_restoration_failure_stays_typed_and_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_propagates_view_regeneration_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_base_merge_interactor_clean_merge_view_failure_preserves_baseline_and_sync_stamp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_base_merge_interactor_clean_merge_baseline_failure_preserves_baseline_and_sync_stamp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_base_merge_interactor_sync_stamp_failure_preserves_complete_published_track"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsBaseMergeCleanupAdapter",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "CN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsBaseMergeCleanupAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::base_merge::BaseMergeCleanupPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "8ac3b88f9f8c8a6b05bdb17c013143e32665864d6481143c9dd93c7c77e4dbc4",
+        "declaration_hash": "c611885111258e65b0b8598f8e3714a0f2ed37bbdc818c4ec6d79ccd66877710",
+        "anchor_text_hash": "0701cfad6fdaeeb90c4bf352edab6dc4fe39450ed89a722db81c70f8c1600827"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(track_dir.join(\"plan.md\").is_file(), \"Views must complete before Baseline\"); ... assert!(!track_dir.join(\".sync-base.json\").exists(), \"the SyncBase stage must not run after Baseline fails\"); ... assert_eq!(std::fs::read_to_string(&type_signals).unwrap(), \"preserved-cache\"); ... assert!(!track_dir.join(\".sync-base.json\").exists());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_regenerates_views_replaces_pinned_baselines_and_preserves_type_signals"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_conflict_keeps_track_available_without_cleanup"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_writes_v1_idempotently_and_replaces_later_commit"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_rejects_malformed_or_non_regular_stamp_without_replacing_prior_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_rejects_invalid_isolated_fixture_and_preserves_prior_complete_track"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_validation_failure_preserves_prior_complete_track"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_publication_failure_preserves_prior_complete_track"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_restoration_failure_stays_typed_and_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_propagates_view_regeneration_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_base_merge_interactor_clean_merge_view_failure_preserves_baseline_and_sync_stamp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_base_merge_interactor_clean_merge_baseline_failure_preserves_baseline_and_sync_stamp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_base_merge_interactor_sync_stamp_failure_preserves_complete_published_track"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsBaseMergeCleanupAdapter",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsBaseMergeCleanupAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::base_merge::BaseMergeCleanupPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "8ac3b88f9f8c8a6b05bdb17c013143e32665864d6481143c9dd93c7c77e4dbc4",
+        "declaration_hash": "c611885111258e65b0b8598f8e3714a0f2ed37bbdc818c4ec6d79ccd66877710",
+        "anchor_text_hash": "d5e6be0352d264e24422b08e522cd2fa714eb06575771f564fde0ddad0d1c7a0"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(!matches!(result, Ok(usecase::base_merge::BaseMergeOutcome::Completed)), \"a failed SyncBase stage must never report completed cleanup\"); ... assert_eq!(std::fs::read_to_string(&prior_baseline).unwrap(), \"prior-valid-baseline\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_regenerates_views_replaces_pinned_baselines_and_preserves_type_signals"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_conflict_keeps_track_available_without_cleanup"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_writes_v1_idempotently_and_replaces_later_commit"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_rejects_malformed_or_non_regular_stamp_without_replacing_prior_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_rejects_invalid_isolated_fixture_and_preserves_prior_complete_track"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_validation_failure_preserves_prior_complete_track"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_publication_failure_preserves_prior_complete_track"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_restoration_failure_stays_typed_and_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_propagates_view_regeneration_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_base_merge_interactor_clean_merge_view_failure_preserves_baseline_and_sync_stamp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_base_merge_interactor_clean_merge_baseline_failure_preserves_baseline_and_sync_stamp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_base_merge_interactor_sync_stamp_failure_preserves_complete_published_track"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsBaseMergeCleanupAdapter",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-11"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsBaseMergeCleanupAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::base_merge::BaseMergeCleanupPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "8ac3b88f9f8c8a6b05bdb17c013143e32665864d6481143c9dd93c7c77e4dbc4",
+        "declaration_hash": "c611885111258e65b0b8598f8e3714a0f2ed37bbdc818c4ec6d79ccd66877710",
+        "anchor_text_hash": "8f72df7566d25066016278de5e0f6d20ef327f95a6f72e7f2d2de2b00cc5e843"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "adapter.write_sync_base_record(&first).unwrap();\nadapter.write_sync_base_record(&first).unwrap();\nlet first_record =\n    decode(&std::fs::read_to_string(track_dir.join(\".sync-base.json\")).unwrap()).unwrap();\nassert_eq!(first_record.schema_version, SyncBaseRecordSchemaVersion::V1);\nassert_eq!(first_record.track_id, first.track_id);\nassert_eq!(first_record.base_branch, first.base_branch);\nassert_eq!(first_record.base_commit, first.base_commit);\n\nadapter.write_sync_base_record(&later).unwrap();\n\nlet record =\n    decode(&std::fs::read_to_string(track_dir.join(\".sync-base.json\")).unwrap()).unwrap();\nassert_eq!(record.base_commit, later.base_commit);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_regenerates_views_replaces_pinned_baselines_and_preserves_type_signals"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_conflict_keeps_track_available_without_cleanup"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_writes_v1_idempotently_and_replaces_later_commit"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_rejects_malformed_or_non_regular_stamp_without_replacing_prior_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_rejects_invalid_isolated_fixture_and_preserves_prior_complete_track"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_validation_failure_preserves_prior_complete_track"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_publication_failure_preserves_prior_complete_track"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_restoration_failure_stays_typed_and_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_propagates_view_regeneration_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_base_merge_interactor_clean_merge_view_failure_preserves_baseline_and_sync_stamp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_base_merge_interactor_clean_merge_baseline_failure_preserves_baseline_and_sync_stamp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_base_merge_interactor_sync_stamp_failure_preserves_complete_published_track"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsBaseMergeCleanupAdapter",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-12"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsBaseMergeCleanupAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::base_merge::BaseMergeCleanupPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "8ac3b88f9f8c8a6b05bdb17c013143e32665864d6481143c9dd93c7c77e4dbc4",
+        "declaration_hash": "c611885111258e65b0b8598f8e3714a0f2ed37bbdc818c4ec6d79ccd66877710",
+        "anchor_text_hash": "2f8501ce2880b06ce24e84c087b1539e8bdfef95c479944a0d0853e85ec77cc5"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome, usecase::base_merge::BaseMergeOutcome::Conflicted); ... assert!(!track_dir.join(\".sync-base.json\").exists()); ... assert!(matches!(result, Err(usecase::base_merge::BaseMergeError::PostMergeCleanup( ... ViewsRegenerationError::Regeneration(_) ... ))); ... assert!(matches!(result, Err(usecase::base_merge::BaseMergeError::PostMergeCleanup( ... BaselineReplacementError::Isolation(_) ... ))); ... assert!(!matches!(result, Ok(usecase::base_merge::BaseMergeOutcome::Completed)), \"a failed SyncBase stage must never report completed cleanup\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_regenerates_views_replaces_pinned_baselines_and_preserves_type_signals"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_conflict_keeps_track_available_without_cleanup"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_writes_v1_idempotently_and_replaces_later_commit"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_rejects_malformed_or_non_regular_stamp_without_replacing_prior_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_rejects_invalid_isolated_fixture_and_preserves_prior_complete_track"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_validation_failure_preserves_prior_complete_track"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_publication_failure_preserves_prior_complete_track"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_restoration_failure_stays_typed_and_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_propagates_view_regeneration_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_base_merge_interactor_clean_merge_view_failure_preserves_baseline_and_sync_stamp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_base_merge_interactor_clean_merge_baseline_failure_preserves_baseline_and_sync_stamp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_base_merge_interactor_sync_stamp_failure_preserves_complete_published_track"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TrackDriver",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TrackDriver",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "04ed39a7b5e822f1733d85a269830b921b72121b029a3abd5e3ccf15527ae588",
+        "declaration_hash": "a141e5064fc2d4ea1ab6b859fe37df1ea49e94bd34639ae1cf6ab5b2817321be",
+        "anchor_text_hash": "008a36faed29453afb25460ea4db3d92210eddc427c7d565839f29f1cce2e93e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(mismatch_outcome.exit_code, 1);\nassert!(\n    mismatch_outcome.stderr.as_deref().unwrap().contains(\"does not match active track\")\n);\nassert_ne!(mismatch_outcome.stdout.as_deref(), Some(\"base merge completed\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_handle_base_merge_delegates_workspace_and_renders_completed"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_handle_base_merge_renders_guard_failures_without_success"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TrackDriver",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TrackDriver",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "dfb7a8ff8dc6ddb8bb947908b2a34ba89d1e7fc763377156b0e06d25bdfa5d61",
+        "declaration_hash": "a141e5064fc2d4ea1ab6b859fe37df1ea49e94bd34639ae1cf6ab5b2817321be",
+        "anchor_text_hash": "c559fb6f4b5ad1f203c8e09b92c1767750c2f7613e52b36514d5a2bfa919ed24"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n    cleanup_calls.iter().map(|(stage, _)| *stage).collect::<Vec<_>>(),\n    vec![\"views\", \"baseline\", \"sync-base\"]\n);\nfor (_, request) in cleanup_calls.iter() {\n    assert_eq!(request.workspace_root, workspace);\n    assert_eq!(request.base_commit.as_ref(), \"fedcba9876543210\");\n}"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_handle_base_merge_real_interactor_orders_cleanup_at_exact_commit"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TrackDriver",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TrackDriver",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "d134dc79e6731dee3b1a90da2bdfd2ad97a5bf7064ccd045d65c7ddd71830e3e",
+        "declaration_hash": "a141e5064fc2d4ea1ab6b859fe37df1ea49e94bd34639ae1cf6ab5b2817321be",
+        "anchor_text_hash": "04ee06225d2dde855bd2ce4384bd448922a1ef5d7cb6550b5f702ec87f32e137"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(workflow.contains(\"Step 1: Confirm the recovery context\")); assert!(workflow.contains(\"Step 2: Resolve the conflict\")); assert!(workflow.contains(\"Step 3: Verify and review\")); assert!(workflow.contains(\"Step 4: Guarded commit\")); assert!(claude_adapter.contains(\"Operational SSoT: `.harness/workflows/track/recover.md`\")); assert!(claude_adapter.contains(\"free of recovery sequence\")); assert!(codex_adapter.contains(\"canonical recover workflow is `.harness/workflows/track/recover.md`\")); assert!(codex_adapter.contains(\"must not duplicate its state machine\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_handle_base_merge_renders_conflict_recovery_handoff"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TrackDriver",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TrackDriver",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "487c4c67930d211accacfd327d2936186ec1644d5fc2b1bf15115029737608b0",
+        "declaration_hash": "a141e5064fc2d4ea1ab6b859fe37df1ea49e94bd34639ae1cf6ab5b2817321be",
+        "anchor_text_hash": "40f4d9f0d37fa58dfb35671b5faada2feea33e0d3a44c57a471647c25bc0d4f5"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(\n            outcome.stderr.as_deref().unwrap().contains(\"differs from snapshot base 'develop'\")\n        );\n        assert!(git_calls.lock().unwrap().is_empty());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_handle_base_merge_real_interactor_rejects_snapshot_source_before_ports"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TrackDriver",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TrackDriver",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "52f62cba6764e78c49872697a4360adef056d412a3793eb5b0152ad551354f48",
+        "declaration_hash": "a141e5064fc2d4ea1ab6b859fe37df1ea49e94bd34639ae1cf6ab5b2817321be",
+        "anchor_text_hash": "f18c851ca6bcb1742ea5111e940f5b4d764e8a3f5972d5c76b358096ed16f950"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(mismatch_outcome.exit_code, 1);\nassert_ne!(mismatch_outcome.stdout.as_deref(), Some(\"base merge completed\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_handle_base_merge_renders_guard_failures_without_success"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TrackDriver",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TrackDriver",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "dfb7a8ff8dc6ddb8bb947908b2a34ba89d1e7fc763377156b0e06d25bdfa5d61",
+        "declaration_hash": "a141e5064fc2d4ea1ab6b859fe37df1ea49e94bd34639ae1cf6ab5b2817321be",
+        "anchor_text_hash": "8fa63a343c348aeac0df772579e983f222f64ff76b2f90fdc2bae85abf103a14"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome.exit_code, 0);\n        assert_eq!(outcome.stdout.as_deref(), Some(\"base merge completed\"));\n        assert_eq!(\n            cleanup_calls.iter().map(|(stage, _)| *stage).collect::<Vec<_>>(),\n            vec![\"views\", \"baseline\", \"sync-base\"]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_handle_base_merge_real_interactor_orders_cleanup_at_exact_commit"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TrackDriver",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TrackDriver",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "d134dc79e6731dee3b1a90da2bdfd2ad97a5bf7064ccd045d65c7ddd71830e3e",
+        "declaration_hash": "a141e5064fc2d4ea1ab6b859fe37df1ea49e94bd34639ae1cf6ab5b2817321be",
+        "anchor_text_hash": "ae93f16b8b5af6d307d274a5c694b4ac052045cff1123092ed79af420e71bad1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(workflow.contains(\"Step 2: Resolve the conflict\"));\n        assert!(workflow.contains(\"Step 3: Verify and review\"));\n        assert!(workflow.contains(\"Step 4: Guarded commit\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_handle_base_merge_renders_conflict_recovery_handoff"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TrackCommand",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TrackCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "f8a3e870fd20f3db25c9e53f55e71dbe183f65d66f2acd75dfa59fa92ad513b9",
+        "declaration_hash": "97c764041df80293e4f295faa78f2626f9e7b24491526392cbd2740c8309dc56",
+        "anchor_text_hash": "008a36faed29453afb25460ea4db3d92210eddc427c7d565839f29f1cce2e93e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(outcome.stderr.as_deref().unwrap().contains(\"does not match active track\")); ... assert!(git_calls.lock().unwrap().is_empty()); ... assert!(outcome.stderr.as_deref().unwrap().contains(\"differs from snapshot base 'develop'\")); ... assert!(git_calls.lock().unwrap().is_empty());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::dispatch::tests",
+          "test_name": "test_track_command_merge_base_dispatches_argument_free_workspace_to_completed_outcome"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_handle_base_merge_real_interactor_surfaces_active_track_guard_before_ports"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_handle_base_merge_real_interactor_rejects_snapshot_source_before_ports"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TrackCommand",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TrackCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "2135a746cc0d1bbb2425bd43aab653341138cb04c0b136b118cd68447a53374a",
+        "declaration_hash": "97c764041df80293e4f295faa78f2626f9e7b24491526392cbd2740c8309dc56",
+        "anchor_text_hash": "c559fb6f4b5ad1f203c8e09b92c1767750c2f7613e52b36514d5a2bfa919ed24"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let result = dispatch_track_cmd_with_base_merge(TrackCommand::MergeBase, |input| {\n            assert_eq!(input.workspace_root, PathBuf::from(\".\"));\n            cli_driver::CommandOutcome::success(Some(\"base merge completed\".to_owned()))\n        });"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::dispatch::tests",
+          "test_name": "test_track_command_merge_base_dispatches_argument_free_workspace_to_completed_outcome"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TrackCommand",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TrackCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "fd30a61c628c5bc8fbb354f9b5e43be6105131066e4e18070445c61a3fc28712",
+        "declaration_hash": "97c764041df80293e4f295faa78f2626f9e7b24491526392cbd2740c8309dc56",
+        "anchor_text_hash": "04ee06225d2dde855bd2ce4384bd448922a1ef5d7cb6550b5f702ec87f32e137"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let result = dispatch_track_cmd_with_base_merge(TrackCommand::MergeBase, |_| {\n            cli_driver::CommandOutcome::failure(Some(\n                \"base merge conflicted; continue with /track:recover\".to_owned(),\n            ))\n        });\n\n        let error = result.unwrap_err().to_string();\n        assert!(error.contains(\"/track:recover\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::dispatch::tests",
+          "test_name": "test_track_command_merge_base_dispatches_conflicted_outcome_as_recovery_failure"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TrackCommand",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TrackCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "5f64d2f184d0040a1a24e7a6824ad434d83fccd90357e6b981095b4240d00245",
+        "declaration_hash": "97c764041df80293e4f295faa78f2626f9e7b24491526392cbd2740c8309dc56",
+        "anchor_text_hash": "40f4d9f0d37fa58dfb35671b5faada2feea33e0d3a44c57a471647c25bc0d4f5"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(outcome.stderr.as_deref().unwrap().contains(\"does not match active track\")); ... assert!(outcome.stderr.as_deref().unwrap().contains(\"differs from snapshot base 'develop'\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::dispatch::tests",
+          "test_name": "test_track_command_merge_base_dispatches_composition_root_guard_failure_without_merge_success"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_handle_base_merge_real_interactor_surfaces_active_track_guard_before_ports"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_handle_base_merge_real_interactor_rejects_snapshot_source_before_ports"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TrackCommand",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TrackCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "b9d41532fac766769afe8e8933cfb3af449beb98aebafdcaa63a587f0e53ee43",
+        "declaration_hash": "97c764041df80293e4f295faa78f2626f9e7b24491526392cbd2740c8309dc56",
+        "anchor_text_hash": "f18c851ca6bcb1742ea5111e940f5b4d764e8a3f5972d5c76b358096ed16f950"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "driver.handle_base_merge(BaseMergeInput { workspace_root: workspace.clone() });\n\nassert_eq!(outcome.exit_code, 1);\nassert!(\n    outcome.stderr.as_deref().unwrap().contains(\"differs from snapshot base 'develop'\")\n);\nassert!(git_calls.lock().unwrap().is_empty());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::dispatch::tests",
+          "test_name": "test_track_command_merge_base_dispatches_composition_root_guard_failure_without_merge_success"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_handle_base_merge_real_interactor_rejects_snapshot_source_before_ports"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TrackCommand",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TrackCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "2135a746cc0d1bbb2425bd43aab653341138cb04c0b136b118cd68447a53374a",
+        "declaration_hash": "97c764041df80293e4f295faa78f2626f9e7b24491526392cbd2740c8309dc56",
+        "anchor_text_hash": "8fa63a343c348aeac0df772579e983f222f64ff76b2f90fdc2bae85abf103a14"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "dispatch_track_cmd_with_base_merge(TrackCommand::MergeBase, |input| {\n            assert_eq!(input.workspace_root, PathBuf::from(\".\"));\n            cli_driver::CommandOutcome::success(Some(\"base merge completed\".to_owned()))\n        });"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::dispatch::tests",
+          "test_name": "test_track_command_merge_base_dispatches_argument_free_workspace_to_completed_outcome"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TrackCommand",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TrackCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "fd30a61c628c5bc8fbb354f9b5e43be6105131066e4e18070445c61a3fc28712",
+        "declaration_hash": "97c764041df80293e4f295faa78f2626f9e7b24491526392cbd2740c8309dc56",
+        "anchor_text_hash": "ae93f16b8b5af6d307d274a5c694b4ac052045cff1123092ed79af420e71bad1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(error.contains(\"/track:recover\"));\n        assert!(!error.contains(\"base merge completed\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::dispatch::tests",
+          "test_name": "test_track_command_merge_base_dispatches_conflicted_outcome_as_recovery_failure"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::track::dispatch::dispatch_track_cmd_with_base_merge",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::track::dispatch::dispatch_track_cmd_with_base_merge",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "be6d62c7270a1971cd9b07bd69bfcb6286287a6a00fd16025f9f57fdb98f51d1",
+        "declaration_hash": "ca9886d187be7c99cf11454cfe578b0e555c160bda7a5bee625342bb9113c5e9",
+        "anchor_text_hash": "008a36faed29453afb25460ea4db3d92210eddc427c7d565839f29f1cce2e93e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let result = dispatch_track_cmd_with_base_merge(TrackCommand::MergeBase, |input| {\n            assert_eq!(input.workspace_root, PathBuf::from(\".\"));\n            cli_driver::CommandOutcome::success(Some(\"base merge completed\".to_owned()))\n        });\n\n        assert_eq!(result.unwrap(), ExitCode::SUCCESS);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::dispatch::tests",
+          "test_name": "test_track_command_merge_base_dispatches_argument_free_workspace_to_completed_outcome"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::dispatch::tests",
+          "test_name": "test_track_command_merge_base_dispatches_composition_root_guard_failure_without_merge_success"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::dispatch::tests",
+          "test_name": "test_track_command_merge_base_dispatches_conflicted_outcome_as_recovery_failure"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_handle_base_merge_real_interactor_surfaces_active_track_guard_before_ports"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_handle_base_merge_real_interactor_rejects_snapshot_source_before_ports"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::track::dispatch::dispatch_track_cmd_with_base_merge",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::track::dispatch::dispatch_track_cmd_with_base_merge",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "be6d62c7270a1971cd9b07bd69bfcb6286287a6a00fd16025f9f57fdb98f51d1",
+        "declaration_hash": "ca9886d187be7c99cf11454cfe578b0e555c160bda7a5bee625342bb9113c5e9",
+        "anchor_text_hash": "40f4d9f0d37fa58dfb35671b5faada2feea33e0d3a44c57a471647c25bc0d4f5"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let result = dispatch_track_cmd_with_base_merge(TrackCommand::MergeBase, |input| {\n            assert_eq!(input.workspace_root, PathBuf::from(\".\"));\n            cli_driver::CommandOutcome::success(Some(\"base merge completed\".to_owned()))\n        });"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::dispatch::tests",
+          "test_name": "test_track_command_merge_base_dispatches_argument_free_workspace_to_completed_outcome"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::dispatch::tests",
+          "test_name": "test_track_command_merge_base_dispatches_composition_root_guard_failure_without_merge_success"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::dispatch::tests",
+          "test_name": "test_track_command_merge_base_dispatches_conflicted_outcome_as_recovery_failure"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_handle_base_merge_real_interactor_surfaces_active_track_guard_before_ports"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_handle_base_merge_real_interactor_rejects_snapshot_source_before_ports"
         }
       ]
     }

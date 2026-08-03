@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "6a0d7d1bb14f8247fe50f5fc3066ff2a0775acc1c118f4430059195e797b0efb",
+  "catalogue_declaration_hash": "40152f45c2c888785a0628d1205fc353a44e67a6e317c336062ae1fa572bc136",
   "signals": [
     {
       "type_name": "BaseMergeInput",

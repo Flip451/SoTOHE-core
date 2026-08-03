@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "cde79c801ad2c6c75cc827bf05eb9ff037fb301ea0b5971775394ff4a58f37f3",
+  "catalogue_declaration_hash": "ef2e87cd5a6f4a9f24b3127326761c7b7d9f4661413b9e00da8e046f915b0ed9",
   "signals": [
     {
       "type_name": "EvaluateSignalsError",
@@ -10,7 +10,7 @@
     {
       "type_name": "FsBaseMergeCleanupAdapter",
       "signal": "blue",
-      "entry_hash": "544e1592601496626421162c61a5b5e9a713915e214cd5714708d42d521375ed"
+      "entry_hash": "e96afe31da24165b2729d5259f8d5ad49bba3ab12b795ad6b98ffbb1776804a3"
     },
     {
       "type_name": "FsBaseMergeContextAdapter",

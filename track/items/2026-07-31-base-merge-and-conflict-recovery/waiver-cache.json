@@ -1032,6 +1032,78 @@
         "citation": "Application-service boundary for BaseMergeCommand and final BaseMergeOutcome values."
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeInput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "waived_reason_hash": "404129708fa77bd97f52c3ba906f1855415f070b4e3a4bbaf15d9470442a8001",
+        "declaration_hash": "31f548dfe89a3a93546b9e8f1e2e104b047e2984dbc082bf7767be6b175caa66",
+        "anchor_text_hash": "008a36faed29453afb25460ea4db3d92210eddc427c7d565839f29f1cce2e93e"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Primary-adapter input carrying only the workspace filesystem root."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeInput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "waived_reason_hash": "74c3cfd406716e09ac7428fe827ae3153906506fab525d1c476c2c2b66540722",
+        "declaration_hash": "31f548dfe89a3a93546b9e8f1e2e104b047e2984dbc082bf7767be6b175caa66",
+        "anchor_text_hash": "40f4d9f0d37fa58dfb35671b5faada2feea33e0d3a44c57a471647c25bc0d4f5"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Primary-adapter input carrying only the workspace filesystem root."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaseMergeInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeInput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "waived_reason_hash": "bb822212e26aa8fed111c9087d96d12c3ba9de3de8c8d8e0624f8c61b7ec6bc7",
+        "declaration_hash": "31f548dfe89a3a93546b9e8f1e2e104b047e2984dbc082bf7767be6b175caa66",
+        "anchor_text_hash": "f18c851ca6bcb1742ea5111e940f5b4d764e8a3f5972d5c76b358096ed16f950"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TypeEntry ... fields: [FieldDecl { name: FieldName(Identifier(\"workspace_root\")), ty: TypeRef(\"std::path::PathBuf\") }] ..."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     }
   ]
 }

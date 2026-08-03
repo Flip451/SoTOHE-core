@@ -4,6 +4,14 @@ const RETIRED_PLANNER_TOKENS: &[&str] = &["plan codex-local", "PlanCodexLocal"];
 const RETIRED_SIGNAL_EXECUTION_TOKENS: &[&str] = &["SignalServiceImpl", "signal::shim"];
 const TRACK_INIT_WORKFLOW: &str =
     include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/../../.harness/workflows/track/init.md"));
+const TRACK_RECOVER_WORKFLOW: &str =
+    include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/../../.harness/workflows/track/recover.md"));
+const TRACK_RECOVER_CLAUDE_ADAPTER: &str =
+    include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/../../.claude/commands/track/recover.md"));
+const TRACK_RECOVER_CODEX_ADAPTER: &str = include_str!(concat!(
+    env!("CARGO_MANIFEST_DIR"),
+    "/../../.agents/skills/track-recover/SKILL.md"
+));
 
 const LIVE_OPERATIONAL_SURFACES: &[(&str, &str)] = &[
     (
@@ -172,6 +180,58 @@ fn test_track_init_workflow_date_prefix_derivation_uses_date_before_slug() {
     assert!(
         !TRACK_INIT_WORKFLOW.contains("kebab-case ASCII + date suffix `YYYY-MM-DD`"),
         "track init workflow must not retain the former slug-date derivation"
+    );
+}
+
+#[test]
+fn test_track_recover_surfaces_delegate_to_one_canonical_workflow() {
+    assert!(
+        TRACK_RECOVER_CLAUDE_ADAPTER.contains(".harness/workflows/track/recover.md"),
+        "Claude recover adapter must reference the canonical recover workflow"
+    );
+    assert!(
+        TRACK_RECOVER_CLAUDE_ADAPTER.contains("free of recovery sequence"),
+        "Claude recover adapter must keep recovery semantics in the workflow SSoT"
+    );
+    assert!(
+        !TRACK_RECOVER_CLAUDE_ADAPTER.contains("git merge"),
+        "Claude recover adapter must not authorize direct git merge"
+    );
+
+    assert!(
+        TRACK_RECOVER_CODEX_ADAPTER.contains(".harness/workflows/track/recover.md"),
+        "Codex recover adapter must reference the canonical recover workflow"
+    );
+    assert!(
+        TRACK_RECOVER_CODEX_ADAPTER.contains("must not duplicate its state machine"),
+        "Codex recover adapter must keep recovery semantics in the workflow SSoT"
+    );
+    assert!(
+        TRACK_RECOVER_CODEX_ADAPTER.contains("Do not invoke git")
+            && TRACK_RECOVER_CODEX_ADAPTER.contains("filesystem recovery operations directly"),
+        "Codex recover adapter must forbid direct recovery operations"
+    );
+    assert!(
+        TRACK_RECOVER_CODEX_ADAPTER.contains("do not create commits, merge branches, or push"),
+        "Codex recover adapter must keep commit and branch operations in guarded workflows"
+    );
+
+    assert!(
+        TRACK_RECOVER_WORKFLOW.contains("bin/sotp track merge-base")
+            && !TRACK_RECOVER_WORKFLOW.contains("/track:review")
+            && !TRACK_RECOVER_WORKFLOW.contains("/track:commit"),
+        "recover workflow must keep provider-specific review and commit invocations in adapters"
+    );
+    assert!(
+        TRACK_RECOVER_CLAUDE_ADAPTER.contains("/track:review")
+            && TRACK_RECOVER_CLAUDE_ADAPTER.contains("/track:commit")
+            && TRACK_RECOVER_CODEX_ADAPTER.contains("$track-review")
+            && TRACK_RECOVER_CODEX_ADAPTER.contains("$track-commit"),
+        "recover adapters must route review and commit through their provider-specific surfaces"
+    );
+    assert!(
+        TRACK_RECOVER_WORKFLOW.contains("never runs clean-merge cleanup"),
+        "recover workflow must preserve the conflict branch's cleanup exclusion"
     );
 }
 

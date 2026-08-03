@@ -25,7 +25,8 @@
     "T004": [
       {"layer": "cli_driver", "entry_key": "BaseMergeInput"},
       {"layer": "cli_driver", "entry_key": "TrackDriver"},
-      {"layer": "cli", "entry_key": "TrackCommand"}
+      {"layer": "cli", "entry_key": "TrackCommand"},
+      {"layer": "cli", "entry_key": "cli::commands::track::dispatch::dispatch_track_cmd_with_base_merge"}
     ],
     "T005": [],
     "T006": [

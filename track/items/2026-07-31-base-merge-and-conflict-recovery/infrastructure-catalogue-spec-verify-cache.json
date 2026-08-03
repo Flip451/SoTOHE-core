@@ -75,7 +75,7 @@
       }
     },
     {
-      "claim_hash": "544e1592601496626421162c61a5b5e9a713915e214cd5714708d42d521375ed",
+      "claim_hash": "e96afe31da24165b2729d5259f8d5ad49bba3ab12b795ad6b98ffbb1776804a3",
       "evidence_hash": "b1ebe6f4e3ef241cee3ab49ab127483a283048c40c19b452348de4ac09005a15",
       "verdict": {
         "kind": "pass",
@@ -99,7 +99,7 @@
       }
     },
     {
-      "claim_hash": "544e1592601496626421162c61a5b5e9a713915e214cd5714708d42d521375ed",
+      "claim_hash": "e96afe31da24165b2729d5259f8d5ad49bba3ab12b795ad6b98ffbb1776804a3",
       "evidence_hash": "1c4d4eda6a4a2dafa6178979f4e7ea21c499d9e8bb85d6284e8503b3c3db7e71",
       "verdict": {
         "kind": "pass",
@@ -123,7 +123,7 @@
       }
     },
     {
-      "claim_hash": "544e1592601496626421162c61a5b5e9a713915e214cd5714708d42d521375ed",
+      "claim_hash": "e96afe31da24165b2729d5259f8d5ad49bba3ab12b795ad6b98ffbb1776804a3",
       "evidence_hash": "c11596aa73c9d76385bd11d40c389db9cf0df6530af7fa89addda894842ed6c7",
       "verdict": {
         "kind": "pass",
@@ -147,11 +147,11 @@
       }
     },
     {
-      "claim_hash": "544e1592601496626421162c61a5b5e9a713915e214cd5714708d42d521375ed",
+      "claim_hash": "e96afe31da24165b2729d5259f8d5ad49bba3ab12b795ad6b98ffbb1776804a3",
       "evidence_hash": "9e9abe7181b71316e54964a1694e1196b70e7705e3e78b819044365c33947b16",
       "verdict": {
         "kind": "pass",
-        "citation": "without running clean-merge cleanup"
+        "citation": "When a guarded base merge conflicts, the orchestrator drives the canonical recovery workflow through editing, zero-findings review, and guarded commit without running clean-merge cleanup."
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -171,7 +171,7 @@
       }
     },
     {
-      "claim_hash": "544e1592601496626421162c61a5b5e9a713915e214cd5714708d42d521375ed",
+      "claim_hash": "e96afe31da24165b2729d5259f8d5ad49bba3ab12b795ad6b98ffbb1776804a3",
       "evidence_hash": "afa25e34321fdb5da8f872a16ef1824d39af8f7cc621c064c6093d0ee631c5e5",
       "verdict": {
         "kind": "pass",
@@ -195,7 +195,7 @@
       }
     },
     {
-      "claim_hash": "544e1592601496626421162c61a5b5e9a713915e214cd5714708d42d521375ed",
+      "claim_hash": "e96afe31da24165b2729d5259f8d5ad49bba3ab12b795ad6b98ffbb1776804a3",
       "evidence_hash": "e83f6a2ed9edffe9aa6824d83e7db6682b02f2d49a18bb16493e9c5133fde6e2",
       "verdict": {
         "kind": "pass",
@@ -219,7 +219,7 @@
       }
     },
     {
-      "claim_hash": "544e1592601496626421162c61a5b5e9a713915e214cd5714708d42d521375ed",
+      "claim_hash": "e96afe31da24165b2729d5259f8d5ad49bba3ab12b795ad6b98ffbb1776804a3",
       "evidence_hash": "d7421f665ec7a508d92f8962947fd4a3a43ba801fb68280a5dd6945a66f96bc8",
       "verdict": {
         "kind": "pass",
@@ -243,7 +243,7 @@
       }
     },
     {
-      "claim_hash": "544e1592601496626421162c61a5b5e9a713915e214cd5714708d42d521375ed",
+      "claim_hash": "e96afe31da24165b2729d5259f8d5ad49bba3ab12b795ad6b98ffbb1776804a3",
       "evidence_hash": "65ebff364d15b048f25f2ee5785481fd781016dfaf00df1feb36b5f9ff0d8706",
       "verdict": {
         "kind": "pass",
@@ -267,7 +267,7 @@
       }
     },
     {
-      "claim_hash": "544e1592601496626421162c61a5b5e9a713915e214cd5714708d42d521375ed",
+      "claim_hash": "e96afe31da24165b2729d5259f8d5ad49bba3ab12b795ad6b98ffbb1776804a3",
       "evidence_hash": "25f655f974305b546c6635b354735cdf64f7896f137dbfe26030bac0aedf968f",
       "verdict": {
         "kind": "pass",
@@ -291,11 +291,11 @@
       }
     },
     {
-      "claim_hash": "544e1592601496626421162c61a5b5e9a713915e214cd5714708d42d521375ed",
+      "claim_hash": "e96afe31da24165b2729d5259f8d5ad49bba3ab12b795ad6b98ffbb1776804a3",
       "evidence_hash": "84b79eec5107343a4c45d0108c7d1c022b92aa7eb54aa2e887aad4ad7fdf9dff",
       "verdict": {
         "kind": "pass",
-        "citation": "\"Following successful views and baseline steps, the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit; rerunning with that same commit is idempotent, while a later successful merge atomically replaces the record with its newly incorporated commit.\""
+        "citation": "Following successful views and baseline steps, the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit; rerunning with that same commit is idempotent, while a later successful merge atomically replaces the record with its newly incorporated commit."
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -315,7 +315,7 @@
       }
     },
     {
-      "claim_hash": "544e1592601496626421162c61a5b5e9a713915e214cd5714708d42d521375ed",
+      "claim_hash": "e96afe31da24165b2729d5259f8d5ad49bba3ab12b795ad6b98ffbb1776804a3",
       "evidence_hash": "3cbbb014a4f62d867a0a746c1980e7b0582bb989d47ff548f21d8b10481109c6",
       "verdict": {
         "kind": "pass",

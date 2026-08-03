@@ -341,14 +341,16 @@
     },
     "FsBaseMergeCleanupAdapter": {
       "action": "add",
-      "docs": "Unit secondary adapter implementing BaseMergeCleanupPort with blocking CLI-process and filesystem operations.",
+    "docs": "Secondary adapter implementing BaseMergeCleanupPort with blocking CLI-process and filesystem operations; its private injected RustdocBaselineCapturePort dependency is intentionally hidden from the public shape.",
       "informal_grounds": [],
-      "kind": {
-        "kind": "struct",
-        "shape": {
-          "kind": "unit"
-        }
-      },
+    "kind": {
+      "kind": "struct",
+      "shape": {
+        "fields": [],
+        "has_stripped_fields": true,
+        "kind": "plain"
+      }
+    },
       "methods": [],
       "module_path": "base_merge",
       "role": {

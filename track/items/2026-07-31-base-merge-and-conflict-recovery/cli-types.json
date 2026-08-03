@@ -24,6 +24,34 @@
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         }
       ]
+    },
+    "cli::commands::track::dispatch::dispatch_track_cmd_with_base_merge": {
+      "action": "add",
+      "docs": "Stateless CLI dispatch seam that routes MergeBase through the injected primary-adapter handler while preserving the normal track-command dispatch contract.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "cmd",
+          "ty": "TrackCommand"
+        },
+        {
+          "name": "base_merge",
+          "ty": "impl FnOnce(cli_driver::track::BaseMergeInput) -> cli_driver::CommandOutcome"
+        }
+      ],
+      "returns": "Result<std::process::ExitCode, crate::CliError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
     }
   },
   "layer": "cli",
@@ -220,32 +248,56 @@
             "name": "Archive",
             "payload": {
               "fields": [
-                "std::path::PathBuf",
-                "Option<String>"
+                {
+                  "name": "items_dir",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "Transition",
             "payload": {
               "fields": [
-                "std::path::PathBuf",
-                "Option<String>",
-                "String",
-                "String",
-                "Option<String>"
+                {
+                  "name": "items_dir",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "task_id",
+                  "ty": "String"
+                },
+                {
+                  "name": "target_status",
+                  "ty": "String"
+                },
+                {
+                  "name": "commit_hash",
+                  "ty": "Option<String>"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "Branch",
             "payload": {
               "fields": [
-                "BranchAction"
+                {
+                  "name": "action",
+                  "ty": "BranchAction"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
@@ -261,125 +313,236 @@
             "name": "Views",
             "payload": {
               "fields": [
-                "ViewAction"
+                {
+                  "name": "action",
+                  "ty": "ViewAction"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "AddTask",
             "payload": {
               "fields": [
-                "std::path::PathBuf",
-                "Option<String>",
-                "String",
-                "Option<String>",
-                "Option<String>"
+                {
+                  "name": "items_dir",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "description",
+                  "ty": "String"
+                },
+                {
+                  "name": "section",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "after",
+                  "ty": "Option<String>"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "SetOverride",
             "payload": {
               "fields": [
-                "std::path::PathBuf",
-                "Option<String>",
-                "String",
-                "String"
+                {
+                  "name": "items_dir",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "status",
+                  "ty": "String"
+                },
+                {
+                  "name": "reason",
+                  "ty": "String"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "ClearOverride",
             "payload": {
               "fields": [
-                "std::path::PathBuf",
-                "Option<String>"
+                {
+                  "name": "items_dir",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "NextTask",
             "payload": {
               "fields": [
-                "std::path::PathBuf",
-                "Option<String>"
+                {
+                  "name": "items_dir",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "TaskCounts",
             "payload": {
               "fields": [
-                "std::path::PathBuf",
-                "Option<String>"
+                {
+                  "name": "items_dir",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "TypeGraph",
             "payload": {
               "fields": [
-                "std::path::PathBuf",
-                "Option<String>",
-                "std::path::PathBuf",
-                "Option<String>",
-                "usize",
-                "String"
+                {
+                  "name": "items_dir",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "workspace_root",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "layer",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "cluster_depth",
+                  "ty": "usize"
+                },
+                {
+                  "name": "edges",
+                  "ty": "String"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "BaselineGraph",
             "payload": {
               "fields": [
-                "std::path::PathBuf",
-                "Option<String>",
-                "std::path::PathBuf",
-                "Option<String>"
+                {
+                  "name": "items_dir",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "workspace_root",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "layers",
+                  "ty": "Option<String>"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "ContractMap",
             "payload": {
               "fields": [
-                "std::path::PathBuf",
-                "Option<String>",
-                "std::path::PathBuf",
-                "Option<String>"
+                {
+                  "name": "items_dir",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "workspace_root",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "layers",
+                  "ty": "Option<String>"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "SpecElementHash",
             "payload": {
               "fields": [
-                "std::path::PathBuf",
-                "Option<String>",
-                "Option<String>"
+                {
+                  "name": "items_dir",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "anchor",
+                  "ty": "Option<String>"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "BaselineCapture",
             "payload": {
               "fields": [
-                "Option<String>",
-                "std::path::PathBuf",
-                "Option<std::path::PathBuf>",
-                "Option<String>"
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "workspace_root",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "source_workspace",
+                  "ty": "Option<std::path::PathBuf>"
+                },
+                {
+                  "name": "layer",
+                  "ty": "Option<String>"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
@@ -404,32 +567,56 @@
             "name": "Lint",
             "payload": {
               "fields": [
-                "Option<String>",
-                "String",
-                "std::path::PathBuf",
-                "Option<std::path::PathBuf>"
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "layer_id",
+                  "ty": "String"
+                },
+                {
+                  "name": "workspace_root",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "rules_file",
+                  "ty": "Option<std::path::PathBuf>"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "CatalogueImplSignals",
             "payload": {
               "fields": [
-                "Option<String>",
-                "std::path::PathBuf",
-                "Option<String>"
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "workspace_root",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "layer",
+                  "ty": "Option<String>"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "SwitchBase",
             "payload": {
               "fields": [
-                "std::path::PathBuf"
+                {
+                  "name": "project_root",
+                  "ty": "std::path::PathBuf"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
