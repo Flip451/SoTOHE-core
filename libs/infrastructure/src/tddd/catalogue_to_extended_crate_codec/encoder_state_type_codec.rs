@@ -296,7 +296,7 @@ impl EncoderState {
             if alias_generics.is_empty() { entry.generics() } else { alias_generics };
         // Type-declaration-level generics / where predicates (ADR `2026-07-02-1345` D6).
         let generic_names: Vec<&str> = declared_generics.iter().map(|g| g.name.as_str()).collect();
-        let generics = self.build_where_form_generics(
+        let generics = self.build_where_form_generics_preserving_spelling(
             declared_generics,
             entry.where_predicates(),
             &generic_names,

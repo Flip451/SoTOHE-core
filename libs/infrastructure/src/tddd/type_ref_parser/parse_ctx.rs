@@ -21,6 +21,7 @@ pub(super) struct ParseCtx<'a, F, G> {
     pub(super) resolve_local: &'a F,
     pub(super) external_crate_ids: &'a HashMap<String, u32>,
     pub(super) emit_external_crate: &'a mut G,
+    pub(super) std_crate_id: u32,
     /// Impl-block generic type parameter names (e.g. `["T", "U"]`).
     ///
     /// When a single-segment type name matches one of these names, it is encoded
@@ -28,6 +29,7 @@ pub(super) struct ParseCtx<'a, F, G> {
     /// path. This implements ADR 2026-06-18-0822 D2: `for_type: "T"` with
     /// `impl_generics: [{name: "T", ...}]` should produce `Type::Generic("T")`.
     pub(super) generic_params: &'a [&'a str],
+    pub(super) preserve_prelude_spelling: bool,
 }
 
 /// Returns the catalogue/rustdoc spelling for a parsed identifier.
@@ -38,6 +40,10 @@ pub(super) struct ParseCtx<'a, F, G> {
 pub(super) fn normalized_ident_name(ident: &syn::Ident) -> String {
     let name = ident.to_string();
     name.strip_prefix("r#").unwrap_or(&name).to_owned()
+}
+
+fn prelude_path_id<F, G>(ctx: &ParseCtx<'_, F, G>) -> Id {
+    if ctx.preserve_prelude_spelling { Id(ctx.std_crate_id) } else { Id(UNRESOLVED_CRATE_ID) }
 }
 
 impl<'a, F, G> ParseCtx<'a, F, G>
@@ -185,16 +191,17 @@ where
 
         // 5. std prelude allowlist?
         //
-        // `Path.id` is an item id, not a crate id. For external types we do not have
-        // the actual item id, so we use the unresolved marker sentinel (`UNRESOLVED_CRATE_ID`).
-        // Use the canonical `std::module::TypeName` path so downstream consumers can
-        // distinguish real std types from truly-unresolved identifiers.
+        // Use the canonical `std::module::TypeName` path for ordinary parsing.
         if STD_PRELUDE_TYPES.contains(&name.as_str()) {
             let generic_args = self.convert_generic_args(&first_seg.arguments);
-            let canonical = std_canonical_path(&name);
+            let canonical = if self.preserve_prelude_spelling {
+                name.clone()
+            } else {
+                std_canonical_path(&name)
+            };
             return Type::ResolvedPath(Path {
                 path: canonical,
-                id: Id(UNRESOLVED_CRATE_ID),
+                id: prelude_path_id(self),
                 args: generic_args.map(Box::new),
             });
         }
@@ -342,8 +349,12 @@ where
 
         // std prelude?
         if STD_PRELUDE_TYPES.contains(&name.as_str()) {
-            let canonical = std_canonical_path(&name);
-            return Path { path: canonical, id: Id(UNRESOLVED_CRATE_ID), args: args.map(Box::new) };
+            let canonical = if self.preserve_prelude_spelling {
+                name.clone()
+            } else {
+                std_canonical_path(&name)
+            };
+            return Path { path: canonical, id: prelude_path_id(self), args: args.map(Box::new) };
         }
 
         // Unresolved marker.

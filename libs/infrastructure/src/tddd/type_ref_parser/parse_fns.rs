@@ -52,12 +52,66 @@ where
     F: Fn(&str) -> Option<Id>,
     G: FnMut(String) -> u32,
 {
+    parse_type_ref_with_generics_inner(
+        type_ref_str,
+        resolve_local,
+        std_crate_id,
+        external_crate_ids,
+        emit_external_crate,
+        generic_params,
+        false,
+    )
+}
+
+/// Parses a type reference while preserving the source spelling of prelude
+/// paths for lexical comparison with rustdoc output.
+pub(crate) fn parse_type_ref_with_generics_preserving_spelling<F, G>(
+    type_ref_str: &str,
+    resolve_local: &F,
+    std_crate_id: u32,
+    external_crate_ids: &HashMap<String, u32>,
+    emit_external_crate: &mut G,
+    generic_params: &[&str],
+) -> Result<Type, String>
+where
+    F: Fn(&str) -> Option<Id>,
+    G: FnMut(String) -> u32,
+{
+    parse_type_ref_with_generics_inner(
+        type_ref_str,
+        resolve_local,
+        std_crate_id,
+        external_crate_ids,
+        emit_external_crate,
+        generic_params,
+        true,
+    )
+}
+
+fn parse_type_ref_with_generics_inner<F, G>(
+    type_ref_str: &str,
+    resolve_local: &F,
+    std_crate_id: u32,
+    external_crate_ids: &HashMap<String, u32>,
+    emit_external_crate: &mut G,
+    generic_params: &[&str],
+    preserve_prelude_spelling: bool,
+) -> Result<Type, String>
+where
+    F: Fn(&str) -> Option<Id>,
+    G: FnMut(String) -> u32,
+{
     validate_generic_identifier_ambiguities(type_ref_str, generic_params)?;
     let syn_type: syn::Type = syn::parse_str(type_ref_str)
         .map_err(|e| format!("syn parse error for `{type_ref_str}`: {e}"))?;
-    let _ = std_crate_id;
-    let mut ctx =
-        ParseCtx { resolve_local, external_crate_ids, emit_external_crate, generic_params };
+    let mut ctx = ParseCtx {
+        resolve_local,
+        external_crate_ids,
+        emit_external_crate,
+        std_crate_id,
+        generic_params,
+        preserve_prelude_spelling,
+    };
     Ok(ctx.convert_type(&syn_type))
 }
 
@@ -81,13 +135,69 @@ where
     F: Fn(&str) -> Option<Id>,
     G: FnMut(String) -> u32,
 {
+    parse_generic_bound_with_generics_inner(
+        bound_str,
+        resolve_local,
+        std_crate_id,
+        external_crate_ids,
+        emit_external_crate,
+        generic_params,
+        false,
+    )
+}
+
+/// Parses a generic bound while preserving the source spelling of prelude
+/// paths.  Alias declarations are compared lexically against rustdoc output,
+/// so `Clone` must remain `Clone` rather than being expanded to
+/// `std::clone::Clone` by the general type resolver.
+pub(crate) fn parse_generic_bound_with_generics_preserving_spelling<F, G>(
+    bound_str: &str,
+    resolve_local: &F,
+    std_crate_id: u32,
+    external_crate_ids: &HashMap<String, u32>,
+    emit_external_crate: &mut G,
+    generic_params: &[&str],
+) -> Result<GenericBound, String>
+where
+    F: Fn(&str) -> Option<Id>,
+    G: FnMut(String) -> u32,
+{
+    parse_generic_bound_with_generics_inner(
+        bound_str,
+        resolve_local,
+        std_crate_id,
+        external_crate_ids,
+        emit_external_crate,
+        generic_params,
+        true,
+    )
+}
+
+fn parse_generic_bound_with_generics_inner<F, G>(
+    bound_str: &str,
+    resolve_local: &F,
+    std_crate_id: u32,
+    external_crate_ids: &HashMap<String, u32>,
+    emit_external_crate: &mut G,
+    generic_params: &[&str],
+    preserve_prelude_spelling: bool,
+) -> Result<GenericBound, String>
+where
+    F: Fn(&str) -> Option<Id>,
+    G: FnMut(String) -> u32,
+{
     validate_generic_identifier_ambiguities(bound_str, generic_params)?;
     let syn_bound: syn::TypeParamBound =
         syn::parse_str(bound_str).map_err(|e| format!("syn parse error for `{bound_str}`: {e}"))?;
 
-    let _ = std_crate_id;
-    let mut ctx =
-        ParseCtx { resolve_local, external_crate_ids, emit_external_crate, generic_params };
+    let mut ctx = ParseCtx {
+        resolve_local,
+        external_crate_ids,
+        emit_external_crate,
+        std_crate_id,
+        generic_params,
+        preserve_prelude_spelling,
+    };
     match syn_bound {
         syn::TypeParamBound::Lifetime(lt) => Ok(GenericBound::Outlives(format!("'{}", lt.ident))),
         syn::TypeParamBound::Trait(tb) => {

@@ -10,7 +10,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CatalogueLinterError | error_type | modify | DuplicateTypeAliasGenericParameter, InvalidTypeAliasGenericParameterName, InvalidRuleConfig, UnknownLayer, ScanFailed | 🔵 | 🔵 |
+| CatalogueLinterError | error_type | modify | DuplicateTypeAliasGenericParameter, InvalidTypeAliasGenericParameterName, ConflictingTypeAliasGenericParameters, InvalidRuleConfig, UnknownLayer, ScanFailed | 🔵 | 🔵 |
 
 ## Free Functions
 

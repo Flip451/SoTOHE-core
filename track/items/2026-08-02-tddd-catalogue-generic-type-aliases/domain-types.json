@@ -108,7 +108,7 @@
   "types": {
     "CatalogueLinterError": {
       "action": "modify",
-      "docs": "Catalogue-lint evaluation errors, including invalid and duplicate alias-generic-parameter rejection.",
+      "docs": "Catalogue-lint evaluation errors, including invalid, duplicate, and conflicting alias-generic-parameter rejection.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -140,6 +140,18 @@
                 {
                   "name": "parameter_name",
                   "ty": "ParamName"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ConflictingTypeAliasGenericParameters",
+            "payload": {
+              "fields": [
+                {
+                  "name": "alias_name",
+                  "ty": "TypeName"
                 }
               ],
               "kind": "struct"

@@ -87,6 +87,28 @@ impl EncoderState {
         where_decls: &[WherePredicateDecl],
         generic_names: &[&str],
     ) -> Result<Generics, CatalogueToExtendedCrateCodecError> {
+        self.build_where_form_generics_inner(generics_decl, where_decls, generic_names, false)
+    }
+
+    /// Builds alias generics while preserving each bound's catalogue spelling.
+    /// Alias generic declarations are a lexical contract; unlike structural
+    /// method/trait generics they must not expand prelude names such as `Clone`.
+    pub(super) fn build_where_form_generics_preserving_spelling(
+        &mut self,
+        generics_decl: &[MethodGenericParam],
+        where_decls: &[WherePredicateDecl],
+        generic_names: &[&str],
+    ) -> Result<Generics, CatalogueToExtendedCrateCodecError> {
+        self.build_where_form_generics_inner(generics_decl, where_decls, generic_names, true)
+    }
+
+    fn build_where_form_generics_inner(
+        &mut self,
+        generics_decl: &[MethodGenericParam],
+        where_decls: &[WherePredicateDecl],
+        generic_names: &[&str],
+        preserve_bound_spelling: bool,
+    ) -> Result<Generics, CatalogueToExtendedCrateCodecError> {
         let mut params: Vec<GenericParamDef> = Vec::with_capacity(generics_decl.len());
         let mut where_predicates: Vec<WherePredicate> = Vec::new();
 
@@ -95,7 +117,12 @@ impl EncoderState {
         for g in generics_decl {
             let mut bounds: Vec<GenericBound> = Vec::with_capacity(g.bounds.len());
             for b in &g.bounds {
-                bounds.push(self.encode_and_validate_bound(b.as_str(), generic_names)?);
+                let bound = if preserve_bound_spelling {
+                    self.encode_and_validate_bound_preserving_spelling(b.as_str(), generic_names)?
+                } else {
+                    self.encode_and_validate_bound(b.as_str(), generic_names)?
+                };
+                bounds.push(bound);
             }
             params.push(GenericParamDef {
                 name: g.name.as_str().to_owned(),
@@ -164,7 +191,15 @@ impl EncoderState {
                 BoundOp::Bound => {
                     let mut bounds: Vec<GenericBound> = Vec::with_capacity(w.rhs.len());
                     for b in &w.rhs {
-                        bounds.push(self.encode_and_validate_bound(b.as_str(), generic_names)?);
+                        let bound = if preserve_bound_spelling {
+                            self.encode_and_validate_bound_preserving_spelling(
+                                b.as_str(),
+                                generic_names,
+                            )?
+                        } else {
+                            self.encode_and_validate_bound(b.as_str(), generic_names)?
+                        };
+                        bounds.push(bound);
                     }
                     where_predicates.push(WherePredicate::BoundPredicate {
                         type_: lhs_type,

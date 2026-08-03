@@ -162,7 +162,7 @@
         {
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_evaluate_catalogue_lint_rejects_malformed_type_alias_generic_bound"
+          "test_name": "test_evaluate_catalogue_lint_rejects_malformed_type_alias_generic_bounds_before_rules"
         },
         {
           "layer": "domain",
@@ -199,7 +199,7 @@
       },
       "key": {
         "anchor_text_hash": "3669f1fd310cc9cd7b5ccfb6b5b9a3f72079949b8c1e4dfb7662ab171cfbf799",
-        "bound_tests_set_hash": "73bed03eb8e0eb5eaa6038f0e190e9f18c5878404b2765cf722fdce5d469800e",
+        "bound_tests_set_hash": "3ea517d4762010794e92412482e6c3a9b880fb96d29714c272812fce38f56a4d",
         "declaration_hash": "4a84e5ff2041b5b39abf5267dd60d1cd013687473165920ede0e73588bc19fce"
       },
       "obligation_id": {
@@ -208,7 +208,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(\n            generics.iter().map(|generic| generic.name.as_str()).collect::<Vec<_>>(),\n            vec![\"T\", \"U\"]\n        );\n        assert_eq!(\n            generics[0].bounds.iter().map(TypeRef::as_str).collect::<Vec<_>>(),\n            vec![\"Clone\"]\n        );\n        assert_eq!(\n            generics[1].bounds.iter().map(TypeRef::as_str).collect::<Vec<_>>(),\n            vec![\"Send\"]\n        );\n\n        assert!(matches!(\n            result,\n            Err(CatalogueLinterError::DuplicateTypeAliasGenericParameter {\n                alias_name,\n                parameter_name,\n            }) if alias_name.as_str() == \"DuplicateAlias\" && parameter_name.as_str() == \"T\"\n        ));\n\n        assert!(matches!(\n            err, CatalogueDocumentCodecError::InvalidEntry { ref entry_name, ref reason }\n                if entry_name == \"BadAlias\" && reason.contains(\"invalid generic param bound\")\n        ));",
+        "citation": "assert!(matches!(result, Ok(violations) if violations.is_empty()));\n\nassert!(matches!(\n            result,\n            Err(CatalogueLinterError::InvalidTypeAliasGenericParameterName {\n                alias_name,\n                parameter_name,\n            }) if alias_name.as_str() == \"KeywordAlias\" && parameter_name.as_str() == \"type\"\n        ));\n\nErr(CatalogueLinterError::DuplicateTypeAliasGenericParameter {\n                alias_name,\n                parameter_name,\n            }) if alias_name.as_str() == \"DuplicateAlias\" && parameter_name.as_str() == \"T\"",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -508,7 +508,7 @@
         {
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_evaluate_catalogue_lint_rejects_malformed_type_alias_generic_bound"
+          "test_name": "test_evaluate_catalogue_lint_rejects_malformed_type_alias_generic_bounds_before_rules"
         },
         {
           "layer": "domain",
@@ -545,7 +545,7 @@
       },
       "key": {
         "anchor_text_hash": "8d3283d1c4f863ebbd4f2651f55ce831a5c2527b9ac7c99d61671cd0140929ce",
-        "bound_tests_set_hash": "73bed03eb8e0eb5eaa6038f0e190e9f18c5878404b2765cf722fdce5d469800e",
+        "bound_tests_set_hash": "3ea517d4762010794e92412482e6c3a9b880fb96d29714c272812fce38f56a4d",
         "declaration_hash": "4a84e5ff2041b5b39abf5267dd60d1cd013687473165920ede0e73588bc19fce"
       },
       "obligation_id": {
@@ -554,7 +554,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(matches!(result, Ok(violations) if violations.is_empty()));",
+        "citation": "\"assert!(matches!(result, Ok(violations) if violations.is_empty()));\" and \"Err(CatalogueLinterError::InvalidTypeAliasGenericParameterName { alias_name, parameter_name, })\"",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -620,7 +620,7 @@
         {
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_evaluate_catalogue_lint_rejects_malformed_type_alias_generic_bound"
+          "test_name": "test_evaluate_catalogue_lint_rejects_malformed_type_alias_generic_bounds_before_rules"
         },
         {
           "layer": "domain",
@@ -737,7 +737,7 @@
       },
       "key": {
         "anchor_text_hash": "44c181e097d06c33658028ef1d86b3bde7673a6fecc2778a9036de3aedfeb06a",
-        "bound_tests_set_hash": "626997dbc71fac5370101cd51aa76243a70a745f506f56591ae2283877261ec1",
+        "bound_tests_set_hash": "378f1d831f57931328645c39880b74ebe73771874adf89fa5e9d5ea7f0cb5b66",
         "declaration_hash": "938fc16eb72e26e723ec50a7070ef4c50eada1715a2b324b0775ca6851b35fb1"
       },
       "obligation_id": {
@@ -746,7 +746,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "let result =\n            evaluate_catalogue_lint(&[], &all_catalogues, &target_layer, &StubPrimitiveScanner);\n\n        assert!(matches!(result, Ok(violations) if violations.is_empty()));",
+        "citation": "TypeKindV2::TypeAlias { target: TypeRef::new(\"String\").unwrap(), generics: vec![] },\n...\nassert!(matches!(result, Ok(violations) if violations.is_empty()));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -767,6 +767,31 @@
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_linter::tests",
           "test_name": "test_evaluate_catalogue_lint_rejects_wildcard_type_alias_generic_parameter"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_accepts_ordered_unique_type_alias_generic_parameters"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_bound_only_type_alias_generic_parameter_is_accepted"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_malformed_type_alias_generic_bounds_before_rules"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_type_alias_generics_in_both_payloads"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_ref_parser::parse_fns::tests",
+          "test_name": "test_raw_generic_name_is_rejected_lexically"
         }
       ],
       "edge_id": {
@@ -778,8 +803,8 @@
       },
       "key": {
         "anchor_text_hash": "3669f1fd310cc9cd7b5ccfb6b5b9a3f72079949b8c1e4dfb7662ab171cfbf799",
-        "bound_tests_set_hash": "3a5d5d1e4ca8a13eabdcd62a3321b8ee13158c607fb178bee7c2ca164a383f4c",
-        "declaration_hash": "00a31d9c569c8a85644ed9b1dcc116d6688899bf5894e1b66b4bd3c5cbf7ceb2"
+        "bound_tests_set_hash": "c06ff05b826495458b350f272d7fd8e15d13330c56d97cbcee80372c417711d6",
+        "declaration_hash": "3945446987afb2c0a9c30c9e50df95394487f96de3cdcb1b064850a0d54662fe"
       },
       "obligation_id": {
         "entry_key": "CatalogueLinterError",
@@ -787,7 +812,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(matches!(\n            result,\n            Err(CatalogueLinterError::DuplicateTypeAliasGenericParameter {\n                alias_name,\n                parameter_name,\n            }) if alias_name.as_str() == \"DuplicateAlias\" && parameter_name.as_str() == \"T\"\n        ));\n\nassert!(matches!(\n                result,\n                Err(CatalogueLinterError::InvalidTypeAliasGenericParameterName {\n                    parameter_name: rejected_name,\n                    ..\n                }) if rejected_name.as_str() == parameter_name\n            ));",
+        "citation": "assert!(matches!(result, Err(CatalogueLinterError::DuplicateTypeAliasGenericParameter { alias_name, parameter_name, }) if alias_name.as_str() == \"DuplicateAlias\" && parameter_name.as_str() == \"T\"));\n\nassert!(matches!(result, Err(CatalogueLinterError::InvalidTypeAliasGenericParameterName { parameter_name: rejected_name, .. }) if rejected_name.as_str() == parameter_name));\n\nassert!(matches!(result, Ok(violations) if violations.is_empty()));\n\nlet result = super::validate_generic_identifier_ambiguities(\"Vec<T>\", &[\"r#T\"]);\nassert!(result.is_err());",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -808,6 +833,26 @@
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_linter::tests",
           "test_name": "test_evaluate_catalogue_lint_rejects_wildcard_type_alias_generic_parameter"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::identifiers_tests",
+          "test_name": "test_param_name_with_empty_string_returns_empty_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_blank_type_alias_generic_bound"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_preserves_non_generic_type_alias_evaluation"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_type_alias_generics_in_both_payloads"
         }
       ],
       "edge_id": {
@@ -819,8 +864,8 @@
       },
       "key": {
         "anchor_text_hash": "6b434c99849cfdcec4fdd4ce5b96fb51e96f3dc1eb1217da03eecf8253b96289",
-        "bound_tests_set_hash": "3a5d5d1e4ca8a13eabdcd62a3321b8ee13158c607fb178bee7c2ca164a383f4c",
-        "declaration_hash": "00a31d9c569c8a85644ed9b1dcc116d6688899bf5894e1b66b4bd3c5cbf7ceb2"
+        "bound_tests_set_hash": "0dfa682563e0d62303de84fed620e906b17456898103e1eaee280177bb7d4e8b",
+        "declaration_hash": "3945446987afb2c0a9c30c9e50df95394487f96de3cdcb1b064850a0d54662fe"
       },
       "obligation_id": {
         "entry_key": "CatalogueLinterError",
@@ -828,7 +873,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "Err(CatalogueLinterError::DuplicateTypeAliasGenericParameter {\n                alias_name,\n                parameter_name,\n            }) if alias_name.as_str() == \"DuplicateAlias\" && parameter_name.as_str() == \"T\"",
+        "citation": "`Err(CatalogueLinterError::DuplicateTypeAliasGenericParameter { alias_name, parameter_name, })` and `Err(CatalogueLinterError::InvalidTypeAliasGenericParameterName { parameter_name: rejected_name, .. })` and `Err(CatalogueLinterError::ScanFailed( PrimitiveOccurrenceScanError::ParseFailure { type_ref } ))` and `Err(CatalogueLinterError::ConflictingTypeAliasGenericParameters { alias_name })`",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -849,6 +894,16 @@
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_linter::tests",
           "test_name": "test_evaluate_catalogue_lint_rejects_wildcard_type_alias_generic_parameter"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_accepts_ordered_unique_type_alias_generic_parameters"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_type_alias_generics_in_both_payloads"
         }
       ],
       "edge_id": {
@@ -860,8 +915,8 @@
       },
       "key": {
         "anchor_text_hash": "8d3283d1c4f863ebbd4f2651f55ce831a5c2527b9ac7c99d61671cd0140929ce",
-        "bound_tests_set_hash": "3a5d5d1e4ca8a13eabdcd62a3321b8ee13158c607fb178bee7c2ca164a383f4c",
-        "declaration_hash": "00a31d9c569c8a85644ed9b1dcc116d6688899bf5894e1b66b4bd3c5cbf7ceb2"
+        "bound_tests_set_hash": "31c76f31d4fb095af9a2bd92d0568f4ecc6608a1fcd2b4f62df6875732873188",
+        "declaration_hash": "3945446987afb2c0a9c30c9e50df95394487f96de3cdcb1b064850a0d54662fe"
       },
       "obligation_id": {
         "entry_key": "CatalogueLinterError",
@@ -869,7 +924,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(matches!(\n            result,\n            Err(CatalogueLinterError::DuplicateTypeAliasGenericParameter {\n                alias_name,\n                parameter_name,\n            }) if alias_name.as_str() == \"DuplicateAlias\" && parameter_name.as_str() == \"T\"\n        ));",
+        "citation": "assert!(matches!(result, Ok(violations) if violations.is_empty())); ... Err(CatalogueLinterError::DuplicateTypeAliasGenericParameter { ... }) ... Err(CatalogueLinterError::InvalidTypeAliasGenericParameterName { ... }) ... Err(CatalogueLinterError::ConflictingTypeAliasGenericParameters { alias_name })",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"

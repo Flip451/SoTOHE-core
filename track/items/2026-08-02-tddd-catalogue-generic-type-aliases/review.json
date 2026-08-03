@@ -295,6 +295,65 @@
           "hash": "rvw1:sha256:03e2014f2fb3ca845fcac65c06558333f7456e5dfd94548cb882e7438fb7623e",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T06:05:36Z",
+          "findings": [
+            {
+              "category": "type-level correctness",
+              "file": "libs/domain/src/tddd/catalogue_linter.rs",
+              "line": 653,
+              "message": "The new alias-bound validation routes every bound through `PrimitiveOccurrenceScanner::scan(..., Bound)`, but this port parses a `TypeRef` as a type and does not accept valid `TypeParamBound`-only syntax. The same file documents that `?Sized` and lifetime bounds are legal catalogue bounds yet can fail this scanner (`BoundOnlyFailingScanner`), so a valid alias such as `type Alias<T: ?Sized> = ...` is rejected before rule evaluation with `ScanFailed`. Validate bound syntax with a bound-aware boundary or only reject the explicitly malformed/blank forms, while preserving valid bounds.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f3e5ddeb2aaa5ae96c6b60287d49aa34947c8114ea7b9c2eb1bdd8ffdb705326",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T06:17:11Z",
+          "findings": [
+            {
+              "category": "type-level correctness",
+              "file": "libs/domain/src/tddd/catalogue_linter.rs",
+              "line": 653,
+              "message": "The replacement bound validation only rejects blank strings and bounds whose trimmed text starts with `<`; malformed bounds such as `!!!`, `T +`, `Vec<`, or `A::` remain accepted and reach rule evaluation. Since `TypeRef::new` intentionally permits these raw strings, this leaves the required catalogue-lint boundary unable to reject malformed alias bounds. The check needs a complete bound-aware syntax validation (or equivalent fail-closed validation), not two lexical cases.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c356259e50a0c3905b6f2b8c610451ab8d6926563687dcfdbded8fb985bae69a",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T06:32:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1ef853e4a32cb79c2d7d1246c4c2e26d2fc04bccb7f84be1ef443c3a849135d4",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T06:38:37Z",
+          "findings": [
+            {
+              "category": "typestate / parse-don't-validate gap",
+              "file": "libs/domain/src/tddd/catalogue_linter.rs",
+              "line": 635,
+              "message": "When kind-level `generics` is non-empty, the fallback silently ignores `entry.generics()`. A programmatically constructed alias can therefore populate both declarations and bypass name, duplicate, and bound validation for the legacy list, even though the codec/encoder treats this dual-populated state as invalid and rule collectors may still inspect both lists. Reject the dual-populated case before selecting the legacy fallback and add regression coverage.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1ef853e4a32cb79c2d7d1246c4c2e26d2fc04bccb7f84be1ef443c3a849135d4",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T07:02:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:71b05a18a370c35bd27b754dabc03ccce389ea890487e04b7785b1e74fb23fed",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -633,6 +692,13 @@
           "at": "2026-08-03T05:41:56Z",
           "findings": [],
           "hash": "rvw1:sha256:0757be51a1f2dd75af5ba81b980d4f7c4203c3c5a7bf6efa3444df80bafd2d2e",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T07:14:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:86105ad62b3cd0e6857c5bf75bc4caa3a0b3f0ac6876a2be08ef0feb816502cd",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -2967,6 +3033,57 @@
           "hash": "rvw1:sha256:b5b4c5e554e460128f76e099c0ab681153998530a1fc4a8d95919eebd7ab77d1",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T06:05:04Z",
+          "findings": [
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_type_ref_parsing.rs",
+              "line": 461,
+              "message": "`preserve_prelude_spelling` が有効な alias generic bound でも、`~const` 分岐は `parse_type_ref_str_inner` を呼ぶため `~const Clone` を `std::clone::Clone` に正規化します。通常の preserving 経路が宣言 spelling (`Clone`) を保持する契約と不整合になり、rustdoc との lexical comparison が失敗します。preserving フラグをこの分岐にも伝播してください。",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:e6b75e4b019cbd9befa41c7f32322ce6ea2f967f56dd5212a794e70974592f21",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T06:17:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9bf4c094864beac0f8c8c5d02cbf8d1563d51d185e70aeb853feea80f7d5be12",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T06:25:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9bf4c094864beac0f8c8c5d02cbf8d1563d51d185e70aeb853feea80f7d5be12",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T06:40:02Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_ctx.rs",
+              "line": 198,
+              "message": "Preserving a prelude bound's spelling leaves its `Path.id` as `UNRESOLVED_CRATE_ID`. For `type Alias<T: Clone> = T`, this branch emits a bare `Clone` path with the unresolved sentinel; Phase 1.5 classifies bare unresolved paths as local and returns `UnresolvedTypeRef(\"Clone\")` because `Clone` is not a catalogue item. The valid alias therefore never reaches structural comparison. Preserve the lexical spelling while marking the bound as a known std external, and add an evaluator-level regression test.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:9bf4c094864beac0f8c8c5d02cbf8d1563d51d185e70aeb853feea80f7d5be12",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T07:11:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3f88b1a56e773318e2c8c6db12831a2a3e217aa30f8a8de1ebca539401d0309d",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -3156,6 +3273,13 @@
           "hash": "rvw1:sha256:110c093fab7a20d82c06cd777d8529fa6379933ad542a57f6b812f7c2fea8fdd",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T07:43:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:250207254cc10661a23f25e7b1902075343fee672711fb3c322e22ecf39606cc",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -3327,6 +3451,13 @@
           "at": "2026-08-02T12:01:49Z",
           "findings": [],
           "hash": "rvw1:sha256:5dc6d235e3114faf3683e73b76c54d49053b9ea0683498d5d9e5f8eda6e66ad8",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T07:14:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5511b5d8eb3ba17dbf9e26f5fe34d4014c1b5251a0ee718f72e0709d911df947",
           "type": "final",
           "verdict": "zero_findings"
         }

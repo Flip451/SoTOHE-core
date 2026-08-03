@@ -143,7 +143,7 @@
         {
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_evaluate_catalogue_lint_rejects_malformed_type_alias_generic_bound"
+          "test_name": "test_evaluate_catalogue_lint_rejects_malformed_type_alias_generic_bounds_before_rules"
         },
         {
           "layer": "domain",
@@ -427,7 +427,7 @@
         {
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_evaluate_catalogue_lint_rejects_malformed_type_alias_generic_bound"
+          "test_name": "test_evaluate_catalogue_lint_rejects_malformed_type_alias_generic_bounds_before_rules"
         },
         {
           "layer": "domain",
@@ -509,7 +509,7 @@
         {
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_evaluate_catalogue_lint_rejects_malformed_type_alias_generic_bound"
+          "test_name": "test_evaluate_catalogue_lint_rejects_malformed_type_alias_generic_bounds_before_rules"
         },
         {
           "layer": "domain",
@@ -642,6 +642,31 @@
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_linter::tests",
           "test_name": "test_evaluate_catalogue_lint_rejects_wildcard_type_alias_generic_parameter"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_accepts_ordered_unique_type_alias_generic_parameters"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_bound_only_type_alias_generic_parameter_is_accepted"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_malformed_type_alias_generic_bounds_before_rules"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_type_alias_generics_in_both_payloads"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_ref_parser::parse_fns::tests",
+          "test_name": "test_raw_generic_name_is_rejected_lexically"
         }
       ]
     },
@@ -669,6 +694,26 @@
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_linter::tests",
           "test_name": "test_evaluate_catalogue_lint_rejects_wildcard_type_alias_generic_parameter"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::identifiers_tests",
+          "test_name": "test_param_name_with_empty_string_returns_empty_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_blank_type_alias_generic_bound"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_preserves_non_generic_type_alias_evaluation"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_type_alias_generics_in_both_payloads"
         }
       ]
     },
@@ -696,6 +741,16 @@
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_linter::tests",
           "test_name": "test_evaluate_catalogue_lint_rejects_wildcard_type_alias_generic_parameter"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_accepts_ordered_unique_type_alias_generic_parameters"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_type_alias_generics_in_both_payloads"
         }
       ]
     }

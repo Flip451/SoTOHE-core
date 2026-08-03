@@ -1,6 +1,5 @@
 //! Tests for [`catalogue_to_extended_crate_codec`] (split out to keep the main module under the 200-400 line guideline).
 
-use domain::tddd::CatalogueToExtendedCratePort;
 use domain::tddd::LayerId;
 use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
 use domain::tddd::catalogue_v2::entries::{AssocConstDecl, AssocTypeDecl, TraitEntry, TypeEntry};
@@ -15,12 +14,14 @@ use domain::tddd::catalogue_v2::{
     FunctionPath, MethodName, ModulePath, ParamName, TraitName, TypeName, TypeRef, VariantName,
     WherePredicateDecl,
 };
+use domain::tddd::{CatalogueToExtendedCratePort, SignalEvaluatorPort};
 use rustdoc_types::{
     AssocItemConstraintKind, GenericArg, GenericArgs, GenericBound, GenericParamDefKind, Id,
-    ItemEnum, ItemKind, Term, Type, VariantKind, WherePredicate,
+    ItemEnum, ItemKind, Term, TraitBoundModifier, Type, VariantKind, WherePredicate,
 };
 
 use super::*;
+use crate::tddd::signal_evaluator_v2::SignalEvaluatorV2;
 use crate::tddd::type_ref_parser::UNRESOLVED_CRATE_ID;
 
 fn make_doc(crate_name: &str) -> CatalogueDocument {
@@ -1048,6 +1049,129 @@ fn test_encode_type_alias_target_generic_emits_type_generic() {
         "expected alias target Type::Generic(\"T\"), got: {:?}",
         ta.type_
     );
+}
+
+#[test]
+fn test_encode_type_alias_generic_bound_preserves_catalogue_spelling() {
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        TypeName::new("Alias").unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::TypeAlias {
+                target: TypeRef::new("T").unwrap(),
+                generics: vec![MethodGenericParam {
+                    name: ParamName::new("T").unwrap(),
+                    bounds: vec![TypeRef::new("Clone").unwrap()],
+                }],
+            },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let alias = ec.krate().index.values().find(|item| {
+        item.name.as_deref() == Some("Alias") && matches!(item.inner, ItemEnum::TypeAlias(_))
+    });
+    let ItemEnum::TypeAlias(ref ta) = alias.expect("expected TypeAlias").inner else {
+        panic!("expected TypeAlias")
+    };
+    let Some(WherePredicate::BoundPredicate { bounds, .. }) = ta.generics.where_predicates.first()
+    else {
+        panic!("expected alias bound predicate")
+    };
+    let Some(GenericBound::TraitBound { trait_, .. }) = bounds.first() else {
+        panic!("expected trait bound")
+    };
+    assert_eq!(trait_.path, "Clone");
+    assert_ne!(trait_.id, Id(UNRESOLVED_CRATE_ID));
+    assert_eq!(ec.krate().paths[&trait_.id].path, ["std", "clone", "Clone"]);
+
+    // A bare prelude trait in an alias bound must make it through Phase 1 as
+    // a known external, rather than being rejected as a local unresolved name.
+    // Model the current rustdoc crate's graph-local id for `Clone`: the
+    // lexical alias comparison must ignore that id while Phase 1 still
+    // requires the catalogue-side bound to be a resolved external.
+    let mut c = ec.krate().clone();
+    for item in c.index.values_mut() {
+        let ItemEnum::TypeAlias(alias) = &mut item.inner else {
+            continue;
+        };
+        for predicate in &mut alias.generics.where_predicates {
+            let WherePredicate::BoundPredicate { bounds, .. } = predicate else {
+                continue;
+            };
+            for bound in bounds {
+                if let GenericBound::TraitBound { trait_, .. } = bound {
+                    if trait_.path == "Clone" {
+                        trait_.id = Id(9_000);
+                    }
+                }
+            }
+        }
+    }
+    let empty_baseline = rustdoc_types::Crate {
+        root: Id(0),
+        crate_version: None,
+        includes_private: false,
+        index: std::collections::HashMap::new(),
+        paths: std::collections::HashMap::new(),
+        external_crates: std::collections::HashMap::new(),
+        format_version: rustdoc_types::FORMAT_VERSION,
+        target: rustdoc_types::Target { triple: String::new(), target_features: vec![] },
+    };
+    let evaluation = SignalEvaluatorV2::new().evaluate(ec, empty_baseline, c);
+    assert!(evaluation.is_ok(), "alias bound must survive evaluator Phase 1: {evaluation:?}");
+}
+
+#[test]
+fn test_encode_type_alias_generic_maybe_const_bound_preserves_catalogue_spelling() {
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        TypeName::new("Alias").unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::TypeAlias {
+                target: TypeRef::new("T").unwrap(),
+                generics: vec![MethodGenericParam {
+                    name: ParamName::new("T").unwrap(),
+                    bounds: vec![TypeRef::new("~const Clone").unwrap()],
+                }],
+            },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let alias = ec.krate().index.values().find(|item| {
+        item.name.as_deref() == Some("Alias") && matches!(item.inner, ItemEnum::TypeAlias(_))
+    });
+    let ItemEnum::TypeAlias(ref ta) = alias.expect("expected TypeAlias").inner else {
+        panic!("expected TypeAlias")
+    };
+    let Some(WherePredicate::BoundPredicate { bounds, .. }) = ta.generics.where_predicates.first()
+    else {
+        panic!("expected alias bound predicate")
+    };
+    let Some(GenericBound::TraitBound { trait_, modifier, .. }) = bounds.first() else {
+        panic!("expected trait bound")
+    };
+    assert_eq!(trait_.path, "Clone");
+    assert_eq!(*modifier, TraitBoundModifier::MaybeConst);
 }
 
 /// A type-alias target using an unqualified associated-type projection rooted

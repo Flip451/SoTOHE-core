@@ -1,9 +1,9 @@
 {
-  "catalogue_declaration_hash": "cdb8ae5d5452f8968d7e2b92b08f84f2c794918ab57963b3b3bcdfecf7c73f06",
+  "catalogue_declaration_hash": "7924d2f6d3b69910701f93076077f8819cbf12f4f1a9e48db74de96928fb0895",
   "schema_version": 1,
   "signals": [
     {
-      "entry_hash": "8992b6f021d74e817d1c141cf1e848d337b7d9316b6c5777c65cd7c8fab07605",
+      "entry_hash": "f130854f4f557c7d06ee40f6a6d7f90ce740efbc2316b9363a4c9c56a3e47717",
       "signal": "blue",
       "type_name": "CatalogueLinterError"
     },

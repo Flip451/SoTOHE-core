@@ -1,7 +1,7 @@
 {
   "entries": [
     {
-      "claim_hash": "8992b6f021d74e817d1c141cf1e848d337b7d9316b6c5777c65cd7c8fab07605",
+      "claim_hash": "f130854f4f557c7d06ee40f6a6d7f90ce740efbc2316b9363a4c9c56a3e47717",
       "claim_origin": {
         "data": {
           "entry_key": "CatalogueLinterError",
@@ -25,7 +25,7 @@
       }
     },
     {
-      "claim_hash": "8992b6f021d74e817d1c141cf1e848d337b7d9316b6c5777c65cd7c8fab07605",
+      "claim_hash": "f130854f4f557c7d06ee40f6a6d7f90ce740efbc2316b9363a4c9c56a3e47717",
       "claim_origin": {
         "data": {
           "entry_key": "CatalogueLinterError",
@@ -44,12 +44,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "schema は宣言列・パラメータ名・bound 参照を復号できない入力を拒否し、lint は空の名前・重複した名前・空の bound を検証エラーとして報告する。",
+        "citation": "lint は空の名前・重複した名前・空の bound を検証エラーとして報告する。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "8992b6f021d74e817d1c141cf1e848d337b7d9316b6c5777c65cd7c8fab07605",
+      "claim_hash": "f130854f4f557c7d06ee40f6a6d7f90ce740efbc2316b9363a4c9c56a3e47717",
       "claim_origin": {
         "data": {
           "entry_key": "CatalogueLinterError",
