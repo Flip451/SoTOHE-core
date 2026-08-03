@@ -9,7 +9,11 @@ use domain::{FreeText, TrackId};
 use serde::Deserialize;
 use usecase::operator_command::{
     CommandArgument, CommandConfigLoadError, CommandConfigSchemaVersion,
-    CommandConfigValidationError, ConfiguredCommand, UnvalidatedTimeoutSeconds,
+    CommandConfigValidationError, CommandDeclarationId, ConfiguredCommand,
+    UnvalidatedTimeoutSeconds,
+};
+use usecase::phase_command::{
+    PhaseCommandConfig, PhaseCommandConfigLoaderPort, PhaseCommandDeclaration,
 };
 use usecase::pre_review_command::{
     CurrentReviewTrackResolveError, CurrentReviewTrackResolverPort, PreReviewCommandConfig,
@@ -19,6 +23,7 @@ use usecase::pre_review_command::{
 use crate::sanitized_failure::io_classification;
 use crate::track::symlink_guard::reject_symlinks_below;
 
+const PHASE_COMMANDS_CONFIG: &str = ".harness/config/phase-commands.json";
 const PRE_REVIEW_GATES_CONFIG: &str = ".harness/config/pre-review-gates.json";
 const MAX_CONFIG_BYTES: u64 = 1024 * 1024;
 const MAX_CURRENT_BRANCH_BYTES: usize = 1024;
@@ -61,6 +66,27 @@ pub struct ConfiguredCommandDto {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
+#[serde(transparent)]
+pub struct CommandDeclarationIdDto {
+    pub value: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct PhaseCommandDeclarationDto {
+    pub id: CommandDeclarationIdDto,
+    pub writer: ConfiguredCommandDto,
+    pub pre_entry_commands: Vec<ConfiguredCommandDto>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct PhaseCommandConfigDto {
+    pub schema_version: CommandConfigSchemaVersionDto,
+    pub phases: Vec<PhaseCommandDeclarationDto>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct PreReviewScopeCommandDeclarationDto {
     pub scope: ReviewScopeNameDto,
@@ -77,6 +103,33 @@ pub struct PreReviewCommandConfigDto {
 #[derive(Debug, Deserialize)]
 struct CommandConfigVersionEnvelope {
     schema_version: CommandConfigSchemaVersionDto,
+}
+
+/// Decodes a phase-command document into its usecase contract.
+pub fn decode_phase_command_config(
+    dto: PhaseCommandConfigDto,
+) -> Result<PhaseCommandConfig, CommandConfigValidationError> {
+    let declarations = dto
+        .phases
+        .into_iter()
+        .map(|phase| {
+            Ok(PhaseCommandDeclaration::new(
+                CommandDeclarationId::try_new(phase.id.value)?,
+                decode_command(phase.writer)?,
+                phase
+                    .pre_entry_commands
+                    .into_iter()
+                    .map(decode_command)
+                    .collect::<Result<Vec<_>, _>>()?,
+            ))
+        })
+        .collect::<Result<Vec<_>, CommandConfigValidationError>>()?;
+
+    PhaseCommandConfig::try_new(
+        CommandConfigSchemaVersion::new(dto.schema_version.version),
+        declarations,
+    )
+    .map_err(|error| error.into_command_config_validation_error())
 }
 
 /// Decodes a pre-review-command document into its usecase contract.
@@ -124,6 +177,33 @@ fn decode_scope(dto: ReviewScopeNameDto) -> Result<ScopeName, CommandConfigValid
     MainScopeName::new(dto.value.clone()).map(ScopeName::Main).map_err(|_| {
         CommandConfigValidationError::InvalidReviewScope { value: FreeText::new(dto.value) }
     })
+}
+
+/// Filesystem adapter for `phase-commands.json`.
+#[derive(Debug, Default)]
+pub struct FsPhaseCommandConfigLoader;
+
+impl FsPhaseCommandConfigLoader {
+    #[must_use]
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+impl PhaseCommandConfigLoaderPort for FsPhaseCommandConfigLoader {
+    fn load(&self, repository_root: &Path) -> Result<PhaseCommandConfig, CommandConfigLoadError> {
+        let source = read_config(repository_root, PHASE_COMMANDS_CONFIG)?;
+        let version: CommandConfigVersionEnvelope =
+            serde_json::from_str(&source).map_err(decode_failed)?;
+        PhaseCommandConfig::try_new(
+            CommandConfigSchemaVersion::new(version.schema_version.version),
+            Vec::new(),
+        )
+        .map_err(|error| error.into_command_config_validation_error())
+        .map_err(CommandConfigLoadError::from)?;
+        let dto = serde_json::from_str(&source).map_err(decode_failed)?;
+        decode_phase_command_config(dto).map_err(CommandConfigLoadError::from)
+    }
 }
 
 /// Filesystem adapter for `pre-review-gates.json`.
@@ -282,6 +362,61 @@ mod tests {
         }
     }
 
+    fn phase_declaration(
+        id: &str,
+        writer: ConfiguredCommandDto,
+        pre_entry_commands: Vec<ConfiguredCommandDto>,
+    ) -> PhaseCommandDeclarationDto {
+        PhaseCommandDeclarationDto {
+            id: CommandDeclarationIdDto { value: id.to_owned() },
+            writer,
+            pre_entry_commands,
+        }
+    }
+
+    fn phase_config(phases: Vec<PhaseCommandDeclarationDto>) -> PhaseCommandConfigDto {
+        PhaseCommandConfigDto {
+            schema_version: CommandConfigSchemaVersionDto { version: 1 },
+            phases,
+        }
+    }
+
+    fn load_phase_config(source: &str) -> Result<PhaseCommandConfig, CommandConfigLoadError> {
+        let repo = tempfile::tempdir().unwrap();
+        let config = repo.path().join(".harness/config");
+        fs::create_dir_all(&config).unwrap();
+        fs::write(config.join("phase-commands.json"), source).unwrap();
+        FsPhaseCommandConfigLoader::new().load(repo.path())
+    }
+
+    fn phase_dto_with_pre_entry_command(command: &str) -> PhaseCommandConfigDto {
+        serde_json::from_str(&format!(
+            r#"{{
+                "schema_version": 1,
+                "phases": [{{
+                    "id": "implementation",
+                    "writer": {{"argv": ["bin/sotp"], "timeout_seconds": null}},
+                    "pre_entry_commands": [{command}]
+                }}]
+            }}"#,
+        ))
+        .unwrap()
+    }
+
+    fn phase_dto_with_writer_command(command: &str) -> PhaseCommandConfigDto {
+        serde_json::from_str(&format!(
+            r#"{{
+                "schema_version": 1,
+                "phases": [{{
+                    "id": "implementation",
+                    "writer": {command},
+                    "pre_entry_commands": []
+                }}]
+            }}"#,
+        ))
+        .unwrap()
+    }
+
     #[test]
     fn test_decode_pre_review_config_uses_literal_argv_and_default_timeout() {
         let config = decode_pre_review_command_config(PreReviewCommandConfigDto {
@@ -338,6 +473,278 @@ mod tests {
             commands.iter().map(|configured| configured.timeout().as_secs()).collect::<Vec<_>>(),
             [45, 3_600]
         );
+    }
+
+    #[test]
+    fn test_decode_phase_config_preserves_literal_argv_order_and_timeouts() {
+        let config = decode_phase_command_config(PhaseCommandConfigDto {
+            schema_version: CommandConfigSchemaVersionDto { version: 1 },
+            phases: vec![PhaseCommandDeclarationDto {
+                id: CommandDeclarationIdDto { value: "implementation".to_owned() },
+                writer: command(&["bin/sotp", "capability", "exec", "implementer"], None),
+                pre_entry_commands: vec![
+                    command(&["bin/sotp", "signal", "calc-impl-catalog"], Some(12)),
+                    command(
+                        &["bin/sotp", "signal", "check-impl-catalog", "--gate", "commit"],
+                        Some(3_600),
+                    ),
+                ],
+            }],
+        })
+        .unwrap();
+
+        let id = CommandDeclarationId::try_new("implementation".to_owned()).unwrap();
+        let declaration = config.declaration(&id).unwrap();
+        let writer: Vec<&str> = declaration
+            .writer()
+            .argv()
+            .arguments()
+            .iter()
+            .map(|argument| argument.as_str())
+            .collect();
+        let pre_entry: Vec<Vec<&str>> = declaration
+            .pre_entry_commands()
+            .iter()
+            .map(|configured| {
+                configured.argv().arguments().iter().map(|argument| argument.as_str()).collect()
+            })
+            .collect();
+
+        assert_eq!(writer, ["bin/sotp", "capability", "exec", "implementer"]);
+        assert_eq!(declaration.writer().timeout().as_secs(), 3_600);
+        assert_eq!(
+            pre_entry,
+            [
+                vec!["bin/sotp", "signal", "calc-impl-catalog"],
+                vec!["bin/sotp", "signal", "check-impl-catalog", "--gate", "commit"],
+            ]
+        );
+        assert_eq!(
+            declaration
+                .pre_entry_commands()
+                .iter()
+                .map(|configured| configured.timeout().as_secs())
+                .collect::<Vec<_>>(),
+            [12, 3_600]
+        );
+    }
+
+    #[test]
+    fn test_decode_phase_config_rejects_invalid_schema_and_commands() {
+        let unsupported_schema = PhaseCommandConfigDto {
+            schema_version: CommandConfigSchemaVersionDto { version: 2 },
+            phases: Vec::new(),
+        };
+        assert!(matches!(
+            decode_phase_command_config(unsupported_schema),
+            Err(CommandConfigValidationError::InvalidSchemaVersion { .. })
+        ));
+
+        for (writer, pre_entry_commands) in [
+            (command(&[], None), Vec::new()),
+            (command(&["bin/sotp", "phase", "enter"], None), Vec::new()),
+            (command(&["bin/sotp", "review", "local"], None), Vec::new()),
+            (command(&["bin/sotp", "review", "fix-local"], None), Vec::new()),
+            (command(&["bin/sotp", "signal"], Some(0)), Vec::new()),
+            (command(&["bin/sotp", "signal"], Some(3_601)), Vec::new()),
+            (
+                command(&["bin/sotp", "signal"], None),
+                vec![command(&["bin/sotp", "phase", "enter"], None)],
+            ),
+        ] {
+            let config = PhaseCommandConfigDto {
+                schema_version: CommandConfigSchemaVersionDto { version: 1 },
+                phases: vec![PhaseCommandDeclarationDto {
+                    id: CommandDeclarationIdDto { value: "implementation".to_owned() },
+                    writer,
+                    pre_entry_commands,
+                }],
+            };
+            assert!(decode_phase_command_config(config).is_err());
+        }
+    }
+
+    #[test]
+    fn test_decode_phase_config_rejects_duplicate_declarations_and_all_recursion_forms() {
+        let duplicate = phase_config(vec![
+            phase_declaration("implementation", command(&["bin/sotp", "signal"], None), Vec::new()),
+            phase_declaration("implementation", command(&["bin/sotp", "signal"], None), Vec::new()),
+        ]);
+        assert!(matches!(
+            decode_phase_command_config(duplicate),
+            Err(CommandConfigValidationError::DuplicateDeclaration(_))
+        ));
+
+        for declaration in [
+            phase_declaration(
+                "implementation",
+                command(&["bin/sotp", "phase", "enter"], None),
+                Vec::new(),
+            ),
+            phase_declaration(
+                "implementation",
+                command(&["bin/sotp", "signal"], None),
+                vec![command(&["bin/sotp", "review", "local"], None)],
+            ),
+            phase_declaration(
+                "implementation",
+                command(&["bin/sotp", "signal"], None),
+                vec![command(&["bin/sotp", "review", "fix-local"], None)],
+            ),
+        ] {
+            assert!(matches!(
+                decode_phase_command_config(phase_config(vec![declaration])),
+                Err(CommandConfigValidationError::RecursiveInvocation { .. })
+            ));
+        }
+    }
+
+    #[test]
+    fn test_phase_config_dto_decode_rejects_unsupported_schema_document() {
+        let dto: PhaseCommandConfigDto =
+            serde_json::from_str(r#"{"schema_version":2,"phases":[]}"#).unwrap();
+
+        assert!(matches!(
+            decode_phase_command_config(dto),
+            Err(CommandConfigValidationError::InvalidSchemaVersion { .. })
+        ));
+    }
+
+    #[test]
+    fn test_phase_declaration_dto_decode_rejects_invalid_declaration_id() {
+        let dto: PhaseCommandConfigDto = serde_json::from_str(
+            r#"{
+                "schema_version": 1,
+                "phases": [{
+                    "id": "",
+                    "writer": {"argv": ["bin/sotp", "signal"], "timeout_seconds": null},
+                    "pre_entry_commands": []
+                }]
+            }"#,
+        )
+        .unwrap();
+
+        assert!(matches!(
+            decode_phase_command_config(dto),
+            Err(CommandConfigValidationError::InvalidDeclarationId { .. })
+        ));
+    }
+
+    #[test]
+    fn test_phase_declaration_dto_decode_rejects_duplicate_and_recursive_content() {
+        let duplicate: PhaseCommandConfigDto = serde_json::from_str(
+            r#"{
+                "schema_version": 1,
+                "phases": [
+                    {"id":"implementation","writer":{"argv":["bin/sotp"],"timeout_seconds":null},"pre_entry_commands":[]},
+                    {"id":"implementation","writer":{"argv":["bin/sotp"],"timeout_seconds":null},"pre_entry_commands":[]}
+                ]
+            }"#,
+        )
+        .unwrap();
+        assert!(matches!(
+            decode_phase_command_config(duplicate),
+            Err(CommandConfigValidationError::DuplicateDeclaration(_))
+        ));
+
+        let recursive_pre_entry: PhaseCommandConfigDto = serde_json::from_str(
+            r#"{
+                "schema_version": 1,
+                "phases": [{
+                    "id":"implementation",
+                    "writer":{"argv":["bin/sotp"],"timeout_seconds":null},
+                    "pre_entry_commands":[{"argv":["bin/sotp","review","local"],"timeout_seconds":null}]
+                }]
+            }"#,
+        )
+        .unwrap();
+        assert!(matches!(
+            decode_phase_command_config(recursive_pre_entry),
+            Err(CommandConfigValidationError::RecursiveInvocation { .. })
+        ));
+    }
+
+    #[test]
+    fn test_phase_declaration_dto_decode_rejects_invalid_pre_entry_commands() {
+        let empty_argv =
+            phase_dto_with_pre_entry_command(r#"{"argv": [], "timeout_seconds": null}"#);
+        assert!(matches!(
+            decode_phase_command_config(empty_argv),
+            Err(CommandConfigValidationError::EmptyArgv)
+        ));
+
+        for timeout_seconds in [0, 3_601] {
+            let timeout = phase_dto_with_pre_entry_command(&format!(
+                r#"{{"argv": ["bin/sotp"], "timeout_seconds": {timeout_seconds}}}"#,
+            ));
+            assert!(matches!(
+                decode_phase_command_config(timeout),
+                Err(CommandConfigValidationError::TimeoutOutOfRange { .. })
+            ));
+        }
+
+        for argv in [r#"["bin/sotp", "phase", "enter"]"#, r#"["bin/sotp", "review", "fix-local"]"#]
+        {
+            let recursive = phase_dto_with_pre_entry_command(&format!(
+                r#"{{"argv": {argv}, "timeout_seconds": null}}"#,
+            ));
+            assert!(matches!(
+                decode_phase_command_config(recursive),
+                Err(CommandConfigValidationError::RecursiveInvocation { .. })
+            ));
+        }
+    }
+
+    #[test]
+    fn test_phase_declaration_dto_decode_rejects_invalid_writer_argv_and_timeout() {
+        let empty_writer_argv: PhaseCommandConfigDto = serde_json::from_str(
+            r#"{
+                "schema_version": 1,
+                "phases": [{
+                    "id":"implementation",
+                    "writer":{"argv":[],"timeout_seconds":null},
+                    "pre_entry_commands":[]
+                }]
+            }"#,
+        )
+        .unwrap();
+        assert!(matches!(
+            decode_phase_command_config(empty_writer_argv),
+            Err(CommandConfigValidationError::EmptyArgv)
+        ));
+
+        let out_of_range_writer_timeout: PhaseCommandConfigDto = serde_json::from_str(
+            r#"{
+                "schema_version": 1,
+                "phases": [{
+                    "id":"implementation",
+                    "writer":{"argv":["bin/sotp"],"timeout_seconds":3601},
+                    "pre_entry_commands":[]
+                }]
+            }"#,
+        )
+        .unwrap();
+        assert!(matches!(
+            decode_phase_command_config(out_of_range_writer_timeout),
+            Err(CommandConfigValidationError::TimeoutOutOfRange { .. })
+        ));
+    }
+
+    #[test]
+    fn test_phase_declaration_dto_decode_rejects_recursive_writer_prefixes() {
+        for argv in [
+            r#"["bin/sotp", "phase", "enter"]"#,
+            r#"["bin/sotp", "review", "local"]"#,
+            r#"["bin/sotp", "review", "fix-local"]"#,
+        ] {
+            let dto = phase_dto_with_writer_command(&format!(
+                r#"{{"argv": {argv}, "timeout_seconds": null}}"#,
+            ));
+            assert!(matches!(
+                decode_phase_command_config(dto),
+                Err(CommandConfigValidationError::RecursiveInvocation { .. })
+            ));
+        }
     }
 
     #[test]
@@ -435,6 +842,238 @@ mod tests {
                 CommandConfigValidationError::InvalidSchemaVersion { .. }
             ))
         ));
+    }
+
+    #[test]
+    fn test_phase_loader_rejects_malformed_and_symlinked_files() {
+        let repo = tempfile::tempdir().unwrap();
+        let config = repo.path().join(".harness/config");
+        fs::create_dir_all(&config).unwrap();
+        fs::write(config.join("phase-commands.json"), "{").unwrap();
+        assert!(matches!(
+            FsPhaseCommandConfigLoader::new().load(repo.path()),
+            Err(CommandConfigLoadError::DecodeFailed { .. })
+        ));
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::symlink;
+
+            fs::write(repo.path().join("outside.json"), "{}").unwrap();
+            fs::remove_file(config.join("phase-commands.json")).unwrap();
+            symlink(repo.path().join("outside.json"), config.join("phase-commands.json")).unwrap();
+            assert!(matches!(
+                FsPhaseCommandConfigLoader::new().load(repo.path()),
+                Err(CommandConfigLoadError::ReadFailed { .. })
+            ));
+        }
+    }
+
+    #[test]
+    fn test_phase_loader_rejects_unknown_schema_before_its_payload_shape() {
+        let repo = tempfile::tempdir().unwrap();
+        let config = repo.path().join(".harness/config");
+        fs::create_dir_all(&config).unwrap();
+        fs::write(
+            config.join("phase-commands.json"),
+            r#"{"schema_version":2,"phases":"a future payload"}"#,
+        )
+        .unwrap();
+
+        let result = FsPhaseCommandConfigLoader::new().load(repo.path());
+        assert!(matches!(
+            result,
+            Err(CommandConfigLoadError::Invalid(
+                CommandConfigValidationError::InvalidSchemaVersion { .. }
+            ))
+        ));
+    }
+
+    #[test]
+    fn test_phase_loader_rejects_invalid_declarations_before_returning_config() {
+        let duplicate = load_phase_config(
+            r#"{
+                "schema_version": 1,
+                "phases": [
+                    {"id":"implementation","writer":{"argv":["bin/sotp"],"timeout_seconds":null},"pre_entry_commands":[]},
+                    {"id":"implementation","writer":{"argv":["bin/sotp"],"timeout_seconds":null},"pre_entry_commands":[]}
+                ]
+            }"#,
+        );
+        assert!(matches!(
+            duplicate,
+            Err(CommandConfigLoadError::Invalid(
+                CommandConfigValidationError::DuplicateDeclaration(_)
+            ))
+        ));
+
+        let empty_argv = load_phase_config(
+            r#"{
+                "schema_version": 1,
+                "phases": [{"id":"implementation","writer":{"argv":[],"timeout_seconds":null},"pre_entry_commands":[]}]
+            }"#,
+        );
+        assert!(matches!(
+            empty_argv,
+            Err(CommandConfigLoadError::Invalid(CommandConfigValidationError::EmptyArgv))
+        ));
+
+        let timeout = load_phase_config(
+            r#"{
+                "schema_version": 1,
+                "phases": [{"id":"implementation","writer":{"argv":["bin/sotp"],"timeout_seconds":3601},"pre_entry_commands":[]}]
+            }"#,
+        );
+        assert!(matches!(
+            timeout,
+            Err(CommandConfigLoadError::Invalid(
+                CommandConfigValidationError::TimeoutOutOfRange { .. }
+            ))
+        ));
+
+        let zero_timeout = load_phase_config(
+            r#"{
+                "schema_version": 1,
+                "phases": [{"id":"implementation","writer":{"argv":["bin/sotp"],"timeout_seconds":0},"pre_entry_commands":[]}]
+            }"#,
+        );
+        assert!(matches!(
+            zero_timeout,
+            Err(CommandConfigLoadError::Invalid(
+                CommandConfigValidationError::TimeoutOutOfRange { .. }
+            ))
+        ));
+
+        let recursive_writer = load_phase_config(
+            r#"{
+                "schema_version": 1,
+                "phases": [{"id":"implementation","writer":{"argv":["bin/sotp","phase","enter"],"timeout_seconds":null},"pre_entry_commands":[]}]
+            }"#,
+        );
+        assert!(matches!(
+            recursive_writer,
+            Err(CommandConfigLoadError::Invalid(
+                CommandConfigValidationError::RecursiveInvocation { .. }
+            ))
+        ));
+
+        let recursive_pre_entry = load_phase_config(
+            r#"{
+                "schema_version": 1,
+                "phases": [{
+                    "id":"implementation",
+                    "writer":{"argv":["bin/sotp"],"timeout_seconds":null},
+                    "pre_entry_commands":[{"argv":["bin/sotp","review","local"],"timeout_seconds":null}]
+                }]
+            }"#,
+        );
+        assert!(matches!(
+            recursive_pre_entry,
+            Err(CommandConfigLoadError::Invalid(
+                CommandConfigValidationError::RecursiveInvocation { .. }
+            ))
+        ));
+
+        let recursive_review_fix_local = load_phase_config(
+            r#"{
+                "schema_version": 1,
+                "phases": [{
+                    "id":"implementation",
+                    "writer":{"argv":["bin/sotp","review","fix-local"],"timeout_seconds":null},
+                    "pre_entry_commands":[]
+                }]
+            }"#,
+        );
+        assert!(matches!(
+            recursive_review_fix_local,
+            Err(CommandConfigLoadError::Invalid(
+                CommandConfigValidationError::RecursiveInvocation { .. }
+            ))
+        ));
+    }
+
+    #[test]
+    fn test_phase_loader_rejects_denylisted_prefix_with_trailing_arguments() {
+        let result = load_phase_config(
+            r#"{
+                "schema_version": 1,
+                "phases": [{
+                    "id":"implementation",
+                    "writer":{
+                        "argv":["bin/sotp","review","local","--scope","cli"],
+                        "timeout_seconds":null
+                    },
+                    "pre_entry_commands":[]
+                }]
+            }"#,
+        );
+
+        assert!(matches!(
+            result,
+            Err(CommandConfigLoadError::Invalid(
+                CommandConfigValidationError::RecursiveInvocation { .. }
+            ))
+        ));
+    }
+
+    #[test]
+    fn test_phase_loader_decodes_valid_configuration_into_usecase_port() {
+        let repo = tempfile::tempdir().unwrap();
+        let config = repo.path().join(".harness/config");
+        fs::create_dir_all(&config).unwrap();
+        fs::write(
+            config.join("phase-commands.json"),
+            r#"{
+                "schema_version": 1,
+                "phases": [{
+                    "id": "implementation",
+                    "writer": {
+                        "argv": ["bin/sotp", "capability", "exec", "implementer"],
+                        "timeout_seconds": null
+                    },
+                    "pre_entry_commands": [
+                        {"argv": ["bin/sotp", "signal", "calc-impl-catalog"], "timeout_seconds": 4},
+                        {"argv": ["bin/sotp", "signal", "check-impl-catalog"], "timeout_seconds": 12}
+                    ]
+                }]
+            }"#,
+        )
+        .unwrap();
+
+        let config = FsPhaseCommandConfigLoader::new().load(repo.path()).unwrap();
+        let id = CommandDeclarationId::try_new("implementation".to_owned()).unwrap();
+        let declaration = config.declaration(&id).unwrap();
+        let writer: Vec<&str> = declaration
+            .writer()
+            .argv()
+            .arguments()
+            .iter()
+            .map(|argument| argument.as_str())
+            .collect();
+        let pre_entry: Vec<Vec<&str>> = declaration
+            .pre_entry_commands()
+            .iter()
+            .map(|command| {
+                command.argv().arguments().iter().map(|argument| argument.as_str()).collect()
+            })
+            .collect();
+
+        assert_eq!(writer, ["bin/sotp", "capability", "exec", "implementer"]);
+        assert_eq!(declaration.writer().timeout().as_secs(), 3_600);
+        assert_eq!(
+            pre_entry,
+            [
+                vec!["bin/sotp", "signal", "calc-impl-catalog"],
+                vec!["bin/sotp", "signal", "check-impl-catalog"],
+            ]
+        );
+        assert_eq!(
+            declaration
+                .pre_entry_commands()
+                .iter()
+                .map(|command| command.timeout().as_secs())
+                .collect::<Vec<_>>(),
+            [4, 12]
+        );
     }
 
     #[test]

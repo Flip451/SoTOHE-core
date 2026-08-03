@@ -3744,6 +3744,447 @@
           "test_name": "test_capability_composition_root_dispatches_valid_claude_host_in_process"
         }
       ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "infrastructure::operator_command_config::decode_phase_command_config",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::operator_command_config::decode_phase_command_config",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "4c909eac5f6b997548df2f22ae9ad392d1d7c72d96e5e353e59d603602d7eed9",
+        "declaration_hash": "e58c952323eb901b80b1640d4ffd178a63927fb6d26ab614e31e53e2ef66f6eb",
+        "anchor_text_hash": "e44a2b38a1ce3bf278e618e41415dbd26068d287e4173facb0f0c39698f67474"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(decode_phase_command_config(unsupported_schema), Err(CommandConfigValidationError::InvalidSchemaVersion { .. }))); ... assert!(decode_phase_command_config(config).is_err()); ... Err(CommandConfigValidationError::DuplicateDeclaration(_)) ... Err(CommandConfigValidationError::RecursiveInvocation { .. })"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_decode_phase_config_preserves_literal_argv_order_and_timeouts"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_decode_phase_config_rejects_invalid_schema_and_commands"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_decode_phase_config_rejects_duplicate_declarations_and_all_recursion_forms"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "infrastructure::operator_command_config::decode_phase_command_config",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::operator_command_config::decode_phase_command_config",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "4c909eac5f6b997548df2f22ae9ad392d1d7c72d96e5e353e59d603602d7eed9",
+        "declaration_hash": "e58c952323eb901b80b1640d4ffd178a63927fb6d26ab614e31e53e2ef66f6eb",
+        "anchor_text_hash": "05b8094316a1aacabb4bec26100b679daf53d5554267297214266776d1838398"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(writer, [\"bin/sotp\", \"capability\", \"exec\", \"implementer\"]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_decode_phase_config_preserves_literal_argv_order_and_timeouts"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_decode_phase_config_rejects_invalid_schema_and_commands"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_decode_phase_config_rejects_duplicate_declarations_and_all_recursion_forms"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsPhaseCommandConfigLoader",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsPhaseCommandConfigLoader",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::phase_command::PhaseCommandConfigLoaderPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "dfc49180290833cfa68e981d56931cf0cd6e860e0e82772503ca07295e9b621f",
+        "declaration_hash": "8e0c781c5865dc1f55870ccfb09fb7aa4b3fd03fd9d6bf6fdb1597a7a67001b9",
+        "anchor_text_hash": "eb3acd9bc2b70f70d7e5b103ad0b2255c300e50456aaeadfd2f50815b79ff6cf"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(writer, [\"bin/sotp\", \"capability\", \"exec\", \"implementer\"]); assert_eq!(declaration.writer().timeout().as_secs(), 3_600); assert_eq!(pre_entry, [vec![\"bin/sotp\", \"signal\", \"calc-impl-catalog\"], vec![\"bin/sotp\", \"signal\", \"check-impl-catalog\"]]); assert_eq!(declaration.pre_entry_commands().iter().map(|command| command.timeout().as_secs()).collect::<Vec<_>>(), [4, 12]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_phase_loader_decodes_valid_configuration_into_usecase_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_phase_loader_rejects_malformed_and_symlinked_files"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_phase_loader_rejects_unknown_schema_before_its_payload_shape"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_phase_loader_rejects_invalid_declarations_before_returning_config"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_phase_loader_rejects_denylisted_prefix_with_trailing_arguments"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsPhaseCommandConfigLoader",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsPhaseCommandConfigLoader",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::phase_command::PhaseCommandConfigLoaderPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "dfc49180290833cfa68e981d56931cf0cd6e860e0e82772503ca07295e9b621f",
+        "declaration_hash": "8e0c781c5865dc1f55870ccfb09fb7aa4b3fd03fd9d6bf6fdb1597a7a67001b9",
+        "anchor_text_hash": "e44a2b38a1ce3bf278e618e41415dbd26068d287e4173facb0f0c39698f67474"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            recursive_review_fix_local,\n            Err(CommandConfigLoadError::Invalid(\n                CommandConfigValidationError::RecursiveInvocation { .. }\n            ))\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_phase_loader_decodes_valid_configuration_into_usecase_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_phase_loader_rejects_malformed_and_symlinked_files"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_phase_loader_rejects_unknown_schema_before_its_payload_shape"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_phase_loader_rejects_invalid_declarations_before_returning_config"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_phase_loader_rejects_denylisted_prefix_with_trailing_arguments"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsPhaseCommandConfigLoader",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsPhaseCommandConfigLoader",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::phase_command::PhaseCommandConfigLoaderPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "dfc49180290833cfa68e981d56931cf0cd6e860e0e82772503ca07295e9b621f",
+        "declaration_hash": "8e0c781c5865dc1f55870ccfb09fb7aa4b3fd03fd9d6bf6fdb1597a7a67001b9",
+        "anchor_text_hash": "05b8094316a1aacabb4bec26100b679daf53d5554267297214266776d1838398"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(recursive_review_fix_local, Err(CommandConfigLoadError::Invalid(CommandConfigValidationError::RecursiveInvocation { .. }))));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_phase_loader_decodes_valid_configuration_into_usecase_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_phase_loader_rejects_malformed_and_symlinked_files"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_phase_loader_rejects_unknown_schema_before_its_payload_shape"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_phase_loader_rejects_invalid_declarations_before_returning_config"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_phase_loader_rejects_denylisted_prefix_with_trailing_arguments"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandConfigDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandConfigDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "7853a2c6c79cc869eb80e62b4d77d93bf59cc671299d7d58612c36f8dac5bc91",
+        "declaration_hash": "33d6c4c74bb97f2e122eca334c377956e1456d1dfd287ce2d962dcb5ed531a6d",
+        "anchor_text_hash": "eb3acd9bc2b70f70d7e5b103ad0b2255c300e50456aaeadfd2f50815b79ff6cf"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let config = FsPhaseCommandConfigLoader::new().load(repo.path()).unwrap();"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_phase_loader_decodes_valid_configuration_into_usecase_port"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandConfigDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandConfigDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "3be1db24ff7bc6cdef560267e1401e60648a5b3edfbb20c34ebf1b8c6107ac49",
+        "declaration_hash": "33d6c4c74bb97f2e122eca334c377956e1456d1dfd287ce2d962dcb5ed531a6d",
+        "anchor_text_hash": "e44a2b38a1ce3bf278e618e41415dbd26068d287e4173facb0f0c39698f67474"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            decode_phase_command_config(dto),\n            Err(CommandConfigValidationError::InvalidSchemaVersion { .. })\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_phase_config_dto_decode_rejects_unsupported_schema_document"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandConfigDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandConfigDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "7853a2c6c79cc869eb80e62b4d77d93bf59cc671299d7d58612c36f8dac5bc91",
+        "declaration_hash": "33d6c4c74bb97f2e122eca334c377956e1456d1dfd287ce2d962dcb5ed531a6d",
+        "anchor_text_hash": "05b8094316a1aacabb4bec26100b679daf53d5554267297214266776d1838398"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(writer, [\"bin/sotp\", \"capability\", \"exec\", \"implementer\"]);\nassert_eq!(declaration.writer().timeout().as_secs(), 3_600);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_phase_loader_decodes_valid_configuration_into_usecase_port"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandDeclarationDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandDeclarationDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "7853a2c6c79cc869eb80e62b4d77d93bf59cc671299d7d58612c36f8dac5bc91",
+        "declaration_hash": "a4cd53ba655b9d3264f2cd5d4daafb43b39970c8fe611febe19e379093e49f3a",
+        "anchor_text_hash": "eb3acd9bc2b70f70d7e5b103ad0b2255c300e50456aaeadfd2f50815b79ff6cf"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(writer, [\"bin/sotp\", \"capability\", \"exec\", \"implementer\"]);\nassert_eq!(declaration.writer().timeout().as_secs(), 3_600);\nassert_eq!(pre_entry, [\n    vec![\"bin/sotp\", \"signal\", \"calc-impl-catalog\"],\n    vec![\"bin/sotp\", \"signal\", \"check-impl-catalog\"],\n]);\nassert_eq!(\n    declaration\n        .pre_entry_commands()\n        .iter()\n        .map(|command| command.timeout().as_secs())\n        .collect::<Vec<_>>(),\n    [4, 12]\n);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_phase_loader_decodes_valid_configuration_into_usecase_port"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandDeclarationDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandDeclarationDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "82626e918d856def8050d7d2b0db8b6a04e43e9fa2d86ce400ae5472408f4bc6",
+        "declaration_hash": "a4cd53ba655b9d3264f2cd5d4daafb43b39970c8fe611febe19e379093e49f3a",
+        "anchor_text_hash": "e44a2b38a1ce3bf278e618e41415dbd26068d287e4173facb0f0c39698f67474"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            decode_phase_command_config(empty_writer_argv),\n            Err(CommandConfigValidationError::EmptyArgv)\n        ));\n\nassert!(matches!(\n            decode_phase_command_config(out_of_range_writer_timeout),\n            Err(CommandConfigValidationError::TimeoutOutOfRange { .. })\n        ));\n\nassert!(matches!(\n            decode_phase_command_config(duplicate),\n            Err(CommandConfigValidationError::DuplicateDeclaration(_))\n        ));\n\nassert!(matches!(\n                decode_phase_command_config(recursive_pre_entry),\n                Err(CommandConfigValidationError::RecursiveInvocation { .. })\n            ));\n\nassert!(matches!(\n                decode_phase_command_config(dto),\n                Err(CommandConfigValidationError::RecursiveInvocation { .. })\n            ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_phase_declaration_dto_decode_rejects_invalid_declaration_id"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_phase_declaration_dto_decode_rejects_duplicate_and_recursive_content"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_phase_declaration_dto_decode_rejects_invalid_writer_argv_and_timeout"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_phase_declaration_dto_decode_rejects_invalid_pre_entry_commands"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_phase_declaration_dto_decode_rejects_recursive_writer_prefixes"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandDeclarationDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandDeclarationDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "7853a2c6c79cc869eb80e62b4d77d93bf59cc671299d7d58612c36f8dac5bc91",
+        "declaration_hash": "a4cd53ba655b9d3264f2cd5d4daafb43b39970c8fe611febe19e379093e49f3a",
+        "anchor_text_hash": "05b8094316a1aacabb4bec26100b679daf53d5554267297214266776d1838398"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let declaration = config.declaration(&id).unwrap();\n        let writer: Vec<&str> = declaration\n            .writer()\n            .argv()\n            .arguments()\n            .iter()\n            .map(|argument| argument.as_str())\n            .collect();\n        let pre_entry: Vec<Vec<&str>> = declaration\n            .pre_entry_commands()\n            .iter()\n            .map(|command| {\n                command.argv().arguments().iter().map(|argument| argument.as_str()).collect()\n            })\n            .collect();\n\n        assert_eq!(writer, [\"bin/sotp\", \"capability\", \"exec\", \"implementer\"]);\n        assert_eq!(declaration.writer().timeout().as_secs(), 3_600);\n        assert_eq!(\n            pre_entry,\n            [\n                vec![\"bin/sotp\", \"signal\", \"calc-impl-catalog\"],\n                vec![\"bin/sotp\", \"signal\", \"check-impl-catalog\"],\n            ]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_phase_loader_decodes_valid_configuration_into_usecase_port"
+        }
+      ]
     }
   ]
 }

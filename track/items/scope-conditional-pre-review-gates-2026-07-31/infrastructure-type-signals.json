@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-03T07:24:11Z",
+  "generated_at": "2026-08-03T08:50:24Z",
   "declaration_hash": "89b2252ccff399710658f79f5946f27bea1bbdfbe2a1fc4d821348a3267aca7a",
-  "implementation_input_hash": "47ff3208c3d762fb54fb903f7f5233fa721c2b844b40cd1067db1ff50e095fe9",
+  "implementation_input_hash": "b67c13c78c9d8923353004f9f621aa1753bb34ba3e192ac07c5d171866ea087b",
   "signals": [
     {
       "type_name": "CommandArgumentDto",
@@ -46,9 +46,9 @@
     {
       "type_name": "CommandDeclarationIdDto",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Deserialize<'de>",
@@ -105,9 +105,9 @@
     {
       "type_name": "FsPhaseCommandConfigLoader",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Debug",
         "Default",
         "usecase::phase_command::PhaseCommandConfigLoaderPort"
@@ -152,9 +152,9 @@
     {
       "type_name": "PhaseCommandConfigDto",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Deserialize<'de>",
@@ -165,9 +165,9 @@
     {
       "type_name": "PhaseCommandDeclarationDto",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Deserialize<'de>",
@@ -279,8 +279,8 @@
     {
       "type_name": "infrastructure::operator_command_config::decode_phase_command_config",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "infrastructure::operator_command_config::decode_pre_review_command_config",

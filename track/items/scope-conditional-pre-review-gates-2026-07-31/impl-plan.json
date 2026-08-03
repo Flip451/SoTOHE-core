@@ -123,7 +123,8 @@
     {
       "id": "T027",
       "description": "`libs/usecase/src/operator_command.rs` の `ConfiguredCommand` construction と configuration/load error vocabulary、および `libs/usecase/src/phase_command.rs` の phase command config / declaration / loader-port、configuration validation error、validate command を catalogue shape に適応し、configuration validation tests を更新する。IN-01、IN-11、CN-01、AC-01、AC-13。",
-      "status": "in_progress",
+      "status": "done",
+      "commit_hash": "275cc9ee271ceeab0a9fa85967f1dd8d92e92602",
       "depends_on": [
         "T025"
       ]
@@ -156,7 +157,7 @@
     {
       "id": "T029",
       "description": "`libs/infrastructure/src/operator_command_config.rs` の phase command configuration loader、command DTO 群、phase DTO / declaration DTO、`decode_phase_command_config` を更新し、phase DTO decode / invalid-config tests を更新する。IN-01、IN-03、AC-01。",
-      "status": "todo",
+      "status": "in_progress",
       "depends_on": [
         "T026"
       ]
