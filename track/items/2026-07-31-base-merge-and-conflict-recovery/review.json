@@ -2772,6 +2772,198 @@
           "hash": "rvw1:sha256:cddf6fe12db21fa79be87f663906c5f70c87d1820e46253dba05063a23e04e48",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T17:08:08Z",
+          "findings": [
+            {
+              "category": "symlink not rejected at boundary",
+              "file": "libs/infrastructure/src/base_merge/cleanup_tree.rs",
+              "line": 332,
+              "message": "`read_snapshot_file` uses path-based `fs::File::open` without a no-follow/symlink recheck. After the earlier `symlink_metadata` validation, a concurrent replacement can turn the entry into a symlink and make this adapter follow it outside the trusted track tree during publication verification. Open the validated file descriptor with `O_NOFOLLOW` (or revalidate atomically) and read from that descriptor.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:dbfa5d278137b513e400c9f2bf246ca4ddd3b988ce8e8cd64ed11d8993b5686a",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T17:14:07Z",
+          "findings": [
+            {
+              "category": "symlink not rejected at boundary",
+              "file": "libs/infrastructure/src/base_merge/cleanup_tree.rs",
+              "line": 332,
+              "message": "`open_snapshot_file_nofollow` protects only the final path component. `read_snapshot_file` still opens a path whose intermediate directories can be replaced concurrently with symlinks after `reject_symlinks_below` runs, causing traversal outside the trusted track tree. Use directory descriptors/openat-style traversal (or equivalent component-wise no-follow opens) for the full path.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:da07a2efd4b157350de5f7af32f3cfb03598f6ec9a201063a9ee74f66d3862f2",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T17:20:18Z",
+          "findings": [
+            {
+              "category": "symlink not rejected at boundary",
+              "file": "libs/infrastructure/src/base_merge/cleanup_tree.rs",
+              "line": 290,
+              "message": "The new descriptor-based leaf reads do not cover directory enumeration: `fs::read_dir(path)` is still performed after a path-based symlink check. If an intermediate directory is replaced concurrently, `read_dir` can follow that symlink and enumerate outside the trusted track tree. Traverse directories using already-open directory descriptors with `openat(..., NOFOLLOW)` as well, or fail closed on the replacement.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:96c570d642ce295e969f887cfcaaf9d1348a12d9a3ad0e1480b5a1ca26fd5e2e",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T17:30:01Z",
+          "findings": [
+            {
+              "category": "symlink not rejected at boundary",
+              "file": "libs/infrastructure/src/base_merge/cleanup_tree.rs",
+              "line": 405,
+              "message": "The handle-relative traversal begins with `open_snapshot_directory_nofollow(root)`, which opens the root by pathname. `O_NOFOLLOW` protects only the final `root` component; a concurrent replacement of an ancestor such as `track/items` or the recovery parent with a symlink can redirect this open outside the trusted tree before descriptor traversal begins. Open each snapshot root relative to an already validated parent directory descriptor (or otherwise verify the complete component chain atomically).",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:880870ce8fcfebb9d8bdd5a7ddc3f76d06eb182f1dc08b4ea1d6881449ce1bb7",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T17:36:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:402e490dc15c4d684cbea67af630cc3d4603006137835c73cc2d910d79a4d511",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T17:45:30Z",
+          "findings": [
+            {
+              "category": "merge-state adjudication",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 616,
+              "message": "A matching MERGE_HEAD does not prove Git reported a conflict. The runner can fail after a clean merge has written MERGE_HEAD and produced a fully merged index but before committing; the new test itself constructs this no-unmerged-path state. Returning Conflicted skips required clean-merge cleanup and incorrectly authorizes /track:recover. Require both a matching MERGE_HEAD and unmerged paths; otherwise fail closed.",
+              "severity": "P1"
+            },
+            {
+              "category": "concurrency/data integrity",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 104,
+              "message": "The drift check and RENAME_EXCHANGE are separate operations without a lock. A writer can update a non-baseline file after verification returns but before the exchange; that edit moves into the recovery tree and is later deleted after SyncBase succeeds. The same gap permits the prepared tree to be replaced after its no-follow scan. Hold the applicable writer lock across verification and exchange, or provide equivalent atomic revalidation/rollback.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:402e490dc15c4d684cbea67af630cc3d4603006137835c73cc2d910d79a4d511",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T18:08:22Z",
+          "findings": [
+            {
+              "category": "concurrency/data integrity",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 138,
+              "message": "The advisory metadata.json.lock does not close the verification/exchange race for the non-baseline writers this check is meant to protect. Track artifact writers use other locks or none; the added ConcurrentWriteBaselineCapture itself successfully writes after this lock has been acquired. If such a write occurs after verification returns and before RENAME_EXCHANGE, it is moved to recovery and eventually deleted. The exchange needs atomic revalidation/rollback or a lock actually shared by every relevant writer.",
+              "severity": "P0"
+            },
+            {
+              "category": "data integrity",
+              "file": "libs/infrastructure/src/base_merge/cleanup_tree.rs",
+              "line": 481,
+              "message": "TRACK_WRITER_LOCK_FILE is skipped by basename at every recursion depth, although only the track-root metadata.json.lock is the reserved writer lock. A legitimate nested file such as artifacts/metadata.json.lock is omitted from the replacement and also ignored by drift verification, so publication succeeds and permanently deletes it. Restrict the exception to the root-relative lock path.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c10038f71de890c25b0779da22d1ed0fcc1e562abf5eaad3215f49966012d8d3",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T18:19:46Z",
+          "findings": [
+            {
+              "category": "data corruption",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 150,
+              "message": "Post-exchange verification can itself discard concurrent writes. A writer updating the new active tree after `EXCHANGE` causes a mismatch; rollback then moves that updated tree to `replacement` and deletes it. A writer holding an old-tree descriptor can likewise write after verification and lose the update when recovery is pruned. The advisory metadata lock does not exclude non-metadata writers. Publication needs synchronization shared by all artifact writers or reconciliation that preserves both trees.",
+              "severity": "P0"
+            },
+            {
+              "category": "data corruption",
+              "file": "libs/infrastructure/src/base_merge/cleanup_tree.rs",
+              "line": 434,
+              "message": "The verification ignores more files than publication intentionally replaces: every `*-baseline.json` and every nested phase-marker name. Only generated root `*-types-baseline.json` files and the root transaction marker are intentional outputs. Consequently, a concurrent update to an ordinary file such as `custom-baseline.json` or a nested marker is invisible to both checks and can be overwritten by the stale snapshot. Restrict exemptions to the exact generated root paths.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:09d047ffe33b2a90406cc67abd6228259051b73e58d0c28c2749405f2a466331",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T18:39:21Z",
+          "findings": [
+            {
+              "category": "data integrity",
+              "file": "libs/infrastructure/src/base_merge/cleanup_tree.rs",
+              "line": 443,
+              "message": "The generated-baseline classifier does not match the binding contract. A valid `catalogue_file: \"shared.json\"` produces `shared-baseline.json`, but this predicate only recognizes `*-types-baseline.json`. The stale file therefore remains in the detached track, baseline capture sees an existing valid file and skips recapture, and cleanup republishes a baseline from the old state instead of the requested base commit. Conversely, any unconfigured root `*-types-baseline.json` is silently deleted. Derive the exact generated filenames from the resolved bindings, plus the feature baseline, instead of using a suffix heuristic.",
+              "severity": "P0"
+            },
+            {
+              "category": "data corruption",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 259,
+              "message": "Retaining both trees after post-exchange drift only postpones loss of writes made through an old-tree descriptor. On the next run, `reconcile_interrupted_replacement` promotes that divergent tree to the recovery slot, but a successful retry subsequently removes the slot before promoting its new recovery tree. The old-tree-only update is never merged into the active snapshot and is ultimately deleted. Recovery must reconcile or explicitly preserve divergent content until incorporated, or publication must use a lock shared by every artifact writer.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:d9fc864b833a59d0270b55bf5c644001350df4e49e5b33b5542aa7afaed8eb41",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T19:06:29Z",
+          "findings": [
+            {
+              "category": "filesystem correctness",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 427,
+              "message": "`expected` と `candidate` は `recovery_root` の直接の子として検証されていますが、比較用ディレクトリハンドルは `recovery_root.parent()` に対して開かれています。スナップショット処理はこのハンドルから各パスの basename を `openat` するため、実在する `recovery_root/.replacement` ではなくその親直下の `.replacement` を探して常に失敗します。その結果、既存 recovery slot がある再試行・promotion は内容が一致していても復旧不能になります。ここでは `recovery_root` 自体を開き、一致する二つのコピーを正常に昇格できるテストを追加してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:20e380758d8cbdce14dc61eb5811c7e60465c7caa524ba05e9c1746e644ed0c5",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T19:15:41Z",
+          "findings": [
+            {
+              "category": "concurrency correctness",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 251,
+              "message": "`_writer_lock` は baseline replacement 関数内だけで保持され、return 時に解放された後、別の `write_sync_base_record` 呼び出しが recovery slot を移動・削除します。この隙間で別の base-merge が同じロックを取得して新しい baseline/recovery を publish すると、先行処理が古い base commit の SyncBase record を書き、新しい処理の recovery copy を削除できます。active baseline・authoritative stamp・recovery が異なる transaction に由来するデータ破損状態になるため、baseline publication から SyncBase commit/recovery cleanup まで同じロックで直列化するか、再取得後に recovery と request の世代を検証してください。",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:c37012dbe155e7d667e7e6fca9f32eb55a058d8083b72c2602c9a473371d63ed",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T19:38:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:917cb2105c0ed1e5211ef7cc52a0fc4e036776113eddd415834fbe1719159311",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },

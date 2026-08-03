@@ -1,5 +1,4 @@
-//! Bounded, symlink-safe staging of track data for base-merge cleanup.
-
+use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
 use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
@@ -7,7 +6,7 @@ use std::sync::Arc;
 
 use super::{
     MAX_CLEANUP_FILE_BYTES, MAX_CLEANUP_TREE_BYTES, MAX_CLEANUP_TREE_DEPTH,
-    MAX_CLEANUP_TREE_ENTRIES, read_regular_file_bounded,
+    MAX_CLEANUP_TREE_ENTRIES, TRACK_WRITER_LOCK_FILE, read_regular_file_bounded,
 };
 use crate::FsSymlinkGuard;
 use crate::tddd::baseline_rustdoc_codec::BaselineRustdocCodec;
@@ -23,10 +22,32 @@ use usecase::baseline_capture::{
 };
 use usecase::git_workflow::DiagnosticText;
 
+use super::BASELINE_REPLACEMENT_PHASE_MARKER;
+use crate::conventions_resolve::directory_walk::{
+    ListingError, bounded_entries, open_directory_at,
+};
+
+#[cfg(test)]
 pub(super) fn copy_cleanup_inputs(
     source_workspace: &Path,
     target_workspace: &Path,
     track_id: &str,
+) -> Result<(), String> {
+    let generated_baseline_files =
+        super::publication::generated_baseline_file_names(source_workspace)?;
+    copy_cleanup_inputs_with_baselines(
+        source_workspace,
+        target_workspace,
+        track_id,
+        &generated_baseline_files,
+    )
+}
+
+pub(super) fn copy_cleanup_inputs_with_baselines(
+    source_workspace: &Path,
+    target_workspace: &Path,
+    track_id: &str,
+    generated_baseline_files: &BTreeSet<String>,
 ) -> Result<(), String> {
     reject_symlinks_up_to_root(target_workspace)
         .map_err(|error| format!("cannot inspect detached cleanup workspace: {error}"))?;
@@ -46,10 +67,18 @@ pub(super) fn copy_cleanup_inputs(
 
     let source_track = source_workspace.join("track/items").join(track_id);
     let target_track = target_workspace.join("track/items").join(track_id);
-    replace_tree(&source_track, &target_track, false, target_workspace)?;
-    remove_baseline_files(&target_track)
+    remove_tree_bounded(&target_track, target_workspace)?;
+    copy_tree_with_baselines(
+        &source_track,
+        &target_track,
+        false,
+        target_workspace,
+        generated_baseline_files,
+    )?;
+    remove_baseline_files(&target_track, generated_baseline_files)
 }
 
+#[cfg(test)]
 pub(super) fn replace_tree(
     source: &Path,
     target: &Path,
@@ -57,11 +86,15 @@ pub(super) fn replace_tree(
     trusted_target_root: &Path,
 ) -> Result<(), String> {
     remove_tree_bounded(target, trusted_target_root)?;
-    copy_tree(source, target, include_baselines, trusted_target_root)
+    copy_tree_with_baselines(
+        source,
+        target,
+        include_baselines,
+        trusted_target_root,
+        &BTreeSet::new(),
+    )
 }
 
-/// Removes a tree without following symlinks or traversing beyond bounded
-/// depth/entry limits. Missing paths are already in the desired state.
 pub(super) fn remove_tree_bounded(path: &Path, trusted_root: &Path) -> Result<(), String> {
     let mut budget = CleanupTraversalBudget::new();
     let mut snapshot = Vec::new();
@@ -202,14 +235,184 @@ impl CleanupTraversalBudget {
     }
 }
 
-pub(super) fn copy_tree(
+pub(super) fn copy_tree_with_baselines(
     source: &Path,
     target: &Path,
     include_baselines: bool,
     trusted_target_root: &Path,
+    generated_baseline_files: &BTreeSet<String>,
 ) -> Result<(), String> {
     let mut budget = CleanupTraversalBudget::new();
-    copy_tree_with_budget(source, target, include_baselines, trusted_target_root, &mut budget)
+    copy_tree_with_budget(
+        source,
+        target,
+        include_baselines,
+        trusted_target_root,
+        &mut budget,
+        generated_baseline_files,
+    )
+}
+
+pub(super) fn verify_non_baseline_content_matches(
+    active_track: &Path,
+    active_parent: &fs::File,
+    prepared_replacement: &Path,
+    replacement_parent: &fs::File,
+    generated_baseline_files: &BTreeSet<String>,
+) -> Result<(), String> {
+    let active =
+        collect_non_baseline_snapshot(active_track, active_parent, generated_baseline_files)?;
+    let prepared = collect_non_baseline_snapshot(
+        prepared_replacement,
+        replacement_parent,
+        generated_baseline_files,
+    )?;
+    (active == prepared)
+        .then_some(())
+        .ok_or_else(|| "active track content changed during baseline capture".to_owned())
+}
+
+#[derive(Debug, Eq, PartialEq)]
+enum SnapshotEntry {
+    Directory,
+    File(Vec<u8>),
+}
+
+fn collect_non_baseline_snapshot(
+    root: &Path,
+    parent: &fs::File,
+    generated_baseline_files: &BTreeSet<String>,
+) -> Result<BTreeMap<PathBuf, SnapshotEntry>, String> {
+    let root_name = root.file_name().ok_or_else(|| {
+        format!("cannot inspect track snapshot without a name: {}", root.display())
+    })?;
+    let directory = open_directory_at(parent, Path::new(root_name))
+        .map_err(|error| format!("cannot open track snapshot {}: {error}", root.display()))?;
+    let mut budget = CleanupTraversalBudget::new();
+    let mut snapshot = BTreeMap::new();
+    collect_non_baseline_snapshot_at(
+        root,
+        directory,
+        PathBuf::new(),
+        &mut budget,
+        0,
+        &mut snapshot,
+        generated_baseline_files,
+    )?;
+    Ok(snapshot)
+}
+
+fn collect_non_baseline_snapshot_at(
+    snapshot_root: &Path,
+    directory: fs::File,
+    relative: PathBuf,
+    budget: &mut CleanupTraversalBudget,
+    depth: usize,
+    snapshot: &mut BTreeMap<PathBuf, SnapshotEntry>,
+    generated_baseline_files: &BTreeSet<String>,
+) -> Result<(), String> {
+    let path = snapshot_root.join(&relative);
+    budget.inspect_entry(&path, depth)?;
+    snapshot.insert(relative.clone(), SnapshotEntry::Directory);
+    let mut listing_budget = MAX_CLEANUP_TREE_ENTRIES;
+    let entries = match bounded_entries(&directory, &mut listing_budget) {
+        Ok(entries) => entries,
+        Err(ListingError::BudgetExhausted) => {
+            return Err(format!(
+                "cleanup input exceeds filesystem entry limit at {}",
+                path.display()
+            ));
+        }
+        Err(ListingError::Io(error)) => {
+            return Err(format!("cannot enumerate track snapshot {}: {error}", path.display()));
+        }
+    };
+    for entry in entries {
+        let child_relative = relative.join(&entry.name);
+        let child_path = snapshot_root.join(&child_relative);
+        if entry.is_symlink {
+            budget.inspect_entry(&child_path, depth + 1)?;
+            return Err(format!(
+                "refusing symlinked track snapshot entry: {}",
+                child_path.display()
+            ));
+        }
+        if entry.is_dir {
+            let nested_directory = open_directory_at(&directory, &entry.name).map_err(|error| {
+                format!("cannot open track snapshot directory {}: {error}", child_path.display())
+            })?;
+            collect_non_baseline_snapshot_at(
+                snapshot_root,
+                nested_directory,
+                child_relative,
+                budget,
+                depth + 1,
+                snapshot,
+                generated_baseline_files,
+            )?;
+            continue;
+        }
+        budget.inspect_entry(&child_path, depth + 1)?;
+        if !entry.is_file {
+            return Err(format!(
+                "refusing non-regular track snapshot entry: {}",
+                child_path.display()
+            ));
+        }
+        if is_ignored_publication_file(&child_relative, generated_baseline_files) {
+            continue;
+        }
+        let file = open_snapshot_leaf_at_nofollow(&directory, &entry.name).map_err(|error| {
+            format!("cannot open track snapshot file {}: {error}", child_path.display())
+        })?;
+        let opened_metadata = file.metadata().map_err(|error| {
+            format!("cannot inspect opened track snapshot file {}: {error}", child_path.display())
+        })?;
+        if !opened_metadata.is_file() {
+            return Err(format!(
+                "track snapshot file changed while it was inspected: {}",
+                child_path.display()
+            ));
+        }
+        let size = opened_metadata.len();
+        budget.file_limit(&child_path, size)?;
+        budget.consume_file(&child_path, size)?;
+        let mut content = Vec::new();
+        file.take(size.saturating_add(1)).read_to_end(&mut content).map_err(|error| {
+            format!("cannot read track snapshot file {}: {error}", child_path.display())
+        })?;
+        if content.len() as u64 != size {
+            return Err(format!(
+                "track snapshot file changed during publication: {}",
+                child_path.display()
+            ));
+        }
+        snapshot.insert(child_relative, SnapshotEntry::File(content));
+    }
+    Ok(())
+}
+
+fn open_snapshot_leaf_at_nofollow(parent: &fs::File, name: &Path) -> std::io::Result<fs::File> {
+    rustix::fs::openat(
+        parent,
+        name,
+        rustix::fs::OFlags::RDONLY | rustix::fs::OFlags::NOFOLLOW | rustix::fs::OFlags::CLOEXEC,
+        rustix::fs::Mode::empty(),
+    )
+    .map(fs::File::from)
+    .map_err(std::io::Error::from)
+}
+
+fn is_ignored_publication_file(
+    relative: &Path,
+    generated_baseline_files: &BTreeSet<String>,
+) -> bool {
+    relative.components().count() == 1
+        && relative.file_name().and_then(|name| name.to_str()).is_some_and(|name| {
+            name == BASELINE_REPLACEMENT_PHASE_MARKER
+                || name == TRACK_WRITER_LOCK_FILE
+                || generated_baseline_files.contains(name)
+        })
 }
 
 fn copy_tree_with_budget(
@@ -218,16 +421,28 @@ fn copy_tree_with_budget(
     include_baselines: bool,
     trusted_target_root: &Path,
     budget: &mut CleanupTraversalBudget,
+    generated_baseline_files: &BTreeSet<String>,
 ) -> Result<(), String> {
-    copy_tree_at_depth(source, target, include_baselines, trusted_target_root, budget, 0, false)
+    copy_tree_at_depth(
+        source,
+        target,
+        include_baselines,
+        trusted_target_root,
+        budget,
+        generated_baseline_files,
+        0,
+        false,
+    )
 }
 
+#[allow(clippy::too_many_arguments)]
 fn copy_tree_at_depth(
     source: &Path,
     target: &Path,
     include_baselines: bool,
     trusted_target_root: &Path,
     budget: &mut CleanupTraversalBudget,
+    generated_baseline_files: &BTreeSet<String>,
     depth: usize,
     already_counted: bool,
 ) -> Result<(), String> {
@@ -253,7 +468,11 @@ fn copy_tree_at_depth(
             budget.inspect_entry(&path, depth + 1)?;
             let name = entry.file_name();
             let name = name.to_string_lossy();
-            if !include_baselines && name.ends_with("-types-baseline.json") {
+            if depth == 0 && name == TRACK_WRITER_LOCK_FILE {
+                continue;
+            }
+            if depth == 0 && !include_baselines && generated_baseline_files.contains(name.as_ref())
+            {
                 continue;
             }
             copy_tree_at_depth(
@@ -262,6 +481,7 @@ fn copy_tree_at_depth(
                 include_baselines,
                 trusted_target_root,
                 budget,
+                generated_baseline_files,
                 depth + 1,
                 true,
             )?;
@@ -307,8 +527,11 @@ fn copy_regular_file_bounded(
     budget.consume_file(source, copied)
 }
 
-fn remove_baseline_files(track_dir: &Path) -> Result<(), String> {
-    for path in baseline_files_below(track_dir)? {
+fn remove_baseline_files(
+    track_dir: &Path,
+    generated_baseline_files: &BTreeSet<String>,
+) -> Result<(), String> {
+    for path in baseline_files_below(track_dir, generated_baseline_files)? {
         fs::remove_file(&path)
             .map_err(|error| format!("cannot clear stale baseline {}: {error}", path.display()))?;
     }
@@ -401,10 +624,20 @@ fn sync_tree_at_depth(
         .map_err(|error| format!("cannot sync staged baseline file {}: {error}", path.display()))
 }
 
-fn baseline_files_below(track_dir: &Path) -> Result<Vec<PathBuf>, String> {
+fn baseline_files_below(
+    track_dir: &Path,
+    generated_baseline_files: &BTreeSet<String>,
+) -> Result<Vec<PathBuf>, String> {
     let mut baseline_files = Vec::new();
     let mut budget = CleanupTraversalBudget::new();
-    collect_baseline_files_below(track_dir, &mut baseline_files, &mut budget, 0, false)?;
+    collect_baseline_files_below(
+        track_dir,
+        &mut baseline_files,
+        &mut budget,
+        generated_baseline_files,
+        0,
+        false,
+    )?;
     Ok(baseline_files)
 }
 
@@ -412,6 +645,7 @@ fn collect_baseline_files_below(
     track_dir: &Path,
     baseline_files: &mut Vec<PathBuf>,
     budget: &mut CleanupTraversalBudget,
+    generated_baseline_files: &BTreeSet<String>,
     depth: usize,
     already_counted: bool,
 ) -> Result<(), String> {
@@ -441,13 +675,21 @@ fn collect_baseline_files_below(
             return Err(format!("refusing symlinked baseline staging entry: {}", path.display()));
         }
         if child.is_dir() {
-            collect_baseline_files_below(&path, baseline_files, budget, depth + 1, true)?;
+            collect_baseline_files_below(
+                &path,
+                baseline_files,
+                budget,
+                generated_baseline_files,
+                depth + 1,
+                true,
+            )?;
         } else if !child.is_file() {
             return Err(format!("refusing non-regular baseline staging entry: {}", path.display()));
-        } else if path
-            .file_name()
-            .and_then(|name| name.to_str())
-            .is_some_and(|name| name.ends_with("-types-baseline.json"))
+        } else if depth == 0
+            && path
+                .file_name()
+                .and_then(|name| name.to_str())
+                .is_some_and(|name| generated_baseline_files.contains(name))
         {
             baseline_files.push(path);
         }
