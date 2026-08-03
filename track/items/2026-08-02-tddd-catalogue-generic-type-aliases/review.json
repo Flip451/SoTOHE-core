@@ -3142,6 +3142,28 @@
           "hash": "rvw1:sha256:f9c7e0072c057d99285c28bf0a6172e012b554cc2943497e4c91f7d5fb2fa91b",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T09:34:24Z",
+          "findings": [
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_ctx.rs",
+              "line": 487,
+              "message": "This change grows `parse_ctx.rs` from exactly 700 to 707 non-test lines, exceeding the repository's explicit 700-line production-module maximum. Move or split the added normalization logic so the module remains within the architecture limit.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:8dc161eb5b44e111227c091eb3d0c450bcd747907a7f943758434a5243531ec7",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T09:41:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fe9297650b3f873afbe8d99634deb0cf3cd14b7e48fc9e7746fef08870b4f896",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },

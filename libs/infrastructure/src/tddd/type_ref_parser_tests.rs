@@ -196,6 +196,27 @@ fn test_parse_type_ref_associated_constraint_preserves_hrtb_binder() {
 }
 
 #[test]
+fn test_parse_type_ref_fn_bound_explicit_unit_output_normalizes_to_none() {
+    let GenericBound::TraitBound { trait_, .. } =
+        parse_generic_bound_with_generics_preserving_spelling(
+            "Fn() -> ()",
+            &no_local,
+            100,
+            &HashMap::new(),
+            &mut |_| 101,
+            &[],
+        )
+        .unwrap()
+    else {
+        panic!("expected Fn trait bound");
+    };
+    let Some(GenericArgs::Parenthesized { output, .. }) = trait_.args.as_deref() else {
+        panic!("expected Fn parenthesized arguments");
+    };
+    assert!(output.is_none(), "explicit unit output must match rustdoc's absent output");
+}
+
+#[test]
 fn test_parse_type_ref_associated_constraint_preserves_associated_item_arguments() {
     let ty = parse("Outer<Item<'a>: Bound>");
     let Type::ResolvedPath(path) = ty else {

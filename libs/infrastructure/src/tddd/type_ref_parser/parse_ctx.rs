@@ -487,7 +487,9 @@ where
                 let inputs: Vec<Type> = p.inputs.iter().map(|t| self.convert_type(t)).collect();
                 let output = match &p.output {
                     syn::ReturnType::Default => None,
-                    syn::ReturnType::Type(_, ty) => Some(self.convert_type(ty)),
+                    syn::ReturnType::Type(_, ty) => Some(self.convert_type(ty)).filter(
+                        |output| !matches!(output, Type::Tuple(elements) if elements.is_empty()),
+                    ),
                 };
                 Some(GenericArgs::Parenthesized { inputs, output })
             }
@@ -500,9 +502,7 @@ where
             syn::GenericArgument::Lifetime(lt) => {
                 Some(GenericArg::Lifetime(format!("'{}", lt.ident)))
             }
-            // `Const` args (e.g. `ArrayVec<u8, 32>`): encode as `GenericArg::Const` using
-            // the stringified expression. We cannot evaluate the expression, but we preserve
-            // the textual form for downstream consumers.
+            // Preserve const expressions textually because they cannot be evaluated here.
             syn::GenericArgument::Const(expr) => {
                 let expr_str = syn_expr_to_string(expr);
                 Some(GenericArg::Const(rustdoc_types::Constant {
