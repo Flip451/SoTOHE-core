@@ -11,7 +11,8 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CapabilityExecArgs | dto | modify | — | 🟡 | 🔵 |
+| CapabilityExecArgs | dto | modify | — | 🔵 | 🔵 |
+| PhaseEnterArgs | dto | add | — | 🟡 | 🔵 |
 | PhaseIdArgs | dto | add | — | 🟡 | 🔵 |
 | PhaseValidateArgs | dto | add | — | 🟡 | 🔵 |
 
@@ -19,7 +20,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| cli::commands::capability::into_driver_input | free_function | modify | fn(args: CapabilityExecArgs, host: cli_driver::capability::ProviderNameArg) -> cli_driver::capability::CapabilityExecDriverInput | 🟡 | 🔵 |
+| cli::commands::capability::into_driver_input | free_function | modify | fn(args: CapabilityExecArgs) -> cli_driver::capability::CapabilityExecDriverInput | 🔵 | 🔵 |
 | cli::commands::phase::execute | free_function | add | fn(command: PhaseCommand) -> std::process::ExitCode | 🟡 | 🔵 |
 | cli::commands::phase::execute_with_driver | free_function | add | fn(command: PhaseCommand, driver: &cli_driver::phase_command::PhaseCommandDriver) -> std::process::ExitCode | 🟡 | 🔵 |
 | cli::commands::phase::input_from_command | free_function | add | fn(command: PhaseCommand) -> cli_driver::phase_command::PhaseCommandInput | 🟡 | 🔵 |

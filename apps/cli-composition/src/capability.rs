@@ -113,6 +113,7 @@ impl CapabilityCompositionRoot {
 #[cfg(test)]
 #[allow(clippy::expect_used)]
 mod tests {
+    use std::ffi::OsString;
     use std::fs;
     use std::path::{Path, PathBuf};
     use std::process::Command;
@@ -165,6 +166,12 @@ mod tests {
                 "schema_version": 1,
                 "providers": {{}},
                 "capabilities": {{
+                    "orchestrator": {{
+                        "provider": "{provider}",
+                        "model": "{model}",
+                        "reasoning_effort": "high",
+                        "execution_mode": "typed-pipeline"
+                    }},
                     "{capability}": {{
                         "provider": "{provider}",
                         "model": "{model}",
@@ -216,7 +223,7 @@ mod tests {
     fn input_for(capability: &str, host: &str) -> CapabilityExecDriverInput {
         CapabilityExecDriverInput {
             capability: CapabilityNameArg::from_str(capability).expect("valid test capability"),
-            host: ProviderNameArg::from_str(host).expect("valid test provider"),
+            host: Some(ProviderNameArg::from_str(host).expect("valid test provider")),
             briefing_file: CapabilityFilePathArg::from_str("tmp/briefing.md")
                 .expect("valid test briefing path"),
             timeout_seconds: None,
@@ -228,16 +235,94 @@ mod tests {
         input_for("implementer", "claude")
     }
 
+    fn input_without_host(capability: &str) -> CapabilityExecDriverInput {
+        CapabilityExecDriverInput {
+            capability: CapabilityNameArg::from_str(capability).expect("valid test capability"),
+            host: None,
+            briefing_file: CapabilityFilePathArg::from_str("tmp/briefing.md")
+                .expect("valid test briefing path"),
+            timeout_seconds: None,
+            resume: cli_driver::capability::CapabilityResumeArg::Fresh,
+        }
+    }
+
+    fn process_env_lock() -> &'static Mutex<()> {
+        static LOCK: OnceLock<Mutex<()>> = OnceLock::new();
+        LOCK.get_or_init(|| Mutex::new(()))
+    }
+
+    struct PathGuard {
+        previous: Option<OsString>,
+    }
+
+    impl PathGuard {
+        fn prepend(directory: &Path) -> Self {
+            let previous = std::env::var_os("PATH");
+            let mut value = directory.as_os_str().to_os_string();
+            value.push(":");
+            value.push(previous.clone().unwrap_or_default());
+            // Safety: the caller holds process_env_lock for this guard's full lifetime.
+            unsafe { std::env::set_var("PATH", value) };
+            Self { previous }
+        }
+    }
+
+    impl Drop for PathGuard {
+        fn drop(&mut self) {
+            // Safety: the test that owns this guard holds process_env_lock until drop completes.
+            unsafe {
+                match self.previous.as_deref() {
+                    Some(value) => std::env::set_var("PATH", value),
+                    None => std::env::remove_var("PATH"),
+                }
+            }
+        }
+    }
+
+    #[cfg(unix)]
+    fn write_fake_claude_bin(root: &Path) -> Result<PathBuf, Box<dyn std::error::Error>> {
+        use std::os::unix::fs::PermissionsExt;
+
+        let bin_dir = root.join("fake-bin");
+        fs::create_dir_all(&bin_dir)?;
+        let claude = bin_dir.join("claude");
+        fs::write(&claude, "#!/bin/sh\nexit 23\n")?;
+        let mut permissions = fs::metadata(&claude)?.permissions();
+        permissions.set_mode(0o755);
+        fs::set_permissions(&claude, permissions)?;
+        Ok(bin_dir)
+    }
+
     #[test]
-    fn test_capability_composition_root_builds_generic_driver() {
+    fn test_capability_composition_root_builds_driver_without_a_caller_profile()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let directory = tempfile::tempdir()?;
+        initialize_git_repository(directory.path())?;
+        write_file(
+            directory.path(),
+            ".harness/config/agent-profiles.json",
+            r#"{
+                "schema_version": 1,
+                "providers": {},
+                "capabilities": {
+                    "implementer": {
+                        "provider": "claude",
+                        "model": "claude-opus",
+                        "reasoning_effort": "high",
+                        "execution_mode": "orchestrator-output"
+                    }
+                }
+            }"#,
+        )?;
         let root = CapabilityCompositionRoot::new(
-            PathBuf::from("/repo"),
-            PathBuf::from("/repo/tmp/capability-runtime"),
+            directory.path().to_owned(),
+            directory.path().join("tmp/capability-runtime"),
         );
 
         let driver = root.capability_driver();
 
         assert!(std::mem::size_of_val(&driver) > 0);
+        Ok(())
     }
 
     #[test]
@@ -258,6 +343,21 @@ mod tests {
     }
 
     #[test]
+    fn test_capability_composition_root_driver_allows_a_root_without_a_repository()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let directory = tempfile::tempdir()?;
+        let root = CapabilityCompositionRoot::new(
+            directory.path().to_owned(),
+            directory.path().join("tmp/capability-runtime"),
+        );
+
+        let driver = root.capability_driver();
+
+        assert!(std::mem::size_of_val(&driver) > 0);
+        Ok(())
+    }
+
+    #[test]
     fn test_capability_composition_root_discover_uses_repository_root_from_subdirectory()
     -> Result<(), Box<dyn std::error::Error>> {
         let _lock = cwd_lock().lock().expect("current directory lock is acquired");
@@ -272,7 +372,13 @@ mod tests {
         let _cwd = CurrentDirGuard::change_to(&nested)?;
 
         let root = CapabilityCompositionRoot::discover()?;
-        let outcome = root.capability_driver().handle(input());
+        let input = input();
+        assert_eq!(
+            input.host,
+            Some(ProviderNameArg::from_str("claude").expect("valid test provider")),
+            "the matching provider host is explicitly supplied rather than inferred"
+        );
+        let outcome = root.capability_driver().handle(input);
 
         assert_eq!(root.repo_root, repository.path());
         assert_eq!(root.runtime_dir, repository.path().join(CAPABILITY_RUNTIME_DIR));
@@ -284,6 +390,7 @@ mod tests {
     fn test_capability_composition_root_dispatches_valid_claude_host_in_process()
     -> Result<(), Box<dyn std::error::Error>> {
         let directory = tempfile::tempdir()?;
+        initialize_git_repository(directory.path())?;
         write_dispatch_fixture(
             directory.path(),
             "---\nname: implementer\ndescription: Implements assigned tasks.\nmodel: claude-opus\ntools:\n  - Read\n---\nagent body\n",
@@ -304,10 +411,130 @@ mod tests {
         Ok(())
     }
 
+    #[cfg(unix)]
+    #[test]
+    fn test_capability_composition_root_omitted_host_executes_requested_provider_subprocess()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let _environment = process_env_lock().lock().expect("process environment lock is acquired");
+        let directory = tempfile::tempdir()?;
+        initialize_git_repository(directory.path())?;
+        write_file(
+            directory.path(),
+            ".harness/config/agent-profiles.json",
+            r#"{
+                "schema_version": 1,
+                "providers": {},
+                "capabilities": {
+                    "orchestrator": {
+                        "provider": "codex",
+                        "model": "gpt-5",
+                        "reasoning_effort": "high",
+                        "execution_mode": "typed-pipeline"
+                    },
+                    "implementer": {
+                        "provider": "claude",
+                        "model": "claude-opus",
+                        "reasoning_effort": "high",
+                        "execution_mode": "orchestrator-output"
+                    }
+                }
+            }"#,
+        )?;
+        write_file(
+            directory.path(),
+            ".harness/prompts/capability-exec-discipline.md",
+            "Do not stage changes.",
+        )?;
+        write_file(directory.path(), "tmp/briefing.md", "Implement the assigned task.")?;
+        write_file(
+            directory.path(),
+            ".claude/agents/implementer.md",
+            "---\nname: implementer\ndescription: Implements assigned tasks.\nmodel: claude-opus\ntools: Read\n---\nagent body\n",
+        )?;
+        let bin_dir = write_fake_claude_bin(directory.path())?;
+        let _path = PathGuard::prepend(&bin_dir);
+        let root = CapabilityCompositionRoot::new(
+            directory.path().to_owned(),
+            directory.path().join("tmp/capability-runtime"),
+        );
+
+        let outcome = root.capability_driver().handle(input_without_host("implementer"));
+        let output = outcome.stdout.expect("subprocess outcome is rendered");
+
+        assert_eq!(outcome.exit_code, 23);
+        assert!(output.contains("CAPABILITY_EXEC_OUTCOME: executed"));
+        assert!(output.contains("provider: claude"));
+        assert!(!output.contains("delegate-in-host"));
+        Ok(())
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_capability_composition_root_explicit_mismatched_host_executes_subprocess()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let _environment = process_env_lock().lock().expect("process environment lock is acquired");
+        let directory = tempfile::tempdir()?;
+        write_file(
+            directory.path(),
+            ".harness/config/agent-profiles.json",
+            r#"{
+                "schema_version": 1,
+                "providers": {},
+                "capabilities": {
+                    "orchestrator": {
+                        "provider": "codex",
+                        "model": "gpt-5",
+                        "reasoning_effort": "high",
+                        "execution_mode": "typed-pipeline"
+                    },
+                    "implementer": {
+                        "provider": "claude",
+                        "model": "claude-opus",
+                        "reasoning_effort": "high",
+                        "execution_mode": "orchestrator-output"
+                    }
+                }
+            }"#,
+        )?;
+        write_file(
+            directory.path(),
+            ".harness/prompts/capability-exec-discipline.md",
+            "Do not stage changes.",
+        )?;
+        write_file(directory.path(), "tmp/briefing.md", "Implement the assigned task.")?;
+        write_file(
+            directory.path(),
+            ".claude/agents/implementer.md",
+            "---\nname: implementer\ndescription: Implements assigned tasks.\nmodel: claude-opus\ntools: Read\n---\nagent body\n",
+        )?;
+        let bin_dir = write_fake_claude_bin(directory.path())?;
+        let _path = PathGuard::prepend(&bin_dir);
+        let root = CapabilityCompositionRoot::new(
+            directory.path().to_owned(),
+            directory.path().join("tmp/capability-runtime"),
+        );
+        let input = input_for("implementer", "codex");
+        assert_eq!(
+            input.host,
+            Some(ProviderNameArg::from_str("codex").expect("valid test provider")),
+            "the mismatched caller host reaches dispatch without normalization"
+        );
+
+        let outcome = root.capability_driver().handle(input);
+        let output = outcome.stdout.expect("subprocess outcome is rendered");
+
+        assert_eq!(outcome.exit_code, 23);
+        assert!(output.contains("CAPABILITY_EXEC_OUTCOME: executed"));
+        assert!(output.contains("provider: claude"));
+        assert!(!output.contains("delegate-in-host"));
+        Ok(())
+    }
+
     #[test]
     fn test_capability_composition_root_dispatch_names_the_repository_conventions()
     -> Result<(), Box<dyn std::error::Error>> {
         let directory = tempfile::tempdir()?;
+        initialize_git_repository(directory.path())?;
         write_dispatch_fixture(
             directory.path(),
             "---\nname: implementer\ndescription: Implements assigned tasks.\nmodel: claude-opus\ntools:\n  - Read\n---\nagent body\n",
@@ -342,6 +569,7 @@ mod tests {
     fn test_capability_composition_root_profile_resolution_yields_resolved_in_host_route()
     -> Result<(), Box<dyn std::error::Error>> {
         let directory = tempfile::tempdir()?;
+        initialize_git_repository(directory.path())?;
         write_profile_dispatch_fixture(
             directory.path(),
             "researcher",
@@ -367,6 +595,7 @@ mod tests {
     fn test_capability_composition_root_rejects_claude_agent_without_tools()
     -> Result<(), Box<dyn std::error::Error>> {
         let directory = tempfile::tempdir()?;
+        initialize_git_repository(directory.path())?;
         write_dispatch_fixture(
             directory.path(),
             "---\nname: implementer\ndescription: Implements assigned tasks.\nmodel: claude-opus\n---\nagent body\n",

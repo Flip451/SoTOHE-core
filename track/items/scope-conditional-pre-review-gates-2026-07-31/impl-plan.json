@@ -121,7 +121,7 @@
     },
     {
       "id": "T027",
-      "description": "`libs/usecase/src/phase_command.rs` の phase command config / declaration / loader-port、configuration validation error、validate command を catalogue shape に適応し、configuration validation tests を更新する。IN-01、CN-01、AC-01。",
+      "description": "`libs/usecase/src/phase_command.rs` の phase command config / declaration / loader-port、configuration validation error、validate command を catalogue shape に適応し、configuration validation tests を更新する。IN-01、IN-11、CN-01、AC-01、AC-13。",
       "status": "todo",
       "depends_on": [
         "T025"
@@ -137,7 +137,7 @@
     },
     {
       "id": "T035",
-      "description": "`libs/usecase/src/phase_command.rs` の phase enter orchestration、enter outcome、shared service / interactor を catalogue shape に適応し、first-failure と writer-once result tests を更新する。IN-02、CN-03、AC-02。",
+      "description": "`libs/usecase/src/phase_command.rs` の phase enter orchestration、host-bearing `PhaseEnterCommand`、enter outcome、shared service / interactor を catalogue shape に適応し、dispatch-boundary host forwarding と関連 tests を更新する。IN-02、IN-11、CN-03、AC-02、AC-13。",
       "status": "todo",
       "depends_on": [
         "T034"
@@ -146,7 +146,8 @@
     {
       "id": "T028",
       "description": "`libs/usecase/src/pre_review_command.rs` を refined execution record、pre-review-specific configuration error、dispatch outcome / explanation consumer shape に適応し、success と first-failure dispatch tests を更新する。IN-05、CN-01、CN-03、AC-05、AC-07。",
-      "status": "in_progress",
+      "status": "done",
+      "commit_hash": "4a05480da7f57adcde5364474da509b474d92932",
       "depends_on": [
         "T025"
       ]
@@ -161,7 +162,7 @@
     },
     {
       "id": "T030",
-      "description": "`apps/cli-driver/src/phase_command.rs` で refined phase explanation と enter outcome を `CommandOutcome` に render し、success、blocked、validation-error render tests を更新する。IN-04、CN-03、AC-02、AC-03。",
+      "description": "`apps/cli-driver/src/phase_command.rs` の `CommandOutcome`、`PhaseCommandDriver`、`PhaseCommandInput`、`PhaseIdArg` と関連 tests を catalogue shape に適応する。IN-04、IN-11、CN-03、AC-02、AC-03、AC-13。",
       "status": "todo",
       "depends_on": [
         "T035"
@@ -169,16 +170,17 @@
     },
     {
       "id": "T031",
-      "description": "`apps/cli/src/commands/phase.rs` の `PhaseCommand`、shared `PhaseIdArgs`、validate args、`execute`、`execute_with_driver`、`input_from_command` を refined phase explanation / outcome input の catalogue shape に適応し、CLI-to-driver mapping と exit outcome tests を更新する。IN-04、AC-03。",
+      "description": "`apps/cli/src/main.rs` の top-level `CliCommand`、`Phase` variant、dispatch arm と、`apps/cli/src/commands/phase.rs` の `PhaseCommand`、`PhaseEnterArgs`、`PhaseIdArgs`、validate args、`execute`、`execute_with_driver`、`input_from_command`、関連 tests を catalogue shape に適応する。IN-04、IN-11、AC-03、AC-13。",
       "status": "todo",
       "depends_on": [
-        "T030"
+        "T030",
+        "T036"
       ]
     },
     {
       "id": "T032",
-      "description": "`apps/cli-composition/src/capability.rs` の `PhaseCompositionRoot`、`apps/cli/src/commands/capability.rs` の `CliCommand`、`CapabilityExecArgs` と `into_driver_input`、`.harness/config/phase-commands.json` の phase writer argv から固定 provider host を除去し、provider-neutral argv tests を更新する。IN-01、IN-04、CN-01、AC-01、AC-03。",
-      "status": "todo"
+      "description": "`libs/usecase/src/capability_exec.rs` の `CapabilityExecRequest`、`CapabilityExecInteractor`、`CapabilityExecService`、`apps/cli-driver/src/capability.rs` の `CapabilityExecDriverInput` と `CapabilityDriver`、`apps/cli-composition/src/capability.rs` の `CapabilityCompositionRoot`、`apps/cli/src/commands/capability.rs` の `CapabilityExecArgs` と `into_driver_input` を catalogue shape に適応する。`.harness/config/phase-commands.json` の phase writer argv と dispatch tests を更新する。IN-01、IN-04、IN-09、IN-10、IN-11、CN-01、AC-01、AC-03、AC-11、AC-12、AC-13。",
+      "status": "in_progress"
     },
     {
       "id": "T033",
@@ -187,6 +189,16 @@
       "depends_on": [
         "T026",
         "T029"
+      ]
+    },
+    {
+      "id": "T036",
+      "description": "`apps/cli-composition/src/phase_command.rs` に `PhaseCompositionRoot` を追加し、phase configuration loader、phase service、phase driver の wiring と module registration、および composition-boundary tests を実装する。IN-04、AC-02、AC-03。",
+      "status": "todo",
+      "depends_on": [
+        "T029",
+        "T035",
+        "T030"
       ]
     }
   ],
@@ -232,7 +244,7 @@
         "id": "S2",
         "title": "approved catalogue repair extension",
         "description": [
-          "T024–T035 は T001–T023 を reopen せず、approved catalogue が要求する source-shape repair と provider-neutral phase-writer configuration を file-exclusive に実装する。"
+          "T024–T036 は T001–T023 を reopen せず、approved catalogue が要求する source-shape repair と provider-neutral phase-writer configuration を file-exclusive に実装する。"
         ],
         "task_ids": [
           "T024",
@@ -244,6 +256,7 @@
           "T028",
           "T029",
           "T030",
+          "T036",
           "T031",
           "T032",
           "T033"

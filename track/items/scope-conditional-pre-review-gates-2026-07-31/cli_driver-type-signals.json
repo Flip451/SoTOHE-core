@@ -1,9 +1,15 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-02T21:59:50Z",
-  "declaration_hash": "a9a80bde63669aa1ded9e3db1ba534752a79e37e87fbd7b145a1146cbee3b062",
-  "implementation_input_hash": "00cd838bf99f1586d3d261927dc545737e5457a86b3066ae0cd4bac9dbf2ef9e",
+  "generated_at": "2026-08-03T03:54:28Z",
+  "declaration_hash": "c3592b78429a273d40fa81edc91585b5cc5afacaf5a7aa01a5284b245cb85a60",
+  "implementation_input_hash": "5f80f4350cc90781bd2ed534e99728a85b50bb26d621fa53775bb9773bf74cbe",
   "signals": [
+    {
+      "type_name": "CapabilityExecDriverInput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
     {
       "type_name": "PhaseCommandDriver",
       "kind_tag": "primary_adapter",
@@ -37,6 +43,12 @@
         "FromStr",
         "PartialEq"
       ]
+    },
+    {
+      "type_name": "CapabilityDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "CommandOutcome",

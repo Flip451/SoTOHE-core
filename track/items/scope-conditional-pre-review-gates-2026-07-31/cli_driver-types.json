@@ -62,6 +62,26 @@
   "schema_version": 5,
   "trait_impls": [
     {
+      "action": "reference",
+      "for_type": "CapabilityExecDriverInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityExecDriverInput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityExecDriverInput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityExecDriverInput",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
       "action": "add",
       "for_type": "PhaseIdArg",
       "trait_ref": "core::fmt::Debug"
@@ -124,6 +144,125 @@
   ],
   "traits": {},
   "types": {
+    "CapabilityDriver": {
+      "action": "reference",
+      "docs": "Pre-existing capability primary adapter carried for revised input edge exposure.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "service",
+              "ty": "std::sync::Arc<dyn usecase::capability_exec::CapabilityExecService>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [
+            {
+              "name": "input",
+              "ty": "CapabilityExecDriverInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "CommandOutcome"
+        }
+      ],
+      "module_path": "capability",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-10",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-11",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "CapabilityExecDriverInput": {
+      "action": "modify",
+      "docs": "Capability driver input with optional host field (IN-09, IN-10, AC-11, AC-12).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "capability",
+              "ty": "CapabilityNameArg"
+            },
+            {
+              "name": "host",
+              "ty": "Option<ProviderNameArg>"
+            },
+            {
+              "name": "briefing_file",
+              "ty": "CapabilityFilePathArg"
+            },
+            {
+              "name": "timeout_seconds",
+              "ty": "Option<TimeoutSecondsArg>"
+            },
+            {
+              "name": "resume",
+              "ty": "CapabilityResumeArg"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "capability",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-10",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-11",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
     "CommandOutcome": {
       "action": "reference",
       "docs": "CLI render boundary carrying opaque stdout/stderr text and process exit status (IN-04, AC-03).",
@@ -229,7 +368,7 @@
     },
     "PhaseCommandInput": {
       "action": "add",
-      "docs": "Phase-command primary-adapter input (IN-04, AC-03).",
+      "docs": "Phase-command primary-adapter input with host-bearing Enter variant (IN-04, IN-11, AC-02, AC-03, AC-13).",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -273,6 +412,10 @@
                 {
                   "name": "phase_id",
                   "ty": "PhaseIdArg"
+                },
+                {
+                  "name": "host",
+                  "ty": "Option<ProviderNameArg>"
                 }
               ],
               "kind": "struct"
@@ -291,11 +434,19 @@
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         },
         {
+          "anchor": "IN-11",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
           "anchor": "AC-02",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         },
         {
           "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-13",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]

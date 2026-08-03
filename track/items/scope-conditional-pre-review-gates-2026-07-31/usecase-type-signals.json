@@ -1,9 +1,15 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-02T23:55:10Z",
-  "declaration_hash": "8ae999e542ae3cacb895c4cbbab8e6cec59cda472f082f271b18b3d81f6f7d66",
-  "implementation_input_hash": "5f5430809580b8e582f8c0cea82d45ff00e92f2f2653a452971ab55c49bd36e5",
+  "generated_at": "2026-08-03T04:17:26Z",
+  "declaration_hash": "857e2a51aaea3989bddb6afaf28c171f478196c45970a6cc4172e17433b9ebb2",
+  "implementation_input_hash": "7a1124033861703a380649ee1cbe33573dc949fef2614c70b0ca43df7a9c3020",
   "signals": [
+    {
+      "type_name": "CapabilityExecRequest",
+      "kind_tag": "command",
+      "signal": "blue",
+      "found_type": true
+    },
     {
       "type_name": "CapturedProgramOutput",
       "kind_tag": "dto",
@@ -606,6 +612,18 @@
         "Eq",
         "PartialEq"
       ]
+    },
+    {
+      "type_name": "CapabilityExecInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CapabilityExecService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
     }
   ]
 }

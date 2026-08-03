@@ -1,7 +1,12 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "aa1dc150bc7b7751f35e45c1684729a108015f09be36fd644ea028042597acab",
+  "catalogue_declaration_hash": "696e7052429b656e8ace7a86f16719be9d27c4e27b17fa42fc8e15ac76d6bbea",
   "signals": [
+    {
+      "type_name": "CapabilityCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "cc7790bccce13aaeb749f0191b248d61df98eb70969591f6ce9c82746d455eda"
+    },
     {
       "type_name": "PhaseCompositionRoot",
       "signal": "blue",

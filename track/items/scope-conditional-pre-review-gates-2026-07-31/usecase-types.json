@@ -489,6 +489,31 @@
   "schema_version": 5,
   "trait_impls": [
     {
+      "action": "reference",
+      "for_type": "CapabilityExecRequest",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityExecRequest",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityExecRequest",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityExecRequest",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityExecInteractor",
+      "trait_ref": "CapabilityExecService"
+    },
+    {
       "action": "add",
       "for_type": "ProgramExitCode",
       "trait_ref": "core::fmt::Debug"
@@ -1377,6 +1402,52 @@
     }
   ],
   "traits": {
+    "CapabilityExecService": {
+      "action": "reference",
+      "docs": "Pre-existing application-service boundary carried for request edge exposure.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "execute",
+          "params": [
+            {
+              "name": "request",
+              "ty": "CapabilityExecRequest"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<CapabilityDispatchOutcome, CapabilityExecError>"
+        }
+      ],
+      "module_path": "capability_exec",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-10",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-11",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
     "CurrentReviewTrackResolverPort": {
       "action": "add",
       "docs": "Synchronous repository-state track resolver for the sequential CLI path (IN-02, IN-05).",
@@ -1689,6 +1760,128 @@
     }
   },
   "types": {
+    "CapabilityExecInteractor": {
+      "action": "reference",
+      "docs": "Pre-existing capability interactor carried for request and service edge exposure.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "profile",
+              "ty": "Arc<dyn CapabilityProfilePort>"
+            },
+            {
+              "name": "source",
+              "ty": "Arc<dyn CapabilitySourcePort>"
+            },
+            {
+              "name": "conventions",
+              "ty": "Arc<dyn ConventionResolveService>"
+            },
+            {
+              "name": "providers",
+              "ty": "Vec<Arc<dyn CapabilityProviderPort>>"
+            },
+            {
+              "name": "project_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "capability_exec",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-10",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-11",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "CapabilityExecRequest": {
+      "action": "modify",
+      "docs": "CapabilityExecRequest host-field optionality modification (IN-09, IN-10, AC-11, AC-12).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "capability",
+              "ty": "CapabilityName"
+            },
+            {
+              "name": "host",
+              "ty": "Option<ProviderName>"
+            },
+            {
+              "name": "briefing_file",
+              "ty": "CapabilityFilePath"
+            },
+            {
+              "name": "timeout",
+              "ty": "Option<TimeoutSeconds>"
+            },
+            {
+              "name": "resume",
+              "ty": "CapabilityResumeRequest"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "capability_exec",
+      "role": {
+        "Command": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-10",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-11",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
     "CapturedProgramOutput": {
       "action": "add",
       "docs": "Opaque captured process-output bytes (CN-02, AC-03).",
@@ -2859,7 +3052,7 @@
     },
     "PhaseEnterCommand": {
       "action": "add",
-      "docs": "Phase-enter request (IN-02, AC-02).",
+      "docs": "Phase-enter request with optional host field (IN-02, IN-11, AC-02, AC-13).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -2872,6 +3065,10 @@
             {
               "name": "phase_id",
               "ty": "CommandDeclarationId"
+            },
+            {
+              "name": "host",
+              "ty": "Option<ProviderName>"
             }
           ],
           "has_stripped_fields": false,
@@ -2893,7 +3090,15 @@
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         },
         {
+          "anchor": "IN-11",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
           "anchor": "AC-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-13",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]
@@ -3112,34 +3317,34 @@
               "kind": "tuple"
             }
           },
-        {
-          "name": "TrackResolution",
-          "payload": {
-            "fields": [
-              "CurrentReviewTrackResolveError"
-            ],
-            "kind": "tuple"
-          }
-        },
-        {
-          "name": "TrackMismatch",
-          "payload": {
-            "fields": [
-              {
-                "name": "explicit",
-                "ty": "domain::TrackId"
-              },
-              {
-                "name": "resolved",
-                "ty": "domain::TrackId"
-              }
-            ],
-            "kind": "struct"
-          }
-        },
-        {
-          "name": "Runner",
-          "payload": {
+          {
+            "name": "TrackResolution",
+            "payload": {
+              "fields": [
+                "CurrentReviewTrackResolveError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "TrackMismatch",
+            "payload": {
+              "fields": [
+                {
+                  "name": "explicit",
+                  "ty": "domain::TrackId"
+                },
+                {
+                  "name": "resolved",
+                  "ty": "domain::TrackId"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Runner",
+            "payload": {
               "fields": [
                 "ProgramRunnerError"
               ],

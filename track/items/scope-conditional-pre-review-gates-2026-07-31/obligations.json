@@ -641,15 +641,23 @@
         "role": "FreeFunction"
       },
       "brief": "Author a logic test covering 'entry' of cli::commands::capability::into_driver_input",
-      "declaration_hash": "d5d801fcad90f9c6a4d2210ccb7b030ea6c660dc80f28f3e4c78030d0f8d99fe",
+      "declaration_hash": "8f998970f4e344ec3c63f9aceed655d8f3880c347b2af3f6a13ebbaf1b62e54b",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-04"
+          "element_id": "IN-09"
         },
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-03"
+          "element_id": "IN-10"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-11"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-12"
         }
       ]
     },
@@ -725,7 +733,7 @@
         "role": "FreeFunction"
       },
       "brief": "Author a logic test covering 'entry' of cli::commands::phase::input_from_command",
-      "declaration_hash": "f60bd34e7030492973cef957e43d73ef62856e5bb4115b8661bfb7ebe63eca4c",
+      "declaration_hash": "ffaec816778b09f21394f63dc935a529ee96b5a091466d2545c1847b0a52c9dc",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -734,6 +742,14 @@
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "AC-03"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-11"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-13"
         }
       ]
     }

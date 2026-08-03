@@ -246,6 +246,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [codex reviewer runtime の bootstrap 解決リンク（resolve & link）配備](2026-07-18-1359-codex-resolve-and-link-provisioning.md) | Proposed | 2026-07-18 |
 | [.claude/agents の description に capability exec 経由を明記する](2026-07-21-1522-agent-md-capability-exec-routing.md) | Proposed | 2026-07-21 |
 | [Codex 正規入口の整備](2026-07-22-1149-codex-merge-done-adr-entrypoints.md) | Proposed | 2026-07-22 |
+| [capability exec の省略 host は profile 解決 subprocess に限定する](2026-08-03-1010-capability-exec-omitted-host-dispatch.md) | Proposed | 2026-08-03 |
 
 ### テスト・CI ツーリング
 

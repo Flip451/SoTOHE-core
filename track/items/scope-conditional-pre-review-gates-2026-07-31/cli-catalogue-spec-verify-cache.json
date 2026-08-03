@@ -3,11 +3,11 @@
   "layer": "cli",
   "entries": [
     {
-      "claim_hash": "cd22548e18c1b5fbda57d8531c3f4443e3ad85d506867adc031ffe077ccb347a",
-      "evidence_hash": "c600677df01b23fc21e331a509de2c22f16a0ef63e6ef1cb2ef604999640d2bb",
+      "claim_hash": "c97a55aa3b9371e100730d21342d271fef746a67bc41f39f22f0b3a7524d5303",
+      "evidence_hash": "9d1fb103e8260e0214bf6c2f2293b3ce735d9c1fabd94cf3f3c6bd849d418c61",
       "verdict": {
         "kind": "pass",
-        "citation": "CLI は validate、explain、enter の観測可能な outcome を提供し、operator が展開済み phase command、実行順序、validation failure、および command failure を監査できるようにする。"
+        "citation": "`capability exec` は `--host` が omitted の場合、provider-match judgment または in-host delegation を行わず、常に subprocess dispatch を選ぶ。subprocess target provider は `.harness/config/agent-profiles.json` の requested capability の `capabilities.<name>.provider` から解決し、`capabilities.orchestrator.provider` を使わない。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -21,17 +21,41 @@
         "kind": "spec_element",
         "data": {
           "section": "in_scope",
-          "element_id": "IN-04",
-          "text_label": "CLI は validate、explain、enter の観測可能な outcome を提供し、operator が展開済み phase command、実行順序、validation failure、および command failure を監査できるようにする。"
+          "element_id": "IN-09",
+          "text_label": "`capability exec` は `--host` が omitted の場合、provider-match judgment または in-host delegation を行わず、常に subprocess dispatch を選ぶ。subprocess target provider は `.harness/config/agent-profiles.json` の requested capability の `capabilities.<name>.provider` から解決し、`capabilities.orchestrator.provider` を使わない。"
         }
       }
     },
     {
-      "claim_hash": "cd22548e18c1b5fbda57d8531c3f4443e3ad85d506867adc031ffe077ccb347a",
-      "evidence_hash": "574c686246d7577d3ab00fe3d015a1ba12dac480d60fd748ff40da6e914bd3dc",
+      "claim_hash": "c97a55aa3b9371e100730d21342d271fef746a67bc41f39f22f0b3a7524d5303",
+      "evidence_hash": "26f934ed9f173908b19c41a6a7c8bf86ed13a723887e021cb6a21dba011e71b2",
       "verdict": {
         "kind": "pass",
-        "citation": "validate、explain、enter の CLI outcome により、operator は展開後の writer/pre-entry argv、実行順、default 3,600-second timeout または explicit timeout、その positive-integer / 3,600-second 上限、stdout/stderr 各 1 MiB (1,048,576-byte) capture limit、validation failure、first failing command、および output-limit または timeout outcome を監査できる。"
+        "citation": "supplied `--host` は caller の runtime-host self-declaration としてそのまま扱い、profile 値で override または normalize しない。in-host delegation は capability contract を保持できる provider-match の場合だけ候補にできる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CapabilityExecArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-10",
+          "text_label": "supplied `--host` は caller の runtime-host self-declaration としてそのまま扱い、profile 値で override または normalize しない。in-host delegation は capability contract を保持できる provider-match の場合だけ候補にできる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c97a55aa3b9371e100730d21342d271fef746a67bc41f39f22f0b3a7524d5303",
+      "evidence_hash": "005bd186a6eb5fe08e7c40ce463a4e982b6b66a3c20255527581fa60d3acff82",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`capability exec` を `--host` なしで起動すると、provider-match judgment または in-host delegation を行わず subprocess dispatch となる。subprocess target は requested capability の `capabilities.<name>.provider` から解決され、`capabilities.orchestrator.provider` の値が異なっても target 選択に使われない。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -45,8 +69,32 @@
         "kind": "spec_element",
         "data": {
           "section": "acceptance_criteria",
-          "element_id": "AC-03",
-          "text_label": "validate、explain、enter の CLI outcome により、operator は展開後の writer/pre-entry argv、実行順、default 3,600-second timeout または explicit timeout、その positive-integer / 3,600-second 上限、stdout/stderr 各 1 MiB (1,048,576-byte) capture limit、validation failure、first failing command、および output-limit または timeout outcome を監査できる。"
+          "element_id": "AC-11",
+          "text_label": "`capability exec` を `--host` なしで起動すると、provider-match judgment または in-host delegation を行わず subprocess dispatch となる。subprocess target は requested capability の `capabilities.<name>.provider` から解決され、`capabilities.orchestrator.provider` の値が異なっても target 選択に使われない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c97a55aa3b9371e100730d21342d271fef746a67bc41f39f22f0b3a7524d5303",
+      "evidence_hash": "32ccf2f80b51804ac615744587822439e958defe9cba8036d71d7994da78c8fb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`capability exec` を explicit `--host` とともに起動すると、supplied value は profile 値へ normalize または override されず caller runtime-host self-declaration として provider-match evaluation に渡される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CapabilityExecArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-12",
+          "text_label": "`capability exec` を explicit `--host` とともに起動すると、supplied value は profile 値へ normalize または override されず caller runtime-host self-declaration として provider-match evaluation に渡される。supplied host と requested capability の `capabilities.<name>.provider` がともに `claude` の場合だけ、agent definition に `model:` と `tools:` があり、`model:` が profile model と完全一致し、delegation output が capability name・briefing path・読み込み済み discipline payload を含むと検証できたときに in-host delegation instruction を返す。それ以外の provider match（`codex` を含む）、definition/payload validation failure、または provider mismatch では subprocess dispatch を選ぶ。"
         }
       }
     },
@@ -99,11 +147,11 @@
       }
     },
     {
-      "claim_hash": "5c8e5dcb0972354a3bdc22168d6a7adbd5a73c00a8bff25003acbb895b8eb2a6",
+      "claim_hash": "62c69f43d824ca22dfde0731c953444f49ac1a87c48e1e7d7c8cbdb7b11134b8",
       "evidence_hash": "c600677df01b23fc21e331a509de2c22f16a0ef63e6ef1cb2ef604999640d2bb",
       "verdict": {
         "kind": "pass",
-        "citation": "CLI は validate、explain、enter の観測可能な outcome を提供し"
+        "citation": "CLI は validate、explain、enter の観測可能な outcome を提供し、operator が展開済み phase command、実行順序、validation failure、および command failure を監査できるようにする。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -123,7 +171,31 @@
       }
     },
     {
-      "claim_hash": "5c8e5dcb0972354a3bdc22168d6a7adbd5a73c00a8bff25003acbb895b8eb2a6",
+      "claim_hash": "62c69f43d824ca22dfde0731c953444f49ac1a87c48e1e7d7c8cbdb7b11134b8",
+      "evidence_hash": "e9f8e82c5561af5f9ded63ec8b3220fe37f99b81c0352e8256321e704ba538f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "config を消費する invocation surface は caller-supplied optional host を受け取り、値が present の場合だけ configured writer の `capability exec` invocation の dispatch boundary でその `--host` と値を追加して forward できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+          "section_key": "types",
+          "entry_key": "PhaseCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-11",
+          "text_label": "operator-owned command config は provider host または `--host` を保持しない。config を消費する invocation surface は caller-supplied optional host を受け取り、値が present の場合だけ configured writer の `capability exec` invocation の dispatch boundary でその `--host` と値を追加して forward できる。保存・解決された literal argv の他の要素は変更しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "62c69f43d824ca22dfde0731c953444f49ac1a87c48e1e7d7c8cbdb7b11134b8",
       "evidence_hash": "574c686246d7577d3ab00fe3d015a1ba12dac480d60fd748ff40da6e914bd3dc",
       "verdict": {
         "kind": "pass",
@@ -143,6 +215,150 @@
           "section": "acceptance_criteria",
           "element_id": "AC-03",
           "text_label": "validate、explain、enter の CLI outcome により、operator は展開後の writer/pre-entry argv、実行順、default 3,600-second timeout または explicit timeout、その positive-integer / 3,600-second 上限、stdout/stderr 各 1 MiB (1,048,576-byte) capture limit、validation failure、first failing command、および output-limit または timeout outcome を監査できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "62c69f43d824ca22dfde0731c953444f49ac1a87c48e1e7d7c8cbdb7b11134b8",
+      "evidence_hash": "7d00562f1197f62211fcda52438425b296bc3d85ad921bcac89edccfb67b5aa1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "invocation surface に optional host が supplied の場合だけ、configured writer の `capability exec` invocation に dispatch boundary でその `--host` と値を追加して forward し、omitted の場合は追加しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+          "section_key": "types",
+          "entry_key": "PhaseCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-13",
+          "text_label": "operator-owned config には provider host または `--host` を保存しない。invocation surface に optional host が supplied の場合だけ、configured writer の `capability exec` invocation に dispatch boundary でその `--host` と値を追加して forward し、omitted の場合は追加しない。その他の configured literal argv 要素は変更しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5ecc64065efb5223876df072e2831084225e5080598c236e5f410bda3078614f",
+      "evidence_hash": "c600677df01b23fc21e331a509de2c22f16a0ef63e6ef1cb2ef604999640d2bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI は validate、explain、enter の観測可能な outcome を提供し、operator が展開済み phase command、実行順序、validation failure、および command failure を監査できるようにする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+          "section_key": "types",
+          "entry_key": "PhaseEnterArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "CLI は validate、explain、enter の観測可能な outcome を提供し、operator が展開済み phase command、実行順序、validation failure、および command failure を監査できるようにする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5ecc64065efb5223876df072e2831084225e5080598c236e5f410bda3078614f",
+      "evidence_hash": "b49fb65c90adaab174287b910af03a5d2c7e928cd33ff55fd2b16efaa3957c33",
+      "verdict": {
+        "kind": "pass",
+        "citation": "phase enter は repository root で pre-entry argv を宣言順に実行し、最初の non-zero の後に remaining command と writer を実行せず、全て zero の場合だけ canonical writer を一度実行する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+          "section_key": "types",
+          "entry_key": "PhaseEnterArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "phase enter は repository root で pre-entry argv を宣言順に実行し、最初の non-zero の後に remaining command と writer を実行せず、全て zero の場合だけ canonical writer を一度実行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5ecc64065efb5223876df072e2831084225e5080598c236e5f410bda3078614f",
+      "evidence_hash": "574c686246d7577d3ab00fe3d015a1ba12dac480d60fd748ff40da6e914bd3dc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "validate、explain、enter の CLI outcome により、operator は展開後の writer/pre-entry argv、実行順、default 3,600-second timeout または explicit timeout、その positive-integer / 3,600-second 上限、stdout/stderr 各 1 MiB (1,048,576-byte) capture limit、validation failure、first failing command、および output-limit または timeout outcome を監査できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+          "section_key": "types",
+          "entry_key": "PhaseEnterArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "validate、explain、enter の CLI outcome により、operator は展開後の writer/pre-entry argv、実行順、default 3,600-second timeout または explicit timeout、その positive-integer / 3,600-second 上限、stdout/stderr 各 1 MiB (1,048,576-byte) capture limit、validation failure、first failing command、および output-limit または timeout outcome を監査できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5ecc64065efb5223876df072e2831084225e5080598c236e5f410bda3078614f",
+      "evidence_hash": "e9f8e82c5561af5f9ded63ec8b3220fe37f99b81c0352e8256321e704ba538f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "operator-owned command config は provider host または `--host` を保持しない。config を消費する invocation surface は caller-supplied optional host を受け取り、値が present の場合だけ configured writer の `capability exec` invocation の dispatch boundary でその `--host` と値を追加して forward できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+          "section_key": "types",
+          "entry_key": "PhaseEnterArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-11",
+          "text_label": "operator-owned command config は provider host または `--host` を保持しない。config を消費する invocation surface は caller-supplied optional host を受け取り、値が present の場合だけ configured writer の `capability exec` invocation の dispatch boundary でその `--host` と値を追加して forward できる。保存・解決された literal argv の他の要素は変更しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5ecc64065efb5223876df072e2831084225e5080598c236e5f410bda3078614f",
+      "evidence_hash": "7d00562f1197f62211fcda52438425b296bc3d85ad921bcac89edccfb67b5aa1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "invocation surface に optional host が supplied の場合だけ、configured writer の `capability exec` invocation に dispatch boundary でその `--host` と値を追加して forward し、omitted の場合は追加しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+          "section_key": "types",
+          "entry_key": "PhaseEnterArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-13",
+          "text_label": "operator-owned config には provider host または `--host` を保存しない。invocation surface に optional host が supplied の場合だけ、configured writer の `capability exec` invocation に dispatch boundary でその `--host` と値を追加して forward し、omitted の場合は追加しない。その他の configured literal argv 要素は変更しない。"
         }
       }
     },
@@ -291,11 +507,11 @@
       }
     },
     {
-      "claim_hash": "cc9d97c56ebbae48106463fb6647999fa41860786b8a4958e8659afe62e6ce6b",
-      "evidence_hash": "c600677df01b23fc21e331a509de2c22f16a0ef63e6ef1cb2ef604999640d2bb",
+      "claim_hash": "7e4563097a686c8d4b4b95abe03c6976e816d036169ec3c3cb1a5df4867257c5",
+      "evidence_hash": "9d1fb103e8260e0214bf6c2f2293b3ce735d9c1fabd94cf3f3c6bd849d418c61",
       "verdict": {
         "kind": "pass",
-        "citation": "CLI は validate、explain、enter の観測可能な outcome を提供し、operator が展開済み phase command、実行順序、validation failure、および command failure を監査できるようにする。"
+        "citation": "`capability exec` は `--host` が omitted の場合、provider-match judgment または in-host delegation を行わず、常に subprocess dispatch を選ぶ。subprocess target provider は `.harness/config/agent-profiles.json` の requested capability の `capabilities.<name>.provider` から解決し、`capabilities.orchestrator.provider` を使わない。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -309,17 +525,41 @@
         "kind": "spec_element",
         "data": {
           "section": "in_scope",
-          "element_id": "IN-04",
-          "text_label": "CLI は validate、explain、enter の観測可能な outcome を提供し、operator が展開済み phase command、実行順序、validation failure、および command failure を監査できるようにする。"
+          "element_id": "IN-09",
+          "text_label": "`capability exec` は `--host` が omitted の場合、provider-match judgment または in-host delegation を行わず、常に subprocess dispatch を選ぶ。subprocess target provider は `.harness/config/agent-profiles.json` の requested capability の `capabilities.<name>.provider` から解決し、`capabilities.orchestrator.provider` を使わない。"
         }
       }
     },
     {
-      "claim_hash": "cc9d97c56ebbae48106463fb6647999fa41860786b8a4958e8659afe62e6ce6b",
-      "evidence_hash": "574c686246d7577d3ab00fe3d015a1ba12dac480d60fd748ff40da6e914bd3dc",
+      "claim_hash": "7e4563097a686c8d4b4b95abe03c6976e816d036169ec3c3cb1a5df4867257c5",
+      "evidence_hash": "26f934ed9f173908b19c41a6a7c8bf86ed13a723887e021cb6a21dba011e71b2",
       "verdict": {
         "kind": "pass",
-        "citation": "validate、explain、enter の CLI outcome により、operator は展開後の writer/pre-entry argv、実行順、default 3,600-second timeout または explicit timeout、その positive-integer / 3,600-second 上限、stdout/stderr 各 1 MiB (1,048,576-byte) capture limit、validation failure、first failing command、および output-limit または timeout outcome を監査できる。"
+        "citation": "supplied `--host` は caller の runtime-host self-declaration としてそのまま扱い、profile 値で override または normalize しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::capability::into_driver_input"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-10",
+          "text_label": "supplied `--host` は caller の runtime-host self-declaration としてそのまま扱い、profile 値で override または normalize しない。in-host delegation は capability contract を保持できる provider-match の場合だけ候補にできる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "7e4563097a686c8d4b4b95abe03c6976e816d036169ec3c3cb1a5df4867257c5",
+      "evidence_hash": "005bd186a6eb5fe08e7c40ce463a4e982b6b66a3c20255527581fa60d3acff82",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`capability exec` を `--host` なしで起動すると、provider-match judgment または in-host delegation を行わず subprocess dispatch となる。subprocess target は requested capability の `capabilities.<name>.provider` から解決され、`capabilities.orchestrator.provider` の値が異なっても target 選択に使われない。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -333,8 +573,32 @@
         "kind": "spec_element",
         "data": {
           "section": "acceptance_criteria",
-          "element_id": "AC-03",
-          "text_label": "validate、explain、enter の CLI outcome により、operator は展開後の writer/pre-entry argv、実行順、default 3,600-second timeout または explicit timeout、その positive-integer / 3,600-second 上限、stdout/stderr 各 1 MiB (1,048,576-byte) capture limit、validation failure、first failing command、および output-limit または timeout outcome を監査できる。"
+          "element_id": "AC-11",
+          "text_label": "`capability exec` を `--host` なしで起動すると、provider-match judgment または in-host delegation を行わず subprocess dispatch となる。subprocess target は requested capability の `capabilities.<name>.provider` から解決され、`capabilities.orchestrator.provider` の値が異なっても target 選択に使われない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "7e4563097a686c8d4b4b95abe03c6976e816d036169ec3c3cb1a5df4867257c5",
+      "evidence_hash": "32ccf2f80b51804ac615744587822439e958defe9cba8036d71d7994da78c8fb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`capability exec` を explicit `--host` とともに起動すると、supplied value は profile 値へ normalize または override されず caller runtime-host self-declaration として provider-match evaluation に渡される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::capability::into_driver_input"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-12",
+          "text_label": "`capability exec` を explicit `--host` とともに起動すると、supplied value は profile 値へ normalize または override されず caller runtime-host self-declaration として provider-match evaluation に渡される。supplied host と requested capability の `capabilities.<name>.provider` がともに `claude` の場合だけ、agent definition に `model:` と `tools:` があり、`model:` が profile model と完全一致し、delegation output が capability name・briefing path・読み込み済み discipline payload を含むと検証できたときに in-host delegation instruction を返す。それ以外の provider match（`codex` を含む）、definition/payload validation failure、または provider mismatch では subprocess dispatch を選ぶ。"
         }
       }
     },
@@ -435,7 +699,7 @@
       }
     },
     {
-      "claim_hash": "42b203a007fcee46aed470abea5664b0a5d14f905456fb22c27c85dc562db98c",
+      "claim_hash": "df2c7dfdcc69beaa64cac01abb71ec0bb02b5a192ca1189bf4c419d7f3c1f87a",
       "evidence_hash": "c600677df01b23fc21e331a509de2c22f16a0ef63e6ef1cb2ef604999640d2bb",
       "verdict": {
         "kind": "pass",
@@ -459,7 +723,7 @@
       }
     },
     {
-      "claim_hash": "42b203a007fcee46aed470abea5664b0a5d14f905456fb22c27c85dc562db98c",
+      "claim_hash": "df2c7dfdcc69beaa64cac01abb71ec0bb02b5a192ca1189bf4c419d7f3c1f87a",
       "evidence_hash": "574c686246d7577d3ab00fe3d015a1ba12dac480d60fd748ff40da6e914bd3dc",
       "verdict": {
         "kind": "pass",
@@ -479,6 +743,54 @@
           "section": "acceptance_criteria",
           "element_id": "AC-03",
           "text_label": "validate、explain、enter の CLI outcome により、operator は展開後の writer/pre-entry argv、実行順、default 3,600-second timeout または explicit timeout、その positive-integer / 3,600-second 上限、stdout/stderr 各 1 MiB (1,048,576-byte) capture limit、validation failure、first failing command、および output-limit または timeout outcome を監査できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "df2c7dfdcc69beaa64cac01abb71ec0bb02b5a192ca1189bf4c419d7f3c1f87a",
+      "evidence_hash": "e9f8e82c5561af5f9ded63ec8b3220fe37f99b81c0352e8256321e704ba538f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "operator-owned command config は provider host または `--host` を保持しない。config を消費する invocation surface は caller-supplied optional host を受け取り、値が present の場合だけ configured writer の `capability exec` invocation の dispatch boundary でその `--host` と値を追加して forward できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::phase::input_from_command"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-11",
+          "text_label": "operator-owned command config は provider host または `--host` を保持しない。config を消費する invocation surface は caller-supplied optional host を受け取り、値が present の場合だけ configured writer の `capability exec` invocation の dispatch boundary でその `--host` と値を追加して forward できる。保存・解決された literal argv の他の要素は変更しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "df2c7dfdcc69beaa64cac01abb71ec0bb02b5a192ca1189bf4c419d7f3c1f87a",
+      "evidence_hash": "7d00562f1197f62211fcda52438425b296bc3d85ad921bcac89edccfb67b5aa1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "invocation surface に optional host が supplied の場合だけ、configured writer の `capability exec` invocation に dispatch boundary でその `--host` と値を追加して forward し、omitted の場合は追加しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::phase::input_from_command"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-13",
+          "text_label": "operator-owned config には provider host または `--host` を保存しない。invocation surface に optional host が supplied の場合だけ、configured writer の `capability exec` invocation に dispatch boundary でその `--host` と値を追加して forward し、omitted の場合は追加しない。その他の configured literal argv 要素は変更しない。"
         }
       }
     }

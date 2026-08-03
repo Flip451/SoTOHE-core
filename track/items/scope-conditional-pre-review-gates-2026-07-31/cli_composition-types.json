@@ -32,6 +32,66 @@
   ],
   "traits": {},
   "types": {
+    "CapabilityCompositionRoot": {
+      "action": "reference",
+      "docs": "Pre-existing capability composition root carried for driver edge exposure.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "repo_root",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "runtime_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "discover",
+          "params": [],
+          "returns": "Result<Self, CompositionError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "capability_driver",
+          "params": [],
+          "receiver": "&self",
+          "returns": "cli_driver::capability::CapabilityDriver"
+        }
+      ],
+      "module_path": "capability",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-11",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
     "PhaseCompositionRoot": {
       "action": "add",
       "docs": "Phase-command composition root (IN-04, AC-02, AC-03).",

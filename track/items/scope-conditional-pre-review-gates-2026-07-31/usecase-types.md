@@ -62,6 +62,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
+| CapabilityExecService | application_service | reference | fn execute(&self, request: CapabilityExecRequest) -> Result<CapabilityDispatchOutcome, CapabilityExecError> | 🔵 | 🔵 |
 | PhaseCommandService | application_service | add | fn validate(&self, command: PhaseValidateCommand) -> Result<(), CommandConfigLoadError>, fn explain(&self, query: PhaseExplainQuery) -> Result<PhaseCommandExplanation, PhaseCommandExplainError>, fn enter(&self, command: PhaseEnterCommand) -> Result<PhaseCommandEnterOutcome, PhaseCommandEnterError> | 🟡 | 🔵 |
 | PreReviewCommandDispatchService | application_service | add | fn dispatch(&self, command: PreReviewCommandDispatchCommand) -> Result<PreReviewCommandDispatchOutcome, PreReviewCommandDispatchError> | 🔵 | 🔵 |
 
@@ -69,6 +70,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
+| CapabilityExecInteractor | interactor | reference | — | 🔵 | 🔵 |
 | PhaseCommandInteractor | interactor | add | — | 🟡 | 🔵 |
 | PreReviewCommandDispatchInteractor | interactor | add | — | 🔵 | 🔵 |
 | PreReviewCommandGatedReviewInteractor | interactor | add | — | 🔵 | 🔵 |
@@ -88,6 +90,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
+| CapabilityExecRequest | command | modify | — | 🔵 | 🔵 |
 | PhaseEnterCommand | command | add | — | 🟡 | 🔵 |
 | PhaseValidateCommand | command | add | — | 🟡 | 🔵 |
 | PreReviewCommandDispatchCommand | command | add | — | 🔵 | 🔵 |

@@ -3,6 +3,198 @@
   "layer": "usecase",
   "entries": [
     {
+      "claim_hash": "c8c891ddf06d414559fdee46cb22573c348e3290ea9637c29f7f6657e7fd53d7",
+      "evidence_hash": "9d1fb103e8260e0214bf6c2f2293b3ce735d9c1fabd94cf3f3c6bd849d418c61",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`capability exec` は `--host` が omitted の場合、provider-match judgment または in-host delegation を行わず、常に subprocess dispatch を選ぶ。subprocess target provider は `.harness/config/agent-profiles.json` の requested capability の `capabilities.<name>.provider` から解決し、`capabilities.orchestrator.provider` を使わない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CapabilityExecInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-09",
+          "text_label": "`capability exec` は `--host` が omitted の場合、provider-match judgment または in-host delegation を行わず、常に subprocess dispatch を選ぶ。subprocess target provider は `.harness/config/agent-profiles.json` の requested capability の `capabilities.<name>.provider` から解決し、`capabilities.orchestrator.provider` を使わない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c8c891ddf06d414559fdee46cb22573c348e3290ea9637c29f7f6657e7fd53d7",
+      "evidence_hash": "26f934ed9f173908b19c41a6a7c8bf86ed13a723887e021cb6a21dba011e71b2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "supplied `--host` は caller の runtime-host self-declaration としてそのまま扱い、profile 値で override または normalize しない。in-host delegation は capability contract を保持できる provider-match の場合だけ候補にできる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CapabilityExecInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-10",
+          "text_label": "supplied `--host` は caller の runtime-host self-declaration としてそのまま扱い、profile 値で override または normalize しない。in-host delegation は capability contract を保持できる provider-match の場合だけ候補にできる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c8c891ddf06d414559fdee46cb22573c348e3290ea9637c29f7f6657e7fd53d7",
+      "evidence_hash": "005bd186a6eb5fe08e7c40ce463a4e982b6b66a3c20255527581fa60d3acff82",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`capability exec` を `--host` なしで起動すると、provider-match judgment または in-host delegation を行わず subprocess dispatch となる。subprocess target は requested capability の `capabilities.<name>.provider` から解決され、`capabilities.orchestrator.provider` の値が異なっても target 選択に使われない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CapabilityExecInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-11",
+          "text_label": "`capability exec` を `--host` なしで起動すると、provider-match judgment または in-host delegation を行わず subprocess dispatch となる。subprocess target は requested capability の `capabilities.<name>.provider` から解決され、`capabilities.orchestrator.provider` の値が異なっても target 選択に使われない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c8c891ddf06d414559fdee46cb22573c348e3290ea9637c29f7f6657e7fd53d7",
+      "evidence_hash": "32ccf2f80b51804ac615744587822439e958defe9cba8036d71d7994da78c8fb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`capability exec` を explicit `--host` とともに起動すると、supplied value は profile 値へ normalize または override されず caller runtime-host self-declaration として provider-match evaluation に渡される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CapabilityExecInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-12",
+          "text_label": "`capability exec` を explicit `--host` とともに起動すると、supplied value は profile 値へ normalize または override されず caller runtime-host self-declaration として provider-match evaluation に渡される。supplied host と requested capability の `capabilities.<name>.provider` がともに `claude` の場合だけ、agent definition に `model:` と `tools:` があり、`model:` が profile model と完全一致し、delegation output が capability name・briefing path・読み込み済み discipline payload を含むと検証できたときに in-host delegation instruction を返す。それ以外の provider match（`codex` を含む）、definition/payload validation failure、または provider mismatch では subprocess dispatch を選ぶ。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c8f7c5fde2e89efc3af4fab9aba069ff62939108eecdceccfbd42197d6d11248",
+      "evidence_hash": "9d1fb103e8260e0214bf6c2f2293b3ce735d9c1fabd94cf3f3c6bd849d418c61",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`capability exec` は `--host` が omitted の場合、provider-match judgment または in-host delegation を行わず、常に subprocess dispatch を選ぶ。subprocess target provider は `.harness/config/agent-profiles.json` の requested capability の `capabilities.<name>.provider` から解決し、`capabilities.orchestrator.provider` を使わない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CapabilityExecRequest"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-09",
+          "text_label": "`capability exec` は `--host` が omitted の場合、provider-match judgment または in-host delegation を行わず、常に subprocess dispatch を選ぶ。subprocess target provider は `.harness/config/agent-profiles.json` の requested capability の `capabilities.<name>.provider` から解決し、`capabilities.orchestrator.provider` を使わない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c8f7c5fde2e89efc3af4fab9aba069ff62939108eecdceccfbd42197d6d11248",
+      "evidence_hash": "26f934ed9f173908b19c41a6a7c8bf86ed13a723887e021cb6a21dba011e71b2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "supplied `--host` は caller の runtime-host self-declaration としてそのまま扱い"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CapabilityExecRequest"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-10",
+          "text_label": "supplied `--host` は caller の runtime-host self-declaration としてそのまま扱い、profile 値で override または normalize しない。in-host delegation は capability contract を保持できる provider-match の場合だけ候補にできる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c8f7c5fde2e89efc3af4fab9aba069ff62939108eecdceccfbd42197d6d11248",
+      "evidence_hash": "005bd186a6eb5fe08e7c40ce463a4e982b6b66a3c20255527581fa60d3acff82",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`capability exec` を `--host` なしで起動すると、provider-match judgment または in-host delegation を行わず subprocess dispatch となる。subprocess target は requested capability の `capabilities.<name>.provider` から解決され、`capabilities.orchestrator.provider` の値が異なっても target 選択に使われない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CapabilityExecRequest"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-11",
+          "text_label": "`capability exec` を `--host` なしで起動すると、provider-match judgment または in-host delegation を行わず subprocess dispatch となる。subprocess target は requested capability の `capabilities.<name>.provider` から解決され、`capabilities.orchestrator.provider` の値が異なっても target 選択に使われない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c8f7c5fde2e89efc3af4fab9aba069ff62939108eecdceccfbd42197d6d11248",
+      "evidence_hash": "32ccf2f80b51804ac615744587822439e958defe9cba8036d71d7994da78c8fb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`capability exec` を explicit `--host` とともに起動すると、supplied value は profile 値へ normalize または override されず caller runtime-host self-declaration として provider-match evaluation に渡される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CapabilityExecRequest"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-12",
+          "text_label": "`capability exec` を explicit `--host` とともに起動すると、supplied value は profile 値へ normalize または override されず caller runtime-host self-declaration として provider-match evaluation に渡される。supplied host と requested capability の `capabilities.<name>.provider` がともに `claude` の場合だけ、agent definition に `model:` と `tools:` があり、`model:` が profile model と完全一致し、delegation output が capability name・briefing path・読み込み済み discipline payload を含むと検証できたときに in-host delegation instruction を返す。それ以外の provider match（`codex` を含む）、definition/payload validation failure、または provider mismatch では subprocess dispatch を選ぶ。"
+        }
+      }
+    },
+    {
       "claim_hash": "5c18e8a82ea466f1efca8743529e8e4dc0dc09899775ee239adefa6f14b1c7bb",
       "evidence_hash": "21d9371c5ac714d4a549a0fb8d87382c3bab75abdb2d63fe60fd48e84eaf8108",
       "verdict": {
@@ -172,10 +364,10 @@
     },
     {
       "claim_hash": "19631289c40e81b27ba27bd2716a90e1f8af8ff3b97d4a7b76b4bdfed6dbbc6f",
-      "evidence_hash": "095b31cc945d3cfcbc2ac864fb587beb77c392cce729b41f644e090f9b15b247",
+      "evidence_hash": "fcf6947ce3a1288ef78c920282154efdd8d7a5123976adbe3f41e1fd6b4540a2",
       "verdict": {
         "kind": "pass",
-        "citation": "config author/operator は公開 `bin/sotp` command の有効性と順序を所有し、engine は argv を書き換えず、subcommand grammar や command の意味論を解釈しない。"
+        "citation": "config author/operator は公開 `bin/sotp` command の有効性と順序を所有し、engine は config に保存・解決された literal argv を書き換えず、subcommand grammar や command の意味論を解釈しない。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -190,16 +382,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-03",
-          "text_label": "config author/operator は公開 `bin/sotp` command の有効性と順序を所有し、engine は argv を書き換えず、subcommand grammar や command の意味論を解釈しない。"
+          "text_label": "config author/operator は公開 `bin/sotp` command の有効性と順序を所有し、engine は config に保存・解決された literal argv を書き換えず、subcommand grammar や command の意味論を解釈しない。ただし D3 の dispatch boundary では、caller-supplied optional host が present の場合に限り configured writer の `capability exec` invocation の実行時 argv へその `--host` と値だけを追加できる。"
         }
       }
     },
     {
       "claim_hash": "19631289c40e81b27ba27bd2716a90e1f8af8ff3b97d4a7b76b4bdfed6dbbc6f",
-      "evidence_hash": "f87e8ff7d7da562cae96c1f6a832bffa8a239b66f89d0ec235f63a79de07c4ef",
+      "evidence_hash": "eed55e184aa24849ff134ac46577b3efe86f7cc48072dacbfa95545682b2805d",
       "verdict": {
         "kind": "pass",
-        "citation": "pre-review command は shell string ではなく literal argv として起動され"
+        "citation": "phase と pre-review command は shell string ではなく literal argv として起動され"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -214,7 +406,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-04",
-          "text_label": "phase と pre-review command は shell string ではなく literal argv として起動され、shell interpolation、pipe、implicit `sh -c`、argv rewrite、または command semantic interpretation を経由しない。"
+          "text_label": "phase と pre-review command は shell string ではなく literal argv として起動され、shell interpolation、pipe、implicit `sh -c`、config に保存・解決された literal argv の rewrite、または command semantic interpretation を経由しない。ただし D3 により caller-supplied optional host が present の場合は、configured writer の `capability exec` invocation の dispatch boundary でその `--host` と値だけを実行時 argv に追加できる。"
         }
       }
     },
@@ -1156,10 +1348,10 @@
     },
     {
       "claim_hash": "6300e9bece65776469689049dd610d4182ce5e1c84af1fc41ca9e84b49679908",
-      "evidence_hash": "095b31cc945d3cfcbc2ac864fb587beb77c392cce729b41f644e090f9b15b247",
+      "evidence_hash": "fcf6947ce3a1288ef78c920282154efdd8d7a5123976adbe3f41e1fd6b4540a2",
       "verdict": {
         "kind": "pass",
-        "citation": "config author/operator は公開 `bin/sotp` command の有効性と順序を所有し"
+        "citation": "config author/operator は公開 `bin/sotp` command の有効性と順序を所有し、engine は config に保存・解決された literal argv を書き換えず、subcommand grammar や command の意味論を解釈しない。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1174,16 +1366,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-03",
-          "text_label": "config author/operator は公開 `bin/sotp` command の有効性と順序を所有し、engine は argv を書き換えず、subcommand grammar や command の意味論を解釈しない。"
+          "text_label": "config author/operator は公開 `bin/sotp` command の有効性と順序を所有し、engine は config に保存・解決された literal argv を書き換えず、subcommand grammar や command の意味論を解釈しない。ただし D3 の dispatch boundary では、caller-supplied optional host が present の場合に限り configured writer の `capability exec` invocation の実行時 argv へその `--host` と値だけを追加できる。"
         }
       }
     },
     {
       "claim_hash": "6300e9bece65776469689049dd610d4182ce5e1c84af1fc41ca9e84b49679908",
-      "evidence_hash": "f87e8ff7d7da562cae96c1f6a832bffa8a239b66f89d0ec235f63a79de07c4ef",
+      "evidence_hash": "eed55e184aa24849ff134ac46577b3efe86f7cc48072dacbfa95545682b2805d",
       "verdict": {
         "kind": "pass",
-        "citation": "phase と pre-review command は shell string ではなく literal argv として起動され、shell interpolation、pipe、implicit `sh -c`、argv rewrite、または command semantic interpretation を経由しない。"
+        "citation": "phase と pre-review command は shell string ではなく literal argv として起動され、shell interpolation、pipe、implicit `sh -c`、config に保存・解決された literal argv の rewrite、または command semantic interpretation を経由しない。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1198,7 +1390,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-04",
-          "text_label": "phase と pre-review command は shell string ではなく literal argv として起動され、shell interpolation、pipe、implicit `sh -c`、argv rewrite、または command semantic interpretation を経由しない。"
+          "text_label": "phase と pre-review command は shell string ではなく literal argv として起動され、shell interpolation、pipe、implicit `sh -c`、config に保存・解決された literal argv の rewrite、または command semantic interpretation を経由しない。ただし D3 により caller-supplied optional host が present の場合は、configured writer の `capability exec` invocation の dispatch boundary でその `--host` と値だけを実行時 argv に追加できる。"
         }
       }
     },
@@ -1996,10 +2188,10 @@
     },
     {
       "claim_hash": "76ad84753e14ce50b05e4d5cb953b32ed580341e070b2098115f0579e7d5bef8",
-      "evidence_hash": "095b31cc945d3cfcbc2ac864fb587beb77c392cce729b41f644e090f9b15b247",
+      "evidence_hash": "fcf6947ce3a1288ef78c920282154efdd8d7a5123976adbe3f41e1fd6b4540a2",
       "verdict": {
         "kind": "pass",
-        "citation": "config author/operator は公開 `bin/sotp` command の有効性と順序を所有し、engine は argv を書き換えず、subcommand grammar や command の意味論を解釈しない。"
+        "citation": "config author/operator は公開 `bin/sotp` command の有効性と順序を所有し、engine は config に保存・解決された literal argv を書き換えず、subcommand grammar や command の意味論を解釈しない。ただし D3 の dispatch boundary では、caller-supplied optional host が present の場合に限り configured writer の `capability exec` invocation の実行時 argv へその `--host` と値だけを追加できる。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -2014,7 +2206,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-03",
-          "text_label": "config author/operator は公開 `bin/sotp` command の有効性と順序を所有し、engine は argv を書き換えず、subcommand grammar や command の意味論を解釈しない。"
+          "text_label": "config author/operator は公開 `bin/sotp` command の有効性と順序を所有し、engine は config に保存・解決された literal argv を書き換えず、subcommand grammar や command の意味論を解釈しない。ただし D3 の dispatch boundary では、caller-supplied optional host が present の場合に限り configured writer の `capability exec` invocation の実行時 argv へその `--host` と値だけを追加できる。"
         }
       }
     },
@@ -2044,10 +2236,10 @@
     },
     {
       "claim_hash": "76ad84753e14ce50b05e4d5cb953b32ed580341e070b2098115f0579e7d5bef8",
-      "evidence_hash": "f87e8ff7d7da562cae96c1f6a832bffa8a239b66f89d0ec235f63a79de07c4ef",
+      "evidence_hash": "eed55e184aa24849ff134ac46577b3efe86f7cc48072dacbfa95545682b2805d",
       "verdict": {
         "kind": "pass",
-        "citation": "phase と pre-review command は shell string ではなく literal argv として起動され、shell interpolation、pipe、implicit `sh -c`、argv rewrite、または command semantic interpretation を経由しない。"
+        "citation": "phase と pre-review command は shell string ではなく literal argv として起動され、shell interpolation、pipe、implicit `sh -c`、config に保存・解決された literal argv の rewrite、または command semantic interpretation を経由しない。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -2062,12 +2254,12 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-04",
-          "text_label": "phase と pre-review command は shell string ではなく literal argv として起動され、shell interpolation、pipe、implicit `sh -c`、argv rewrite、または command semantic interpretation を経由しない。"
+          "text_label": "phase と pre-review command は shell string ではなく literal argv として起動され、shell interpolation、pipe、implicit `sh -c`、config に保存・解決された literal argv の rewrite、または command semantic interpretation を経由しない。ただし D3 により caller-supplied optional host が present の場合は、configured writer の `capability exec` invocation の dispatch boundary でその `--host` と値だけを実行時 argv に追加できる。"
         }
       }
     },
     {
-      "claim_hash": "20de4b9d3a8687e91907c1a5c0d02049b95244be786f0c9eb062652631f35768",
+      "claim_hash": "57461c704dd89b23f84d7cd76ded0085aef16941167051458ecfea1694afaf76",
       "evidence_hash": "5f06457592cbea35eca821280789c39a156cb9dbfbc96ac3cb37d83239bba370",
       "verdict": {
         "kind": "pass",
@@ -2091,7 +2283,7 @@
       }
     },
     {
-      "claim_hash": "20de4b9d3a8687e91907c1a5c0d02049b95244be786f0c9eb062652631f35768",
+      "claim_hash": "57461c704dd89b23f84d7cd76ded0085aef16941167051458ecfea1694afaf76",
       "evidence_hash": "5766f2233e51df7dd5a39554022688b7364647b79f00722e6c78f0cde48989fa",
       "verdict": {
         "kind": "pass",
@@ -2115,7 +2307,31 @@
       }
     },
     {
-      "claim_hash": "20de4b9d3a8687e91907c1a5c0d02049b95244be786f0c9eb062652631f35768",
+      "claim_hash": "57461c704dd89b23f84d7cd76ded0085aef16941167051458ecfea1694afaf76",
+      "evidence_hash": "e9f8e82c5561af5f9ded63ec8b3220fe37f99b81c0352e8256321e704ba538f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "invocation surface は caller-supplied optional host を受け取り、値が present の場合だけ configured writer の `capability exec` invocation の dispatch boundary でその `--host` と値を追加して forward できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PhaseEnterCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-11",
+          "text_label": "operator-owned command config は provider host または `--host` を保持しない。config を消費する invocation surface は caller-supplied optional host を受け取り、値が present の場合だけ configured writer の `capability exec` invocation の dispatch boundary でその `--host` と値を追加して forward できる。保存・解決された literal argv の他の要素は変更しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "57461c704dd89b23f84d7cd76ded0085aef16941167051458ecfea1694afaf76",
       "evidence_hash": "b49fb65c90adaab174287b910af03a5d2c7e928cd33ff55fd2b16efaa3957c33",
       "verdict": {
         "kind": "pass",
@@ -2135,6 +2351,30 @@
           "section": "acceptance_criteria",
           "element_id": "AC-02",
           "text_label": "phase enter は repository root で pre-entry argv を宣言順に実行し、最初の non-zero の後に remaining command と writer を実行せず、全て zero の場合だけ canonical writer を一度実行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "57461c704dd89b23f84d7cd76ded0085aef16941167051458ecfea1694afaf76",
+      "evidence_hash": "7d00562f1197f62211fcda52438425b296bc3d85ad921bcac89edccfb67b5aa1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "invocation surface に optional host が supplied の場合だけ、configured writer の `capability exec` invocation に dispatch boundary でその `--host` と値を追加して forward し、omitted の場合は追加しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PhaseEnterCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-13",
+          "text_label": "operator-owned config には provider host または `--host` を保存しない。invocation surface に optional host が supplied の場合だけ、configured writer の `capability exec` invocation に dispatch boundary でその `--host` と値を追加して forward し、omitted の場合は追加しない。その他の configured literal argv 要素は変更しない。"
         }
       }
     },
@@ -3028,10 +3268,10 @@
     },
     {
       "claim_hash": "6b4e77f60cf94fc2be1ea6ec1f499c158292fdaf20ae0ae233c436af690760af",
-      "evidence_hash": "095b31cc945d3cfcbc2ac864fb587beb77c392cce729b41f644e090f9b15b247",
+      "evidence_hash": "fcf6947ce3a1288ef78c920282154efdd8d7a5123976adbe3f41e1fd6b4540a2",
       "verdict": {
         "kind": "pass",
-        "citation": "engine は argv を書き換えず、subcommand grammar や command の意味論を解釈しない。"
+        "citation": "engine は config に保存・解決された literal argv を書き換えず、subcommand grammar や command の意味論を解釈しない。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -3046,7 +3286,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-03",
-          "text_label": "config author/operator は公開 `bin/sotp` command の有効性と順序を所有し、engine は argv を書き換えず、subcommand grammar や command の意味論を解釈しない。"
+          "text_label": "config author/operator は公開 `bin/sotp` command の有効性と順序を所有し、engine は config に保存・解決された literal argv を書き換えず、subcommand grammar や command の意味論を解釈しない。ただし D3 の dispatch boundary では、caller-supplied optional host が present の場合に限り configured writer の `capability exec` invocation の実行時 argv へその `--host` と値だけを追加できる。"
         }
       }
     },
@@ -3076,10 +3316,10 @@
     },
     {
       "claim_hash": "6b4e77f60cf94fc2be1ea6ec1f499c158292fdaf20ae0ae233c436af690760af",
-      "evidence_hash": "f87e8ff7d7da562cae96c1f6a832bffa8a239b66f89d0ec235f63a79de07c4ef",
+      "evidence_hash": "eed55e184aa24849ff134ac46577b3efe86f7cc48072dacbfa95545682b2805d",
       "verdict": {
         "kind": "pass",
-        "citation": "phase と pre-review command は shell string ではなく literal argv として起動され、shell interpolation、pipe、implicit `sh -c`、argv rewrite、または command semantic interpretation を経由しない。"
+        "citation": "phase と pre-review command は shell string ではなく literal argv として起動され、shell interpolation、pipe、implicit `sh -c`、config に保存・解決された literal argv の rewrite、または command semantic interpretation を経由しない。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -3094,7 +3334,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-04",
-          "text_label": "phase と pre-review command は shell string ではなく literal argv として起動され、shell interpolation、pipe、implicit `sh -c`、argv rewrite、または command semantic interpretation を経由しない。"
+          "text_label": "phase と pre-review command は shell string ではなく literal argv として起動され、shell interpolation、pipe、implicit `sh -c`、config に保存・解決された literal argv の rewrite、または command semantic interpretation を経由しない。ただし D3 により caller-supplied optional host が present の場合は、configured writer の `capability exec` invocation の dispatch boundary でその `--host` と値だけを実行時 argv に追加できる。"
         }
       }
     },
@@ -3268,7 +3508,7 @@
     },
     {
       "claim_hash": "86a2a1f7d56610b8fb4ab377d35e8ae4f239cdd53570a77dd7a91fe9efcfb15a",
-      "evidence_hash": "f87e8ff7d7da562cae96c1f6a832bffa8a239b66f89d0ec235f63a79de07c4ef",
+      "evidence_hash": "eed55e184aa24849ff134ac46577b3efe86f7cc48072dacbfa95545682b2805d",
       "verdict": {
         "kind": "pass",
         "citation": "phase と pre-review command は shell string ではなく literal argv として起動され"
@@ -3286,7 +3526,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-04",
-          "text_label": "phase と pre-review command は shell string ではなく literal argv として起動され、shell interpolation、pipe、implicit `sh -c`、argv rewrite、または command semantic interpretation を経由しない。"
+          "text_label": "phase と pre-review command は shell string ではなく literal argv として起動され、shell interpolation、pipe、implicit `sh -c`、config に保存・解決された literal argv の rewrite、または command semantic interpretation を経由しない。ただし D3 により caller-supplied optional host が present の場合は、configured writer の `capability exec` invocation の dispatch boundary でその `--host` と値だけを実行時 argv に追加できる。"
         }
       }
     },
@@ -3551,6 +3791,102 @@
           "section": "acceptance_criteria",
           "element_id": "AC-05",
           "text_label": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または configured argv の先頭三要素が exactly `[\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、もしくは `[\"bin/sotp\", \"review\", \"fix-local\"]` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f7330b6eae435f6c7038dec6d4f972fa0b19fbd8a5cf731fda181960b641dab4",
+      "evidence_hash": "9d1fb103e8260e0214bf6c2f2293b3ce735d9c1fabd94cf3f3c6bd849d418c61",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`capability exec` は `--host` が omitted の場合、provider-match judgment または in-host delegation を行わず、常に subprocess dispatch を選ぶ。subprocess target provider は `.harness/config/agent-profiles.json` の requested capability の `capabilities.<name>.provider` から解決し、`capabilities.orchestrator.provider` を使わない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "CapabilityExecService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-09",
+          "text_label": "`capability exec` は `--host` が omitted の場合、provider-match judgment または in-host delegation を行わず、常に subprocess dispatch を選ぶ。subprocess target provider は `.harness/config/agent-profiles.json` の requested capability の `capabilities.<name>.provider` から解決し、`capabilities.orchestrator.provider` を使わない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f7330b6eae435f6c7038dec6d4f972fa0b19fbd8a5cf731fda181960b641dab4",
+      "evidence_hash": "26f934ed9f173908b19c41a6a7c8bf86ed13a723887e021cb6a21dba011e71b2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "in-host delegation は capability contract を保持できる provider-match の場合だけ候補にできる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "CapabilityExecService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-10",
+          "text_label": "supplied `--host` は caller の runtime-host self-declaration としてそのまま扱い、profile 値で override または normalize しない。in-host delegation は capability contract を保持できる provider-match の場合だけ候補にできる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f7330b6eae435f6c7038dec6d4f972fa0b19fbd8a5cf731fda181960b641dab4",
+      "evidence_hash": "005bd186a6eb5fe08e7c40ce463a4e982b6b66a3c20255527581fa60d3acff82",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`capability exec` を `--host` なしで起動すると、provider-match judgment または in-host delegation を行わず subprocess dispatch となる。subprocess target は requested capability の `capabilities.<name>.provider` から解決され、`capabilities.orchestrator.provider` の値が異なっても target 選択に使われない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "CapabilityExecService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-11",
+          "text_label": "`capability exec` を `--host` なしで起動すると、provider-match judgment または in-host delegation を行わず subprocess dispatch となる。subprocess target は requested capability の `capabilities.<name>.provider` から解決され、`capabilities.orchestrator.provider` の値が異なっても target 選択に使われない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f7330b6eae435f6c7038dec6d4f972fa0b19fbd8a5cf731fda181960b641dab4",
+      "evidence_hash": "32ccf2f80b51804ac615744587822439e958defe9cba8036d71d7994da78c8fb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`capability exec` を explicit `--host` とともに起動すると、supplied value は profile 値へ normalize または override されず caller runtime-host self-declaration として provider-match evaluation に渡される。supplied host と requested capability の `capabilities.<name>.provider` がともに `claude` の場合だけ、agent definition に `model:` と `tools:` があり、`model:` が profile model と完全一致し、delegation output が capability name・briefing path・読み込み済み discipline payload を含むと検証できたときに in-host delegation instruction を返す。それ以外の provider match（`codex` を含む）、definition/payload validation failure、または provider mismatch では subprocess dispatch を選ぶ。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "CapabilityExecService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-12",
+          "text_label": "`capability exec` を explicit `--host` とともに起動すると、supplied value は profile 値へ normalize または override されず caller runtime-host self-declaration として provider-match evaluation に渡される。supplied host と requested capability の `capabilities.<name>.provider` がともに `claude` の場合だけ、agent definition に `model:` と `tools:` があり、`model:` が profile model と完全一致し、delegation output が capability name・briefing path・読み込み済み discipline payload を含むと検証できたときに in-host delegation instruction を返す。それ以外の provider match（`codex` を含む）、definition/payload validation failure、または provider mismatch では subprocess dispatch を選ぶ。"
         }
       }
     },
@@ -4084,10 +4420,10 @@
     },
     {
       "claim_hash": "d49b5165ce5926cac4cc005cdff3ae323187a58af0cd34bed74b5586d427dd3f",
-      "evidence_hash": "095b31cc945d3cfcbc2ac864fb587beb77c392cce729b41f644e090f9b15b247",
+      "evidence_hash": "fcf6947ce3a1288ef78c920282154efdd8d7a5123976adbe3f41e1fd6b4540a2",
       "verdict": {
         "kind": "pass",
-        "citation": "config author/operator は公開 `bin/sotp` command の有効性と順序を所有し、engine は argv を書き換えず、subcommand grammar や command の意味論を解釈しない。"
+        "citation": "ただし D3 の dispatch boundary では、caller-supplied optional host が present の場合に限り configured writer の `capability exec` invocation の実行時 argv へその `--host` と値だけを追加できる。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -4102,7 +4438,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-03",
-          "text_label": "config author/operator は公開 `bin/sotp` command の有効性と順序を所有し、engine は argv を書き換えず、subcommand grammar や command の意味論を解釈しない。"
+          "text_label": "config author/operator は公開 `bin/sotp` command の有効性と順序を所有し、engine は config に保存・解決された literal argv を書き換えず、subcommand grammar や command の意味論を解釈しない。ただし D3 の dispatch boundary では、caller-supplied optional host が present の場合に限り configured writer の `capability exec` invocation の実行時 argv へその `--host` と値だけを追加できる。"
         }
       }
     },
@@ -4132,10 +4468,10 @@
     },
     {
       "claim_hash": "d49b5165ce5926cac4cc005cdff3ae323187a58af0cd34bed74b5586d427dd3f",
-      "evidence_hash": "f87e8ff7d7da562cae96c1f6a832bffa8a239b66f89d0ec235f63a79de07c4ef",
+      "evidence_hash": "eed55e184aa24849ff134ac46577b3efe86f7cc48072dacbfa95545682b2805d",
       "verdict": {
         "kind": "pass",
-        "citation": "phase と pre-review command は shell string ではなく literal argv として起動され、shell interpolation、pipe、implicit `sh -c`、argv rewrite、または command semantic interpretation を経由しない。"
+        "citation": "phase と pre-review command は shell string ではなく literal argv として起動され、shell interpolation、pipe、implicit `sh -c`、config に保存・解決された literal argv の rewrite、または command semantic interpretation を経由しない。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -4150,7 +4486,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-04",
-          "text_label": "phase と pre-review command は shell string ではなく literal argv として起動され、shell interpolation、pipe、implicit `sh -c`、argv rewrite、または command semantic interpretation を経由しない。"
+          "text_label": "phase と pre-review command は shell string ではなく literal argv として起動され、shell interpolation、pipe、implicit `sh -c`、config に保存・解決された literal argv の rewrite、または command semantic interpretation を経由しない。ただし D3 により caller-supplied optional host が present の場合は、configured writer の `capability exec` invocation の dispatch boundary でその `--host` と値だけを実行時 argv に追加できる。"
         }
       }
     }

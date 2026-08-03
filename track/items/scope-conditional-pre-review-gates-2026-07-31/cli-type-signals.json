@@ -1,13 +1,13 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-02T17:08:07Z",
-  "declaration_hash": "7a12aa03f55ae1a1aeb6f5ccf6f88fcb3ca3e044cf1558dd84fd3e39a0579a52",
-  "implementation_input_hash": "f6f32f8e3ea581d960d7cd35e09ff8202a29eb7b08b1d31f40b40cb67d300d7a",
+  "generated_at": "2026-08-03T03:54:30Z",
+  "declaration_hash": "3f4181d557a89b8a20bce583c0931b094307e62a667f91bd99a265dd871b6498",
+  "implementation_input_hash": "151740f16937267843c4d32c69a05b7785ed9d219eb7efc0291608d3ebd161d7",
   "signals": [
     {
       "type_name": "CapabilityExecArgs",
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
@@ -25,6 +25,17 @@
         "Debug",
         "FromArgMatches",
         "Subcommand"
+      ]
+    },
+    {
+      "type_name": "PhaseEnterArgs",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Args",
+        "Debug",
+        "FromArgMatches"
       ]
     },
     {
@@ -52,7 +63,7 @@
     {
       "type_name": "cli::commands::capability::into_driver_input",
       "kind_tag": "free_function",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {

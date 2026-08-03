@@ -3,6 +3,54 @@
   "layer": "cli_composition",
   "entries": [
     {
+      "claim_hash": "cc7790bccce13aaeb749f0191b248d61df98eb70969591f6ce9c82746d455eda",
+      "evidence_hash": "9d1fb103e8260e0214bf6c2f2293b3ce735d9c1fabd94cf3f3c6bd849d418c61",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`capability exec` は `--host` が omitted の場合、provider-match judgment または in-host delegation を行わず、常に subprocess dispatch を選ぶ。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "CapabilityCompositionRoot"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-09",
+          "text_label": "`capability exec` は `--host` が omitted の場合、provider-match judgment または in-host delegation を行わず、常に subprocess dispatch を選ぶ。subprocess target provider は `.harness/config/agent-profiles.json` の requested capability の `capabilities.<name>.provider` から解決し、`capabilities.orchestrator.provider` を使わない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cc7790bccce13aaeb749f0191b248d61df98eb70969591f6ce9c82746d455eda",
+      "evidence_hash": "005bd186a6eb5fe08e7c40ce463a4e982b6b66a3c20255527581fa60d3acff82",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`capability exec` を `--host` なしで起動すると、provider-match judgment または in-host delegation を行わず subprocess dispatch となる。subprocess target は requested capability の `capabilities.<name>.provider` から解決され、`capabilities.orchestrator.provider` の値が異なっても target 選択に使われない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "CapabilityCompositionRoot"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-11",
+          "text_label": "`capability exec` を `--host` なしで起動すると、provider-match judgment または in-host delegation を行わず subprocess dispatch となる。subprocess target は requested capability の `capabilities.<name>.provider` から解決され、`capabilities.orchestrator.provider` の値が異なっても target 選択に使われない。"
+        }
+      }
+    },
+    {
       "claim_hash": "0ec9dcaa0216ebdc38542a319623057167ffff0183f270d18093a24339c8571f",
       "evidence_hash": "c600677df01b23fc21e331a509de2c22f16a0ef63e6ef1cb2ef604999640d2bb",
       "verdict": {

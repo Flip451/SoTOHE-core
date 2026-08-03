@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "7a12aa03f55ae1a1aeb6f5ccf6f88fcb3ca3e044cf1558dd84fd3e39a0579a52",
+  "catalogue_declaration_hash": "3f4181d557a89b8a20bce583c0931b094307e62a667f91bd99a265dd871b6498",
   "signals": [
     {
       "type_name": "CapabilityExecArgs",
       "signal": "blue",
-      "entry_hash": "cd22548e18c1b5fbda57d8531c3f4443e3ad85d506867adc031ffe077ccb347a"
+      "entry_hash": "c97a55aa3b9371e100730d21342d271fef746a67bc41f39f22f0b3a7524d5303"
     },
     {
       "type_name": "CliCommand",
@@ -15,7 +15,12 @@
     {
       "type_name": "PhaseCommand",
       "signal": "blue",
-      "entry_hash": "5c8e5dcb0972354a3bdc22168d6a7adbd5a73c00a8bff25003acbb895b8eb2a6"
+      "entry_hash": "62c69f43d824ca22dfde0731c953444f49ac1a87c48e1e7d7c8cbdb7b11134b8"
+    },
+    {
+      "type_name": "PhaseEnterArgs",
+      "signal": "blue",
+      "entry_hash": "5ecc64065efb5223876df072e2831084225e5080598c236e5f410bda3078614f"
     },
     {
       "type_name": "PhaseIdArgs",
@@ -30,7 +35,7 @@
     {
       "type_name": "cli::commands::capability::into_driver_input",
       "signal": "blue",
-      "entry_hash": "cc9d97c56ebbae48106463fb6647999fa41860786b8a4958e8659afe62e6ce6b"
+      "entry_hash": "7e4563097a686c8d4b4b95abe03c6976e816d036169ec3c3cb1a5df4867257c5"
     },
     {
       "type_name": "cli::commands::phase::execute",
@@ -45,7 +50,7 @@
     {
       "type_name": "cli::commands::phase::input_from_command",
       "signal": "blue",
-      "entry_hash": "42b203a007fcee46aed470abea5664b0a5d14f905456fb22c27c85dc562db98c"
+      "entry_hash": "df2c7dfdcc69beaa64cac01abb71ec0bb02b5a192ca1189bf4c419d7f3c1f87a"
     }
   ]
 }

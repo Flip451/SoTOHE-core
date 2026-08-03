@@ -233,11 +233,11 @@
       "key": {
         "waived_reason_hash": "34054518716435d23d175ce44a74179ab501ddef2280b76b5f66fa9a2d7bc3e4",
         "declaration_hash": "5457e56b5ee58fe5698d48e226710fe41e1f3cfdb9bed56e13ec2aba840bbc86",
-        "anchor_text_hash": "9e04804ce8a7fd2c873ad048240923655926a25e6a72b36ada8f4cac5887ddfe"
+        "anchor_text_hash": "fa7e4f00724359c580b35833faf745f970a7f203d8fbd44a502a13e850af54b9"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "phase と pre-review command は shell string ではなく literal argv として起動され"
+        "citation": "Opaque literal command-argument value (IN-03, AC-04)."
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -281,11 +281,11 @@
       "key": {
         "waived_reason_hash": "b12cda0caf5d15eac2ce3ad78d3603e065059f9118521567ea74df227e451bbb",
         "declaration_hash": "5457e56b5ee58fe5698d48e226710fe41e1f3cfdb9bed56e13ec2aba840bbc86",
-        "anchor_text_hash": "57cb8a46e67a19b841ffe81921fef96722df9c62023de8d0968ad9bfaedd83b0"
+        "anchor_text_hash": "40dc60e9383fe78e784c70d0531f18bc574b03cbaa5710618f0fcdf56d3382f7"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "Opaque literal command-argument value (IN-03, AC-04)."
+        "citation": "kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: []"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -305,11 +305,11 @@
       "key": {
         "waived_reason_hash": "692ab8f5aff10683fbc4a8c558ac717aebf5efc62a90545920f7d8652111c105",
         "declaration_hash": "ab6f4b6f367d43f6ae7d79e7d6463a14266dfd2a7e14888275afb200258f1d63",
-        "anchor_text_hash": "9e04804ce8a7fd2c873ad048240923655926a25e6a72b36ada8f4cac5887ddfe"
+        "anchor_text_hash": "fa7e4f00724359c580b35833faf745f970a7f203d8fbd44a502a13e850af54b9"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "phase と pre-review command は shell string ではなく literal argv として起動され"
+        "citation": "Serde mirror of an opaque command argument (IN-03, AC-04)."
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -329,7 +329,7 @@
       "key": {
         "waived_reason_hash": "32df1710243b81907baa30597ea34065497a040c7389d3a586fe6a0b1b31ab0b",
         "declaration_hash": "ab6f4b6f367d43f6ae7d79e7d6463a14266dfd2a7e14888275afb200258f1d63",
-        "anchor_text_hash": "57cb8a46e67a19b841ffe81921fef96722df9c62023de8d0968ad9bfaedd83b0"
+        "anchor_text_hash": "40dc60e9383fe78e784c70d0531f18bc574b03cbaa5710618f0fcdf56d3382f7"
       },
       "verdict": {
         "kind": "waived",
@@ -339,49 +339,25 @@
     },
     {
       "edge_id": {
-        "entry_key": "CommandArgv",
+        "entry_key": "CommandArgvDto",
         "anchor_id": {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "AC-01"
         }
       },
       "obligation_id": {
-        "entry_key": "CommandArgv",
+        "entry_key": "CommandArgvDto",
         "obligation_kind": "logic",
         "item_identifier": "voluntary:AC-01"
       },
       "key": {
-        "waived_reason_hash": "8fe215965f2ef236fe1e3500d35a25bbae56800b2e7449cbefba1769a4c60618",
-        "declaration_hash": "64763fa279fdc04aa7bbe9997855406d086b14fee38c4f18e4e0fc3579d19457",
+        "waived_reason_hash": "72a0dded009d2c92d05be07a3ea9dfbbcf0609b6acc702dac6553b2528ca91bb",
+        "declaration_hash": "049e287880d9751a457908056a9f12c8af80d3e8120b6bfab7ebc1ebb0a7a707",
         "anchor_text_hash": "05b8094316a1aacabb4bec26100b679daf53d5554267297214266776d1838398"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "\"configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する\""
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "entry_key": "CommandArgv",
-        "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-05"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "CommandArgv",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:AC-05"
-      },
-      "key": {
-        "waived_reason_hash": "3bafea04fca6e60c3148c72f50d1ff52093ca2d8f18ede56a86b2bbf8beca2df",
-        "declaration_hash": "64763fa279fdc04aa7bbe9997855406d086b14fee38c4f18e4e0fc3579d19457",
-        "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
-      },
-      "verdict": {
-        "kind": "waived",
-        "citation": "methods: []"
+        "citation": "Serde mirror of a command-argument sequence (CN-01, AC-01, AC-05)."
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -399,7 +375,7 @@
         "item_identifier": "voluntary:AC-05"
       },
       "key": {
-        "waived_reason_hash": "99a123669d799be09575b5d3bd32d3167a01e5e4f018fe296b7c5e93b22af5f9",
+        "waived_reason_hash": "263a35025d6500c014abada8c46c4923d5a74aa5829ba98e1b277173b3740820",
         "declaration_hash": "049e287880d9751a457908056a9f12c8af80d3e8120b6bfab7ebc1ebb0a7a707",
         "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
       },
@@ -622,54 +598,6 @@
       "verdict": {
         "kind": "waived",
         "citation": "Command-configuration loading failures (GO-03, AC-01, AC-05)."
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "entry_key": "CommandConfigSchemaVersion",
-        "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-01"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "CommandConfigSchemaVersion",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:AC-01"
-      },
-      "key": {
-        "waived_reason_hash": "b2b37523489fe356731bd2b9275ec541edeb820c43ddb77583137fefa0e3c0c6",
-        "declaration_hash": "a64d33952293f5b8146b53e2893a4089614178fc766bdfff99ae716a79cb3207",
-        "anchor_text_hash": "05b8094316a1aacabb4bec26100b679daf53d5554267297214266776d1838398"
-      },
-      "verdict": {
-        "kind": "waived",
-        "citation": "methods: []"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "entry_key": "CommandConfigSchemaVersion",
-        "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-05"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "CommandConfigSchemaVersion",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:AC-05"
-      },
-      "key": {
-        "waived_reason_hash": "6a55b3b04279603ca964e1ed99948cb02dbd678e0feda7b6a05a0d69a1cda5a6",
-        "declaration_hash": "a64d33952293f5b8146b53e2893a4089614178fc766bdfff99ae716a79cb3207",
-        "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
-      },
-      "verdict": {
-        "kind": "waived",
-        "citation": "Command-configuration schema-version value (CN-01)."
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -1302,30 +1230,6 @@
         "entry_key": "CommandTimeoutValidationError",
         "anchor_id": {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-01"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "CommandTimeoutValidationError",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:AC-01"
-      },
-      "key": {
-        "waived_reason_hash": "8c8cf159b730968a132df1715b8ab7d9611f00f591c1235f2fa36c916ef93d2f",
-        "declaration_hash": "7383e09944b2f5f80f542f6b150cdd8cd7373a60d129aa0cf42e8cf53698acc5",
-        "anchor_text_hash": "05b8094316a1aacabb4bec26100b679daf53d5554267297214266776d1838398"
-      },
-      "verdict": {
-        "kind": "waived",
-        "citation": "role: ErrorType, methods: []"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "entry_key": "CommandTimeoutValidationError",
-        "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "CN-01"
         }
       },
@@ -1385,11 +1289,11 @@
       "key": {
         "waived_reason_hash": "5e81953b15cfa24abbdea9ac5e068cc5e9e5f3b4536af6bda5ae6b2cbe0fd127",
         "declaration_hash": "ac0548be2999e4e65245dc06dab132f2dfd5bae85899b6ca5f357303e35c82ca",
-        "anchor_text_hash": "9e04804ce8a7fd2c873ad048240923655926a25e6a72b36ada8f4cac5887ddfe"
+        "anchor_text_hash": "fa7e4f00724359c580b35833faf745f970a7f203d8fbd44a502a13e850af54b9"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "methods: []"
+        "citation": "TypeEntry { action: Add, role: ValueObject { invariants: [] }"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -1457,11 +1361,11 @@
       "key": {
         "waived_reason_hash": "bda7fee834baea4294a54a7cbe014e77c9d5506ddffc32e29e388c1b8904056d",
         "declaration_hash": "ac0548be2999e4e65245dc06dab132f2dfd5bae85899b6ca5f357303e35c82ca",
-        "anchor_text_hash": "57cb8a46e67a19b841ffe81921fef96722df9c62023de8d0968ad9bfaedd83b0"
+        "anchor_text_hash": "40dc60e9383fe78e784c70d0531f18bc574b03cbaa5710618f0fcdf56d3382f7"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "engine は argv を書き換えず、subcommand grammar や command の意味論を解釈しない。"
+        "citation": "config author/operator は公開 `bin/sotp` command の有効性と順序を所有し、engine は config に保存・解決された literal argv を書き換えず、subcommand grammar や command の意味論を解釈しない。"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -1678,54 +1582,6 @@
       "verdict": {
         "kind": "waived",
         "citation": "methods: []"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "entry_key": "ContractedEntryRefDto",
-        "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-08"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "ContractedEntryRefDto",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:AC-08"
-      },
-      "key": {
-        "waived_reason_hash": "1bc6c88653e7aa920d509c69d64e5ec7d8fac4364a257bea9f1f852ad43cc01c",
-        "declaration_hash": "0750e0530c006366b08c29a17ecd4a0c4370a3d587c815a7a556e1191407ba12",
-        "anchor_text_hash": "c6e5c18bf5cad17887f4e549819d0397ade7094237ea54caea13553e8d0be0c6"
-      },
-      "verdict": {
-        "kind": "waived",
-        "citation": "Serde mirror of a catalogue-entry attribution identity (IN-07, AC-08)."
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "entry_key": "ContractedEntryRefDto",
-        "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-07"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "ContractedEntryRefDto",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-07"
-      },
-      "key": {
-        "waived_reason_hash": "acad24a752727a7baded1ca92ee3841a6a35c90c4b96907b0a3da40b0214dffe",
-        "declaration_hash": "0750e0530c006366b08c29a17ecd4a0c4370a3d587c815a7a556e1191407ba12",
-        "anchor_text_hash": "49ca0a9a32f87a071ed1596ecadc8dffc6f22a3356b5f7ac2972e8c40448c1a9"
-      },
-      "verdict": {
-        "kind": "waived",
-        "citation": "task-contract の attribution target は catalogue entry のみとし、source-only baseline restoration、evidence/inspector eligibility、coverage/liveness carrier variant、および stale-carrier lifecycle を持ち込まない。"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -2753,11 +2609,11 @@
       "key": {
         "waived_reason_hash": "16390e196d0bf7c80b9b59b0ab3f3c2c53fbd032140a344764738d1ca64c0fb3",
         "declaration_hash": "eafb4f4ff7dfee437df5bd35076ddb012bf32868be6983db6c3a70c9ee565f15",
-        "anchor_text_hash": "9e04804ce8a7fd2c873ad048240923655926a25e6a72b36ada8f4cac5887ddfe"
+        "anchor_text_hash": "fa7e4f00724359c580b35833faf745f970a7f203d8fbd44a502a13e850af54b9"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "phase と pre-review command は shell string ではなく literal argv として起動され"
+        "citation": "TypeEntry { action: Add, role: Dto, kind: Struct(...), methods: [], generics: [], where_predicates: [], ... }"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -2825,11 +2681,11 @@
       "key": {
         "waived_reason_hash": "05c8544a571eb70bd2d1a3cf737371e1dfc66eb1e351142a9eb42d2764db4999",
         "declaration_hash": "eafb4f4ff7dfee437df5bd35076ddb012bf32868be6983db6c3a70c9ee565f15",
-        "anchor_text_hash": "57cb8a46e67a19b841ffe81921fef96722df9c62023de8d0968ad9bfaedd83b0"
+        "anchor_text_hash": "40dc60e9383fe78e784c70d0531f18bc574b03cbaa5710618f0fcdf56d3382f7"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "engine は argv を書き換えず、subcommand grammar や command の意味論を解釈しない。"
+        "citation": "methods: []"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -2969,11 +2825,11 @@
       "key": {
         "waived_reason_hash": "3c3f83e5a522d31157bfb1d6ad619ac2bc0f9af38a674e5cd80351f2480bb7cc",
         "declaration_hash": "3f47349b7f6f3606caf0ba5d851e11b4679c94ef9612598a5967ccabb62ad8ba",
-        "anchor_text_hash": "9e04804ce8a7fd2c873ad048240923655926a25e6a72b36ada8f4cac5887ddfe"
+        "anchor_text_hash": "fa7e4f00724359c580b35833faf745f970a7f203d8fbd44a502a13e850af54b9"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "\"phase と pre-review command は shell string ではなく literal argv として起動され\""
+        "citation": "methods: []"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -3478,6 +3334,174 @@
       "verdict": {
         "kind": "waived",
         "citation": "\"Transparent serde mirror for a task-contract track identifier (IN-07, AC-08).\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TrackIdDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TrackIdDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-08"
+      },
+      "key": {
+        "waived_reason_hash": "a5d2881ad3eaf00a4a2fd8f183b363509170950f11cb4015da3db2fcb52a2a21",
+        "declaration_hash": "579d39da8308c311b73fd80e09188a33478edce6d75780d7299da4755b279065",
+        "anchor_text_hash": "c6e5c18bf5cad17887f4e549819d0397ade7094237ea54caea13553e8d0be0c6"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Transparent serde mirror for a task-contract track identifier (IN-07, AC-08)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskIdDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskIdDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-07"
+      },
+      "key": {
+        "waived_reason_hash": "e05b5aa240321e22fcdb58b9f3c40c7f504950f923c50b8fe8b7131df132526d",
+        "declaration_hash": "e9b83ef0d9d6047fef81c585c83e0ffec044224c539aed4834ecf21b84796835",
+        "anchor_text_hash": "49ca0a9a32f87a071ed1596ecadc8dffc6f22a3356b5f7ac2972e8c40448c1a9"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"Transparent serde mirror for a task-contract task identifier (IN-07, AC-08).\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskIdDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskIdDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-08"
+      },
+      "key": {
+        "waived_reason_hash": "e05b5aa240321e22fcdb58b9f3c40c7f504950f923c50b8fe8b7131df132526d",
+        "declaration_hash": "e9b83ef0d9d6047fef81c585c83e0ffec044224c539aed4834ecf21b84796835",
+        "anchor_text_hash": "c6e5c18bf5cad17887f4e549819d0397ade7094237ea54caea13553e8d0be0c6"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Transparent serde mirror for a task-contract task identifier (IN-07, AC-08)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "LayerIdDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "LayerIdDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-07"
+      },
+      "key": {
+        "waived_reason_hash": "929476f9dede9e9c82029e0271fab24b245a5c86c73e750d597c7c81eeb145c0",
+        "declaration_hash": "0cca728621486453520c134be88d587478a3e1e2d9dab7a60c248e04bbde896a",
+        "anchor_text_hash": "49ca0a9a32f87a071ed1596ecadc8dffc6f22a3356b5f7ac2972e8c40448c1a9"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "task-contract の attribution target は catalogue entry のみとし、source-only baseline restoration、evidence/inspector eligibility、coverage/liveness carrier variant、および stale-carrier lifecycle を持ち込まない。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "LayerIdDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "LayerIdDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-08"
+      },
+      "key": {
+        "waived_reason_hash": "929476f9dede9e9c82029e0271fab24b245a5c86c73e750d597c7c81eeb145c0",
+        "declaration_hash": "0cca728621486453520c134be88d587478a3e1e2d9dab7a60c248e04bbde896a",
+        "anchor_text_hash": "c6e5c18bf5cad17887f4e549819d0397ade7094237ea54caea13553e8d0be0c6"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "shape: Tuple { fields: [TypeRef(\"String\")], has_stripped_fields: false }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "EntryKeyDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "EntryKeyDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-07"
+      },
+      "key": {
+        "waived_reason_hash": "140499a17b9413209c96d812d39720eca6ef2ee174de783e75f15345fb79b7ed",
+        "declaration_hash": "0e0bca880b2dbc2950950a3fa09c15614dd62a0a686893813b23116d660773cf",
+        "anchor_text_hash": "49ca0a9a32f87a071ed1596ecadc8dffc6f22a3356b5f7ac2972e8c40448c1a9"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "shape: Tuple { fields: [TypeRef(\"String\")], has_stripped_fields: false }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "EntryKeyDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "EntryKeyDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-08"
+      },
+      "key": {
+        "waived_reason_hash": "140499a17b9413209c96d812d39720eca6ef2ee174de783e75f15345fb79b7ed",
+        "declaration_hash": "0e0bca880b2dbc2950950a3fa09c15614dd62a0a686893813b23116d660773cf",
+        "anchor_text_hash": "c6e5c18bf5cad17887f4e549819d0397ade7094237ea54caea13553e8d0be0c6"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TypeEntry { action: Add, role: Dto, kind: Struct(StructKind { shape: Tuple { fields: [TypeRef(\"String\")], has_stripped_fields: false }, typestate: None }), methods: [], generics: [], where_predicates: [], module_path: ModulePath([Identifier(\"task_contract_codec\")]), docs: Some(DocString(\"Transparent serde mirror for a task-contract catalogue-entry key (IN-07, AC-08).\")), spec_refs: [SpecRef { file: \"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json\", anchor: SpecElementId(\"IN-07\") }, SpecRef { file: \"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json\", anchor: SpecElementId(\"AC-08\") }], informal_grounds: [] }"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     }

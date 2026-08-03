@@ -4,10 +4,10 @@
   "entries": [
     {
       "claim_hash": "53965b2bded41d104d5038c790fbfeb145bf55b3db89e6597eaaf7bc4779960f",
-      "evidence_hash": "095b31cc945d3cfcbc2ac864fb587beb77c392cce729b41f644e090f9b15b247",
+      "evidence_hash": "fcf6947ce3a1288ef78c920282154efdd8d7a5123976adbe3f41e1fd6b4540a2",
       "verdict": {
         "kind": "pass",
-        "citation": "engine は argv を書き換えず、subcommand grammar や command の意味論を解釈しない。"
+        "citation": "config author/operator は公開 `bin/sotp` command の有効性と順序を所有し、engine は config に保存・解決された literal argv を書き換えず、subcommand grammar や command の意味論を解釈しない。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -22,13 +22,13 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-03",
-          "text_label": "config author/operator は公開 `bin/sotp` command の有効性と順序を所有し、engine は argv を書き換えず、subcommand grammar や command の意味論を解釈しない。"
+          "text_label": "config author/operator は公開 `bin/sotp` command の有効性と順序を所有し、engine は config に保存・解決された literal argv を書き換えず、subcommand grammar や command の意味論を解釈しない。ただし D3 の dispatch boundary では、caller-supplied optional host が present の場合に限り configured writer の `capability exec` invocation の実行時 argv へその `--host` と値だけを追加できる。"
         }
       }
     },
     {
       "claim_hash": "53965b2bded41d104d5038c790fbfeb145bf55b3db89e6597eaaf7bc4779960f",
-      "evidence_hash": "f87e8ff7d7da562cae96c1f6a832bffa8a239b66f89d0ec235f63a79de07c4ef",
+      "evidence_hash": "eed55e184aa24849ff134ac46577b3efe86f7cc48072dacbfa95545682b2805d",
       "verdict": {
         "kind": "pass",
         "citation": "phase と pre-review command は shell string ではなく literal argv として起動され"
@@ -46,7 +46,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-04",
-          "text_label": "phase と pre-review command は shell string ではなく literal argv として起動され、shell interpolation、pipe、implicit `sh -c`、argv rewrite、または command semantic interpretation を経由しない。"
+          "text_label": "phase と pre-review command は shell string ではなく literal argv として起動され、shell interpolation、pipe、implicit `sh -c`、config に保存・解決された literal argv の rewrite、または command semantic interpretation を経由しない。ただし D3 により caller-supplied optional host が present の場合は、configured writer の `capability exec` invocation の dispatch boundary でその `--host` と値だけを実行時 argv に追加できる。"
         }
       }
     },
@@ -1060,10 +1060,10 @@
     },
     {
       "claim_hash": "5c49961aa67d03c8ec521e30c0867442ea951b7aa31ee3bb87a7c88b5bce8a88",
-      "evidence_hash": "095b31cc945d3cfcbc2ac864fb587beb77c392cce729b41f644e090f9b15b247",
+      "evidence_hash": "fcf6947ce3a1288ef78c920282154efdd8d7a5123976adbe3f41e1fd6b4540a2",
       "verdict": {
         "kind": "pass",
-        "citation": "config author/operator は公開 `bin/sotp` command の有効性と順序を所有し、engine は argv を書き換えず、subcommand grammar や command の意味論を解釈しない。"
+        "citation": "D3 の dispatch boundary では、caller-supplied optional host が present の場合に限り configured writer の `capability exec` invocation の実行時 argv へその `--host` と値だけを追加できる。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1078,7 +1078,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-03",
-          "text_label": "config author/operator は公開 `bin/sotp` command の有効性と順序を所有し、engine は argv を書き換えず、subcommand grammar や command の意味論を解釈しない。"
+          "text_label": "config author/operator は公開 `bin/sotp` command の有効性と順序を所有し、engine は config に保存・解決された literal argv を書き換えず、subcommand grammar や command の意味論を解釈しない。ただし D3 の dispatch boundary では、caller-supplied optional host が present の場合に限り configured writer の `capability exec` invocation の実行時 argv へその `--host` と値だけを追加できる。"
         }
       }
     },
@@ -1108,10 +1108,10 @@
     },
     {
       "claim_hash": "5c49961aa67d03c8ec521e30c0867442ea951b7aa31ee3bb87a7c88b5bce8a88",
-      "evidence_hash": "f87e8ff7d7da562cae96c1f6a832bffa8a239b66f89d0ec235f63a79de07c4ef",
+      "evidence_hash": "eed55e184aa24849ff134ac46577b3efe86f7cc48072dacbfa95545682b2805d",
       "verdict": {
         "kind": "pass",
-        "citation": "phase と pre-review command は shell string ではなく literal argv として起動され、shell interpolation、pipe、implicit `sh -c`、argv rewrite、または command semantic interpretation を経由しない。"
+        "citation": "phase と pre-review command は shell string ではなく literal argv として起動され、shell interpolation、pipe、implicit `sh -c`、config に保存・解決された literal argv の rewrite、または command semantic interpretation を経由しない。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1126,7 +1126,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-04",
-          "text_label": "phase と pre-review command は shell string ではなく literal argv として起動され、shell interpolation、pipe、implicit `sh -c`、argv rewrite、または command semantic interpretation を経由しない。"
+          "text_label": "phase と pre-review command は shell string ではなく literal argv として起動され、shell interpolation、pipe、implicit `sh -c`、config に保存・解決された literal argv の rewrite、または command semantic interpretation を経由しない。ただし D3 により caller-supplied optional host が present の場合は、configured writer の `capability exec` invocation の dispatch boundary でその `--host` と値だけを実行時 argv に追加できる。"
         }
       }
     },

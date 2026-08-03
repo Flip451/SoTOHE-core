@@ -3,28 +3,32 @@
   "functions": {
     "cli::commands::capability::into_driver_input": {
       "action": "modify",
-      "docs": "Modify capability driver-input mapping (IN-04, AC-03).",
+      "docs": "Capability argument-to-driver-input mapping with optional host field (IN-09, IN-10, AC-11, AC-12).",
       "informal_grounds": [],
       "is_async": false,
       "params": [
         {
           "name": "args",
           "ty": "CapabilityExecArgs"
-        },
-        {
-          "name": "host",
-          "ty": "cli_driver::capability::ProviderNameArg"
         }
       ],
       "returns": "cli_driver::capability::CapabilityExecDriverInput",
       "role": "FreeFunction",
       "spec_refs": [
         {
-          "anchor": "IN-04",
+          "anchor": "IN-09",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         },
         {
-          "anchor": "AC-03",
+          "anchor": "IN-10",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-11",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-12",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]
@@ -83,7 +87,7 @@
     },
     "cli::commands::phase::input_from_command": {
       "action": "add",
-      "docs": "Maps the CLI phase command DTO into the primary-adapter input without interpreting command semantics (IN-04, AC-03).",
+      "docs": "Phase-command input mapping with host-bearing Enter fields (IN-04, IN-11, AC-03, AC-13).",
       "informal_grounds": [],
       "is_async": false,
       "params": [
@@ -101,6 +105,14 @@
         },
         {
           "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-11",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-13",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]
@@ -176,13 +188,25 @@
     {
       "for_type": "PhaseIdArgs",
       "trait_ref": "clap_builder::derive::FromArgMatches"
+    },
+    {
+      "for_type": "PhaseEnterArgs",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "PhaseEnterArgs",
+      "trait_ref": "clap_builder::derive::Args"
+    },
+    {
+      "for_type": "PhaseEnterArgs",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
     }
   ],
   "traits": {},
   "types": {
     "CapabilityExecArgs": {
       "action": "modify",
-      "docs": "Modify capability-dispatch CLI arguments (IN-04, AC-03).",
+      "docs": "Capability-execution CLI arguments with optional host field (IN-09, IN-10, AC-11, AC-12).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -224,11 +248,19 @@
       },
       "spec_refs": [
         {
-          "anchor": "IN-04",
+          "anchor": "IN-09",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         },
         {
-          "anchor": "AC-03",
+          "anchor": "IN-10",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-11",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-12",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]
@@ -608,7 +640,7 @@
     },
     "PhaseCommand": {
       "action": "add",
-      "docs": "Public phase-command family (IN-04, AC-03).",
+      "docs": "Public phase-command family with enter-specific arguments (IN-04, IN-11, AC-03, AC-13).",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -635,7 +667,7 @@
             "name": "Enter",
             "payload": {
               "fields": [
-                "PhaseIdArgs"
+                "PhaseEnterArgs"
               ],
               "kind": "tuple"
             }
@@ -653,7 +685,64 @@
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         },
         {
+          "anchor": "IN-11",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
           "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-13",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PhaseEnterArgs": {
+      "action": "add",
+      "docs": "Phase-enter CLI arguments with optional host field (IN-04, IN-11, AC-02, AC-03, AC-13).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "phase_id",
+              "ty": "cli_driver::phase_command::PhaseIdArg"
+            },
+            {
+              "name": "host",
+              "ty": "Option<cli_driver::capability::ProviderNameArg>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "commands::phase",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-11",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-13",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]

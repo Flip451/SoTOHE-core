@@ -933,11 +933,11 @@
       "key": {
         "bound_tests_set_hash": "0c930024ec86c3958e8d18aa589c213c6795c87359dc1d83fbe9d5706c31745e",
         "declaration_hash": "33faedc0921bd162fd3083410d25118bc65909659fd2c2ba76f0bce05c1192c6",
-        "anchor_text_hash": "57cb8a46e67a19b841ffe81921fef96722df9c62023de8d0968ad9bfaedd83b0"
+        "anchor_text_hash": "40dc60e9383fe78e784c70d0531f18bc574b03cbaa5710618f0fcdf56d3382f7"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(output.stdout, b\"out; printf err >&2; exit 7\");"
+        "citation": "assert_eq!(output.stdout, b\"out; printf err >&2; exit 7\");\nassert!(output.stderr.is_empty());"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -1065,7 +1065,7 @@
       "key": {
         "bound_tests_set_hash": "0c930024ec86c3958e8d18aa589c213c6795c87359dc1d83fbe9d5706c31745e",
         "declaration_hash": "33faedc0921bd162fd3083410d25118bc65909659fd2c2ba76f0bce05c1192c6",
-        "anchor_text_hash": "9e04804ce8a7fd2c873ad048240923655926a25e6a72b36ada8f4cac5887ddfe"
+        "anchor_text_hash": "fa7e4f00724359c580b35833faf745f970a7f203d8fbd44a502a13e850af54b9"
       },
       "verdict": {
         "kind": "fulfilled",
@@ -1463,11 +1463,11 @@
       "key": {
         "bound_tests_set_hash": "0c930024ec86c3958e8d18aa589c213c6795c87359dc1d83fbe9d5706c31745e",
         "declaration_hash": "2166336660e38d526663b9e6fa468e181c1d94ae41911a2ca5bde3ce988f697e",
-        "anchor_text_hash": "57cb8a46e67a19b841ffe81921fef96722df9c62023de8d0968ad9bfaedd83b0"
+        "anchor_text_hash": "40dc60e9383fe78e784c70d0531f18bc574b03cbaa5710618f0fcdf56d3382f7"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(output.stdout, b\"out; printf err >&2; exit 7\");"
+        "citation": "assert_eq!(output.stdout, b\"out; printf err >&2; exit 7\");\n                assert!(output.stderr.is_empty());"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -1595,11 +1595,11 @@
       "key": {
         "bound_tests_set_hash": "0c930024ec86c3958e8d18aa589c213c6795c87359dc1d83fbe9d5706c31745e",
         "declaration_hash": "2166336660e38d526663b9e6fa468e181c1d94ae41911a2ca5bde3ce988f697e",
-        "anchor_text_hash": "9e04804ce8a7fd2c873ad048240923655926a25e6a72b36ada8f4cac5887ddfe"
+        "anchor_text_hash": "fa7e4f00724359c580b35833faf745f970a7f203d8fbd44a502a13e850af54b9"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(exit_code.as_i32(), 0);\n                assert_eq!(output.stdout, b\"out; printf err >&2; exit 7\");\n                assert!(output.stderr.is_empty());"
+        "citation": "assert_eq!(output.stdout, b\"out; printf err >&2; exit 7\");\n                assert!(output.stderr.is_empty());"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -1763,6 +1763,78 @@
         "entry_key": "CommandArgv",
         "anchor_id": {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandArgv",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "b4387be4757ad72fda7cd6fb3b79533ecf489be9c435be98b06da2d1dc5adc38",
+        "declaration_hash": "64763fa279fdc04aa7bbe9997855406d086b14fee38c4f18e4e0fc3579d19457",
+        "anchor_text_hash": "05b8094316a1aacabb4bec26100b679daf53d5554267297214266776d1838398"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            CommandArgv::try_new(empty_argv),\n            Err(CommandConfigValidationError::EmptyArgv)\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::operator_command::tests",
+          "test_name": "test_command_argv_empty_array_is_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::operator_command::tests",
+          "test_name": "test_command_argv_empty_arguments_is_rejected"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandArgv",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandArgv",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "5eb87cc3da284e47ef2d4ad2be85016e12c5fdf8ae04753d99da6ba1383a0905",
+        "declaration_hash": "64763fa279fdc04aa7bbe9997855406d086b14fee38c4f18e4e0fc3579d19457",
+        "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(values, [\"bin/sotp\", \"signal\", \"check\"]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::operator_command::tests",
+          "test_name": "test_command_argument_preserves_empty_literal_and_argv_order"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::operator_command::tests",
+          "test_name": "test_command_argv_appends_arguments_without_changing_prefix"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandArgv",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "CN-01"
         }
       },
@@ -1827,32 +1899,63 @@
     },
     {
       "edge_id": {
-        "entry_key": "CommandArgvDto",
+        "entry_key": "CommandConfigSchemaVersion",
         "anchor_id": {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "AC-01"
         }
       },
       "obligation_id": {
-        "entry_key": "CommandArgvDto",
+        "entry_key": "CommandConfigSchemaVersion",
         "obligation_kind": "logic",
         "item_identifier": "voluntary:AC-01"
       },
       "key": {
-        "bound_tests_set_hash": "35475b5071691a033f3db8dd2f8cc15c6e322ce08497eaab6bf51a15924d9ee5",
-        "declaration_hash": "049e287880d9751a457908056a9f12c8af80d3e8120b6bfab7ebc1ebb0a7a707",
+        "bound_tests_set_hash": "a0eea3c61eb8ef0ff85937861858cd2c54d8802218964c54f64ca85ef06f1254",
+        "declaration_hash": "a64d33952293f5b8146b53e2893a4089614178fc766bdfff99ae716a79cb3207",
         "anchor_text_hash": "05b8094316a1aacabb4bec26100b679daf53d5554267297214266776d1838398"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let dto: CommandArgvDto =\n            serde_json::from_str(r#\"[\"bin/sotp\",\"task-contract\",\"check\"]\"#).unwrap();\n        let values: Vec<&str> =\n            dto.arguments.iter().map(|argument| argument.value.as_str()).collect();\n        assert_eq!(values, [\"bin/sotp\", \"task-contract\", \"check\"]);"
+        "citation": "assert!(CommandConfigSchemaVersion::new(1).validate().is_ok());\n        assert!(matches!(\n            CommandConfigSchemaVersion::new(2).validate(),\n            Err(CommandConfigValidationError::InvalidSchemaVersion { .. })\n        ));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
         {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::operator_command_config::tests",
-          "test_name": "test_command_argv_dto_deserialization_preserves_argument_order"
+          "layer": "usecase",
+          "module_path": "usecase::operator_command::tests",
+          "test_name": "test_declaration_id_empty_value_and_schema_version_validation_are_explicit"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandConfigSchemaVersion",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandConfigSchemaVersion",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "a0eea3c61eb8ef0ff85937861858cd2c54d8802218964c54f64ca85ef06f1254",
+        "declaration_hash": "a64d33952293f5b8146b53e2893a4089614178fc766bdfff99ae716a79cb3207",
+        "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(CommandConfigSchemaVersion::new(1).validate().is_ok());\n        assert!(matches!(\n            CommandConfigSchemaVersion::new(2).validate(),\n            Err(CommandConfigValidationError::InvalidSchemaVersion { .. })\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::operator_command::tests",
+          "test_name": "test_declaration_id_empty_value_and_schema_version_validation_are_explicit"
         }
       ]
     },
@@ -1959,6 +2062,37 @@
         "entry_key": "CommandTimeoutValidationError",
         "anchor_id": {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandTimeoutValidationError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "1c5ac29682749785c041ce0239561373d95e4bec791866542c13fa6cc6f066ad",
+        "declaration_hash": "7383e09944b2f5f80f542f6b150cdd8cd7373a60d129aa0cf42e8cf53698acc5",
+        "anchor_text_hash": "05b8094316a1aacabb4bec26100b679daf53d5554267297214266776d1838398"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(zero, Err(CommandConfigValidationError::TimeoutOutOfRange { .. }))); \n        match CommandTimeoutSeconds::try_new(UnvalidatedTimeoutSeconds::new(3_601)) {\n            Err(CommandConfigValidationError::TimeoutOutOfRange { seconds }) => {\n                assert_eq!(seconds.as_u64(), 3_601);\n            }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::operator_command::tests",
+          "test_name": "test_command_timeout_bounds_and_error_value_are_preserved"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandTimeoutValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "AC-03"
         }
       },
@@ -1982,6 +2116,78 @@
           "layer": "usecase",
           "module_path": "usecase::operator_command::tests",
           "test_name": "test_command_timeout_bounds_and_error_value_are_preserved"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ContractedEntryRefDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ContractedEntryRefDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-08"
+      },
+      "key": {
+        "bound_tests_set_hash": "948c4f04dd5cf172a380320c722f93159b42b31063af8fb01f40b82256fa3e14",
+        "declaration_hash": "0750e0530c006366b08c29a17ecd4a0c4370a3d587c815a7a556e1191407ba12",
+        "anchor_text_hash": "c6e5c18bf5cad17887f4e549819d0397ade7094237ea54caea13553e8d0be0c6"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(decode(json.as_bytes()), Err(TaskContractCodecError::Json(_))));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::task_contract_codec::tests",
+          "test_name": "test_decode_rejects_carrier_variant_attribution_targets"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::task_contract_codec::tests",
+          "test_name": "test_decode_rejects_eligibility_and_stale_lifecycle_attribution_targets"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ContractedEntryRefDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ContractedEntryRefDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "948c4f04dd5cf172a380320c722f93159b42b31063af8fb01f40b82256fa3e14",
+        "declaration_hash": "0750e0530c006366b08c29a17ecd4a0c4370a3d587c815a7a556e1191407ba12",
+        "anchor_text_hash": "49ca0a9a32f87a071ed1596ecadc8dffc6f22a3356b5f7ac2972e8c40448c1a9"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(decode(json.as_bytes()), Err(TaskContractCodecError::Json(_))));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::task_contract_codec::tests",
+          "test_name": "test_decode_rejects_carrier_variant_attribution_targets"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::task_contract_codec::tests",
+          "test_name": "test_decode_rejects_eligibility_and_stale_lifecycle_attribution_targets"
         }
       ]
     },
@@ -2018,323 +2224,567 @@
     },
     {
       "edge_id": {
-        "entry_key": "TrackIdDto",
+        "entry_key": "cli::commands::capability::into_driver_input",
         "anchor_id": {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-08"
+          "element_id": "IN-09"
         }
       },
       "obligation_id": {
-        "entry_key": "TrackIdDto",
+        "entry_key": "cli::commands::capability::into_driver_input",
         "obligation_kind": "logic",
-        "item_identifier": "voluntary:AC-08"
+        "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "95225e14b20d002da5921342385d5ec4cd7ab87a1b4812bef45b64f645bf9f5c",
-        "declaration_hash": "579d39da8308c311b73fd80e09188a33478edce6d75780d7299da4755b279065",
-        "anchor_text_hash": "c6e5c18bf5cad17887f4e549819d0397ade7094237ea54caea13553e8d0be0c6"
+        "bound_tests_set_hash": "e9dc8b7b710b231affb1df1c703342c191e3c16408298dd6f157ff58fd025ef8",
+        "declaration_hash": "8f998970f4e344ec3c63f9aceed655d8f3880c347b2af3f6a13ebbaf1b62e54b",
+        "anchor_text_hash": "05ea8088255b796489dee4442970e0fc05d12a1da87c3d4c89697e81fa8e0fa0"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(decode(json.as_bytes()), Err(TaskContractCodecError::Json(_))));"
+        "citation": "assert_eq!(input.host, None);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
         {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::task_contract_codec::tests",
-          "test_name": "test_track_id_dto_round_trips_domain_invalid_string_without_validation"
+          "layer": "cli",
+          "module_path": "cli::commands::capability::tests",
+          "test_name": "test_capability_exec_preserves_omitted_host_in_driver_input"
         },
         {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::task_contract_codec::tests",
-          "test_name": "decode_maps_domain_identifier_rejections_to_validation_errors"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::task_contract_codec::tests",
-          "test_name": "test_decode_rejects_carrier_variant_attribution_targets"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::task_contract_codec::tests",
-          "test_name": "test_decode_rejects_eligibility_and_stale_lifecycle_attribution_targets"
+          "layer": "cli",
+          "module_path": "cli::commands::capability::tests",
+          "test_name": "test_capability_exec_preserves_supplied_host_in_driver_input"
         }
       ]
     },
     {
       "edge_id": {
-        "entry_key": "TaskIdDto",
+        "entry_key": "cli::commands::capability::into_driver_input",
         "anchor_id": {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-07"
+          "element_id": "IN-10"
         }
       },
       "obligation_id": {
-        "entry_key": "TaskIdDto",
+        "entry_key": "cli::commands::capability::into_driver_input",
         "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-07"
+        "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "d2571c7cb7265b4ae40eba289f91740771e447c0e97dbe194893085b89def178",
-        "declaration_hash": "e9b83ef0d9d6047fef81c585c83e0ffec044224c539aed4834ecf21b84796835",
-        "anchor_text_hash": "49ca0a9a32f87a071ed1596ecadc8dffc6f22a3356b5f7ac2972e8c40448c1a9"
+        "bound_tests_set_hash": "e9dc8b7b710b231affb1df1c703342c191e3c16408298dd6f157ff58fd025ef8",
+        "declaration_hash": "8f998970f4e344ec3c63f9aceed655d8f3880c347b2af3f6a13ebbaf1b62e54b",
+        "anchor_text_hash": "98593df0dcc7f6fc5ea1d4d328177faf5ff342ee6cf80687c918ded1bada6718"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let dto: TaskIdDto = serde_json::from_str(r#\"\"invalid task id\"\"#).unwrap();\n\n        assert_eq!(dto, TaskIdDto(raw.to_owned()));\n        assert_eq!(serde_json::to_string(&dto).unwrap(), r#\"\"invalid task id\"\"#);"
+        "citation": "assert_eq!(\n            input.host,\n            Some(\"codex\".parse::<ProviderNameArg>().expect(\"valid test provider\"))\n        );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
         {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::task_contract_codec::tests",
-          "test_name": "test_task_id_dto_round_trips_domain_invalid_string_without_validation"
+          "layer": "cli",
+          "module_path": "cli::commands::capability::tests",
+          "test_name": "test_capability_exec_preserves_omitted_host_in_driver_input"
         },
         {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::task_contract_codec::tests",
-          "test_name": "decode_maps_domain_identifier_rejections_to_validation_errors"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::task_contract_codec::tests",
-          "test_name": "test_decode_rejects_carrier_variant_attribution_targets"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::task_contract_codec::tests",
-          "test_name": "test_decode_rejects_eligibility_and_stale_lifecycle_attribution_targets"
+          "layer": "cli",
+          "module_path": "cli::commands::capability::tests",
+          "test_name": "test_capability_exec_preserves_supplied_host_in_driver_input"
         }
       ]
     },
     {
       "edge_id": {
-        "entry_key": "TaskIdDto",
+        "entry_key": "cli::commands::capability::into_driver_input",
         "anchor_id": {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-08"
+          "element_id": "AC-11"
         }
       },
       "obligation_id": {
-        "entry_key": "TaskIdDto",
+        "entry_key": "cli::commands::capability::into_driver_input",
         "obligation_kind": "logic",
-        "item_identifier": "voluntary:AC-08"
+        "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "d2571c7cb7265b4ae40eba289f91740771e447c0e97dbe194893085b89def178",
-        "declaration_hash": "e9b83ef0d9d6047fef81c585c83e0ffec044224c539aed4834ecf21b84796835",
-        "anchor_text_hash": "c6e5c18bf5cad17887f4e549819d0397ade7094237ea54caea13553e8d0be0c6"
+        "bound_tests_set_hash": "e9dc8b7b710b231affb1df1c703342c191e3c16408298dd6f157ff58fd025ef8",
+        "declaration_hash": "8f998970f4e344ec3c63f9aceed655d8f3880c347b2af3f6a13ebbaf1b62e54b",
+        "anchor_text_hash": "5e9d6e232d0a900415ec68372cf6b51463d576a1f9be6cc6e7800723165cd4be"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(decode(json.as_bytes()), Err(TaskContractCodecError::Json(_))));"
+        "citation": "assert_eq!(input.host, None);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
         {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::task_contract_codec::tests",
-          "test_name": "test_task_id_dto_round_trips_domain_invalid_string_without_validation"
+          "layer": "cli",
+          "module_path": "cli::commands::capability::tests",
+          "test_name": "test_capability_exec_preserves_omitted_host_in_driver_input"
         },
         {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::task_contract_codec::tests",
-          "test_name": "decode_maps_domain_identifier_rejections_to_validation_errors"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::task_contract_codec::tests",
-          "test_name": "test_decode_rejects_carrier_variant_attribution_targets"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::task_contract_codec::tests",
-          "test_name": "test_decode_rejects_eligibility_and_stale_lifecycle_attribution_targets"
+          "layer": "cli",
+          "module_path": "cli::commands::capability::tests",
+          "test_name": "test_capability_exec_preserves_supplied_host_in_driver_input"
         }
       ]
     },
     {
       "edge_id": {
-        "entry_key": "LayerIdDto",
+        "entry_key": "cli::commands::capability::into_driver_input",
         "anchor_id": {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-07"
+          "element_id": "AC-12"
         }
       },
       "obligation_id": {
-        "entry_key": "LayerIdDto",
+        "entry_key": "cli::commands::capability::into_driver_input",
         "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-07"
+        "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "2419fa314ccb0bd92118f90a3be10aa73e999b4bbbdc1e96896544f8e72fe7cb",
-        "declaration_hash": "0cca728621486453520c134be88d587478a3e1e2d9dab7a60c248e04bbde896a",
-        "anchor_text_hash": "49ca0a9a32f87a071ed1596ecadc8dffc6f22a3356b5f7ac2972e8c40448c1a9"
+        "bound_tests_set_hash": "e9dc8b7b710b231affb1df1c703342c191e3c16408298dd6f157ff58fd025ef8",
+        "declaration_hash": "8f998970f4e344ec3c63f9aceed655d8f3880c347b2af3f6a13ebbaf1b62e54b",
+        "anchor_text_hash": "6f504ab46c4ee9db049ec0a7da9fac7497f9dd752b32c265a9b769659b11e026"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "        let raw = \"invalid layer\";\n        let dto: LayerIdDto = serde_json::from_str(r#\"\"invalid layer\"\"#).unwrap();\n\n        assert_eq!(dto, LayerIdDto(raw.to_owned()));\n        assert_eq!(serde_json::to_string(&dto).unwrap(), r#\"\"invalid layer\"\"#);"
+        "citation": "assert_eq!(\n            input.host,\n            Some(\"codex\".parse::<ProviderNameArg>().expect(\"valid test provider\"))\n        );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
         {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::task_contract_codec::tests",
-          "test_name": "test_layer_id_dto_round_trips_domain_invalid_string_without_validation"
+          "layer": "cli",
+          "module_path": "cli::commands::capability::tests",
+          "test_name": "test_capability_exec_preserves_omitted_host_in_driver_input"
         },
         {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::task_contract_codec::tests",
-          "test_name": "decode_maps_domain_identifier_rejections_to_validation_errors"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::task_contract_codec::tests",
-          "test_name": "test_decode_rejects_carrier_variant_attribution_targets"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::task_contract_codec::tests",
-          "test_name": "test_decode_rejects_eligibility_and_stale_lifecycle_attribution_targets"
+          "layer": "cli",
+          "module_path": "cli::commands::capability::tests",
+          "test_name": "test_capability_exec_preserves_supplied_host_in_driver_input"
         }
       ]
     },
     {
       "edge_id": {
-        "entry_key": "LayerIdDto",
+        "entry_key": "CapabilityExecRequest",
         "anchor_id": {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-08"
+          "element_id": "IN-09"
         }
       },
       "obligation_id": {
-        "entry_key": "LayerIdDto",
+        "entry_key": "CapabilityExecRequest",
         "obligation_kind": "logic",
-        "item_identifier": "voluntary:AC-08"
+        "item_identifier": "voluntary:IN-09"
       },
       "key": {
-        "bound_tests_set_hash": "2419fa314ccb0bd92118f90a3be10aa73e999b4bbbdc1e96896544f8e72fe7cb",
-        "declaration_hash": "0cca728621486453520c134be88d587478a3e1e2d9dab7a60c248e04bbde896a",
-        "anchor_text_hash": "c6e5c18bf5cad17887f4e549819d0397ade7094237ea54caea13553e8d0be0c6"
+        "bound_tests_set_hash": "2112a16818355ddcc28d31d065e9f2f3eeebfdeb32b36f25a6d0358dd6567019",
+        "declaration_hash": "351f9342def0052e6f49d34369352555ec5fec8d884992468d87d2303a202e9d",
+        "anchor_text_hash": "05ea8088255b796489dee4442970e0fc05d12a1da87c3d4c89697e81fa8e0fa0"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(decode(json.as_bytes()), Err(TaskContractCodecError::Json(_))));"
+        "citation": "assert!(!output.contains(\"delegate-in-host\"));\nassert!(output.contains(\"provider: claude\"));\nassert_eq!(outcome.exit_code, 23);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
         {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::task_contract_codec::tests",
-          "test_name": "test_layer_id_dto_round_trips_domain_invalid_string_without_validation"
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_omitted_host_dispatches_to_requested_capability_provider"
         },
         {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::task_contract_codec::tests",
-          "test_name": "decode_maps_domain_identifier_rejections_to_validation_errors"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::task_contract_codec::tests",
-          "test_name": "test_decode_rejects_carrier_variant_attribution_targets"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::task_contract_codec::tests",
-          "test_name": "test_decode_rejects_eligibility_and_stale_lifecycle_attribution_targets"
+          "layer": "cli_composition",
+          "module_path": "cli_composition::capability::tests",
+          "test_name": "test_capability_composition_root_omitted_host_executes_requested_provider_subprocess"
         }
       ]
     },
     {
       "edge_id": {
-        "entry_key": "EntryKeyDto",
+        "entry_key": "CapabilityExecRequest",
         "anchor_id": {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-07"
+          "element_id": "IN-10"
         }
       },
       "obligation_id": {
-        "entry_key": "EntryKeyDto",
+        "entry_key": "CapabilityExecRequest",
         "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-07"
+        "item_identifier": "voluntary:IN-10"
       },
       "key": {
-        "bound_tests_set_hash": "ec9c9506480e605072cdc8f0a7432b7ed9db5c3d94c1a117ade227c24418cc03",
-        "declaration_hash": "0e0bca880b2dbc2950950a3fa09c15614dd62a0a686893813b23116d660773cf",
-        "anchor_text_hash": "49ca0a9a32f87a071ed1596ecadc8dffc6f22a3356b5f7ac2972e8c40448c1a9"
+        "bound_tests_set_hash": "49d1e691437131d7e2fa33948b6ce4e3f874fb75007e3ada08779d8fe6d55845",
+        "declaration_hash": "351f9342def0052e6f49d34369352555ec5fec8d884992468d87d2303a202e9d",
+        "anchor_text_hash": "98593df0dcc7f6fc5ea1d4d328177faf5ff342ee6cf80687c918ded1bada6718"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let dto: EntryKeyDto = serde_json::from_str(r#\"\" \"\"#).unwrap();\n\n        assert_eq!(dto, EntryKeyDto(raw.to_owned()));\n        assert_eq!(serde_json::to_string(&dto).unwrap(), r#\"\" \"\"#);"
+        "citation": "assert_eq!(recorded[0].request.host.as_ref().map(ProviderName::as_str), Some(\"codex\"));\n        assert_eq!(recorded[0].profile.provider.as_str(), \"claude\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
         {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::task_contract_codec::tests",
-          "test_name": "test_entry_key_dto_round_trips_domain_invalid_string_without_validation"
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_preserves_explicit_mismatched_host_for_selected_provider"
         },
         {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::task_contract_codec::tests",
-          "test_name": "decode_maps_domain_identifier_rejections_to_validation_errors"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::task_contract_codec::tests",
-          "test_name": "test_decode_rejects_carrier_variant_attribution_targets"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::task_contract_codec::tests",
-          "test_name": "test_decode_rejects_eligibility_and_stale_lifecycle_attribution_targets"
+          "layer": "cli_composition",
+          "module_path": "cli_composition::capability::tests",
+          "test_name": "test_capability_composition_root_dispatches_valid_claude_host_in_process"
         }
       ]
     },
     {
       "edge_id": {
-        "entry_key": "EntryKeyDto",
+        "entry_key": "CapabilityExecRequest",
         "anchor_id": {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-08"
+          "element_id": "AC-11"
         }
       },
       "obligation_id": {
-        "entry_key": "EntryKeyDto",
+        "entry_key": "CapabilityExecRequest",
         "obligation_kind": "logic",
-        "item_identifier": "voluntary:AC-08"
+        "item_identifier": "voluntary:AC-11"
       },
       "key": {
-        "bound_tests_set_hash": "ec9c9506480e605072cdc8f0a7432b7ed9db5c3d94c1a117ade227c24418cc03",
-        "declaration_hash": "0e0bca880b2dbc2950950a3fa09c15614dd62a0a686893813b23116d660773cf",
-        "anchor_text_hash": "c6e5c18bf5cad17887f4e549819d0397ade7094237ea54caea13553e8d0be0c6"
+        "bound_tests_set_hash": "45d9ced260bf5950ee75588a132d3a2000673c957e0b99d6f7f83f626fffc08b",
+        "declaration_hash": "351f9342def0052e6f49d34369352555ec5fec8d884992468d87d2303a202e9d",
+        "anchor_text_hash": "5e9d6e232d0a900415ec68372cf6b51463d576a1f9be6cc6e7800723165cd4be"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(dto, EntryKeyDto(raw.to_owned()));\n        assert_eq!(serde_json::to_string(&dto).unwrap(), r#\"\" \"#);"
+        "citation": "assert!(output.contains(\"CAPABILITY_EXEC_OUTCOME: executed\"));\n        assert!(output.contains(\"provider: claude\"));\n        assert!(!output.contains(\"delegate-in-host\"));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
         {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::task_contract_codec::tests",
-          "test_name": "test_entry_key_dto_round_trips_domain_invalid_string_without_validation"
+          "layer": "cli_composition",
+          "module_path": "cli_composition::capability::tests",
+          "test_name": "test_capability_composition_root_omitted_host_executes_requested_provider_subprocess"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityExecRequest",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-12"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityExecRequest",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-12"
+      },
+      "key": {
+        "bound_tests_set_hash": "babdf665e1dafb7bfb4b22610d332c1e94c42cd73840738f9998a5f2d844168b",
+        "declaration_hash": "351f9342def0052e6f49d34369352555ec5fec8d884992468d87d2303a202e9d",
+        "anchor_text_hash": "6f504ab46c4ee9db049ec0a7da9fac7497f9dd752b32c265a9b769659b11e026"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(recorded[0].request.host.as_ref().map(ProviderName::as_str), Some(\"codex\"));\nassert!(output.contains(\"CAPABILITY_EXEC_OUTCOME: delegate-in-host\"));\nassert!(output.contains(\"capability: implementer\"));\nassert!(output.contains(\"briefing_file: tmp/briefing.md\"));\nassert!(output.contains(\"Do not stage changes.\"));\nassert_eq!(outcome.exit_code, 23);\nassert!(!output.contains(\"delegate-in-host\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_preserves_explicit_mismatched_host_for_selected_provider"
         },
         {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::task_contract_codec::tests",
-          "test_name": "decode_maps_domain_identifier_rejections_to_validation_errors"
+          "layer": "cli_composition",
+          "module_path": "cli_composition::capability::tests",
+          "test_name": "test_capability_composition_root_dispatches_valid_claude_host_in_process"
         },
         {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::task_contract_codec::tests",
-          "test_name": "test_decode_rejects_carrier_variant_attribution_targets"
+          "layer": "cli_composition",
+          "module_path": "cli_composition::capability::tests",
+          "test_name": "test_capability_composition_root_explicit_mismatched_host_executes_subprocess"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityExecDriverInput",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityExecDriverInput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-09"
+      },
+      "key": {
+        "bound_tests_set_hash": "12fa9addd13395237997c80e6d94012a9989f88ce222b792bb6cc9a0ba3b0fa6",
+        "declaration_hash": "05d785ced5a88aa6853914df0edd8de8cab0a0d35581e93eb617008de6682239",
+        "anchor_text_hash": "05ea8088255b796489dee4442970e0fc05d12a1da87c3d4c89697e81fa8e0fa0"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(request.host, None);\nassert!(output.contains(\"provider: claude\"));\nassert!(!output.contains(\"delegate-in-host\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::capability::tests",
+          "test_name": "test_capability_driver_preserves_omitted_host_in_request"
         },
         {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::task_contract_codec::tests",
-          "test_name": "test_decode_rejects_eligibility_and_stale_lifecycle_attribution_targets"
+          "layer": "cli_composition",
+          "module_path": "cli_composition::capability::tests",
+          "test_name": "test_capability_composition_root_omitted_host_executes_requested_provider_subprocess"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityExecDriverInput",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityExecDriverInput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-10"
+      },
+      "key": {
+        "bound_tests_set_hash": "dfef2cd4d39817ef84669afe2f6a2823aa642febba1fec724dd0cad59ef7b28c",
+        "declaration_hash": "05d785ced5a88aa6853914df0edd8de8cab0a0d35581e93eb617008de6682239",
+        "anchor_text_hash": "98593df0dcc7f6fc5ea1d4d328177faf5ff342ee6cf80687c918ded1bada6718"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(request.host.as_ref().map(ProviderName::as_str), Some(\"codex\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::capability::tests",
+          "test_name": "test_capability_driver_preserves_explicit_host_without_profile_normalization"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityExecDriverInput",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-11"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityExecDriverInput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-11"
+      },
+      "key": {
+        "bound_tests_set_hash": "12fa9addd13395237997c80e6d94012a9989f88ce222b792bb6cc9a0ba3b0fa6",
+        "declaration_hash": "05d785ced5a88aa6853914df0edd8de8cab0a0d35581e93eb617008de6682239",
+        "anchor_text_hash": "5e9d6e232d0a900415ec68372cf6b51463d576a1f9be6cc6e7800723165cd4be"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let outcome = root.capability_driver().handle(input_without_host(\"implementer\")); ... assert!(output.contains(\"provider: claude\")); assert!(!output.contains(\"delegate-in-host\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::capability::tests",
+          "test_name": "test_capability_driver_preserves_omitted_host_in_request"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::capability::tests",
+          "test_name": "test_capability_composition_root_omitted_host_executes_requested_provider_subprocess"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityExecDriverInput",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-12"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityExecDriverInput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-12"
+      },
+      "key": {
+        "bound_tests_set_hash": "3016d89507bd25dbf2f3bbdb982dc52e33e93fa9aa67b7fdb661020b6f7b57ef",
+        "declaration_hash": "05d785ced5a88aa6853914df0edd8de8cab0a0d35581e93eb617008de6682239",
+        "anchor_text_hash": "6f504ab46c4ee9db049ec0a7da9fac7497f9dd752b32c265a9b769659b11e026"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(request.host.as_ref().map(ProviderName::as_str), Some(\"codex\"));\n\nassert!(output.contains(\"CAPABILITY_EXEC_OUTCOME: delegate-in-host\"));\n\nassert!(!output.contains(\"delegate-in-host\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::capability::tests",
+          "test_name": "test_capability_driver_preserves_explicit_host_without_profile_normalization"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::capability::tests",
+          "test_name": "test_capability_composition_root_dispatches_valid_claude_host_in_process"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::capability::tests",
+          "test_name": "test_capability_composition_root_explicit_mismatched_host_executes_subprocess"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityExecArgs",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityExecArgs",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-09"
+      },
+      "key": {
+        "bound_tests_set_hash": "de7d2d3bac7bff169073a7fbf60865e819b0f685547eff8e5bc7d1d2c7937fc2",
+        "declaration_hash": "8ae2a019bb054b2960c051ca8be29daa8603bd2f220e576217a1a3b01df4e442",
+        "anchor_text_hash": "05ea8088255b796489dee4442970e0fc05d12a1da87c3d4c89697e81fa8e0fa0"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(input.host, None);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::capability::tests",
+          "test_name": "test_capability_exec_preserves_omitted_host_in_driver_input"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityExecArgs",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityExecArgs",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-10"
+      },
+      "key": {
+        "bound_tests_set_hash": "431878cef191d91a0747df6fe5ca7cc562cf42061884efe66b3353f205920d0b",
+        "declaration_hash": "8ae2a019bb054b2960c051ca8be29daa8603bd2f220e576217a1a3b01df4e442",
+        "anchor_text_hash": "98593df0dcc7f6fc5ea1d4d328177faf5ff342ee6cf80687c918ded1bada6718"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            input.host,\n            Some(\"codex\".parse::<ProviderNameArg>().expect(\"valid test provider\"))\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::capability::tests",
+          "test_name": "test_capability_exec_preserves_supplied_host_in_driver_input"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityExecArgs",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-11"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityExecArgs",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-11"
+      },
+      "key": {
+        "bound_tests_set_hash": "1a6b625c6af741f66313f0f65e98711e283d28a9f65cef5b29749c8056e062e1",
+        "declaration_hash": "8ae2a019bb054b2960c051ca8be29daa8603bd2f220e576217a1a3b01df4e442",
+        "anchor_text_hash": "5e9d6e232d0a900415ec68372cf6b51463d576a1f9be6cc6e7800723165cd4be"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(input.host, None); ... assert!(output.contains(\"CAPABILITY_EXEC_OUTCOME: executed\")); ... assert!(output.contains(\"provider: claude\")); ... assert!(!output.contains(\"delegate-in-host\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::capability::tests",
+          "test_name": "test_capability_exec_preserves_omitted_host_in_driver_input"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::capability::tests",
+          "test_name": "test_capability_composition_root_omitted_host_executes_requested_provider_subprocess"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityExecArgs",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-12"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityExecArgs",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-12"
+      },
+      "key": {
+        "bound_tests_set_hash": "42f31837f256baad6d626677197cebd4b761c9b1095370f7ce65ff4ccfb548eb",
+        "declaration_hash": "8ae2a019bb054b2960c051ca8be29daa8603bd2f220e576217a1a3b01df4e442",
+        "anchor_text_hash": "6f504ab46c4ee9db049ec0a7da9fac7497f9dd752b32c265a9b769659b11e026"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            input.host,\n            Some(\"codex\".parse::<ProviderNameArg>().expect(\"valid test provider\"))\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::capability::tests",
+          "test_name": "test_capability_exec_preserves_supplied_host_in_driver_input"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::capability::tests",
+          "test_name": "test_capability_composition_root_dispatches_valid_claude_host_in_process"
         }
       ]
     }

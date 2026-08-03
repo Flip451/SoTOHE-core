@@ -10,6 +10,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
+| CapabilityExecDriverInput | dto | modify | — | 🔵 | 🔵 |
 | CommandOutcome | dto | reference | — | 🔵 | 🔵 |
 | PhaseIdArg | dto | add | — | 🟡 | 🔵 |
 
@@ -17,5 +18,6 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
+| CapabilityDriver | primary_adapter | reference | — | 🔵 | 🔵 |
 | PhaseCommandDriver | primary_adapter | add | — | 🟡 | 🔵 |
 

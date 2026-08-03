@@ -125,7 +125,9 @@
       {"layer": "cli_driver", "entry_key": "PhaseIdArg"}
     ],
     "T031": [
+      {"layer": "cli", "entry_key": "CliCommand"},
       {"layer": "cli", "entry_key": "PhaseCommand"},
+      {"layer": "cli", "entry_key": "PhaseEnterArgs"},
       {"layer": "cli", "entry_key": "PhaseIdArgs"},
       {"layer": "cli", "entry_key": "PhaseValidateArgs"},
       {"layer": "cli", "entry_key": "cli::commands::phase::execute"},
@@ -133,9 +135,13 @@
       {"layer": "cli", "entry_key": "cli::commands::phase::input_from_command"}
     ],
     "T032": [
-      {"layer": "cli_composition", "entry_key": "PhaseCompositionRoot"},
+      {"layer": "usecase", "entry_key": "CapabilityExecRequest"},
+      {"layer": "usecase", "entry_key": "CapabilityExecInteractor"},
+      {"layer": "usecase", "entry_key": "CapabilityExecService"},
+      {"layer": "cli_driver", "entry_key": "CapabilityExecDriverInput"},
+      {"layer": "cli_driver", "entry_key": "CapabilityDriver"},
+      {"layer": "cli_composition", "entry_key": "CapabilityCompositionRoot"},
       {"layer": "cli", "entry_key": "CapabilityExecArgs"},
-      {"layer": "cli", "entry_key": "CliCommand"},
       {"layer": "cli", "entry_key": "cli::commands::capability::into_driver_input"}
     ],
     "T034": [
@@ -149,6 +155,9 @@
       {"layer": "usecase", "entry_key": "PhaseCommandInteractor"},
       {"layer": "usecase", "entry_key": "PhaseCommandService"},
       {"layer": "usecase", "entry_key": "PhaseEnterCommand"}
+    ],
+    "T036": [
+      {"layer": "cli_composition", "entry_key": "PhaseCompositionRoot"}
     ]
   }
 }

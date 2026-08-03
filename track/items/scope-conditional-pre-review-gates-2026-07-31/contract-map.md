@@ -84,6 +84,23 @@ subgraph domain["domain"]
 end
 subgraph usecase["usecase"]
   direction TB
+  subgraph usecase_usecase_module_capability_exec["usecase::capability_exec"]
+    direction TB
+  subgraph T40_usecase_usecase_CapabilityExecInteractor["capability_exec::CapabilityExecInteractor"]
+    direction TB
+    T40_usecase_usecase_CapabilityExecInteractor__self[CapabilityExecInteractor]
+    T40_usecase_usecase_CapabilityExecInteractor_new([new])
+  end
+  subgraph T37_usecase_usecase_CapabilityExecRequest["capability_exec::CapabilityExecRequest"]
+    direction TB
+    T37_usecase_usecase_CapabilityExecRequest__self[CapabilityExecRequest]
+  end
+  subgraph R37_usecase_usecase_CapabilityExecService["capability_exec::CapabilityExecService"]
+    direction TB
+    R37_usecase_usecase_CapabilityExecService__self[CapabilityExecService]
+    R37_usecase_usecase_CapabilityExecService_execute([execute])
+  end
+  end
   subgraph usecase_usecase_module_operator_command["usecase::operator_command"]
     direction TB
   subgraph T31_usecase_usecase_CommandArgument["operator_command::CommandArgument"]
@@ -510,6 +527,19 @@ subgraph infrastructure["infrastructure"]
 end
 subgraph cli_driver["cli_driver"]
   direction TB
+  subgraph cli_driver_cli_driver_module_capability["cli_driver::capability"]
+    direction TB
+  subgraph T38_cli_driver_cli_driver_CapabilityDriver["capability::CapabilityDriver"]
+    direction TB
+    T38_cli_driver_cli_driver_CapabilityDriver__self[CapabilityDriver]
+    T38_cli_driver_cli_driver_CapabilityDriver_new([new])
+    T38_cli_driver_cli_driver_CapabilityDriver_handle([handle])
+  end
+  subgraph T47_cli_driver_cli_driver_CapabilityExecDriverInput["capability::CapabilityExecDriverInput"]
+    direction TB
+    T47_cli_driver_cli_driver_CapabilityExecDriverInput__self[CapabilityExecDriverInput]
+  end
+  end
   subgraph cli_driver_cli_driver_module_phase_command["cli_driver::phase_command"]
     direction TB
   subgraph T40_cli_driver_cli_driver_PhaseCommandDriver["phase_command::PhaseCommandDriver"]
@@ -544,6 +574,16 @@ subgraph cli_driver["cli_driver"]
 end
 subgraph cli_composition["cli_composition"]
   direction TB
+  subgraph cli_composition_cli_composition_module_capability["cli_composition::capability"]
+    direction TB
+  subgraph T57_cli_composition_cli_composition_CapabilityCompositionRoot["capability::CapabilityCompositionRoot"]
+    direction TB
+    T57_cli_composition_cli_composition_CapabilityCompositionRoot__self[CapabilityCompositionRoot]
+    T57_cli_composition_cli_composition_CapabilityCompositionRoot_new([new])
+    T57_cli_composition_cli_composition_CapabilityCompositionRoot_discover([discover])
+    T57_cli_composition_cli_composition_CapabilityCompositionRoot_capability_driver([capability_driver])
+  end
+  end
   subgraph cli_composition_cli_composition_module_phase_command["cli_composition::phase_command"]
     direction TB
   subgraph T52_cli_composition_cli_composition_PhaseCompositionRoot["phase_command::PhaseCompositionRoot"]
@@ -602,6 +642,10 @@ subgraph cli["cli"]
     T20_cli_cli_PhaseCommand_Explain[Explain]
     T20_cli_cli_PhaseCommand_Enter[Enter]
   end
+  subgraph T22_cli_cli_PhaseEnterArgs["commands::phase::PhaseEnterArgs"]
+    direction TB
+    T22_cli_cli_PhaseEnterArgs__self[PhaseEnterArgs]
+  end
   subgraph T19_cli_cli_PhaseIdArgs["commands::phase::PhaseIdArgs"]
     direction TB
     T19_cli_cli_PhaseIdArgs__self[PhaseIdArgs]
@@ -630,6 +674,8 @@ T36_domain_domain_PreReviewGateViolation_NonBlueSignal --o T32_domain_domain_Con
 T34_domain_domain_TaskContractDocument_new --o T32_domain_domain_ContractedEntryRef__self
 T34_domain_domain_TaskContractDocument_new --> T34_domain_domain_TaskContractDocument__self
 T34_domain_domain_TaskContractDocument_entries --> T32_domain_domain_ContractedEntryRef__self
+T40_usecase_usecase_CapabilityExecInteractor_new --> T40_usecase_usecase_CapabilityExecInteractor__self
+R37_usecase_usecase_CapabilityExecService_execute --o T37_usecase_usecase_CapabilityExecRequest__self
 T31_usecase_usecase_CommandArgument_try_new --> T31_usecase_usecase_CommandArgument__self
 T27_usecase_usecase_CommandArgv_try_new --o T31_usecase_usecase_CommandArgument__self
 T27_usecase_usecase_CommandArgv_try_new --> T42_usecase_usecase_CommandArgvValidationError__self
@@ -753,6 +799,7 @@ T33_usecase_usecase_ProgramRunOutcome_OutputLimitExceeded --o|output| T37_usecas
 R33_usecase_usecase_ProgramRunnerPort_run --o T33_usecase_usecase_ProgramInvocation__self
 R33_usecase_usecase_ProgramRunnerPort_run --> T33_usecase_usecase_ProgramRunOutcome__self
 R33_usecase_usecase_ProgramRunnerPort_run --> T34_usecase_usecase_ProgramRunnerError__self
+T40_usecase_usecase_CapabilityExecInteractor__self -.impl.-> R37_usecase_usecase_CapabilityExecService__self
 T38_usecase_usecase_PhaseCommandInteractor__self -.impl.-> R35_usecase_usecase_PhaseCommandService__self
 T50_usecase_usecase_PreReviewCommandDispatchInteractor__self -.impl.-> R47_usecase_usecase_PreReviewCommandDispatchService__self
 T44_infrastructure_infrastructure_CommandArgvDto__self --o|arguments| T48_infrastructure_infrastructure_CommandArgumentDto__self
@@ -787,6 +834,10 @@ T56_infrastructure_infrastructure_FsPhaseCommandConfigLoader__self -.impl.-> R44
 T60_infrastructure_infrastructure_FsPreReviewCommandConfigLoader__self -.impl.-> R48_usecase_usecase_PreReviewCommandConfigLoaderPort__self
 T50_infrastructure_infrastructure_ProcessProgramRunner__self -.impl.-> R33_usecase_usecase_ProgramRunnerPort__self
 T59_infrastructure_infrastructure_GitCurrentReviewTrackResolver__self -.impl.-> R46_usecase_usecase_CurrentReviewTrackResolverPort__self
+T38_cli_driver_cli_driver_CapabilityDriver_new --o R37_usecase_usecase_CapabilityExecService__self
+T38_cli_driver_cli_driver_CapabilityDriver_new --> T38_cli_driver_cli_driver_CapabilityDriver__self
+T38_cli_driver_cli_driver_CapabilityDriver_handle --o T47_cli_driver_cli_driver_CapabilityExecDriverInput__self
+T38_cli_driver_cli_driver_CapabilityDriver_handle --> T36_cli_driver_cli_driver_CommandOutcome__self
 T40_cli_driver_cli_driver_PhaseCommandDriver_new --o R35_usecase_usecase_PhaseCommandService__self
 T40_cli_driver_cli_driver_PhaseCommandDriver_new --> T40_cli_driver_cli_driver_PhaseCommandDriver__self
 T40_cli_driver_cli_driver_PhaseCommandDriver_handle --o T39_cli_driver_cli_driver_PhaseCommandInput__self
@@ -800,13 +851,18 @@ T32_cli_driver_cli_driver_PhaseIdArg_as_declaration_id --> T36_usecase_usecase_C
 T32_cli_driver_cli_driver_PhaseIdArg__self --o|value| T36_usecase_usecase_CommandDeclarationId__self
 T36_cli_driver_cli_driver_CommandOutcome_success --> T36_cli_driver_cli_driver_CommandOutcome__self
 T36_cli_driver_cli_driver_CommandOutcome_failure --> T36_cli_driver_cli_driver_CommandOutcome__self
+T57_cli_composition_cli_composition_CapabilityCompositionRoot_new --> T57_cli_composition_cli_composition_CapabilityCompositionRoot__self
+T57_cli_composition_cli_composition_CapabilityCompositionRoot_discover --> T57_cli_composition_cli_composition_CapabilityCompositionRoot__self
+T57_cli_composition_cli_composition_CapabilityCompositionRoot_capability_driver --> T38_cli_driver_cli_driver_CapabilityDriver__self
 T52_cli_composition_cli_composition_PhaseCompositionRoot_build --> T40_cli_driver_cli_driver_PhaseCommandDriver__self
 T18_cli_cli_CliCommand_Phase --o|cmd| T20_cli_cli_PhaseCommand__self
 T20_cli_cli_PhaseCommand_Validate --o T25_cli_cli_PhaseValidateArgs__self
 T20_cli_cli_PhaseCommand_Explain --o T19_cli_cli_PhaseIdArgs__self
-T20_cli_cli_PhaseCommand_Enter --o T19_cli_cli_PhaseIdArgs__self
+T20_cli_cli_PhaseCommand_Enter --o T22_cli_cli_PhaseEnterArgs__self
+T22_cli_cli_PhaseEnterArgs__self --o|phase_id| T32_cli_driver_cli_driver_PhaseIdArg__self
 T19_cli_cli_PhaseIdArgs__self --o|phase_id| T32_cli_driver_cli_driver_PhaseIdArg__self
 F52_cli_cli_cli__commands__capability__into_driver_input --o T26_cli_cli_CapabilityExecArgs__self
+F52_cli_cli_cli__commands__capability__into_driver_input --> T47_cli_driver_cli_driver_CapabilityExecDriverInput__self
 F37_cli_cli_cli__commands__phase__execute --o T20_cli_cli_PhaseCommand__self
 F49_cli_cli_cli__commands__phase__execute_with_driver --o T20_cli_cli_PhaseCommand__self
 F49_cli_cli_cli__commands__phase__execute_with_driver --o T40_cli_driver_cli_driver_PhaseCommandDriver__self
@@ -838,6 +894,11 @@ class T34_domain_domain_TaskContractDocument_schema_version method_node
 class T34_domain_domain_TaskContractDocument_track_id method_node
 class T34_domain_domain_TaskContractDocument_entries method_node
 class T34_domain_domain_TaskContractDocument__self value_object
+class T40_usecase_usecase_CapabilityExecInteractor_new method_node
+class T40_usecase_usecase_CapabilityExecInteractor__self interactor
+class T37_usecase_usecase_CapabilityExecRequest__self command
+class R37_usecase_usecase_CapabilityExecService_execute method_node
+class R37_usecase_usecase_CapabilityExecService__self app_service
 class T31_usecase_usecase_CommandArgument_try_new method_node
 class T31_usecase_usecase_CommandArgument__self value_object
 class T27_usecase_usecase_CommandArgv_try_new method_node
@@ -1014,6 +1075,10 @@ class T53_infrastructure_infrastructure_TaskContractDocumentDto__self dto
 class T58_infrastructure_infrastructure_TaskContractSchemaVersionDto__self dto
 class T39_infrastructure_infrastructure_TaskIdDto__self dto
 class T40_infrastructure_infrastructure_TrackIdDto__self dto
+class T38_cli_driver_cli_driver_CapabilityDriver_new method_node
+class T38_cli_driver_cli_driver_CapabilityDriver_handle method_node
+class T38_cli_driver_cli_driver_CapabilityDriver__self primary_adapter
+class T47_cli_driver_cli_driver_CapabilityExecDriverInput__self dto
 class T40_cli_driver_cli_driver_PhaseCommandDriver_new method_node
 class T40_cli_driver_cli_driver_PhaseCommandDriver_handle method_node
 class T40_cli_driver_cli_driver_PhaseCommandDriver__self primary_adapter
@@ -1027,6 +1092,10 @@ class T32_cli_driver_cli_driver_PhaseIdArg__self dto
 class T36_cli_driver_cli_driver_CommandOutcome_success method_node
 class T36_cli_driver_cli_driver_CommandOutcome_failure method_node
 class T36_cli_driver_cli_driver_CommandOutcome__self dto
+class T57_cli_composition_cli_composition_CapabilityCompositionRoot_new method_node
+class T57_cli_composition_cli_composition_CapabilityCompositionRoot_discover method_node
+class T57_cli_composition_cli_composition_CapabilityCompositionRoot_capability_driver method_node
+class T57_cli_composition_cli_composition_CapabilityCompositionRoot__self composition_root
 class T52_cli_composition_cli_composition_PhaseCompositionRoot_build method_node
 class T52_cli_composition_cli_composition_PhaseCompositionRoot__self composition_root
 class T18_cli_cli_CliCommand_Arch variant_node
@@ -1065,6 +1134,7 @@ class T20_cli_cli_PhaseCommand_Validate variant_node
 class T20_cli_cli_PhaseCommand_Explain variant_node
 class T20_cli_cli_PhaseCommand_Enter variant_node
 class T20_cli_cli_PhaseCommand__self dto
+class T22_cli_cli_PhaseEnterArgs__self dto
 class T19_cli_cli_PhaseIdArgs__self dto
 class T25_cli_cli_PhaseValidateArgs__self dto
 class F52_cli_cli_cli__commands__capability__into_driver_input free_function

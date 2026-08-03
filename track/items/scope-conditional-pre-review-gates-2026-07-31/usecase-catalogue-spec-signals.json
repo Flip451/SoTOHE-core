@@ -1,7 +1,17 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "8ae999e542ae3cacb895c4cbbab8e6cec59cda472f082f271b18b3d81f6f7d66",
+  "catalogue_declaration_hash": "857e2a51aaea3989bddb6afaf28c171f478196c45970a6cc4172e17433b9ebb2",
   "signals": [
+    {
+      "type_name": "CapabilityExecInteractor",
+      "signal": "blue",
+      "entry_hash": "c8c891ddf06d414559fdee46cb22573c348e3290ea9637c29f7f6657e7fd53d7"
+    },
+    {
+      "type_name": "CapabilityExecRequest",
+      "signal": "blue",
+      "entry_hash": "c8f7c5fde2e89efc3af4fab9aba069ff62939108eecdceccfbd42197d6d11248"
+    },
     {
       "type_name": "CapturedProgramOutput",
       "signal": "blue",
@@ -135,7 +145,7 @@
     {
       "type_name": "PhaseEnterCommand",
       "signal": "blue",
-      "entry_hash": "20de4b9d3a8687e91907c1a5c0d02049b95244be786f0c9eb062652631f35768"
+      "entry_hash": "57461c704dd89b23f84d7cd76ded0085aef16941167051458ecfea1694afaf76"
     },
     {
       "type_name": "PhaseExplainQuery",
@@ -236,6 +246,11 @@
       "type_name": "UnvalidatedTimeoutSeconds",
       "signal": "blue",
       "entry_hash": "ba82cd2e326daddfc21628ee14e90daaee9440d9f33319ddd075924881dfa609"
+    },
+    {
+      "type_name": "CapabilityExecService",
+      "signal": "blue",
+      "entry_hash": "f7330b6eae435f6c7038dec6d4f972fa0b19fbd8a5cf731fda181960b641dab4"
     },
     {
       "type_name": "CurrentReviewTrackResolverPort",

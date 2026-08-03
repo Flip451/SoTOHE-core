@@ -102,7 +102,7 @@
       },
       {
         "id": "IN-03",
-        "text": "config author/operator は公開 `bin/sotp` command の有効性と順序を所有し、engine は argv を書き換えず、subcommand grammar や command の意味論を解釈しない。",
+        "text": "config author/operator は公開 `bin/sotp` command の有効性と順序を所有し、engine は config に保存・解決された literal argv を書き換えず、subcommand grammar や command の意味論を解釈しない。ただし D3 の dispatch boundary では、caller-supplied optional host が present の場合に限り configured writer の `capability exec` invocation の実行時 argv へその `--host` と値だけを追加できる。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md",
@@ -110,6 +110,10 @@
           },
           {
             "file": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md",
+            "anchor": "D3"
+          },
+          {
+            "file": "knowledge/adr/2026-08-03-1010-capability-exec-omitted-host-dispatch.md",
             "anchor": "D3"
           }
         ]
@@ -175,12 +179,46 @@
             "anchor": "D1"
           }
         ]
+      },
+      {
+        "id": "IN-09",
+        "text": "`capability exec` は `--host` が omitted の場合、provider-match judgment または in-host delegation を行わず、常に subprocess dispatch を選ぶ。subprocess target provider は `.harness/config/agent-profiles.json` の requested capability の `capabilities.<name>.provider` から解決し、`capabilities.orchestrator.provider` を使わない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-08-03-1010-capability-exec-omitted-host-dispatch.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-10",
+        "text": "supplied `--host` は caller の runtime-host self-declaration としてそのまま扱い、profile 値で override または normalize しない。in-host delegation は capability contract を保持できる provider-match の場合だけ候補にできる。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-08-03-1010-capability-exec-omitted-host-dispatch.md",
+            "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-08-03-1010-capability-exec-omitted-host-dispatch.md",
+            "anchor": "D4"
+          }
+        ]
+      },
+      {
+        "id": "IN-11",
+        "text": "operator-owned command config は provider host または `--host` を保持しない。config を消費する invocation surface は caller-supplied optional host を受け取り、値が present の場合だけ configured writer の `capability exec` invocation の dispatch boundary でその `--host` と値を追加して forward できる。保存・解決された literal argv の他の要素は変更しない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-08-03-1010-capability-exec-omitted-host-dispatch.md",
+            "anchor": "D3"
+          }
+        ]
       }
     ],
     "out_of_scope": [
       {
         "id": "OS-01",
-        "text": "phase engine または pre-review dispatcher が arbitrary または full な `bin/sotp` subcommand grammar、gate predicate、argv rewrite、または hidden executable mapping を実装・再現することは含まない。ただし、D5 が義務付ける config safety validation としての finite exact-literal-prefix recursion denylist はこれに含まれず、command semantic interpretation ではない。",
+        "text": "phase engine または pre-review dispatcher が arbitrary または full な `bin/sotp` subcommand grammar、gate predicate、config に保存・解決された literal argv の rewrite、または hidden executable mapping を実装・再現することは含まない。ただし、D5 が義務付ける config safety validation としての finite exact-literal-prefix recursion denylist と、D3 による caller-supplied optional host の configured writer `capability exec` invocation への dispatch-boundary での実行時追加はこれに含まれず、command semantic interpretation ではない。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md",
@@ -193,6 +231,10 @@
           {
             "file": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md",
             "anchor": "D5"
+          },
+          {
+            "file": "knowledge/adr/2026-08-03-1010-capability-exec-omitted-host-dispatch.md",
+            "anchor": "D3"
           }
         ]
       },
@@ -341,16 +383,20 @@
     },
     {
       "id": "AC-04",
-      "text": "phase と pre-review command は shell string ではなく literal argv として起動され、shell interpolation、pipe、implicit `sh -c`、argv rewrite、または command semantic interpretation を経由しない。",
+        "text": "phase と pre-review command は shell string ではなく literal argv として起動され、shell interpolation、pipe、implicit `sh -c`、config に保存・解決された literal argv の rewrite、または command semantic interpretation を経由しない。ただし D3 により caller-supplied optional host が present の場合は、configured writer の `capability exec` invocation の dispatch boundary でその `--host` と値だけを実行時 argv に追加できる。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md",
           "anchor": "D1"
         },
-        {
-          "file": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md",
-          "anchor": "D5"
-        }
+          {
+            "file": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md",
+            "anchor": "D5"
+          },
+          {
+            "file": "knowledge/adr/2026-08-03-1010-capability-exec-omitted-host-dispatch.md",
+            "anchor": "D3"
+          }
       ]
     },
     {
@@ -424,6 +470,44 @@
           "anchor": "D1"
         }
       ]
+    },
+    {
+      "id": "AC-11",
+      "text": "`capability exec` を `--host` なしで起動すると、provider-match judgment または in-host delegation を行わず subprocess dispatch となる。subprocess target は requested capability の `capabilities.<name>.provider` から解決され、`capabilities.orchestrator.provider` の値が異なっても target 選択に使われない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-08-03-1010-capability-exec-omitted-host-dispatch.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-12",
+      "text": "`capability exec` を explicit `--host` とともに起動すると、supplied value は profile 値へ normalize または override されず caller runtime-host self-declaration として provider-match evaluation に渡される。supplied host と requested capability の `capabilities.<name>.provider` がともに `claude` の場合だけ、agent definition に `model:` と `tools:` があり、`model:` が profile model と完全一致し、delegation output が capability name・briefing path・読み込み済み discipline payload を含むと検証できたときに in-host delegation instruction を返す。それ以外の provider match（`codex` を含む）、definition/payload validation failure、または provider mismatch では subprocess dispatch を選ぶ。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-08-03-1010-capability-exec-omitted-host-dispatch.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-08-03-1010-capability-exec-omitted-host-dispatch.md",
+          "anchor": "D4"
+        },
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D7"
+        }
+      ]
+    },
+    {
+      "id": "AC-13",
+      "text": "operator-owned config には provider host または `--host` を保存しない。invocation surface に optional host が supplied の場合だけ、configured writer の `capability exec` invocation に dispatch boundary でその `--host` と値を追加して forward し、omitted の場合は追加しない。その他の configured literal argv 要素は変更しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-08-03-1010-capability-exec-omitted-host-dispatch.md",
+          "anchor": "D3"
+        }
+      ]
     }
   ],
   "related_conventions": [
@@ -437,7 +521,7 @@
     }
   ],
   "signals": {
-    "blue": 32,
+    "blue": 38,
     "yellow": 0,
     "red": 0
   }
