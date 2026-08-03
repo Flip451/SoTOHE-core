@@ -444,6 +444,7 @@ pub(super) fn reconcile_interrupted_replacement(
     replacement: &Path,
     recovery_slot: &Path,
     recovery_root: &Path,
+    active_track: &Path,
     generated_baseline_files: &BTreeSet<String>,
 ) -> Result<(), String> {
     reject_symlinks_below(replacement, recovery_root)
@@ -462,6 +463,25 @@ pub(super) fn reconcile_interrupted_replacement(
         sync_directory(recovery_root)?;
         return Ok(());
     }
+    let active_parent = active_track.parent().ok_or_else(|| {
+        format!("active track has no parent directory: {}", active_track.display())
+    })?;
+    reject_symlinks_up_to_root(active_parent)
+        .map_err(|error| format!("cannot inspect active track parent directory: {error}"))?;
+    reject_symlinks_below(active_track, active_parent)
+        .map_err(|error| format!("cannot inspect active track: {error}"))?;
+    let active_parent_file = open_directory_nofollow(active_parent)
+        .map_err(|error| format!("cannot open active track parent directory: {error}"))?;
+    let recovery_parent_file = open_directory_nofollow(recovery_root)
+        .map_err(|error| format!("cannot open baseline recovery root: {error}"))?;
+    verify_non_baseline_content_matches(
+        active_track,
+        &active_parent_file,
+        replacement,
+        &recovery_parent_file,
+        generated_baseline_files,
+    )
+    .map_err(|error| format!("active track and retained replacement differ: {error}"))?;
     let metadata_marker = replacement.join("metadata.json");
     let metadata_is_regular = match fs::symlink_metadata(&metadata_marker) {
         Ok(metadata) => metadata.is_file(),
@@ -482,10 +502,11 @@ pub(super) fn reconcile_interrupted_replacement(
         reject_symlinks_below(recovery_slot, recovery_root)
             .map_err(|error| format!("cannot inspect prior baseline recovery slot: {error}"))?;
         sync_tree(recovery_slot, recovery_root)?;
-        verify_recovery_copy_matches(
+        verify_non_baseline_content_matches(
             replacement,
+            &recovery_parent_file,
             recovery_slot,
-            recovery_root,
+            &recovery_parent_file,
             generated_baseline_files,
         )?;
         remove_tree_bounded(recovery_slot, recovery_root)
@@ -496,59 +517,27 @@ pub(super) fn reconcile_interrupted_replacement(
     sync_directory(recovery_root)
 }
 
-pub(super) fn verify_recovery_copy_matches(
-    expected: &Path,
-    candidate: &Path,
-    recovery_root: &Path,
-    generated_baseline_files: &BTreeSet<String>,
-) -> Result<(), String> {
-    if expected.parent() != Some(recovery_root) || candidate.parent() != Some(recovery_root) {
-        return Err(
-            "baseline recovery copies are not direct children of the recovery root".to_owned()
-        );
-    }
-    let recovery_root_file = open_directory_nofollow(recovery_root)
-        .map_err(|error| format!("cannot open baseline recovery root: {error}"))?;
-    verify_non_baseline_content_matches(
-        expected,
-        &recovery_root_file,
-        candidate,
-        &recovery_root_file,
-        generated_baseline_files,
-    )
-}
-
 pub(super) fn promote_baseline_recovery_slot(
     replacement: &Path,
     recovery_slot: &Path,
     recovery_root: &Path,
-    generated_baseline_files: &BTreeSet<String>,
 ) -> Result<(), BaselineReplacementError> {
     reject_symlinks_below(recovery_slot, recovery_root).map_err(|error| {
         BaselineReplacementError::Publish(DiagnosticText::new(format!(
             "cannot inspect prior baseline recovery slot before promotion: {error}"
         )))
     })?;
-    if path_exists(recovery_slot)
-        .map_err(|error| BaselineReplacementError::Publish(DiagnosticText::new(error)))?
-    {
-        verify_recovery_copy_matches(
-            replacement,
-            recovery_slot,
-            recovery_root,
-            generated_baseline_files,
-        )
+    // A canonical recovery slot may be retained after a later cleanup stage
+    // fails. Stage that older copy before promoting the current replacement;
+    // it predates this run and therefore need not match its telemetry or
+    // other non-baseline content. The active-track drift checks in
+    // `publish_baseline_replacements` still guard this publication window.
+    let staged_recovery = stage_recovery_copy_for_sync(recovery_slot, recovery_root, recovery_root)
         .map_err(|error| {
             BaselineReplacementError::Publish(DiagnosticText::new(format!(
-                "cannot clear a divergent baseline recovery slot: {error}"
+                "cannot stage retained baseline recovery slot: {error}"
             )))
         })?;
-        remove_tree_bounded(recovery_slot, recovery_root).map_err(|error| {
-            BaselineReplacementError::Publish(DiagnosticText::new(format!(
-                "cannot clear superseded baseline recovery slot: {error}"
-            )))
-        })?;
-    }
     fs::rename(replacement, recovery_slot).map_err(|error| {
         BaselineReplacementError::Publish(DiagnosticText::new(format!(
             "cannot promote baseline recovery slot: {error}"
@@ -558,7 +547,15 @@ pub(super) fn promote_baseline_recovery_slot(
         BaselineReplacementError::Publish(DiagnosticText::new(format!(
             "cannot persist promoted baseline recovery slot: {error}"
         )))
-    })
+    })?;
+    if let Some(staged_recovery) = staged_recovery {
+        staged_recovery.cleanup().map_err(|error| {
+            BaselineReplacementError::Publish(DiagnosticText::new(format!(
+                "cannot clear superseded baseline recovery slot: {error}"
+            )))
+        })?;
+    }
+    Ok(())
 }
 
 pub(super) fn write_replacement_phase_marker(
@@ -828,17 +825,22 @@ mod tests {
         let recovery_root = fixture.path().join("recovery");
         let replacement = recovery_root.join(".replacement");
         let recovery_slot = recovery_root.join("cleanup-test");
+        let active_track = fixture.path().join("active");
         std::fs::create_dir_all(&replacement).unwrap();
         std::fs::create_dir_all(&recovery_slot).unwrap();
+        std::fs::create_dir_all(&active_track).unwrap();
         std::fs::write(replacement.join("metadata.json"), "same metadata").unwrap();
         std::fs::write(recovery_slot.join("metadata.json"), "same metadata").unwrap();
+        std::fs::write(active_track.join("metadata.json"), "same metadata").unwrap();
         std::fs::write(replacement.join("preserved-input.txt"), "pending").unwrap();
         std::fs::write(recovery_slot.join("preserved-input.txt"), "concurrent").unwrap();
+        std::fs::write(active_track.join("preserved-input.txt"), "pending").unwrap();
 
         let result = reconcile_interrupted_replacement(
             &replacement,
             &recovery_slot,
             &recovery_root,
+            &active_track,
             &BTreeSet::new(),
         );
 
@@ -850,6 +852,68 @@ mod tests {
         assert_eq!(
             std::fs::read_to_string(recovery_slot.join("preserved-input.txt")).unwrap(),
             "concurrent"
+        );
+    }
+
+    #[test]
+    fn test_reconcile_interrupted_replacement_preserves_post_exchange_replacement() {
+        let fixture = tempfile::tempdir().unwrap();
+        let recovery_root = fixture.path().join("recovery");
+        let replacement = recovery_root.join(".replacement");
+        let recovery_slot = recovery_root.join("cleanup-test");
+        let active_track = fixture.path().join("active");
+        std::fs::create_dir_all(&replacement).unwrap();
+        std::fs::create_dir_all(&active_track).unwrap();
+        std::fs::write(replacement.join("metadata.json"), "retained metadata").unwrap();
+        std::fs::write(replacement.join("preserved-input.txt"), "concurrent").unwrap();
+        std::fs::write(active_track.join("metadata.json"), "active metadata").unwrap();
+        std::fs::write(active_track.join("preserved-input.txt"), "active").unwrap();
+
+        let result = reconcile_interrupted_replacement(
+            &replacement,
+            &recovery_slot,
+            &recovery_root,
+            &active_track,
+            &BTreeSet::new(),
+        );
+
+        assert!(result.is_err());
+        assert!(replacement.is_dir());
+        assert!(!recovery_slot.exists());
+        assert_eq!(
+            std::fs::read_to_string(replacement.join("preserved-input.txt")).unwrap(),
+            "concurrent"
+        );
+    }
+
+    #[test]
+    fn test_reconcile_interrupted_replacement_promotes_equal_active_content() {
+        let fixture = tempfile::tempdir().unwrap();
+        let recovery_root = fixture.path().join("recovery");
+        let replacement = recovery_root.join(".replacement");
+        let recovery_slot = recovery_root.join("cleanup-test");
+        let active_track = fixture.path().join("active");
+        std::fs::create_dir_all(&replacement).unwrap();
+        std::fs::create_dir_all(&active_track).unwrap();
+        for (root, content) in [(&replacement, "same"), (&active_track, "same")] {
+            std::fs::write(root.join("metadata.json"), "same metadata").unwrap();
+            std::fs::write(root.join("preserved-input.txt"), content).unwrap();
+        }
+        std::fs::write(active_track.join(BASELINE_REPLACEMENT_PHASE_MARKER), "prepared\n").unwrap();
+
+        reconcile_interrupted_replacement(
+            &replacement,
+            &recovery_slot,
+            &recovery_root,
+            &active_track,
+            &BTreeSet::new(),
+        )
+        .unwrap();
+
+        assert!(!replacement.exists());
+        assert_eq!(
+            std::fs::read_to_string(recovery_slot.join("preserved-input.txt")).unwrap(),
+            "same"
         );
     }
 
@@ -867,14 +931,7 @@ mod tests {
         std::fs::write(recovery_slot.join("preserved-input.txt"), "same input").unwrap();
         std::fs::write(replacement.join("domain-types-baseline.json"), "new baseline").unwrap();
         std::fs::write(recovery_slot.join("domain-types-baseline.json"), "old baseline").unwrap();
-        let generated_baseline_files = BTreeSet::from(["domain-types-baseline.json".to_owned()]);
-
-        let result = promote_baseline_recovery_slot(
-            &replacement,
-            &recovery_slot,
-            &recovery_root,
-            &generated_baseline_files,
-        );
+        let result = promote_baseline_recovery_slot(&replacement, &recovery_slot, &recovery_root);
 
         assert!(result.is_ok());
         assert!(!replacement.exists());

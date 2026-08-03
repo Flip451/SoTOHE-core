@@ -315,6 +315,7 @@ fn replace_baselines_from_exact_commit(
             &replacement,
             &recovery_slot,
             &recovery_root,
+            &track_dir,
             &generated_baseline_files,
         )
         .map_err(|error| BaselineReplacementError::Isolation(DiagnosticText::new(error)))?;
@@ -392,12 +393,7 @@ fn replace_baselines_from_exact_commit(
             &mut exchanged,
         )?;
         published = true;
-        promote_baseline_recovery_slot(
-            &replacement,
-            &recovery_slot,
-            &recovery_root,
-            &generated_baseline_files,
-        )
+        promote_baseline_recovery_slot(&replacement, &recovery_slot, &recovery_root)
     })();
 
     let removal = remove_commit_pinned_worktree(&repository_root, &worktree)
@@ -1789,6 +1785,64 @@ mod tests {
             !root.join("track/.sotp-baseline-recovery-cleanup-test").exists(),
             "a failed SyncBase validation must not create a pending copy"
         );
+    }
+
+    #[test]
+    fn test_base_merge_retry_reconciles_retained_recovery_after_telemetry_drift() {
+        let fixture = setup_cleanup_repository();
+        let root = fixture.path();
+        let track_dir = root.join("track/items/cleanup-test");
+        let sync_stamp = track_dir.join(".sync-base.json");
+        let telemetry = track_dir.join("failure-telemetry.json");
+        let base_commit = CommitHash::try_new(current_commit(root, "develop^{commit}")).unwrap();
+        std::fs::write(&telemetry, "initial failure\n").unwrap();
+        std::fs::create_dir(&sync_stamp).unwrap();
+        let cleanup: Arc<dyn BaseMergeCleanupPort> = Arc::new(
+            FsBaseMergeCleanupAdapter::with_baseline_capture(Arc::new(FixtureBaselineCapture)),
+        );
+        let run = || {
+            let interactor = usecase::base_merge::BaseMergeInteractor::new(
+                Arc::new(FixedCleanupContext),
+                Arc::new(ExactCommitCleanupGit { base_commit: base_commit.clone() }),
+                Arc::clone(&cleanup),
+            );
+            usecase::base_merge::BaseMergeService::execute(
+                &interactor,
+                usecase::base_merge::BaseMergeCommand { workspace_root: root.to_path_buf() },
+            )
+        };
+
+        let first = run();
+        assert!(matches!(
+            first,
+            Err(usecase::base_merge::BaseMergeError::PostMergeCleanup(
+                usecase::base_merge::PostMergeCleanupError::SyncBaseStamp(
+                    SyncBaseRecordError::Write(_)
+                )
+            ))
+        ));
+        assert!(root.join("track/.sotp-baseline-recovery/cleanup-test").is_dir());
+
+        std::fs::remove_dir(&sync_stamp).unwrap();
+        use std::io::Write as _;
+        std::fs::OpenOptions::new()
+            .append(true)
+            .open(&telemetry)
+            .unwrap()
+            .write_all(b"retry failure\n")
+            .unwrap();
+
+        let second = run();
+        assert!(matches!(second, Ok(usecase::base_merge::BaseMergeOutcome::Completed)));
+        assert_eq!(
+            std::fs::read_to_string(&telemetry).unwrap(),
+            "initial failure\nretry failure\n"
+        );
+        assert!(sync_stamp.is_file());
+        assert!(!root.join("track/.sotp-baseline-recovery/cleanup-test").exists());
+        assert!(!root.join("track/.sotp-baseline-recovery-cleanup-test").exists());
+        let record = decode(&std::fs::read_to_string(sync_stamp).unwrap()).unwrap();
+        assert_eq!(record.base_commit, base_commit);
     }
 
     #[test]

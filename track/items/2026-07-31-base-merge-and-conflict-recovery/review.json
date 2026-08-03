@@ -2964,6 +2964,72 @@
           "hash": "rvw1:sha256:917cb2105c0ed1e5211ef7cc52a0fc4e036776113eddd415834fbe1719159311",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T20:11:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bb98323399b08778c5164e1ffc3e58826639a0a2060a12ae697fe821e646edac",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T20:16:03Z",
+          "findings": [
+            {
+              "category": "data_loss",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 536,
+              "message": "The unconditional staging/removal of every retained recovery slot can delete the only copy of a concurrent write. If the post-exchange drift check previously detected a write to the old active tree, publication deliberately retained that divergent `replacement`; on retry, `reconcile_interrupted_replacement` moves it to `recovery_slot`, but this path then stages and ultimately deletes it after installing a snapshot that lacks the write. Only bypass equivalence checks for slots proven to originate from a completed baseline publication followed by a later cleanup-stage failure; otherwise preserve the divergent slot.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:bb98323399b08778c5164e1ffc3e58826639a0a2060a12ae697fe821e646edac",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T20:28:33Z",
+          "findings": [
+            {
+              "category": "data_loss",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 322,
+              "message": "Marker absence does not prove that a retained `replacement` is safe to supersede. Publication can remove the active marker successfully and then fail while syncing the track or parent directory; `retain_after_baseline_exchange` preserves both trees because a writer holding a pre-exchange descriptor may have changed the old tree during that window. On retry, passing `false` here lets reconciliation move that unique tree into the canonical slot, after which promotion deletes it without an equivalence check. Preserve or compare retained post-exchange trees using stronger provenance, including marker-cleared failure/crash states.",
+              "severity": "P0"
+            },
+            {
+              "category": "crash_recovery",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 466,
+              "message": "This unconditional error also classifies an ordinary crash immediately after the atomic exchange as unrecoverable: that valid state has an unmarked old tree in `replacement` and the phase marker in the new active tree. Every retry observes the same two paths and returns the same error, contradicting the transaction's documented restart reconciliation. Compare the two trees and reconcile equal content while preserving only divergent content instead of treating marker presence alone as a permanent stop condition.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:34d41f8a0c2d721a276e4da8f8c9273af014da4a218167c9db033a978c31eba9",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T20:36:54Z",
+          "findings": [
+            {
+              "category": "module_size",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 506,
+              "message": "The added recovery verification leaves this module at 731 production lines before `#[cfg(test)]`, exceeding the repository's hard 700-line limit; `bin/sotp verify module-size` now fails on this file. Extract the reconciliation/verification logic into a sibling module so the structural gate passes.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:41f42cbda61a68f8d79771cd4b4ceb14dc7564e0c51f9e745ed3ec7fbed159ab",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T20:43:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:527e1c2830d921ea646c25f7d4c6090e2896c205d6b0c473fe70fcca481aa6d8",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
