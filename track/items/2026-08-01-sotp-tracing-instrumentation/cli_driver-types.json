@@ -1,8 +1,101 @@
 {
   "crate_name": "cli_driver",
-  "functions": {},
-  "inherent_impls": [
-    {
+  "functions": {
+    "cli_driver::telemetry::duration_millis": {
+      "action": "add",
+      "docs": "Convert a completed command start instant to an unconstrained full-range technical millisecond measurement for diagnostic telemetry.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "start",
+          "ty": "std::time::Instant"
+        }
+      ],
+      "returns": "u64",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ]
+    },
+    "cli_driver::telemetry::exit_code_value": {
+      "action": "add",
+      "docs": "Convert a process exit result to an unconstrained raw process-status integer for diagnostic telemetry.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "exit_code",
+          "ty": "std::process::ExitCode"
+        }
+      ],
+      "returns": "i32",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ]
+    },
+    "cli_driver::telemetry::items_dir_from_args": {
+      "action": "add",
+      "docs": "Extract only the technical track-items filesystem path from opaque OS arguments; command identity and positional payload interpretation remain outside this cli_driver helper.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "args",
+          "ty": "&[std::ffi::OsString]"
+        }
+      ],
+      "returns": "std::path::PathBuf",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ]
+    }
+  },
+  "inherent_impls": [],
+  "layer": "cli_driver",
+  "schema_version": 5,
+  "trait_impls": [],
+  "traits": {},
+  "types": {
+    "TelemetryDriver": {
+      "action": "modify",
+      "docs": "Primary adapter accepting data-only TelemetryInput values and delegating report/emission operations to one aggregate service.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
       "methods": [
         {
           "has_default_impl": false,
@@ -11,7 +104,7 @@
           "params": [
             {
               "name": "service",
-              "ty": "std::sync::Arc<dyn usecase::telemetry::CommandTraceService>"
+              "ty": "std::sync::Arc<dyn usecase::telemetry::TelemetryAggregateService>"
             }
           ],
           "returns": "Self"
@@ -22,49 +115,151 @@
           "name": "handle",
           "params": [
             {
-              "name": "outcome",
-              "ty": "CommandOutcome"
-            },
-            {
-              "name": "record",
-              "ty": "usecase::telemetry::CommandTraceRecord"
+              "name": "input",
+              "ty": "TelemetryInput"
             }
           ],
           "receiver": "&self",
           "returns": "CommandOutcome"
         }
       ],
-      "type_name": "CommandTraceDriver"
-    }
-  ],
-  "layer": "cli_driver",
-  "schema_version": 5,
-  "traits": {},
-  "types": {
-    "CommandTraceDriver": {
-      "action": "add",
-      "docs": "Primary adapter that locally records one already-completed command. Its usecase dependency retains the typed Result<(), CommandTraceWriteError> boundary. The driver consumes that typed result and always returns CommandOutcome: a trace-write failure is rendered into stderr without changing the completed command's stdout or original exit_code, so tracing failure remains visible without replacing the command's behavioral result or leaking infrastructure types.",
-      "informal_grounds": [],
-      "kind": {
-        "kind": "struct",
-        "shape": {
-          "fields": [],
-          "has_stripped_fields": true,
-          "kind": "plain"
-        }
-      },
-      "methods": [],
-      "module_path": "telemetry::command_trace",
+      "module_path": "telemetry",
       "role": {
         "PrimaryAdapter": {}
       },
       "spec_refs": [
         {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
           "anchor": "IN-02",
           "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
         },
         {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
           "anchor": "AC-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ]
+    },
+    "TelemetryInput": {
+      "action": "modify",
+      "docs": "Data-only telemetry driver input for report and direct emission operations; command completion is submitted as an EmitCompletedCommand payload after CLI dispatch.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Report",
+            "payload": {
+              "fields": [
+                "TelemetryReportInput"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "EmitCompletedCommand",
+            "payload": {
+              "fields": [
+                {
+                  "name": "items_dir",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "source_track_id",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "subcommand",
+                  "ty": "String"
+                },
+                {
+                  "name": "exit_code",
+                  "ty": "i32"
+                },
+                {
+                  "name": "duration_ms",
+                  "ty": "u64"
+                },
+                {
+                  "name": "error_chain",
+                  "ty": "Option<String>"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "EmitArchivedTrackSubcommand",
+            "payload": {
+              "fields": [
+                {
+                  "name": "items_dir",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "String"
+                },
+                {
+                  "name": "subcommand",
+                  "ty": "String"
+                },
+                {
+                  "name": "exit_code",
+                  "ty": "i32"
+                },
+                {
+                  "name": "duration_ms",
+                  "ty": "u64"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "telemetry",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-03",
           "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
         }
       ]

@@ -1,182 +1,19 @@
 {
   "crate_name": "infrastructure",
   "functions": {},
-  "inherent_impls": [
-    {
-      "methods": [
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "try_new",
-          "params": [
-            {
-              "name": "value",
-              "ty": "u64"
-            }
-          ],
-          "returns": "Result<Self, CommandTracePolicyError>"
-        },
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "value",
-          "params": [],
-          "receiver": "&self",
-          "returns": "u64"
-        }
-      ],
-      "type_name": "CommandTraceFileSizeLimitBytes"
-    },
-    {
-      "methods": [
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "try_new",
-          "params": [
-            {
-              "name": "value",
-              "ty": "u16"
-            }
-          ],
-          "returns": "Result<Self, CommandTracePolicyError>"
-        },
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "value",
-          "params": [],
-          "receiver": "&self",
-          "returns": "u16"
-        }
-      ],
-      "type_name": "CommandTraceRetainedFileCount"
-    },
-    {
-      "methods": [
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "new",
-          "params": [
-            {
-              "name": "max_file_size",
-              "ty": "CommandTraceFileSizeLimitBytes"
-            },
-            {
-              "name": "retained_files",
-              "ty": "CommandTraceRetainedFileCount"
-            }
-          ],
-          "returns": "Self"
-        }
-      ],
-      "type_name": "CommandTraceRotationPolicy"
-    },
-    {
-      "methods": [
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "new",
-          "params": [
-            {
-              "name": "output_path",
-              "ty": "std::path::PathBuf"
-            },
-            {
-              "name": "rotation",
-              "ty": "CommandTraceRotationPolicy"
-            }
-          ],
-          "returns": "Self"
-        }
-      ],
-      "type_name": "FsCommandTraceAdapter"
-    }
-  ],
+  "inherent_impls": [],
   "layer": "infrastructure",
   "schema_version": 5,
   "trait_impls": [
     {
-      "for_type": "CommandTraceFileSizeLimitBytes",
-      "trait_ref": "core::fmt::Debug"
+      "action": "reference",
+      "for_type": "FsTelemetryEmitDynamicAdapter",
+      "trait_ref": "core::default::Default"
     },
     {
-      "for_type": "CommandTraceFileSizeLimitBytes",
-      "trait_ref": "core::clone::Clone"
-    },
-    {
-      "for_type": "CommandTraceFileSizeLimitBytes",
-      "trait_ref": "core::marker::Copy"
-    },
-    {
-      "for_type": "CommandTraceFileSizeLimitBytes",
-      "trait_ref": "core::cmp::PartialEq"
-    },
-    {
-      "for_type": "CommandTraceFileSizeLimitBytes",
-      "trait_ref": "core::cmp::Eq"
-    },
-    {
-      "for_type": "CommandTraceRetainedFileCount",
-      "trait_ref": "core::fmt::Debug"
-    },
-    {
-      "for_type": "CommandTraceRetainedFileCount",
-      "trait_ref": "core::clone::Clone"
-    },
-    {
-      "for_type": "CommandTraceRetainedFileCount",
-      "trait_ref": "core::marker::Copy"
-    },
-    {
-      "for_type": "CommandTraceRetainedFileCount",
-      "trait_ref": "core::cmp::PartialEq"
-    },
-    {
-      "for_type": "CommandTraceRetainedFileCount",
-      "trait_ref": "core::cmp::Eq"
-    },
-    {
-      "for_type": "CommandTraceRotationPolicy",
-      "trait_ref": "core::fmt::Debug"
-    },
-    {
-      "for_type": "CommandTraceRotationPolicy",
-      "trait_ref": "core::clone::Clone"
-    },
-    {
-      "for_type": "CommandTraceRotationPolicy",
-      "trait_ref": "core::marker::Copy"
-    },
-    {
-      "for_type": "CommandTraceRotationPolicy",
-      "trait_ref": "core::cmp::PartialEq"
-    },
-    {
-      "for_type": "CommandTraceRotationPolicy",
-      "trait_ref": "core::cmp::Eq"
-    },
-    {
-      "for_type": "FsCommandTraceAdapter",
-      "trait_ref": "usecase::telemetry::command_trace::CommandTraceWriterPort"
-    },
-    {
-      "for_type": "FsCommandTraceAdapter",
-      "trait_ref": "core::fmt::Debug"
-    },
-    {
-      "for_type": "CommandTracePolicyError",
-      "trait_ref": "core::fmt::Debug"
-    },
-    {
-      "for_type": "CommandTracePolicyError",
-      "trait_ref": "core::fmt::Display"
-    },
-    {
-      "for_type": "CommandTracePolicyError",
-      "trait_ref": "core::error::Error"
+      "action": "modify",
+      "for_type": "FsTelemetryEmitDynamicAdapter",
+      "trait_ref": "usecase::telemetry::TelemetryEmitDynamicPort"
     },
     {
       "for_type": "TelemetryReportSnapshot",
@@ -194,154 +31,26 @@
   ],
   "traits": {},
   "types": {
-    "CommandTraceFileSizeLimitBytes": {
-      "action": "add",
-      "docs": "Adapter-configuration DTO for a positive byte limit; try_new produces only CommandTracePolicyError::ZeroFileSizeLimit.",
+    "FsTelemetryEmitDynamicAdapter": {
+      "action": "modify",
+      "docs": "Filesystem secondary adapter implementing active-track telemetry emission through TelemetryEmitDynamicPort.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
         "shape": {
-          "fields": [],
-          "has_stripped_fields": true,
-          "kind": "tuple"
+          "kind": "unit"
         }
       },
-      "methods": [],
-      "module_path": "telemetry::command_trace",
-      "role": {
-        "Dto": {}
-      },
-      "spec_refs": [
+      "methods": [
         {
-          "anchor": "IN-04",
-          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
-        },
-        {
-          "anchor": "CN-02",
-          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
         }
-      ]
-    },
-    "CommandTracePolicyError": {
-      "action": "add",
-      "docs": "Rotation-policy constructor errors with explicit owners: CommandTraceFileSizeLimitBytes::try_new produces ZeroFileSizeLimit and CommandTraceRetainedFileCount::try_new produces ZeroRetainedFileCount.",
-      "informal_grounds": [],
-      "kind": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "ZeroFileSizeLimit",
-            "payload": {
-              "kind": "unit"
-            }
-          },
-          {
-            "name": "ZeroRetainedFileCount",
-            "payload": {
-              "kind": "unit"
-            }
-          }
-        ]
-      },
-      "methods": [],
-      "module_path": "telemetry::command_trace",
-      "role": {
-        "ErrorType": {}
-      },
-      "spec_refs": [
-        {
-          "anchor": "IN-04",
-          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
-        },
-        {
-          "anchor": "CN-02",
-          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
-        }
-      ]
-    },
-    "CommandTraceRetainedFileCount": {
-      "action": "add",
-      "docs": "Adapter-configuration DTO for a positive retained-file count; try_new produces only CommandTracePolicyError::ZeroRetainedFileCount.",
-      "informal_grounds": [],
-      "kind": {
-        "kind": "struct",
-        "shape": {
-          "fields": [],
-          "has_stripped_fields": true,
-          "kind": "tuple"
-        }
-      },
-      "methods": [],
-      "module_path": "telemetry::command_trace",
-      "role": {
-        "Dto": {}
-      },
-      "spec_refs": [
-        {
-          "anchor": "IN-04",
-          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
-        },
-        {
-          "anchor": "CN-02",
-          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
-        }
-      ]
-    },
-    "CommandTraceRotationPolicy": {
-      "action": "add",
-      "docs": "Infrastructure configuration DTO combining typed file-size and retention bounds for deterministic local JSONL rotation.",
-      "informal_grounds": [],
-      "kind": {
-        "kind": "struct",
-        "shape": {
-          "fields": [
-            {
-              "name": "max_file_size",
-              "ty": "CommandTraceFileSizeLimitBytes"
-            },
-            {
-              "name": "retained_files",
-              "ty": "CommandTraceRetainedFileCount"
-            }
-          ],
-          "has_stripped_fields": false,
-          "kind": "plain"
-        }
-      },
-      "methods": [],
-      "module_path": "telemetry::command_trace",
-      "role": {
-        "Dto": {}
-      },
-      "spec_refs": [
-        {
-          "anchor": "IN-04",
-          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
-        },
-        {
-          "anchor": "CN-02",
-          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
-        },
-        {
-          "anchor": "AC-04",
-          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
-        }
-      ]
-    },
-    "FsCommandTraceAdapter": {
-      "action": "add",
-      "docs": "Synchronous filesystem implementation of CommandTraceWriterPort.",
-      "informal_grounds": [],
-      "kind": {
-        "kind": "struct",
-        "shape": {
-          "fields": [],
-          "has_stripped_fields": true,
-          "kind": "plain"
-        }
-      },
-      "methods": [],
-      "module_path": "telemetry::command_trace",
+      ],
+      "module_path": "telemetry::report_adapter",
       "role": {
         "SecondaryAdapter": {}
       },
@@ -350,12 +59,16 @@
           "anchor": "IN-01",
           "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
         },
-        {
-          "anchor": "IN-02",
+    {
+      "anchor": "IN-02",
+      "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+    },
+    {
+      "anchor": "AC-01",
           "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
         },
         {
-          "anchor": "IN-04",
+          "anchor": "AC-03",
           "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
         }
       ]

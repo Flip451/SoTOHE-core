@@ -1,67 +1,16 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-02T00:14:12Z",
-  "declaration_hash": "78399ada641dc69c17e97b263893ccf15a30e339e34e9da374b77a1af562b2a6",
-  "implementation_input_hash": "9cbb631fb109fa686a63559bccbe4250ba8cb6d37c4022116eaaa9f94b8784de",
+  "generated_at": "2026-08-03T17:04:21Z",
+  "declaration_hash": "562c26513d729dd93cfdc5dacd82f8ff12ac6ee7562424e610f50896d0af723c",
+  "implementation_input_hash": "ea2b224d9d36375f307412fcf70c512c861ded9895c44c48dd9ee2839ee45f03",
   "signals": [
     {
-      "type_name": "CommandTraceFileSizeLimitBytes",
-      "kind_tag": "dto",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Clone",
-        "Copy",
-        "Debug",
-        "Eq",
-        "PartialEq"
-      ]
-    },
-    {
-      "type_name": "CommandTracePolicyError",
-      "kind_tag": "error_type",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Debug",
-        "Display",
-        "Error"
-      ]
-    },
-    {
-      "type_name": "CommandTraceRetainedFileCount",
-      "kind_tag": "dto",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Clone",
-        "Copy",
-        "Debug",
-        "Eq",
-        "PartialEq"
-      ]
-    },
-    {
-      "type_name": "CommandTraceRotationPolicy",
-      "kind_tag": "dto",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Clone",
-        "Copy",
-        "Debug",
-        "Eq",
-        "PartialEq"
-      ]
-    },
-    {
-      "type_name": "FsCommandTraceAdapter",
+      "type_name": "FsTelemetryEmitDynamicAdapter",
       "kind_tag": "secondary_adapter",
       "signal": "blue",
       "found_type": true,
       "found_items": [
-        "Debug",
-        "usecase::telemetry::command_trace::CommandTraceWriterPort"
+        "usecase::telemetry::TelemetryEmitDynamicPort"
       ]
     },
     {

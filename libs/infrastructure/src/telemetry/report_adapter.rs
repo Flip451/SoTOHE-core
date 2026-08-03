@@ -7,7 +7,6 @@
 //! never imports infrastructure directly.
 
 use std::path::{Component, Path, PathBuf};
-use std::sync::Arc;
 
 use domain::TrackId;
 use usecase::telemetry::{
@@ -17,12 +16,8 @@ use usecase::telemetry::{
     TelemetryReportPort,
 };
 
-use usecase::{
-    ArchivedTrackTelemetryCommand, ArchivedTrackTelemetryInteractor,
-    ArchivedTrackTelemetryService as _,
-};
-
 use crate::telemetry::report::{TelemetryReport, TelemetryReportError as InfraError};
+use crate::telemetry::{TelemetryConfig, TelemetryEvent, TelemetryWriter};
 
 #[derive(Debug)]
 #[allow(dead_code)]
@@ -116,10 +111,10 @@ impl TelemetryReportPort for FsTelemetryReportAdapter {
 
 /// Filesystem adapter implementing [`TelemetryEmitDynamicPort`].
 ///
-/// Mirrors the logic in
-/// `cli_composition::telemetry::TelemetryCompositionRoot::telemetry_emit_archived_track_subcommand`:
-/// derives the telemetry directory from `items_dir` + git repo discovery,
-/// then delegates to [`ArchivedTrackTelemetryInteractor`].
+/// Resolves the repository from `items_dir` and delegates active
+/// command-completion persistence to the existing telemetry writer. The
+/// caller supplies the track captured before dispatch; a missing context is a
+/// branch-bound no-op.
 pub struct FsTelemetryEmitDynamicAdapter;
 
 impl FsTelemetryEmitDynamicAdapter {
@@ -137,65 +132,71 @@ impl Default for FsTelemetryEmitDynamicAdapter {
 }
 
 impl TelemetryEmitDynamicPort for FsTelemetryEmitDynamicAdapter {
-    fn emit_archived(
+    fn emit_active(
         &self,
         items_dir: &Path,
-        track_id: &str,
+        source_track_id: Option<&str>,
         subcommand: String,
         exit_code: i32,
         duration_ms: u64,
+        error_chain: Option<String>,
     ) -> Result<(), TelemetryEmitDynamicPortError> {
-        use crate::git_cli::SystemGitRepo;
-        use crate::telemetry::archived_track::FsArchivedTrackTelemetryAdapter;
-
-        let project_root = resolve_project_root_from_items_dir(items_dir)
+        // `None` is the captured pre-dispatch non-track context. Never
+        // re-read the branch after dispatch: a command may have switched to a
+        // track branch, but that destination must not receive the event.
+        let Some(source_track_id) = source_track_id else {
+            return Ok(());
+        };
+        // Resolve the repository from the supplied items directory, never from
+        // the process CWD. Invalid paths and unavailable repository state are
+        // typed adapter failures; the driver deliberately swallows those
+        // diagnostic failures so the original command outcome remains unchanged.
+        let repo_root = resolve_project_root_from_items_dir(items_dir)
             .map_err(|e| TelemetryEmitDynamicPortError::EmitUnavailable(e.to_string()))?;
-        let repo = SystemGitRepo::discover_from(&project_root).map_err(|e| {
+        let resolved_track_id = source_track_id.to_owned();
+        let track_id = TrackId::try_new(resolved_track_id).map_err(|error| {
             TelemetryEmitDynamicPortError::EmitUnavailable(format!(
-                "failed to discover git repository: {e}"
+                "invalid captured track id: {error}"
             ))
         })?;
-        let repo_root = repo.root().to_path_buf();
-        ensure_trusted_root(&repo_root)
-            .map_err(|e| TelemetryEmitDynamicPortError::EmitUnavailable(e.to_string()))?;
+        let anchored_items_dir = repo_root.join("track").join("items");
+        let writer = TelemetryWriter::new(
+            TelemetryConfig::from_env(),
+            track_id.as_ref().to_owned(),
+            anchored_items_dir,
+        );
 
-        let valid_track_id = domain::TrackId::try_new(track_id.to_owned()).map_err(|e| {
-            TelemetryEmitDynamicPortError::EmitUnavailable(format!("invalid track ID: {e}"))
-        })?;
-        let archive_root = repo_root.join("track").join("archive");
-        crate::track::symlink_guard::reject_symlinks_below(&archive_root, &repo_root).map_err(
-            |e| {
-                TelemetryEmitDynamicPortError::EmitUnavailable(format!(
-                    "failed to validate archive root: {e}"
-                ))
-            },
-        )?;
-        let telemetry_dir = archive_root.join(valid_track_id.as_ref()).join("logs");
-        if !telemetry_dir.starts_with(&archive_root) {
-            return Err(TelemetryEmitDynamicPortError::EmitUnavailable(format!(
-                "telemetry path escapes archive root: {}",
-                telemetry_dir.display()
-            )));
+        let timestamp = chrono::Utc::now().to_rfc3339();
+        // The existing TelemetryWriter is the sole active-track sink. Its
+        // kill-switch, override path, append semantics, and fail-open write
+        // behavior therefore remain unchanged.
+        let mut write_error = None;
+        if let Err(error) = writer.write(TelemetryEvent::TrackSubcommand {
+            schema_version: 1,
+            track_id: track_id.as_ref().to_owned(),
+            command: subcommand.clone(),
+            exit_code,
+            duration_ms,
+            timestamp: timestamp.clone(),
+        }) {
+            write_error = Some(error.to_string());
         }
-        crate::track::symlink_guard::reject_symlinks_below(&telemetry_dir, &archive_root).map_err(
-            |e| {
-                TelemetryEmitDynamicPortError::EmitUnavailable(format!(
-                    "failed to validate telemetry path: {e}"
-                ))
-            },
-        )?;
-
-        let adapter = Arc::new(FsArchivedTrackTelemetryAdapter::new(telemetry_dir));
-        let interactor = ArchivedTrackTelemetryInteractor::new(adapter);
-
-        interactor
-            .emit(ArchivedTrackTelemetryCommand {
-                subcommand,
-                track_id: track_id.to_owned(),
+        if exit_code != 0 {
+            if let Err(error) = writer.write(TelemetryEvent::NonZeroExit {
+                schema_version: 1,
+                track_id: track_id.as_ref().to_owned(),
+                command: subcommand,
                 exit_code,
-                duration_ms,
-            })
-            .map_err(|e| TelemetryEmitDynamicPortError::EmitUnavailable(e.to_string()))
+                error_chain: error_chain.unwrap_or_default(),
+                timestamp,
+            }) {
+                if write_error.is_none() {
+                    write_error = Some(error.to_string());
+                }
+            }
+        }
+        write_error
+            .map_or(Ok(()), |error| Err(TelemetryEmitDynamicPortError::EmitUnavailable(error)))
     }
 }
 
@@ -219,7 +220,66 @@ fn resolve_project_root_from_items_dir(items_dir: &Path) -> Result<PathBuf, Tele
                         items_dir.display()
                     ))
                 })?;
-            ensure_current_repo_root(&root)
+            let absolute_root = if root.is_absolute() {
+                root.clone()
+            } else {
+                crate::git_cli::SystemGitRepo::discover()
+                    .map_err(|e| {
+                        TelemetryAdapterError(format!(
+                            "cannot discover git repository for relative items_dir: {e}"
+                        ))
+                    })?
+                    .root()
+                    .join(&root)
+            };
+            let canonical_root = absolute_root.canonicalize().map_err(|e| {
+                TelemetryAdapterError(format!(
+                    "failed to canonicalize project root {}: {e}",
+                    absolute_root.display()
+                ))
+            })?;
+            ensure_trusted_root(&canonical_root)?;
+            let repo =
+                crate::git_cli::SystemGitRepo::discover_from(&canonical_root).map_err(|e| {
+                    TelemetryAdapterError(format!(
+                        "cannot discover git repository from supplied project root {}: {e}",
+                        canonical_root.display()
+                    ))
+                })?;
+            let repo_root = repo.root().canonicalize().map_err(|e| {
+                TelemetryAdapterError(format!(
+                    "failed to canonicalize discovered repository root {}: {e}",
+                    repo.root().display()
+                ))
+            })?;
+            ensure_trusted_root(&repo_root)?;
+            if canonical_root != repo_root {
+                return Err(TelemetryAdapterError(format!(
+                    "--items-dir must resolve to the discovered repository root {}; got {}",
+                    repo_root.display(),
+                    canonical_root.display()
+                )));
+            }
+            crate::track::symlink_guard::reject_symlinks_up_to_root(&repo_root).map_err(|e| {
+                TelemetryAdapterError(format!(
+                    "items_dir path rejected before use at '{}': {e}",
+                    items_dir.display()
+                ))
+            })?;
+            let absolute_items_dir = if items_dir.is_absolute() {
+                items_dir.to_path_buf()
+            } else {
+                repo_root.join(items_dir)
+            };
+            crate::track::symlink_guard::reject_symlinks_below(&absolute_items_dir, &repo_root)
+                .map(|_| ())
+                .map_err(|e| {
+                    TelemetryAdapterError(format!(
+                        "items_dir path rejected before use at '{}': {e}",
+                        items_dir.display()
+                    ))
+                })?;
+            Ok(repo_root)
         }
         _ => Err(TelemetryAdapterError(format!(
             "--items-dir must point to '<project-root>/track/items'; got {}",
@@ -322,44 +382,19 @@ fn ensure_trusted_root(root: &Path) -> Result<(), TelemetryAdapterError> {
     }
 }
 
-fn ensure_current_repo_root(root: &Path) -> Result<PathBuf, TelemetryAdapterError> {
-    use crate::git_cli::SystemGitRepo;
-
-    let canonical_root = root.canonicalize().map_err(|e| {
-        TelemetryAdapterError(format!(
-            "failed to canonicalize project root {}: {e}",
-            root.display()
-        ))
-    })?;
-    let repo = SystemGitRepo::discover().map_err(|e| {
-        TelemetryAdapterError(format!("cannot discover current git repository: {e}"))
-    })?;
-    let canonical_repo_root = repo.root().canonicalize().map_err(|e| {
-        TelemetryAdapterError(format!(
-            "failed to canonicalize current repository root {}: {e}",
-            repo.root().display()
-        ))
-    })?;
-    if canonical_root != canonical_repo_root {
-        return Err(TelemetryAdapterError(format!(
-            "--items-dir must resolve to the current repository root {}; got {}",
-            canonical_repo_root.display(),
-            canonical_root.display()
-        )));
-    }
-    Ok(canonical_root)
-}
-
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
     use std::path::Path;
 
     use super::{
-        FsTelemetryReportAdapter, ensure_trusted_root, resolve_items_dir_under_current_repo,
-        resolve_project_root_from_items_dir,
+        FsTelemetryEmitDynamicAdapter, FsTelemetryReportAdapter, ensure_trusted_root,
+        resolve_items_dir_under_current_repo, resolve_project_root_from_items_dir,
     };
-    use usecase::telemetry::{TelemetryReportError as UsecaseError, TelemetryReportPort as _};
+    use usecase::telemetry::{
+        TelemetryEmitDynamicPort as _, TelemetryEmitDynamicPortError,
+        TelemetryReportError as UsecaseError, TelemetryReportPort as _,
+    };
 
     fn tempdir_in_current_repo() -> tempfile::TempDir {
         let repo = crate::git_cli::SystemGitRepo::discover().unwrap();
@@ -406,6 +441,25 @@ mod tests {
 
     #[cfg(unix)]
     #[test]
+    fn resolve_project_root_from_items_dir_rejects_symlinked_ancestor() {
+        let repo = crate::git_cli::SystemGitRepo::discover().unwrap();
+        let parent = tempfile::tempdir().unwrap();
+        let root_link = parent.path().join("repo-link");
+        std::os::unix::fs::symlink(repo.root(), &root_link).unwrap();
+        let items_dir = root_link.join("track").join("items");
+
+        let err = resolve_project_root_from_items_dir(&items_dir).unwrap_err();
+
+        let message = err.to_string();
+        assert!(
+            message.contains("refusing to follow symlink")
+                || message.contains("refusing to use symlinked repository root"),
+            "{message}"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
     fn resolve_project_root_from_items_dir_rejects_symlinked_items_dir() {
         let tmp = tempfile::tempdir().unwrap();
         let outside = tempfile::tempdir().unwrap();
@@ -421,14 +475,25 @@ mod tests {
     }
 
     #[test]
-    fn resolve_project_root_from_items_dir_rejects_non_current_repo_root() {
+    fn resolve_project_root_from_items_dir_rejects_non_repository_root() {
         let tmp = tempfile::tempdir().unwrap();
         let items_dir = tmp.path().join("track").join("items");
         std::fs::create_dir_all(&items_dir).unwrap();
 
         let err = resolve_project_root_from_items_dir(&items_dir).unwrap_err();
 
-        assert!(err.to_string().contains("current repository root"), "{err}");
+        assert!(err.to_string().contains("git repository"), "{err}");
+    }
+
+    #[test]
+    fn test_resolve_project_root_from_items_dir_rejects_nested_repository_path() {
+        let tmp = tempdir_in_current_repo();
+        let items_dir = tmp.path().join("track").join("items");
+        std::fs::create_dir_all(&items_dir).unwrap();
+
+        let err = resolve_project_root_from_items_dir(&items_dir).unwrap_err();
+
+        assert!(err.to_string().contains("discovered repository root"), "{err}");
     }
 
     #[test]
@@ -462,9 +527,9 @@ mod tests {
         std::fs::write(
             logs_dir.join("telemetry.jsonl"),
             concat!(
-                r#"{"command":"track plan","duration_ms":120,"result":{"status":"success"}}"#,
+                r#"{"event_type":"TrackSubcommand","schema_version":1,"track_id":"some-track","command":"track plan","exit_code":0,"duration_ms":120,"timestamp":"2026-06-10T00:00:00Z"}"#,
                 "\n",
-                r#"{"command":"track plan","duration_ms":80,"result":{"status":"failure","exit_code":17}}"#,
+                r#"{"event_type":"TrackSubcommand","schema_version":1,"track_id":"some-track","command":"track plan","exit_code":17,"duration_ms":80,"timestamp":"2026-06-10T00:00:01Z"}"#,
                 "\n"
             ),
         )
@@ -479,6 +544,80 @@ mod tests {
         assert_eq!(*metric.failures().as_ref(), 1);
         assert_eq!(*metric.total_duration().as_ref(), 200);
         assert_eq!(metric.failure_rate().value(), 5_000);
+    }
+
+    #[test]
+    fn test_emit_active_appends_completed_command_to_existing_track_telemetry_jsonl() {
+        let repo = crate::git_cli::SystemGitRepo::discover().unwrap();
+        let Some(branch) = repo.current_branch().unwrap() else {
+            return;
+        };
+        let Ok(track_id) = usecase::track_resolution::resolve_track_id_from_branch(Some(&branch))
+        else {
+            return;
+        };
+        let items_dir = repo.root().join("track").join("items");
+        let path = items_dir.join(&track_id).join("logs").join("telemetry.jsonl");
+        let original = std::fs::read(&path).ok();
+        struct RestoreFile {
+            path: std::path::PathBuf,
+            original: Option<Vec<u8>>,
+        }
+        impl Drop for RestoreFile {
+            fn drop(&mut self) {
+                match &self.original {
+                    Some(bytes) => {
+                        let _ = std::fs::write(&self.path, bytes);
+                    }
+                    None => {
+                        let _ = std::fs::remove_file(&self.path);
+                    }
+                }
+            }
+        }
+        let _restore = RestoreFile { path: path.clone(), original };
+        std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+        std::fs::write(&path, b"{\"event_type\":\"Existing\"}\n").unwrap();
+        let adapter = FsTelemetryEmitDynamicAdapter::new();
+        temp_env::with_vars([("SOTP_TELEMETRY", Some("1")), ("SOTP_TELEMETRY_DIR", None)], || {
+            adapter
+                .emit_active(
+                    &items_dir,
+                    Some(&track_id),
+                    "sotp dry".to_owned(),
+                    17,
+                    240,
+                    Some("command failed".to_owned()),
+                )
+                .unwrap();
+        });
+
+        let content = std::fs::read_to_string(path).unwrap();
+        assert!(content.contains("\"event_type\":\"Existing\""));
+        assert!(content.contains("\"event_type\":\"TrackSubcommand\""));
+        assert!(content.contains("\"command\":\"sotp dry\""));
+        assert!(content.contains("\"exit_code\":17"));
+        assert!(content.contains("\"duration_ms\":240"));
+        assert!(content.contains("\"event_type\":\"NonZeroExit\""));
+        assert!(content.contains("command failed"));
+    }
+
+    #[test]
+    fn test_emit_active_rejects_malformed_items_dir() {
+        let adapter = FsTelemetryEmitDynamicAdapter::new();
+        let error = adapter
+            .emit_active(
+                Path::new("wrong/path"),
+                Some("track-id"),
+                "sotp dry".to_owned(),
+                0,
+                1,
+                None,
+            )
+            .unwrap_err();
+
+        assert!(matches!(error, TelemetryEmitDynamicPortError::EmitUnavailable(_)));
+        assert!(error.to_string().contains("--items-dir"));
     }
 
     #[test]

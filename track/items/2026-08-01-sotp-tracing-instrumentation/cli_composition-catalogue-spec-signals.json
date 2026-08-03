@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "c60dff90ad97e2b62160dfc582b76f9c9a6fde25985e7fbf31a3811576e2e080",
+  "catalogue_declaration_hash": "2272aaeefd0f6671edb60c0a4388eeee2a67fdd17b499be1f75d14e656d96ac4",
   "signals": [
     {
-      "type_name": "CommandTraceCompositionRoot",
+      "type_name": "TelemetryCompositionRoot",
       "signal": "blue",
-      "entry_hash": "ab9f738bc68dcea6908edb089a3c2be207eb8fa4948c4d364ec94714710ed5b6"
+      "entry_hash": "8a11567c04085ffc94370ec64b5a2ed640cc72c958712c79e57739a12c7aeaa8"
     }
   ]
 }

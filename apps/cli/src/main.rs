@@ -2,10 +2,7 @@
 
 use std::process::ExitCode;
 
-use clap::{Parser, Subcommand};
-use cli_composition::{CompositionError, DemoCompositionRoot, TelemetryCompositionRoot};
-use cli_driver::demo::DemoInput;
-use cli_driver::telemetry::TelemetryInput;
+use clap::{CommandFactory, Parser, Subcommand};
 
 mod commands;
 mod error;
@@ -164,6 +161,128 @@ enum CliCommand {
     Demo,
 }
 
+macro_rules! run_cli_with_context {
+    (
+        $cli:expr,
+        $dry_execute:expr,
+        $ref_verify_execute:expr,
+        $command_identity:expr,
+        $telemetry_items_dir:expr $(,)?
+    ) => {{
+        use cli_composition::{DemoCompositionRoot, TelemetryCompositionRoot};
+        use cli_driver::demo::DemoInput;
+        use cli_driver::telemetry::{TelemetryInput, duration_millis, exit_code_value};
+        use $crate::commands;
+        use $crate::{CliCommand, execute_hook_with_telemetry, execute_verify_with_telemetry};
+
+        let cli = $cli;
+        let dry_execute = $dry_execute;
+        let ref_verify_execute = $ref_verify_execute;
+        let command_identity = $command_identity;
+        let telemetry_items_dir = $telemetry_items_dir;
+        let telemetry_driver = TelemetryCompositionRoot::new().telemetry_driver();
+        // Capture the branch-bound track context before dispatch so a command
+        // that changes branches cannot retarget its completion event.
+        let source_track_id =
+            cli_composition::telemetry_wiring::resolve_telemetry_writer(&telemetry_items_dir)
+                .map(|(_, track_id)| track_id);
+        let started = std::time::Instant::now();
+        let (exit_code, error_chain) = match cli.command {
+            Some(CliCommand::Arch { cmd }) => (commands::arch::execute(cmd), None),
+            Some(CliCommand::AdrBaseline { cmd }) => (commands::adr_baseline::execute(cmd), None),
+            Some(CliCommand::Conventions { cmd }) => (commands::conventions::execute(cmd), None),
+            Some(CliCommand::Domain { cmd }) => (commands::domain::execute(cmd), None),
+            Some(CliCommand::Guard { cmd }) => (commands::guard::execute(cmd), None),
+            Some(CliCommand::Hook { cmd }) => (execute_hook_with_telemetry(cmd), None),
+            Some(CliCommand::Maintenance { cmd }) => (commands::maintenance::execute(cmd), None),
+            Some(CliCommand::Track { cmd }) => commands::track::execute_with_error_chain(cmd),
+            Some(CliCommand::Git { cmd }) => (commands::git::execute(cmd), None),
+            Some(CliCommand::Pr { cmd }) => (commands::pr::execute(cmd), None),
+            Some(CliCommand::Capability { cmd }) => (commands::capability::execute(cmd), None),
+            Some(CliCommand::Review { cmd }) => (commands::review::execute(cmd), None),
+            Some(CliCommand::File { cmd }) => (commands::file::execute(cmd), None),
+            Some(CliCommand::Verify { cmd }) => (execute_verify_with_telemetry(cmd), None),
+            Some(CliCommand::FindSimilar(args)) => {
+                (commands::semantic_dup::execute_find_similar(args), None)
+            }
+            Some(CliCommand::DupIndex { cmd }) => {
+                (commands::semantic_dup::execute_dup_index(cmd), None)
+            }
+            Some(CliCommand::DupCheck(args)) => {
+                (commands::semantic_dup::execute_dup_check(args), None)
+            }
+            Some(CliCommand::Telemetry { cmd }) => (commands::telemetry::execute(cmd), None),
+            Some(CliCommand::Dry { cmd }) => (dry_execute(cmd), None),
+            Some(CliCommand::RefVerify { cmd }) => (ref_verify_execute(cmd), None),
+            Some(CliCommand::TestObligation { cmd }) => (
+                commands::test_obligation::execute(
+                    commands::test_obligation::TestObligationArgs::new(cmd),
+                ),
+                None,
+            ),
+            Some(CliCommand::Signal { cmd }) => (commands::signal::execute(cmd), None),
+            Some(CliCommand::TaskContract { cmd }) => (commands::task_contract::execute(cmd), None),
+            Some(CliCommand::BatchPlan { cmd }) => (commands::batch_plan::execute(cmd), None),
+            Some(CliCommand::Catalog { cmd }) => (commands::catalog::execute(cmd), None),
+            Some(CliCommand::CatalogueLint { cmd }) => {
+                (commands::catalogue_lint::execute(cmd), None)
+            }
+            Some(CliCommand::Template { cmd }) => (commands::template::execute(cmd), None),
+            Some(CliCommand::CodexRuntime { cmd }) => (commands::codex_runtime::execute(cmd), None),
+            #[cfg(not(doc))]
+            Some(CliCommand::Demo) | None => {
+                let outcome = DemoCompositionRoot::new().demo_driver().handle(DemoInput::Run);
+                if let Some(msg) = outcome.stdout {
+                    println!("{msg}");
+                }
+                if let Some(msg) = outcome.stderr {
+                    eprintln!("{msg}");
+                }
+                (ExitCode::from(outcome.exit_code), None)
+            }
+            #[cfg(doc)]
+            None => {
+                let outcome = DemoCompositionRoot::new().demo_driver().handle(DemoInput::Run);
+                if let Some(msg) = outcome.stdout {
+                    println!("{msg}");
+                }
+                if let Some(msg) = outcome.stderr {
+                    eprintln!("{msg}");
+                }
+                (ExitCode::from(outcome.exit_code), None)
+            }
+        };
+        let exit_code_i32 = exit_code_value(exit_code);
+        let normalized = command_identity.strip_prefix("sotp ").unwrap_or(&command_identity);
+        if telemetry_completion_eligible(normalized) {
+            let duration_ms = duration_millis(started);
+            let archived_track_id = (normalized == "track archive"
+                && exit_code == ExitCode::SUCCESS)
+                .then(|| source_track_id.as_ref().cloned())
+                .flatten();
+            if let Some(track_id) = archived_track_id {
+                let _ = telemetry_driver.handle(TelemetryInput::EmitArchivedTrackSubcommand {
+                    items_dir: telemetry_items_dir,
+                    track_id,
+                    subcommand: command_identity,
+                    exit_code: exit_code_i32,
+                    duration_ms,
+                });
+            } else {
+                let _ = telemetry_driver.handle(TelemetryInput::EmitCompletedCommand {
+                    items_dir: telemetry_items_dir,
+                    source_track_id,
+                    subcommand: command_identity,
+                    exit_code: exit_code_i32,
+                    duration_ms,
+                    error_chain,
+                });
+            }
+        }
+        exit_code
+    }};
+}
+
 fn main() -> ExitCode {
     // Initialise tracing subscriber once at the composition root entry point
     // (IN-01 / CN-04 / AC-01: subscriber init lives here, not in domain or usecase).
@@ -172,174 +291,83 @@ fn main() -> ExitCode {
     run_cli(Cli::parse(), commands::dry::execute)
 }
 
-fn run_cli(cli: Cli, dry_execute: impl FnOnce(commands::dry::DryCommand) -> ExitCode) -> ExitCode {
+/// Thin entrypoint retained for the existing CLI boundary.
+///
+/// The common completion lifecycle remains owned by `TelemetryDriver`; this
+/// wrapper only supplies the parsed command and the raw-argv context needed by
+/// the driver-facing macro.
+fn run_cli(cli: Cli, dry_execute: fn(commands::dry::DryCommand) -> ExitCode) -> ExitCode {
     run_cli_with(cli, dry_execute, commands::ref_verify::execute)
 }
 
+/// Common CLI entrypoint that captures command context before dispatch, then
+/// submits the resulting completion as a data-only telemetry input.
 fn run_cli_with(
     cli: Cli,
-    dry_execute: impl FnOnce(commands::dry::DryCommand) -> ExitCode,
-    ref_verify_execute: impl FnOnce(commands::ref_verify::RefVerifyCommand) -> ExitCode,
+    dry_execute: fn(commands::dry::DryCommand) -> ExitCode,
+    ref_verify_execute: fn(commands::ref_verify::RefVerifyCommand) -> ExitCode,
 ) -> ExitCode {
-    match cli.command {
-        Some(CliCommand::Arch { cmd }) => commands::arch::execute(cmd),
-        Some(CliCommand::AdrBaseline { cmd }) => commands::adr_baseline::execute(cmd),
-        Some(CliCommand::Conventions { cmd }) => commands::conventions::execute(cmd),
-        Some(CliCommand::Domain { cmd }) => commands::domain::execute(cmd),
-        Some(CliCommand::Guard { cmd }) => commands::guard::execute(cmd),
-        Some(CliCommand::Hook { cmd }) => execute_hook_with_telemetry(cmd),
-        Some(CliCommand::Maintenance { cmd }) => commands::maintenance::execute(cmd),
-        Some(CliCommand::Track { cmd }) => execute_track_with_telemetry(cmd),
-        Some(CliCommand::Git { cmd }) => commands::git::execute(cmd),
-        Some(CliCommand::Pr { cmd }) => commands::pr::execute(cmd),
-        Some(CliCommand::Capability { cmd }) => commands::capability::execute(cmd),
-        Some(CliCommand::Review { cmd }) => commands::review::execute(cmd),
-        Some(CliCommand::File { cmd }) => commands::file::execute(cmd),
-        Some(CliCommand::Verify { cmd }) => execute_verify_with_telemetry(cmd),
-        Some(CliCommand::FindSimilar(args)) => commands::semantic_dup::execute_find_similar(args),
-        Some(CliCommand::DupIndex { cmd }) => commands::semantic_dup::execute_dup_index(cmd),
-        Some(CliCommand::DupCheck(args)) => commands::semantic_dup::execute_dup_check(args),
-        Some(CliCommand::Telemetry { cmd }) => commands::telemetry::execute(cmd),
-        Some(CliCommand::Dry { cmd }) => dry_execute(cmd),
-        Some(CliCommand::RefVerify { cmd }) => ref_verify_execute(cmd),
-        Some(CliCommand::TestObligation { cmd }) => commands::test_obligation::execute(
-            commands::test_obligation::TestObligationArgs::new(cmd),
-        ),
-        Some(CliCommand::Signal { cmd }) => commands::signal::execute(cmd),
-        Some(CliCommand::TaskContract { cmd }) => commands::task_contract::execute(cmd),
-        Some(CliCommand::BatchPlan { cmd }) => commands::batch_plan::execute(cmd),
-        Some(CliCommand::Catalog { cmd }) => commands::catalog::execute(cmd),
-        Some(CliCommand::CatalogueLint { cmd }) => commands::catalogue_lint::execute(cmd),
-        Some(CliCommand::Template { cmd }) => commands::template::execute(cmd),
-        Some(CliCommand::CodexRuntime { cmd }) => commands::codex_runtime::execute(cmd),
-        #[cfg(not(doc))]
-        Some(CliCommand::Demo) | None => {
-            let outcome = DemoCompositionRoot::new().demo_driver().handle(DemoInput::Run);
-            if let Some(msg) = outcome.stdout {
-                println!("{msg}");
-            }
-            if let Some(msg) = outcome.stderr {
-                eprintln!("{msg}");
-            }
-            ExitCode::from(outcome.exit_code)
-        }
-        #[cfg(doc)]
-        None => {
-            let outcome = DemoCompositionRoot::new().demo_driver().handle(DemoInput::Run);
-            if let Some(msg) = outcome.stdout {
-                println!("{msg}");
-            }
-            if let Some(msg) = outcome.stderr {
-                eprintln!("{msg}");
-            }
-            ExitCode::from(outcome.exit_code)
-        }
-    }
+    let argv = std::env::args_os().collect::<Vec<_>>();
+    let command_identity = command_identity_from_args(&argv);
+    let items_dir = cli_driver::telemetry::items_dir_from_args(&argv);
+    run_cli_with_context!(cli, dry_execute, ref_verify_execute, command_identity, items_dir,)
 }
 
-/// Dispatch a `TrackCommand` with telemetry instrumentation.
-///
-/// Pure display commands (OS-04) are dispatched directly without emitting any
-/// telemetry event (ensuring no file IO for those paths — AC-06).
-///
-/// All other track operation subcommands are timed and emit:
-/// - `TelemetryEvent::TrackSubcommand` on completion (AC-02).
-/// - `TelemetryEvent::NonZeroExit` additionally when exit code != 0 (IN-03).
-///
-/// Telemetry is emitted only when the current branch is `track/<id>` (AC-11).
-/// On non-track branches or when telemetry env is disabled, dispatch falls
-/// through without any file IO (AC-06 / AC-11).
-fn execute_track_with_telemetry(cmd: commands::track::TrackCommand) -> ExitCode {
-    use cli_composition::telemetry_wiring::{
-        emit_non_zero_exit, emit_track_subcommand, resolve_telemetry_writer,
+/// Derive only the clap subcommand path for telemetry. `ArgMatches` exposes
+/// the command tree while ignoring positional payloads and option values, so
+/// prompts, track ids, and other user data never become part of the event
+/// identity.
+fn command_identity_from_args(args: &[std::ffi::OsString]) -> String {
+    let Ok(matches) = Cli::command().try_get_matches_from(args.to_owned()) else {
+        return "sotp demo".to_owned();
     };
-    use std::time::Instant;
-
-    // Classify the command: pure display commands are excluded from telemetry
-    // per OS-04 (IN-03, AC-06).
-    let command_label = track_command_label(&cmd);
-    let is_display_only = is_display_only_track_command(&cmd);
-    let is_archive = matches!(&cmd, commands::track::TrackCommand::Archive { .. });
-
-    if is_display_only {
-        // Pure display command: dispatch directly, no telemetry IO.
-        return commands::track::execute(cmd);
+    let mut names = Vec::new();
+    let mut current = &matches;
+    while let Some((name, subcommand)) = current.subcommand() {
+        names.push(name);
+        current = subcommand;
     }
-
-    // Track operation command: resolve telemetry writer (branch-bound, AC-11).
-    // Use the command's own items_dir so non-default --items-dir or
-    // --workspace-root / --project-root invocations write telemetry to the
-    // correct path (P1 fix: workspace_root/project_root variants now derive
-    // the correct items_dir rather than returning the constant "track/items").
-    let items_dir = cmd.items_dir();
-    let telemetry = resolve_telemetry_writer(&items_dir);
-
-    let start = Instant::now();
-    // Use execute_with_error_chain so the error message is available for
-    // NonZeroExit.error_chain (IN-03).  The error is also printed to stderr
-    // by execute_with_error_chain (same behaviour as execute()).
-    let (exit_code, error_chain) = commands::track::execute_with_error_chain(cmd);
-    // `ExitCode` does not expose its numeric value in stable Rust.
-    // Map to a conventional i32: SUCCESS → 0, everything else → 1.
-    // This is sufficient for the telemetry event (AC-02 requires exit_code field;
-    // exact code > 1 is preserved when ExitCode stabilises numeric access).
-    let exit_code_i32: i32 = if exit_code == ExitCode::SUCCESS { 0 } else { 1 };
-
-    // Emit telemetry on completion - NOT at start (exit_code/duration are only
-    // known after dispatch completes; IN-03 / T004 description).
-    if let Some((ref w, ref track_id)) = telemetry {
-        if is_archive && exit_code == ExitCode::SUCCESS && !telemetry_dir_override_is_set() {
-            let _ = emit_archived_track_subcommand(
-                &items_dir,
-                track_id,
-                command_label,
-                exit_code_i32,
-                start,
-            );
-        } else {
-            emit_track_subcommand(w, track_id, command_label, exit_code_i32, start);
-        }
-
-        if exit_code_i32 != 0 {
-            // Populate error_chain from the dispatch error (IN-03).
-            // Falls back to "" when the dispatch error has no string representation
-            // (e.g. exit-code-only failures from sub-processes).
-            let chain = error_chain.as_deref().unwrap_or("");
-            emit_non_zero_exit(w, track_id, command_label, exit_code_i32, chain);
-        }
-    }
-
-    exit_code
+    if names.is_empty() { "sotp demo".to_owned() } else { format!("sotp {}", names.join(" ")) }
 }
 
-fn telemetry_dir_override_is_set() -> bool {
-    std::env::var("SOTP_TELEMETRY_DIR").ok().is_some_and(|value| !value.is_empty())
+/// Composition policy for the common command-completion telemetry boundary.
+///
+/// The CLI owns command-family routing because it is the only layer that sees
+/// the parsed clap command tree. The driver receives only the resulting data
+/// payload through `TelemetryInput::EmitCompletedCommand`.
+fn telemetry_completion_eligible(subcommand: &str) -> bool {
+    let top_level = subcommand.split_whitespace().next().unwrap_or_default();
+    if matches!(top_level, "arch" | "track" | "hook" | "verify" | "find-similar" | "telemetry") {
+        return top_level == "track" && !telemetry_track_display_only(subcommand);
+    }
+    !matches!(
+        subcommand,
+        "conventions resolve"
+            | "review results"
+            | "review classify"
+            | "review files"
+            | "dry results"
+            | "ref-verify results"
+            | "signal report"
+            | "test-obligation results"
+            | "test-obligation bindings-skeleton"
+            | "dup-index measure-quality"
+    )
 }
 
-fn emit_archived_track_subcommand(
-    items_dir: &std::path::Path,
-    track_id: &str,
-    command_label: &str,
-    exit_code: i32,
-    start: std::time::Instant,
-) -> Result<(), CompositionError> {
-    let duration_ms = u64::try_from(start.elapsed().as_millis()).unwrap_or(u64::MAX);
-    let outcome = TelemetryCompositionRoot::new().telemetry_driver().handle(
-        TelemetryInput::EmitArchivedTrackSubcommand {
-            items_dir: items_dir.to_path_buf(),
-            track_id: track_id.to_owned(),
-            subcommand: command_label.to_owned(),
-            exit_code,
-            duration_ms,
-        },
-    );
-    if outcome.exit_code == 0 {
-        Ok(())
-    } else {
-        let msg =
-            outcome.stderr.unwrap_or_else(|| "archived-track telemetry emit failed".to_owned());
-        Err(CompositionError::Infrastructure(msg))
-    }
+fn telemetry_track_display_only(subcommand: &str) -> bool {
+    matches!(
+        subcommand,
+        "track resolve"
+            | "track next-task"
+            | "track task-counts"
+            | "track views validate"
+            | "track spec-element-hash"
+            | "track fixpoint-resolve"
+            | "track catalogue-impl-signals"
+            | "track type-graph"
+            | "track contract-map"
+    )
 }
 
 // ---------------------------------------------------------------------------
@@ -510,68 +538,6 @@ fn verify_command_gate_name(cmd: &commands::verify::VerifyCommand) -> &'static s
     }
 }
 
-/// Returns a static label string for the given `TrackCommand` variant.
-///
-/// Used as the `command` field in `TelemetryEvent::TrackSubcommand` /
-/// `TelemetryEvent::NonZeroExit`.
-fn track_command_label(cmd: &commands::track::TrackCommand) -> &'static str {
-    use commands::track::{BranchAction, TrackCommand, ViewAction};
-
-    match cmd {
-        TrackCommand::Archive { .. } => "track archive",
-        TrackCommand::Transition { .. } => "track transition",
-        TrackCommand::Branch { action: BranchAction::Create(_) } => "track branch create",
-        TrackCommand::Branch { action: BranchAction::Switch(_) } => "track branch switch",
-        TrackCommand::Resolve(_) => "track resolve",
-        TrackCommand::Views { action: ViewAction::Validate { .. } } => "track views validate",
-        TrackCommand::Views { action: ViewAction::Sync { .. } } => "track views sync",
-        TrackCommand::AddTask { .. } => "track add-task",
-        TrackCommand::SetOverride { .. } => "track set-override",
-        TrackCommand::ClearOverride { .. } => "track clear-override",
-        TrackCommand::NextTask { .. } => "track next-task",
-        TrackCommand::TaskCounts { .. } => "track task-counts",
-        TrackCommand::TypeGraph { .. } => "track type-graph",
-        TrackCommand::BaselineGraph { .. } => "track baseline-graph",
-        TrackCommand::ContractMap { .. } => "track contract-map",
-        TrackCommand::SpecElementHash { .. } => "track spec-element-hash",
-        TrackCommand::BaselineCapture { .. } => "track baseline-capture",
-        TrackCommand::CatalogueImplSignals { .. } => "track catalogue-impl-signals",
-        TrackCommand::Lint { .. } => "track lint",
-        TrackCommand::FixpointResolve(_) => "track fixpoint-resolve",
-        TrackCommand::SetCommitHash(_) => "track set-commit-hash",
-        TrackCommand::SwitchBase { .. } => "track switch-base",
-    }
-}
-
-/// Returns `true` for pure display commands that must not emit telemetry
-/// (OS-04 / AC-06).
-///
-/// Excluded set rationale:
-/// - `Resolve` / `NextTask` / `TaskCounts`: read-only queries with no side
-///   effects; emitting on these would pollute the log with noise.
-/// - `Views { Validate }`: read-only metadata validation.
-/// - `SpecElementHash`: read-only hash output helper.
-/// - `FixpointResolve`: read-only gate selector that only prints the next step.
-/// - `CatalogueImplSignals` / `TypeGraph` / `ContractMap`: diagnostic/display
-///   commands; run on demand for viewing purposes, not part of the workflow
-///   execution path that telemetry is meant to track.
-fn is_display_only_track_command(cmd: &commands::track::TrackCommand) -> bool {
-    use commands::track::{TrackCommand, ViewAction};
-
-    matches!(
-        cmd,
-        TrackCommand::Resolve(_)
-            | TrackCommand::NextTask { .. }
-            | TrackCommand::TaskCounts { .. }
-            | TrackCommand::Views { action: ViewAction::Validate { .. } }
-            | TrackCommand::SpecElementHash { .. }
-            | TrackCommand::FixpointResolve(_)
-            | TrackCommand::CatalogueImplSignals { .. }
-            | TrackCommand::TypeGraph { .. }
-            | TrackCommand::ContractMap { .. }
-    )
-}
-
 #[cfg(test)]
 #[allow(clippy::indexing_slicing, clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
@@ -583,11 +549,10 @@ mod tests {
     use cli_driver::demo::DemoInput as DriverDemoInput;
     use tempfile::TempDir;
 
-    use super::run_cli_with;
-    use super::{Cli, CliCommand, run_cli};
+    use super::{Cli, CliCommand, command_identity_from_args, telemetry_completion_eligible};
     use crate::commands::dry::DryCommand;
     use crate::commands::ref_verify::RefVerifyCommand;
-    use crate::commands::track::test_support::{process_env_lock, run_in_dir, seed_repo};
+    use crate::commands::track::test_support::{process_env_lock, run_git, run_in_dir, seed_repo};
 
     const MINIMAL_RULES: &str = r#"{
   "layers": [
@@ -596,8 +561,32 @@ mod tests {
   ]
 }"#;
 
+    macro_rules! dispatch_cli_test {
+        ($cli:expr, $dry_execute:expr $(,)?) => {
+            run_cli_with_context!(
+                $cli,
+                $dry_execute,
+                crate::commands::ref_verify::execute,
+                "sotp telemetry".to_owned(),
+                std::path::PathBuf::from("track/items"),
+            )
+        };
+    }
+
+    macro_rules! dispatch_cli_with_test {
+        ($cli:expr, $dry_execute:expr, $ref_verify_execute:expr $(,)?) => {
+            run_cli_with_context!(
+                $cli,
+                $dry_execute,
+                $ref_verify_execute,
+                "sotp telemetry".to_owned(),
+                std::path::PathBuf::from("track/items"),
+            )
+        };
+    }
+
     /// End-to-end dispatch: `sotp arch tree --project-root <dir>` parses via `Cli::try_parse_from`
-    /// and is dispatched through `run_cli` to `commands::arch::execute`, returning success.
+    /// and is dispatched through the common CLI entrypoint to `commands::arch::execute`, returning success.
     #[test]
     fn test_arch_tree_dispatch_via_run_cli_succeeds_with_valid_rules() {
         let dir = TempDir::new().unwrap();
@@ -605,7 +594,7 @@ mod tests {
         let project_root = dir.path().to_str().unwrap();
         let cli =
             Cli::try_parse_from(["sotp", "arch", "tree", "--project-root", project_root]).unwrap();
-        let exit = run_cli(cli, |_cmd| ExitCode::FAILURE);
+        let exit = dispatch_cli_test!(cli, |_cmd| ExitCode::FAILURE);
         assert_eq!(exit, ExitCode::SUCCESS);
     }
 
@@ -680,6 +669,200 @@ mod tests {
         );
     }
 
+    #[test]
+    fn test_completed_command_success_appends_existing_telemetry_event() {
+        let _guard = process_env_lock().lock().unwrap();
+        let directory = TempDir::new().unwrap();
+        seed_repo(directory.path(), "track/trace-success");
+        let cli =
+            Cli::try_parse_from(["sotp", "dry", "write", "--track-id", "trace-success"]).unwrap();
+        let path = directory.path().join("track/items/trace-success/logs/telemetry.jsonl");
+        fs::create_dir_all(path.parent().unwrap()).unwrap();
+        fs::write(
+            &path,
+            "{\"event_type\":\"HookBlock\",\"schema_version\":1,\"track_id\":\"trace-success\",\"hook_name\":\"existing\",\"timestamp\":\"2026-08-02T00:00:00Z\"}\n",
+        )
+        .unwrap();
+
+        let exit = temp_env::with_vars(
+            [("SOTP_TELEMETRY", Some("1")), ("SOTP_TELEMETRY_DIR", None)],
+            || {
+                run_in_dir(directory.path(), || {
+                    run_cli_with_context!(
+                        cli,
+                        |_command| ExitCode::SUCCESS,
+                        |_command| ExitCode::FAILURE,
+                        "sotp dry".to_owned(),
+                        std::path::PathBuf::from("track/items"),
+                    )
+                })
+            },
+        );
+
+        assert_eq!(exit, ExitCode::SUCCESS);
+        let lines = fs::read_to_string(&path).unwrap();
+        assert_eq!(lines.lines().count(), 2, "completion must append to existing telemetry");
+        assert!(lines.lines().next().unwrap().contains("\"hook_name\":\"existing\""));
+        let record: serde_json::Value =
+            serde_json::from_str(lines.lines().last().unwrap()).unwrap();
+        assert_eq!(record["event_type"], "TrackSubcommand");
+        assert_eq!(record["command"], "sotp dry");
+        assert_eq!(record["exit_code"], 0);
+        assert!(record["duration_ms"].is_u64());
+    }
+
+    #[test]
+    fn test_completed_command_failure_preserves_exit_and_appends_nonzero_event() {
+        let _guard = process_env_lock().lock().unwrap();
+        let directory = TempDir::new().unwrap();
+        seed_repo(directory.path(), "track/trace-failure");
+        let cli =
+            Cli::try_parse_from(["sotp", "dry", "write", "--track-id", "trace-failure"]).unwrap();
+
+        let exit = temp_env::with_vars(
+            [("SOTP_TELEMETRY", Some("1")), ("SOTP_TELEMETRY_DIR", None)],
+            || {
+                run_in_dir(directory.path(), || {
+                    run_cli_with_context!(
+                        cli,
+                        |_command| ExitCode::from(u8::MAX),
+                        |_command| ExitCode::SUCCESS,
+                        "sotp dry".to_owned(),
+                        std::path::PathBuf::from("track/items"),
+                    )
+                })
+            },
+        );
+
+        assert_eq!(exit, ExitCode::from(u8::MAX));
+        let path = directory.path().join("track/items/trace-failure/logs/telemetry.jsonl");
+        let lines = fs::read_to_string(path).unwrap();
+        assert!(lines.lines().any(|line| line.contains("\"event_type\":\"TrackSubcommand\"")));
+        assert!(lines.lines().any(|line| line.contains("\"event_type\":\"NonZeroExit\"")));
+    }
+
+    #[test]
+    fn test_completed_command_append_failure_preserves_original_exit() {
+        let _guard = process_env_lock().lock().unwrap();
+        let directory = TempDir::new().unwrap();
+        let track_id = "trace-append-failure";
+        seed_repo(directory.path(), &format!("track/{track_id}"));
+        let logs_path = directory.path().join("track/items").join(track_id).join("logs");
+        fs::create_dir_all(logs_path.parent().unwrap()).unwrap();
+        fs::write(&logs_path, "not a directory").unwrap();
+        let cli = Cli::try_parse_from(["sotp", "dry", "write", "--track-id", track_id]).unwrap();
+
+        let exit = temp_env::with_vars(
+            [("SOTP_TELEMETRY", Some("1")), ("SOTP_TELEMETRY_DIR", None)],
+            || {
+                run_in_dir(directory.path(), || {
+                    run_cli_with_context!(
+                        cli,
+                        |_command| ExitCode::from(42),
+                        |_command| ExitCode::SUCCESS,
+                        "sotp dry".to_owned(),
+                        std::path::PathBuf::from("track/items"),
+                    )
+                })
+            },
+        );
+
+        assert_eq!(exit, ExitCode::from(42));
+        assert!(logs_path.is_file(), "append failure must not replace the original path");
+    }
+
+    #[test]
+    fn test_completed_command_non_track_branch_leaves_no_telemetry_log() {
+        let _guard = process_env_lock().lock().unwrap();
+        let directory = TempDir::new().unwrap();
+        seed_repo(directory.path(), "main");
+        let cli =
+            Cli::try_parse_from(["sotp", "dry", "write", "--track-id", "not-a-track"]).unwrap();
+
+        let exit = temp_env::with_vars(
+            [("SOTP_TELEMETRY", Some("1")), ("SOTP_TELEMETRY_DIR", None)],
+            || {
+                run_in_dir(directory.path(), || {
+                    run_cli_with_context!(
+                        cli,
+                        |_command| ExitCode::SUCCESS,
+                        |_command| ExitCode::FAILURE,
+                        "sotp dry".to_owned(),
+                        std::path::PathBuf::from("track/items"),
+                    )
+                })
+            },
+        );
+
+        assert_eq!(exit, ExitCode::SUCCESS);
+        assert!(
+            !directory.path().join("track/items/not-a-track/logs/telemetry.jsonl").exists(),
+            "non-track branches must not create telemetry logs"
+        );
+    }
+
+    #[test]
+    fn test_completed_command_uses_only_existing_telemetry_jsonl_sink() {
+        let _guard = process_env_lock().lock().unwrap();
+        let directory = TempDir::new().unwrap();
+        let track_id = "trace-single-sink";
+        seed_repo(directory.path(), &format!("track/{track_id}"));
+        let cli = Cli::try_parse_from(["sotp", "dry", "write", "--track-id", track_id]).unwrap();
+
+        let exit = temp_env::with_vars(
+            [("SOTP_TELEMETRY", Some("1")), ("SOTP_TELEMETRY_DIR", None)],
+            || {
+                run_in_dir(directory.path(), || {
+                    run_cli_with_context!(
+                        cli,
+                        |_command| ExitCode::SUCCESS,
+                        |_command| ExitCode::FAILURE,
+                        "sotp dry".to_owned(),
+                        std::path::PathBuf::from("track/items"),
+                    )
+                })
+            },
+        );
+
+        assert_eq!(exit, ExitCode::SUCCESS);
+        let logs_path = directory.path().join("track/items").join(track_id).join("logs");
+        let file_names: Vec<_> =
+            fs::read_dir(&logs_path).unwrap().map(|entry| entry.unwrap().file_name()).collect();
+        assert_eq!(file_names, vec![std::ffi::OsString::from("telemetry.jsonl")]);
+    }
+
+    #[test]
+    fn test_command_identity_ignores_positional_payload_and_option_values() {
+        let args = vec![
+            std::ffi::OsString::from("sotp"),
+            std::ffi::OsString::from("review"),
+            std::ffi::OsString::from("codex-local"),
+            std::ffi::OsString::from("--prompt"),
+            std::ffi::OsString::from("do-not-record-this"),
+            std::ffi::OsString::from("--model"),
+            std::ffi::OsString::from("gpt-5.6-terra"),
+            std::ffi::OsString::from("--round-type"),
+            std::ffi::OsString::from("final"),
+            std::ffi::OsString::from("--group"),
+            std::ffi::OsString::from("cli"),
+        ];
+
+        assert_eq!(command_identity_from_args(&args), "sotp review codex-local");
+    }
+
+    #[test]
+    fn test_telemetry_completion_eligible_accepts_track_workflow_commands() {
+        assert!(telemetry_completion_eligible("track spec-design"));
+        assert!(telemetry_completion_eligible("dry write"));
+    }
+
+    #[test]
+    fn test_telemetry_completion_eligible_excludes_display_only_and_report_commands() {
+        assert!(!telemetry_completion_eligible("track resolve"));
+        assert!(!telemetry_completion_eligible("telemetry report"));
+        assert!(!telemetry_completion_eligible("review results"));
+    }
+
     // ── CliCommand::Dry entrypoint dispatch routing ───────────────────────────
 
     /// `sotp dry write --track-id x` must resolve to `CliCommand::Dry { cmd: DryCommand::Write }`.
@@ -688,7 +871,7 @@ mod tests {
     #[test]
     fn test_dry_dispatch_write_routes_to_dry_write_variant() {
         let cli = Cli::try_parse_from(["sotp", "dry", "write", "--track-id", "my-track"]).unwrap();
-        let exit = run_cli(cli, |cmd| {
+        let exit = dispatch_cli_test!(cli, |cmd| {
             match cmd {
                 DryCommand::Write(args) => {
                     assert_eq!(args.track_id, "my-track");
@@ -717,7 +900,7 @@ mod tests {
     fn test_dry_dispatch_results_routes_to_dry_results_variant() {
         let cli =
             Cli::try_parse_from(["sotp", "dry", "results", "--track-id", "my-track"]).unwrap();
-        let exit = run_cli(cli, |cmd| {
+        let exit = dispatch_cli_test!(cli, |cmd| {
             match cmd {
                 DryCommand::Results(args) => {
                     assert_eq!(args.track_id, "my-track");
@@ -748,7 +931,7 @@ mod tests {
     fn test_dry_dispatch_check_approved_routes_to_dry_check_approved_variant() {
         let cli = Cli::try_parse_from(["sotp", "dry", "check-approved", "--track-id", "my-track"])
             .unwrap();
-        let exit = run_cli(cli, |cmd| {
+        let exit = dispatch_cli_test!(cli, |cmd| {
             match cmd {
                 DryCommand::CheckApproved(args) => {
                     assert_eq!(args.track_id.as_deref(), Some("my-track"));
@@ -790,19 +973,15 @@ mod tests {
     fn test_ref_verify_dispatch_run_routes_to_ref_verify_run_variant() {
         let cli =
             Cli::try_parse_from(["sotp", "ref-verify", "run", "--track-id", "my-track"]).unwrap();
-        let exit = run_cli_with(
-            cli,
-            |_cmd| ExitCode::FAILURE,
-            |cmd| {
-                match cmd {
-                    RefVerifyCommand::Run(args) => {
-                        assert_eq!(args.track_id.as_deref(), Some("my-track"));
-                    }
-                    other => panic!("expected Run, got {other:?}"),
+        let exit = dispatch_cli_with_test!(cli, |_cmd| ExitCode::FAILURE, |cmd| {
+            match cmd {
+                RefVerifyCommand::Run(args) => {
+                    assert_eq!(args.track_id.as_deref(), Some("my-track"));
                 }
-                ExitCode::from(41)
-            },
-        );
+                other => panic!("expected Run, got {other:?}"),
+            }
+            ExitCode::from(41)
+        },);
         assert_eq!(exit, ExitCode::from(41));
     }
 
@@ -827,19 +1006,15 @@ mod tests {
         let cli =
             Cli::try_parse_from(["sotp", "ref-verify", "check-approved", "--track-id", "my-track"])
                 .unwrap();
-        let exit = run_cli_with(
-            cli,
-            |_cmd| ExitCode::FAILURE,
-            |cmd| {
-                match cmd {
-                    RefVerifyCommand::CheckApproved(args) => {
-                        assert_eq!(args.track_id.as_deref(), Some("my-track"));
-                    }
-                    other => panic!("expected CheckApproved, got {other:?}"),
+        let exit = dispatch_cli_with_test!(cli, |_cmd| ExitCode::FAILURE, |cmd| {
+            match cmd {
+                RefVerifyCommand::CheckApproved(args) => {
+                    assert_eq!(args.track_id.as_deref(), Some("my-track"));
                 }
-                ExitCode::from(43)
-            },
-        );
+                other => panic!("expected CheckApproved, got {other:?}"),
+            }
+            ExitCode::from(43)
+        },);
         assert_eq!(exit, ExitCode::from(43));
     }
 
@@ -869,7 +1044,7 @@ mod tests {
     // ── CliCommand::Telemetry entrypoint dispatch routing ───────────────────
 
     /// `sotp telemetry report <track-id>` must be registered at the public CLI
-    /// entrypoint and dispatch through `run_cli` to the report command.
+    /// entrypoint and dispatch through the common CLI entrypoint to the report command.
     #[test]
     fn test_telemetry_report_dispatch_via_run_cli_succeeds_with_existing_track() {
         let _guard = process_env_lock().lock().unwrap();
@@ -889,60 +1064,69 @@ mod tests {
                 "track/items",
             ])
             .unwrap();
-            run_cli(cli, |_cmd| ExitCode::FAILURE)
+            dispatch_cli_test!(cli, |_cmd| ExitCode::FAILURE)
         });
         assert_eq!(exit, ExitCode::SUCCESS);
     }
 
     #[test]
-    fn test_archive_telemetry_emit_writes_to_archived_track_logs() {
+    fn test_archive_completion_telemetry_moves_to_archived_track_logs() {
         let _guard = process_env_lock().lock().unwrap();
         let dir = TempDir::new().unwrap();
         let root = dir.path();
         let track_id = "archive-telemetry-track";
         seed_repo(root, &format!("track/{track_id}"));
-        let items_dir = std::path::PathBuf::from("track/items");
-        let archived_track_dir = root.join("track").join("archive").join(track_id);
-        fs::create_dir_all(&archived_track_dir).unwrap();
+        let items_dir = root.join("track").join("items");
+        let track_dir = items_dir.join(track_id);
+        fs::create_dir_all(&track_dir).unwrap();
+        fs::create_dir_all(root.join("track").join("archive")).unwrap();
+        fs::write(root.join(".gitignore"), "track/items/*/logs/\n").unwrap();
+        fs::write(track_dir.join("tracked.txt"), "archive fixture\n").unwrap();
+        run_git(root, &["add", ".gitignore", "track/items/archive-telemetry-track/tracked.txt"]);
+        run_git(root, &["commit", "-m", "archive fixture", "--no-gpg-sign"]);
         let nested_cwd = root.join("nested").join("workdir");
         fs::create_dir_all(&nested_cwd).unwrap();
-        let started_at = std::time::Instant::now() - std::time::Duration::from_millis(1);
-
-        run_in_dir(&nested_cwd, || {
-            super::emit_archived_track_subcommand(
-                &items_dir,
-                track_id,
-                "track archive",
-                0,
-                started_at,
-            )
-            .unwrap();
+        let items_dir_text = items_dir.to_string_lossy().into_owned();
+        temp_env::with_vars([("SOTP_TELEMETRY", Some("1")), ("SOTP_TELEMETRY_DIR", None)], || {
+            run_in_dir(&nested_cwd, || {
+                let cli = Cli::try_parse_from([
+                    "sotp",
+                    "track",
+                    "archive",
+                    "--track-id",
+                    track_id,
+                    "--items-dir",
+                    items_dir_text.as_str(),
+                ])
+                .unwrap();
+                let exit = run_cli_with_context!(
+                    cli,
+                    |_command| ExitCode::FAILURE,
+                    |_command| ExitCode::FAILURE,
+                    "sotp track archive".to_owned(),
+                    items_dir.clone(),
+                );
+                assert_eq!(exit, ExitCode::SUCCESS);
+            });
         });
 
-        let active_log =
-            root.join("track").join("items").join(track_id).join("logs").join("telemetry.jsonl");
-        let nested_archive_log = nested_cwd
-            .join("track")
-            .join("archive")
-            .join(track_id)
-            .join("logs")
-            .join("telemetry.jsonl");
-        let archived_log = archived_track_dir.join("logs").join("telemetry.jsonl");
+        let active_log = items_dir.join(track_id).join("logs").join("telemetry.jsonl");
+        let archived_log =
+            root.join("track").join("archive").join(track_id).join("logs").join("telemetry.jsonl");
+        assert!(
+            archived_log.exists(),
+            "successful archive completion must append to the archived track log: {archived_log:?}"
+        );
         assert!(
             !active_log.exists(),
-            "archive telemetry must not recreate the active track log: {active_log:?}"
+            "successful archive completion must not recreate the active track sink: {active_log:?}"
         );
-        assert!(
-            !nested_archive_log.exists(),
-            "relative items_dir must be anchored at the repo root, not cwd: {nested_archive_log:?}"
-        );
-
         let line = fs::read_to_string(&archived_log).unwrap();
         let value: serde_json::Value = serde_json::from_str(line.trim()).unwrap();
         assert_eq!(value["event_type"], "TrackSubcommand");
         assert_eq!(value["schema_version"], 1);
         assert_eq!(value["track_id"], track_id);
-        assert_eq!(value["command"], "track archive");
+        assert_eq!(value["command"], "sotp track archive");
         assert_eq!(value["exit_code"], 0);
         let duration_ms = value["duration_ms"].as_u64().expect("duration_ms must be u64");
         assert!(
@@ -953,19 +1137,6 @@ mod tests {
             value.get("timestamp").is_some(),
             "timestamp field must be present in the JSONL line"
         );
-    }
-
-    #[test]
-    fn test_is_display_only_track_command_fixpoint_resolve_returns_true() {
-        let cmd = crate::commands::track::TrackCommand::FixpointResolve(
-            crate::commands::track::fixpoint_resolve::FixpointResolveArgs {
-                items_dir: std::path::PathBuf::from("track/items"),
-                track_id: "my-track".to_owned(),
-                current_branch: "track/my-track".to_owned(),
-            },
-        );
-
-        assert!(super::is_display_only_track_command(&cmd));
     }
 
     // ── CliCommand::Conventions entrypoint dispatch routing ──────────────────
@@ -992,7 +1163,7 @@ mod tests {
     }
 
     /// End-to-end dispatch: `sotp conventions verify-index --project-root <dir>` parses via
-    /// `Cli::try_parse_from` and is dispatched through `run_cli` to
+    /// `Cli::try_parse_from` and is dispatched through the common CLI entrypoint to
     /// `commands::conventions::execute`, returning success when the index is in sync.
     #[test]
     fn test_conventions_verify_index_dispatch_via_run_cli_succeeds_with_synced_index() {
@@ -1007,7 +1178,7 @@ mod tests {
             project_root,
         ])
         .unwrap();
-        let exit = run_cli(cli, |_cmd| ExitCode::FAILURE);
+        let exit = dispatch_cli_test!(cli, |_cmd| ExitCode::FAILURE);
         assert_eq!(exit, ExitCode::SUCCESS);
     }
 
@@ -1060,7 +1231,7 @@ mod tests {
     #[test]
     fn test_hook_dispatch_skill_compliance_via_run_cli_exits_zero() {
         let cli = Cli::try_parse_from(["sotp", "hook", "dispatch", "skill-compliance"]).unwrap();
-        let exit = run_cli(cli, |_cmd| ExitCode::FAILURE);
+        let exit = dispatch_cli_test!(cli, |_cmd| ExitCode::FAILURE);
         assert_eq!(exit, ExitCode::SUCCESS);
     }
 
@@ -1078,7 +1249,7 @@ mod tests {
         let cli = Cli::try_parse_from(["sotp", "verify", "layers", "--project-root", project_root])
             .unwrap();
         // Non-zero exit expected (no Cargo.toml for cargo-metadata). Must not panic.
-        let exit = run_cli(cli, |_cmd| ExitCode::FAILURE);
+        let exit = dispatch_cli_test!(cli, |_cmd| ExitCode::FAILURE);
         assert_ne!(exit, ExitCode::from(2u8), "exit 2 reserved for hook blocks");
     }
 

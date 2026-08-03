@@ -3,78 +3,6 @@
   "entries": [
     {
       "edge_id": {
-        "entry_key": "CommandExecutionResult",
-        "anchor_id": {
-          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
-          "element_id": "AC-01"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "CommandExecutionResult",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:AC-01"
-      },
-      "key": {
-        "waived_reason_hash": "10f00d27f8377bbfd7d1ce54c6f987e07c8824a35ff754cd80ca3e0c74db0624",
-        "declaration_hash": "d55cf73f9815e43106b3cca3c7db027f3f5ba7b65f9f3a1e639d6b33d429eb23",
-        "anchor_text_hash": "20dde4425f6215906fc5e8b5e58462b7a85b79d7bcea0971fd911e457a3a9113"
-      },
-      "verdict": {
-        "kind": "waived",
-        "citation": "\"Finite completed-command outcome: success carries no invalid code, while failure must carry a validated non-zero CommandExitCode.\""
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "entry_key": "CommandTraceRecord",
-        "anchor_id": {
-          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
-          "element_id": "IN-01"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "CommandTraceRecord",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-01"
-      },
-      "key": {
-        "waived_reason_hash": "458808a782962f441149395ced06d30a1eaaa62890ad3af848df8cbcc4781943",
-        "declaration_hash": "201629ff14ada99e7fa65067742e6edd162b6b64421a693ab976517ba5da709e",
-        "anchor_text_hash": "e8372367836888c48ae6c6884d835ad2cb235a64da700bb711dbd7fc03b9273c"
-      },
-      "verdict": {
-        "kind": "waived",
-        "citation": "Application-boundary DTO passed to CommandTraceService and CommandTraceWriterPort."
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "entry_key": "CommandTraceRecord",
-        "anchor_id": {
-          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
-          "element_id": "AC-01"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "CommandTraceRecord",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:AC-01"
-      },
-      "key": {
-        "waived_reason_hash": "eefbeb9d84c9a73360edfef516a1dbf72c6356f888bd44d50c1daa18e48de308",
-        "declaration_hash": "201629ff14ada99e7fa65067742e6edd162b6b64421a693ab976517ba5da709e",
-        "anchor_text_hash": "20dde4425f6215906fc5e8b5e58462b7a85b79d7bcea0971fd911e457a3a9113"
-      },
-      "verdict": {
-        "kind": "waived",
-        "citation": "Application-boundary DTO passed to CommandTraceService and CommandTraceWriterPort."
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
         "entry_key": "CommandTraceValueError",
         "anchor_id": {
           "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
@@ -88,12 +16,12 @@
       },
       "key": {
         "waived_reason_hash": "8b42a10437df745679341848615e69c55134ba90e89005d542fe3418535c7ec2",
-        "declaration_hash": "ca607317a4b3b8cd5f8fa4c8c0c3b3ffbf6694a26a0dc812a1b67bd91aeede39",
-        "anchor_text_hash": "e8372367836888c48ae6c6884d835ad2cb235a64da700bb711dbd7fc03b9273c"
+        "declaration_hash": "706609e45ffe3f3d1e607f6e3c16dff3e560b709f9632dbb5b521cdc4148a345",
+        "anchor_text_hash": "c2c7f968ad201efcf6c2b0e52aa82c94b1eb77f3361dde7b9293d7a063785050"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "TypeEntry ... docs: Some(DocString(\"Constructor errors with explicit owners: SotpCommandIdentity::try_new produces EmptyCommandIdentity; CommandExitCode::try_new accepts u8 and produces ZeroExitCode only for zero, while values outside 0..=255 are unrepresentable at the API boundary; CommandExecutionMetric::new produces ZeroExecutions or FailureCountExceedsExecutions; CommandFailureRateBasisPoints::try_new produces FailureRateOutOfRange.\"))"
+        "citation": "Constructor errors with explicit owners: SotpCommandIdentity::try_new produces EmptyCommandIdentity; CommandExecutionMetric::new produces ZeroExecutions or FailureCountExceedsExecutions; CommandFailureRateBasisPoints::try_new produces FailureRateOutOfRange."
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -112,60 +40,12 @@
       },
       "key": {
         "waived_reason_hash": "618d89a9a9d76aa914afafc7ff05ddfd1bdbdb4dc471d5059c9a8c645261013f",
-        "declaration_hash": "ca607317a4b3b8cd5f8fa4c8c0c3b3ffbf6694a26a0dc812a1b67bd91aeede39",
-        "anchor_text_hash": "886b259b72d31a9481887873baede5471f2b81415aad543979b98bd24b8f0528"
+        "declaration_hash": "706609e45ffe3f3d1e607f6e3c16dff3e560b709f9632dbb5b521cdc4148a345",
+        "anchor_text_hash": "7c54b1065f0715eca63ef37b6909f20b93abf04a62b2fa7e396598f46916355d"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "\"CommandTraceValueError only represents in-memory validation failures\""
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "entry_key": "SotpCommandIdentity",
-        "anchor_id": {
-          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
-          "element_id": "IN-01"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "SotpCommandIdentity",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-01"
-      },
-      "key": {
-        "waived_reason_hash": "50b33718a74cfd3660350c229d29f1cd1dafe151a53065bcec3cdb329c428d29",
-        "declaration_hash": "73989c7c9b9a06d5df0797e0ebdc575b5c1362ff4c1503501a9e78e8c3df3b1f",
-        "anchor_text_hash": "e8372367836888c48ae6c6884d835ad2cb235a64da700bb711dbd7fc03b9273c"
-      },
-      "verdict": {
-        "kind": "waived",
-        "citation": "Validated non-empty command identity; try_new produces only CommandTraceValueError::EmptyCommandIdentity."
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "entry_key": "FsCommandTraceAdapter",
-        "anchor_id": {
-          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
-          "element_id": "IN-01"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "FsCommandTraceAdapter",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-01"
-      },
-      "key": {
-        "waived_reason_hash": "0352cc06b0059ab2044f9ab704a2baeba3465f79fd40452637430a8b5530373d",
-        "declaration_hash": "31455b74abd62c3d0e32565385b1351b1eae9fb53859d84424442f8da6081c9c",
-        "anchor_text_hash": "e8372367836888c48ae6c6884d835ad2cb235a64da700bb711dbd7fc03b9273c"
-      },
-      "verdict": {
-        "kind": "waived",
-        "citation": "\"Synchronous filesystem implementation of CommandTraceWriterPort.\""
+        "citation": "Constructor errors with explicit owners"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     }

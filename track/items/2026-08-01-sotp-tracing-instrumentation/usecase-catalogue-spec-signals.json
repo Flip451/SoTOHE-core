@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "dabdb145434bfbe01ac696857c1e94a06532fe81cdc03d787f735b28e4a5d074",
+  "catalogue_declaration_hash": "325c5c6f147e12b04bf58c74a1fff5675ebddb4e05224d0ef95f0e712917aa00",
   "signals": [
     {
       "type_name": "CommandDurationMillis",
@@ -18,44 +18,34 @@
       "entry_hash": "cc5465f4ec56114829340b68e35a8b88213d3d1f44d7dbd686196ed518d4f3c3"
     },
     {
-      "type_name": "CommandExecutionResult",
-      "signal": "blue",
-      "entry_hash": "7f5037b5046add7b45133c82a0f0b520d49962193f3d9b27274edb94b7cf9960"
-    },
-    {
-      "type_name": "CommandExitCode",
-      "signal": "blue",
-      "entry_hash": "b560620f02b10e71abecf1b68233c29e2cd78133e72d60403c2e1419974aa648"
-    },
-    {
       "type_name": "CommandFailureRateBasisPoints",
       "signal": "blue",
       "entry_hash": "d3f504cc0410f0d3aa9a74be80657735ecaefbb432988400f0563f9ffd0bd259"
     },
     {
-      "type_name": "CommandTraceInteractor",
-      "signal": "blue",
-      "entry_hash": "a717f7580f07ce7badb756721c3feb50d14f92c172644efd2a14270038a53762"
-    },
-    {
-      "type_name": "CommandTraceRecord",
-      "signal": "blue",
-      "entry_hash": "e5c74b5fe1da22ab930042f347cde02811b1e56060117d83394394b0d7a43477"
-    },
-    {
       "type_name": "CommandTraceValueError",
       "signal": "blue",
-      "entry_hash": "1405dab21306fbd9dbcf6cab1ba2bae5943696086123116036c7a7c64a85de90"
-    },
-    {
-      "type_name": "CommandTraceWriteError",
-      "signal": "blue",
-      "entry_hash": "dab57c82ff4eb3918372a12f6facb8369c44710ed752119c97352c320a8a1311"
+      "entry_hash": "7629cb9872aa149630afb0c915671a2ddcc2ecad3a4146efeaca3720356f6384"
     },
     {
       "type_name": "SotpCommandIdentity",
       "signal": "blue",
       "entry_hash": "560b6a62fc352cd4981d5337adcb495a9cc3b6c659e3f87cf3561b59c4ba8c41"
+    },
+    {
+      "type_name": "TelemetryAggregateInteractor",
+      "signal": "blue",
+      "entry_hash": "6080c3f11d161a347c96829b0dfb425b5704cd3aeff6501a4236619fbf3afa7c"
+    },
+    {
+      "type_name": "TelemetryArchiveInteractor",
+      "signal": "blue",
+      "entry_hash": "b52bf525c3192d60ef9b236b736fb1c34bd6ffaaeaf75d602710520ca535b41c"
+    },
+    {
+      "type_name": "TelemetryEmitInteractor",
+      "signal": "blue",
+      "entry_hash": "b4c0fb711446b15da8795e3b9da3c3ac8f001d998bafa36dae94cb3037bb79a4"
     },
     {
       "type_name": "TelemetryReportOutput",
@@ -65,17 +55,32 @@
     {
       "type_name": "TelemetrySkippedLineCount",
       "signal": "blue",
-      "entry_hash": "e452641fc2b6ab10f66fb9b0dd1506ccec147486d6241057c495beffa10fa4cd"
+      "entry_hash": "d2278f793dcf87dc995bda2a44e3c72d5d3c44d9354ab65a7da63786f1b841b4"
     },
     {
-      "type_name": "CommandTraceService",
+      "type_name": "TelemetryAggregateService",
       "signal": "blue",
-      "entry_hash": "6253654df178cf74df21a2226fca8822693a4ebc2106b1ccb2933a51c77f89bb"
+      "entry_hash": "58bcbab2da3d1257f988a4dbfa8787858fc1f09f172e3d239e9e49047dbcaf1f"
     },
     {
-      "type_name": "CommandTraceWriterPort",
+      "type_name": "TelemetryArchivedService",
       "signal": "blue",
-      "entry_hash": "c3700550162b9a03b0810d3ed7e0181c9c047660b0b0d1d874856d3757a812b9"
+      "entry_hash": "2ca317307dc67e6cf803a0083291424e095847c9f9d7ec3189ae98158eb79f01"
+    },
+    {
+      "type_name": "TelemetryEmitDynamicPort",
+      "signal": "blue",
+      "entry_hash": "cc052561efa18192e67f2e97a06742188ff99215c4d6c922447a3ab020b0acda"
+    },
+    {
+      "type_name": "TelemetryEmitService",
+      "signal": "blue",
+      "entry_hash": "f2e243e836cfdf3abdb96b92eee2ab8b3533eb69c0e66a2334627e092d0ccad5"
+    },
+    {
+      "type_name": "TelemetryReportService",
+      "signal": "blue",
+      "entry_hash": "0c385e4113bbff8562c1ea55b02b39cd3a7d3ca118264e4efb08d6dd1f29ef60"
     }
   ]
 }

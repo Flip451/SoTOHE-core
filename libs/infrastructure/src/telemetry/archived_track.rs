@@ -1,8 +1,8 @@
 //! Filesystem adapter implementing `ArchivedTrackTelemetryPort`.
 //!
-//! Mirrors the I/O pattern from `apps/cli/src/main.rs:247-294`
-//! (`emit_archived_track_subcommand`), which is the source being extracted
-//! in T009. This adapter:
+//! Reuses the existing archived-track telemetry port and appends the canonical
+//! event to the existing track-local telemetry path supplied by the usecase.
+//! This adapter:
 //!
 //! 1. Constructs the telemetry JSON object with `subcommand` and a RFC-3339
 //!    timestamp (produced via `chrono::Utc::now()`).
@@ -231,6 +231,20 @@ mod tests {
             parsed.get("timestamp").is_some(),
             "timestamp field must be present in the JSONL line"
         );
+    }
+
+    #[test]
+    fn test_archived_telemetry_reuses_existing_jsonl_without_rotation() {
+        let tmp = TempDir::new().unwrap();
+        let adapter = adapter_in_tempdir(&tmp);
+
+        adapter.emit("track-2026-07-04".to_owned(), "track archive".to_owned(), 0, 12).unwrap();
+        adapter.emit("track-2026-07-04".to_owned(), "track archive".to_owned(), 0, 13).unwrap();
+
+        let telemetry = tmp.path().join("telemetry.jsonl");
+        assert_eq!(std::fs::read_to_string(&telemetry).unwrap().lines().count(), 2);
+        assert!(!tmp.path().join("command-trace.jsonl").exists());
+        assert!(!tmp.path().join("telemetry.1.jsonl").exists());
     }
 
     #[test]

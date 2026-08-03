@@ -1,7 +1,6 @@
 //! Telemetry module for JSONL-format workflow telemetry.
 //!
 //! This module contains:
-//! - `command_trace`: typed local command-trace rotation-policy configuration (T004)
 //! - `TelemetryEvent`: wire-format DTO enum (T002)
 //! - `TelemetryWriteError`: error type for `TelemetryWriter` (T002)
 //! - `TelemetryConfig`: env-var resolved configuration (T003)
@@ -13,20 +12,17 @@
 //! (CN-09 / AC-09 / IN-08).
 
 pub mod archived_track;
-pub mod command_trace;
 pub mod config;
 pub mod report;
 pub mod report_adapter;
 pub mod writer;
-
-mod report_command_trace;
 
 pub use config::TelemetryConfig;
 pub use report::{
     PhaseDurationSummary, TelemetryErrorEntry, TelemetryHookBlockEntry, TelemetryReport,
     TelemetryReportError, TelemetryReportSnapshot,
 };
-pub use report_adapter::FsTelemetryReportAdapter;
+pub use report_adapter::{FsTelemetryEmitDynamicAdapter, FsTelemetryReportAdapter};
 pub use writer::TelemetryWriter;
 
 use serde::{Deserialize, Serialize};

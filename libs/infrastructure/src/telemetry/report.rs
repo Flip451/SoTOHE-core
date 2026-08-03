@@ -19,7 +19,6 @@ use usecase::telemetry::command_trace::{
 };
 
 use crate::telemetry::TelemetryEvent;
-use crate::telemetry::report_command_trace::decode;
 use crate::track::symlink_guard::reject_symlinks_below;
 
 // ---------------------------------------------------------------------------
@@ -334,10 +333,33 @@ impl TelemetryReport {
 
                     match serde_json::from_slice::<TelemetryEvent>(&line) {
                         Ok(event) => match event {
-                            TelemetryEvent::TrackSubcommand { command, duration_ms, .. } => {
-                                let entry = phase_map.entry(command).or_insert((0, 0));
+                            TelemetryEvent::TrackSubcommand {
+                                command,
+                                duration_ms,
+                                exit_code,
+                                ..
+                            } => {
+                                let Ok(identity) = SotpCommandIdentity::try_new(command.clone())
+                                else {
+                                    skipped_lines = skipped_lines.saturating_add(1);
+                                    continue;
+                                };
+
+                                let entry = phase_map.entry(command.clone()).or_insert((0, 0));
                                 entry.0 = entry.0.saturating_add(duration_ms);
                                 entry.1 = entry.1.saturating_add(1);
+
+                                // Command metrics are projected from the same
+                                // established TrackSubcommand event that is
+                                // already stored in telemetry.jsonl. No
+                                // separate command-trace record format is
+                                // accepted or written.
+                                let metric = command_map.entry(identity).or_insert((0, 0, 0));
+                                metric.0 = metric.0.saturating_add(1);
+                                if exit_code != 0 {
+                                    metric.1 = metric.1.saturating_add(1);
+                                }
+                                metric.2 = metric.2.saturating_add(duration_ms);
                             }
                             TelemetryEvent::NonZeroExit {
                                 timestamp,
@@ -358,15 +380,7 @@ impl TelemetryReport {
                             }
                             _ => {}
                         },
-                        Err(_) => match decode(&line, KNOWN_SCHEMA_VERSIONS) {
-                            Some(record) => {
-                                let entry = command_map.entry(record.command).or_insert((0, 0, 0));
-                                entry.0 = entry.0.saturating_add(1);
-                                entry.1 = entry.1.saturating_add(u64::from(record.failed));
-                                entry.2 = entry.2.saturating_add(record.duration_ms);
-                            }
-                            None => skipped_lines = skipped_lines.saturating_add(1),
-                        },
+                        Err(_) => skipped_lines = skipped_lines.saturating_add(1),
                     }
                 }
             }
@@ -606,7 +620,7 @@ fn open_read_no_follow(path: &Path) -> io::Result<std::fs::File> {
 // ---------------------------------------------------------------------------
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used, clippy::panic)]
+#[allow(clippy::unwrap_used, clippy::indexing_slicing, clippy::panic)]
 mod tests {
     use super::*;
     use std::io::Write;
@@ -650,10 +664,8 @@ mod tests {
     const SUBCOMMAND_LINE: &str = r#"{"event_type":"TrackSubcommand","schema_version":1,"track_id":"t","command":"track spec-design","exit_code":0,"duration_ms":1200,"timestamp":"2026-06-10T00:00:00Z"}"#;
     const NON_ZERO_EXIT_LINE: &str = r#"{"event_type":"NonZeroExit","schema_version":1,"track_id":"t","command":"track spec-design","exit_code":1,"error_chain":"gate failed","timestamp":"2026-06-10T01:00:00Z"}"#;
     const HOOK_BLOCK_LINE: &str = r#"{"event_type":"HookBlock","schema_version":1,"track_id":"t","hook_name":"block-direct-git-ops","timestamp":"2026-06-10T02:00:00Z"}"#;
-    const COMMAND_SUCCESS_LINE: &str =
-        r#"{"command":"track plan","duration_ms":120,"result":{"status":"success"}}"#;
-    const COMMAND_FAILURE_LINE: &str =
-        r#"{"command":"track plan","duration_ms":80,"result":{"status":"failure","exit_code":17}}"#;
+    const COMMAND_SUCCESS_LINE: &str = r#"{"event_type":"TrackSubcommand","schema_version":1,"track_id":"t","command":"track plan","exit_code":0,"duration_ms":120,"timestamp":"2026-06-10T00:00:00Z"}"#;
+    const COMMAND_FAILURE_LINE: &str = r#"{"event_type":"TrackSubcommand","schema_version":1,"track_id":"t","command":"track plan","exit_code":17,"duration_ms":80,"timestamp":"2026-06-10T00:00:00Z"}"#;
 
     /// Happy path: aggregate collects phase durations, errors, and hook blocks.
     #[test]
@@ -721,7 +733,7 @@ mod tests {
 
     #[test]
     fn test_aggregate_malformed_command_record_is_skipped_and_counted() {
-        let malformed_command = r#"{"command":"","duration_ms":80,"result":{"status":"success"}}"#;
+        let malformed_command = r#"{"event_type":"TrackSubcommand","schema_version":1,"track_id":"t","command":"","exit_code":0,"duration_ms":80,"timestamp":"2026-06-10T00:00:00Z"}"#;
         let tmp = TempDir::new().unwrap();
         write_jsonl(tmp.path(), "t", &[COMMAND_SUCCESS_LINE, malformed_command]);
 
@@ -730,24 +742,29 @@ mod tests {
 
         assert_eq!(*output.skipped_lines.as_ref(), 1);
         assert_eq!(output.command_metrics.len(), 1);
+        assert_eq!(output.phase_durations.len(), 1);
+        assert_eq!(output.phase_durations[0].total_ms, 120);
     }
 
     #[test]
-    fn test_aggregate_out_of_range_command_exit_code_is_skipped_and_counted() {
-        let out_of_range_failure = r#"{"command":"track plan","duration_ms":80,"result":{"status":"failure","exit_code":256}}"#;
+    fn test_aggregate_large_command_exit_code_is_accepted_and_counted() {
+        let out_of_range_failure = r#"{"event_type":"TrackSubcommand","schema_version":1,"track_id":"t","command":"track plan","exit_code":256,"duration_ms":80,"timestamp":"2026-06-10T00:00:00Z"}"#;
         let tmp = TempDir::new().unwrap();
         write_jsonl(tmp.path(), "t", &[COMMAND_SUCCESS_LINE, out_of_range_failure]);
 
         let report = TelemetryReport::new(tmp.path().to_path_buf());
         let output = report.aggregate(&track_id("t")).unwrap();
 
-        assert_eq!(*output.skipped_lines.as_ref(), 1);
+        assert_eq!(*output.skipped_lines.as_ref(), 0);
         assert_eq!(output.command_metrics.len(), 1);
+        let metric = output.command_metrics.first().unwrap();
+        assert_eq!(*metric.executions().as_ref(), 2);
+        assert_eq!(*metric.failures().as_ref(), 1);
     }
 
     #[test]
     fn test_aggregate_unknown_schema_command_record_is_skipped_and_counted() {
-        let unknown_schema_command = r#"{"schema_version":999,"command":"track plan","duration_ms":80,"result":{"status":"success"}}"#;
+        let unknown_schema_command = r#"{"event_type":"TrackSubcommand","schema_version":999,"track_id":"t","command":"track plan","exit_code":0,"duration_ms":80,"timestamp":"2026-06-10T00:00:00Z"}"#;
         let tmp = TempDir::new().unwrap();
         write_jsonl(tmp.path(), "t", &[COMMAND_SUCCESS_LINE, unknown_schema_command]);
 
@@ -762,7 +779,7 @@ mod tests {
 
     #[test]
     fn test_aggregate_null_command_schema_version_is_skipped_and_counted() {
-        let null_schema_command = r#"{"schema_version":null,"command":"track plan","duration_ms":80,"result":{"status":"success"}}"#;
+        let null_schema_command = r#"{"event_type":"TrackSubcommand","schema_version":null,"track_id":"t","command":"track plan","exit_code":0,"duration_ms":80,"timestamp":"2026-06-10T00:00:00Z"}"#;
         let tmp = TempDir::new().unwrap();
         write_jsonl(tmp.path(), "t", &[COMMAND_SUCCESS_LINE, null_schema_command]);
 
@@ -777,7 +794,7 @@ mod tests {
 
     #[test]
     fn test_aggregate_future_command_record_fields_are_skipped_and_counted() {
-        let future_command = r#"{"schema_version":1,"command":"track plan","duration_ms":80,"result":{"status":"success"},"new_field":"future value"}"#;
+        let future_command = r#"{"event_type":"TrackSubcommand","schema_version":1,"track_id":"t","command":"track plan","exit_code":0,"duration_ms":80,"timestamp":"2026-06-10T00:00:00Z","new_field":"future value"}"#;
         let tmp = TempDir::new().unwrap();
         write_jsonl(tmp.path(), "t", &[COMMAND_SUCCESS_LINE, future_command]);
 
@@ -792,7 +809,7 @@ mod tests {
 
     #[test]
     fn test_aggregate_future_command_result_fields_are_skipped_and_counted() {
-        let future_result = r#"{"schema_version":1,"command":"track plan","duration_ms":80,"result":{"status":"success","new_field":"future value"}}"#;
+        let future_result = r#"{"event_type":"TrackSubcommand","schema_version":1,"track_id":"t","command":"track plan","exit_code":0,"duration_ms":80,"timestamp":"2026-06-10T00:00:00Z","future_result":{"new_field":"future value"}}"#;
         let tmp = TempDir::new().unwrap();
         write_jsonl(tmp.path(), "t", &[COMMAND_SUCCESS_LINE, future_result]);
 

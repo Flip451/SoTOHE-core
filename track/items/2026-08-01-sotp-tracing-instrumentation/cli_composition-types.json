@@ -1,61 +1,60 @@
 {
   "crate_name": "cli_composition",
   "functions": {},
-  "inherent_impls": [
+  "inherent_impls": [],
+  "layer": "cli_composition",
+  "schema_version": 5,
+  "trait_impls": [
     {
+      "action": "reference",
+      "for_type": "TelemetryCompositionRoot",
+      "trait_ref": "core::default::Default"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "TelemetryCompositionRoot": {
+      "action": "reference",
+      "docs": "Baseline composition root kept wiring-only: it constructs the existing telemetry service graph and exposes the zero-argument telemetry driver accessor without accepting request paths or performing branch-context resolution.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
       "methods": [
         {
           "has_default_impl": false,
           "is_async": false,
           "name": "new",
-          "params": [
-            {
-              "name": "project_root",
-              "ty": "std::path::PathBuf"
-            }
-          ],
-          "returns": "Result<Self, CompositionError>"
+          "params": [],
+          "returns": "Self"
         },
         {
           "has_default_impl": false,
           "is_async": false,
-          "name": "command_trace_driver",
+          "name": "telemetry_driver",
           "params": [],
           "receiver": "&self",
-          "returns": "&cli_driver::telemetry::CommandTraceDriver"
+          "returns": "cli_driver::telemetry::TelemetryDriver"
         }
       ],
-      "type_name": "CommandTraceCompositionRoot"
-    }
-  ],
-  "layer": "cli_composition",
-  "schema_version": 5,
-  "traits": {},
-  "types": {
-    "CommandTraceCompositionRoot": {
-      "action": "add",
-      "docs": "Composition root for repository-local command tracing. Construction can produce only CompositionError::WiringFailed, wrapping rotation-default validation failure; ConfigLoad, AdapterInit, Usecase, and Infrastructure are structurally unreachable because subsequent adapter, interactor, and driver wiring is infallible.",
-      "informal_grounds": [],
-      "kind": {
-        "kind": "struct",
-        "shape": {
-          "fields": [],
-          "has_stripped_fields": true,
-          "kind": "plain"
-        }
-      },
-      "methods": [],
-      "module_path": "telemetry::command_trace",
+      "module_path": "telemetry",
       "role": {
         "CompositionRoot": {}
       },
       "spec_refs": [
         {
-          "anchor": "IN-02",
+          "anchor": "IN-01",
           "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
         },
         {
-          "anchor": "IN-04",
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-04",
           "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
         }
       ]

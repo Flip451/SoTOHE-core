@@ -5,7 +5,7 @@
   "goal": [
     {
       "id": "GO-01",
-      "text": "全 `sotp` コマンドの実行頻度、所要時間、および失敗率を横断的に観測できるようにし、CI 並列化、ゲート運用コスト、UX 改善の優先度をデータに基づいて判断できるようにする。",
+      "text": "track ブランチ上で、track が解決できる純表示系ではない `sotp` コマンドの完了観測を共通 entry point から既存 telemetry に記録し、利用頻度、所要時間、および失敗率を確認できるようにする。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-29-0839-sotp-tracing-instrumentation.md",
@@ -18,7 +18,7 @@
     "in_scope": [
       {
         "id": "IN-01",
-        "text": "すべての `sotp` コマンドを共通の entry point で tracing 計装し、コマンド横断で一貫した実行観測を行う。",
+        "text": "track ブランチ上で完了した、track が解決できる純表示系ではない `sotp` コマンドを共通の entry point で計装し、完了時にコマンド identity、所要時間、および exit 結果を観測する。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-07-29-0839-sotp-tracing-instrumentation.md",
@@ -28,31 +28,39 @@
       },
       {
         "id": "IN-02",
-        "text": "各コマンド実行について、コマンド identity、所要時間、および exit 結果をローカル JSONL 記録へ残す。",
+        "text": "track ブランチ上で完了した、track が解決できる純表示系ではないコマンドの観測イベントを、通常は既存の track-local `track/items/<track-id>/logs/telemetry.jsonl` へ追記する。`track archive` の成功時だけは、既存ログが track とともに archive へ移動するため `track/archive/<track-id>/logs/telemetry.jsonl` へ追記し、active 側のログを再作成しない。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-07-29-0839-sotp-tracing-instrumentation.md",
             "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
+            "anchor": "D3"
           }
         ]
       },
       {
         "id": "IN-03",
-        "text": "既存の `sotp telemetry` を、このローカル記録からコマンド横断の利用頻度、所要時間、および失敗率を分析できるように拡張する。",
+        "text": "既存の `sotp telemetry` 集計を、追記されたコマンド観測イベントを含めて利用頻度、所要時間、および失敗率を分析できるように拡張する。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-07-29-0839-sotp-tracing-instrumentation.md",
             "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
+            "anchor": "D6"
           }
         ]
       },
       {
         "id": "IN-04",
-        "text": "記録ファイルの増大を運用可能に保つため、ローテーションを扱う。",
+        "text": "telemetry の track 帰属は現在の branch に結び付け、track ブランチ上の実行だけを当該 track の時系列観測に含める。",
         "adr_refs": [
           {
-            "file": "knowledge/adr/2026-07-29-0839-sotp-tracing-instrumentation.md",
-            "anchor": "D1"
+            "file": "knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
+            "anchor": "D4"
           }
         ]
       }
@@ -60,7 +68,7 @@
     "out_of_scope": [
       {
         "id": "OUT-01",
-        "text": "tracing 記録または telemetry 分析結果を外部サービスへ送信することは対象外とする。",
+        "text": "計装記録または telemetry 分析結果を外部サービスへ送信することは対象外とする。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-07-29-0839-sotp-tracing-instrumentation.md",
@@ -70,6 +78,26 @@
       },
       {
         "id": "OUT-02",
+        "text": "新たな `telemetry.jsonl` 以外の command-trace sink またはローテーション方針を導入しない。既存 report reader の互換読み取りは変更対象外とする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "OUT-03",
+        "text": "track ブランチ以外で実行されたコマンドを telemetry に記録することは対象外とする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
+            "anchor": "D4"
+          }
+        ]
+      },
+      {
+        "id": "OUT-04",
         "text": "コマンド内部の詳細な span を追加することは対象外とし、必要性が判明した場合に再評価する。",
         "adr_refs": [
           {
@@ -93,36 +121,16 @@
     },
     {
       "id": "CN-02",
-      "text": "ローカル JSONL の active 記録ファイルには正の最大バイト数と正の保持ファイル数を設定し、次の記録の追記で最大バイト数を超える前に active ファイルをローテーションする。ローテーション済みファイルが保持数を超える場合は最も古いものを削除する。",
+      "text": "診断用 telemetry の追記失敗はコマンドの完了結果を変更せず、SoT 成果物を損なわない fire-and-forget の挙動を維持する。",
       "adr_refs": [
         {
-          "file": "knowledge/adr/2026-08-01-0902-sotp-tracing-rotation-policy.md",
+          "file": "knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
           "anchor": "D1"
         }
       ]
     },
     {
       "id": "CN-03",
-      "text": "コマンド trace の記録に失敗した場合、その失敗で panic せず、また黙って握りつぶさず、typed `CommandTraceWriteError` として `Result` を通じて caller へ伝搬する。",
-      "adr_refs": [
-        {
-          "file": "knowledge/adr/2026-08-01-2356-sotp-tracing-write-failure-policy.md",
-          "anchor": "D1"
-        }
-      ],
-      "convention_refs": [
-        {
-          "file": "knowledge/conventions/coding-principles.md",
-          "anchor": "Error Handling: Result and ? Operator"
-        },
-        {
-          "file": "knowledge/conventions/coding-principles.md",
-          "anchor": "No Panics in Library Code"
-        }
-      ]
-    },
-    {
-      "id": "CN-04",
       "text": "`sotp telemetry` は、形式不正な記録および未知の `schema_version` を持つ記録を fail-open で skip し、skip した記録件数を報告する。",
       "adr_refs": [
         {
@@ -135,41 +143,59 @@
   "acceptance_criteria": [
     {
       "id": "AC-01",
-      "text": "任意の `sotp` コマンドを実行すると、そのコマンド identity、所要時間、および exit 結果を含むローカル JSONL 記録が生成される。",
+      "text": "track ブランチ上で、track が解決できる純表示系ではない任意の `sotp` コマンドが完了すると、同じ track の `telemetry.jsonl` にコマンド identity、所要時間、および exit 結果を含むイベントが追記される。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-29-0839-sotp-tracing-instrumentation.md",
           "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
+          "anchor": "D3"
         }
       ]
     },
     {
       "id": "AC-02",
-      "text": "`sotp telemetry` はローカル記録を分析し、コマンド横断の実行頻度、所要時間、および失敗率を確認できる。",
+      "text": "`sotp telemetry` は既存の telemetry 記録を集計し、コマンド横断の実行頻度、所要時間、および失敗率を確認できる。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-29-0839-sotp-tracing-instrumentation.md",
           "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
+          "anchor": "D6"
         }
       ]
     },
     {
       "id": "AC-03",
-      "text": "計装と telemetry 分析の実行は、記録または分析結果を外部へ送信しない。",
+      "text": "telemetry の追記に失敗しても、実行済みコマンドの exit 結果は telemetry 失敗によって失敗へ変わらない。",
       "adr_refs": [
         {
-          "file": "knowledge/adr/2026-07-29-0839-sotp-tracing-instrumentation.md",
+          "file": "knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
           "anchor": "D1"
         }
       ]
     },
     {
       "id": "AC-04",
-      "text": "正の最大バイト数と正の保持ファイル数を設定し、各記録が最大バイト数以下で累積サイズがその上限を超える複数のコマンド記録を生成すると、上限を超える追記の前に active JSONL ファイルがローテーションされる。ローテーション後は active ファイルが上限を超えず、保持されるローテーション済みファイル数は設定した保持数以下であることを確認できる。",
+      "text": "track ブランチ以外でコマンドを実行しても、track の telemetry 記録は生成または更新されない。",
       "adr_refs": [
         {
-          "file": "knowledge/adr/2026-08-01-0902-sotp-tracing-rotation-policy.md",
-          "anchor": "D1"
+          "file": "knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "AC-05",
+      "text": "実行後に作成または更新されるコマンド観測の記録先は既存の `telemetry.jsonl` のみであり、別の command-trace file やローテーション済み世代は作成されない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
+          "anchor": "D3"
         }
       ]
     }
@@ -185,7 +211,7 @@
     }
   ],
   "signals": {
-    "blue": 15,
+    "blue": 17,
     "yellow": 0,
     "red": 0
   }

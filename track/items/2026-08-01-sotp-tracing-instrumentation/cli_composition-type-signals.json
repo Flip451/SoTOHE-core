@@ -1,11 +1,11 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-02T03:39:01Z",
-  "declaration_hash": "c60dff90ad97e2b62160dfc582b76f9c9a6fde25985e7fbf31a3811576e2e080",
-  "implementation_input_hash": "80796d01458ced5296815b7c96b60256e5dc58e1a73dd5002289028c5328b1af",
+  "generated_at": "2026-08-03T14:26:34Z",
+  "declaration_hash": "2272aaeefd0f6671edb60c0a4388eeee2a67fdd17b499be1f75d14e656d96ac4",
+  "implementation_input_hash": "cd857046ace1952def0e4816999b59acdc421dcff01f533cb5c009d6952c36c8",
   "signals": [
     {
-      "type_name": "CommandTraceCompositionRoot",
+      "type_name": "TelemetryCompositionRoot",
       "kind_tag": "composition_root",
       "signal": "blue",
       "found_type": true

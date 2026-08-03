@@ -3,46 +3,22 @@
 
 ## Summary
 
-GO-01 → T001, T002, T003, T004, T005, T006, T007, T008, T009, T010.
+GO-01 → T001, T003, T006, T010.
+IN-01 / IN-02 / IN-04 / CN-02 / AC-01 / AC-03–AC-05 → T010.
+IN-03 / CN-03 / AC-02 → T003, T006.
 
-## Tasks (9/10 resolved)
+## Tasks (4/4 resolved)
 
-### S1 — Typed command-trace application model
+### S1 — Existing telemetry event schema and aggregation
 
-> Establish validated values, the recording usecase boundary, and typed aggregation output. IN-01, IN-02, IN-03, CN-01, CN-03, AC-01, AC-02.
+> libs/usecase/src/telemetry/command_trace.rs, libs/usecase/src/telemetry.rs::TelemetryAggregateInteractor::report, and libs/infrastructure/src/telemetry/report.rs::TelemetryReport::aggregate — implement and regression-test telemetry schema and aggregation work. IN-01–IN-03, OUT-01–OUT-02, CN-01, CN-03, AC-01–AC-02, AC-05.
 
-- [x] **T001**: Add `libs/usecase/src/telemetry/command_trace.rs` with `SotpCommandIdentity`, `CommandDurationMillis`, `CommandExitCode`, `CommandExecutionResult`, `CommandTraceRecord`, and `CommandTraceValueError`, including their validating constructors and value tests. IN-01, IN-02, CN-01, AC-01, AC-03. (`9f1fda8a075c52709e99a2bee44e4f698bed3bf2`)
-- [x] **T002**: Add `CommandTraceService`, `CommandTraceWriterPort`, `CommandTraceInteractor`, and `CommandTraceWriteError` in `libs/usecase/src/telemetry/command_trace.rs`, including recording-flow result and port-contract tests. IN-01, IN-02, CN-01, CN-03, AC-01, AC-03. (`f83e49e3be1d5981ba9810f9a69ae308adfc9251`)
-- [x] **T003**: Extend `TelemetryAggregateInteractor` and the usecase telemetry output with typed per-command execution metrics, bounded failure-rate data, and fail-open malformed- and unknown-schema-record skipped-count accounting, with focused aggregation-conversion tests. IN-03, CN-01, CN-04, AC-02, AC-03. (`88362dca5c29c4038c95d8d9ad2657a677e7f186`)
+- [x] **T001**: libs/usecase/src/telemetry/command_trace.rs — implement and regression-test command-telemetry value objects. IN-01, IN-02, OUT-01, OUT-02, CN-01, AC-01, AC-05. (`9f1fda8a075c52709e99a2bee44e4f698bed3bf2`)
+- [x] **T003**: libs/usecase/src/telemetry.rs::TelemetryAggregateInteractor::report — implement and regression-test telemetry aggregation. IN-03, CN-01, CN-03, AC-02. (`88362dca5c29c4038c95d8d9ad2657a677e7f186`)
+- [x] **T006**: libs/infrastructure/src/telemetry/report.rs::TelemetryReport::aggregate — implement and regression-test telemetry-report aggregation. IN-03, CN-01, CN-03, AC-02. (`1dc7b80fca414e70b70705d5313ffec72ceefed6`)
 
-### S2 — Typed local trace-rotation policy
+### S2 — Branch-bound CLI lifecycle regression coverage
 
-> Construct and validate the positive filesystem rotation bounds before adapter work. IN-04, CN-02.
+> apps/cli/src/main.rs::run_cli_with_context! (pre-dispatch context capture, command dispatch, eligibility policy, and data-only EmitCompletedCommand submission), telemetry_completion_eligible, and commands::track::execute_with_error_chain; apps/cli/src/main.rs::command_identity_from_args; apps/cli-driver/src/telemetry.rs::TelemetryInput, TelemetryDriver::handle, and items_dir_from_args; libs/usecase/src/telemetry.rs::TelemetryEmitService::emit_completed, TelemetryEmitInteractor, TelemetryArchiveInteractor, and TelemetryAggregateInteractor; libs/infrastructure/src/telemetry/report_adapter.rs::FsTelemetryEmitDynamicAdapter::emit_active; apps/cli-composition/src/telemetry.rs::TelemetryCompositionRoot (wiring-only reference) — implement and regression-test the branch-bound completion lifecycle, existing telemetry.jsonl sink, archive timing, and composition boundaries. IN-01, IN-02, IN-04, OUT-01–OUT-04, CN-01–CN-02, AC-01, AC-03–AC-05.
 
-- [x] **T004**: Implement validated rotation-policy construction only: `CommandTraceFileSizeLimitBytes`, `CommandTraceRetainedFileCount`, `CommandTracePolicyError`, and `CommandTraceRotationPolicy`, with positive-bound and policy-construction tests. IN-04, CN-02. (`1402599b252c80d0a20221852e0f8498d1f1fc88`)
-
-### S3 — Atomic local JSONL persistence and rotation
-
-> Complete the terminal filesystem writer contract using the validated policy: local persistence, typed failures, pre-append rotation, bounded retention, and focused verification. IN-02, IN-04, OUT-01, CN-01, CN-02, CN-03, AC-01, AC-03, AC-04.
-
-- [x] **T005**: Complete the terminal `FsCommandTraceAdapter` as the local JSONL `CommandTraceWriterPort` implementation, building on the uncommitted append-only adapter: typed write-failure propagation, JSONL persistence, pre-append rotation, and oldest-first retention, with record-format, write-failure, AC-01, and AC-04 tests. IN-02, IN-04, OUT-01, CN-01, CN-02, CN-03, AC-01, AC-03, AC-04. (`faf97afdf260eecce2ecaa30487c1e5f5e1e120f`)
-
-### S4 — Telemetry aggregation and display
-
-> Replace the infrastructure report DTO with its snapshot model, convert persisted command records through the existing aggregation path, and render the resulting metrics through the telemetry command. IN-03, OUT-01, CN-01, CN-04, AC-02, AC-03.
-
-- [x] **T006**: Delete the old infrastructure `TelemetryReportOutput`, modify `TelemetryReport::aggregate`, add the layer-unique `TelemetryReportSnapshot` read model, and update `FsTelemetryReportAdapter` parser-to-usecase conversion for persisted command metrics and fail-open malformed- and unknown-schema-record skip reporting, with focused aggregation-path tests. IN-03, OUT-01, CN-01, CN-04, AC-02, AC-03. (`1dc7b80fca414e70b70705d5313ffec72ceefed6`)
-- [x] **T009**: Extend `TelemetryDriver::telemetry_report` and `apps/cli/src/commands/telemetry.rs::execute` to render command metrics from the existing aggregation path; add focused AC-02 CLI regression tests for frequency, duration, and failure rate. IN-03, CN-01, AC-02, AC-03.
-
-### S5 — Tracing composition
-
-> Build the primary driver and wire the complete local tracing dependency graph before entrypoint use. IN-02, IN-04, OUT-01, CN-01, CN-02, CN-03, AC-01, AC-03, AC-04.
-
-- [x] **T007**: Update `CommandTraceDriver::handle(outcome, record) -> CommandOutcome` to invoke local trace recording and render trace diagnostics; add focused success/failure regression tests. IN-02, AC-01, AC-03. (`bfd13949a00cfed25b84483098700206458b28b1`)
-- [x] **T008**: Implement `CommandTraceCompositionRoot` to validate rotation defaults and wire the complete filesystem adapter, usecase flow, and primary driver before any entrypoint invokes it. IN-02, IN-04, OUT-01, CN-01, CN-02, CN-03, AC-01, AC-03, AC-04. (`6bb94f15950ec117fa3339bb25b10a36a673d57f`)
-
-### S6 — Cross-command entrypoint integration
-
-> `apps/cli/src/main.rs::run_cli_with`: construct and invoke `CommandTraceCompositionRoot::command_trace_driver`; add success/failure regression tests. IN-01, IN-02, OUT-02, CN-01, CN-03, AC-01, AC-03.
-
-- [ ] **T010**: Update `apps/cli/src/main.rs::run_cli_with` to construct and invoke `CommandTraceCompositionRoot::command_trace_driver`; add focused `run_cli_with` success and failure regression tests. IN-01, IN-02, OUT-02, CN-01, CN-03, AC-01, AC-03.
+- [x] **T010**: apps/cli/src/main.rs::run_cli_with_context! (pre-dispatch context capture, command dispatch, eligibility policy, and data-only EmitCompletedCommand submission), telemetry_completion_eligible, and commands::track::execute_with_error_chain; apps/cli/src/main.rs::command_identity_from_args; apps/cli-driver/src/telemetry.rs::TelemetryInput, TelemetryDriver::handle, and items_dir_from_args; libs/usecase/src/telemetry.rs::TelemetryEmitService::emit_completed, TelemetryEmitInteractor, TelemetryArchiveInteractor, and TelemetryAggregateInteractor; libs/infrastructure/src/telemetry/report_adapter.rs::FsTelemetryEmitDynamicAdapter::emit_active; apps/cli-composition/src/telemetry.rs::TelemetryCompositionRoot (wiring-only reference) — implement and regression-test the branch-bound completion lifecycle, existing telemetry.jsonl sink, archive timing, and composition boundaries. IN-01, IN-02, IN-04, OUT-01–OUT-04, CN-01–CN-02, AC-01, AC-03–AC-05.

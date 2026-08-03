@@ -3,21 +3,61 @@
   "obligations": [
     {
       "id": {
-        "entry_key": "CommandTraceInteractor",
+        "entry_key": "TelemetryAggregateInteractor",
         "obligation_kind": "result",
         "item_identifier": "entry"
       },
       "target_entry": {
         "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
         "section_key": "types",
-        "entry_key": "CommandTraceInteractor"
+        "entry_key": "TelemetryAggregateInteractor"
       },
       "target_role": {
         "kind": "data_role",
         "role": "Interactor"
       },
-      "brief": "Author a result test covering 'entry' of CommandTraceInteractor",
-      "declaration_hash": "f4737828fba9ac3cd13bd6cb916010ae43314331eeba37243f278c4cd92ea5af",
+      "brief": "Author a result test covering 'entry' of TelemetryAggregateInteractor",
+      "declaration_hash": "b0d7a6a06e4055e44acbad19b413b6f3d8e8707f9ebead71c906bc4aaa9712b5",
+      "spec_refs": [
+        {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-02"
+        },
+        {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-03"
+        },
+        {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "AC-01"
+        },
+        {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "AC-02"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "TelemetryArchiveInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "TelemetryArchiveInteractor"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      },
+      "brief": "Author a result test covering 'entry' of TelemetryArchiveInteractor",
+      "declaration_hash": "23b062df7d755044dd4196eb769610685e06a2b5918464e5ddbad953c3450d59",
       "spec_refs": [
         {
           "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
@@ -25,91 +65,419 @@
         },
         {
           "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
-          "element_id": "CN-03"
+          "element_id": "AC-05"
         }
       ]
     },
     {
       "id": {
-        "entry_key": "CommandTraceService",
+        "entry_key": "TelemetryEmitInteractor",
         "obligation_kind": "result",
-        "item_identifier": "trait_method:record"
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "TelemetryEmitInteractor"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      },
+      "brief": "Author a result test covering 'entry' of TelemetryEmitInteractor",
+      "declaration_hash": "9653c4165eed3c859e737f187a697e25f3e655325cd2231f86b5e3e6f2c8ce4f",
+      "spec_refs": [
+        {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-02"
+        },
+        {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "AC-01"
+        },
+        {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "AC-03"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "TelemetryArchivedService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:emit_archived"
       },
       "target_entry": {
         "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
         "section_key": "traits",
-        "entry_key": "CommandTraceService"
+        "entry_key": "TelemetryArchivedService"
       },
       "target_role": {
         "kind": "contract_role",
         "role": "ApplicationService"
       },
-      "brief": "Author a result test covering 'trait_method:record' of CommandTraceService",
-      "declaration_hash": "bc1269a038dd12381cb2b39a548e1e10aeb7187ed02cf0b9696874ad350aa647",
+      "brief": "Author a result test covering 'trait_method:emit_archived' of TelemetryArchivedService",
+      "declaration_hash": "627a9118dcdcb378c0de5ec9c4ae7667ff7527d1ceeb6629238d77c9925e4e9d",
       "spec_refs": [
         {
           "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
-          "element_id": "IN-02"
-        },
-        {
-          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
-          "element_id": "CN-03"
+          "element_id": "OUT-02"
         }
       ]
     },
     {
       "id": {
-        "entry_key": "CommandTraceWriterPort",
+        "entry_key": "TelemetryEmitDynamicPort",
         "obligation_kind": "contract",
-        "item_identifier": "trait_method:record"
+        "item_identifier": "trait_method:emit_active"
       },
       "target_entry": {
         "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
         "section_key": "traits",
-        "entry_key": "CommandTraceWriterPort"
+        "entry_key": "TelemetryEmitDynamicPort"
       },
       "target_role": {
         "kind": "contract_role",
         "role": "SecondaryPort"
       },
-      "brief": "Author a contract test covering 'trait_method:record' of CommandTraceWriterPort",
-      "declaration_hash": "4796f1f4dd920c3b6b4aa05f474f5e8a5fb701bbfc6e4ce35559c86ebae87abc",
+      "brief": "Author a contract test covering 'trait_method:emit_active' of TelemetryEmitDynamicPort",
+      "declaration_hash": "574fe3a43580b19ad3e81ef17c05adc3f737bcb49f9e01fa9cabdff9aee1a1e4",
       "spec_refs": [
+        {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-01"
+        },
         {
           "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
           "element_id": "IN-02"
         },
         {
           "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
-          "element_id": "CN-03"
+          "element_id": "AC-01"
         }
       ]
     },
     {
       "id": {
-        "entry_key": "FsCommandTraceAdapter",
-        "obligation_kind": "contract_conformance",
-        "item_identifier": "trait_impl:usecase::telemetry::command_trace::CommandTraceWriterPort"
+        "entry_key": "TelemetryEmitService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:emit_completed"
       },
       "target_entry": {
-        "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/infrastructure-types.json",
+        "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
         "section_key": "traits",
-        "entry_key": "FsCommandTraceAdapter"
+        "entry_key": "TelemetryEmitService"
       },
       "target_role": {
-        "kind": "trait_impl",
-        "role": "SecondaryPort"
+        "kind": "contract_role",
+        "role": "ApplicationService"
       },
-      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::telemetry::command_trace::CommandTraceWriterPort' of FsCommandTraceAdapter",
-      "declaration_hash": "4d9cc002fc78db493d5785a4027d64e0ae3500b271613f2bb07e9b20f47f1f24",
+      "brief": "Author a result test covering 'trait_method:emit_completed' of TelemetryEmitService",
+      "declaration_hash": "33517827dcfd3476c8d54073c58122422dc875e6354990b6186abe3ffeb637f0",
       "spec_refs": [
+        {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-01"
+        },
         {
           "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
           "element_id": "IN-02"
         },
         {
           "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
-          "element_id": "CN-03"
+          "element_id": "AC-01"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "TelemetryReportService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:report"
+      },
+      "target_entry": {
+        "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "TelemetryReportService"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      },
+      "brief": "Author a result test covering 'trait_method:report' of TelemetryReportService",
+      "declaration_hash": "24ddcb83759958b8e4f49fe9871fde51833d19c710bbc5ac6e922764cd0469bc",
+      "spec_refs": [
+        {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-03"
+        },
+        {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "AC-02"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "FsTelemetryEmitDynamicAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::telemetry::TelemetryEmitDynamicPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "FsTelemetryEmitDynamicAdapter"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::telemetry::TelemetryEmitDynamicPort' of FsTelemetryEmitDynamicAdapter",
+      "declaration_hash": "3a420ccbcb60960688cecda9283f04baf77c2382d20ba5fbf110608f069bd478",
+      "spec_refs": [
+        {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-02"
+        },
+        {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "AC-01"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli_driver::telemetry::duration_millis",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/cli_driver-types.json",
+        "section_key": "functions",
+        "entry_key": "cli_driver::telemetry::duration_millis"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli_driver::telemetry::duration_millis",
+      "declaration_hash": "ca809ec48da1fc1885185e4761f5d38c42703d47028219b4f63b939f7abfa58b",
+      "spec_refs": [
+        {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "AC-01"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli_driver::telemetry::exit_code_value",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/cli_driver-types.json",
+        "section_key": "functions",
+        "entry_key": "cli_driver::telemetry::exit_code_value"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli_driver::telemetry::exit_code_value",
+      "declaration_hash": "81e4b394a2a057bb5888876ed0c641aa3254ed8cdcb5c07374256e17e8ba108e",
+      "spec_refs": [
+        {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "AC-01"
+        },
+        {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "AC-03"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli_driver::telemetry::items_dir_from_args",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/cli_driver-types.json",
+        "section_key": "functions",
+        "entry_key": "cli_driver::telemetry::items_dir_from_args"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli_driver::telemetry::items_dir_from_args",
+      "declaration_hash": "96fb4737671c41f2c8d249ede3184d7ec60bf5917ba9074737735db7a2fb6df8",
+      "spec_refs": [
+        {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "AC-01"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::command_identity_from_args",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::command_identity_from_args"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::command_identity_from_args",
+      "declaration_hash": "4f938c87be16442e294f5ab2c814a12d8652210a12492ad96c5c1eb450502008",
+      "spec_refs": [
+        {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "AC-01"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::run_cli",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::run_cli"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::run_cli",
+      "declaration_hash": "7db271ae2ace944f1b052d503b3cd7a530afa4215c47390f4a7f1ab15873780b",
+      "spec_refs": [
+        {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "AC-01"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::run_cli_with",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::run_cli_with"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::run_cli_with",
+      "declaration_hash": "b5e474ba51d2e45432f1436bd7dd833af48f735be9438f7a9cc9e6708300ec42",
+      "spec_refs": [
+        {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "AC-01"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::telemetry_completion_eligible",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::telemetry_completion_eligible"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::telemetry_completion_eligible",
+      "declaration_hash": "6e6f56e1903fea05a384bb153af0c07bbbe9197473cfe4d4837c83d3aabd5d35",
+      "spec_refs": [
+        {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "AC-01"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::telemetry_track_display_only",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::telemetry_track_display_only"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::telemetry_track_display_only",
+      "declaration_hash": "d841ef78bcfed69904ca7dc7d73e8abe42d3f4cdf1a757e77471ab6812155523",
+      "spec_refs": [
+        {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "AC-01"
         }
       ]
     }

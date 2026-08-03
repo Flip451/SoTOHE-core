@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-02T00:14:09Z",
-  "declaration_hash": "dabdb145434bfbe01ac696857c1e94a06532fe81cdc03d787f735b28e4a5d074",
-  "implementation_input_hash": "d7b6a314673762bea3df1ab552a4d862c0775f0f667570a0ada3ff561aa4226a",
+  "generated_at": "2026-08-03T15:17:03Z",
+  "declaration_hash": "325c5c6f147e12b04bf58c74a1fff5675ebddb4e05224d0ef95f0e712917aa00",
+  "implementation_input_hash": "9d0367c417546fc03273b2d760d66f05090d8fc624ba68552cf82496482b6cd6",
   "signals": [
     {
       "type_name": "CommandDurationMillis",
@@ -47,31 +47,6 @@
       ]
     },
     {
-      "type_name": "CommandExecutionResult",
-      "kind_tag": "enum",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Clone",
-        "Debug",
-        "Eq",
-        "PartialEq"
-      ]
-    },
-    {
-      "type_name": "CommandExitCode",
-      "kind_tag": "value_object",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Clone",
-        "Copy",
-        "Debug",
-        "Eq",
-        "PartialEq"
-      ]
-    },
-    {
       "type_name": "CommandFailureRateBasisPoints",
       "kind_tag": "value_object",
       "signal": "blue",
@@ -85,33 +60,6 @@
       ]
     },
     {
-      "type_name": "CommandTraceInteractor",
-      "kind_tag": "interactor",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "CommandTraceService"
-      ]
-    },
-    {
-      "type_name": "CommandTraceRecord",
-      "kind_tag": "dto",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Clone",
-        "Debug",
-        "Eq",
-        "PartialEq"
-      ]
-    },
-    {
-      "type_name": "CommandTraceService",
-      "kind_tag": "application_service",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
       "type_name": "CommandTraceValueError",
       "kind_tag": "error_type",
       "signal": "blue",
@@ -121,23 +69,6 @@
         "Display",
         "Error"
       ]
-    },
-    {
-      "type_name": "CommandTraceWriteError",
-      "kind_tag": "error_type",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Debug",
-        "Display",
-        "Error"
-      ]
-    },
-    {
-      "type_name": "CommandTraceWriterPort",
-      "kind_tag": "secondary_port",
-      "signal": "blue",
-      "found_type": true
     },
     {
       "type_name": "SotpCommandIdentity",
@@ -153,6 +84,60 @@
       ]
     },
     {
+      "type_name": "TelemetryAggregateInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "TelemetryAggregateService",
+        "TelemetryArchivedService",
+        "TelemetryEmitService",
+        "TelemetryReportService"
+      ]
+    },
+    {
+      "type_name": "TelemetryAggregateService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TelemetryArchiveInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "TelemetryArchivedService"
+      ]
+    },
+    {
+      "type_name": "TelemetryArchivedService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TelemetryEmitDynamicPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TelemetryEmitInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "TelemetryEmitService"
+      ]
+    },
+    {
+      "type_name": "TelemetryEmitService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
       "type_name": "TelemetryReportOutput",
       "kind_tag": "dto",
       "signal": "blue",
@@ -161,6 +146,12 @@
         "Clone",
         "Debug"
       ]
+    },
+    {
+      "type_name": "TelemetryReportService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "TelemetrySkippedLineCount",

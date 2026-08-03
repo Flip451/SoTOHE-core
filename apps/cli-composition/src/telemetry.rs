@@ -7,16 +7,12 @@
 //! This module is wiring-only (CN-03): it constructs the infrastructure
 //! adapters (`FsGitWorkflowAdapter`, `FsTelemetryReportAdapter`,
 //! `FsArchivedTelemetryFactoryAdapter`) and injects them into the usecase
-//! `TelemetryAggregateInteractor`, which owns both the `report` aggregation and
-//! the `emit_archived` archive orchestration (repo-root resolution via
-//! `GitPrimitivePort::resolve_repo_root`). No orchestration logic lives here.
+//! `TelemetryAggregateInteractor`, which owns report and emission ports. The
+//! primary driver keeps command dispatch and timing at the adapter boundary;
+//! no completion orchestration lives here.
 
 use std::path::PathBuf;
 use std::sync::Arc;
-
-mod command_trace;
-
-pub use command_trace::CommandTraceCompositionRoot;
 
 // ---------------------------------------------------------------------------
 // Per-context composition root
@@ -54,26 +50,34 @@ impl TelemetryCompositionRoot {
     /// family.
     ///
     /// Wiring-only (CN-03): constructs the infrastructure adapters and injects
-    /// them into `usecase::telemetry::TelemetryAggregateInteractor`, which owns
-    /// the report + archive orchestration. No orchestration logic lives here.
+    /// them into `usecase::telemetry::TelemetryAggregateInteractor`.
     pub fn telemetry_driver(&self) -> cli_driver::telemetry::TelemetryDriver {
         use infrastructure::{
-            FsArchivedTelemetryFactoryAdapter, FsGitWorkflowAdapter, FsTelemetryReportAdapter,
+            FsArchivedTelemetryFactoryAdapter, FsGitWorkflowAdapter, FsTelemetryEmitDynamicAdapter,
+            FsTelemetryReportAdapter,
         };
         use usecase::git_workflow::GitPrimitivePort;
         use usecase::telemetry::{
-            ArchivedTelemetryFactoryPort, TelemetryAggregateInteractor, TelemetryEmitInteractor,
-            TelemetryReportInteractor, TelemetryReportPort,
+            ArchivedTelemetryFactoryPort, TelemetryAggregateInteractor, TelemetryArchiveInteractor,
+            TelemetryEmitDynamicPort, TelemetryEmitInteractor, TelemetryReportInteractor,
+            TelemetryReportPort,
         };
 
         let git: Arc<dyn GitPrimitivePort> = Arc::new(FsGitWorkflowAdapter::new());
         let report_port: Arc<dyn TelemetryReportPort> = Arc::new(FsTelemetryReportAdapter::new());
         let archived_factory: Arc<dyn ArchivedTelemetryFactoryPort> =
             Arc::new(FsArchivedTelemetryFactoryAdapter::new());
-
+        let active_emit: Arc<dyn TelemetryEmitDynamicPort> =
+            Arc::new(FsTelemetryEmitDynamicAdapter::new());
+        let emit = Arc::new(TelemetryEmitInteractor::new(Arc::clone(&active_emit)));
+        let archived = Arc::new(TelemetryArchiveInteractor::new(
+            Arc::clone(&git),
+            Arc::clone(&archived_factory),
+        ));
         let service = Arc::new(TelemetryAggregateInteractor::new(
             TelemetryReportInteractor::new(report_port),
-            TelemetryEmitInteractor::new(git, archived_factory),
+            emit,
+            archived,
         )) as Arc<dyn usecase::TelemetryAggregateService>;
         cli_driver::telemetry::TelemetryDriver::new(service)
     }

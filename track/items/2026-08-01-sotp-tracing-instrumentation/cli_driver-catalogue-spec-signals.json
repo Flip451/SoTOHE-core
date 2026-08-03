@@ -1,11 +1,31 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "2d0df89e5aa1e2cfd888bcf8c2aa247eff0ee2e92efd6f889e887e6938e78654",
+  "catalogue_declaration_hash": "093d6b35702f39db8708db3d320494ac4e67808fcc9f3af69c846f85df146880",
   "signals": [
     {
-      "type_name": "CommandTraceDriver",
+      "type_name": "TelemetryDriver",
       "signal": "blue",
-      "entry_hash": "9b283f744618c8f483961a75fa37df946f976842298569b261023f806dc36389"
+      "entry_hash": "f242271bbe6876c39f820190e97cfbb9dcb86cc5914d97ca1861d805b75d0a52"
+    },
+    {
+      "type_name": "TelemetryInput",
+      "signal": "blue",
+      "entry_hash": "4cee4180521f4a561b3c853c0c3cdd46417085c9e0e368a5a98b83df3c841024"
+    },
+    {
+      "type_name": "cli_driver::telemetry::duration_millis",
+      "signal": "blue",
+      "entry_hash": "138e15932af28c1178e26ba8293641f5daad6e3c5a07b89dc791b692e701c1c6"
+    },
+    {
+      "type_name": "cli_driver::telemetry::exit_code_value",
+      "signal": "blue",
+      "entry_hash": "308e1519faed8e5cf5e5a8bc0c139d047f2dccf0bc022727e65bbfed68e3b071"
+    },
+    {
+      "type_name": "cli_driver::telemetry::items_dir_from_args",
+      "signal": "blue",
+      "entry_hash": "d2b26ba7a59a8f0f55280215e8178befa5e1e86de046896f9516fcf6863fd706"
     }
   ]
 }
