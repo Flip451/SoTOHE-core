@@ -24,7 +24,10 @@ use super::dto::{
     TypeKindDto, TypestateMarkerDto, VariantDeclDto, VariantPayloadDto,
 };
 use super::dto_slots::{EntrySlotDto, TombstoneDto};
-use super::validate::{validate_bound_str_with_generics, validate_type_alias_generic_names};
+use super::validate::{
+    validate_bound_str_with_generics, validate_type_alias_generic_names,
+    validate_type_alias_target, validate_type_alias_where_predicates,
+};
 use crate::tddd::spec_ground_codec::{informal_grounds_from_dtos, spec_refs_from_dtos};
 // Keep the path-only validator referenced for callers outside top-level impl slots.
 const _: fn(&str) -> Result<(), String> = super::validate::validate_trait_ref_is_path;
@@ -205,6 +208,9 @@ pub(super) fn type_entry_from_dto(
         }
         _ => generics.iter().map(|generic| generic.name.as_str()).collect::<Vec<_>>(),
     };
+    if let TypeKindV2::TypeAlias { target, .. } = &kind {
+        validate_type_alias_target(name, target.as_str(), &generic_names)?;
+    }
     let methods = dto
         .methods
         .into_iter()
@@ -212,6 +218,9 @@ pub(super) fn type_entry_from_dto(
         .collect::<Result<Vec<_>, _>>()?;
     let where_predicates =
         where_predicates_from_dtos_with_generics(name, dto.where_predicates, &generic_names)?;
+    if matches!(&kind, TypeKindV2::TypeAlias { .. }) {
+        validate_type_alias_where_predicates(name, &where_predicates, &generic_names)?;
+    }
 
     let module_path = if dto.module_path.is_empty() {
         ModulePath::root()

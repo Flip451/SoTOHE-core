@@ -9,6 +9,7 @@ use domain::tddd::catalogue_v2::MethodGenericParam;
 
 use super::CatalogueDocumentCodecError;
 use super::validate::{is_valid_generic_param_name, validate_bound_str_with_generics};
+use crate::tddd::type_ref_parser::validate_lexical_generic_bound;
 
 /// Validates the sole generic declaration that a type alias will encode.
 ///
@@ -43,7 +44,7 @@ pub(super) fn validate_type_alias_generics(
             });
         }
         for (idx, bound) in generic.bounds.iter().enumerate() {
-            validate_bound_str_with_generics(bound.as_str(), &generic_names).map_err(|error| {
+            validate_lexical_generic_bound(bound.as_str(), &generic_names).map_err(|error| {
                 CatalogueDocumentCodecError::InvalidEntry {
                     entry_name: entry_name.to_owned(),
                     reason: format!("invalid generic param bound[{idx}]: {error}"),

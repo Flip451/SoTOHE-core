@@ -1,5 +1,6 @@
 //! Pure helper functions that do not require a `ParseCtx`.
 
+use quote::ToTokens;
 use rustdoc_types::{Id, Path, Type};
 
 use super::constants::UNRESOLVED_CRATE_ID;
@@ -246,6 +247,8 @@ pub(crate) fn syn_expr_to_string(expr: &syn::Expr) -> String {
             syn::Lit::Int(i) => i.base10_digits().to_string(),
             syn::Lit::Str(s) => s.value(),
             syn::Lit::Bool(b) => b.value().to_string(),
+            syn::Lit::Char(c) => format!("{:?}", c.value()),
+            syn::Lit::Byte(b) => b.to_token_stream().to_string(),
             _ => "<const_expr>".to_string(),
         },
         syn::Expr::Path(path_expr) => path_expr
@@ -255,15 +258,21 @@ pub(crate) fn syn_expr_to_string(expr: &syn::Expr) -> String {
             .map(|s| s.ident.to_string())
             .collect::<Vec<_>>()
             .join("::"),
+        syn::Expr::Unary(unary_expr)
+            if matches!(unary_expr.op, syn::UnOp::Neg(_))
+                && matches!(&*unary_expr.expr, syn::Expr::Lit(lit) if matches!(lit.lit, syn::Lit::Int(_))) =>
+        {
+            expr_to_token_string(expr)
+        }
         _ => "<const_expr>".to_string(),
     }
 }
 
 /// Converts a `syn::Expr` const array length to a string representation.
 ///
-/// Preserves integer literals verbatim, named constants, and binary/unary
-/// arithmetic expressions. Falls back to `"<const_len>"` only for forms that
-/// cannot be represented as a simple token string.
+/// Preserves integer literals verbatim, named constants, and supported binary
+/// arithmetic expressions. Unsupported forms are rejected by the parser before
+/// this renderer is used for lexical comparison.
 #[must_use]
 pub(crate) fn array_len_to_string(expr: &syn::Expr) -> String {
     evaluate_usize_const_expr(expr)
@@ -314,6 +323,8 @@ pub(super) fn expr_to_token_string(expr: &syn::Expr) -> String {
             syn::Lit::Int(i) => i.base10_digits().to_string(),
             syn::Lit::Str(s) => format!("{:?}", s.value()),
             syn::Lit::Bool(b) => b.value().to_string(),
+            syn::Lit::Char(c) => format!("{:?}", c.value()),
+            syn::Lit::Byte(b) => b.to_token_stream().to_string(),
             _ => "<const_expr>".to_string(),
         },
         syn::Expr::Path(path_expr) => path_expr

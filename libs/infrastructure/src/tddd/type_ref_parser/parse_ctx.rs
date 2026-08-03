@@ -22,16 +22,10 @@ pub(super) struct ParseCtx<'a, F, G> {
     pub(super) external_crate_ids: &'a HashMap<String, u32>,
     pub(super) emit_external_crate: &'a mut G,
     pub(super) std_crate_id: u32,
-    /// Impl-block generic type parameter names (e.g. `["T", "U"]`).
-    ///
-    /// When a single-segment type name matches one of these names, it is encoded
-    /// as `Type::Generic(name)` instead of falling through to the unresolved-marker
-    /// path. This implements ADR 2026-06-18-0822 D2: `for_type: "T"` with
-    /// `impl_generics: [{name: "T", ...}]` should produce `Type::Generic("T")`.
+    /// Generic type parameter names resolved as `Type::Generic`.
     pub(super) generic_params: &'a [&'a str],
     pub(super) preserve_prelude_spelling: bool,
 }
-
 /// Returns the catalogue/rustdoc spelling for a parsed identifier.
 ///
 /// `syn` retains the `r#` marker on raw identifiers (`r#type`), while rustdoc
@@ -306,8 +300,13 @@ where
     /// `dyn serde::Serialize` are resolved consistently with plain path types.
     pub(super) fn resolve_trait_bound_path(&mut self, syn_path: &syn::Path) -> Path {
         let segments: Vec<_> = syn_path.segments.iter().collect();
-        let full_path =
+        let segment_path =
             segments.iter().map(|s| normalized_ident_name(&s.ident)).collect::<Vec<_>>().join("::");
+        let full_path = if self.preserve_prelude_spelling && syn_path.leading_colon.is_some() {
+            format!("::{segment_path}")
+        } else {
+            segment_path
+        };
 
         // Multi-segment: treat first as a crate/module prefix.
         if segments.len() > 1 {
@@ -343,17 +342,18 @@ where
             return Path { path: full_path, id: Id(UNRESOLVED_CRATE_ID), args: None };
         };
         let name = normalized_ident_name(&first_seg.ident);
+        let source_name = full_path.clone();
         let args = self.convert_generic_args(&first_seg.arguments);
 
         // Local catalogue?
         if let Some(local_id) = (self.resolve_local)(&name) {
-            return Path { path: name, id: local_id, args: args.map(Box::new) };
+            return Path { path: source_name.clone(), id: local_id, args: args.map(Box::new) };
         }
 
         // std prelude?
         if STD_PRELUDE_TYPES.contains(&name.as_str()) {
             let canonical = if self.preserve_prelude_spelling {
-                name.clone()
+                source_name.clone()
             } else {
                 std_canonical_path(&name)
             };
@@ -361,7 +361,7 @@ where
         }
 
         // Unresolved marker.
-        Path { path: name, id: Id(UNRESOLVED_CRATE_ID), args: args.map(Box::new) }
+        Path { path: source_name, id: Id(UNRESOLVED_CRATE_ID), args: args.map(Box::new) }
     }
 
     /// Converts a `dyn Trait + Trait2` type object into `Type::DynTrait`.

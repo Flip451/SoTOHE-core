@@ -3311,6 +3311,235 @@
           "hash": "rvw1:sha256:1a10216f3b526f0af8dafb37d0095c039159fdca42c721eeb548584fd83d847b",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T12:36:38Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 196,
+              "message": "The new array-length guard makes catalogue validation and extended-crate encoding asymmetric. Document validation still accepts any `syn::TypeParamBound`, including valid bounds such as `Trait<[u8; 1 as usize]>`, but this encoder now rejects them. The same guard also affects generic-less `TypeRef`s through `parse_type_ref`, breaking previously accepted catalogues and the additive-change constraint. Apply the restriction consistently at the document boundary or limit it to the alias lexical-comparison path without changing existing TypeRef behavior.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_ctx.rs",
+              "line": 311,
+              "message": "This change grows `parse_ctx.rs` from exactly 700 to 706 production lines. The file has no test-only section, so it exceeds the repository's 700-line maximum and must be split or reduced.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4e520de84740079b9912696cc932d7071438781d811f1673e63f9cc9307aa56b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T12:40:24Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 109,
+              "message": "The array-length restriction is applied in the shared parser regardless of whether lexical alias comparison is requested. Consequently ordinary `parse_type_ref` calls now reject valid, previously encodable types such as `[u8; 1 as usize]`; document validation still accepts them via `syn`, so a catalogue can decode successfully and fail only during extended-crate encoding. This also changes existing non-generic aliases and other TypeRef positions, violating the additive-compatibility requirement. Confine any lexical fail-closed handling to the alias comparison path without shrinking the general TypeRef grammar.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_ctx.rs",
+              "line": 311,
+              "message": "This change grows `parse_ctx.rs` from exactly 700 to 706 production lines. The module contains no test-only section, so it now exceeds the repository's explicit 700-line maximum and must be split or reduced.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4e520de84740079b9912696cc932d7071438781d811f1673e63f9cc9307aa56b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T12:49:39Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 198,
+              "message": "The restriction is now confined to preserving-spelling calls, but the document boundary still accepts these same alias bounds and where-clause types using plain `syn` parsing. For example, `Trait<[u8; 1 as usize]>` passes catalogue decoding/validation and then fails only during extended-crate encoding here. This violates the briefing's symmetric validation requirement; unsupported lexical forms must be rejected at the document boundary or represented without a lossy collision.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_ctx.rs",
+              "line": 306,
+              "message": "`parse_ctx.rs` remains 701 production lines after this revision. Because it has no test-only section, it still exceeds the repository's explicit 700-line maximum and needs one more line removed or a small extraction.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6b2a75305742f0d832027ca6e651951e04cfabe7d691a2577a7fbc8fd5e62311",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T13:11:45Z",
+          "findings": [
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/validate.rs",
+              "line": 120,
+              "message": "`validate_type_alias_target` applies the preserving-spelling lexical gate to every alias target, rejecting valid targets such as `[u8; 1 as usize]`. Alias targets are encoded through the general `parse_type_ref_str_with_generics` path, which intentionally accepts these expressions, so both document decode and encode now break existing non-generic aliases. Use the general type-reference validator for targets and reserve lexical validation for alias bounds and where predicates.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4da2ef10ad4713652896b6a643810313ce9fa22ae60279707ec8c0485c0691e8",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T13:20:38Z",
+          "findings": [
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/validate.rs",
+              "line": 93,
+              "message": "`validate_type_alias_where_predicates` applies the preserving-spelling lexical restrictions to every predicate LHS and `Equal` RHS, although `build_where_form_generics_preserving_spelling` encodes those type expressions through the general type parser and preserves spelling only for bounds. Consequently valid clauses such as `where [u8; 1 as usize]: Sized` are rejected at both document boundaries despite the downstream parser intentionally accepting that expression. Use general type-reference validation for the LHS and equality RHS; retain lexical validation for `Bound` RHS values.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_ctx.rs",
+              "line": 305,
+              "message": "Leading `::` is now retained by `resolve_trait_bound_path` regardless of `preserve_prelude_spelling`. This changes ordinary non-alias bounds such as `::std::clone::Clone` from the canonical `std::clone::Clone`, diverging from normal type-path parsing and rustdoc comparison. It also breaks preserved absolute bounds downstream: external-ID resolution splits on the first `::`, sees an empty crate segment (and `::Clone` no longer matches the prelude marker), leaving the accepted bound unresolved or with the wrong ID. Gate lexical prefix preservation to the preserving mode and ensure its resolver handles the prefix.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:46a3fc69d86678bf6d101fcd68c1e20a7e4889911370434474d4351c19f86658",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T13:38:01Z",
+          "findings": [
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/helpers.rs",
+              "line": 249,
+              "message": "`validate_lexical_generic_bound` accepts valid character const arguments such as `Marker<'x'>`, but this fallback converts `syn::Lit::Char` to `\"<const_expr>\"`. The encoded alias bound therefore differs from rustdoc's actual `\"'x'\"` constant and produces a false structural mismatch instead of preserving the declared lexical value. Preserve character literals losslessly or reject them at the lexical validation boundary.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0812e9d90dc6d7d0bf1a0fbc1b4619da38888f67b52be9b3928874c644372dc6",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T13:44:32Z",
+          "findings": [
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/helpers.rs",
+              "line": 250,
+              "message": "`syn::Lit::Byte` still falls through to `\"<const_expr>\"`. Byte literals are valid `u8` const arguments, so an alias bound such as `Marker<b'x'>` passes `validate_lexical_generic_bound` but is encoded with the placeholder and falsely mismatches rustdoc output. Render byte literals losslessly in both const-expression helpers or reject them at the lexical validation boundary.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:cffab59dca3b5d70a70732193ba189575c7ba3f0fdf57fb919e348720794a1f0",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T13:52:51Z",
+          "findings": [
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 109,
+              "message": "The new const-argument guard only runs for preserving-spelling parses. Alias targets use the ordinary `parse_type_ref_with_generics` path, so a valid target such as `Marker<b'x'>` passes document validation but `syn_expr_to_string` silently converts its byte literal to `\"<const_expr>\"`, causing a false structural mismatch against rustdoc. Render byte literals losslessly or apply an equivalent fail-closed check to alias targets and other ordinary alias type positions.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:126fcb9de3e59951611d53178910dfd01a987fc54cdd57edf71a89084345a173",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T14:02:10Z",
+          "findings": [
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 396,
+              "message": "The lexical const whitelist rejects `syn::Lit::Char` even though the parser now renders character literals correctly. Because every alias target is passed through this validator, a valid existing alias such as `type Alias = Marker<'x'>` is rejected during both encode and decode, violating the requirement to preserve non-generic aliases. Permit character literals or keep alias targets on the general type-reference validation path.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 384,
+              "message": "`UnsupportedConstArgumentVisitor` checks only positional `GenericArgument::Const` values and ignores `GenericArgument::AssocConst`. Consequently, an alias bound such as `Trait<FLAG = b'a'>` passes the new fail-closed validation, after which `expr_to_token_string` renders the byte literal as `<const_expr>`; distinct declared bounds can therefore collapse to the same encoded value and compare equal. Validate `AssocConst.value` as well or render all accepted literals losslessly.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f079527eafd55727e8f3749755b4ecccbe78fdd9501c2c9084e4e210f421cc8f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T14:06:41Z",
+          "findings": [
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/validate.rs",
+              "line": 124,
+              "message": "`validate_type_alias_target` applies the preserving-spelling array restrictions even though alias targets are encoded through the ordinary type-reference parser. Both codec directions therefore reject an existing valid non-generic alias such as `type Alias = [u8; 1 as usize]`, while the scoped parser test explicitly requires this ordinary form to remain encodable. Validate targets with the general parser rules or narrow only genuinely lossy constructs.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 410,
+              "message": "The const-expression whitelist accepts `Expr::Path` values with a leading `::`, but both const renderers discard that prefix. An alias bound such as `Trait<FLAG = ::crate_name::N>` consequently passes validation and encodes identically to `Trait<FLAG = crate_name::N>`, defeating the required lexical comparison. Preserve the leading colon or reject such paths at this gate.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:17f2ff71bad2c774624a23c99a60ea7f5e95ec6d218f461c10f9d5662c8c87f6",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T14:14:21Z",
+          "findings": [
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/validate.rs",
+              "line": 123,
+              "message": "`validate_type_alias_target` now applies the fail-closed const-argument whitelist to every alias target, including non-generic aliases. Because that whitelist omits valid byte literals, an existing alias such as `type Alias = Marker<b'x'>` is rejected by both document decode and encode. This violates the requirement to preserve non-generic aliases; byte const literals should be rendered and accepted rather than rejected.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f42c942ab9cb0728f6d3959d4f05a0cb4490aa155989d07f1172fcd7ef33e131",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T14:28:01Z",
+          "findings": [
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 409,
+              "message": "`is_supported_const_argument_expr` rejects all unary expressions, so a stable-valid const argument such as `Marker<-1>` fails `validate_type_alias_target`. Because both document codec directions now run this validator even for non-generic aliases, such an existing alias is converted into `InvalidEntry`, violating the requirement to preserve non-generic aliases. Support unary-negative integer literals losslessly in both the whitelist and positional const renderer.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:38fd463246fefaf3e1d1560ac848989c8f4cf536a4d05121ce7663d6d4d6072a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T14:33:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:585898622d73b70a108f58f25fd9d73a46c1b8429360d8e7de71bf773f891443",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -3505,6 +3734,13 @@
           "at": "2026-08-03T07:43:47Z",
           "findings": [],
           "hash": "rvw1:sha256:250207254cc10661a23f25e7b1902075343fee672711fb3c322e22ecf39606cc",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T14:35:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:487b983c4244d839872daef9a8a7137156b305b7de8d4d423e75c4770706c4e0",
           "type": "final",
           "verdict": "zero_findings"
         }

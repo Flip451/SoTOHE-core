@@ -4,10 +4,11 @@
 //! human-readable error on failure. Used at the decode boundary to surface
 //! malformed inputs before they reach `CatalogueToExtendedCrateCodec`.
 
-use domain::tddd::catalogue_v2::MethodGenericParam;
+use domain::tddd::catalogue_v2::{BoundOp, MethodGenericParam, WherePredicateDecl};
 
 use crate::tddd::type_ref_parser::{
-    is_plain_generic_param_name, validate_generic_identifier_ambiguities,
+    is_plain_generic_param_name, validate_const_arguments_in_type_ref,
+    validate_generic_identifier_ambiguities, validate_lexical_generic_bound,
 };
 
 use super::CatalogueDocumentCodecError;
@@ -57,6 +58,7 @@ pub(super) fn validate_type_alias_generic_names(
     entry_name: &str,
     generics: &[MethodGenericParam],
 ) -> Result<(), CatalogueDocumentCodecError> {
+    let generic_names = generics.iter().map(|generic| generic.name.as_str()).collect::<Vec<_>>();
     for generic in generics {
         if !is_valid_generic_param_name(generic.name.as_str()) {
             return Err(CatalogueDocumentCodecError::InvalidEntry {
@@ -67,8 +69,63 @@ pub(super) fn validate_type_alias_generic_names(
                 ),
             });
         }
+        for (idx, bound) in generic.bounds.iter().enumerate() {
+            validate_lexical_generic_bound(bound.as_str(), &generic_names).map_err(|error| {
+                CatalogueDocumentCodecError::InvalidEntry {
+                    entry_name: entry_name.to_owned(),
+                    reason: format!("invalid type alias generic param bound[{idx}]: {error}"),
+                }
+            })?;
+        }
     }
     Ok(())
+}
+
+/// Validates alias `:` where-clause bounds with the same fail-closed lexical
+/// rules used by the preserving-spelling encoder.  Non-alias declarations keep
+/// the general `syn::TypeParamBound` grammar and are intentionally unchanged.
+pub(super) fn validate_type_alias_where_predicates(
+    entry_name: &str,
+    predicates: &[WherePredicateDecl],
+    generic_params: &[&str],
+) -> Result<(), CatalogueDocumentCodecError> {
+    for predicate in predicates {
+        validate_const_arguments_in_type_ref(predicate.lhs.as_str(), generic_params).map_err(
+            |error| CatalogueDocumentCodecError::InvalidEntry {
+                entry_name: entry_name.to_owned(),
+                reason: format!("invalid type alias where predicate lhs: {error}"),
+            },
+        )?;
+        for (idx, bound) in predicate.rhs.iter().enumerate() {
+            let validation = match predicate.operator {
+                BoundOp::Bound => validate_lexical_generic_bound(bound.as_str(), generic_params),
+                BoundOp::Equal => {
+                    validate_const_arguments_in_type_ref(bound.as_str(), generic_params)
+                }
+            };
+            validation.map_err(|error| CatalogueDocumentCodecError::InvalidEntry {
+                entry_name: entry_name.to_owned(),
+                reason: format!("invalid type alias where predicate rhs[{idx}]: {error}"),
+            })?;
+        }
+    }
+    Ok(())
+}
+
+/// Validates a type-alias target with the general type-reference rules used by
+/// its encoder. Alias bounds and where predicates use a separate lexical gate
+/// because their structural comparison preserves declared spelling.
+pub(super) fn validate_type_alias_target(
+    entry_name: &str,
+    target: &str,
+    generic_params: &[&str],
+) -> Result<(), CatalogueDocumentCodecError> {
+    validate_const_arguments_in_type_ref(target, generic_params).map_err(|error| {
+        CatalogueDocumentCodecError::InvalidEntry {
+            entry_name: entry_name.to_owned(),
+            reason: format!("invalid type alias target: {error}"),
+        }
+    })
 }
 
 /// Validates that `type_str` is syntactically well-formed as a Rust type expression

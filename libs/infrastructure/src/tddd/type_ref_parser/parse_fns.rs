@@ -106,6 +106,10 @@ where
     let syn_type: syn::Type = syn::parse_str(type_ref_str)
         .map_err(|e| format!("syn parse error for `{type_ref_str}`: {e}"))?;
     reject_anonymous_const_blocks_in_type(&syn_type)?;
+    if preserve_prelude_spelling {
+        reject_unsupported_array_lengths_in_type(&syn_type)?;
+        reject_unsupported_const_arguments_in_type(&syn_type)?;
+    }
     let mut ctx = ParseCtx {
         resolve_local,
         external_crate_ids,
@@ -123,6 +127,37 @@ pub(crate) fn parse_syn_type(type_ref_str: &str) -> syn::Result<syn::Type> {
 
 pub(crate) fn parse_syn_type_param_bound(type_ref_str: &str) -> syn::Result<syn::TypeParamBound> {
     syn::parse_str(type_ref_str)
+}
+
+/// Validates a type reference while checking const-generic arguments whose
+/// renderer would otherwise collapse to `<const_expr>`.  Array-length syntax
+/// is intentionally not restricted here because ordinary where-clause type
+/// positions use the general array renderer.
+pub(crate) fn validate_const_arguments_in_type_ref(
+    type_ref_str: &str,
+    generic_params: &[&str],
+) -> Result<(), String> {
+    validate_generic_identifier_ambiguities(type_ref_str, generic_params)?;
+    let syntax: syn::Type = syn::parse_str(type_ref_str)
+        .map_err(|e| format!("invalid type syntax '{type_ref_str}': {e}"))?;
+    reject_anonymous_const_blocks_in_type(&syntax)?;
+    reject_unsupported_const_arguments_in_type(&syntax)
+}
+
+/// Validates a generic bound for the lexical alias-comparison path without
+/// converting it to a rustdoc type.  The document codec uses this same
+/// `syn`-backed gate so an alias bound cannot pass decoding and fail later in
+/// the preserving-spelling encoder.
+pub(crate) fn validate_lexical_generic_bound(
+    bound_str: &str,
+    generic_params: &[&str],
+) -> Result<(), String> {
+    validate_generic_identifier_ambiguities(bound_str, generic_params)?;
+    let syn_bound: syn::TypeParamBound = syn::parse_str(bound_str)
+        .map_err(|e| format!("invalid bound syntax '{bound_str}': {e}"))?;
+    reject_anonymous_const_blocks_in_bound(&syn_bound)?;
+    reject_unsupported_array_lengths_in_bound(&syn_bound)?;
+    reject_unsupported_const_arguments_in_bound(&syn_bound)
 }
 
 pub(crate) fn parse_generic_bound_with_generics<F, G>(
@@ -192,6 +227,10 @@ where
     let syn_bound: syn::TypeParamBound =
         syn::parse_str(bound_str).map_err(|e| format!("syn parse error for `{bound_str}`: {e}"))?;
     reject_anonymous_const_blocks_in_bound(&syn_bound)?;
+    if preserve_prelude_spelling {
+        reject_unsupported_array_lengths_in_bound(&syn_bound)?;
+        reject_unsupported_const_arguments_in_bound(&syn_bound)?;
+    }
 
     let mut ctx = ParseCtx {
         resolve_local,
@@ -249,6 +288,164 @@ fn reject_anonymous_const_blocks_in_bound(syntax: &syn::TypeParamBound) -> Resul
     let mut visitor = AnonymousConstBlockVisitor::default();
     visitor.visit_type_param_bound(syntax);
     reject_if_anonymous_const_block_found(visitor.found)
+}
+
+/// Rejects array-length expressions whose spelling cannot be compared safely
+/// against rustdoc's normalized representation.
+///
+/// The lexical adapter deliberately accepts only the expression forms already
+/// handled by [`super::helpers::array_len_to_string`]: integer literals, plain
+/// constant paths, parenthesized forms, and the supported binary operators.
+/// Method calls (for example `10usize.pow(2)`), unary expressions, casts, and
+/// other expressions are rejected instead of being rendered as a lossy marker.
+#[derive(Default)]
+struct UnsupportedArrayLengthVisitor {
+    found: bool,
+}
+
+impl<'ast> Visit<'ast> for UnsupportedArrayLengthVisitor {
+    fn visit_type_array(&mut self, node: &'ast syn::TypeArray) {
+        if !is_supported_array_length_expr(&node.len) {
+            self.found = true;
+        }
+        syn::visit::visit_type_array(self, node);
+    }
+}
+
+fn is_supported_array_length_expr(expr: &syn::Expr) -> bool {
+    match expr {
+        syn::Expr::Lit(lit) => matches!(lit.lit, syn::Lit::Int(_)),
+        syn::Expr::Path(path) => {
+            path.qself.is_none()
+                && path.path.leading_colon.is_none()
+                && path
+                    .path
+                    .segments
+                    .iter()
+                    .all(|segment| matches!(segment.arguments, syn::PathArguments::None))
+        }
+        syn::Expr::Paren(paren) => is_supported_array_length_expr(&paren.expr),
+        syn::Expr::Binary(binary) => {
+            matches!(
+                binary.op,
+                syn::BinOp::Add(_)
+                    | syn::BinOp::Sub(_)
+                    | syn::BinOp::Mul(_)
+                    | syn::BinOp::Div(_)
+                    | syn::BinOp::Rem(_)
+                    | syn::BinOp::BitAnd(_)
+                    | syn::BinOp::BitOr(_)
+                    | syn::BinOp::BitXor(_)
+                    | syn::BinOp::Shl(_)
+                    | syn::BinOp::Shr(_)
+            ) && is_supported_array_length_expr(&binary.left)
+                && is_supported_array_length_expr(&binary.right)
+        }
+        _ => false,
+    }
+}
+
+fn reject_unsupported_array_lengths_in_type(syntax: &syn::Type) -> Result<(), String> {
+    let mut visitor = UnsupportedArrayLengthVisitor::default();
+    visitor.visit_type(syntax);
+    reject_if_unsupported_array_length_found(visitor.found)
+}
+
+fn reject_unsupported_array_lengths_in_bound(syntax: &syn::TypeParamBound) -> Result<(), String> {
+    let mut visitor = UnsupportedArrayLengthVisitor::default();
+    visitor.visit_type_param_bound(syntax);
+    reject_if_unsupported_array_length_found(visitor.found)
+}
+
+/// Rejects const generic arguments that the lexical renderer would collapse
+/// to its information-free placeholder. The preserving path is deliberately
+/// fail-closed for compound expressions; ordinary type parsing keeps its
+/// historical permissive behavior.
+#[derive(Default)]
+struct UnsupportedConstArgumentVisitor {
+    found: bool,
+}
+
+impl<'ast> Visit<'ast> for UnsupportedConstArgumentVisitor {
+    fn visit_generic_argument(&mut self, node: &'ast syn::GenericArgument) {
+        match node {
+            syn::GenericArgument::Const(expr) => {
+                if !is_supported_const_argument_expr(expr) {
+                    self.found = true;
+                }
+            }
+            syn::GenericArgument::AssocConst(assoc_const) => {
+                if !is_supported_const_argument_expr(&assoc_const.value) {
+                    self.found = true;
+                }
+            }
+            _ => {}
+        }
+        syn::visit::visit_generic_argument(self, node);
+    }
+}
+
+fn is_supported_const_argument_expr(expr: &syn::Expr) -> bool {
+    match expr {
+        syn::Expr::Lit(lit) => {
+            matches!(
+                lit.lit,
+                syn::Lit::Int(_)
+                    | syn::Lit::Str(_)
+                    | syn::Lit::Bool(_)
+                    | syn::Lit::Char(_)
+                    | syn::Lit::Byte(_)
+            )
+        }
+        syn::Expr::Path(path) => {
+            path.qself.is_none()
+                && path.path.leading_colon.is_none()
+                && path
+                    .path
+                    .segments
+                    .iter()
+                    .all(|segment| matches!(segment.arguments, syn::PathArguments::None))
+        }
+        syn::Expr::Unary(unary) => {
+            matches!(unary.op, syn::UnOp::Neg(_))
+                && matches!(&*unary.expr, syn::Expr::Lit(lit) if matches!(lit.lit, syn::Lit::Int(_)))
+        }
+        _ => false,
+    }
+}
+
+fn reject_unsupported_const_arguments_in_type(syntax: &syn::Type) -> Result<(), String> {
+    let mut visitor = UnsupportedConstArgumentVisitor::default();
+    visitor.visit_type(syntax);
+    reject_if_unsupported_const_argument_found(visitor.found)
+}
+
+fn reject_unsupported_const_arguments_in_bound(syntax: &syn::TypeParamBound) -> Result<(), String> {
+    let mut visitor = UnsupportedConstArgumentVisitor::default();
+    visitor.visit_type_param_bound(syntax);
+    reject_if_unsupported_const_argument_found(visitor.found)
+}
+
+fn reject_if_unsupported_const_argument_found(found: bool) -> Result<(), String> {
+    if found {
+        Err(
+            "const generic argument expressions outside the supported lexical forms are not supported by lexical type comparison"
+                .to_owned(),
+        )
+    } else {
+        Ok(())
+    }
+}
+
+fn reject_if_unsupported_array_length_found(found: bool) -> Result<(), String> {
+    if found {
+        Err(
+            "array length expressions outside the supported lexical forms are not supported by lexical type comparison"
+                .to_owned(),
+        )
+    } else {
+        Ok(())
+    }
 }
 
 fn reject_if_anonymous_const_block_found(found: bool) -> Result<(), String> {

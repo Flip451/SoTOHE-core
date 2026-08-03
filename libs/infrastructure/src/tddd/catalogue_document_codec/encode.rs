@@ -28,7 +28,10 @@ use super::dto_roles::{
 };
 use super::dto_slots::{EntrySlotDto, TombstoneDto};
 use super::encode_validate::{validate_generic_params_for_encode, validate_type_alias_generics};
-use super::validate::{validate_bound_str_with_generics, validate_type_ref_str_with_generics};
+use super::validate::{
+    validate_bound_str_with_generics, validate_type_alias_target,
+    validate_type_alias_where_predicates, validate_type_ref_str_with_generics,
+};
 
 // ---------------------------------------------------------------------------
 // Top-level entry point
@@ -173,6 +176,13 @@ pub(super) fn type_entry_to_dto(
         .map(|method| method_decl_to_dto_with_outer_generics(method, &effective_generic_names))
         .collect::<Result<_, _>>()?;
     let kind = type_kind_to_dto(entry_name, entry.kind(), entry.generics())?;
+    if matches!(entry.kind(), TypeKindV2::TypeAlias { .. }) {
+        validate_type_alias_where_predicates(
+            entry_name,
+            entry.where_predicates(),
+            &effective_generic_names,
+        )?;
+    }
     let where_predicates = entry
         .where_predicates()
         .iter()
@@ -281,6 +291,9 @@ fn type_kind_to_dto(
             }
             let effective_generics = if generics.is_empty() { entry_generics } else { generics };
             validate_type_alias_generics(entry_name, effective_generics)?;
+            let generic_names =
+                effective_generics.iter().map(|generic| generic.name.as_str()).collect::<Vec<_>>();
+            validate_type_alias_target(entry_name, target.as_str(), &generic_names)?;
             Ok(TypeKindDto::TypeAlias {
                 target: target.as_str().to_owned(),
                 generics: method_generic_params_to_dtos(generics),

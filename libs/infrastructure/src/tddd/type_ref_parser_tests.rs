@@ -95,6 +95,51 @@ fn test_parse_type_ref_result_with_generic_args_succeeds() {
 }
 
 #[test]
+fn test_parse_type_ref_const_char_argument_preserves_literal() {
+    let ty = parse("Marker<'x'>");
+    let Type::ResolvedPath(path) = ty else {
+        panic!("expected Marker resolved path");
+    };
+    let Some(GenericArgs::AngleBracketed { args, .. }) = path.args.as_deref() else {
+        panic!("expected angle-bracketed arguments");
+    };
+    let Some(GenericArg::Const(constant)) = args.first() else {
+        panic!("expected const character argument");
+    };
+    assert_eq!(constant.expr, "'x'");
+}
+
+#[test]
+fn test_parse_type_ref_const_byte_argument_preserves_literal() {
+    let ty = parse("Marker<b'x'>");
+    let Type::ResolvedPath(path) = ty else {
+        panic!("expected Marker resolved path");
+    };
+    let Some(GenericArgs::AngleBracketed { args, .. }) = path.args.as_deref() else {
+        panic!("expected angle-bracketed arguments");
+    };
+    let Some(GenericArg::Const(constant)) = args.first() else {
+        panic!("expected const byte argument");
+    };
+    assert_eq!(constant.expr, "b'x'");
+}
+
+#[test]
+fn test_parse_type_ref_const_negative_integer_argument_preserves_literal() {
+    let ty = parse("Marker<-1>");
+    let Type::ResolvedPath(path) = ty else {
+        panic!("expected Marker resolved path");
+    };
+    let Some(GenericArgs::AngleBracketed { args, .. }) = path.args.as_deref() else {
+        panic!("expected angle-bracketed arguments");
+    };
+    let Some(GenericArg::Const(constant)) = args.first() else {
+        panic!("expected const integer argument");
+    };
+    assert_eq!(constant.expr, "-1");
+}
+
+#[test]
 fn test_parse_type_ref_nested_dyn_trait_preserves_hrtb_binder() {
     let ty = parse("Box<dyn for<'a> Fn(&'a str)>");
     let Type::ResolvedPath(path) = ty else {
@@ -223,6 +268,90 @@ fn test_parse_type_ref_array_length_constant_expression_is_evaluated() {
         panic!("expected array type");
     };
     assert_eq!(len, "3");
+}
+
+#[test]
+fn test_parse_type_ref_accepts_nonlexical_array_length_expressions() {
+    for source in ["[u8; 10usize.pow(2)]", "[u8; -1]", "[u8; 1 as usize]"] {
+        assert!(
+            parse_type_ref(source, &no_local, 100, &HashMap::new(), &mut |_| 101).is_ok(),
+            "nonlexical array length should remain encodable: {source}"
+        );
+    }
+}
+
+#[test]
+fn test_parse_type_ref_preserving_spelling_rejects_nonlexical_array_length_expression() {
+    let result = parse_type_ref_with_generics_preserving_spelling(
+        "[u8; 1 as usize]",
+        &no_local,
+        100,
+        &HashMap::new(),
+        &mut |_| 101,
+        &[],
+    );
+    let error = match result {
+        Err(error) => error,
+        Ok(value) => panic!("lexical array length unexpectedly parsed: {value:?}"),
+    };
+    assert!(error.contains("array length expressions"), "error: {error}");
+}
+
+#[test]
+fn test_parse_generic_bound_preserves_leading_colon() {
+    for (source, expected) in
+        [("::std::clone::Clone", "::std::clone::Clone"), ("::Clone", "::Clone")]
+    {
+        let bound = match parse_generic_bound_with_generics_preserving_spelling(
+            source,
+            &no_local,
+            100,
+            &HashMap::new(),
+            &mut |_| 101,
+            &[],
+        ) {
+            Ok(bound) => bound,
+            Err(error) => panic!("absolute bound path should parse: {error}"),
+        };
+        let GenericBound::TraitBound { trait_, .. } = bound else {
+            panic!("expected trait bound");
+        };
+        assert_eq!(trait_.path, expected);
+    }
+}
+
+#[test]
+fn test_parse_generic_bound_rejects_unsupported_array_length_expression() {
+    let result = parse_generic_bound_with_generics_preserving_spelling(
+        "Trait<[u8; 10usize.pow(2)]>",
+        &no_local,
+        100,
+        &HashMap::new(),
+        &mut |_| 101,
+        &[],
+    );
+    let error = match result {
+        Err(error) => error,
+        Ok(value) => panic!("method-call array length in bound unexpectedly parsed: {value:?}"),
+    };
+    assert!(error.contains("array length expressions"), "error: {error}");
+}
+
+#[test]
+fn test_parse_generic_bound_rejects_unsupported_const_expression() {
+    let result = parse_generic_bound_with_generics_preserving_spelling(
+        "Marker<1.0>",
+        &no_local,
+        100,
+        &HashMap::new(),
+        &mut |_| 101,
+        &[],
+    );
+    let error = match result {
+        Err(error) => error,
+        Ok(value) => panic!("float const argument unexpectedly parsed: {value:?}"),
+    };
+    assert!(error.contains("const generic argument expressions"), "error: {error}");
 }
 
 #[test]

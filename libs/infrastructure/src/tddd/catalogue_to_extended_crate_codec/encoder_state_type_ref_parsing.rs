@@ -115,6 +115,11 @@ impl EncoderState {
 
     /// Resolves external type ids inside a `Path` value (used for trait bound paths).
     pub(super) fn resolve_external_type_ids_in_path(&mut self, path: Path) -> Path {
+        // A preserving-spelling path may retain an absolute `::` prefix for
+        // lexical comparison.  Strip that prefix only for external-crate
+        // lookup and synthetic path registration; the emitted `Path.path`
+        // remains byte-for-byte faithful to the catalogue spelling.
+        let lookup_path = path.path.strip_prefix("::").unwrap_or(path.path.as_str());
         // The preserving parser carries the std crate id as a temporary marker
         // for a bare prelude spelling (`Clone`, `Iterator`, ...).  It must be
         // converted to the same synthetic item id used by canonical paths;
@@ -124,28 +129,28 @@ impl EncoderState {
         // collision when a user declaration happens to reuse the spelling.
         let is_preserved_std_marker = self.ext_name_to_id.get("std").is_some_and(|&std_id| {
             path.id == Id(std_id)
-                && STD_PRELUDE_TYPES.contains(&path.path.as_str())
-                && !self.local_name_to_id.contains_key(&path.path)
+                && STD_PRELUDE_TYPES.contains(&lookup_path)
+                && !self.local_name_to_id.contains_key(lookup_path)
         });
         let new_id = if path.id == Id(UNRESOLVED_CRATE_ID) {
-            if let Some(colon_pos) = path.path.find("::") {
-                let first_seg = &path.path[..colon_pos];
+            if let Some(colon_pos) = lookup_path.find("::") {
+                let first_seg = &lookup_path[..colon_pos];
                 if self.ext_name_to_id.contains_key(first_seg) {
-                    self.ensure_external_type_id(&path.path, first_seg)
+                    self.ensure_external_type_id(lookup_path, first_seg)
                 } else {
                     Id(UNRESOLVED_CRATE_ID)
                 }
-            } else if STD_PRELUDE_TYPES.contains(&path.path.as_str()) {
+            } else if STD_PRELUDE_TYPES.contains(&lookup_path) {
                 // Alias bounds retain their catalogue spelling (for example,
                 // `Clone`) for lexical comparison.  Their bare spelling still
                 // denotes a known std external, so register the canonical path
                 // and retain the short spelling on the emitted `Path`.
-                self.ensure_external_type_id(&std_canonical_path(&path.path), "std")
+                self.ensure_external_type_id(&std_canonical_path(lookup_path), "std")
             } else {
                 Id(UNRESOLVED_CRATE_ID)
             }
         } else if is_preserved_std_marker {
-            self.ensure_external_type_id(&std_canonical_path(&path.path), "std")
+            self.ensure_external_type_id(&std_canonical_path(lookup_path), "std")
         } else {
             path.id
         };
