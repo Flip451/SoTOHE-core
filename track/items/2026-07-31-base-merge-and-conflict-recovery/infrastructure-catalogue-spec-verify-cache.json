@@ -1,0 +1,1374 @@
+{
+  "entries": [
+    {
+      "claim_hash": "abb3a2aeb883ad5defb7133cb00229a66a3adea8e009177b4d3491f27a88cf61",
+      "claim_origin": {
+        "data": {
+          "entry_key": "EvaluateSignalsError",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "817b72909e99cba8c63ea6783688c285d7a31b1b957ac27e383020deabd3d2e4",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "For the currently active track only, evaluate and self-heal type-signals cache entries using catalogue declaration, implementation input, and actual baseline hashes."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "For the currently active track only, evaluate and self-heal type-signals cache entries using catalogue declaration, implementation input, and actual baseline hashes.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "abb3a2aeb883ad5defb7133cb00229a66a3adea8e009177b4d3491f27a88cf61",
+      "claim_origin": {
+        "data": {
+          "entry_key": "EvaluateSignalsError",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "2c9b19622c3a0e2132e20416f8a2daea82bc3ee0d9fb04093e62f80c1db9eb47",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-04",
+          "section": "constraint",
+          "text_label": "Cache misses caused by hash mismatch or any cache decode failure must reevaluate and atomically overwrite only after success; missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures must fail closed."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures must fail closed.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "abb3a2aeb883ad5defb7133cb00229a66a3adea8e009177b4d3491f27a88cf61",
+      "claim_origin": {
+        "data": {
+          "entry_key": "EvaluateSignalsError",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "d508f9ad6e631d86ac123e28064377878b68c60a1c537d96963226b756b08915",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-09",
+          "section": "acceptance_criteria",
+          "text_label": "Missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures fail closed; inactive and archived tracks are untouched, and manual type-signals deletion is not part of ordinary baseline recapture."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures fail closed",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e96afe31da24165b2729d5259f8d5ad49bba3ab12b795ad6b98ffbb1776804a3",
+      "claim_origin": {
+        "data": {
+          "entry_key": "FsBaseMergeCleanupAdapter",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "b1ebe6f4e3ef241cee3ab49ab127483a283048c40c19b452348de4ac09005a15",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "After every clean guarded base merge, regenerate derived views, replace the baseline from a commit-pinned isolated worktree without exposing a partial replacement, and then record synchronization of that exact merged base commit."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "After every clean guarded base merge, regenerate derived views, replace the baseline from a commit-pinned isolated worktree without exposing a partial replacement, and then record synchronization of that exact merged base commit.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e96afe31da24165b2729d5259f8d5ad49bba3ab12b795ad6b98ffbb1776804a3",
+      "claim_origin": {
+        "data": {
+          "entry_key": "FsBaseMergeCleanupAdapter",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "1c4d4eda6a4a2dafa6178979f4e7ea21c499d9e8bb85d6284e8503b3c3db7e71",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "Conflict recovery must follow the canonical workflow through conflict editing, zero-findings review, and guarded commit under orchestrator ownership; conflict outcomes do not run clean-merge cleanup."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Conflict recovery must follow the canonical workflow through conflict editing, zero-findings review, and guarded commit under orchestrator ownership; conflict outcomes do not run clean-merge cleanup.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e96afe31da24165b2729d5259f8d5ad49bba3ab12b795ad6b98ffbb1776804a3",
+      "claim_origin": {
+        "data": {
+          "entry_key": "FsBaseMergeCleanupAdapter",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "c11596aa73c9d76385bd11d40c389db9cf0df6530af7fa89addda894842ed6c7",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "After a clean guarded base merge, derived views are regenerated; a complete, validated baseline replacement produced in an isolated worktree pinned to the exact merged base commit is atomically published; and only then is the sync-base record atomically written before the operation reports success."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "After a clean guarded base merge, derived views are regenerated; a complete, validated baseline replacement produced in an isolated worktree pinned to the exact merged base commit is atomically published; and only then is the sync-base record atomically written before the operation reports success.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e96afe31da24165b2729d5259f8d5ad49bba3ab12b795ad6b98ffbb1776804a3",
+      "claim_origin": {
+        "data": {
+          "entry_key": "FsBaseMergeCleanupAdapter",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9e9abe7181b71316e54964a1694e1196b70e7705e3e78b819044365c33947b16",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "When a guarded base merge conflicts, the orchestrator drives the canonical recovery workflow through editing, zero-findings review, and guarded commit without running clean-merge cleanup."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "When a guarded base merge conflicts, the orchestrator drives the canonical recovery workflow through editing, zero-findings review, and guarded commit without running clean-merge cleanup.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e96afe31da24165b2729d5259f8d5ad49bba3ab12b795ad6b98ffbb1776804a3",
+      "claim_origin": {
+        "data": {
+          "entry_key": "FsBaseMergeCleanupAdapter",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "afa25e34321fdb5da8f872a16ef1824d39af8f7cc621c064c6093d0ee631c5e5",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-06",
+          "section": "in_scope",
+          "text_label": "Persist the active track's synchronization state as an atomically replaced, schema-versioned record containing its track identity, base branch, and the exact base commit incorporated by a successful guarded merge."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Persist the active track's synchronization state as an atomically replaced, schema-versioned record containing its track identity, base branch, and the exact base commit incorporated by a successful guarded merge.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e96afe31da24165b2729d5259f8d5ad49bba3ab12b795ad6b98ffbb1776804a3",
+      "claim_origin": {
+        "data": {
+          "entry_key": "FsBaseMergeCleanupAdapter",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "e83f6a2ed9edffe9aa6824d83e7db6682b02f2d49a18bb16493e9c5133fde6e2",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-05",
+          "section": "constraint",
+          "text_label": "Baseline recapture must generate and validate a complete replacement in an isolated worktree pinned to the already-authorized base commit, atomically publish it only after success, and preserve or restore the prior baseline on any failure; every failure, including failed restoration, fails closed."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Baseline recapture must generate and validate a complete replacement in an isolated worktree pinned to the already-authorized base commit, atomically publish it only after success, and preserve or restore the prior baseline on any failure; every failure, including failed restoration, fails closed.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e96afe31da24165b2729d5259f8d5ad49bba3ab12b795ad6b98ffbb1776804a3",
+      "claim_origin": {
+        "data": {
+          "entry_key": "FsBaseMergeCleanupAdapter",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "d7421f665ec7a508d92f8962947fd4a3a43ba801fb68280a5dd6945a66f96bc8",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-06",
+          "section": "constraint",
+          "text_label": "The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution, be atomically written only after views and baseline recapture succeed, support idempotent retry for the same value, and fail closed on record generation, validation, write, or replacement failure."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution, be atomically written only after views and baseline recapture succeed, support idempotent retry for the same value, and fail closed on record generation, validation, write, or replacement failure.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e96afe31da24165b2729d5259f8d5ad49bba3ab12b795ad6b98ffbb1776804a3",
+      "claim_origin": {
+        "data": {
+          "entry_key": "FsBaseMergeCleanupAdapter",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "65ebff364d15b048f25f2ee5785481fd781016dfaf00df1feb36b5f9ff0d8706",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-07",
+          "section": "constraint",
+          "text_label": "Clean-merge cleanup may complete only in the order Views, Baseline, then SyncBaseStamp; conflict outcomes do not run that cleanup, and baseline replacement does not delete the type-signals cache."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Clean-merge cleanup may complete only in the order Views, Baseline, then SyncBaseStamp; conflict outcomes do not run that cleanup, and baseline replacement does not delete the type-signals cache.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e96afe31da24165b2729d5259f8d5ad49bba3ab12b795ad6b98ffbb1776804a3",
+      "claim_origin": {
+        "data": {
+          "entry_key": "FsBaseMergeCleanupAdapter",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "25f655f974305b546c6635b354735cdf64f7896f137dbfe26030bac0aedf968f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-10",
+          "section": "acceptance_criteria",
+          "text_label": "If isolated baseline generation, validation, atomic replacement, or necessary restoration fails, the operation reports failure rather than cleanup completion and the previously valid baseline remains available whenever restoration succeeds."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "If isolated baseline generation, validation, atomic replacement, or necessary restoration fails, the operation reports failure rather than cleanup completion and the previously valid baseline remains available whenever restoration succeeds.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e96afe31da24165b2729d5259f8d5ad49bba3ab12b795ad6b98ffbb1776804a3",
+      "claim_origin": {
+        "data": {
+          "entry_key": "FsBaseMergeCleanupAdapter",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "84b79eec5107343a4c45d0108c7d1c022b92aa7eb54aa2e887aad4ad7fdf9dff",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-11",
+          "section": "acceptance_criteria",
+          "text_label": "Following successful views and baseline steps, the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit; rerunning with that same commit is idempotent, while a later successful merge atomically replaces the record with its newly incorporated commit."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Following successful views and baseline steps, the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit; rerunning with that same commit is idempotent, while a later successful merge atomically replaces the record with its newly incorporated commit.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e96afe31da24165b2729d5259f8d5ad49bba3ab12b795ad6b98ffbb1776804a3",
+      "claim_origin": {
+        "data": {
+          "entry_key": "FsBaseMergeCleanupAdapter",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "3cbbb014a4f62d867a0a746c1980e7b0582bb989d47ff548f21d8b10481109c6",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-12",
+          "section": "acceptance_criteria",
+          "text_label": "A conflict outcome enters the canonical recovery workflow without running clean-merge cleanup, and a failure in views, baseline recapture, or sync-base recording prevents a completed-cleanup success result."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A conflict outcome enters the canonical recovery workflow without running clean-merge cleanup, and a failure in views, baseline recapture, or sync-base recording prevents a completed-cleanup success result.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "74388bee5f36d04c6599db58332fbc16d7b652953969c019d74d1f1c639ac82c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "FsBaseMergeContextAdapter",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9c04c25ac8797b57a56b46079c14b00823ac3b1b860495b5d228d67b89b00db7",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "Provide a guarded base-merge operation that runs only when the current branch is the active `track/<id>` branch and its source is that track's branch-strategy snapshot base branch."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Provide a guarded base-merge operation that runs only when the current branch is the active `track/<id>` branch and its source is that track's branch-strategy snapshot base branch.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "74388bee5f36d04c6599db58332fbc16d7b652953969c019d74d1f1c639ac82c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "FsBaseMergeContextAdapter",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "7ec10995aa47e8531cbd5645e1c378863fa0617b440210cba4f0929d62416aaa",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "The base-merge guard must reject reverse-direction merges, a non-track current branch, and any source branch that differs from the active track's recorded base branch."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "The base-merge guard must reject reverse-direction merges, a non-track current branch, and any source branch that differs from the active track's recorded base branch.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "74388bee5f36d04c6599db58332fbc16d7b652953969c019d74d1f1c639ac82c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "FsBaseMergeContextAdapter",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "d5914c88f34ebe09359d33c2238a2158fe5f2350d2a22258922277f31f29cb76",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "A guarded base merge succeeds only from the currently active `track/<id>` branch and only when the requested source equals its branch-strategy snapshot base branch."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A guarded base merge succeeds only from the currently active `track/<id>` branch and only when the requested source equals its branch-strategy snapshot base branch.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "74388bee5f36d04c6599db58332fbc16d7b652953969c019d74d1f1c639ac82c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "FsBaseMergeContextAdapter",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "d1a8d3e43a11bbad62882da88d0ebfbaced67f21758977ebd741d2beb5bf6129",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "A reverse-direction merge, an invalid current branch, or a source that differs from the snapshot base branch is rejected without performing the merge."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A reverse-direction merge, an invalid current branch, or a source that differs from the snapshot base branch is rejected without performing the merge.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "702b8a1a7249e444b5a5a562f9fa46aa03201f2d47c7dace0b841dc270871ed4",
+      "claim_origin": {
+        "data": {
+          "entry_key": "FsBaseMergeGitAdapter",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9c04c25ac8797b57a56b46079c14b00823ac3b1b860495b5d228d67b89b00db7",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "Provide a guarded base-merge operation that runs only when the current branch is the active `track/<id>` branch and its source is that track's branch-strategy snapshot base branch."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Provide a guarded base-merge operation that runs only when the current branch is the active `track/<id>` branch and its source is that track's branch-strategy snapshot base branch.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "702b8a1a7249e444b5a5a562f9fa46aa03201f2d47c7dace0b841dc270871ed4",
+      "claim_origin": {
+        "data": {
+          "entry_key": "FsBaseMergeGitAdapter",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "7ec10995aa47e8531cbd5645e1c378863fa0617b440210cba4f0929d62416aaa",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "The base-merge guard must reject reverse-direction merges, a non-track current branch, and any source branch that differs from the active track's recorded base branch."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "The base-merge guard must reject reverse-direction merges, a non-track current branch, and any source branch that differs from the active track's recorded base branch.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "702b8a1a7249e444b5a5a562f9fa46aa03201f2d47c7dace0b841dc270871ed4",
+      "claim_origin": {
+        "data": {
+          "entry_key": "FsBaseMergeGitAdapter",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "d5914c88f34ebe09359d33c2238a2158fe5f2350d2a22258922277f31f29cb76",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "A guarded base merge succeeds only from the currently active `track/<id>` branch and only when the requested source equals its branch-strategy snapshot base branch."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A guarded base merge succeeds only from the currently active `track/<id>` branch and only when the requested source equals its branch-strategy snapshot base branch.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "702b8a1a7249e444b5a5a562f9fa46aa03201f2d47c7dace0b841dc270871ed4",
+      "claim_origin": {
+        "data": {
+          "entry_key": "FsBaseMergeGitAdapter",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "d1a8d3e43a11bbad62882da88d0ebfbaced67f21758977ebd741d2beb5bf6129",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "A reverse-direction merge, an invalid current branch, or a source that differs from the snapshot base branch is rejected without performing the merge."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A reverse-direction merge, an invalid current branch, or a source that differs from the snapshot base branch is rejected without performing the merge.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "702b8a1a7249e444b5a5a562f9fa46aa03201f2d47c7dace0b841dc270871ed4",
+      "claim_origin": {
+        "data": {
+          "entry_key": "FsBaseMergeGitAdapter",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9e9abe7181b71316e54964a1694e1196b70e7705e3e78b819044365c33947b16",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "When a guarded base merge conflicts, the orchestrator drives the canonical recovery workflow through editing, zero-findings review, and guarded commit without running clean-merge cleanup."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "When a guarded base merge conflicts, the orchestrator drives the canonical recovery workflow through editing, zero-findings review, and guarded commit without running clean-merge cleanup.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "702b8a1a7249e444b5a5a562f9fa46aa03201f2d47c7dace0b841dc270871ed4",
+      "claim_origin": {
+        "data": {
+          "entry_key": "FsBaseMergeGitAdapter",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "b1ebe6f4e3ef241cee3ab49ab127483a283048c40c19b452348de4ac09005a15",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "After every clean guarded base merge, regenerate derived views, replace the baseline from a commit-pinned isolated worktree without exposing a partial replacement, and then record synchronization of that exact merged base commit."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "After every clean guarded base merge, regenerate derived views, replace the baseline from a commit-pinned isolated worktree without exposing a partial replacement, and then record synchronization of that exact merged base commit.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "702b8a1a7249e444b5a5a562f9fa46aa03201f2d47c7dace0b841dc270871ed4",
+      "claim_origin": {
+        "data": {
+          "entry_key": "FsBaseMergeGitAdapter",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "d7421f665ec7a508d92f8962947fd4a3a43ba801fb68280a5dd6945a66f96bc8",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-06",
+          "section": "constraint",
+          "text_label": "The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution, be atomically written only after views and baseline recapture succeed, support idempotent retry for the same value, and fail closed on record generation, validation, write, or replacement failure."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution, be atomically written only after views and baseline recapture succeed, support idempotent retry for the same value, and fail closed on record generation, validation, write, or replacement failure.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "702b8a1a7249e444b5a5a562f9fa46aa03201f2d47c7dace0b841dc270871ed4",
+      "claim_origin": {
+        "data": {
+          "entry_key": "FsBaseMergeGitAdapter",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "c11596aa73c9d76385bd11d40c389db9cf0df6530af7fa89addda894842ed6c7",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "After a clean guarded base merge, derived views are regenerated; a complete, validated baseline replacement produced in an isolated worktree pinned to the exact merged base commit is atomically published; and only then is the sync-base record atomically written before the operation reports success."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "After a clean guarded base merge, derived views are regenerated; a complete, validated baseline replacement produced in an isolated worktree pinned to the exact merged base commit is atomically published; and only then is the sync-base record atomically written before the operation reports success.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "702b8a1a7249e444b5a5a562f9fa46aa03201f2d47c7dace0b841dc270871ed4",
+      "claim_origin": {
+        "data": {
+          "entry_key": "FsBaseMergeGitAdapter",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "84b79eec5107343a4c45d0108c7d1c022b92aa7eb54aa2e887aad4ad7fdf9dff",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-11",
+          "section": "acceptance_criteria",
+          "text_label": "Following successful views and baseline steps, the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit; rerunning with that same commit is idempotent, while a later successful merge atomically replaces the record with its newly incorporated commit."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Following successful views and baseline steps, the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit; rerunning with that same commit is idempotent, while a later successful merge atomically replaces the record with its newly incorporated commit.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "fd641ee1e5607f90728e97f5b24ee29399c4c6560b7e5d8c8affb766b6d76aed",
+      "claim_origin": {
+        "data": {
+          "entry_key": "FsGitStashAdapter",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "2706940b3c96469faf851e83a23fe38412526fdf9b6137fbacb76c3c280a89d9",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "Provide guarded stash and stash-pop support that explicitly includes untracked track artifacts while preserving repository safety gates."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Provide guarded stash and stash-pop support that explicitly includes untracked track artifacts while preserving repository safety gates.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "fd641ee1e5607f90728e97f5b24ee29399c4c6560b7e5d8c8affb766b6d76aed",
+      "claim_origin": {
+        "data": {
+          "entry_key": "FsGitStashAdapter",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "552679255e3570a7bdc446dc8d5a5aae5be794c21e81c4c1abaf23f6d1858c3b",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-06",
+          "section": "acceptance_criteria",
+          "text_label": "A guarded stash records untracked track artifacts, and a successful guarded stash-pop restores them through the `bin/sotp git stash` command path without changing branch history, updating branch refs, or changing the active track branch; the stash-internal objects and `refs/stash` updates required by stash and stash-pop are permitted."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "\"A guarded stash records untracked track artifacts, and a successful guarded stash-pop restores them through the `bin/sotp git stash` command path without changing branch history, updating branch refs, or changing the active track branch\"",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cffe1a62718dbadc8527c5dd5e1b58f1d992b5438ed744c0eda5f93b7a331d5c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "SyncBaseRecord",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "afa25e34321fdb5da8f872a16ef1824d39af8f7cc621c064c6093d0ee631c5e5",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-06",
+          "section": "in_scope",
+          "text_label": "Persist the active track's synchronization state as an atomically replaced, schema-versioned record containing its track identity, base branch, and the exact base commit incorporated by a successful guarded merge."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Persist the active track's synchronization state as an atomically replaced, schema-versioned record containing its track identity, base branch, and the exact base commit incorporated by a successful guarded merge.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cffe1a62718dbadc8527c5dd5e1b58f1d992b5438ed744c0eda5f93b7a331d5c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "SyncBaseRecord",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "d7421f665ec7a508d92f8962947fd4a3a43ba801fb68280a5dd6945a66f96bc8",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-06",
+          "section": "constraint",
+          "text_label": "The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution, be atomically written only after views and baseline recapture succeed, support idempotent retry for the same value, and fail closed on record generation, validation, write, or replacement failure."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution, be atomically written only after views and baseline recapture succeed, support idempotent retry for the same value, and fail closed on record generation, validation, write, or replacement failure.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cffe1a62718dbadc8527c5dd5e1b58f1d992b5438ed744c0eda5f93b7a331d5c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "SyncBaseRecord",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "84b79eec5107343a4c45d0108c7d1c022b92aa7eb54aa2e887aad4ad7fdf9dff",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-11",
+          "section": "acceptance_criteria",
+          "text_label": "Following successful views and baseline steps, the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit; rerunning with that same commit is idempotent, while a later successful merge atomically replaces the record with its newly incorporated commit."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "25c47dfcc0072c1ebb06e881fffc78c4a8f967c9a7ad7799312b64aa50e832db",
+      "claim_origin": {
+        "data": {
+          "entry_key": "SyncBaseRecordSchemaVersion",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "afa25e34321fdb5da8f872a16ef1824d39af8f7cc621c064c6093d0ee631c5e5",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-06",
+          "section": "in_scope",
+          "text_label": "Persist the active track's synchronization state as an atomically replaced, schema-versioned record containing its track identity, base branch, and the exact base commit incorporated by a successful guarded merge."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "schema-versioned record",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "25c47dfcc0072c1ebb06e881fffc78c4a8f967c9a7ad7799312b64aa50e832db",
+      "claim_origin": {
+        "data": {
+          "entry_key": "SyncBaseRecordSchemaVersion",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "d7421f665ec7a508d92f8962947fd4a3a43ba801fb68280a5dd6945a66f96bc8",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-06",
+          "section": "constraint",
+          "text_label": "The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution, be atomically written only after views and baseline recapture succeed, support idempotent retry for the same value, and fail closed on record generation, validation, write, or replacement failure."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "25c47dfcc0072c1ebb06e881fffc78c4a8f967c9a7ad7799312b64aa50e832db",
+      "claim_origin": {
+        "data": {
+          "entry_key": "SyncBaseRecordSchemaVersion",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "84b79eec5107343a4c45d0108c7d1c022b92aa7eb54aa2e887aad4ad7fdf9dff",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-11",
+          "section": "acceptance_criteria",
+          "text_label": "Following successful views and baseline steps, the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit; rerunning with that same commit is idempotent, while a later successful merge atomically replaces the record with its newly incorporated commit."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "has a schema-versioned sync-base record",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "07b8788cb48162bc61f6fd581b77888df4a753efe11c9f9735aafc83666228ad",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsCodecError",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "817b72909e99cba8c63ea6783688c285d7a31b1b957ac27e383020deabd3d2e4",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "For the currently active track only, evaluate and self-heal type-signals cache entries using catalogue declaration, implementation input, and actual baseline hashes."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "For the currently active track only, evaluate and self-heal type-signals cache entries using catalogue declaration, implementation input, and actual baseline hashes.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "07b8788cb48162bc61f6fd581b77888df4a753efe11c9f9735aafc83666228ad",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsCodecError",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "2c9b19622c3a0e2132e20416f8a2daea82bc3ee0d9fb04093e62f80c1db9eb47",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-04",
+          "section": "constraint",
+          "text_label": "Cache misses caused by hash mismatch or any cache decode failure must reevaluate and atomically overwrite only after success; missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures must fail closed."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "any cache decode failure must reevaluate and atomically overwrite only after success; missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures must fail closed.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "07b8788cb48162bc61f6fd581b77888df4a753efe11c9f9735aafc83666228ad",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsCodecError",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "6db977ec88a955486c701792d79190a537792e0c8f40534a9f7c5006d4f1a05e",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-08",
+          "section": "acceptance_criteria",
+          "text_label": "Any hash mismatch, missing cache, schema mismatch, missing required cache field, invalid cache value, or malformed cache JSON is treated as a cache miss; successful reevaluation atomically replaces the cache with the new result and all current hashes."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Any hash mismatch, missing cache, schema mismatch, missing required cache field, invalid cache value, or malformed cache JSON is treated as a cache miss;",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1e657dd622d3dba16705867ff63c48d67329feb42d68ed5498e7c037b95d567a",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsExecutorAdapter",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "817b72909e99cba8c63ea6783688c285d7a31b1b957ac27e383020deabd3d2e4",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "For the currently active track only, evaluate and self-heal type-signals cache entries using catalogue declaration, implementation input, and actual baseline hashes."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "For the currently active track only, evaluate and self-heal type-signals cache entries using catalogue declaration, implementation input, and actual baseline hashes.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1e657dd622d3dba16705867ff63c48d67329feb42d68ed5498e7c037b95d567a",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsExecutorAdapter",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "be0e4f36c9a55e0674c479938e51a0160b52d5398c63aa8438a14586d168f92f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "A type-signals cache may be reused only when its catalogue declaration hash, implementation input hash, and actual baseline hash all equal the current authoritative values."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A type-signals cache may be reused only when its catalogue declaration hash, implementation input hash, and actual baseline hash all equal the current authoritative values.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1e657dd622d3dba16705867ff63c48d67329feb42d68ed5498e7c037b95d567a",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsExecutorAdapter",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "2c9b19622c3a0e2132e20416f8a2daea82bc3ee0d9fb04093e62f80c1db9eb47",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-04",
+          "section": "constraint",
+          "text_label": "Cache misses caused by hash mismatch or any cache decode failure must reevaluate and atomically overwrite only after success; missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures must fail closed."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Cache misses caused by hash mismatch or any cache decode failure must reevaluate and atomically overwrite only after success; missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures must fail closed.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1e657dd622d3dba16705867ff63c48d67329feb42d68ed5498e7c037b95d567a",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsExecutorAdapter",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "7b54404cb71772b0ba0fb9dba8a139fb332f9fbbfd5df060512546c80aa23e09",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-07",
+          "section": "acceptance_criteria",
+          "text_label": "For the active track, a type-signals cache is reused only when all three current hashes—catalogue declaration, implementation input, and actual baseline—match the cache record."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "For the active track, a type-signals cache is reused only when all three current hashes—catalogue declaration, implementation input, and actual baseline—match the cache record.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1e657dd622d3dba16705867ff63c48d67329feb42d68ed5498e7c037b95d567a",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsExecutorAdapter",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "6db977ec88a955486c701792d79190a537792e0c8f40534a9f7c5006d4f1a05e",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-08",
+          "section": "acceptance_criteria",
+          "text_label": "Any hash mismatch, missing cache, schema mismatch, missing required cache field, invalid cache value, or malformed cache JSON is treated as a cache miss; successful reevaluation atomically replaces the cache with the new result and all current hashes."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Any hash mismatch, missing cache, schema mismatch, missing required cache field, invalid cache value, or malformed cache JSON is treated as a cache miss; successful reevaluation atomically replaces the cache with the new result and all current hashes.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1e657dd622d3dba16705867ff63c48d67329feb42d68ed5498e7c037b95d567a",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsExecutorAdapter",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "d508f9ad6e631d86ac123e28064377878b68c60a1c537d96963226b756b08915",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-09",
+          "section": "acceptance_criteria",
+          "text_label": "Missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures fail closed; inactive and archived tracks are untouched, and manual type-signals deletion is not part of ordinary baseline recapture."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures fail closed; inactive and archived tracks are untouched, and manual type-signals deletion is not part of ordinary baseline recapture.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "b98eed6fba2e0efcce99c4d5c6ec71d2cfba31549a71ece8212d369fbd707088",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::tddd::type_signals_codec::baseline_hash",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "817b72909e99cba8c63ea6783688c285d7a31b1b957ac27e383020deabd3d2e4",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "For the currently active track only, evaluate and self-heal type-signals cache entries using catalogue declaration, implementation input, and actual baseline hashes."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "For the currently active track only, evaluate and self-heal type-signals cache entries using catalogue declaration, implementation input, and actual baseline hashes.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "b98eed6fba2e0efcce99c4d5c6ec71d2cfba31549a71ece8212d369fbd707088",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::tddd::type_signals_codec::baseline_hash",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "be0e4f36c9a55e0674c479938e51a0160b52d5398c63aa8438a14586d168f92f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "A type-signals cache may be reused only when its catalogue declaration hash, implementation input hash, and actual baseline hash all equal the current authoritative values."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A type-signals cache may be reused only when its catalogue declaration hash, implementation input hash, and actual baseline hash all equal the current authoritative values.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "b98eed6fba2e0efcce99c4d5c6ec71d2cfba31549a71ece8212d369fbd707088",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::tddd::type_signals_codec::baseline_hash",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "7b54404cb71772b0ba0fb9dba8a139fb332f9fbbfd5df060512546c80aa23e09",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-07",
+          "section": "acceptance_criteria",
+          "text_label": "For the active track, a type-signals cache is reused only when all three current hashes—catalogue declaration, implementation input, and actual baseline—match the cache record."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "For the active track, a type-signals cache is reused only when all three current hashes—catalogue declaration, implementation input, and actual baseline—match the cache record.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "82dd3fc43d3702abfe53568d8901aa20e5dd205eb4fa0d2295d678566ea359f9",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::tddd::type_signals_codec::decode",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "817b72909e99cba8c63ea6783688c285d7a31b1b957ac27e383020deabd3d2e4",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "For the currently active track only, evaluate and self-heal type-signals cache entries using catalogue declaration, implementation input, and actual baseline hashes."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "For the currently active track only, evaluate and self-heal type-signals cache entries using catalogue declaration, implementation input, and actual baseline hashes.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "82dd3fc43d3702abfe53568d8901aa20e5dd205eb4fa0d2295d678566ea359f9",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::tddd::type_signals_codec::decode",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "2c9b19622c3a0e2132e20416f8a2daea82bc3ee0d9fb04093e62f80c1db9eb47",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-04",
+          "section": "constraint",
+          "text_label": "Cache misses caused by hash mismatch or any cache decode failure must reevaluate and atomically overwrite only after success; missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures must fail closed."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Cache misses caused by hash mismatch or any cache decode failure must reevaluate and atomically overwrite only after success;",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "82dd3fc43d3702abfe53568d8901aa20e5dd205eb4fa0d2295d678566ea359f9",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::tddd::type_signals_codec::decode",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "6db977ec88a955486c701792d79190a537792e0c8f40534a9f7c5006d4f1a05e",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-08",
+          "section": "acceptance_criteria",
+          "text_label": "Any hash mismatch, missing cache, schema mismatch, missing required cache field, invalid cache value, or malformed cache JSON is treated as a cache miss; successful reevaluation atomically replaces the cache with the new result and all current hashes."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Any hash mismatch, missing cache, schema mismatch, missing required cache field, invalid cache value, or malformed cache JSON is treated as a cache miss;",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "33d8d2f6a5b643acc5cdebf91b24513d99116d407af5fea72e891bf55aa077bd",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::tddd::type_signals_codec::encode",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "817b72909e99cba8c63ea6783688c285d7a31b1b957ac27e383020deabd3d2e4",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "For the currently active track only, evaluate and self-heal type-signals cache entries using catalogue declaration, implementation input, and actual baseline hashes."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "For the currently active track only, evaluate and self-heal type-signals cache entries using catalogue declaration, implementation input, and actual baseline hashes.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "33d8d2f6a5b643acc5cdebf91b24513d99116d407af5fea72e891bf55aa077bd",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::tddd::type_signals_codec::encode",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "2c9b19622c3a0e2132e20416f8a2daea82bc3ee0d9fb04093e62f80c1db9eb47",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-04",
+          "section": "constraint",
+          "text_label": "Cache misses caused by hash mismatch or any cache decode failure must reevaluate and atomically overwrite only after success; missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures must fail closed."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Cache misses caused by hash mismatch or any cache decode failure must reevaluate and atomically overwrite only after success; missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures must fail closed.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "33d8d2f6a5b643acc5cdebf91b24513d99116d407af5fea72e891bf55aa077bd",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::tddd::type_signals_codec::encode",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "6db977ec88a955486c701792d79190a537792e0c8f40534a9f7c5006d4f1a05e",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-08",
+          "section": "acceptance_criteria",
+          "text_label": "Any hash mismatch, missing cache, schema mismatch, missing required cache field, invalid cache value, or malformed cache JSON is treated as a cache miss; successful reevaluation atomically replaces the cache with the new result and all current hashes."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Any hash mismatch, missing cache, schema mismatch, missing required cache field, invalid cache value, or malformed cache JSON is treated as a cache miss; successful reevaluation atomically replaces the cache with the new result and all current hashes.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "33d8d2f6a5b643acc5cdebf91b24513d99116d407af5fea72e891bf55aa077bd",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::tddd::type_signals_codec::encode",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "d508f9ad6e631d86ac123e28064377878b68c60a1c537d96963226b756b08915",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-09",
+          "section": "acceptance_criteria",
+          "text_label": "Missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures fail closed; inactive and archived tracks are untouched, and manual type-signals deletion is not part of ordinary baseline recapture."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures fail closed; inactive and archived tracks are untouched, and manual type-signals deletion is not part of ordinary baseline recapture.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "4f27d6b97bc22e8eae0aa09f4a6e4f20f4cbb3226badfd965a3c32671511a552",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "817b72909e99cba8c63ea6783688c285d7a31b1b957ac27e383020deabd3d2e4",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "For the currently active track only, evaluate and self-heal type-signals cache entries using catalogue declaration, implementation input, and actual baseline hashes."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "For the currently active track only, evaluate and self-heal type-signals cache entries using catalogue declaration, implementation input, and actual baseline hashes.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "4f27d6b97bc22e8eae0aa09f4a6e4f20f4cbb3226badfd965a3c32671511a552",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "2c9b19622c3a0e2132e20416f8a2daea82bc3ee0d9fb04093e62f80c1db9eb47",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-04",
+          "section": "constraint",
+          "text_label": "Cache misses caused by hash mismatch or any cache decode failure must reevaluate and atomically overwrite only after success; missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures must fail closed."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Cache misses caused by hash mismatch or any cache decode failure must reevaluate and atomically overwrite only after success; missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures must fail closed.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "4f27d6b97bc22e8eae0aa09f4a6e4f20f4cbb3226badfd965a3c32671511a552",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "d508f9ad6e631d86ac123e28064377878b68c60a1c537d96963226b756b08915",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-09",
+          "section": "acceptance_criteria",
+          "text_label": "Missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures fail closed; inactive and archived tracks are untouched, and manual type-signals deletion is not part of ordinary baseline recapture."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures fail closed; inactive and archived tracks are untouched, and manual type-signals deletion is not part of ordinary baseline recapture.",
+        "kind": "pass"
+      }
+    }
+  ],
+  "layer": "infrastructure",
+  "schema_version": 1
+}

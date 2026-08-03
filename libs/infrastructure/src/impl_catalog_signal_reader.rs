@@ -185,10 +185,11 @@ mod tests {
     }
 
     const SAMPLE_SIGNALS_JSON: &str = r#"{
-  "schema_version": 3,
+  "schema_version": 4,
   "generated_at": "2026-06-27T00:00:00Z",
   "declaration_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
   "implementation_input_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "baseline_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
   "signals": [
     {
       "type_name": "MyType",

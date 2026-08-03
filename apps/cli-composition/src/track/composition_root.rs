@@ -48,6 +48,11 @@ impl TrackCompositionRoot {
                 Arc::new(infrastructure::track::fixpoint_resolve_driver::FsFixpointDryGateFactoryAdapter),
                 Arc::new(infrastructure::track::fixpoint_resolve_driver::FsFixpointGateStateFactoryAdapter),
             ));
-        cli_driver::track::TrackDriver::new(service, fixpoint_resolve_service)
+        let base_merge_service = Arc::new(usecase::base_merge::BaseMergeInteractor::new(
+            Arc::new(infrastructure::base_merge::FsBaseMergeContextAdapter::new()),
+            Arc::new(infrastructure::base_merge::FsBaseMergeGitAdapter::new()),
+            Arc::new(infrastructure::base_merge::FsBaseMergeCleanupAdapter::new()),
+        ));
+        cli_driver::track::TrackDriver::new(service, fixpoint_resolve_service, base_merge_service)
     }
 }

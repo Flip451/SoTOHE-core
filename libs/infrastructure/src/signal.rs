@@ -1092,6 +1092,16 @@ mod tests {
         )
         .unwrap();
         let signals_path = track_dir.join("domain-type-signals.json");
+        let mut persisted: serde_json::Value =
+            serde_json::from_str(&std::fs::read_to_string(&signals_path).unwrap()).unwrap();
+        let object = persisted.as_object_mut().unwrap();
+        let declaration_hash = object.get("declaration_hash").cloned().unwrap();
+        object.insert(
+            "schema_version".to_owned(),
+            serde_json::json!(domain::TYPE_SIGNALS_SCHEMA_VERSION),
+        );
+        object.insert("baseline_hash".to_owned(), declaration_hash);
+        std::fs::write(&signals_path, serde_json::to_string_pretty(&persisted).unwrap()).unwrap();
         let persisted_before_check = std::fs::read_to_string(&signals_path).unwrap();
 
         let check = SystemSignalCommandAdapter::new()

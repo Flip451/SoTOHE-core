@@ -5,6 +5,9 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::time::Duration;
 
+#[cfg(test)]
+use std::sync::Mutex;
+
 use sha2::Digest;
 
 use domain::tddd::type_signals_doc::Sha256Digest;
@@ -18,6 +21,9 @@ const MAX_SOURCE_FILE_BYTES: u64 = 16 * 1024 * 1024;
 const MAX_TOTAL_SOURCE_BYTES: u64 = 64 * 1024 * 1024;
 const MAX_TOOLCHAIN_COMMAND_OUTPUT_BYTES: usize = 64 * 1024;
 const MAX_TOOLCHAIN_COMMAND_DURATION: Duration = Duration::from_secs(10);
+
+#[cfg(test)]
+pub(super) static PROCESS_ENVIRONMENT_LOCK: Mutex<()> = Mutex::new(());
 
 /// Hashes exactly one crate's source contents, its manifest, optional build
 /// script, the workspace manifest and lockfile, and the active nightly
@@ -46,7 +52,7 @@ fn hash_implementation_inputs_with_toolchain_identifier(
 ) -> Result<Sha256Digest, EvaluateSignalsError> {
     let source_root = crate_source_root(workspace_root, target_crate)?;
     let crate_root = source_root.parent().ok_or_else(|| {
-        EvaluateSignalsError(format!(
+        EvaluateSignalsError::authoritative_input(format!(
             "cannot determine crate root from source directory '{}'",
             source_root.display()
         ))
@@ -60,7 +66,7 @@ fn hash_implementation_inputs_with_toolchain_identifier(
     let mut remaining_budget = MAX_TOTAL_SOURCE_BYTES;
     for path in source_files {
         let relative = path.strip_prefix(workspace_root).map_err(|_| {
-            EvaluateSignalsError(format!(
+            EvaluateSignalsError::authoritative_input(format!(
                 "crate source '{}' is outside the workspace",
                 path.display()
             ))
@@ -90,7 +96,7 @@ fn hash_implementation_inputs_with_toolchain_identifier(
         ),
         Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
         Err(error) => {
-            return Err(EvaluateSignalsError(format!(
+            return Err(EvaluateSignalsError::authoritative_input(format!(
                 "cannot stat optional crate build script '{}': {error}",
                 build_script.display()
             )));
@@ -117,7 +123,9 @@ fn hash_implementation_inputs_with_toolchain_identifier(
     append_component(&mut hasher, b"toolchain", toolchain_identifier);
 
     Sha256Digest::try_new(format!("{:x}", hasher.finalize())).map_err(|error| {
-        EvaluateSignalsError(format!("failed to construct implementation-input digest: {error}"))
+        EvaluateSignalsError::authoritative_input(format!(
+            "failed to construct implementation-input digest: {error}"
+        ))
     })
 }
 
@@ -131,7 +139,7 @@ fn crate_source_root(
         "cli_driver" => workspace_root.join("apps/cli-driver"),
         "cli_composition" => workspace_root.join("apps/cli-composition"),
         _ => {
-            return Err(EvaluateSignalsError(format!(
+            return Err(EvaluateSignalsError::authoritative_input(format!(
                 "unsupported TDDD target crate '{target_crate}' for implementation-input hashing"
             )));
         }
@@ -141,19 +149,19 @@ fn crate_source_root(
     // `src` segment — a symlinked `libs/` or crate directory would otherwise
     // let the traversal hash sources outside the trusted workspace.
     crate::track::symlink_guard::reject_symlinks_up_to_root(&source_root).map_err(|error| {
-        EvaluateSignalsError(format!(
+        EvaluateSignalsError::authoritative_input(format!(
             "refusing crate source directory '{}': {error}",
             source_root.display()
         ))
     })?;
     let metadata = std::fs::symlink_metadata(&source_root).map_err(|error| {
-        EvaluateSignalsError(format!(
+        EvaluateSignalsError::authoritative_input(format!(
             "cannot stat crate source directory '{}': {error}",
             source_root.display()
         ))
     })?;
     if !metadata.is_dir() {
-        return Err(EvaluateSignalsError(format!(
+        return Err(EvaluateSignalsError::authoritative_input(format!(
             "crate source directory '{}' is unavailable",
             source_root.display()
         )));
@@ -168,7 +176,7 @@ fn collect_source_files(
     files: &mut Vec<PathBuf>,
 ) -> Result<(), EvaluateSignalsError> {
     for entry in std::fs::read_dir(directory).map_err(|error| {
-        EvaluateSignalsError(format!(
+        EvaluateSignalsError::authoritative_input(format!(
             "cannot read source directory '{}': {error}",
             directory.display()
         ))
@@ -177,25 +185,32 @@ fn collect_source_files(
         // a tree of empty directories cannot cause unbounded traversal work.
         *visited_entries += 1;
         if *visited_entries > MAX_SOURCE_ENTRIES {
-            return Err(EvaluateSignalsError(format!(
+            return Err(EvaluateSignalsError::authoritative_input(format!(
                 "crate source traversal exceeds maximum of {MAX_SOURCE_ENTRIES} entries"
             )));
         }
         let path = entry
-            .map_err(|error| EvaluateSignalsError(format!("cannot read source entry: {error}")))?
+            .map_err(|error| {
+                EvaluateSignalsError::authoritative_input(format!(
+                    "cannot read source entry: {error}"
+                ))
+            })?
             .path();
         let metadata = std::fs::symlink_metadata(&path).map_err(|error| {
-            EvaluateSignalsError(format!("cannot stat crate source '{}': {error}", path.display()))
+            EvaluateSignalsError::authoritative_input(format!(
+                "cannot stat crate source '{}': {error}",
+                path.display()
+            ))
         })?;
         if metadata.file_type().is_symlink() {
-            return Err(EvaluateSignalsError(format!(
+            return Err(EvaluateSignalsError::authoritative_input(format!(
                 "cannot read crate source '{}': symlinks are unsupported",
                 path.display()
             )));
         }
         if metadata.is_dir() {
             if depth >= MAX_SOURCE_DEPTH {
-                return Err(EvaluateSignalsError(format!(
+                return Err(EvaluateSignalsError::authoritative_input(format!(
                     "crate source traversal exceeds maximum depth of {MAX_SOURCE_DEPTH} at '{}'",
                     path.display()
                 )));
@@ -203,13 +218,13 @@ fn collect_source_files(
             collect_source_files(&path, depth + 1, visited_entries, files)?;
         } else if metadata.is_file() {
             if files.len() >= MAX_SOURCE_FILES {
-                return Err(EvaluateSignalsError(format!(
+                return Err(EvaluateSignalsError::authoritative_input(format!(
                     "crate source traversal exceeds maximum of {MAX_SOURCE_FILES} files"
                 )));
             }
             files.push(path);
         } else {
-            return Err(EvaluateSignalsError(format!(
+            return Err(EvaluateSignalsError::authoritative_input(format!(
                 "cannot read crate source '{}': not a regular file or directory",
                 path.display()
             )));
@@ -237,9 +252,15 @@ fn nightly_toolchain_identifier(workspace_root: &Path) -> Result<Vec<u8>, Evalua
         MAX_TOOLCHAIN_COMMAND_DURATION,
         "nightly toolchain identity",
     )
-    .map_err(|error| EvaluateSignalsError(format!("cannot identify nightly toolchain: {error}")))?;
+    .map_err(|error| {
+        EvaluateSignalsError::authoritative_input(format!(
+            "cannot identify nightly toolchain: {error}"
+        ))
+    })?;
     if !output.status.success() || output.stdout.is_empty() {
-        return Err(EvaluateSignalsError("cannot identify nightly toolchain".to_owned()));
+        return Err(EvaluateSignalsError::authoritative_input(
+            "cannot identify nightly toolchain".to_owned(),
+        ));
     }
     Ok(output.stdout)
 }
@@ -250,22 +271,25 @@ fn read_regular_source_file(
     remaining_budget: &mut u64,
 ) -> Result<Vec<u8>, EvaluateSignalsError> {
     let metadata = std::fs::symlink_metadata(path).map_err(|error| {
-        EvaluateSignalsError(format!("cannot stat build input '{}': {error}", path.display()))
+        EvaluateSignalsError::authoritative_input(format!(
+            "cannot stat build input '{}': {error}",
+            path.display()
+        ))
     })?;
     if metadata.file_type().is_symlink() {
-        return Err(EvaluateSignalsError(format!(
+        return Err(EvaluateSignalsError::authoritative_input(format!(
             "cannot read build input '{}': symlinks are unsupported",
             path.display()
         )));
     }
     if !metadata.is_file() {
-        return Err(EvaluateSignalsError(format!(
+        return Err(EvaluateSignalsError::authoritative_input(format!(
             "cannot read build input '{}': not a regular file",
             path.display()
         )));
     }
     if metadata.len() > per_file_limit {
-        return Err(EvaluateSignalsError(format!(
+        return Err(EvaluateSignalsError::authoritative_input(format!(
             "build input '{}' exceeds the {per_file_limit}-byte per-file limit; the \
              implementation-input hash is indeterminate",
             path.display()
@@ -275,20 +299,26 @@ fn read_regular_source_file(
     // stat above and this read; reading one extra byte detects that race.
     let mut bytes = Vec::new();
     let file = std::fs::File::open(path).map_err(|error| {
-        EvaluateSignalsError(format!("cannot read build input '{}': {error}", path.display()))
+        EvaluateSignalsError::authoritative_input(format!(
+            "cannot read build input '{}': {error}",
+            path.display()
+        ))
     })?;
     file.take(per_file_limit.saturating_add(1)).read_to_end(&mut bytes).map_err(|error| {
-        EvaluateSignalsError(format!("cannot read build input '{}': {error}", path.display()))
+        EvaluateSignalsError::authoritative_input(format!(
+            "cannot read build input '{}': {error}",
+            path.display()
+        ))
     })?;
     if bytes.len() as u64 > per_file_limit {
-        return Err(EvaluateSignalsError(format!(
+        return Err(EvaluateSignalsError::authoritative_input(format!(
             "build input '{}' grew past the {per_file_limit}-byte per-file limit during \
              hashing; the implementation-input hash is indeterminate",
             path.display()
         )));
     }
     if bytes.len() as u64 > *remaining_budget {
-        return Err(EvaluateSignalsError(format!(
+        return Err(EvaluateSignalsError::authoritative_input(format!(
             "build inputs exceed the cumulative {MAX_TOTAL_SOURCE_BYTES}-byte budget at '{}'; \
              the implementation-input hash is indeterminate",
             path.display()
@@ -313,10 +343,6 @@ mod tests {
         hash_implementation_inputs_with_toolchain_identifier, read_regular_source_file,
     };
     use std::path::{Path, PathBuf};
-    use std::sync::Mutex;
-
-    static PROCESS_ENVIRONMENT_LOCK: Mutex<()> = Mutex::new(());
-
     #[test]
     fn test_read_regular_source_file_enforces_per_file_and_cumulative_limits() {
         let directory = tempfile::tempdir().unwrap();
@@ -325,11 +351,11 @@ mod tests {
 
         let mut budget = 1024u64;
         let oversized = read_regular_source_file(&input, 5, &mut budget).unwrap_err();
-        assert!(oversized.0.contains("per-file limit"), "got: {}", oversized.0);
+        assert!(oversized.to_string().contains("per-file limit"), "got: {oversized}");
 
         let mut exhausted = 5u64;
         let over_budget = read_regular_source_file(&input, 64, &mut exhausted).unwrap_err();
-        assert!(over_budget.0.contains("cumulative"), "got: {}", over_budget.0);
+        assert!(over_budget.to_string().contains("cumulative"), "got: {over_budget}");
 
         let mut remaining = 64u64;
         assert_eq!(read_regular_source_file(&input, 64, &mut remaining).unwrap().len(), 10);
@@ -500,39 +526,43 @@ mod tests {
     #[test]
     fn test_hash_implementation_inputs_uses_rustup_toolchain_identity_and_rejects_unavailable_rustup()
      {
-        let _environment_guard = PROCESS_ENVIRONMENT_LOCK.lock().unwrap();
-        let workspace = workspace_with_domain_source();
-        let fake_bin = tempfile::tempdir().unwrap();
+        super::super::with_process_environment_lock(|| {
+            let workspace = workspace_with_domain_source();
+            let fake_bin = tempfile::tempdir().unwrap();
 
-        let rustup = write_fake_rustup(fake_bin.path(), "#!/bin/sh\nprintf 'nightly-a\\n'\n");
-        let first = temp_env::with_var("PATH", Some(fake_bin.path().as_os_str()), || {
-            hash_implementation_inputs(workspace.path(), "domain")
-        })
-        .unwrap();
-
-        std::fs::write(&rustup, "#!/bin/sh\nprintf 'nightly-b\\n'\n").unwrap();
-        let second = temp_env::with_var("PATH", Some(fake_bin.path().as_os_str()), || {
-            hash_implementation_inputs(workspace.path(), "domain")
-        })
-        .unwrap();
-        assert_ne!(first, second, "the rustup-reported toolchain identity must affect the hash");
-
-        std::fs::remove_file(&rustup).unwrap();
-        assert!(
-            temp_env::with_var("PATH", Some(fake_bin.path().as_os_str()), || {
+            let rustup = write_fake_rustup(fake_bin.path(), "#!/bin/sh\nprintf 'nightly-a\\n'\n");
+            let first = temp_env::with_var("PATH", Some(fake_bin.path().as_os_str()), || {
                 hash_implementation_inputs(workspace.path(), "domain")
             })
-            .is_err(),
-            "an unavailable rustup must make the implementation hash indeterminate"
-        );
+            .unwrap();
 
-        write_fake_rustup(fake_bin.path(), "#!/bin/sh\nexit 1\n");
-        assert!(
-            temp_env::with_var("PATH", Some(fake_bin.path().as_os_str()), || {
+            std::fs::write(&rustup, "#!/bin/sh\nprintf 'nightly-b\\n'\n").unwrap();
+            let second = temp_env::with_var("PATH", Some(fake_bin.path().as_os_str()), || {
                 hash_implementation_inputs(workspace.path(), "domain")
             })
-            .is_err(),
-            "a failing rustup must make the implementation hash indeterminate"
-        );
+            .unwrap();
+            assert_ne!(
+                first, second,
+                "the rustup-reported toolchain identity must affect the hash"
+            );
+
+            std::fs::remove_file(&rustup).unwrap();
+            assert!(
+                temp_env::with_var("PATH", Some(fake_bin.path().as_os_str()), || {
+                    hash_implementation_inputs(workspace.path(), "domain")
+                })
+                .is_err(),
+                "an unavailable rustup must make the implementation hash indeterminate"
+            );
+
+            write_fake_rustup(fake_bin.path(), "#!/bin/sh\nexit 1\n");
+            assert!(
+                temp_env::with_var("PATH", Some(fake_bin.path().as_os_str()), || {
+                    hash_implementation_inputs(workspace.path(), "domain")
+                })
+                .is_err(),
+                "a failing rustup must make the implementation hash indeterminate"
+            );
+        });
     }
 }

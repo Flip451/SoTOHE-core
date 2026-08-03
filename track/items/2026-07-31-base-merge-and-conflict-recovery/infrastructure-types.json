@@ -1,0 +1,771 @@
+{
+  "crate_name": "infrastructure",
+  "functions": {
+    "infrastructure::tddd::type_signals_codec::baseline_hash": {
+      "action": "add",
+      "docs": "Computes a typed SHA-256 identity from baseline bytes.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "baseline_bytes",
+          "ty": "&[u8]"
+        }
+      ],
+      "returns": "domain::tddd::type_signals_doc::BaselineHash",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
+    "infrastructure::tddd::type_signals_codec::decode": {
+      "action": "reference",
+      "docs": "Baseline function signature for decoding a type-signals cache document.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "json",
+          "ty": "&str"
+        }
+      ],
+      "returns": "Result<domain::tddd::type_signals_doc::TypeSignalsDocument, TypeSignalsCodecError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
+    "infrastructure::tddd::type_signals_codec::encode": {
+      "action": "reference",
+      "docs": "Baseline function signature for encoding a typed cache document as opaque JSON text.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "doc",
+          "ty": "&domain::tddd::type_signals_doc::TypeSignalsDocument"
+        }
+      ],
+      "returns": "Result<String, TypeSignalsCodecError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
+    "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer": {
+      "action": "reference",
+      "docs": "Baseline-public entrypoint for per-layer type-signal evaluation.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "items_dir",
+          "ty": "&std::path::Path"
+        },
+        {
+          "name": "track_id",
+          "ty": "&domain::TrackId"
+        },
+        {
+          "name": "workspace_root",
+          "ty": "&std::path::Path"
+        },
+        {
+          "name": "binding",
+          "ty": "&TdddLayerBinding"
+        },
+        {
+          "name": "features",
+          "ty": "&[domain::tddd::CargoFeatureName]"
+        }
+      ],
+      "returns": "Result<std::process::ExitCode, EvaluateSignalsError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    }
+  },
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "FsBaseMergeContextAdapter"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "FsBaseMergeGitAdapter"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "FsBaseMergeCleanupAdapter"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "FsGitStashAdapter"
+    }
+  ],
+  "layer": "infrastructure",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "FsBaseMergeContextAdapter",
+      "trait_ref": "usecase::base_merge::BaseMergeContextPort"
+    },
+    {
+      "for_type": "FsBaseMergeGitAdapter",
+      "trait_ref": "usecase::base_merge::BaseMergeGitPort"
+    },
+    {
+      "for_type": "FsBaseMergeCleanupAdapter",
+      "trait_ref": "usecase::base_merge::BaseMergeCleanupPort"
+    },
+    {
+      "for_type": "FsGitStashAdapter",
+      "trait_ref": "usecase::git_stash::GitStashPort"
+    },
+    {
+      "for_type": "FsGitStashAdapter",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "reference",
+      "for_type": "TypeSignalsExecutorAdapter",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "TypeSignalsExecutorAdapter",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "reference",
+      "for_type": "TypeSignalsExecutorAdapter",
+      "trait_ref": "usecase::type_signals::ports::TypeSignalsExecutorPort"
+    },
+    {
+      "action": "reference",
+      "for_type": "EvaluateSignalsError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "EvaluateSignalsError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "TypeSignalsCodecError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "TypeSignalsCodecError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "TypeSignalsCodecError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "reference",
+      "for_type": "TypeSignalsCodecError",
+      "trait_ref": "core::convert::From<serde_json::Error>"
+    },
+    {
+      "for_type": "SyncBaseRecordSchemaVersion",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "SyncBaseRecordSchemaVersion",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "SyncBaseRecordSchemaVersion",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "SyncBaseRecordSchemaVersion",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "SyncBaseRecordSchemaVersion",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "SyncBaseRecordSchemaVersion",
+      "trait_ref": "serde::Serialize"
+    },
+    {
+      "for_type": "SyncBaseRecordSchemaVersion",
+      "trait_ref": "serde::Deserialize"
+    },
+    {
+      "for_type": "SyncBaseRecord",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "SyncBaseRecord",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "SyncBaseRecord",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "SyncBaseRecord",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "SyncBaseRecord",
+      "trait_ref": "serde::Serialize"
+    },
+    {
+      "for_type": "SyncBaseRecord",
+      "trait_ref": "serde::Deserialize"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "EvaluateSignalsError": {
+      "action": "modify",
+      "docs": "Stage-classified evaluator error carrying domain::FreeText diagnostic payloads.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "AuthoritativeInput",
+            "payload": {
+              "fields": [
+                "domain::FreeText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Evaluation",
+            "payload": {
+              "fields": [
+                "domain::FreeText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "CacheWrite",
+            "payload": {
+              "fields": [
+                "domain::FreeText"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::type_signals_evaluator",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
+    "FsBaseMergeCleanupAdapter": {
+      "action": "add",
+      "docs": "Secondary adapter implementing BaseMergeCleanupPort with blocking CLI-process and filesystem operations; its private injected RustdocBaselineCapturePort dependency is intentionally hidden from the public shape.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "base_merge",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "IN-06",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-05",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-06",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-07",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-11",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
+    "FsBaseMergeContextAdapter": {
+      "action": "add",
+      "docs": "Unit secondary adapter implementing BaseMergeContextPort.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "base_merge",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
+    "FsBaseMergeGitAdapter": {
+      "action": "add",
+      "docs": "Unit secondary adapter implementing BaseMergeGitPort.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "base_merge",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-06",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-11",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
+    "FsGitStashAdapter": {
+      "action": "add",
+      "docs": "Unit secondary adapter implementing GitStashPort.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "git_stash",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
+    "SyncBaseRecord": {
+      "action": "add",
+      "docs": "DTO for the sync-base record.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "schema_version",
+              "ty": "SyncBaseRecordSchemaVersion"
+            },
+            {
+              "name": "track_id",
+              "ty": "domain::TrackId"
+            },
+            {
+              "name": "base_branch",
+              "ty": "domain::branch_strategy::BaseBranchName"
+            },
+            {
+              "name": "base_commit",
+              "ty": "domain::CommitHash"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "base_merge",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-06",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-11",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
+    "SyncBaseRecordSchemaVersion": {
+      "action": "add",
+      "docs": "Persistence DTO for the sync-base record schema version.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "V1",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "base_merge",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-06",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-11",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
+    "TypeSignalsCodecError": {
+      "action": "modify",
+      "docs": "Per-layer type-signals codec error with a track-modified variant set.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Json",
+            "payload": {
+              "fields": [
+                "serde_json::Error"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "UnsupportedSchemaVersion",
+            "payload": {
+              "fields": [
+                "domain::tddd::type_signals_doc::TypeSignalsSchemaVersion"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidSchemaVersion",
+            "payload": {
+              "fields": [
+                "domain::tddd::type_signals_doc::TypeSignalsSchemaVersionError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidTimestamp",
+            "payload": {
+              "fields": [
+                "domain::FreeText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidDigest",
+            "payload": {
+              "fields": [
+                {
+                  "name": "field",
+                  "ty": "domain::FreeText"
+                },
+                {
+                  "name": "source",
+                  "ty": "domain::tddd::type_signals_doc::Sha256DigestError"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "InvalidSignal",
+            "payload": {
+              "fields": [
+                "domain::FreeText"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::type_signals_codec",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
+    "TypeSignalsExecutorAdapter": {
+      "action": "reference",
+      "docs": "Baseline-identical secondary-adapter public shape for TypeSignalsExecutorPort.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "tddd::type_signals_executor_adapter",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    }
+  }
+}

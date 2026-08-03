@@ -1,0 +1,876 @@
+{
+  "crate_name": "domain",
+  "functions": {
+    "domain::branch_strategy::derive_base_merge_direction": {
+      "action": "add",
+      "docs": "Pure constructor deriving BaseMergeDirection from a TrackMetadata aggregate.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "track",
+          "ty": "&TrackMetadata"
+        }
+      ],
+      "returns": "Result<BaseMergeDirection, BaseMergeDirectionError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
+    "domain::tddd::type_signals_doc::decide_type_signals_reuse": {
+      "action": "modify",
+      "docs": "Pure comparison of two typed cache keys into a reuse-decision value.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "recorded_key",
+          "ty": "&TypeSignalsCacheKey"
+        },
+        {
+          "name": "current_key",
+          "ty": "&TypeSignalsCacheKey"
+        }
+      ],
+      "returns": "TypeSignalsReuseDecision",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    }
+  },
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<Self, RefValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "type_name": "BaseBranchName"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "track_id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TrackId"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "active_track",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TrackBranch"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "source",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&BaseBranchName"
+        }
+      ],
+      "type_name": "BaseMergeDirection"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "digest",
+              "ty": "Sha256Digest"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_digest",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&Sha256Digest"
+        }
+      ],
+      "type_name": "BaselineHash"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "declaration_hash",
+              "ty": "CatalogueDeclarationHash"
+            },
+            {
+              "name": "implementation_input_hash",
+              "ty": "ImplementationInputHash"
+            },
+            {
+              "name": "baseline_hash",
+              "ty": "BaselineHash"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "declaration_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&CatalogueDeclarationHash"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "implementation_input_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ImplementationInputHash"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "baseline_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&BaselineHash"
+        }
+      ],
+      "type_name": "TypeSignalsCacheKey"
+    }
+  ],
+  "layer": "domain",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "BaseBranchName",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "BaseBranchName",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "BaseBranchName",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "BaseBranchName",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "BaseBranchName",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "for_type": "BaseMergeDirection",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "BaseMergeDirection",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "BaseMergeDirection",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "BaseMergeDirection",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "BaselineHash",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "BaselineHash",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "BaselineHash",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "BaselineHash",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "BaselineHash",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "for_type": "TypeSignalsCacheKey",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TypeSignalsCacheKey",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "TypeSignalsCacheKey",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TypeSignalsCacheKey",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "TypeSignalsCacheKey",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeSignalsDocument",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeSignalsDocument",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeSignalsDocument",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeSignalsDocument",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CommitHash",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "CommitHash",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "CommitHash",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CommitHash",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CommitHash",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "action": "reference",
+      "for_type": "CommitHash",
+      "trait_ref": "core::cmp::PartialOrd"
+    },
+    {
+      "action": "reference",
+      "for_type": "CommitHash",
+      "trait_ref": "core::cmp::Ord"
+    },
+    {
+      "action": "reference",
+      "for_type": "CommitHash",
+      "trait_ref": "core::convert::AsRef<str>"
+    },
+    {
+      "action": "reference",
+      "for_type": "CommitHash",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "TrackMetadata",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "TrackMetadata",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "TrackMetadata",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "TrackMetadata",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "BaseMergeDirectionError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "BaseMergeDirectionError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "BaseMergeDirectionError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "BaseMergeDirectionError",
+      "trait_ref": "core::convert::From<RefValidationError>"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "BaseBranchName": {
+      "action": "add",
+      "docs": "Validated value object for a base-branch git reference.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "branch_strategy",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
+    "BaseMergeDirection": {
+      "action": "add",
+      "docs": "Base-merge direction value object with TrackId, TrackBranch, and BaseBranchName accessors.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "branch_strategy",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
+    "BaseMergeDirectionError": {
+      "action": "add",
+      "docs": "Error enum for BaseMergeDirection construction.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "InactiveTrack",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "InvalidBaseName",
+            "payload": {
+              "fields": [
+                "RefValidationError"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "branch_strategy",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
+    "BaselineHash": {
+      "action": "add",
+      "docs": "Typed identity of the actual rustdoc baseline bytes used for one layer's signal evaluation.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::type_signals_doc",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
+    "CommitHash": {
+      "action": "reference",
+      "docs": "Referenced validated git commit identity.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "impl Into"
+            }
+          ],
+          "returns": "Result<Self, ValidationError>"
+        }
+      ],
+      "module_path": "ids",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "IN-06",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-05",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-06",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-11",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
+    "TrackMetadata": {
+      "action": "reference",
+      "docs": "Baseline aggregate carried for the BaseMergeDirection constructor edge.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "id",
+              "ty": "TrackId"
+            },
+            {
+              "name": "title",
+              "ty": "impl Into"
+            },
+            {
+              "name": "status_override",
+              "ty": "Option<StatusOverride>"
+            },
+            {
+              "name": "branch_strategy_snapshot",
+              "ty": "BranchStrategySnapshot"
+            }
+          ],
+          "returns": "Result<Self, DomainError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "with_branch",
+          "params": [
+            {
+              "name": "id",
+              "ty": "TrackId"
+            },
+            {
+              "name": "branch",
+              "ty": "Option<TrackBranch>"
+            },
+            {
+              "name": "title",
+              "ty": "impl Into"
+            },
+            {
+              "name": "status_override",
+              "ty": "Option<StatusOverride>"
+            },
+            {
+              "name": "branch_strategy_snapshot",
+              "ty": "BranchStrategySnapshot"
+            }
+          ],
+          "returns": "Result<Self, DomainError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TrackId"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "branch",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&TrackBranch>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "is_activated",
+          "params": [],
+          "receiver": "&self",
+          "returns": "bool"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "set_branch",
+          "params": [
+            {
+              "name": "branch",
+              "ty": "Option<TrackBranch>"
+            }
+          ],
+          "receiver": "&mut self",
+          "returns": "Result<(), DomainError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "title",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "status_override",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&StatusOverride>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "set_status_override",
+          "params": [
+            {
+              "name": "status_override",
+              "ty": "Option<StatusOverride>"
+            }
+          ],
+          "receiver": "&mut self",
+          "returns": "()"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "branch_strategy_snapshot",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&BranchStrategySnapshot"
+        }
+      ],
+      "module_path": "track",
+      "role": {
+        "AggregateRoot": {
+          "emits": [],
+          "exclusive_members": [],
+          "identity": {
+            "method_name": "id"
+          },
+          "invariants": [],
+          "shared_value_objects": []
+        }
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
+    "TypeSignalsCacheKey": {
+      "action": "add",
+      "docs": "Atomic freshness identity composed of catalogue declaration, implementation input, and actual baseline hashes.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::type_signals_doc",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
+    "TypeSignalsDocument": {
+      "action": "modify",
+      "docs": "Persisted type-signal cache document containing a typed freshness key and signal set.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "generated_at",
+              "ty": "Timestamp"
+            },
+            {
+              "name": "cache_key",
+              "ty": "TypeSignalsCacheKey"
+            },
+            {
+              "name": "signals",
+              "ty": "Vec<TypeSignal>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "with_schema_version",
+          "params": [
+            {
+              "name": "schema_version",
+              "ty": "TypeSignalsSchemaVersion"
+            },
+            {
+              "name": "generated_at",
+              "ty": "Timestamp"
+            },
+            {
+              "name": "cache_key",
+              "ty": "TypeSignalsCacheKey"
+            },
+            {
+              "name": "signals",
+              "ty": "Vec<TypeSignal>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "schema_version",
+          "params": [],
+          "receiver": "&self",
+          "returns": "TypeSignalsSchemaVersion"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "generated_at",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&Timestamp"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "cache_key",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TypeSignalsCacheKey"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "signals",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[TypeSignal]"
+        }
+      ],
+      "module_path": "tddd::type_signals_doc",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    }
+  }
+}

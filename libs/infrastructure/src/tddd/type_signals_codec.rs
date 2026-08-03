@@ -1,10 +1,11 @@
 //! Serde codec for per-layer TDDD evaluation-result files.
 
 use domain::tddd::type_signals_doc::{
-    CatalogueDeclarationHash, ImplementationInputHash, Sha256Digest, Sha256DigestError,
-    TypeSignalsDocument, TypeSignalsSchemaVersion, TypeSignalsSchemaVersionError,
+    BaselineHash, CatalogueDeclarationHash, ImplementationInputHash, Sha256Digest,
+    Sha256DigestError, TypeSignalsCacheKey, TypeSignalsDocument, TypeSignalsSchemaVersion,
+    TypeSignalsSchemaVersionError,
 };
-use domain::{ConfidenceSignal, ContentHash, FreeText, Timestamp, TypeSignal};
+use domain::{ContentHash, FreeText, Timestamp, TypeSignal};
 use serde::{Deserialize, Serialize};
 use sha2::Digest;
 
@@ -27,6 +28,8 @@ pub enum TypeSignalsCodecError {
     InvalidTimestamp(FreeText),
     #[error("invalid {field} digest: {source}")]
     InvalidDigest { field: FreeText, source: Sha256DigestError },
+    #[error("invalid confidence signal value: {0}")]
+    InvalidSignal(FreeText),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -36,6 +39,7 @@ struct TypeSignalsDocDto {
     generated_at: String,
     declaration_hash: String,
     implementation_input_hash: String,
+    baseline_hash: String,
     signals: Vec<TypeSignalDto>,
 }
 
@@ -73,15 +77,19 @@ pub fn decode(json: &str) -> Result<TypeSignalsDocument, TypeSignalsCodecError> 
     if !is_utc_timestamp(&dto.generated_at) {
         return Err(TypeSignalsCodecError::InvalidTimestamp(FreeText::new(dto.generated_at)));
     }
-    Ok(TypeSignalsDocument::with_schema_version(
-        schema_version,
-        generated_at,
+    let cache_key = TypeSignalsCacheKey::new(
         CatalogueDeclarationHash::new(parse_digest("declaration_hash", dto.declaration_hash)?),
         ImplementationInputHash::new(parse_digest(
             "implementation_input_hash",
             dto.implementation_input_hash,
         )?),
-        dto.signals.into_iter().map(signal_from_dto).collect(),
+        BaselineHash::new(parse_digest("baseline_hash", dto.baseline_hash)?),
+    );
+    Ok(TypeSignalsDocument::with_schema_version(
+        schema_version,
+        generated_at,
+        cache_key,
+        dto.signals.into_iter().map(signal_from_dto).collect::<Result<Vec<_>, _>>()?,
     ))
 }
 
@@ -97,8 +105,14 @@ pub fn encode(doc: &TypeSignalsDocument) -> Result<String, TypeSignalsCodecError
     let dto = TypeSignalsDocDto {
         schema_version: doc.schema_version().value(),
         generated_at: doc.generated_at().as_str().to_owned(),
-        declaration_hash: doc.declaration_hash().as_digest().as_str().to_owned(),
-        implementation_input_hash: doc.implementation_input_hash().as_digest().as_str().to_owned(),
+        declaration_hash: doc.cache_key().declaration_hash().as_digest().as_str().to_owned(),
+        implementation_input_hash: doc
+            .cache_key()
+            .implementation_input_hash()
+            .as_digest()
+            .as_str()
+            .to_owned(),
+        baseline_hash: doc.cache_key().baseline_hash().as_digest().as_str().to_owned(),
         signals: doc.signals().iter().map(signal_to_dto).collect(),
     };
     // Serialize through Value so every signal object uses canonical key order
@@ -114,6 +128,13 @@ pub fn declaration_hash(declaration_bytes: &[u8]) -> CatalogueDeclarationHash {
     CatalogueDeclarationHash::new(Sha256Digest::from_content_hash(ContentHash::from_bytes(bytes)))
 }
 
+/// Computes the SHA-256 digest of baseline file bytes.
+#[must_use = "the baseline hash is required to validate type-signal freshness"]
+pub fn baseline_hash(baseline_bytes: &[u8]) -> BaselineHash {
+    let bytes: [u8; 32] = sha2::Sha256::digest(baseline_bytes).into();
+    BaselineHash::new(Sha256Digest::from_content_hash(ContentHash::from_bytes(bytes)))
+}
+
 fn is_utc_timestamp(raw: &str) -> bool {
     raw.ends_with('Z') || raw.ends_with("+00:00")
 }
@@ -125,16 +146,20 @@ fn parse_digest(field: &str, value: String) -> Result<Sha256Digest, TypeSignalsC
     })
 }
 
-fn signal_from_dto(dto: TypeSignalDto) -> TypeSignal {
-    TypeSignal::new(
+fn signal_from_dto(dto: TypeSignalDto) -> Result<TypeSignal, TypeSignalsCodecError> {
+    // An unknown value must fail the decode: mapping it to a default would let
+    // an invalid cache document skip the cache-miss/self-healing path.
+    let signal = parse_confidence_signal(&dto.signal)
+        .ok_or_else(|| TypeSignalsCodecError::InvalidSignal(FreeText::new(dto.signal.clone())))?;
+    Ok(TypeSignal::new(
         dto.type_name,
         dto.kind_tag,
-        parse_confidence_signal(&dto.signal).unwrap_or(ConfidenceSignal::Red),
+        signal,
         dto.found_type,
         dto.found_items,
         dto.missing_items,
         dto.extra_items,
-    )
+    ))
 }
 
 fn signal_to_dto(signal: &TypeSignal) -> TypeSignalDto {
@@ -152,6 +177,8 @@ fn signal_to_dto(signal: &TypeSignal) -> TypeSignalDto {
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
+    use domain::ConfidenceSignal;
+
     use super::*;
 
     const DIGEST: &str = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
@@ -160,8 +187,11 @@ mod tests {
         let digest = Sha256Digest::try_new(DIGEST.to_owned()).unwrap();
         TypeSignalsDocument::new(
             Timestamp::new("2026-04-18T12:00:00Z").unwrap(),
-            CatalogueDeclarationHash::new(digest.clone()),
-            ImplementationInputHash::new(digest),
+            TypeSignalsCacheKey::new(
+                CatalogueDeclarationHash::new(digest.clone()),
+                ImplementationInputHash::new(digest.clone()),
+                BaselineHash::new(digest),
+            ),
             vec![TypeSignal::new(
                 "Example",
                 "struct",
@@ -189,7 +219,7 @@ mod tests {
 
         assert_eq!(first, second, "type-signal encoding must not churn JSON bytes");
         assert!(
-            first.starts_with("{\n  \"declaration_hash\":"),
+            first.starts_with("{\n  \"baseline_hash\":"),
             "type-signal keys must be canonicalized: {first}"
         );
         let signal = &first[first.find("\"extra_items\"").unwrap()..];
@@ -225,6 +255,7 @@ mod tests {
             generated_at: "2026-04-18T12:00:00Z".to_owned(),
             declaration_hash: DIGEST.to_owned(),
             implementation_input_hash: DIGEST.to_owned(),
+            baseline_hash: DIGEST.to_owned(),
             signals: vec![],
         })
         .unwrap();
@@ -242,11 +273,54 @@ mod tests {
             generated_at: "2026-04-18T12:00:00Z".to_owned(),
             declaration_hash: DIGEST.to_owned(),
             implementation_input_hash: DIGEST.to_owned(),
+            baseline_hash: DIGEST.to_owned(),
             signals: vec![],
         })
         .unwrap();
         payload.as_object_mut().unwrap().remove("implementation_input_hash");
         assert!(matches!(decode(&payload.to_string()), Err(TypeSignalsCodecError::Json(_))));
+    }
+
+    #[test]
+    fn test_decode_requires_baseline_hash() {
+        let mut payload = serde_json::to_value(&TypeSignalsDocDto {
+            schema_version: domain::TYPE_SIGNALS_SCHEMA_VERSION,
+            generated_at: "2026-04-18T12:00:00Z".to_owned(),
+            declaration_hash: DIGEST.to_owned(),
+            implementation_input_hash: DIGEST.to_owned(),
+            baseline_hash: DIGEST.to_owned(),
+            signals: vec![],
+        })
+        .unwrap();
+        payload.as_object_mut().unwrap().remove("baseline_hash");
+        assert!(matches!(decode(&payload.to_string()), Err(TypeSignalsCodecError::Json(_))));
+    }
+
+    #[test]
+    fn test_decode_rejects_unknown_confidence_signal_value() {
+        let mut payload = serde_json::to_value(&TypeSignalsDocDto {
+            schema_version: domain::TYPE_SIGNALS_SCHEMA_VERSION,
+            generated_at: "2026-04-18T12:00:00Z".to_owned(),
+            declaration_hash: DIGEST.to_owned(),
+            implementation_input_hash: DIGEST.to_owned(),
+            baseline_hash: DIGEST.to_owned(),
+            signals: vec![signal_to_dto(&TypeSignal::new(
+                "Example",
+                "struct",
+                ConfidenceSignal::Blue,
+                true,
+                vec![],
+                vec![],
+                vec![],
+            ))],
+        })
+        .unwrap();
+        *payload.pointer_mut("/signals/0/signal").unwrap() =
+            serde_json::Value::String("bogus".to_owned());
+        assert!(
+            matches!(decode(&payload.to_string()), Err(TypeSignalsCodecError::InvalidSignal(_))),
+            "an unknown signal value must fail the decode instead of defaulting"
+        );
     }
 
     #[test]
@@ -256,6 +330,7 @@ mod tests {
             generated_at: "2026-04-18T12:00:00Z".to_owned(),
             declaration_hash: DIGEST.to_owned(),
             implementation_input_hash: DIGEST.to_owned(),
+            baseline_hash: DIGEST.to_owned(),
             signals: vec![],
         })
         .unwrap();
@@ -270,6 +345,7 @@ mod tests {
             generated_at: "2026-04-18T12:00:00Z".to_owned(),
             declaration_hash: DIGEST.to_owned(),
             implementation_input_hash: DIGEST.to_owned(),
+            baseline_hash: DIGEST.to_owned(),
             signals: vec![],
         };
 
@@ -299,5 +375,14 @@ mod tests {
             decode(&serde_json::to_string(&invalid_digest).unwrap()),
             Err(TypeSignalsCodecError::InvalidDigest { source: Sha256DigestError::InvalidHex, .. })
         ));
+    }
+
+    #[test]
+    fn test_baseline_hash_changes_when_baseline_bytes_change() {
+        assert_eq!(
+            baseline_hash(b"baseline A").as_digest().as_str(),
+            "7061fe86b948cf084b16235a204ce4a357f6b38f637f28edad27213428fda3d6"
+        );
+        assert_ne!(baseline_hash(b"baseline A"), baseline_hash(b"baseline B"));
     }
 }

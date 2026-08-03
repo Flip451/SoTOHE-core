@@ -45,6 +45,18 @@
       "reasoning_effort": "high",
       "execution_mode": "orchestrator-output"
     },
+    "rollback-diagnoser": {
+      "provider": "claude",
+      "model": "claude-opus-5",
+      "reasoning_effort": "xhigh",
+      "execution_mode": "orchestrator-output"
+    },
+    "adr-diagnoser": {
+      "provider": "claude",
+      "model": "claude-opus-5",
+      "reasoning_effort": "xhigh",
+      "execution_mode": "orchestrator-output"
+    },
     "implementer": {
       "provider": "claude",
       "model": "claude-opus-5",
@@ -64,6 +76,68 @@
       "model": "claude-opus-5",
       "reasoning_effort": "medium",
       "execution_mode": "orchestrator-output"
+    },
+    "review-fix-lead": {
+      "provider": "claude",
+      "model": "claude-opus-5",
+      "reasoning_effort": "medium",
+      "execution_mode": "typed-pipeline"
+    },
+    "dry-checker": {
+      "provider": "codex",
+      "model": "gpt-5.6-terra",
+      "fast_model": "gpt-5.6-luna",
+      "fast_reasoning_effort": "low",
+      "final_reasoning_effort": "xhigh",
+      "execution_mode": "typed-pipeline"
+    },
+    "dry-fix-lead": {
+      "provider": "codex",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "max",
+      "execution_mode": "typed-pipeline"
+    },
+    "pr-reviewer": {
+      "provider": "codex",
+      "execution_mode": "typed-pipeline"
+    },
+    "ref-verifier-chain1": {
+      "provider": "codex",
+      "model": "gpt-5.6-sol",
+      "fast_provider": "codex",
+      "fast_model": "gpt-5.6-luna",
+      "reasoning_effort": "xhigh",
+      "fast_reasoning_effort": "low",
+      "prompt_template_path": ".harness/prompts/ref-verifier-chain1.md",
+      "execution_mode": "typed-pipeline"
+    },
+    "ref-verifier-chain2": {
+      "provider": "codex",
+      "model": "gpt-5.6-sol",
+      "fast_provider": "codex",
+      "fast_model": "gpt-5.6-luna",
+      "reasoning_effort": "xhigh",
+      "fast_reasoning_effort": "low",
+      "prompt_template_path": ".harness/prompts/ref-verifier-chain2.md",
+      "execution_mode": "typed-pipeline"
+    },
+    "obligation-fulfillment-verifier": {
+      "provider": "codex",
+      "model": "gpt-5.6-terra",
+      "fast_provider": "codex",
+      "fast_model": "gpt-5.6-luna",
+      "reasoning_effort": "xhigh",
+      "fast_reasoning_effort": "low",
+      "execution_mode": "typed-pipeline"
+    },
+    "waiver-verifier": {
+      "provider": "codex",
+      "model": "gpt-5.6-terra",
+      "fast_provider": "codex",
+      "fast_model": "gpt-5.6-luna",
+      "reasoning_effort": "xhigh",
+      "fast_reasoning_effort": "low",
+      "execution_mode": "typed-pipeline"
     }
   }
 }

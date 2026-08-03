@@ -1357,17 +1357,18 @@ decisions:
 
     // --- read_type_signals ---
 
-    /// A minimal valid `<layer>-type-signals.json` payload (schema_version 3).
+    /// A minimal valid `<layer>-type-signals.json` payload.
     ///
     /// `declaration_hash` is all-zeroes — valid per the codec (any 64-char
     /// lowercase hex string is accepted; freshness checking lives in the
     /// caller, not the codec). Used by `read_type_signals` tests that only
     /// need successful decoding.
     const TYPE_SIGNALS_MINIMAL: &str = r#"{
-  "schema_version": 3,
+  "schema_version": 4,
   "generated_at": "2026-04-18T12:00:00Z",
   "declaration_hash": "0000000000000000000000000000000000000000000000000000000000000000",
   "implementation_input_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+  "baseline_hash": "0000000000000000000000000000000000000000000000000000000000000000",
   "signals": [
     { "type_name": "TrackId", "kind_tag": "value_object", "signal": "blue", "found_type": true }
   ]
@@ -1387,7 +1388,7 @@ decisions:
                 assert_eq!(doc.signals().len(), 1);
                 assert_eq!(doc.signals()[0].type_name(), "TrackId");
                 assert_eq!(
-                    doc.declaration_hash().as_digest().as_str(),
+                    doc.cache_key().declaration_hash().as_digest().as_str(),
                     "0000000000000000000000000000000000000000000000000000000000000000"
                 );
             }

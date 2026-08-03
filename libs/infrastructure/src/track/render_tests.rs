@@ -1641,17 +1641,18 @@ fn sync_rendered_views_populates_signal_emojis_from_signal_file() {
     std::fs::write(dir.path().join("architecture-rules.json"), DOMAIN_ARCH_RULES).unwrap();
     write_minimal_style_config_to_root(dir.path());
 
-    // Schema-v2 companion signal file with a Blue signal for the declared TrackId.
+    // Current-schema companion signal file with a Blue signal for the declared TrackId.
     let decl_bytes = std::fs::read(track_dir.join("domain-types.json")).unwrap();
     let hash = crate::tddd::type_signals_codec::declaration_hash(&decl_bytes)
         .as_digest()
         .as_str()
         .to_owned();
     let signal_file = serde_json::json!({
-        "schema_version": 3,
+        "schema_version": 4,
         "generated_at": "2026-04-19T00:00:00Z",
         "declaration_hash": hash,
         "implementation_input_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "baseline_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
         "signals": [
             {
                 "type_name": "TrackId",

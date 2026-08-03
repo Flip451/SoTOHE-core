@@ -33,11 +33,14 @@ impl Default for GitCompositionRoot {
 impl GitCompositionRoot {
     /// Build a wired [`cli_driver::git::GitDriver`] for the git family.
     pub fn git_driver(&self) -> cli_driver::git::GitDriver {
-        use infrastructure::FsGitWorkflowAdapter;
+        use infrastructure::{FsGitStashAdapter, FsGitWorkflowAdapter};
+        use usecase::git_stash::{GitStashInteractor, GitStashPort};
         use usecase::git_workflow::{GitPrimitivePort, GitWorkflowInteractor};
 
         let port: Arc<dyn GitPrimitivePort> = Arc::new(FsGitWorkflowAdapter::new());
         let service = Arc::new(GitWorkflowInteractor::new(port));
-        cli_driver::git::GitDriver::new(service)
+        let stash_port: Arc<dyn GitStashPort> = Arc::new(FsGitStashAdapter::new());
+        let stash_service = Arc::new(GitStashInteractor::new(stash_port));
+        cli_driver::git::GitDriver::new(service, stash_service)
     }
 }

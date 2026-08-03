@@ -1,4 +1,4 @@
-//! Existing rustdoc reuse helpers for the type-signal evaluator.
+//! Cache-freshness helpers for the type-signal evaluator.
 
 use std::path::PathBuf;
 
@@ -9,13 +9,10 @@ use domain::schema::SchemaExportError;
 use domain::tddd::CargoFeatureName;
 use domain::tddd::catalogue_v2::CrateName;
 use domain::tddd::type_signals_doc::{
-    CatalogueDeclarationHash, ImplementationInputHash, TypeSignalsDocument,
-    TypeSignalsReuseDecision, decide_type_signals_reuse,
+    TypeSignalsCacheKey, TypeSignalsDocument, TypeSignalsReuseDecision, decide_type_signals_reuse,
 };
 
-use super::{MAX_RUSTDOC_JSON_BYTES, read_utf8_file_limited};
 use crate::schema_export::RustdocSchemaExporter;
-use crate::tddd::baseline_rustdoc_codec::BaselineRustdocCodec;
 
 pub(super) trait RustdocJsonPathProvider {
     fn export_rustdoc_json_path(
@@ -23,31 +20,14 @@ pub(super) trait RustdocJsonPathProvider {
         crate_name: &CrateName,
         features: &[CargoFeatureName],
     ) -> Result<PathBuf, SchemaExportError>;
-    fn existing_rustdoc_json_path(&self, crate_name: &str) -> Result<PathBuf, SchemaExportError>;
-}
-
-pub(super) fn existing_rustdoc_content(
-    exporter: &impl RustdocJsonPathProvider,
-    target_crate: &str,
-) -> Option<String> {
-    let path = exporter.existing_rustdoc_json_path(target_crate).ok()?;
-    let content = read_utf8_file_limited(&path, MAX_RUSTDOC_JSON_BYTES).ok()?;
-    BaselineRustdocCodec::from_json(&content).ok()?;
-    Some(content)
 }
 
 pub(super) fn reuse_decision_for_recorded_document(
     recorded: Option<&TypeSignalsDocument>,
-    current_declaration_hash: &CatalogueDeclarationHash,
-    current_implementation_input_hash: Option<&ImplementationInputHash>,
+    current_key: &TypeSignalsCacheKey,
 ) -> TypeSignalsReuseDecision {
     recorded.map_or(TypeSignalsReuseDecision::ReextractAndEvaluate, |document| {
-        decide_type_signals_reuse(
-            document.declaration_hash(),
-            document.implementation_input_hash(),
-            current_declaration_hash,
-            current_implementation_input_hash,
-        )
+        decide_type_signals_reuse(document.cache_key(), current_key)
     })
 }
 
@@ -58,45 +38,6 @@ impl RustdocJsonPathProvider for RustdocSchemaExporter {
         features: &[CargoFeatureName],
     ) -> Result<PathBuf, SchemaExportError> {
         Self::export_rustdoc_json_path_with_features(self, crate_name, features)
-    }
-
-    fn existing_rustdoc_json_path(&self, crate_name: &str) -> Result<PathBuf, SchemaExportError> {
-        Self::existing_rustdoc_json_path(self, crate_name)
-    }
-}
-
-#[cfg(test)]
-#[allow(clippy::unwrap_used)]
-mod tests {
-    use super::{RustdocJsonPathProvider, existing_rustdoc_content};
-    use domain::schema::SchemaExportError;
-    use domain::tddd::CargoFeatureName;
-    use domain::tddd::catalogue_v2::CrateName;
-    use std::path::PathBuf;
-
-    struct FixedPathProvider(PathBuf);
-
-    impl RustdocJsonPathProvider for FixedPathProvider {
-        fn export_rustdoc_json_path(
-            &self,
-            _: &CrateName,
-            _: &[CargoFeatureName],
-        ) -> Result<PathBuf, SchemaExportError> {
-            Err(SchemaExportError::CrateNotFound("fixture".to_owned()))
-        }
-
-        fn existing_rustdoc_json_path(&self, _: &str) -> Result<PathBuf, SchemaExportError> {
-            Ok(self.0.clone())
-        }
-    }
-
-    #[test]
-    fn test_existing_rustdoc_content_rejects_malformed_json_for_reuse() {
-        let directory = tempfile::tempdir().unwrap();
-        let path = directory.path().join("domain.json");
-        std::fs::write(&path, "{ malformed rustdoc json }").unwrap();
-
-        assert_eq!(existing_rustdoc_content(&FixedPathProvider(path), "domain"), None);
     }
 }
 
@@ -214,9 +155,5 @@ impl RustdocJsonPathProvider for RustdocLaunchObserver {
                 .push(features.iter().map(|feature| feature.as_str().to_owned()).collect());
         }
         self.json_path_for(crate_name.as_str())
-    }
-
-    fn existing_rustdoc_json_path(&self, crate_name: &str) -> Result<PathBuf, SchemaExportError> {
-        self.json_path_for(crate_name)
     }
 }

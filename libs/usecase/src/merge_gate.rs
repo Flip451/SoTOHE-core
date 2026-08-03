@@ -464,12 +464,14 @@ where
         };
 
         // Step 3: freshness check — declaration_hash must match (CN-11).
-        if signals_doc.declaration_hash().as_digest().as_str() != declaration_hash_from_catalogue {
+        if signals_doc.cache_key().declaration_hash().as_digest().as_str()
+            != declaration_hash_from_catalogue
+        {
             outcome.merge(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "layer '{layer_id}': type-signals declaration_hash mismatch \
                  (recorded={}, current={}) — re-run `sotp signal calc-impl-catalog` \
                  and commit the refreshed evaluation result",
-                signals_doc.declaration_hash().as_digest().as_str(),
+                signals_doc.cache_key().declaration_hash().as_digest().as_str(),
                 declaration_hash_from_catalogue
             ))]));
             continue;
@@ -704,8 +706,11 @@ mod tests {
         let digest = domain::Sha256Digest::try_new(ZERO_HASH.to_owned()).unwrap();
         TypeSignalsDocument::new(
             ts,
-            domain::CatalogueDeclarationHash::new(digest.clone()),
-            domain::ImplementationInputHash::new(digest),
+            domain::TypeSignalsCacheKey::new(
+                domain::CatalogueDeclarationHash::new(digest.clone()),
+                domain::ImplementationInputHash::new(digest.clone()),
+                domain::BaselineHash::new(digest),
+            ),
             sigs,
         )
     }

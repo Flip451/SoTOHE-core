@@ -4,7 +4,7 @@ use std::io;
 use std::path::Path;
 
 use domain::tddd::CargoFeatureName;
-use domain::tddd::type_signals_doc::{ImplementationInputHash, Sha256Digest};
+use domain::tddd::type_signals_doc::{ImplementationInputHash, Sha256Digest, TypeSignalsCacheKey};
 use sha2::Digest as _;
 
 use super::{EvaluateSignalsError, build_inputs};
@@ -63,7 +63,9 @@ fn implementation_hash_with_feature_selection(
         hasher.update([0]);
     }
     let digest = Sha256Digest::try_new(format!("{:x}", hasher.finalize())).map_err(|error| {
-        EvaluateSignalsError(format!("failed to construct implementation-input digest: {error}"))
+        EvaluateSignalsError::authoritative_input(format!(
+            "failed to construct implementation-input digest: {error}"
+        ))
     })?;
     Ok(ImplementationInputHash::new(digest))
 }
@@ -74,26 +76,38 @@ pub(super) fn verify_evaluation_inputs_unchanged(
     target_crate: &str,
     features: &[CargoFeatureName],
     catalogue_path: &Path,
-    initial_declaration_hash: &domain::CatalogueDeclarationHash,
-    initial_implementation_input_hash: &ImplementationInputHash,
+    baseline_path: &Path,
+    initial_key: &TypeSignalsCacheKey,
 ) -> Result<(), EvaluateSignalsError> {
+    if hash_workspace_inputs(workspace_root, target_crate, features)?
+        != *initial_key.implementation_input_hash()
+    {
+        return Err(EvaluateSignalsError::authoritative_input(
+            "implementation inputs changed during type-signal evaluation".to_owned(),
+        ));
+    }
     let catalogue =
         read_bytes_file_limited(catalogue_path, super::MAX_CATALOGUE_BYTES).map_err(|error| {
-            EvaluateSignalsError(format!(
+            EvaluateSignalsError::authoritative_input(format!(
                 "cannot re-read catalogue '{}': {error}",
                 catalogue_path.display()
             ))
         })?;
-    if type_signals_codec::declaration_hash(&catalogue) != *initial_declaration_hash {
-        return Err(EvaluateSignalsError(
+    if type_signals_codec::declaration_hash(&catalogue) != *initial_key.declaration_hash() {
+        return Err(EvaluateSignalsError::authoritative_input(
             "catalogue changed during type-signal evaluation".to_owned(),
         ));
     }
-    if hash_workspace_inputs(workspace_root, target_crate, features)?
-        != *initial_implementation_input_hash
-    {
-        return Err(EvaluateSignalsError(
-            "implementation inputs changed during type-signal evaluation".to_owned(),
+    let baseline =
+        read_bytes_file_limited(baseline_path, super::MAX_RUSTDOC_JSON_BYTES).map_err(|error| {
+            EvaluateSignalsError::authoritative_input(format!(
+                "cannot re-read baseline '{}': {error}",
+                baseline_path.display()
+            ))
+        })?;
+    if type_signals_codec::baseline_hash(&baseline) != *initial_key.baseline_hash() {
+        return Err(EvaluateSignalsError::authoritative_input(
+            "baseline changed during type-signal evaluation".to_owned(),
         ));
     }
     Ok(())

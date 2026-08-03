@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "track_id": "2026-07-31-base-merge-and-conflict-recovery",
+  "entries": {
+    "T001": [
+      {"layer": "domain", "entry_key": "BaseBranchName"},
+      {"layer": "domain", "entry_key": "BaseMergeDirection"},
+      {"layer": "domain", "entry_key": "BaseMergeDirectionError"},
+      {"layer": "domain", "entry_key": "TrackMetadata"},
+      {"layer": "domain", "entry_key": "domain::branch_strategy::derive_base_merge_direction"}
+    ],
+    "T002": [
+      {"layer": "usecase", "entry_key": "BaseMergeContextPort"},
+      {"layer": "usecase", "entry_key": "BaseMergeService"},
+      {"layer": "usecase", "entry_key": "BaseMergeCommand"},
+      {"layer": "usecase", "entry_key": "BaseMergeContextError"},
+      {"layer": "usecase", "entry_key": "BaseMergeGitError"},
+      {"layer": "usecase", "entry_key": "BaseMergeInteractor"},
+      {"layer": "usecase", "entry_key": "BaseMergeOutcome"}
+    ],
+    "T003": [
+      {"layer": "infrastructure", "entry_key": "FsBaseMergeContextAdapter"},
+      {"layer": "infrastructure", "entry_key": "FsBaseMergeGitAdapter"}
+    ],
+    "T004": [
+      {"layer": "cli_driver", "entry_key": "BaseMergeInput"},
+      {"layer": "cli_driver", "entry_key": "TrackDriver"},
+      {"layer": "cli", "entry_key": "TrackCommand"},
+      {"layer": "cli", "entry_key": "cli::commands::track::dispatch::dispatch_track_cmd_with_base_merge"}
+    ],
+    "T005": [],
+    "T006": [
+      {"layer": "usecase", "entry_key": "GitStashPort"},
+      {"layer": "usecase", "entry_key": "GitStashService"},
+      {"layer": "usecase", "entry_key": "GitStashCommand"},
+      {"layer": "usecase", "entry_key": "GitStashError"},
+      {"layer": "usecase", "entry_key": "GitStashInteractor"},
+      {"layer": "infrastructure", "entry_key": "FsGitStashAdapter"},
+      {"layer": "cli_driver", "entry_key": "GitDriver"},
+      {"layer": "cli_driver", "entry_key": "GitStashInput"},
+      {"layer": "cli", "entry_key": "GitCommand"},
+      {"layer": "cli", "entry_key": "GitStashAction"},
+      {"layer": "cli", "entry_key": "cli::commands::git::execute"}
+    ],
+    "T007": [
+      {"layer": "domain", "entry_key": "BaselineHash"},
+      {"layer": "domain", "entry_key": "TypeSignalsCacheKey"},
+      {"layer": "domain", "entry_key": "TypeSignalsDocument"},
+      {"layer": "domain", "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse"}
+    ],
+    "T008": [
+      {"layer": "usecase", "entry_key": "TypeSignalsError"},
+      {"layer": "usecase", "entry_key": "TypeSignalsExecutionError"},
+      {"layer": "usecase", "entry_key": "TypeSignalsInteractor"},
+      {"layer": "usecase", "entry_key": "TypeSignalsExecutorPort"}
+    ],
+    "T009": [
+      {"layer": "infrastructure", "entry_key": "TypeSignalsExecutorAdapter"},
+      {"layer": "infrastructure", "entry_key": "infrastructure::tddd::type_signals_codec::baseline_hash"},
+      {"layer": "infrastructure", "entry_key": "infrastructure::tddd::type_signals_codec::decode"},
+      {"layer": "infrastructure", "entry_key": "infrastructure::tddd::type_signals_codec::encode"},
+      {"layer": "infrastructure", "entry_key": "EvaluateSignalsError"},
+      {"layer": "infrastructure", "entry_key": "TypeSignalsCodecError"},
+      {"layer": "infrastructure", "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"}
+    ],
+    "T010": [
+      {"layer": "domain", "entry_key": "CommitHash"},
+      {"layer": "usecase", "entry_key": "BaseMergeAttemptOutcome"},
+      {"layer": "usecase", "entry_key": "BaseMergeCleanupPort"},
+      {"layer": "usecase", "entry_key": "BaseMergeGitPort"},
+      {"layer": "usecase", "entry_key": "BaseMergeError"},
+      {"layer": "usecase", "entry_key": "BaseMergeCleanupRequest"},
+      {"layer": "usecase", "entry_key": "PostMergeCleanupError"},
+      {"layer": "usecase", "entry_key": "ViewsRegenerationError"},
+      {"layer": "usecase", "entry_key": "BaselineReplacementError"},
+      {"layer": "usecase", "entry_key": "SyncBaseRecordError"},
+      {"layer": "infrastructure", "entry_key": "SyncBaseRecordSchemaVersion"},
+      {"layer": "infrastructure", "entry_key": "SyncBaseRecord"}
+    ],
+    "T011": [
+      {"layer": "infrastructure", "entry_key": "FsBaseMergeCleanupAdapter"}
+    ]
+  }
+}

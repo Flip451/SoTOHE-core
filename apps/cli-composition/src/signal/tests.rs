@@ -976,22 +976,21 @@ fn test_signal_composition_freshness_skip_and_conservative_reextract_use_real_ad
     );
 
     std::fs::remove_file(&lockfile_path).unwrap();
-    let restored_lockfile_path = lockfile_path.clone();
-    let indeterminate_observer = RustdocLaunchObserver::using_json_path_with_before_export(
-        rustdoc_json_paths.get("domain").cloned().unwrap(),
-        std::sync::Arc::new(move || {
-            std::fs::write(&restored_lockfile_path, &changed_lockfile_content).unwrap();
-        }),
+    let missing_lockfile_observer = RustdocLaunchObserver::using_json_paths(rustdoc_json_paths);
+    let missing_lockfile =
+        calc_impl_catalog_with_observer(root, track_id, missing_lockfile_observer.clone());
+    assert_ne!(
+        missing_lockfile.exit_code, 0,
+        "a missing authoritative lockfile must fail closed: {missing_lockfile:?}"
     );
-    let indeterminate =
-        calc_impl_catalog_with_observer(root, track_id, indeterminate_observer.clone());
-    assert_eq!(
-        indeterminate.exit_code, 0,
-        "an indeterminate reuse hash must fall back to a successful fresh evaluation: {indeterminate:?}"
+    let diagnostic = missing_lockfile.stdout.as_deref().unwrap_or_default();
+    assert!(
+        diagnostic.contains("authoritative input failed") && diagnostic.contains("Cargo.lock"),
+        "the failure must identify the authoritative missing lockfile: {missing_lockfile:?}"
     );
     assert_eq!(
-        indeterminate_observer.launches(),
-        1,
-        "an indeterminate implementation hash must re-extract rather than skip"
+        missing_lockfile_observer.launches(),
+        0,
+        "a missing authoritative lockfile must fail before rustdoc launch"
     );
 }

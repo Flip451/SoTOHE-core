@@ -128,6 +128,8 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [TDDD chain ③ の `cargo rustdoc` 呼び出しに `--document-hidden-items` を追加する](2026-06-27-0440-tddd-rustdoc-document-hidden-items.md) | Proposed | 2026-06-27 |
 | [TDDD chain ③ の rustdoc 抽出を track 単位の feature 宣言に基づかせる](2026-07-27-0039-tddd-track-scoped-feature-declaration.md) | Proposed | 2026-07-27 |
 | [catalogue の適用範囲を実装の追加・変更に一致させる](2026-07-28-1024-catalogue-scope-is-implementation-delta.md) | Proposed | 2026-07-28 |
+| [sotp 生成 JSON のキー順を決定的にする](2026-07-29-0839-deterministic-json-serialization.md) | Proposed | 2026-07-29 |
+| [信号機 Yellow/Red 内訳を横断列挙する signal report コマンドを追加する](2026-07-29-0839-signal-report-command.md) | Proposed | 2026-07-29 |
 | [signal report の発生単位データ取得方針](2026-07-31-2134-signal-report-occurrence-source.md) | Proposed | 2026-07-31 |
 | [型カタログ作成の「生成 + 注釈」への移行 — 意図入力スキャフォールディング API](2026-07-02-1345-catalogue-generation-annotation.md) | — | 2026-07-02 |
 | [テスト義務ゲートと obligation-fulfillment 意味論検証 — SoT chain 第三リンクの意味論検証の完成](2026-07-02-0359-test-obligation-and-fulfillment-gate.md) | Proposed | 2026-07-02 |
@@ -173,6 +175,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [`batch-plan.json` の scope 名を review scope 設定に照合し、未知名を fail-closed で拒否する](2026-07-30-0951-batch-plan-scope-name-config-validation.md) | Accepted | 2026-07-30 |
 | [`batch-plan.json` の宣言対象を未 settle タスクに限定する](2026-07-30-1022-batch-plan-declaration-domain-unsettled-tasks.md) | Accepted | 2026-07-30 |
 | [per-task commit hash の記録時に repository 実在と HEAD 到達可能性を要求する](2026-07-30-2101-per-task-commit-hash-record-time-validation.md) | Accepted | 2026-07-30 |
+| [clean な base merge 後の baseline 再取得と同期状態の原子的 lifecycle を定める](2026-08-02-0715-base-merge-cleanup-state.md) | Accepted | 2026-08-02 |
 
 ### ADR 運用
 
