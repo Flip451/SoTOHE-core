@@ -6,7 +6,7 @@ use thiserror::Error;
 
 use crate::operator_command::{
     CommandConfigLoadError, CommandConfigSchemaVersion, CommandConfigValidationError,
-    CommandDeclarationId, ConfiguredCommand,
+    CommandDeclarationId, ConfiguredCommand, OutputCaptureLimitBytes,
 };
 
 /// A configured writer and its ordered pre-entry commands for one phase.
@@ -117,6 +117,31 @@ pub struct PhaseValidateCommand {
     pub repository_root: PathBuf,
 }
 
+/// Request to explain one configured phase without executing its commands.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PhaseExplainQuery {
+    pub repository_root: PathBuf,
+    pub phase_id: CommandDeclarationId,
+}
+
+/// Observable command declaration details for one configured phase.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PhaseCommandExplanation {
+    pub phase_id: CommandDeclarationId,
+    pub pre_entry_commands: Vec<ConfiguredCommand>,
+    pub writer: ConfiguredCommand,
+    pub output_limit: OutputCaptureLimitBytes,
+}
+
+/// Failures while loading or resolving a phase explanation.
+#[derive(Debug, Error)]
+pub enum PhaseCommandExplainError {
+    #[error(transparent)]
+    Config(#[from] CommandConfigLoadError),
+    #[error("unknown phase: {}", .0.as_str())]
+    UnknownPhase(CommandDeclarationId),
+}
+
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
@@ -125,11 +150,13 @@ mod tests {
 
     use super::{
         PhaseCommandConfig, PhaseCommandConfigLoaderPort, PhaseCommandConfigValidationError,
-        PhaseCommandDeclaration, PhaseValidateCommand,
+        PhaseCommandDeclaration, PhaseCommandExplainError, PhaseCommandExplanation,
+        PhaseExplainQuery, PhaseValidateCommand,
     };
     use crate::operator_command::{
-        CommandArgument, CommandConfigSchemaVersion, CommandConfigValidationError,
-        CommandDeclarationId, ConfiguredCommand, UnvalidatedTimeoutSeconds,
+        CommandArgument, CommandConfigLoadError, CommandConfigSchemaVersion,
+        CommandConfigValidationError, CommandDeclarationId, ConfiguredCommand,
+        OutputCaptureLimitBytes, UnvalidatedTimeoutSeconds,
     };
 
     fn command(value: &str) -> ConfiguredCommand {
@@ -279,6 +306,48 @@ mod tests {
             declaration.pre_entry_commands().get(1).map(|command| command.timeout().as_secs()),
             Some(45)
         );
+    }
+
+    #[test]
+    fn test_phase_command_explanation_preserves_observable_expanded_commands_and_limits() {
+        let phase_id = CommandDeclarationId::try_new("phase-one".to_owned()).unwrap();
+        let writer = command("writer");
+        let pre_entry =
+            vec![command("first-pre-entry"), command_with_timeout("second-pre-entry", 45)];
+        let explanation = PhaseCommandExplanation {
+            phase_id: phase_id.clone(),
+            pre_entry_commands: pre_entry.clone(),
+            writer: writer.clone(),
+            output_limit: OutputCaptureLimitBytes::one_mebibyte(),
+        };
+        let query = PhaseExplainQuery { repository_root: "/repo".into(), phase_id };
+
+        assert_eq!(query.repository_root, PathBuf::from("/repo"));
+        assert_eq!(query.phase_id, explanation.phase_id);
+        assert_eq!(explanation.pre_entry_commands, pre_entry);
+        assert_eq!(explanation.writer, writer);
+        assert_eq!(explanation.output_limit.as_usize(), 1_048_576);
+    }
+
+    #[test]
+    fn test_phase_command_explain_error_preserves_unknown_phase_identifier() {
+        let phase_id = CommandDeclarationId::try_new("unknown-phase".to_owned()).unwrap();
+        let error = PhaseCommandExplainError::UnknownPhase(phase_id);
+
+        assert_eq!(error.to_string(), "unknown phase: unknown-phase");
+    }
+
+    #[test]
+    fn test_phase_command_explain_error_converts_configuration_failure() {
+        let error = PhaseCommandExplainError::from(CommandConfigLoadError::ReadFailed {
+            message: domain::FreeText::new("configuration is unavailable".to_owned()),
+        });
+
+        assert!(matches!(
+            error,
+            PhaseCommandExplainError::Config(CommandConfigLoadError::ReadFailed { message })
+                if message.as_str() == "configuration is unavailable"
+        ));
     }
 
     #[test]

@@ -44,7 +44,7 @@
 | CurrentReviewTrackResolveError | error_type | add | ResolveFailed | 🔵 | 🔵 |
 | PhaseCommandConfigValidationError | error_type | add | InvalidSchemaVersion, DuplicateDeclaration | 🔵 | 🔵 |
 | PhaseCommandEnterError | error_type | add | Config, UnknownPhase, Runner | 🟡 | 🔵 |
-| PhaseCommandExplainError | error_type | add | Config, UnknownPhase | 🟡 | 🔵 |
+| PhaseCommandExplainError | error_type | add | Config, UnknownPhase | 🔵 | 🔵 |
 | PreReviewCommandConfigValidationError | error_type | add | InvalidSchemaVersion, DuplicateScope | 🔵 | 🔵 |
 | PreReviewCommandDispatchError | error_type | add | Config, UnknownScope, TrackResolution, TrackMismatch, Runner | 🔵 | 🔵 |
 | ProgramRunnerError | error_type | add | SpawnFailed, WaitFailed, TerminateFailed | 🔵 | 🔵 |
@@ -81,7 +81,7 @@
 |------|------|--------|---------|--------|----------|
 | CapturedProgramOutput | dto | add | — | 🔵 | 🔵 |
 | FailedProgramExecutionRecord | dto | add | — | 🔵 | 🔵 |
-| PhaseCommandExplanation | dto | add | — | 🟡 | 🔵 |
+| PhaseCommandExplanation | dto | add | — | 🔵 | 🔵 |
 | ProgramExecutionRecord | dto | add | — | 🔵 | 🔵 |
 | ProgramInvocation | dto | add | — | 🔵 | 🔵 |
 | SuccessfulProgramExecutionRecord | dto | add | — | 🔵 | 🔵 |
@@ -99,5 +99,5 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| PhaseExplainQuery | query | add | — | 🟡 | 🔵 |
+| PhaseExplainQuery | query | add | — | 🔵 | 🔵 |
 

@@ -2235,7 +2235,7 @@
       }
     },
     {
-      "claim_hash": "853b7fa81c4663a12995ea4b602383822c386905eb035cfd580dfddc16b5b74c",
+      "claim_hash": "6d3df6bdf6acc751330d6fea83495adde362d44795747a992d9305e6c6f0bf21",
       "evidence_hash": "2d1947e7251b3b41bd334fd9a540772c7a828fc41758b05a4aeccc4aebb29fcb",
       "verdict": {
         "kind": "pass",
@@ -2259,7 +2259,7 @@
       }
     },
     {
-      "claim_hash": "853b7fa81c4663a12995ea4b602383822c386905eb035cfd580dfddc16b5b74c",
+      "claim_hash": "6d3df6bdf6acc751330d6fea83495adde362d44795747a992d9305e6c6f0bf21",
       "evidence_hash": "c600677df01b23fc21e331a509de2c22f16a0ef63e6ef1cb2ef604999640d2bb",
       "verdict": {
         "kind": "pass",
@@ -2279,30 +2279,6 @@
           "section": "in_scope",
           "element_id": "IN-04",
           "text_label": "CLI は validate、explain、enter の観測可能な outcome を提供し、operator が展開済み phase command、実行順序、validation failure、および command failure を監査できるようにする。"
-        }
-      }
-    },
-    {
-      "claim_hash": "853b7fa81c4663a12995ea4b602383822c386905eb035cfd580dfddc16b5b74c",
-      "evidence_hash": "574c686246d7577d3ab00fe3d015a1ba12dac480d60fd748ff40da6e914bd3dc",
-      "verdict": {
-        "kind": "pass",
-        "citation": "validation failure"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
-          "section_key": "types",
-          "entry_key": "PhaseCommandExplainError"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "acceptance_criteria",
-          "element_id": "AC-03",
-          "text_label": "validate、explain、enter の CLI outcome により、operator は展開後の writer/pre-entry argv、実行順、default 3,600-second timeout または explicit timeout、その positive-integer / 3,600-second 上限、stdout/stderr 各 1 MiB (1,048,576-byte) capture limit、validation failure、first failing command、および output-limit または timeout outcome を監査できる。"
         }
       }
     },
@@ -2595,31 +2571,7 @@
       }
     },
     {
-      "claim_hash": "1b4c6f2f655e96a5a348ea7904bf8f0498ca86b32dc0ae2fd23636f34ecd7ca1",
-      "evidence_hash": "c600677df01b23fc21e331a509de2c22f16a0ef63e6ef1cb2ef604999640d2bb",
-      "verdict": {
-        "kind": "pass",
-        "citation": "CLI は validate、explain、enter の観測可能な outcome を提供し、operator が展開済み phase command、実行順序、validation failure、および command failure を監査できるようにする。"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
-          "section_key": "types",
-          "entry_key": "PhaseExplainQuery"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "in_scope",
-          "element_id": "IN-04",
-          "text_label": "CLI は validate、explain、enter の観測可能な outcome を提供し、operator が展開済み phase command、実行順序、validation failure、および command failure を監査できるようにする。"
-        }
-      }
-    },
-    {
-      "claim_hash": "1b4c6f2f655e96a5a348ea7904bf8f0498ca86b32dc0ae2fd23636f34ecd7ca1",
+      "claim_hash": "8f7d2fc0d046037a49074831d2bba72db763ec2655720c7468515c456c37626e",
       "evidence_hash": "574c686246d7577d3ab00fe3d015a1ba12dac480d60fd748ff40da6e914bd3dc",
       "verdict": {
         "kind": "pass",

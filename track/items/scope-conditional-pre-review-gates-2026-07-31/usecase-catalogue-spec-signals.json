@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "f06d1180c522a933152cc34e33eb34612b6ec2401883312ed40578d970932104",
+  "catalogue_declaration_hash": "b7e7d4142458376c2e954eae27dc2d67c9e5f1e43384e3f0393ef1bf438c778b",
   "signals": [
     {
       "type_name": "CapabilityExecInteractor",
@@ -130,7 +130,7 @@
     {
       "type_name": "PhaseCommandExplainError",
       "signal": "blue",
-      "entry_hash": "853b7fa81c4663a12995ea4b602383822c386905eb035cfd580dfddc16b5b74c"
+      "entry_hash": "6d3df6bdf6acc751330d6fea83495adde362d44795747a992d9305e6c6f0bf21"
     },
     {
       "type_name": "PhaseCommandExplanation",
@@ -150,7 +150,7 @@
     {
       "type_name": "PhaseExplainQuery",
       "signal": "blue",
-      "entry_hash": "1b4c6f2f655e96a5a348ea7904bf8f0498ca86b32dc0ae2fd23636f34ecd7ca1"
+      "entry_hash": "8f7d2fc0d046037a49074831d2bba72db763ec2655720c7468515c456c37626e"
     },
     {
       "type_name": "PhaseValidateCommand",

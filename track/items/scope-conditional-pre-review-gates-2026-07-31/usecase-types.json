@@ -2985,7 +2985,7 @@
     },
     "PhaseCommandExplainError": {
       "action": "add",
-      "docs": "Phase-explain operation failures (GO-03, IN-04, AC-03).",
+      "docs": "Phase-explain operation failures (GO-03, IN-04).",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -3022,10 +3022,6 @@
         },
         {
           "anchor": "IN-04",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "AC-03",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]
@@ -3179,7 +3175,7 @@
     },
     "PhaseExplainQuery": {
       "action": "add",
-      "docs": "Phase-explain request (IN-04, AC-03).",
+      "docs": "Phase-explain request (AC-03).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -3204,10 +3200,6 @@
         "Query": {}
       },
       "spec_refs": [
-        {
-          "anchor": "IN-04",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
         {
           "anchor": "AC-03",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"

@@ -4185,6 +4185,171 @@
           "test_name": "test_phase_loader_decodes_valid_configuration_into_usecase_port"
         }
       ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandExplainError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "GO-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandExplainError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:GO-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "b734e69a41aaa693460cc2801d5f1b1b53e84fd718e129262f891acc4c8418a1",
+        "declaration_hash": "5aa52a74056c33ad1901239c7716acba7b563a8eaeea5fffa74fded2f16f0277",
+        "anchor_text_hash": "0203a405476f817ab74879ed006ba32454744fc289e4c38e0d204f4d9ddc995b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let error = PhaseCommandExplainError::UnknownPhase(phase_id);\n\n        assert_eq!(error.to_string(), \"unknown phase: unknown-phase\");\n\n        assert!(matches!(\n            error,\n            PhaseCommandExplainError::Config(CommandConfigLoadError::ReadFailed { message })\n                if message.as_str() == \"configuration is unavailable\"\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_explain_error_preserves_unknown_phase_identifier"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_explain_error_converts_configuration_failure"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandExplainError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandExplainError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "b734e69a41aaa693460cc2801d5f1b1b53e84fd718e129262f891acc4c8418a1",
+        "declaration_hash": "5aa52a74056c33ad1901239c7716acba7b563a8eaeea5fffa74fded2f16f0277",
+        "anchor_text_hash": "3a64b29a92e9e9eeaf1a9ea27e22587c95af88cf00d71369188fd9b70d334f36"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(error.to_string(), \"unknown phase: unknown-phase\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_explain_error_preserves_unknown_phase_identifier"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_explain_error_converts_configuration_failure"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandExplanation",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandExplanation",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "afe435d16e1d4e8e1069d37aa3371f3fbbb36a0be23aab7168fad04f7b2c7643",
+        "declaration_hash": "b45e8be01da2295010e0845e750bf44059df2ed88e91a9f91cabbfe8f90f4970",
+        "anchor_text_hash": "3a64b29a92e9e9eeaf1a9ea27e22587c95af88cf00d71369188fd9b70d334f36"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(explanation.pre_entry_commands, pre_entry);\n        assert_eq!(explanation.writer, writer);\n        assert_eq!(explanation.output_limit.as_usize(), 1_048_576);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_explanation_preserves_observable_expanded_commands_and_limits"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandExplanation",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandExplanation",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "afe435d16e1d4e8e1069d37aa3371f3fbbb36a0be23aab7168fad04f7b2c7643",
+        "declaration_hash": "b45e8be01da2295010e0845e750bf44059df2ed88e91a9f91cabbfe8f90f4970",
+        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(explanation.pre_entry_commands, pre_entry);\n        assert_eq!(explanation.writer, writer);\n        assert_eq!(explanation.output_limit.as_usize(), 1_048_576);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_explanation_preserves_observable_expanded_commands_and_limits"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseExplainQuery",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseExplainQuery",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "afe435d16e1d4e8e1069d37aa3371f3fbbb36a0be23aab7168fad04f7b2c7643",
+        "declaration_hash": "0e1539fa5554b426e56578bbf1ab1d0563f9e572bd7139c8377373ca6d7b66e9",
+        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(query.repository_root, PathBuf::from(\"/repo\"));\n        assert_eq!(query.phase_id, explanation.phase_id);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_explanation_preserves_observable_expanded_commands_and_limits"
+        }
+      ]
     }
   ]
 }

@@ -132,7 +132,7 @@
     {
       "id": "T034",
       "description": "`libs/usecase/src/phase_command.rs` の phase explanation と explain query を catalogue shape に適応し、explain result tests を更新する。IN-04、AC-03。",
-      "status": "todo",
+      "status": "in_progress",
       "depends_on": [
         "T027"
       ]
@@ -157,7 +157,8 @@
     {
       "id": "T029",
       "description": "`libs/infrastructure/src/operator_command_config.rs` の phase command configuration loader、command DTO 群、phase DTO / declaration DTO、`decode_phase_command_config` を更新し、phase DTO decode / invalid-config tests を更新する。IN-01、IN-03、AC-01。",
-      "status": "in_progress",
+      "status": "done",
+      "commit_hash": "22b098d16aa6ca63fd48ff24475501f06d57d791",
       "depends_on": [
         "T026"
       ]

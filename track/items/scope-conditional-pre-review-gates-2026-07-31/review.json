@@ -1,6 +1,132 @@
 {
   "schema_version": 2,
   "scopes": {
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8dfa8e508838969638fde1b0510a9ddc452dea1b9b31f6474cb01d0878a2d7ae",
+          "at": "2026-08-01T17:05:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a74567c55ae3e68c1a9d55e84e885ec85d726b68fe89b3dd5c7d17d926bb22b",
+          "at": "2026-08-02T16:17:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a74567c55ae3e68c1a9d55e84e885ec85d726b68fe89b3dd5c7d17d926bb22b",
+          "at": "2026-08-02T16:20:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:60280264200dcb324805d05355ac719106591baa77ea0d3bbd567634fe1cb03f",
+          "at": "2026-08-02T21:21:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Changing the reviewer default to 3,600 seconds leaves the canonical review-fix invocation budget stale: `.harness/capabilities/review-fix-lead.md:103-109` still prescribes 16,320,000 ms, calculated from four 3,600-second gates, a 1,800-second reviewer, and 120 seconds overhead. With this default, a worst-case invocation needs 18,120,000 ms, so the shell tool can kill a legitimate reviewer about 30 minutes early and record no round. Update the capability budget/instructions and callers for the new default, or retain 1,800 seconds.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/mod.rs",
+              "line": 29,
+              "category": "branch-wide consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:60280264200dcb324805d05355ac719106591baa77ea0d3bbd567634fe1cb03f",
+          "at": "2026-08-02T21:24:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:60280264200dcb324805d05355ac719106591baa77ea0d3bbd567634fe1cb03f",
+          "at": "2026-08-02T21:26:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2ae54af0529d9d3bdcdba8b646db7c2b55d7103fa309a7efe64631dfe4bdaf2e",
+          "at": "2026-08-03T01:01:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Host-default selection is implemented as a branching decision in the binary layer. The CLI should preserve the optional host in the typed input and dispatch it; the already wired `CapabilityDriver` should apply its `default_host`. Keeping `unwrap_or_else` here violates the CLI thin-bin contract by placing application policy in `apps/cli`.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/capability.rs",
+              "line": 77,
+              "category": "architecture"
+            },
+            {
+              "message": "Driver-construction errors are printed verbatim. `capability_driver()` forwards `AgentProfilesError` text, whose I/O and trusted-root variants contain absolute repository/config paths, so this newly reachable failure path exposes internal filesystem details despite the sanitized-diagnostics requirement. Convert it to a stable public diagnostic before writing to stderr.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/capability.rs",
+              "line": 73,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:2ae54af0529d9d3bdcdba8b646db7c2b55d7103fa309a7efe64631dfe4bdaf2e",
+          "at": "2026-08-03T01:07:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CapabilityExecDriverInput.host` は `ProviderNameArg` なのに、`args.host` の `Option<ProviderNameArg>` をそのまま代入しているため、CLI crate がコンパイルできません。省略時の host を composition/driver のデフォルトで解決してから入力を構築する必要があります。",
+              "severity": "P0",
+              "file": "apps/cli/src/commands/capability.rs",
+              "line": 82,
+              "category": "build failure"
+            }
+          ],
+          "hash": "rvw1:sha256:6d0c2fdb2a057f4b571b98a1fcba401581963efe0f362e0179c2b82bc7c6bdd1",
+          "at": "2026-08-03T02:59:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6d0c2fdb2a057f4b571b98a1fcba401581963efe0f362e0179c2b82bc7c6bdd1",
+          "at": "2026-08-03T03:03:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6d0c2fdb2a057f4b571b98a1fcba401581963efe0f362e0179c2b82bc7c6bdd1",
+          "at": "2026-08-03T03:05:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6899da70e4dd4afc7760425cee487310b9db6deceb6c46bc205ee5f7a97927ae",
+          "at": "2026-08-03T04:12:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6899da70e4dd4afc7760425cee487310b9db6deceb6c46bc205ee5f7a97927ae",
+          "at": "2026-08-03T04:13:53Z"
+        }
+      ]
+    },
     "cli_composition": {
       "rounds": [
         {
@@ -304,239 +430,187 @@
         }
       ]
     },
-    "adr": {
+    "cli_driver": {
       "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:324adbdf67c8e139f034ccf08288be93375905e70134d9c011061bea4a075bf2",
-          "at": "2026-07-31T11:21:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:324adbdf67c8e139f034ccf08288be93375905e70134d9c011061bea4a075bf2",
-          "at": "2026-07-31T11:24:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0fdb687eae29921dcb294481fdc12d29f8cd6fe47f3a2f1f77a76930f863c89f",
-          "at": "2026-07-31T11:31:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0fdb687eae29921dcb294481fdc12d29f8cd6fe47f3a2f1f77a76930f863c89f",
-          "at": "2026-07-31T11:33:40Z"
-        },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "D4 embeds workflow procedure rather than only recording the lifecycle decision: stopping the task, having impl-planner edit both artifacts, rerunning named checks, and sequencing implementation review are downstream workflow/capability details. Removing lines 88–91 would preserve the decision that a restored carrier must become stale and be removed before settlement; delegate this procedure to the applicable workflow SSoT.",
+              "message": "The test-only `RecordingDispatcher::dispatch` matches on `self.response` by value through `&self`, moving a non-`Copy` field and causing the cli_driver test target to fail compilation. Match by reference or derive `Copy` for the enum.",
               "severity": "P1",
-              "file": "knowledge/adr/2026-08-01-1749-source-only-baseline-restoration-carrier.md",
-              "line": 88,
-              "category": "scope leakage into ADR body"
+              "file": "apps/cli-driver/src/review.rs",
+              "line": 816,
+              "category": "test-compilation"
             },
             {
-              "message": "The Validation Strategy is an operational test matrix with fixture cases, round-trip checks, and named gate assertions. Removing lines 128–139 leaves D1–D4 unchanged, so this detail obscures the recorded decisions and belongs in the implementation/test contract rather than the ADR.",
+              "message": "The required invalid-track validation path has no regression test. Add coverage verifying an invalid `track_id` returns a failure and prevents both dispatcher and reviewer-service invocation.",
               "severity": "P1",
-              "file": "knowledge/adr/2026-08-01-1749-source-only-baseline-restoration-carrier.md",
-              "line": 128,
-              "category": "decision obscured by excess detail"
+              "file": "apps/cli-driver/src/review.rs",
+              "line": 353,
+              "category": "testing"
             }
           ],
-          "hash": "rvw1:sha256:3fba0818bf0341dd168c971048a578cee05afabf6949c14f91fe4f4a86b1da7a",
-          "at": "2026-08-01T09:58:29Z"
+          "hash": "rvw1:sha256:1e5a08b55ed3b45720cf6cbdb39c9238fa20c996ca356789b8246750a302f83c",
+          "at": "2026-08-01T03:31:09Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7fcc56e3fbf0e713c6092bf2d07dd5fd98f8e40c97eb041eb991e5063b943261",
-          "at": "2026-08-01T10:05:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7fcc56e3fbf0e713c6092bf2d07dd5fd98f8e40c97eb041eb991e5063b943261",
-          "at": "2026-08-01T10:08:36Z"
+          "hash": "rvw1:sha256:b81d614cd2d3a0fb5379d16fc0a1ebf64a6752d15255836b3c7053d0fb5c0171",
+          "at": "2026-08-01T06:50:25Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:40568f1efe56d603ebb5abeb01ec3c36bd3404f4c3560914af3695e55d1118ac",
-          "at": "2026-08-01T23:16:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:40568f1efe56d603ebb5abeb01ec3c36bd3404f4c3560914af3695e55d1118ac",
-          "at": "2026-08-01T23:19:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:70d76ae6c4b40d56861850865416b170abfdf237734bcaea68c53582ac838357",
-          "at": "2026-08-01T23:36:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:70d76ae6c4b40d56861850865416b170abfdf237734bcaea68c53582ac838357",
-          "at": "2026-08-01T23:39:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fca6b4c8c7da5433e26d7023918eb029c1c29a73eef5955b30b0f81f960448c0",
-          "at": "2026-08-03T02:59:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fca6b4c8c7da5433e26d7023918eb029c1c29a73eef5955b30b0f81f960448c0",
-          "at": "2026-08-03T03:02:02Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8dfa8e508838969638fde1b0510a9ddc452dea1b9b31f6474cb01d0878a2d7ae",
-          "at": "2026-08-01T17:05:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7a74567c55ae3e68c1a9d55e84e885ec85d726b68fe89b3dd5c7d17d926bb22b",
-          "at": "2026-08-02T16:17:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7a74567c55ae3e68c1a9d55e84e885ec85d726b68fe89b3dd5c7d17d926bb22b",
-          "at": "2026-08-02T16:20:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:60280264200dcb324805d05355ac719106591baa77ea0d3bbd567634fe1cb03f",
-          "at": "2026-08-02T21:21:33Z"
+          "hash": "rvw1:sha256:b81d614cd2d3a0fb5379d16fc0a1ebf64a6752d15255836b3c7053d0fb5c0171",
+          "at": "2026-08-01T07:05:30Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "Changing the reviewer default to 3,600 seconds leaves the canonical review-fix invocation budget stale: `.harness/capabilities/review-fix-lead.md:103-109` still prescribes 16,320,000 ms, calculated from four 3,600-second gates, a 1,800-second reviewer, and 120 seconds overhead. With this default, a worst-case invocation needs 18,120,000 ms, so the shell tool can kill a legitimate reviewer about 30 minutes early and record no round. Update the capability budget/instructions and callers for the new default, or retain 1,800 seconds.",
+              "message": "Each successful review path now calls two separate use-case services in sequence: the pre-review dispatcher and then `ReviewService`. This violates the cli_driver rule that one request invokes exactly one interactor and places gate→review orchestration in the primary adapter. Move this sequencing behind one use-case application-service port so the driver performs one invoke→render flow.",
               "severity": "P1",
-              "file": "apps/cli/src/commands/review/mod.rs",
-              "line": 29,
-              "category": "branch-wide consistency"
-            }
-          ],
-          "hash": "rvw1:sha256:60280264200dcb324805d05355ac719106591baa77ea0d3bbd567634fe1cb03f",
-          "at": "2026-08-02T21:24:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:60280264200dcb324805d05355ac719106591baa77ea0d3bbd567634fe1cb03f",
-          "at": "2026-08-02T21:26:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2ae54af0529d9d3bdcdba8b646db7c2b55d7103fa309a7efe64631dfe4bdaf2e",
-          "at": "2026-08-03T01:01:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Host-default selection is implemented as a branching decision in the binary layer. The CLI should preserve the optional host in the typed input and dispatch it; the already wired `CapabilityDriver` should apply its `default_host`. Keeping `unwrap_or_else` here violates the CLI thin-bin contract by placing application policy in `apps/cli`.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/capability.rs",
-              "line": 77,
+              "file": "apps/cli-driver/src/review.rs",
+              "line": 292,
               "category": "architecture"
             },
             {
-              "message": "Driver-construction errors are printed verbatim. `capability_driver()` forwards `AgentProfilesError` text, whose I/O and trusted-root variants contain absolute repository/config paths, so this newly reachable failure path exposes internal filesystem details despite the sanitized-diagnostics requirement. Convert it to a stable public diagnostic before writing to stderr.",
+              "message": "Scope translation no longer preserves the baseline `ReviewGroupName` normalization semantics. `MainScopeName::new` does not trim, so previously accepted inputs such as `\" spec \"` are looked up as a different matrix scope, while whitespace-only input reaches config lookup instead of producing the stable invalid-group diagnostic. Normalize with the same validated boundary type before constructing the selector and forwarding the request, and add regression coverage for these cases.",
               "severity": "P1",
-              "file": "apps/cli/src/commands/capability.rs",
-              "line": 73,
-              "category": "security"
+              "file": "apps/cli-driver/src/review.rs",
+              "line": 399,
+              "category": "input_validation"
             }
           ],
-          "hash": "rvw1:sha256:2ae54af0529d9d3bdcdba8b646db7c2b55d7103fa309a7efe64631dfe4bdaf2e",
-          "at": "2026-08-03T01:07:05Z"
+          "hash": "rvw1:sha256:b81d614cd2d3a0fb5379d16fc0a1ebf64a6752d15255836b3c7053d0fb5c0171",
+          "at": "2026-08-01T07:17:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The successful RunCodex/RunClaude/RunLocal paths still invoke two separate use-case services in sequence: `pre_review_gate_dispatcher.dispatch(...)` and then `ReviewService::run_*`. This violates the cli_driver policy requiring exactly one interactor per request and leaves gate→review orchestration in the primary adapter. Move the sequencing behind one use-case application-service port so the driver performs a single invoke→render flow.",
+              "severity": "P1",
+              "file": "apps/cli-driver/src/review.rs",
+              "line": 297,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:927f3d93fa379aa62f5ba2fbd85d5f9b011d3ce05ea2a8a5b26519de7bdac15e",
+          "at": "2026-08-01T07:25:36Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`CapabilityExecDriverInput.host` は `ProviderNameArg` なのに、`args.host` の `Option<ProviderNameArg>` をそのまま代入しているため、CLI crate がコンパイルできません。省略時の host を composition/driver のデフォルトで解決してから入力を構築する必要があります。",
-              "severity": "P0",
-              "file": "apps/cli/src/commands/capability.rs",
-              "line": 82,
-              "category": "build failure"
+              "message": "The new `InvalidSourceOnlyBaselineRestoration` coverage diagnostic uses Rust `Debug` formatting (`{reason:?}`) for the user-facing output. This exposes implementation-shaped enum/field formatting and is not a stable CLI diagnostic; render each ineligibility reason explicitly into a stable message, including nested task/entry data.",
+              "severity": "P1",
+              "file": "apps/cli-driver/src/task_contract.rs",
+              "line": 280,
+              "category": "diagnostics"
             }
           ],
-          "hash": "rvw1:sha256:6d0c2fdb2a057f4b571b98a1fcba401581963efe0f362e0179c2b82bc7c6bdd1",
-          "at": "2026-08-03T02:59:40Z"
+          "hash": "rvw1:sha256:ae1ac1b83e6b8f265dc1909d09d9a280fb27441d0655c313a7610a88534175a3",
+          "at": "2026-08-01T17:06:05Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6d0c2fdb2a057f4b571b98a1fcba401581963efe0f362e0179c2b82bc7c6bdd1",
-          "at": "2026-08-03T03:03:19Z"
+          "hash": "rvw1:sha256:03e10171eea4242772267e89b4384892e0fede44ff23804b36d3d9080ec9b6f0",
+          "at": "2026-08-02T16:17:58Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6d0c2fdb2a057f4b571b98a1fcba401581963efe0f362e0179c2b82bc7c6bdd1",
-          "at": "2026-08-03T03:05:24Z"
+          "hash": "rvw1:sha256:03e10171eea4242772267e89b4384892e0fede44ff23804b36d3d9080ec9b6f0",
+          "at": "2026-08-02T16:22:31Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6899da70e4dd4afc7760425cee487310b9db6deceb6c46bc205ee5f7a97927ae",
-          "at": "2026-08-03T04:12:41Z"
+          "hash": "rvw1:sha256:f394c6c5c9a538aed98bdd1683d9d95f0586c991d3e48d79854cde3e42f872ed",
+          "at": "2026-08-02T16:57:53Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6899da70e4dd4afc7760425cee487310b9db6deceb6c46bc205ee5f7a97927ae",
-          "at": "2026-08-03T04:13:53Z"
+          "hash": "rvw1:sha256:f394c6c5c9a538aed98bdd1683d9d95f0586c991d3e48d79854cde3e42f872ed",
+          "at": "2026-08-02T16:59:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c3b5bb273d604cbfe25278d9369da375140c4bbb27e109233a76bb7b548d69d8",
+          "at": "2026-08-02T21:51:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`render_gate_error` writes the opaque infrastructure diagnostic verbatim to `CommandOutcome.stderr`. The filesystem adapters populate these messages with `path.display()` and OS error details, so failures can expose internal filesystem paths despite the briefing's sanitization requirement. Render stable user-facing messages and keep infrastructure diagnostics out of stderr.",
+              "severity": "P1",
+              "file": "apps/cli-driver/src/task_contract.rs",
+              "line": 180,
+              "category": "security"
+            },
+            {
+              "message": "The new service fakes only return `Ok` and do not record invocations. Consequently the added driver tests cover only `Ok(Blocked)` and do not verify either public variant's happy path, service-error mapping, translated command, or the required exactly-one-service invocation. Add recording or fail-on-call fakes plus `Passed` and `Err` cases for both `Check` and `Coverage`.",
+              "severity": "P1",
+              "file": "apps/cli-driver/src/task_contract.rs",
+              "line": 318,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:c3b5bb273d604cbfe25278d9369da375140c4bbb27e109233a76bb7b548d69d8",
+          "at": "2026-08-02T21:56:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4241b7c1e256339e6781fd344cc596bdc7f634f24a1cce0b91feaa7cd45b7019",
+          "at": "2026-08-02T22:01:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:722a9bf085c20c52f53f4ed41bebc2a0f177dd8c56e45d06f74f68d7464d900d",
+          "at": "2026-08-03T01:01:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:722a9bf085c20c52f53f4ed41bebc2a0f177dd8c56e45d06f74f68d7464d900d",
+          "at": "2026-08-03T01:07:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:30d1cd6e48fcab2d3c6a7682d71b9697685411fca00b99adf44eebcee676eb16",
+          "at": "2026-08-03T02:59:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:30d1cd6e48fcab2d3c6a7682d71b9697685411fca00b99adf44eebcee676eb16",
+          "at": "2026-08-03T03:01:19Z"
         }
       ]
     },
@@ -1128,6 +1202,581 @@
           "findings": [],
           "hash": "rvw1:sha256:0aac5416bcbce9882224d55170d10faa281b89251238b76dc0f04b26336c60c5",
           "at": "2026-08-03T08:58:22Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
+          "at": "2026-07-31T12:02:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
+          "at": "2026-07-31T12:07:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9d62f0bfd851f0143e534fdab30b4c815a35b0c4bfea98ad53bf233485334898",
+          "at": "2026-07-31T23:33:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9d62f0bfd851f0143e534fdab30b4c815a35b0c4bfea98ad53bf233485334898",
+          "at": "2026-07-31T23:37:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The singleton rule is internally contradictory: line 28 requires every other task “ready at that frontier” to be excluded by a dependency, but a ready task has no unmet dependency. This makes dependency an impossible singleton justification and prevents deterministic execution of the scheduling policy. Rephrase the exclusion over non-ready tasks or over the dependency frontier precisely.",
+              "severity": "P1",
+              "file": ".harness/capabilities/impl-planner.md",
+              "line": 28,
+              "category": "executable scheduling policy"
+            },
+            {
+              "message": "“Reasonable review headroom” is undefined in both the capability and reviewer policy, while the existing batch-plan schema exposes only declared estimates and resolved ceilings. This permits subjective serialization findings even when estimates fit the configured ceiling and gives no reproducible admission criterion. Define the term mechanically or remove it from the scheduling/review rule.",
+              "severity": "P1",
+              "file": ".harness/custom/review-prompts/impl-plan.md",
+              "line": 98,
+              "category": "executable scheduling policy"
+            }
+          ],
+          "hash": "rvw1:sha256:83086c78eb06661df638fc98fd6924fdf3d9e53cdc0384521daa1e4d098b93e8",
+          "at": "2026-08-01T06:56:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:16e4682ab3dc9ecc69110edf9a258942fe9b5475277aeb658f32ef1bfc250849",
+          "at": "2026-08-01T06:58:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:16e4682ab3dc9ecc69110edf9a258942fe9b5475277aeb658f32ef1bfc250849",
+          "at": "2026-08-01T07:05:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new eligibility rule requires every predecessor to complete before a task's batch, which forces each dependency frontier into a separate batch. This contradicts `knowledge/adr/2026-07-29-0358-task-dependency-declaration-and-batch-order-check.md` D2 and `.harness/workflows/track/full-cycle.md` Step 0b: dependencies may be in the same batch and are implemented there in dependency order before one review/commit. The reviewer prompt's “no declared dependency path” condition mirrors the contradiction, so it would exempt avoidable serialization of dependency chains. Allow dependency-ordered tasks to share a batch when ownership and ceilings permit.",
+              "severity": "P1",
+              "file": ".harness/capabilities/impl-planner.md",
+              "line": 102,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "An indivisibility justification is not by itself a reason for exclusive batch membership. Under the existing batch-plan contract, it only exempts an over-ceiling task as the sole contributor to the exceeded scope; `knowledge/adr/2026-07-28-1521-scope-diff-ceiling-admission-enforcement.md` D1 explicitly permits that task to share a batch with tasks contributing only to other scopes. Treating “an indivisibility constraint” as sufficient for a singleton—and repeating that exemption in the reviewer prompt—accepts avoidable serialization despite compatible disjoint-scope work. Require an actual dependency, ownership conflict, or per-scope ceiling conflict instead.",
+              "severity": "P1",
+              "file": ".harness/capabilities/impl-planner.md",
+              "line": 28,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "The prompt calls a batch whose estimate sum exceeds a resolved ceiling “structurally valid but semantically unsound,” but its own opening assigns this exact structural conformance check to `bin/sotp batch-plan check`. Such a batch cannot pass that gate, so this example crosses the documented mechanical-gate/reviewer boundary and makes the policy internally contradictory. Keep this reviewer category limited to semantic defects that can survive the structural gate.",
+              "severity": "P1",
+              "file": ".harness/custom/review-prompts/impl-plan.md",
+              "line": 90,
+              "category": "responsibility-boundary cross"
+            }
+          ],
+          "hash": "rvw1:sha256:16e4682ab3dc9ecc69110edf9a258942fe9b5475277aeb658f32ef1bfc250849",
+          "at": "2026-08-01T07:14:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The eligibility predicate requires every combined per-scope sum to remain within its ceiling, so a valid over-ceiling indivisible task can never share a batch with compatible work in a different scope. This contradicts line 28 and the sole-contributor exemption: the exceeded scope may remain over ceiling when the indivisible task is its only contributor. The reviewer prompt repeats the same strict predicate at line 98, making its later statement that indivisibility alone does not excuse serialization ineffective. Define feasibility as either within the ceiling or satisfying the existing per-scope sole-contributor exemption.",
+              "severity": "P1",
+              "file": ".harness/capabilities/impl-planner.md",
+              "line": 102,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:badd7f2e3fa4b3ea92a523ce096af1d59f9f1e4cd0f3b83e1eb60056ca68b166",
+          "at": "2026-08-01T07:19:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2fbb41d98a430dae0a09c64db9808cb2e3b57804addbbab199dae3ca1403097",
+          "at": "2026-08-01T07:22:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The implementation-scope command entries invoke `signal calc-impl-catalog`, `signal check-impl-catalog`, and both task-contract commands without a `--track-id` (for example, lines 7–10). These commands resolve the active track from the current branch, while `bin/sotp review local` accepts an explicit `--track-id`; reviewing an explicit track from a non-track/base branch therefore runs the pre-review gates against the wrong track or fails closed.",
+              "severity": "P1",
+              "file": ".harness/config/pre-review-gates.json",
+              "line": 7,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:446779cfef266c89f3eb728ce942bf9a882ddd4e4488d533a62d19568e57a28a",
+          "at": "2026-08-02T15:24:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Implementation-scope entries invoke signal and task-contract commands without `--track-id` (for example, lines 7–10). When `bin/sotp review local` is given an explicit track ID from a non-track/base branch, these commands resolve the current branch instead and gate the wrong track or fail closed.",
+              "severity": "P1",
+              "file": ".harness/config/pre-review-gates.json",
+              "line": 7,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:446779cfef266c89f3eb728ce942bf9a882ddd4e4488d533a62d19568e57a28a",
+          "at": "2026-08-02T16:57:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:446779cfef266c89f3eb728ce942bf9a882ddd4e4488d533a62d19568e57a28a",
+          "at": "2026-08-02T17:16:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The three canonical writer argv declarations omit the currently required `--host <HOST>` argument. The public `bin/sotp capability exec` interface therefore rejects each command before dispatch. Since this file is now included in the template distribution, either land provider-neutral host resolution with this configuration or declare a valid host argument.",
+              "severity": "P1",
+              "file": ".harness/config/phase-commands.json",
+              "line": 7,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "`Among eligible compositions, minimize the number of ordered batches` imposes global optimization over all valid dependency/ownership/ceiling partitions. This conflicts with the companion reviewer policy, which explicitly forbids demanding globally optimal bin packing and only admits evidence-backed removable boundaries. Use the stated work-conserving, earliest-feasible rule and treat fewer batches as a preference, not an absolute optimum.",
+              "severity": "P1",
+              "file": ".harness/capabilities/impl-planner.md",
+              "line": 102,
+              "category": "policy inconsistency"
+            },
+            {
+              "message": "After removing `track-active-gate` from both review-wrapper dependencies, this description—and the corresponding claim in `track-commit-message`—still says review invocations share and depend on that gate. Reviews now run only the scope-specific CLI sequence, so `calc-catalog-spec`, catalogue checks, and `track views sync` are not supplied by `track-active-gate`. Update the remaining descriptions to reflect the thin-wrapper cutover or restore the wiring.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 798,
+              "category": "branch-wide consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:446779cfef266c89f3eb728ce942bf9a882ddd4e4488d533a62d19568e57a28a",
+          "at": "2026-08-02T17:26:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The updated `track-local-review-fix` description claims that `bin/sotp review fix-local` dispatches the operator-owned pre-review command sequence, but the configured pre-review wrapper gates only `run_local`; `fix-local` bypasses that dispatcher. Removing the previous Makefile gate dependencies therefore leaves fixer rounds ungated while advertising the opposite behavior.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 874,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:0efef4620a3e29360b56fc4b2fb2c3cbd10af743574956670712ad9a6ef43431",
+          "at": "2026-08-02T17:31:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:132a2a2880c78e5d6bb236bb3641ac1a74e3edf6dbf9146f729b97eeeec4863d",
+          "at": "2026-08-02T17:32:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track-active-gate` still claims that both commit and review invocations depend on it, but the review wrappers no longer declare that dependency and `track-commit-message` now explicitly calls regeneration commit-only. This leaves the documented pre-review wiring internally contradictory; describe this gate as commit-only.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 798,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:132a2a2880c78e5d6bb236bb3641ac1a74e3edf6dbf9146f729b97eeeec4863d",
+          "at": "2026-08-02T17:35:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The added “For implementation reviews…” paragraph puts exact gate ownership and command ordering under `.harness/custom`, which the harness-policy boundary reserves for consumer-customizable severity preferences—not framework review/gate methodology. It also duplicates the framework-owned sequence already stated in `impl-planner.md`. Keep only the reviewer-lane consequence here and leave sequencing in a framework-owned capability/workflow SSoT.",
+              "severity": "P1",
+              "file": ".harness/custom/review-prompts/impl-plan.md",
+              "line": 18,
+              "category": "responsibility-boundary cross"
+            },
+            {
+              "message": "Making `track-active-gate` commit-only removes `track views sync` from review rounds, while `.harness/workflows/track/review.md` still requires shared rendered views to be refreshed per invocation and the fixer prompt explicitly forbids invoking view sync because it assumes this wrapper does so. After fixer edits, reviewers can therefore receive stale `*-types.md` context. Preserve view synchronization in the review path or update the workflow and fixer contract coherently.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 798,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:2a41dce892038968761c72761b5111ecc4ef0d004e5eab866397f221108c167a",
+          "at": "2026-08-02T17:45:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Both review wrappers unconditionally run `track-active-gate` before their scripts, so its fail-closed impl/catalogue/lint commands execute before the CLI can resolve the scope or reject an explicit-track/branch mismatch. Consequently scopes with an empty matrix (`spec`, `impl-plan`, `harness-policy`, `other`, etc.) are not actually gate-free, and a mismatched invocation can mutate/gate the branch before dispatcher rejection. Move reviewer-context refresh behind scope/track dispatch without reintroducing unconditional gates.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 870,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "`track-commit-message` says the `track-active-gate` regeneration is commit-only, but both review wrappers depend on that same task and its own description explicitly says it is shared with reviews. Correct this factual wiring contradiction once the intended review dependency is settled.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 937,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:e8f3cd3b6198881397ef4697a8d10a9e2d7b2e7bf44aae444f89a693bb2b63e2",
+          "at": "2026-08-02T17:50:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track-local-review-fix` now only executes `bin/sotp review fix-local`; removing its former gate dependencies means no pre-review command sequence runs before the fixer. The description’s claim that gating is dispatched by `bin/sotp review local` “inside the fix loop” is not implemented by this wrapper, while the review workflow requires the fixer wrapper itself to perform the refresh and task-contract gate.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 876,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:0c501c0e6ad6ca3811789c0419971356ef1f01aaab69f677b9a9d85cf4d6a58b",
+          "at": "2026-08-02T17:54:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "After the wrapper was changed to delegate directly without `track-active-gate`, this statement is no longer true: “the wrapper refreshes them at each invocation.” The scope-resolved pre-review commands only recalculate/check impl-catalog and task-contract data; they do not refresh rendered views or the other artifacts produced by `track-active-gate`, so fixer/reviewer rounds can consume stale operational artifacts.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/review.md",
+              "line": 183,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:5bfca0ff8f9db412e470498ece49369cb962f65eb9c967f46d52b4a73d6c8e2f",
+          "at": "2026-08-02T17:56:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:039aafa63abc32c6a203e12ed517b76902dd5757bb7e0a3438ca320a919fa53d",
+          "at": "2026-08-02T17:58:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new per-fixer view refresh is not executable on the default Codex route. The active `review-fix-lead` profile uses Codex, `.codex/rules/default.rules` does not allow bare `bin/sotp track views sync`, and the fixer runner still explicitly assumes that command must not be issued because the wrapper handles it. After removing the wrapper dependency, required rendered-view refreshes can therefore be denied or omitted, leaving later reviewers with stale context. Provide an allowed operator-owned refresh route and update the runner contract coherently.",
+              "severity": "P1",
+              "file": ".harness/capabilities/review-fix-lead.md",
+              "line": 91,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "`track-active-gate` still claims that review wrappers depend on it, but both wrappers now carry no dependency and `track-commit-message` explicitly describes the regeneration as commit-only. Correct this factual wiring contradiction.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 798,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:039aafa63abc32c6a203e12ed517b76902dd5757bb7e0a3438ca320a919fa53d",
+          "at": "2026-08-02T18:02:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new Codex refresh route is described as allowed, but the active Codex fixer cannot invoke it headlessly: `.codex/rules/default.rules` permits the review wrappers but has no rule for `cargo make track-views-sync` (`codex execpolicy check` reports no matching decision), and `.codex/instructions.md` omits it from the command policy. A fixer needing fresh views between rounds will therefore block instead of completing the documented workflow. Add the wrapper to the Codex command-policy surfaces or use an already permitted route.",
+              "severity": "P1",
+              "file": ".harness/briefings/review-fix-lead-codex.md",
+              "line": 75,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:4506feb342435e33c289e67917957af85e0c488f30f2fe264fe2a26d4eaecc5a",
+          "at": "2026-08-02T18:13:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Each implementation review now runs four sequential commands that may each consume 3,600 seconds before the 1,800-second reviewer, but the review-fix-lead contract still says an outer shell timeout of 1,920,000 ms (32 minutes) is sufficient. A gate can therefore be killed by the fixer while still within its declared timeout, leaving no review round recorded. Align the outer invocation timeout with the cumulative command and reviewer budgets, or reduce the configured command timeouts.",
+              "severity": "P1",
+              "file": ".harness/config/pre-review-gates.json",
+              "line": 7,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:e251514793ccfcf62ef926ee37be8fba410a50d3a28a90164c6bc1cb030c7194",
+          "at": "2026-08-02T18:18:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:78c2d60b3d5a2f845d5c34d22b06987d8364c782dd03513b80913faf01510aad",
+          "at": "2026-08-02T18:22:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d7b810bbc6ce3de18cd3c37c0c3797358b48c0892f70f12782919f38577073c",
+          "at": "2026-08-02T21:28:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d7b810bbc6ce3de18cd3c37c0c3797358b48c0892f70f12782919f38577073c",
+          "at": "2026-08-02T21:32:50Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:431479782a2ad8acf702b7b9f350ef9a2a25fa43fe204d1cc0aa669a8b054f56",
+          "at": "2026-07-31T12:46:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:431479782a2ad8acf702b7b9f350ef9a2a25fa43fe204d1cc0aa669a8b054f56",
+          "at": "2026-07-31T13:29:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e3c5f433acd849667bdca5be1283078cedc419d4272298bc059e78ef08c1d14",
+          "at": "2026-08-01T09:02:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e3c5f433acd849667bdca5be1283078cedc419d4272298bc059e78ef08c1d14",
+          "at": "2026-08-01T09:05:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6c32fc04d55c32618447ead1ec8c6ce2a5b6ae13ed363f3a861f1062298667d0",
+          "at": "2026-08-01T10:28:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6c32fc04d55c32618447ead1ec8c6ce2a5b6ae13ed363f3a861f1062298667d0",
+          "at": "2026-08-01T10:29:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:af856c25a9d1e06461384023fb04a0db7d57e2047260ffdb7c66b950524e5a4b",
+          "at": "2026-08-01T23:42:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-03 の reviewer 側 fail-closed 要求に acceptance coverage がない。AC-01 は phase command config の validation のみを対象とし、AC-05 は解決済み sequence の command が non-zero を返す場合しか検証しないため、空 argv・重複・再帰などを含む不正な `pre-review-gates.json` が reviewer 起動前に拒否されることを、どの AC も決定的に証明しない。したがって全 AC を満たしても reviewer 経路の無効な gate configuration が fail-open になり得る。",
+              "severity": "P1",
+              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+              "line": 36,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:af856c25a9d1e06461384023fb04a0db7d57e2047260ffdb7c66b950524e5a4b",
+          "at": "2026-08-01T23:45:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-01/CN-02 require an output upper bound, but specify neither its numeric/value contract nor how it is configured. Downstream implementation would have to invent the bound, so this constraint is not concrete enough to serve as a behavioral contract.",
+              "severity": "P1",
+              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+              "line": 242,
+              "category": "constraint vague or untestable"
+            },
+            {
+              "message": "AC-05 requires rejecting a “configured limit” violation and applicable review/phase-engine recursion, but the spec defines neither the configured limit nor a deterministic recursion condition. This leaves the acceptance test under-specified.",
+              "severity": "P1",
+              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+              "line": 362,
+              "category": "acceptance criterion non-observable"
+            }
+          ],
+          "hash": "rvw1:sha256:4c0e29c50c7b41b70acf97a4347f73a5e9abc58d02fac73f3a7ea7f7bf57ca66",
+          "at": "2026-08-01T23:49:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "OS-01 excludes implementing or reproducing `bin/sotp` subcommand grammar, but CN-01, AC-01, and AC-05 require the dispatcher to inspect exact `phase enter`/`review local`/`review fix-local` subcommand prefixes for recursion rejection. This is an internal scope contradiction that leaves the permitted boundary for recursion validation unclear.",
+              "severity": "P1",
+              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+              "line": 190,
+              "category": "out_of_scope leakage"
+            }
+          ],
+          "hash": "rvw1:sha256:957d9565601188c267111157810d8628eb9fae2f45e0529a15d60f09c519fa6b",
+          "at": "2026-08-01T23:54:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b3a86902b72eb25410ea31f14a8f5c56602ee1b7c4f593f423a9bd17f0c11e7d",
+          "at": "2026-08-01T23:57:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-03 の fail-closed 要求は cross-dispatch recursion を検証できていない。AC-01 は phase config 内の `bin/sotp phase enter`、AC-05 は pre-review config 内の `bin/sotp review local|fix-local` だけを拒否するため、phase declaration が `bin/sotp review local` を起動し、その scope の pre-review config が `bin/sotp phase enter` を起動する循環は両方の validation を通過する。writer/reviewer 起動前に再帰を止めるという D5/GO-03 の要件を満たさず、nested dispatcher が fail-open に起動し得る。",
+              "severity": "P1",
+              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+              "line": 36,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:b3a86902b72eb25410ea31f14a8f5c56602ee1b7c4f593f423a9bd17f0c11e7d",
+          "at": "2026-08-02T00:00:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0ad54ce6af2b50149ee5111d6116de9ece3aafa9a52ecd91a3d339245888f9c1",
+          "at": "2026-08-02T00:03:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0ad54ce6af2b50149ee5111d6116de9ece3aafa9a52ecd91a3d339245888f9c1",
+          "at": "2026-08-02T00:04:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc739c5890cfbd21227fcbd15076dd9ffdb4522311fcc9bdc6069f8a7c7a55da",
+          "at": "2026-08-02T01:20:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc739c5890cfbd21227fcbd15076dd9ffdb4522311fcc9bdc6069f8a7c7a55da",
+          "at": "2026-08-02T01:21:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-12 is not deterministically observable: “capability contract を保持できる provider-match” is undefined in this spec, so a test cannot determine which provider-match cases must permit in-host delegation or how to verify contract preservation.",
+              "severity": "P1",
+              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+              "line": 474,
+              "category": "acceptance criterion non-observable"
+            }
+          ],
+          "hash": "rvw1:sha256:2903b71dec244bf2ff8a82e90684821efdd1911b5b7143e5cd8618e58b67eb9f",
+          "at": "2026-08-03T01:35:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2725d2ebfeb62e660be7c21f44a1a5628197e095f4a931cdb9eed57ca58647f4",
+          "at": "2026-08-03T01:37:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-13 は configured writer の実行時 argv に `--host` を追加するよう要求していますが、IN-03、OS-01、AC-04 は phase engine/phase command による argv rewrite を例外なく禁止しています。引用 ADR D3 は host forwarding を旧 D1 の限定的例外としているため、現状では同じ実装に「argv を変更せよ」と「変更するな」を同時に要求しています。IN-03、OS-01、AC-04 に dispatch-boundary の例外を明記してください。",
+              "severity": "P1",
+              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+              "line": 492,
+              "category": "scope / acceptance_criteria contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2725d2ebfeb62e660be7c21f44a1a5628197e095f4a931cdb9eed57ca58647f4",
+          "at": "2026-08-03T01:41:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2cc968ec32b06b822e8f9ce2f14852b04ef9c29772e5823f790f7f47f29f23d8",
+          "at": "2026-08-03T01:44:45Z"
         }
       ]
     },
@@ -2469,826 +3118,20 @@
           "findings": [],
           "hash": "rvw1:sha256:196ca22ed547fb0266a903e09a18f4a6a6fd5c4d630e3cffe468a2a4874ee47e",
           "at": "2026-08-03T07:43:05Z"
-        }
-      ]
-    },
-    "cli_driver": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The test-only `RecordingDispatcher::dispatch` matches on `self.response` by value through `&self`, moving a non-`Copy` field and causing the cli_driver test target to fail compilation. Match by reference or derive `Copy` for the enum.",
-              "severity": "P1",
-              "file": "apps/cli-driver/src/review.rs",
-              "line": 816,
-              "category": "test-compilation"
-            },
-            {
-              "message": "The required invalid-track validation path has no regression test. Add coverage verifying an invalid `track_id` returns a failure and prevents both dispatcher and reviewer-service invocation.",
-              "severity": "P1",
-              "file": "apps/cli-driver/src/review.rs",
-              "line": 353,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:1e5a08b55ed3b45720cf6cbdb39c9238fa20c996ca356789b8246750a302f83c",
-          "at": "2026-08-01T03:31:09Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b81d614cd2d3a0fb5379d16fc0a1ebf64a6752d15255836b3c7053d0fb5c0171",
-          "at": "2026-08-01T06:50:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b81d614cd2d3a0fb5379d16fc0a1ebf64a6752d15255836b3c7053d0fb5c0171",
-          "at": "2026-08-01T07:05:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Each successful review path now calls two separate use-case services in sequence: the pre-review dispatcher and then `ReviewService`. This violates the cli_driver rule that one request invokes exactly one interactor and places gate→review orchestration in the primary adapter. Move this sequencing behind one use-case application-service port so the driver performs one invoke→render flow.",
-              "severity": "P1",
-              "file": "apps/cli-driver/src/review.rs",
-              "line": 292,
-              "category": "architecture"
-            },
-            {
-              "message": "Scope translation no longer preserves the baseline `ReviewGroupName` normalization semantics. `MainScopeName::new` does not trim, so previously accepted inputs such as `\" spec \"` are looked up as a different matrix scope, while whitespace-only input reaches config lookup instead of producing the stable invalid-group diagnostic. Normalize with the same validated boundary type before constructing the selector and forwarding the request, and add regression coverage for these cases.",
-              "severity": "P1",
-              "file": "apps/cli-driver/src/review.rs",
-              "line": 399,
-              "category": "input_validation"
-            }
-          ],
-          "hash": "rvw1:sha256:b81d614cd2d3a0fb5379d16fc0a1ebf64a6752d15255836b3c7053d0fb5c0171",
-          "at": "2026-08-01T07:17:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The successful RunCodex/RunClaude/RunLocal paths still invoke two separate use-case services in sequence: `pre_review_gate_dispatcher.dispatch(...)` and then `ReviewService::run_*`. This violates the cli_driver policy requiring exactly one interactor per request and leaves gate→review orchestration in the primary adapter. Move the sequencing behind one use-case application-service port so the driver performs a single invoke→render flow.",
-              "severity": "P1",
-              "file": "apps/cli-driver/src/review.rs",
-              "line": 297,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:927f3d93fa379aa62f5ba2fbd85d5f9b011d3ce05ea2a8a5b26519de7bdac15e",
-          "at": "2026-08-01T07:25:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `InvalidSourceOnlyBaselineRestoration` coverage diagnostic uses Rust `Debug` formatting (`{reason:?}`) for the user-facing output. This exposes implementation-shaped enum/field formatting and is not a stable CLI diagnostic; render each ineligibility reason explicitly into a stable message, including nested task/entry data.",
-              "severity": "P1",
-              "file": "apps/cli-driver/src/task_contract.rs",
-              "line": 280,
-              "category": "diagnostics"
-            }
-          ],
-          "hash": "rvw1:sha256:ae1ac1b83e6b8f265dc1909d09d9a280fb27441d0655c313a7610a88534175a3",
-          "at": "2026-08-01T17:06:05Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:03e10171eea4242772267e89b4384892e0fede44ff23804b36d3d9080ec9b6f0",
-          "at": "2026-08-02T16:17:58Z"
+          "hash": "rvw1:sha256:abe09a2201535c5303c65b2a02eb8da47c376e89d799474ee873fa0666202ea7",
+          "at": "2026-08-03T09:34:22Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:03e10171eea4242772267e89b4384892e0fede44ff23804b36d3d9080ec9b6f0",
-          "at": "2026-08-02T16:22:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f394c6c5c9a538aed98bdd1683d9d95f0586c991d3e48d79854cde3e42f872ed",
-          "at": "2026-08-02T16:57:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f394c6c5c9a538aed98bdd1683d9d95f0586c991d3e48d79854cde3e42f872ed",
-          "at": "2026-08-02T16:59:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c3b5bb273d604cbfe25278d9369da375140c4bbb27e109233a76bb7b548d69d8",
-          "at": "2026-08-02T21:51:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`render_gate_error` writes the opaque infrastructure diagnostic verbatim to `CommandOutcome.stderr`. The filesystem adapters populate these messages with `path.display()` and OS error details, so failures can expose internal filesystem paths despite the briefing's sanitization requirement. Render stable user-facing messages and keep infrastructure diagnostics out of stderr.",
-              "severity": "P1",
-              "file": "apps/cli-driver/src/task_contract.rs",
-              "line": 180,
-              "category": "security"
-            },
-            {
-              "message": "The new service fakes only return `Ok` and do not record invocations. Consequently the added driver tests cover only `Ok(Blocked)` and do not verify either public variant's happy path, service-error mapping, translated command, or the required exactly-one-service invocation. Add recording or fail-on-call fakes plus `Passed` and `Err` cases for both `Check` and `Coverage`.",
-              "severity": "P1",
-              "file": "apps/cli-driver/src/task_contract.rs",
-              "line": 318,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:c3b5bb273d604cbfe25278d9369da375140c4bbb27e109233a76bb7b548d69d8",
-          "at": "2026-08-02T21:56:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4241b7c1e256339e6781fd344cc596bdc7f634f24a1cce0b91feaa7cd45b7019",
-          "at": "2026-08-02T22:01:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:722a9bf085c20c52f53f4ed41bebc2a0f177dd8c56e45d06f74f68d7464d900d",
-          "at": "2026-08-03T01:01:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:722a9bf085c20c52f53f4ed41bebc2a0f177dd8c56e45d06f74f68d7464d900d",
-          "at": "2026-08-03T01:07:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:30d1cd6e48fcab2d3c6a7682d71b9697685411fca00b99adf44eebcee676eb16",
-          "at": "2026-08-03T02:59:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:30d1cd6e48fcab2d3c6a7682d71b9697685411fca00b99adf44eebcee676eb16",
-          "at": "2026-08-03T03:01:19Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a72bdbc8c0b19cfa35ff11d0f8393a8adbc61bd3476c13b67e626128122702ba",
-          "at": "2026-08-01T17:05:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:574ba5aaad4fed230f791770efa34f5bddf85f72ed7ceeda6e8ec43d40c2faea",
-          "at": "2026-08-02T07:36:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:574ba5aaad4fed230f791770efa34f5bddf85f72ed7ceeda6e8ec43d40c2faea",
-          "at": "2026-08-02T07:40:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The public tuple variant permits constructing `PreReviewGateOutcome::Blocked(Vec::new())` directly, bypassing `blocked()` validation and violating the documented non-empty invariant. Use a private or validated payload representation.",
-              "severity": "P1",
-              "file": "libs/domain/src/task_contract.rs",
-              "line": 205,
-              "category": "typestate / invariant"
-            },
-            {
-              "message": "The public tuple variant permits constructing `CoverageVerifyOutcome::Blocked(Vec::new())` directly, bypassing `blocked()` validation and violating the documented non-empty invariant.",
-              "severity": "P1",
-              "file": "libs/domain/src/task_contract.rs",
-              "line": 242,
-              "category": "typestate / invariant"
-            }
-          ],
-          "hash": "rvw1:sha256:a682c3c861830b77350036dd612fd53d6ee8d2003dfb2443759995035dd34eda",
-          "at": "2026-08-02T16:17:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2f97b714242b000b578dcfe1d0edd693147837e273a94fd96bcf8f1748e2cd37",
-          "at": "2026-08-02T16:58:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2f97b714242b000b578dcfe1d0edd693147837e273a94fd96bcf8f1748e2cd37",
-          "at": "2026-08-02T17:18:04Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:431479782a2ad8acf702b7b9f350ef9a2a25fa43fe204d1cc0aa669a8b054f56",
-          "at": "2026-07-31T12:46:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:431479782a2ad8acf702b7b9f350ef9a2a25fa43fe204d1cc0aa669a8b054f56",
-          "at": "2026-07-31T13:29:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7e3c5f433acd849667bdca5be1283078cedc419d4272298bc059e78ef08c1d14",
-          "at": "2026-08-01T09:02:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7e3c5f433acd849667bdca5be1283078cedc419d4272298bc059e78ef08c1d14",
-          "at": "2026-08-01T09:05:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6c32fc04d55c32618447ead1ec8c6ce2a5b6ae13ed363f3a861f1062298667d0",
-          "at": "2026-08-01T10:28:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6c32fc04d55c32618447ead1ec8c6ce2a5b6ae13ed363f3a861f1062298667d0",
-          "at": "2026-08-01T10:29:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:af856c25a9d1e06461384023fb04a0db7d57e2047260ffdb7c66b950524e5a4b",
-          "at": "2026-08-01T23:42:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "GO-03 の reviewer 側 fail-closed 要求に acceptance coverage がない。AC-01 は phase command config の validation のみを対象とし、AC-05 は解決済み sequence の command が non-zero を返す場合しか検証しないため、空 argv・重複・再帰などを含む不正な `pre-review-gates.json` が reviewer 起動前に拒否されることを、どの AC も決定的に証明しない。したがって全 AC を満たしても reviewer 経路の無効な gate configuration が fail-open になり得る。",
-              "severity": "P1",
-              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-              "line": 36,
-              "category": "missing AC coverage for a stated goal"
-            }
-          ],
-          "hash": "rvw1:sha256:af856c25a9d1e06461384023fb04a0db7d57e2047260ffdb7c66b950524e5a4b",
-          "at": "2026-08-01T23:45:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "CN-01/CN-02 require an output upper bound, but specify neither its numeric/value contract nor how it is configured. Downstream implementation would have to invent the bound, so this constraint is not concrete enough to serve as a behavioral contract.",
-              "severity": "P1",
-              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-              "line": 242,
-              "category": "constraint vague or untestable"
-            },
-            {
-              "message": "AC-05 requires rejecting a “configured limit” violation and applicable review/phase-engine recursion, but the spec defines neither the configured limit nor a deterministic recursion condition. This leaves the acceptance test under-specified.",
-              "severity": "P1",
-              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-              "line": 362,
-              "category": "acceptance criterion non-observable"
-            }
-          ],
-          "hash": "rvw1:sha256:4c0e29c50c7b41b70acf97a4347f73a5e9abc58d02fac73f3a7ea7f7bf57ca66",
-          "at": "2026-08-01T23:49:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "OS-01 excludes implementing or reproducing `bin/sotp` subcommand grammar, but CN-01, AC-01, and AC-05 require the dispatcher to inspect exact `phase enter`/`review local`/`review fix-local` subcommand prefixes for recursion rejection. This is an internal scope contradiction that leaves the permitted boundary for recursion validation unclear.",
-              "severity": "P1",
-              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-              "line": 190,
-              "category": "out_of_scope leakage"
-            }
-          ],
-          "hash": "rvw1:sha256:957d9565601188c267111157810d8628eb9fae2f45e0529a15d60f09c519fa6b",
-          "at": "2026-08-01T23:54:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b3a86902b72eb25410ea31f14a8f5c56602ee1b7c4f593f423a9bd17f0c11e7d",
-          "at": "2026-08-01T23:57:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "GO-03 の fail-closed 要求は cross-dispatch recursion を検証できていない。AC-01 は phase config 内の `bin/sotp phase enter`、AC-05 は pre-review config 内の `bin/sotp review local|fix-local` だけを拒否するため、phase declaration が `bin/sotp review local` を起動し、その scope の pre-review config が `bin/sotp phase enter` を起動する循環は両方の validation を通過する。writer/reviewer 起動前に再帰を止めるという D5/GO-03 の要件を満たさず、nested dispatcher が fail-open に起動し得る。",
-              "severity": "P1",
-              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-              "line": 36,
-              "category": "missing AC coverage for a stated goal"
-            }
-          ],
-          "hash": "rvw1:sha256:b3a86902b72eb25410ea31f14a8f5c56602ee1b7c4f593f423a9bd17f0c11e7d",
-          "at": "2026-08-02T00:00:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0ad54ce6af2b50149ee5111d6116de9ece3aafa9a52ecd91a3d339245888f9c1",
-          "at": "2026-08-02T00:03:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0ad54ce6af2b50149ee5111d6116de9ece3aafa9a52ecd91a3d339245888f9c1",
-          "at": "2026-08-02T00:04:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bc739c5890cfbd21227fcbd15076dd9ffdb4522311fcc9bdc6069f8a7c7a55da",
-          "at": "2026-08-02T01:20:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bc739c5890cfbd21227fcbd15076dd9ffdb4522311fcc9bdc6069f8a7c7a55da",
-          "at": "2026-08-02T01:21:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-12 is not deterministically observable: “capability contract を保持できる provider-match” is undefined in this spec, so a test cannot determine which provider-match cases must permit in-host delegation or how to verify contract preservation.",
-              "severity": "P1",
-              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-              "line": 474,
-              "category": "acceptance criterion non-observable"
-            }
-          ],
-          "hash": "rvw1:sha256:2903b71dec244bf2ff8a82e90684821efdd1911b5b7143e5cd8618e58b67eb9f",
-          "at": "2026-08-03T01:35:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2725d2ebfeb62e660be7c21f44a1a5628197e095f4a931cdb9eed57ca58647f4",
-          "at": "2026-08-03T01:37:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-13 は configured writer の実行時 argv に `--host` を追加するよう要求していますが、IN-03、OS-01、AC-04 は phase engine/phase command による argv rewrite を例外なく禁止しています。引用 ADR D3 は host forwarding を旧 D1 の限定的例外としているため、現状では同じ実装に「argv を変更せよ」と「変更するな」を同時に要求しています。IN-03、OS-01、AC-04 に dispatch-boundary の例外を明記してください。",
-              "severity": "P1",
-              "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-              "line": 492,
-              "category": "scope / acceptance_criteria contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:2725d2ebfeb62e660be7c21f44a1a5628197e095f4a931cdb9eed57ca58647f4",
-          "at": "2026-08-03T01:41:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2cc968ec32b06b822e8f9ce2f14852b04ef9c29772e5823f790f7f47f29f23d8",
-          "at": "2026-08-03T01:44:45Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
-          "at": "2026-07-31T12:02:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
-          "at": "2026-07-31T12:07:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9d62f0bfd851f0143e534fdab30b4c815a35b0c4bfea98ad53bf233485334898",
-          "at": "2026-07-31T23:33:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9d62f0bfd851f0143e534fdab30b4c815a35b0c4bfea98ad53bf233485334898",
-          "at": "2026-07-31T23:37:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The singleton rule is internally contradictory: line 28 requires every other task “ready at that frontier” to be excluded by a dependency, but a ready task has no unmet dependency. This makes dependency an impossible singleton justification and prevents deterministic execution of the scheduling policy. Rephrase the exclusion over non-ready tasks or over the dependency frontier precisely.",
-              "severity": "P1",
-              "file": ".harness/capabilities/impl-planner.md",
-              "line": 28,
-              "category": "executable scheduling policy"
-            },
-            {
-              "message": "“Reasonable review headroom” is undefined in both the capability and reviewer policy, while the existing batch-plan schema exposes only declared estimates and resolved ceilings. This permits subjective serialization findings even when estimates fit the configured ceiling and gives no reproducible admission criterion. Define the term mechanically or remove it from the scheduling/review rule.",
-              "severity": "P1",
-              "file": ".harness/custom/review-prompts/impl-plan.md",
-              "line": 98,
-              "category": "executable scheduling policy"
-            }
-          ],
-          "hash": "rvw1:sha256:83086c78eb06661df638fc98fd6924fdf3d9e53cdc0384521daa1e4d098b93e8",
-          "at": "2026-08-01T06:56:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:16e4682ab3dc9ecc69110edf9a258942fe9b5475277aeb658f32ef1bfc250849",
-          "at": "2026-08-01T06:58:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:16e4682ab3dc9ecc69110edf9a258942fe9b5475277aeb658f32ef1bfc250849",
-          "at": "2026-08-01T07:05:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new eligibility rule requires every predecessor to complete before a task's batch, which forces each dependency frontier into a separate batch. This contradicts `knowledge/adr/2026-07-29-0358-task-dependency-declaration-and-batch-order-check.md` D2 and `.harness/workflows/track/full-cycle.md` Step 0b: dependencies may be in the same batch and are implemented there in dependency order before one review/commit. The reviewer prompt's “no declared dependency path” condition mirrors the contradiction, so it would exempt avoidable serialization of dependency chains. Allow dependency-ordered tasks to share a batch when ownership and ceilings permit.",
-              "severity": "P1",
-              "file": ".harness/capabilities/impl-planner.md",
-              "line": 102,
-              "category": "convention contradiction"
-            },
-            {
-              "message": "An indivisibility justification is not by itself a reason for exclusive batch membership. Under the existing batch-plan contract, it only exempts an over-ceiling task as the sole contributor to the exceeded scope; `knowledge/adr/2026-07-28-1521-scope-diff-ceiling-admission-enforcement.md` D1 explicitly permits that task to share a batch with tasks contributing only to other scopes. Treating “an indivisibility constraint” as sufficient for a singleton—and repeating that exemption in the reviewer prompt—accepts avoidable serialization despite compatible disjoint-scope work. Require an actual dependency, ownership conflict, or per-scope ceiling conflict instead.",
-              "severity": "P1",
-              "file": ".harness/capabilities/impl-planner.md",
-              "line": 28,
-              "category": "convention contradiction"
-            },
-            {
-              "message": "The prompt calls a batch whose estimate sum exceeds a resolved ceiling “structurally valid but semantically unsound,” but its own opening assigns this exact structural conformance check to `bin/sotp batch-plan check`. Such a batch cannot pass that gate, so this example crosses the documented mechanical-gate/reviewer boundary and makes the policy internally contradictory. Keep this reviewer category limited to semantic defects that can survive the structural gate.",
-              "severity": "P1",
-              "file": ".harness/custom/review-prompts/impl-plan.md",
-              "line": 90,
-              "category": "responsibility-boundary cross"
-            }
-          ],
-          "hash": "rvw1:sha256:16e4682ab3dc9ecc69110edf9a258942fe9b5475277aeb658f32ef1bfc250849",
-          "at": "2026-08-01T07:14:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The eligibility predicate requires every combined per-scope sum to remain within its ceiling, so a valid over-ceiling indivisible task can never share a batch with compatible work in a different scope. This contradicts line 28 and the sole-contributor exemption: the exceeded scope may remain over ceiling when the indivisible task is its only contributor. The reviewer prompt repeats the same strict predicate at line 98, making its later statement that indivisibility alone does not excuse serialization ineffective. Define feasibility as either within the ceiling or satisfying the existing per-scope sole-contributor exemption.",
-              "severity": "P1",
-              "file": ".harness/capabilities/impl-planner.md",
-              "line": 102,
-              "category": "convention contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:badd7f2e3fa4b3ea92a523ce096af1d59f9f1e4cd0f3b83e1eb60056ca68b166",
-          "at": "2026-08-01T07:19:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a2fbb41d98a430dae0a09c64db9808cb2e3b57804addbbab199dae3ca1403097",
-          "at": "2026-08-01T07:22:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The implementation-scope command entries invoke `signal calc-impl-catalog`, `signal check-impl-catalog`, and both task-contract commands without a `--track-id` (for example, lines 7–10). These commands resolve the active track from the current branch, while `bin/sotp review local` accepts an explicit `--track-id`; reviewing an explicit track from a non-track/base branch therefore runs the pre-review gates against the wrong track or fails closed.",
-              "severity": "P1",
-              "file": ".harness/config/pre-review-gates.json",
-              "line": 7,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:446779cfef266c89f3eb728ce942bf9a882ddd4e4488d533a62d19568e57a28a",
-          "at": "2026-08-02T15:24:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Implementation-scope entries invoke signal and task-contract commands without `--track-id` (for example, lines 7–10). When `bin/sotp review local` is given an explicit track ID from a non-track/base branch, these commands resolve the current branch instead and gate the wrong track or fail closed.",
-              "severity": "P1",
-              "file": ".harness/config/pre-review-gates.json",
-              "line": 7,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:446779cfef266c89f3eb728ce942bf9a882ddd4e4488d533a62d19568e57a28a",
-          "at": "2026-08-02T16:57:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:446779cfef266c89f3eb728ce942bf9a882ddd4e4488d533a62d19568e57a28a",
-          "at": "2026-08-02T17:16:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The three canonical writer argv declarations omit the currently required `--host <HOST>` argument. The public `bin/sotp capability exec` interface therefore rejects each command before dispatch. Since this file is now included in the template distribution, either land provider-neutral host resolution with this configuration or declare a valid host argument.",
-              "severity": "P1",
-              "file": ".harness/config/phase-commands.json",
-              "line": 7,
-              "category": "command wiring breakage"
-            },
-            {
-              "message": "`Among eligible compositions, minimize the number of ordered batches` imposes global optimization over all valid dependency/ownership/ceiling partitions. This conflicts with the companion reviewer policy, which explicitly forbids demanding globally optimal bin packing and only admits evidence-backed removable boundaries. Use the stated work-conserving, earliest-feasible rule and treat fewer batches as a preference, not an absolute optimum.",
-              "severity": "P1",
-              "file": ".harness/capabilities/impl-planner.md",
-              "line": 102,
-              "category": "policy inconsistency"
-            },
-            {
-              "message": "After removing `track-active-gate` from both review-wrapper dependencies, this description—and the corresponding claim in `track-commit-message`—still says review invocations share and depend on that gate. Reviews now run only the scope-specific CLI sequence, so `calc-catalog-spec`, catalogue checks, and `track views sync` are not supplied by `track-active-gate`. Update the remaining descriptions to reflect the thin-wrapper cutover or restore the wiring.",
-              "severity": "P1",
-              "file": "Makefile.toml",
-              "line": 798,
-              "category": "branch-wide consistency"
-            }
-          ],
-          "hash": "rvw1:sha256:446779cfef266c89f3eb728ce942bf9a882ddd4e4488d533a62d19568e57a28a",
-          "at": "2026-08-02T17:26:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The updated `track-local-review-fix` description claims that `bin/sotp review fix-local` dispatches the operator-owned pre-review command sequence, but the configured pre-review wrapper gates only `run_local`; `fix-local` bypasses that dispatcher. Removing the previous Makefile gate dependencies therefore leaves fixer rounds ungated while advertising the opposite behavior.",
-              "severity": "P1",
-              "file": "Makefile.toml",
-              "line": 874,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:0efef4620a3e29360b56fc4b2fb2c3cbd10af743574956670712ad9a6ef43431",
-          "at": "2026-08-02T17:31:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:132a2a2880c78e5d6bb236bb3641ac1a74e3edf6dbf9146f729b97eeeec4863d",
-          "at": "2026-08-02T17:32:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`track-active-gate` still claims that both commit and review invocations depend on it, but the review wrappers no longer declare that dependency and `track-commit-message` now explicitly calls regeneration commit-only. This leaves the documented pre-review wiring internally contradictory; describe this gate as commit-only.",
-              "severity": "P1",
-              "file": "Makefile.toml",
-              "line": 798,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:132a2a2880c78e5d6bb236bb3641ac1a74e3edf6dbf9146f729b97eeeec4863d",
-          "at": "2026-08-02T17:35:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The added “For implementation reviews…” paragraph puts exact gate ownership and command ordering under `.harness/custom`, which the harness-policy boundary reserves for consumer-customizable severity preferences—not framework review/gate methodology. It also duplicates the framework-owned sequence already stated in `impl-planner.md`. Keep only the reviewer-lane consequence here and leave sequencing in a framework-owned capability/workflow SSoT.",
-              "severity": "P1",
-              "file": ".harness/custom/review-prompts/impl-plan.md",
-              "line": 18,
-              "category": "responsibility-boundary cross"
-            },
-            {
-              "message": "Making `track-active-gate` commit-only removes `track views sync` from review rounds, while `.harness/workflows/track/review.md` still requires shared rendered views to be refreshed per invocation and the fixer prompt explicitly forbids invoking view sync because it assumes this wrapper does so. After fixer edits, reviewers can therefore receive stale `*-types.md` context. Preserve view synchronization in the review path or update the workflow and fixer contract coherently.",
-              "severity": "P1",
-              "file": "Makefile.toml",
-              "line": 798,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:2a41dce892038968761c72761b5111ecc4ef0d004e5eab866397f221108c167a",
-          "at": "2026-08-02T17:45:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Both review wrappers unconditionally run `track-active-gate` before their scripts, so its fail-closed impl/catalogue/lint commands execute before the CLI can resolve the scope or reject an explicit-track/branch mismatch. Consequently scopes with an empty matrix (`spec`, `impl-plan`, `harness-policy`, `other`, etc.) are not actually gate-free, and a mismatched invocation can mutate/gate the branch before dispatcher rejection. Move reviewer-context refresh behind scope/track dispatch without reintroducing unconditional gates.",
-              "severity": "P1",
-              "file": "Makefile.toml",
-              "line": 870,
-              "category": "command wiring breakage"
-            },
-            {
-              "message": "`track-commit-message` says the `track-active-gate` regeneration is commit-only, but both review wrappers depend on that same task and its own description explicitly says it is shared with reviews. Correct this factual wiring contradiction once the intended review dependency is settled.",
-              "severity": "P1",
-              "file": "Makefile.toml",
-              "line": 937,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:e8f3cd3b6198881397ef4697a8d10a9e2d7b2e7bf44aae444f89a693bb2b63e2",
-          "at": "2026-08-02T17:50:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`track-local-review-fix` now only executes `bin/sotp review fix-local`; removing its former gate dependencies means no pre-review command sequence runs before the fixer. The description’s claim that gating is dispatched by `bin/sotp review local` “inside the fix loop” is not implemented by this wrapper, while the review workflow requires the fixer wrapper itself to perform the refresh and task-contract gate.",
-              "severity": "P1",
-              "file": "Makefile.toml",
-              "line": 876,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:0c501c0e6ad6ca3811789c0419971356ef1f01aaab69f677b9a9d85cf4d6a58b",
-          "at": "2026-08-02T17:54:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "After the wrapper was changed to delegate directly without `track-active-gate`, this statement is no longer true: “the wrapper refreshes them at each invocation.” The scope-resolved pre-review commands only recalculate/check impl-catalog and task-contract data; they do not refresh rendered views or the other artifacts produced by `track-active-gate`, so fixer/reviewer rounds can consume stale operational artifacts.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/review.md",
-              "line": 183,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:5bfca0ff8f9db412e470498ece49369cb962f65eb9c967f46d52b4a73d6c8e2f",
-          "at": "2026-08-02T17:56:57Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:039aafa63abc32c6a203e12ed517b76902dd5757bb7e0a3438ca320a919fa53d",
-          "at": "2026-08-02T17:58:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new per-fixer view refresh is not executable on the default Codex route. The active `review-fix-lead` profile uses Codex, `.codex/rules/default.rules` does not allow bare `bin/sotp track views sync`, and the fixer runner still explicitly assumes that command must not be issued because the wrapper handles it. After removing the wrapper dependency, required rendered-view refreshes can therefore be denied or omitted, leaving later reviewers with stale context. Provide an allowed operator-owned refresh route and update the runner contract coherently.",
-              "severity": "P1",
-              "file": ".harness/capabilities/review-fix-lead.md",
-              "line": 91,
-              "category": "command wiring breakage"
-            },
-            {
-              "message": "`track-active-gate` still claims that review wrappers depend on it, but both wrappers now carry no dependency and `track-commit-message` explicitly describes the regeneration as commit-only. Correct this factual wiring contradiction.",
-              "severity": "P1",
-              "file": "Makefile.toml",
-              "line": 798,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:039aafa63abc32c6a203e12ed517b76902dd5757bb7e0a3438ca320a919fa53d",
-          "at": "2026-08-02T18:02:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new Codex refresh route is described as allowed, but the active Codex fixer cannot invoke it headlessly: `.codex/rules/default.rules` permits the review wrappers but has no rule for `cargo make track-views-sync` (`codex execpolicy check` reports no matching decision), and `.codex/instructions.md` omits it from the command policy. A fixer needing fresh views between rounds will therefore block instead of completing the documented workflow. Add the wrapper to the Codex command-policy surfaces or use an already permitted route.",
-              "severity": "P1",
-              "file": ".harness/briefings/review-fix-lead-codex.md",
-              "line": 75,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:4506feb342435e33c289e67917957af85e0c488f30f2fe264fe2a26d4eaecc5a",
-          "at": "2026-08-02T18:13:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Each implementation review now runs four sequential commands that may each consume 3,600 seconds before the 1,800-second reviewer, but the review-fix-lead contract still says an outer shell timeout of 1,920,000 ms (32 minutes) is sufficient. A gate can therefore be killed by the fixer while still within its declared timeout, leaving no review round recorded. Align the outer invocation timeout with the cumulative command and reviewer budgets, or reduce the configured command timeouts.",
-              "severity": "P1",
-              "file": ".harness/config/pre-review-gates.json",
-              "line": 7,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:e251514793ccfcf62ef926ee37be8fba410a50d3a28a90164c6bc1cb030c7194",
-          "at": "2026-08-02T18:18:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:78c2d60b3d5a2f845d5c34d22b06987d8364c782dd03513b80913faf01510aad",
-          "at": "2026-08-02T18:22:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1d7b810bbc6ce3de18cd3c37c0c3797358b48c0892f70f12782919f38577073c",
-          "at": "2026-08-02T21:28:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1d7b810bbc6ce3de18cd3c37c0c3797358b48c0892f70f12782919f38577073c",
-          "at": "2026-08-02T21:32:50Z"
+          "hash": "rvw1:sha256:abe09a2201535c5303c65b2a02eb8da47c376e89d799474ee873fa0666202ea7",
+          "at": "2026-08-03T09:38:14Z"
         }
       ]
     },
@@ -3752,6 +3595,20 @@
           "findings": [],
           "hash": "rvw1:sha256:654a45267a481acde6b6b9cb23b71a4e801dbb9534d2da01fc75b4d89da52666",
           "at": "2026-08-03T08:03:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4520c865940ac013e75b3f381205ede8be0b0f11d77ffaa86f19601a5a130b8a",
+          "at": "2026-08-03T09:34:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4520c865940ac013e75b3f381205ede8be0b0f11d77ffaa86f19601a5a130b8a",
+          "at": "2026-08-03T09:36:52Z"
         }
       ]
     },
@@ -5187,6 +5044,191 @@
           "findings": [],
           "hash": "rvw1:sha256:76e0cf0c34fb13d3551c60ca04bc88645e762271dab65f5075d7a8a47c908f50",
           "at": "2026-08-03T08:55:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c1d07bf18160ed498920335573e8027c6bc401b79efb216cb56b81597c74d9f",
+          "at": "2026-08-03T09:33:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c1d07bf18160ed498920335573e8027c6bc401b79efb216cb56b81597c74d9f",
+          "at": "2026-08-03T09:37:50Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:324adbdf67c8e139f034ccf08288be93375905e70134d9c011061bea4a075bf2",
+          "at": "2026-07-31T11:21:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:324adbdf67c8e139f034ccf08288be93375905e70134d9c011061bea4a075bf2",
+          "at": "2026-07-31T11:24:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0fdb687eae29921dcb294481fdc12d29f8cd6fe47f3a2f1f77a76930f863c89f",
+          "at": "2026-07-31T11:31:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0fdb687eae29921dcb294481fdc12d29f8cd6fe47f3a2f1f77a76930f863c89f",
+          "at": "2026-07-31T11:33:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D4 embeds workflow procedure rather than only recording the lifecycle decision: stopping the task, having impl-planner edit both artifacts, rerunning named checks, and sequencing implementation review are downstream workflow/capability details. Removing lines 88–91 would preserve the decision that a restored carrier must become stale and be removed before settlement; delegate this procedure to the applicable workflow SSoT.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-08-01-1749-source-only-baseline-restoration-carrier.md",
+              "line": 88,
+              "category": "scope leakage into ADR body"
+            },
+            {
+              "message": "The Validation Strategy is an operational test matrix with fixture cases, round-trip checks, and named gate assertions. Removing lines 128–139 leaves D1–D4 unchanged, so this detail obscures the recorded decisions and belongs in the implementation/test contract rather than the ADR.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-08-01-1749-source-only-baseline-restoration-carrier.md",
+              "line": 128,
+              "category": "decision obscured by excess detail"
+            }
+          ],
+          "hash": "rvw1:sha256:3fba0818bf0341dd168c971048a578cee05afabf6949c14f91fe4f4a86b1da7a",
+          "at": "2026-08-01T09:58:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7fcc56e3fbf0e713c6092bf2d07dd5fd98f8e40c97eb041eb991e5063b943261",
+          "at": "2026-08-01T10:05:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7fcc56e3fbf0e713c6092bf2d07dd5fd98f8e40c97eb041eb991e5063b943261",
+          "at": "2026-08-01T10:08:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:40568f1efe56d603ebb5abeb01ec3c36bd3404f4c3560914af3695e55d1118ac",
+          "at": "2026-08-01T23:16:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:40568f1efe56d603ebb5abeb01ec3c36bd3404f4c3560914af3695e55d1118ac",
+          "at": "2026-08-01T23:19:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:70d76ae6c4b40d56861850865416b170abfdf237734bcaea68c53582ac838357",
+          "at": "2026-08-01T23:36:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:70d76ae6c4b40d56861850865416b170abfdf237734bcaea68c53582ac838357",
+          "at": "2026-08-01T23:39:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fca6b4c8c7da5433e26d7023918eb029c1c29a73eef5955b30b0f81f960448c0",
+          "at": "2026-08-03T02:59:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fca6b4c8c7da5433e26d7023918eb029c1c29a73eef5955b30b0f81f960448c0",
+          "at": "2026-08-03T03:02:02Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a72bdbc8c0b19cfa35ff11d0f8393a8adbc61bd3476c13b67e626128122702ba",
+          "at": "2026-08-01T17:05:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:574ba5aaad4fed230f791770efa34f5bddf85f72ed7ceeda6e8ec43d40c2faea",
+          "at": "2026-08-02T07:36:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:574ba5aaad4fed230f791770efa34f5bddf85f72ed7ceeda6e8ec43d40c2faea",
+          "at": "2026-08-02T07:40:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The public tuple variant permits constructing `PreReviewGateOutcome::Blocked(Vec::new())` directly, bypassing `blocked()` validation and violating the documented non-empty invariant. Use a private or validated payload representation.",
+              "severity": "P1",
+              "file": "libs/domain/src/task_contract.rs",
+              "line": 205,
+              "category": "typestate / invariant"
+            },
+            {
+              "message": "The public tuple variant permits constructing `CoverageVerifyOutcome::Blocked(Vec::new())` directly, bypassing `blocked()` validation and violating the documented non-empty invariant.",
+              "severity": "P1",
+              "file": "libs/domain/src/task_contract.rs",
+              "line": 242,
+              "category": "typestate / invariant"
+            }
+          ],
+          "hash": "rvw1:sha256:a682c3c861830b77350036dd612fd53d6ee8d2003dfb2443759995035dd34eda",
+          "at": "2026-08-02T16:17:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2f97b714242b000b578dcfe1d0edd693147837e273a94fd96bcf8f1748e2cd37",
+          "at": "2026-08-02T16:58:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2f97b714242b000b578dcfe1d0edd693147837e273a94fd96bcf8f1748e2cd37",
+          "at": "2026-08-02T17:18:04Z"
         }
       ]
     },
@@ -5854,6 +5896,20 @@
           "findings": [],
           "hash": "rvw1:sha256:689cae610b1bf41be589bfb4df85d46d295fdd681afec345e9f61ddb4c801303",
           "at": "2026-08-03T08:56:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:36c212fb46e0c70a3420ebcd134471d5a09e9c23d08d6bced20217d457dd7c1c",
+          "at": "2026-08-03T09:34:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:36c212fb46e0c70a3420ebcd134471d5a09e9c23d08d6bced20217d457dd7c1c",
+          "at": "2026-08-03T09:38:12Z"
         }
       ]
     }
