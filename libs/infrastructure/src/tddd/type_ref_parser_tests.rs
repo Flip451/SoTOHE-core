@@ -141,6 +141,22 @@ fn test_parse_type_ref_const_negative_integer_argument_preserves_literal() {
 }
 
 #[test]
+fn test_parse_type_ref_const_suffixed_integer_argument_preserves_literal() {
+    let ty = parse("Marker<3usize>");
+    let Type::ResolvedPath(path) = ty else {
+        panic!("expected Marker resolved path");
+    };
+    let Some(GenericArgs::AngleBracketed { args, .. }) = path.args.as_deref() else {
+        panic!("expected angle-bracketed arguments");
+    };
+    let Some(GenericArg::Const(constant)) = args.first() else {
+        panic!("expected const integer argument");
+    };
+    assert_eq!(constant.expr, "3usize");
+    assert!(constant.is_literal, "suffixed integer literals must retain rustdoc's literal flag");
+}
+
+#[test]
 fn test_parse_type_ref_nested_dyn_trait_preserves_hrtb_binder() {
     let ty = parse("Box<dyn for<'a> Fn(&'a str)>");
     let Type::ResolvedPath(path) = ty else {

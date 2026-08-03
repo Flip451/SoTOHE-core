@@ -244,7 +244,7 @@ pub(crate) fn core_canonical_path(short_name: &str) -> String {
 pub(crate) fn syn_expr_to_string(expr: &syn::Expr) -> String {
     match expr {
         syn::Expr::Lit(lit_expr) => match &lit_expr.lit {
-            syn::Lit::Int(i) => i.base10_digits().to_string(),
+            syn::Lit::Int(i) => i.to_token_stream().to_string().replace("- ", "-"),
             syn::Lit::Str(s) => s.value(),
             syn::Lit::Bool(b) => b.value().to_string(),
             syn::Lit::Char(c) => format!("{:?}", c.value()),
@@ -325,7 +325,7 @@ fn evaluate_usize_const_expr(expr: &syn::Expr) -> Option<usize> {
 pub(super) fn expr_to_token_string(expr: &syn::Expr) -> String {
     match expr {
         syn::Expr::Lit(lit_expr) => match &lit_expr.lit {
-            syn::Lit::Int(i) => i.base10_digits().to_string(),
+            syn::Lit::Int(i) => i.to_token_stream().to_string().replace("- ", "-"),
             syn::Lit::Str(s) => format!("{:?}", s.value()),
             syn::Lit::Bool(b) => b.value().to_string(),
             syn::Lit::Char(c) => format!("{:?}", c.value()),
