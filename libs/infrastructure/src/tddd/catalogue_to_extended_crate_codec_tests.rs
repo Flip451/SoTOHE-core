@@ -1132,6 +1132,122 @@ fn test_encode_type_alias_generic_bound_preserves_catalogue_spelling() {
 }
 
 #[test]
+fn test_encode_type_alias_where_subject_preserves_catalogue_spelling() {
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        TypeName::new("Alias").unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::TypeAlias {
+                target: TypeRef::new("T").unwrap(),
+                generics: vec![MethodGenericParam {
+                    name: ParamName::new("T").unwrap(),
+                    bounds: vec![],
+                }],
+            },
+            vec![],
+            vec![],
+            vec![WherePredicateDecl {
+                lhs: TypeRef::new("Vec<T>").unwrap(),
+                rhs: vec![TypeRef::new("Clone").unwrap()],
+                operator: BoundOp::Bound,
+            }],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let alias = ec.krate().index.values().find(|item| {
+        item.name.as_deref() == Some("Alias") && matches!(item.inner, ItemEnum::TypeAlias(_))
+    });
+    let ItemEnum::TypeAlias(ref ta) = alias.expect("expected TypeAlias").inner else {
+        panic!("expected TypeAlias")
+    };
+    let Some(WherePredicate::BoundPredicate { type_, .. }) = ta.generics.where_predicates.first()
+    else {
+        panic!("expected alias where predicate")
+    };
+    let Type::ResolvedPath(path) = type_ else {
+        panic!("expected resolved Vec<T> where subject, got {type_:?}")
+    };
+    assert_eq!(path.path, "Vec");
+    assert!(path.args.is_some(), "expected generic argument T on Vec<T>");
+}
+
+#[test]
+fn test_encode_type_alias_where_subject_rejects_unsupported_array_lengths() {
+    for lhs in ["[u8; LEN]", "[u8; 1 as usize]"] {
+        let mut doc = make_doc("domain");
+        doc.insert_type(
+            TypeName::new("Alias").unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::TypeAlias {
+                    target: TypeRef::new("u8").unwrap(),
+                    generics: vec![MethodGenericParam {
+                        name: ParamName::new("T").unwrap(),
+                        bounds: vec![],
+                    }],
+                },
+                vec![],
+                vec![],
+                vec![WherePredicateDecl {
+                    lhs: TypeRef::new(lhs).unwrap(),
+                    rhs: vec![TypeRef::new("Clone").unwrap()],
+                    operator: BoundOp::Bound,
+                }],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let error = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap_err();
+        assert!(
+            matches!(error, domain::tddd::NewTypeGraphCodecError::InvalidTypeRef(_)),
+            "unsupported lexical array length should be rejected: {lhs}: {error:?}"
+        );
+    }
+}
+
+#[test]
+fn test_encode_legacy_type_alias_where_subject_accepts_array_lengths() {
+    for lhs in ["[u8; LEN]", "[u8; 1 as usize]"] {
+        let mut doc = make_doc("domain");
+        doc.insert_type(
+            TypeName::new("Alias").unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::TypeAlias { target: TypeRef::new("u8").unwrap(), generics: vec![] },
+                vec![],
+                vec![],
+                vec![WherePredicateDecl {
+                    lhs: TypeRef::new(lhs).unwrap(),
+                    rhs: vec![TypeRef::new("Clone").unwrap()],
+                    operator: BoundOp::Bound,
+                }],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        assert!(
+            CatalogueToExtendedCrateCodec::new().encode(doc).is_ok(),
+            "legacy alias where subject should remain accepted: {lhs}"
+        );
+    }
+}
+
+#[test]
 fn test_encode_type_alias_generic_maybe_const_bound_preserves_catalogue_spelling() {
     let mut doc = make_doc("domain");
     doc.insert_type(

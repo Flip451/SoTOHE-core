@@ -3590,6 +3590,198 @@
           "hash": "rvw1:sha256:9c39aa63ca88fa5c93f9d662a90f2078270b8da4f1fa56012541e7a6c4818f63",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T17:03:39Z",
+          "findings": [
+            {
+              "category": "codec symmetry",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_core.rs",
+              "line": 170,
+              "message": "The new preserving parser rejects named or non-lexical array lengths such as `[u8; LEN]` and `[u8; 1 as usize]`, while the type-alias document validator explicitly accepts array-length syntax. A catalogue can therefore decode successfully but fail during extended-crate encoding, also regressing previously accepted non-generic aliases. Align validation with this stricter parser or preserve the accepted forms during encoding.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d68ca2372bed08d5896d31e6fb02d709824f0a7e6d35895745a18bec288bfa50",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T17:13:38Z",
+          "findings": [
+            {
+              "category": "fingerprint/structural comparison drift",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 141,
+              "message": "Disabling the array-length guard for the lexical alias path admits expressions the renderer cannot preserve. For example, an accepted subject such as `[u8; std::mem::size_of::<u32>()]` reaches `array_len_to_string`, whose fallback renders the call as `<const_expr>`; distinct expressions therefore collapse to the same catalogue-side representation or fail to match rustdoc's normalized length. This can hide an alias where-clause mismatch or reject an identical declaration. Reject unsupported forms consistently at the document boundary, or render them losslessly instead of bypassing the guard wholesale.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:81d02f731a41651ed8552c36bf79efd8fdf25e37217351663439abdfbaeef7cb",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T17:21:42Z",
+          "findings": [
+            {
+              "category": "backward compatibility / codec correctness",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/validate.rs",
+              "line": 94,
+              "message": "This lexical validator is applied to every type alias, including legacy aliases with no generic declaration. It now rejects previously accepted where-clause types such as `[u8; LEN]` and `[u8; 1 as usize]`; the added regression test explicitly uses `generics: []` and expects that new failure. Existing non-generic catalogue documents can therefore stop decoding, contradicting the briefing’s compatibility requirement and the prior syn-parseable acceptance rule. Limit the new lexical restriction to aliases opting into the generic contract, or provide lossless handling without narrowing legacy inputs.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a241aa3bdbf8647dfd308ca7fc21b09615a3aa9009b8f9a815c1b7708b3bb6e2",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T17:34:35Z",
+          "findings": [
+            {
+              "category": "backward_compatibility",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/validate.rs",
+              "line": 96,
+              "message": "When `generic_params` is empty, this still uses the new fail-closed validator rather than the legacy `syn::Type` gate. `validate_const_arguments_in_type_ref` rejects type-position macros such as `type_macro!()`, while the non-preserving encoder accepts them, so previously accepted non-generic alias predicates now fail document decoding despite the compatibility requirement. Restore the legacy validation path for non-generic aliases or make both codec directions enforce the same contract.",
+              "severity": "P1"
+            },
+            {
+              "category": "codec_symmetry",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 174,
+              "message": "`validate_lexical_generic_bound` passes `~const Clone` directly to `syn::TypeParamBound`, which rejects this syntax, while the encoder explicitly strips `~const` and emits `TraitBoundModifier::MaybeConst`. Consequently, an alias bound supported by the encoder and its new test cannot enter through the document codec. Mirror the encoder's `~const` handling in this validation path.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b74cc26598c86d46fa7d36c9d78b2191e7b1977c8c1fab57bc1105d3e40d36e1",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T17:39:52Z",
+          "findings": [
+            {
+              "category": "codec_symmetry",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/validate.rs",
+              "line": 96,
+              "message": "The no-generics branch now performs only `syn::Type` validation, but the corresponding non-preserving encoder still unconditionally rejects anonymous const blocks. A legacy alias predicate such as `Foo<{ 1 + 2 }>: Clone` therefore passes document decoding and then fails extended-crate encoding. Use the same validation gate in both directions or restore the legacy encoder behavior.",
+              "severity": "P1"
+            },
+            {
+              "category": "codec_symmetry",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/validate.rs",
+              "line": 129,
+              "message": "Alias targets are validated with `validate_const_arguments_in_type_ref`, which rejects type-position macros, while the general target encoder accepts such syntax on its non-preserving path. Consequently `type Alias = make_type!()` is rejected through JSON decoding but accepted from an in-memory catalogue, violating the required codec symmetry and legacy behavior.",
+              "severity": "P1"
+            },
+            {
+              "category": "input_validation",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 174,
+              "message": "After stripping `~const`, this accepts every `TypeParamBound`, including lifetimes, precise captures, and `?` bounds, while the encoder's `~const` branch requires the remainder to encode as a resolved trait path. For example, `~const 'static` passes document validation but fails encoding. Require a trait-path bound after stripping the modifier so both boundaries accept the same inputs.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:87dda19d44358e03d4c0c4d5cd56e7fa44dd4f13560886a958114cee653073d4",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T17:49:04Z",
+          "findings": [
+            {
+              "category": "codec_symmetry",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 186,
+              "message": "`~const T` passes document validation when `T` is a declared alias generic: `syn` represents it as an unqualified path here. During encoding, however, the same name resolves to `Type::Generic(\"T\")`, while the `~const` encoder accepts only `Type::ResolvedPath`, so a successfully decoded catalogue later fails to encode. Make this validator reject generic-rooted `~const` paths (including projections), or share the encoder’s representability check.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:bc39bb88f1c61c77cecc0507dd32c8ff799724a935791e793141ed494dc8d296",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T17:56:39Z",
+          "findings": [
+            {
+              "category": "codec_symmetry",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 186,
+              "message": "The `~const` gate still accepts primitive paths such as `~const u8`: `syn` represents `u8` as an unqualified `Type::Path`, but the encoder converts it to `Type::Primitive` and rejects it because `~const` requires `Type::ResolvedPath`. Thus a catalogue can decode successfully and then fail during encoding. Reject primitive roots or share the encoder's representability check.",
+              "severity": "P1"
+            },
+            {
+              "category": "codec_symmetry",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 194,
+              "message": "The generic-root rejection ignores an absolute path's leading `::`. With a declared generic named `std`, the valid bound `~const ::std::marker::Send` is rejected here because its first segment matches the generic, although the encoder treats this multi-segment absolute path as `Type::ResolvedPath` and accepts it. Apply generic-root rejection only to paths the encoder actually resolves as generic projections.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:94ef737195dd52703a2f32d543bcaa32ca7b3194c47a3a62aa06aca750696afa",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T18:03:06Z",
+          "findings": [
+            {
+              "category": "codec_symmetry",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/validate.rs",
+              "line": 39,
+              "message": "Alias `~const` bounds cannot pass document decoding. Generic and where-predicate DTO conversion first calls this general validator, which sends the raw `~const Clone` string to `syn::TypeParamBound`; stable syn rejects that syntax before the later alias-specific `validate_lexical_generic_bound` can strip the prefix. Consequently the encoder supports a bound that the document codec cannot decode. Route alias bounds directly through the lexical validator or teach this initial boundary about `~const`.",
+              "severity": "P1"
+            },
+            {
+              "category": "codec_symmetry",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 194,
+              "message": "The `leading_colon` exemptions still admit single-segment paths that the encoder rejects. For example, `~const ::u8` passes this validator because the primitive check is skipped, but the type parser converts it to `Type::Primitive` and the `~const` encoder requires `Type::ResolvedPath`; similarly `~const ::T` becomes `Type::Generic` when `T` is declared. Restrict the exemption to multi-segment absolute paths or use the encoder's representability check.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1ac303b444870764e627f6f666d8ee8fe3d6014ae1d591db37f0e7e5dca56b8e",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T18:09:02Z",
+          "findings": [
+            {
+              "category": "codec_symmetry",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/validate.rs",
+              "line": 39,
+              "message": "The new global `~const` fast path sends every generic bound through the alias-specific lexical validator. That validator rejects shapes such as named or complex array lengths, so a previously supported non-alias declaration like `~const Trait<[u8; LEN]>` now fails document decoding even though the general encoder accepts the same syn-parseable bound. Keep early DTO validation limited to the general `~const` shape and apply the stricter lexical validation only to aliases.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:921e04592992b60fbe85a4ca3d41e14aac5f5861232d4d697dcf64b05064b2e6",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T18:15:50Z",
+          "findings": [
+            {
+              "category": "codec_symmetry",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 216,
+              "message": "`validate_maybe_const_bound` accepts anonymous const blocks nested in a non-alias `~const` trait path, such as `~const Trait<{ 1 + 2 }>`, and therefore the document decoder accepts the bound. The general encoder subsequently parses the inner path through `parse_type_ref_with_generics_inner`, which always rejects anonymous const blocks, so the same document fails during extended-crate encoding. Apply the general anonymous-const rejection in this validator while leaving the alias-only macro/array/const restrictions separate.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9e6a97332a313155eebb519b32be9263e6c7b72ce2628c9d7bfa287218558a65",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T18:19:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:59b1b66008be18afad441ac0451d3874a04b90788c8c4d56b299904e922793e9",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },

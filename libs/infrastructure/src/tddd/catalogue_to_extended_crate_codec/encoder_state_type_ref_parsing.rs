@@ -264,6 +264,15 @@ impl EncoderState {
         self.parse_type_ref_str_inner(type_ref_str, generic_params, &[])
     }
 
+    /// Parses a type reference while preserving the source spelling of std-prelude paths.
+    pub(super) fn parse_type_ref_str_with_generics_preserving_spelling(
+        &mut self,
+        type_ref_str: &str,
+        generic_params: &[&str],
+    ) -> Result<Type, CatalogueToExtendedCrateCodecError> {
+        self.parse_type_ref_str_inner_with_prelude_spelling(type_ref_str, generic_params, &[], true)
+    }
+
     pub(super) fn parse_type_ref_str_with_suppressed_external_prefixes(
         &mut self,
         type_ref_str: &str,

@@ -5,7 +5,7 @@ use std::collections::HashMap;
 use rustdoc_types::{GenericBound, Id, Path, TraitBoundModifier, Type};
 use syn::visit::Visit;
 
-use super::constants::UNRESOLVED_CRATE_ID;
+use super::constants::{PRIMITIVE_TYPES, UNRESOLVED_CRATE_ID};
 use super::generic_tokens;
 use super::parse_ctx::{ParseCtx, bound_lifetimes_to_generic_params};
 use super::precise_capture::convert_precise_capture;
@@ -130,11 +130,23 @@ pub(crate) fn parse_syn_type_param_bound(type_ref_str: &str) -> syn::Result<syn:
     syn::parse_str(type_ref_str)
 }
 
-/// Validates a type reference while checking const-generic arguments whose
-/// renderer would otherwise collapse to `<const_expr>`.  Array-length syntax
-/// is intentionally not restricted here because ordinary where-clause type
-/// positions use the general array renderer.
-pub(crate) fn validate_const_arguments_in_type_ref(
+/// Validates the legacy type-position contract: ordinary `syn::Type` syntax
+/// remains accepted, while anonymous const blocks are rejected because the
+/// encoder cannot retain their expression identity.
+pub(crate) fn validate_legacy_type_ref(
+    type_ref_str: &str,
+    generic_params: &[&str],
+) -> Result<(), String> {
+    validate_generic_identifier_ambiguities(type_ref_str, generic_params)?;
+    let syntax: syn::Type = syn::parse_str(type_ref_str)
+        .map_err(|e| format!("invalid type syntax '{type_ref_str}': {e}"))?;
+    reject_anonymous_const_blocks_in_type(&syntax)
+}
+
+/// Validates a type reference for lexical comparison. Unlike the general type
+/// validator, this also rejects array-length expressions that cannot be matched
+/// safely against rustdoc's normalized representation.
+pub(crate) fn validate_lexical_type_ref(
     type_ref_str: &str,
     generic_params: &[&str],
 ) -> Result<(), String> {
@@ -143,7 +155,66 @@ pub(crate) fn validate_const_arguments_in_type_ref(
         .map_err(|e| format!("invalid type syntax '{type_ref_str}': {e}"))?;
     reject_anonymous_const_blocks_in_type(&syntax)?;
     reject_unsupported_type_macros_in_type(&syntax)?;
+    reject_unsupported_array_lengths_in_type(&syntax)?;
     reject_unsupported_const_arguments_in_type(&syntax)
+}
+
+/// Validates the representable shape of a `~const` bound without imposing the
+/// lexical renderer's stricter nested-expression rules. This shared gate is
+/// used before alias-specific validation so non-alias bounds retain their
+/// historical acceptance of syn-parseable generic arguments.
+pub(crate) fn validate_maybe_const_bound(
+    bound_str: &str,
+    generic_params: &[&str],
+) -> Result<(), String> {
+    validate_generic_identifier_ambiguities(bound_str, generic_params)?;
+    let syntax_str = bound_str
+        .strip_prefix("~const ")
+        .ok_or_else(|| "missing `~const` bound modifier".to_owned())?
+        .trim_start();
+    let syn_bound: syn::TypeParamBound = syn::parse_str(syntax_str)
+        .map_err(|e| format!("invalid bound syntax '{bound_str}': {e}"))?;
+    reject_anonymous_const_blocks_in_bound(&syn_bound)?;
+    let is_plain_trait = matches!(
+        syn_bound,
+        syn::TypeParamBound::Trait(trait_bound)
+            if matches!(trait_bound.modifier, syn::TraitBoundModifier::None)
+    );
+    if !is_plain_trait {
+        return Err(
+            "`~const` must prefix a plain trait path supported by the lexical encoder".to_owned()
+        );
+    }
+    let syn::Type::Path(type_path) = syn::parse_str(syntax_str)
+        .map_err(|e| format!("invalid `~const` trait path '{bound_str}': {e}"))?
+    else {
+        return Err(
+            "`~const` must prefix a plain trait path supported by the lexical encoder".to_owned()
+        );
+    };
+    if type_path.qself.is_some() {
+        return Err(
+            "`~const` must prefix a plain trait path supported by the lexical encoder".to_owned()
+        );
+    }
+    if (type_path.path.leading_colon.is_none() || type_path.path.segments.len() == 1)
+        && type_path.path.segments.first().is_some_and(|segment| {
+            let name = segment.ident.to_string();
+            generic_params.iter().any(|generic| *generic == name)
+        })
+    {
+        return Err("`~const` cannot be rooted at a declared generic parameter".to_owned());
+    }
+    if type_path.path.segments.len() == 1
+        && type_path
+            .path
+            .segments
+            .first()
+            .is_some_and(|segment| PRIMITIVE_TYPES.contains(&segment.ident.to_string().as_str()))
+    {
+        return Err("`~const` must prefix a trait path, not a primitive type".to_owned());
+    }
+    Ok(())
 }
 
 /// Validates a generic bound for the lexical alias-comparison path without
@@ -155,8 +226,12 @@ pub(crate) fn validate_lexical_generic_bound(
     generic_params: &[&str],
 ) -> Result<(), String> {
     validate_generic_identifier_ambiguities(bound_str, generic_params)?;
-    let syn_bound: syn::TypeParamBound = syn::parse_str(bound_str)
+    let syntax_str = bound_str.strip_prefix("~const ").map_or(bound_str, str::trim_start);
+    let syn_bound: syn::TypeParamBound = syn::parse_str(syntax_str)
         .map_err(|e| format!("invalid bound syntax '{bound_str}': {e}"))?;
+    if bound_str.starts_with("~const ") {
+        validate_maybe_const_bound(bound_str, generic_params)?;
+    }
     reject_anonymous_const_blocks_in_bound(&syn_bound)?;
     reject_unsupported_type_macros_in_bound(&syn_bound)?;
     reject_unsupported_array_lengths_in_bound(&syn_bound)?;

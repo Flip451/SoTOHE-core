@@ -111,6 +111,7 @@ impl EncoderState {
     ) -> Result<Generics, CatalogueToExtendedCrateCodecError> {
         let mut params: Vec<GenericParamDef> = Vec::with_capacity(generics_decl.len());
         let mut where_predicates: Vec<WherePredicate> = Vec::new();
+        let preserve_lexical_types = preserve_bound_spelling && !generic_names.is_empty();
 
         // (1) MethodGenericParam → empty-bound `GenericParamDef` + one
         //     `BoundPredicate { type_: Generic(name), bounds }` per param.
@@ -166,27 +167,28 @@ impl EncoderState {
             // acceptance gate, not shape faithfulness.  The decoder accepts these forms via
             // `validate_type_ref_str` (syn::Type), so the encoder must also accept them to
             // preserve round-trip symmetry.
-            let lhs_type =
-                if !generic_names.is_empty() && is_bare_generic_name(lhs_str, generic_names) {
-                    // Simple bare generic: `T` → `Type::Generic("T")`
-                    Type::Generic(lhs_str.trim().to_string())
-                } else if !generic_names.is_empty() {
-                    if let Some(proj) = try_build_generic_projection(lhs_str, generic_names) {
-                        // Single-level associated-type projection: `T::Item` →
-                        // `Type::QualifiedPath { name: "Item", self_type: Generic("T"),
-                        //  trait_: None, args: None }`.
-                        //
-                        // This matches the shape that rustdoc emits for `where T::Item: …`
-                        // predicates so that A-catalogue and C-rustdoc representations
-                        // compare equal in `build_where_form_view`.
-                        proj
-                    } else {
-                        let raw = self.parse_type_ref_str_with_generics(lhs_str, generic_names)?;
-                        rewrite_generic_types(raw, generic_names)
-                    }
+            let lhs_type = if preserve_lexical_types {
+                self.parse_type_ref_str_with_generics_preserving_spelling(lhs_str, generic_names)?
+            } else if !generic_names.is_empty() && is_bare_generic_name(lhs_str, generic_names) {
+                // Simple bare generic: `T` → `Type::Generic("T")`
+                Type::Generic(lhs_str.trim().to_string())
+            } else if !generic_names.is_empty() {
+                if let Some(proj) = try_build_generic_projection(lhs_str, generic_names) {
+                    // Single-level associated-type projection: `T::Item` →
+                    // `Type::QualifiedPath { name: "Item", self_type: Generic("T"),
+                    //  trait_: None, args: None }`.
+                    //
+                    // This matches the shape that rustdoc emits for `where T::Item: …`
+                    // predicates so that A-catalogue and C-rustdoc representations
+                    // compare equal in `build_where_form_view`.
+                    proj
                 } else {
-                    self.parse_type_ref_str(lhs_str)?
-                };
+                    let raw = self.parse_type_ref_str_with_generics(lhs_str, generic_names)?;
+                    rewrite_generic_types(raw, generic_names)
+                }
+            } else {
+                self.parse_type_ref_str(lhs_str)?
+            };
             match w.operator {
                 BoundOp::Bound => {
                     let mut bounds: Vec<GenericBound> = Vec::with_capacity(w.rhs.len());
@@ -239,7 +241,12 @@ impl EncoderState {
                     // RHS, including qualified-path forms like `<T as Trait>::Assoc`.  The
                     // parser falls back to an unresolved placeholder for forms it cannot encode
                     // exactly, which is acceptable — syntactic validity is the gate.
-                    let rhs_type = if !generic_names.is_empty()
+                    let rhs_type = if preserve_lexical_types {
+                        self.parse_type_ref_str_with_generics_preserving_spelling(
+                            rhs_str,
+                            generic_names,
+                        )?
+                    } else if !generic_names.is_empty()
                         && is_bare_generic_name(rhs_str, generic_names)
                     {
                         Type::Generic(rhs_str.trim().to_string())

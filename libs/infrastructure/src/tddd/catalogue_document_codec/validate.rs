@@ -7,8 +7,8 @@
 use domain::tddd::catalogue_v2::{BoundOp, MethodGenericParam, WherePredicateDecl};
 
 use crate::tddd::type_ref_parser::{
-    is_plain_generic_param_name, validate_const_arguments_in_type_ref,
-    validate_generic_identifier_ambiguities, validate_lexical_generic_bound,
+    is_plain_generic_param_name, validate_generic_identifier_ambiguities, validate_legacy_type_ref,
+    validate_lexical_generic_bound, validate_lexical_type_ref, validate_maybe_const_bound,
 };
 
 use super::CatalogueDocumentCodecError;
@@ -35,6 +35,9 @@ pub(super) fn validate_bound_str_with_generics(
     bound_str: &str,
     generic_params: &[&str],
 ) -> Result<(), String> {
+    if bound_str.starts_with("~const ") {
+        return validate_maybe_const_bound(bound_str, generic_params);
+    }
     validate_generic_identifier_ambiguities(bound_str, generic_params)?;
     syn::parse_str::<syn::TypeParamBound>(bound_str)
         .map(|_| ())
@@ -90,18 +93,23 @@ pub(super) fn validate_type_alias_where_predicates(
     generic_params: &[&str],
 ) -> Result<(), CatalogueDocumentCodecError> {
     for predicate in predicates {
-        validate_const_arguments_in_type_ref(predicate.lhs.as_str(), generic_params).map_err(
-            |error| CatalogueDocumentCodecError::InvalidEntry {
+        let validate_where_type = |type_ref: &str| {
+            if generic_params.is_empty() {
+                validate_legacy_type_ref(type_ref, generic_params)
+            } else {
+                validate_lexical_type_ref(type_ref, generic_params)
+            }
+        };
+        validate_where_type(predicate.lhs.as_str()).map_err(|error| {
+            CatalogueDocumentCodecError::InvalidEntry {
                 entry_name: entry_name.to_owned(),
                 reason: format!("invalid type alias where predicate lhs: {error}"),
-            },
-        )?;
+            }
+        })?;
         for (idx, bound) in predicate.rhs.iter().enumerate() {
             let validation = match predicate.operator {
                 BoundOp::Bound => validate_lexical_generic_bound(bound.as_str(), generic_params),
-                BoundOp::Equal => {
-                    validate_const_arguments_in_type_ref(bound.as_str(), generic_params)
-                }
+                BoundOp::Equal => validate_where_type(bound.as_str()),
             };
             validation.map_err(|error| CatalogueDocumentCodecError::InvalidEntry {
                 entry_name: entry_name.to_owned(),
@@ -120,7 +128,7 @@ pub(super) fn validate_type_alias_target(
     target: &str,
     generic_params: &[&str],
 ) -> Result<(), CatalogueDocumentCodecError> {
-    validate_const_arguments_in_type_ref(target, generic_params).map_err(|error| {
+    validate_legacy_type_ref(target, generic_params).map_err(|error| {
         CatalogueDocumentCodecError::InvalidEntry {
             entry_name: entry_name.to_owned(),
             reason: format!("invalid type alias target: {error}"),
