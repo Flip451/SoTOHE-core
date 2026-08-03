@@ -376,7 +376,8 @@ where
             match bound {
                 syn::TypeParamBound::Trait(tb) => {
                     let trait_path = self.resolve_trait_bound_path(&tb.path);
-                    traits.push(PolyTrait { trait_: trait_path, generic_params: vec![] });
+                    let generic_params = bound_lifetimes_to_generic_params(tb.lifetimes.as_ref());
+                    traits.push(PolyTrait { trait_: trait_path, generic_params });
                 }
                 syn::TypeParamBound::Lifetime(lt) => {
                     if lifetime.is_none() {
@@ -427,13 +428,12 @@ where
         let inputs: Vec<(String, Type)> = bare_fn
             .inputs
             .iter()
-            .enumerate()
-            .map(|(i, arg)| {
+            .map(|arg| {
                 let name = arg
                     .name
                     .as_ref()
                     .map(|(n, _)| normalized_ident_name(n))
-                    .unwrap_or_else(|| format!("_arg{i}"));
+                    .unwrap_or_else(|| "_".to_owned());
                 let ty = self.convert_type(&arg.ty);
                 (name, ty)
             })

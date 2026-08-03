@@ -372,45 +372,32 @@ impl EncoderState {
         F: Fn(&str) -> Option<Id>,
         G: FnMut(String) -> u32,
     {
-        if generic_params.is_empty() {
-            if preserve_prelude_spelling {
-                parse_type_ref_with_generics_preserving_spelling(
-                    type_ref_str,
-                    resolve_local,
-                    std_crate_id,
-                    external_crate_ids,
-                    emit_external_crate,
-                    generic_params,
-                )
-            } else {
-                parse_type_ref(
-                    type_ref_str,
-                    resolve_local,
-                    std_crate_id,
-                    external_crate_ids,
-                    emit_external_crate,
-                )
-            }
+        if preserve_prelude_spelling {
+            parse_type_ref_with_generics_preserving_spelling(
+                type_ref_str,
+                resolve_local,
+                std_crate_id,
+                external_crate_ids,
+                emit_external_crate,
+                generic_params,
+            )
+        } else if generic_params.is_empty() {
+            parse_type_ref(
+                type_ref_str,
+                resolve_local,
+                std_crate_id,
+                external_crate_ids,
+                emit_external_crate,
+            )
         } else {
-            if preserve_prelude_spelling {
-                parse_type_ref_with_generics_preserving_spelling(
-                    type_ref_str,
-                    resolve_local,
-                    std_crate_id,
-                    external_crate_ids,
-                    emit_external_crate,
-                    generic_params,
-                )
-            } else {
-                parse_type_ref_with_generics(
-                    type_ref_str,
-                    resolve_local,
-                    std_crate_id,
-                    external_crate_ids,
-                    emit_external_crate,
-                    generic_params,
-                )
-            }
+            parse_type_ref_with_generics(
+                type_ref_str,
+                resolve_local,
+                std_crate_id,
+                external_crate_ids,
+                emit_external_crate,
+                generic_params,
+            )
         }
     }
 

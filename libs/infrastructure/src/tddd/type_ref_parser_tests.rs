@@ -92,6 +92,40 @@ fn test_parse_type_ref_result_with_generic_args_succeeds() {
     }
 }
 
+#[test]
+fn test_parse_type_ref_nested_dyn_trait_preserves_hrtb_binder() {
+    let ty = parse("Box<dyn for<'a> Fn(&'a str)>");
+    let Type::ResolvedPath(path) = ty else {
+        panic!("expected Box resolved path");
+    };
+    let Some(GenericArgs::AngleBracketed { args, .. }) = path.args.as_deref() else {
+        panic!("expected Box angle-bracketed arguments");
+    };
+    let Some(GenericArg::Type(Type::DynTrait(dyn_trait))) = args.first() else {
+        panic!("expected dyn trait argument");
+    };
+    let Some(poly_trait) = dyn_trait.traits.first() else {
+        panic!("expected nested Fn poly-trait");
+    };
+    assert_eq!(poly_trait.generic_params.len(), 1);
+    assert_eq!(poly_trait.generic_params.first().map(|param| param.name.as_str()), Some("'a"));
+}
+
+#[test]
+fn test_parse_type_ref_unnamed_function_pointer_argument_uses_rustdoc_placeholder() {
+    let ty = parse("Trait<fn(u8)>");
+    let Type::ResolvedPath(path) = ty else {
+        panic!("expected Trait resolved path");
+    };
+    let Some(GenericArgs::AngleBracketed { args, .. }) = path.args.as_deref() else {
+        panic!("expected Trait angle-bracketed arguments");
+    };
+    let Some(GenericArg::Type(Type::FunctionPointer(function_pointer))) = args.first() else {
+        panic!("expected function pointer argument");
+    };
+    assert_eq!(function_pointer.sig.inputs.first().map(|input| input.0.as_str()), Some("_"));
+}
+
 // -----------------------------------------------------------------------
 // AC-06: primitive types
 // -----------------------------------------------------------------------
