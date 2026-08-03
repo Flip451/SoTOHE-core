@@ -193,7 +193,8 @@
     {
       "id": "T036",
       "description": "`apps/cli-composition/src/phase_command.rs` に `PhaseCompositionRoot` を追加し、phase configuration loader、phase service、phase driver の wiring と module registration、および composition-boundary tests を実装する。IN-04、AC-02、AC-03。",
-      "status": "in_progress",
+      "status": "done",
+      "commit_hash": "d4d9983f8bf98b4c09bc2a3b37221e6aab1d82eb",
       "depends_on": [
         "T029",
         "T035",
@@ -203,7 +204,7 @@
     {
       "id": "T031",
       "description": "`apps/cli/src/main.rs` の top-level `CliCommand`、`Phase` variant、dispatch arm と、`apps/cli/src/commands/phase.rs` の `PhaseCommand`、`PhaseEnterArgs`、`PhaseIdArgs`、validate args、`execute`、`execute_with_driver`、`input_from_command`、関連 tests を catalogue shape に適応する。IN-04、IN-11、AC-03、AC-13。",
-      "status": "todo",
+      "status": "in_progress",
       "depends_on": [
         "T030",
         "T036"

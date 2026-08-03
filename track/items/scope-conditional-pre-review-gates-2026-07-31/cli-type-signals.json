@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-03T03:54:30Z",
+  "generated_at": "2026-08-03T15:52:27Z",
   "declaration_hash": "3f4181d557a89b8a20bce583c0931b094307e62a667f91bd99a265dd871b6498",
-  "implementation_input_hash": "151740f16937267843c4d32c69a05b7785ed9d219eb7efc0291608d3ebd161d7",
+  "implementation_input_hash": "0947192454feb155a151000d2b064e57a15556e4dcfc293b99b0972a7b93dca6",
   "signals": [
     {
       "type_name": "CapabilityExecArgs",
@@ -13,15 +13,15 @@
     {
       "type_name": "CliCommand",
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
       "type_name": "PhaseCommand",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Debug",
         "FromArgMatches",
         "Subcommand"
@@ -30,9 +30,9 @@
     {
       "type_name": "PhaseEnterArgs",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Args",
         "Debug",
         "FromArgMatches"
@@ -41,9 +41,9 @@
     {
       "type_name": "PhaseIdArgs",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Args",
         "Debug",
         "FromArgMatches"
@@ -52,9 +52,9 @@
     {
       "type_name": "PhaseValidateArgs",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Args",
         "Debug",
         "FromArgMatches"
@@ -69,20 +69,20 @@
     {
       "type_name": "cli::commands::phase::execute",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "cli::commands::phase::execute_with_driver",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "cli::commands::phase::input_from_command",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     }
   ]
 }

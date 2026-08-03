@@ -80,6 +80,11 @@ enum CliCommand {
         #[command(subcommand)]
         cmd: commands::capability::CapabilityCommand,
     },
+    /// Validate, explain, and enter operator-owned workflow phases.
+    Phase {
+        #[command(subcommand)]
+        cmd: commands::phase::PhaseCommand,
+    },
     /// Local review workflow wrappers.
     Review {
         #[command(subcommand)]
@@ -160,7 +165,6 @@ enum CliCommand {
         cmd: commands::batch_plan::BatchPlanCommand,
     },
     /// Run the example track state machine demo.
-    #[cfg(not(doc))]
     Demo,
 }
 
@@ -193,6 +197,7 @@ fn run_cli_with(
         Some(CliCommand::Git { cmd }) => commands::git::execute(cmd),
         Some(CliCommand::Pr { cmd }) => commands::pr::execute(cmd),
         Some(CliCommand::Capability { cmd }) => commands::capability::execute(cmd),
+        Some(CliCommand::Phase { cmd }) => commands::phase::execute(cmd),
         Some(CliCommand::Review { cmd }) => commands::review::execute(cmd),
         Some(CliCommand::File { cmd }) => commands::file::execute(cmd),
         Some(CliCommand::Verify { cmd }) => execute_verify_with_telemetry(cmd),
@@ -212,19 +217,7 @@ fn run_cli_with(
         Some(CliCommand::CatalogueLint { cmd }) => commands::catalogue_lint::execute(cmd),
         Some(CliCommand::Template { cmd }) => commands::template::execute(cmd),
         Some(CliCommand::CodexRuntime { cmd }) => commands::codex_runtime::execute(cmd),
-        #[cfg(not(doc))]
         Some(CliCommand::Demo) | None => {
-            let outcome = DemoCompositionRoot::new().demo_driver().handle(DemoInput::Run);
-            if let Some(msg) = outcome.stdout {
-                println!("{msg}");
-            }
-            if let Some(msg) = outcome.stderr {
-                eprintln!("{msg}");
-            }
-            ExitCode::from(outcome.exit_code)
-        }
-        #[cfg(doc)]
-        None => {
             let outcome = DemoCompositionRoot::new().demo_driver().handle(DemoInput::Run);
             if let Some(msg) = outcome.stdout {
                 println!("{msg}");
@@ -637,6 +630,29 @@ mod tests {
             matches!(cli.command, Some(CliCommand::Capability { .. })),
             "capability exec must select the Capability variant"
         );
+    }
+
+    #[test]
+    fn test_phase_validate_is_registered_and_dispatched_at_top_level() {
+        let _process_guard = process_env_lock().lock().unwrap();
+        let repository = TempDir::new().unwrap();
+        let config_dir = repository.path().join(".harness/config");
+        fs::create_dir_all(&config_dir).unwrap();
+        fs::write(
+            config_dir.join("phase-commands.json"),
+            r#"{"schema_version":1,"phases":[{"id":"review","writer":{"argv":["true"]},"pre_entry_commands":[]}]}"#,
+        )
+        .unwrap();
+
+        let exit = run_in_dir(repository.path(), || {
+            run_cli(
+                Cli::try_parse_from(["sotp", "phase", "validate"])
+                    .expect("phase validate must parse at the top-level command boundary"),
+                |_cmd| ExitCode::FAILURE,
+            )
+        });
+
+        assert_eq!(exit, ExitCode::SUCCESS);
     }
 
     #[test]

@@ -4,6 +4,86 @@
     {
       "kind": "fulfillment",
       "obligation_id": {
+        "entry_key": "cli::commands::phase::execute",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_execute_composes_default_timeout_and_failure_phase_outcomes"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_execute_with_driver_renders_default_timeout_and_failure_outcomes"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "cli::commands::phase::execute_with_driver",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_execute_with_driver_dispatches_validate_explain_and_enter_commands"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_execute_with_driver_runs_composed_phase_commands_in_order_and_fails_closed"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_execute_with_driver_renders_default_timeout_and_failure_outcomes"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "cli::commands::phase::input_from_command",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_input_from_command_preserves_supplied_and_omitted_host_verbatim"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_input_from_command_maps_all_phase_variants_with_repository_root_and_phase_id"
+        }
+      ]
+    },
+    {"kind":"voluntary_binding","edge_id":{"entry_key":"PhaseCommand","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"IN-04"}},"tests":[{"layer":"cli","module_path":"cli::commands::phase::tests","test_name":"test_execute_with_driver_dispatches_validate_explain_and_enter_commands"},{"layer":"cli","module_path":"cli::commands::phase::tests","test_name":"test_execute_with_driver_runs_composed_phase_commands_in_order_and_fails_closed"},{"layer":"cli_composition","module_path":"cli_composition::phase_command::tests","test_name":"test_phase_composition_root_valid_config_exposes_all_phase_operations"}]},
+    {"kind":"voluntary_binding","edge_id":{"entry_key":"PhaseCommand","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"IN-11"}},"tests":[{"layer":"cli","module_path":"cli::commands::phase::tests","test_name":"test_input_from_command_preserves_supplied_and_omitted_host_verbatim"}]},
+    {"kind":"voluntary_binding","edge_id":{"entry_key":"PhaseCommand","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"AC-03"}},"tests":[{"layer":"cli","module_path":"cli::commands::phase::tests","test_name":"test_execute_with_driver_dispatches_validate_explain_and_enter_commands"},{"layer":"cli","module_path":"cli::commands::phase::tests","test_name":"test_execute_with_driver_runs_composed_phase_commands_in_order_and_fails_closed"},{"layer":"cli","module_path":"cli::commands::phase::tests","test_name":"test_execute_with_driver_renders_default_timeout_and_failure_outcomes"},{"layer":"cli","module_path":"cli::commands::phase::tests","test_name":"test_execute_composes_default_timeout_and_failure_phase_outcomes"},{"layer":"cli_composition","module_path":"cli_composition::phase_command::tests","test_name":"test_phase_composition_root_valid_config_exposes_all_phase_operations"},{"layer":"cli_composition","module_path":"cli_composition::phase_command::tests","test_name":"test_phase_composition_root_second_pre_entry_failure_records_prior_success_and_stops_remaining_commands_and_writer"},{"layer":"cli_composition","module_path":"cli_composition::phase_command::tests","test_name":"test_phase_composition_root_invalid_config_renders_validation_failure"}]},
+    {"kind":"voluntary_binding","edge_id":{"entry_key":"PhaseCommand","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"AC-13"}},"tests":[{"layer":"cli","module_path":"cli::commands::phase::tests","test_name":"test_input_from_command_preserves_supplied_and_omitted_host_verbatim"}]},
+    {"kind":"voluntary_binding","edge_id":{"entry_key":"PhaseEnterArgs","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"IN-04"}},"tests":[{"layer":"cli","module_path":"cli::commands::phase::tests","test_name":"test_execute_with_driver_dispatches_validate_explain_and_enter_commands"},{"layer":"cli","module_path":"cli::commands::phase::tests","test_name":"test_execute_with_driver_runs_composed_phase_commands_in_order_and_fails_closed"},{"layer":"cli_composition","module_path":"cli_composition::phase_command::tests","test_name":"test_phase_composition_root_valid_config_exposes_all_phase_operations"}]},
+    {"kind":"voluntary_binding","edge_id":{"entry_key":"PhaseEnterArgs","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"AC-02"}},"tests":[{"layer":"cli","module_path":"cli::commands::phase::tests","test_name":"test_execute_with_driver_runs_composed_phase_commands_in_order_and_fails_closed"},{"layer":"cli_composition","module_path":"cli_composition::phase_command::tests","test_name":"test_phase_composition_root_valid_config_exposes_all_phase_operations"},{"layer":"cli_composition","module_path":"cli_composition::phase_command::tests","test_name":"test_phase_composition_root_second_pre_entry_failure_records_prior_success_and_stops_remaining_commands_and_writer"}]},
+    {"kind":"voluntary_binding","edge_id":{"entry_key":"PhaseEnterArgs","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"AC-03"}},"tests":[{"layer":"cli","module_path":"cli::commands::phase::tests","test_name":"test_execute_with_driver_runs_composed_phase_commands_in_order_and_fails_closed"},{"layer":"cli_composition","module_path":"cli_composition::phase_command::tests","test_name":"test_phase_composition_root_valid_config_exposes_all_phase_operations"},{"layer":"cli_composition","module_path":"cli_composition::phase_command::tests","test_name":"test_phase_composition_root_second_pre_entry_failure_records_prior_success_and_stops_remaining_commands_and_writer"}]},
+    {"kind":"voluntary_binding","edge_id":{"entry_key":"PhaseEnterArgs","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"IN-11"}},"tests":[{"layer":"cli","module_path":"cli::commands::phase::tests","test_name":"test_input_from_command_preserves_supplied_and_omitted_host_verbatim"}]},
+    {"kind":"voluntary_binding","edge_id":{"entry_key":"PhaseEnterArgs","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"AC-13"}},"tests":[{"layer":"cli","module_path":"cli::commands::phase::tests","test_name":"test_input_from_command_preserves_supplied_and_omitted_host_verbatim"}]},
+    {"kind":"voluntary_binding","edge_id":{"entry_key":"PhaseIdArgs","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"IN-04"}},"tests":[{"layer":"cli","module_path":"cli::commands::phase::tests","test_name":"test_phase_id_commands_parse_validated_phase_ids"},{"layer":"cli","module_path":"cli::commands::phase::tests","test_name":"test_execute_with_driver_runs_composed_phase_commands_in_order_and_fails_closed"},{"layer":"cli_composition","module_path":"cli_composition::phase_command::tests","test_name":"test_phase_composition_root_valid_config_exposes_all_phase_operations"}]},
+    {"kind":"voluntary_binding","edge_id":{"entry_key":"PhaseIdArgs","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"AC-02"}},"tests":[{"layer":"cli","module_path":"cli::commands::phase::tests","test_name":"test_execute_with_driver_runs_composed_phase_commands_in_order_and_fails_closed"},{"layer":"cli_composition","module_path":"cli_composition::phase_command::tests","test_name":"test_phase_composition_root_valid_config_exposes_all_phase_operations"}]},
+    {"kind":"voluntary_binding","edge_id":{"entry_key":"PhaseIdArgs","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"AC-03"}},"tests":[{"layer":"cli","module_path":"cli::commands::phase::tests","test_name":"test_phase_id_commands_parse_validated_phase_ids"}]},
+    {"kind":"voluntary_binding","edge_id":{"entry_key":"PhaseValidateArgs","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"IN-04"}},"tests":[{"layer":"cli","module_path":"cli::tests","test_name":"test_phase_validate_is_registered_and_dispatched_at_top_level"},{"layer":"cli","module_path":"cli::commands::phase::tests","test_name":"test_execute_with_driver_runs_composed_phase_commands_in_order_and_fails_closed"},{"layer":"cli_composition","module_path":"cli_composition::phase_command::tests","test_name":"test_phase_composition_root_invalid_config_renders_validation_failure"}]},
+    {"kind":"voluntary_binding","edge_id":{"entry_key":"PhaseValidateArgs","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"AC-01"}},"tests":[{"layer":"cli","module_path":"cli::commands::phase::tests","test_name":"test_execute_with_driver_runs_composed_phase_commands_in_order_and_fails_closed"},{"layer":"cli_composition","module_path":"cli_composition::phase_command::tests","test_name":"test_phase_composition_root_invalid_config_renders_validation_failure"}]},
+    {"kind":"voluntary_binding","edge_id":{"entry_key":"PhaseValidateArgs","anchor_id":{"file_path":"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json","element_id":"AC-03"}},"tests":[{"layer":"cli","module_path":"cli::commands::phase::tests","test_name":"test_execute_with_driver_runs_composed_phase_commands_in_order_and_fails_closed"},{"layer":"cli_composition","module_path":"cli_composition::phase_command::tests","test_name":"test_phase_composition_root_invalid_config_renders_validation_failure"}]},
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
         "entry_key": "PhaseCommandConfigLoaderPort",
         "item_identifier": "trait_method:load",
         "obligation_kind": "contract"

@@ -3,6 +3,874 @@
   "entries": [
     {
       "edge_id": {
+        "entry_key": "cli::commands::phase::execute",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::phase::execute",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "04b12331b16ca152a1a6da6e6996dc040e96fcb34980ea6ec670dab182cf4e9a",
+        "declaration_hash": "0abef1eb7c4edf90666cee99323eaf2d9b178f28a4fc9e1a2038bff0c2558ff3",
+        "anchor_text_hash": "3a64b29a92e9e9eeaf1a9ea27e22587c95af88cf00d71369188fd9b70d334f36"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "execute(PhaseCommand::Explain(PhaseIdArgs {\n                    phase_id: PhaseIdArg::from_str(\"default-timeout\").expect(\"valid phase id\"),\n                }))"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_execute_composes_default_timeout_and_failure_phase_outcomes"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_execute_with_driver_renders_default_timeout_and_failure_outcomes"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::phase::execute",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::phase::execute",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "04b12331b16ca152a1a6da6e6996dc040e96fcb34980ea6ec670dab182cf4e9a",
+        "declaration_hash": "0abef1eb7c4edf90666cee99323eaf2d9b178f28a4fc9e1a2038bff0c2558ff3",
+        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "execute(PhaseCommand::Enter(PhaseEnterArgs {\n                    phase_id: PhaseIdArg::from_str(\"timed-out\").expect(\"valid phase id\"),\n                    host: None,\n                }))\n...\nassert!(stderr.contains(\n            \"phase command blocked at sequence 0: [\\\"sleep\\\",\\\"2\\\"]; outcome: timed out\"\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_execute_composes_default_timeout_and_failure_phase_outcomes"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_execute_with_driver_renders_default_timeout_and_failure_outcomes"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::phase::execute_with_driver",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::phase::execute_with_driver",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "f8cca89e52574ad7d2e03a04a5c2ab437dd6758d9e881bb9900600503fb2c65a",
+        "declaration_hash": "f708849a3ca0972d5c3a6a397031116878c24fa9098d4589a221ec5861cc5ec8",
+        "anchor_text_hash": "3a64b29a92e9e9eeaf1a9ea27e22587c95af88cf00d71369188fd9b70d334f36"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(service.calls.lock().expect(\"test mutex\").as_slice(), [\"validate:.\", \"explain:phase-1\", \"enter:phase-1:None\"]); ... assert_eq!(exit, std::process::ExitCode::FAILURE); ... assert_eq!(fs::read_to_string(&audit_path).expect(\"blocked execution is recorded\"), \"first\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_execute_with_driver_dispatches_validate_explain_and_enter_commands"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_execute_with_driver_runs_composed_phase_commands_in_order_and_fails_closed"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_execute_with_driver_renders_default_timeout_and_failure_outcomes"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::phase::execute_with_driver",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::phase::execute_with_driver",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "f8cca89e52574ad7d2e03a04a5c2ab437dd6758d9e881bb9900600503fb2c65a",
+        "declaration_hash": "f708849a3ca0972d5c3a6a397031116878c24fa9098d4589a221ec5861cc5ec8",
+        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            service.calls.lock().expect(\"test mutex\").as_slice(),\n            [\"validate:.\", \"explain:phase-1\", \"enter:phase-1:None\"]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_execute_with_driver_dispatches_validate_explain_and_enter_commands"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_execute_with_driver_runs_composed_phase_commands_in_order_and_fails_closed"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_execute_with_driver_renders_default_timeout_and_failure_outcomes"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::phase::input_from_command",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::phase::input_from_command",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "ae0f69fef1b6d73f4ee79cb2eb8ab1d923560a7f0ecb5c3da800cf8b923e8e87",
+        "declaration_hash": "ffaec816778b09f21394f63dc935a529ee96b5a091466d2545c1847b0a52c9dc",
+        "anchor_text_hash": "3a64b29a92e9e9eeaf1a9ea27e22587c95af88cf00d71369188fd9b70d334f36"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            supplied,\n            PhaseCommandInput::Enter { host: Some(host), .. }\n                if host == \"codex\".parse().expect(\"test host\")\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_input_from_command_preserves_supplied_and_omitted_host_verbatim"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_input_from_command_maps_all_phase_variants_with_repository_root_and_phase_id"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::phase::input_from_command",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::phase::input_from_command",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "ae0f69fef1b6d73f4ee79cb2eb8ab1d923560a7f0ecb5c3da800cf8b923e8e87",
+        "declaration_hash": "ffaec816778b09f21394f63dc935a529ee96b5a091466d2545c1847b0a52c9dc",
+        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            supplied,\n            PhaseCommandInput::Enter { host: Some(host), .. }\n                if host == \"codex\".parse().expect(\"test host\")\n        ));\n        assert!(matches!(omitted, PhaseCommandInput::Enter { host: None, .. }));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_input_from_command_preserves_supplied_and_omitted_host_verbatim"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_input_from_command_maps_all_phase_variants_with_repository_root_and_phase_id"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::phase::input_from_command",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-11"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::phase::input_from_command",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "ae0f69fef1b6d73f4ee79cb2eb8ab1d923560a7f0ecb5c3da800cf8b923e8e87",
+        "declaration_hash": "ffaec816778b09f21394f63dc935a529ee96b5a091466d2545c1847b0a52c9dc",
+        "anchor_text_hash": "ebe6fab89b5c121c6f2179eebc761a3372cfefe75713d1d4dce322e9302354e6"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            supplied,\n            PhaseCommandInput::Enter { host: Some(host), .. }\n                if host == \"codex\".parse().expect(\"test host\")\n        ));\n        assert!(matches!(omitted, PhaseCommandInput::Enter { host: None, .. }));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_input_from_command_preserves_supplied_and_omitted_host_verbatim"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_input_from_command_maps_all_phase_variants_with_repository_root_and_phase_id"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::phase::input_from_command",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-13"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::phase::input_from_command",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "ae0f69fef1b6d73f4ee79cb2eb8ab1d923560a7f0ecb5c3da800cf8b923e8e87",
+        "declaration_hash": "ffaec816778b09f21394f63dc935a529ee96b5a091466d2545c1847b0a52c9dc",
+        "anchor_text_hash": "05e6e189bc377aa5f6c10e51bb69aa449a5cbd9f6ac58595389e164fcacefeea"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            supplied,\n            PhaseCommandInput::Enter { host: Some(host), .. }\n                if host == \"codex\".parse().expect(\"test host\")\n        ));\n        assert!(matches!(omitted, PhaseCommandInput::Enter { host: None, .. }));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_input_from_command_preserves_supplied_and_omitted_host_verbatim"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_input_from_command_maps_all_phase_variants_with_repository_root_and_phase_id"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommand",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "b42f805bd08b10e85d28a5eedbbf851107415b47866f4ea65e12589a9a693c1e",
+        "declaration_hash": "f11b496b4de47edf51ab84ca8812af79ea7a0df5baf5c8940cacc75b74f2ae5f",
+        "anchor_text_hash": "3a64b29a92e9e9eeaf1a9ea27e22587c95af88cf00d71369188fd9b70d334f36"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(fs::read_to_string(&audit_path).expect(\"successful phase execution is recorded\"), \"pre-entrywriter\"); ... assert_eq!(fs::read_to_string(&audit_path).expect(\"blocked execution is recorded\"), \"first\"); ... assert_eq!(exit, std::process::ExitCode::FAILURE);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_execute_with_driver_dispatches_validate_explain_and_enter_commands"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_execute_with_driver_runs_composed_phase_commands_in_order_and_fails_closed"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::phase_command::tests",
+          "test_name": "test_phase_composition_root_valid_config_exposes_all_phase_operations"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommand",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-11"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-11"
+      },
+      "key": {
+        "bound_tests_set_hash": "55165c9ea3432582e7b1db6ae5d6a3fea64c072a5f452345857f77397b0e5903",
+        "declaration_hash": "f11b496b4de47edf51ab84ca8812af79ea7a0df5baf5c8940cacc75b74f2ae5f",
+        "anchor_text_hash": "ebe6fab89b5c121c6f2179eebc761a3372cfefe75713d1d4dce322e9302354e6"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(omitted, PhaseCommandInput::Enter { host: None, .. }));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_input_from_command_preserves_supplied_and_omitted_host_verbatim"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommand",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "259b29a311c60e6c57499ca552a6a989bb1d694933b44cf98a59a48fd8756f4b",
+        "declaration_hash": "f11b496b4de47edf51ab84ca8812af79ea7a0df5baf5c8940cacc75b74f2ae5f",
+        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(explanation.contains(\"phase example (output limit: 1048576 bytes)\")); assert!(explanation.contains(r#\"pre-entry 0: [\"printf\",\"pre-entry\\\\n\"] (timeout: 1s)\"#)); assert!(explanation.contains(r#\"writer: [\"printf\",\"writer\\\\n\"] (timeout: 1s)\"#)); assert!(pre_entry_position < writer_position, \"pre-entry runs before the writer\"); stderr.contains(\"phase command blocked at sequence 1: [\\\"false\\\"]; outcome: exited with 1\"); stderr.contains(\"phase command blocked at sequence 0: [\\\"yes\\\"]; outcome: output limit exceeded on stdout\"); stderr.contains(\"phase command blocked at sequence 0: [\\\"sleep\\\",\\\"2\\\"]; outcome: timed out\")"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_execute_with_driver_dispatches_validate_explain_and_enter_commands"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_execute_with_driver_runs_composed_phase_commands_in_order_and_fails_closed"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_execute_with_driver_renders_default_timeout_and_failure_outcomes"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_execute_composes_default_timeout_and_failure_phase_outcomes"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::phase_command::tests",
+          "test_name": "test_phase_composition_root_valid_config_exposes_all_phase_operations"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::phase_command::tests",
+          "test_name": "test_phase_composition_root_second_pre_entry_failure_records_prior_success_and_stops_remaining_commands_and_writer"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::phase_command::tests",
+          "test_name": "test_phase_composition_root_invalid_config_renders_validation_failure"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommand",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-13"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-13"
+      },
+      "key": {
+        "bound_tests_set_hash": "55165c9ea3432582e7b1db6ae5d6a3fea64c072a5f452345857f77397b0e5903",
+        "declaration_hash": "f11b496b4de47edf51ab84ca8812af79ea7a0df5baf5c8940cacc75b74f2ae5f",
+        "anchor_text_hash": "05e6e189bc377aa5f6c10e51bb69aa449a5cbd9f6ac58595389e164fcacefeea"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            supplied,\n            PhaseCommandInput::Enter { host: Some(host), .. }\n                if host == \"codex\".parse().expect(\"test host\")\n        ));\n        assert!(matches!(omitted, PhaseCommandInput::Enter { host: None, .. }));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_input_from_command_preserves_supplied_and_omitted_host_verbatim"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseEnterArgs",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseEnterArgs",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "b42f805bd08b10e85d28a5eedbbf851107415b47866f4ea65e12589a9a693c1e",
+        "declaration_hash": "4309682c0317910d464487345a37ea853450bcf0a7cf4e8efdc3a3a847476437",
+        "anchor_text_hash": "3a64b29a92e9e9eeaf1a9ea27e22587c95af88cf00d71369188fd9b70d334f36"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome.exit_code, 0); ... assert!(explanation.contains(\"phase example (output limit: 1048576 bytes)\")); ... assert!(pre_entry_position < writer_position, \"pre-entry runs before the writer\"); ... assert_eq!(exit, std::process::ExitCode::FAILURE); ... assert_eq!(fs::read_to_string(&audit_path).expect(\"blocked execution is recorded\"), \"first\"); ... assert_eq!(exit, std::process::ExitCode::FAILURE);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_execute_with_driver_dispatches_validate_explain_and_enter_commands"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_execute_with_driver_runs_composed_phase_commands_in_order_and_fails_closed"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::phase_command::tests",
+          "test_name": "test_phase_composition_root_valid_config_exposes_all_phase_operations"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseEnterArgs",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseEnterArgs",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "52d58d1da249c51bd4aa1ca6c459ec803f36060e75b33360fb9921ac4b00c12e",
+        "declaration_hash": "4309682c0317910d464487345a37ea853450bcf0a7cf4e8efdc3a3a847476437",
+        "anchor_text_hash": "edb4e92dab097edf9daf4986f7e535467ff8962fca5911e37dec2e1756d33671"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            fs::read_to_string(&audit_path).expect(\"successful phase execution is recorded\"),\n            \"pre-entrywriter\"\n        ); ... assert!(!stdout.contains(\"remaining-should-not-run\"));\n        assert!(!stdout.contains(\"writer-should-not-run\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_execute_with_driver_runs_composed_phase_commands_in_order_and_fails_closed"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::phase_command::tests",
+          "test_name": "test_phase_composition_root_valid_config_exposes_all_phase_operations"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::phase_command::tests",
+          "test_name": "test_phase_composition_root_second_pre_entry_failure_records_prior_success_and_stops_remaining_commands_and_writer"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseEnterArgs",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseEnterArgs",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "52d58d1da249c51bd4aa1ca6c459ec803f36060e75b33360fb9921ac4b00c12e",
+        "declaration_hash": "4309682c0317910d464487345a37ea853450bcf0a7cf4e8efdc3a3a847476437",
+        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "PhaseCommand::Enter(PhaseEnterArgs {\n                        phase_id: PhaseIdArg::from_str(\"review\").expect(\"valid phase id\"),\n                        host: None,\n                    })"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_execute_with_driver_runs_composed_phase_commands_in_order_and_fails_closed"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::phase_command::tests",
+          "test_name": "test_phase_composition_root_valid_config_exposes_all_phase_operations"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::phase_command::tests",
+          "test_name": "test_phase_composition_root_second_pre_entry_failure_records_prior_success_and_stops_remaining_commands_and_writer"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseEnterArgs",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-11"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseEnterArgs",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-11"
+      },
+      "key": {
+        "bound_tests_set_hash": "55165c9ea3432582e7b1db6ae5d6a3fea64c072a5f452345857f77397b0e5903",
+        "declaration_hash": "4309682c0317910d464487345a37ea853450bcf0a7cf4e8efdc3a3a847476437",
+        "anchor_text_hash": "ebe6fab89b5c121c6f2179eebc761a3372cfefe75713d1d4dce322e9302354e6"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            supplied,\n            PhaseCommandInput::Enter { host: Some(host), .. }\n                if host == \"codex\".parse().expect(\"test host\")\n        ));\n        assert!(matches!(omitted, PhaseCommandInput::Enter { host: None, .. }));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_input_from_command_preserves_supplied_and_omitted_host_verbatim"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseEnterArgs",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-13"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseEnterArgs",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-13"
+      },
+      "key": {
+        "bound_tests_set_hash": "55165c9ea3432582e7b1db6ae5d6a3fea64c072a5f452345857f77397b0e5903",
+        "declaration_hash": "4309682c0317910d464487345a37ea853450bcf0a7cf4e8efdc3a3a847476437",
+        "anchor_text_hash": "05e6e189bc377aa5f6c10e51bb69aa449a5cbd9f6ac58595389e164fcacefeea"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            supplied,\n            PhaseCommandInput::Enter { host: Some(host), .. }\n                if host == \"codex\".parse().expect(\"test host\")\n        ));\n        assert!(matches!(omitted, PhaseCommandInput::Enter { host: None, .. }));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_input_from_command_preserves_supplied_and_omitted_host_verbatim"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseIdArgs",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseIdArgs",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "1c7aed1cf002e8997818c8c51356cf687e8173d65a9eefb771cd73395fdbea62",
+        "declaration_hash": "5fe4ea21756179ba01d22ef865538f561f3d43f5426d97092cf550da2b4c81b0",
+        "anchor_text_hash": "3a64b29a92e9e9eeaf1a9ea27e22587c95af88cf00d71369188fd9b70d334f36"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let phase_id = match cli.command {\n                PhaseCommand::Explain(PhaseIdArgs { phase_id })\n                | PhaseCommand::Enter(PhaseEnterArgs { phase_id, .. }) => phase_id,\n                PhaseCommand::Validate(_) => panic!(\"expected a phase-id command\"),\n            };\n            assert_eq!(phase_id.as_declaration_id().as_str(), \"phase-1\");\n\n            phase_id: PhaseIdArg::from_str(\"example\").expect(\"valid phase id\"),"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_phase_id_commands_parse_validated_phase_ids"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_execute_with_driver_runs_composed_phase_commands_in_order_and_fails_closed"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::phase_command::tests",
+          "test_name": "test_phase_composition_root_valid_config_exposes_all_phase_operations"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseIdArgs",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseIdArgs",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "f24226a4807c9669127c6831209d2102ce0fd656ff3f9e1ab942112897b3014a",
+        "declaration_hash": "5fe4ea21756179ba01d22ef865538f561f3d43f5426d97092cf550da2b4c81b0",
+        "anchor_text_hash": "edb4e92dab097edf9daf4986f7e535467ff8962fca5911e37dec2e1756d33671"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "fs::read_to_string(&audit_path).expect(\"successful phase execution is recorded\"),\n            \"pre-entrywriter\"\n... fs::read_to_string(&audit_path).expect(\"blocked execution is recorded\"),\n            \"first\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_execute_with_driver_runs_composed_phase_commands_in_order_and_fails_closed"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::phase_command::tests",
+          "test_name": "test_phase_composition_root_valid_config_exposes_all_phase_operations"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseIdArgs",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseIdArgs",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "f6b9ff4412f5053ad53d278eb3a2355db75c4bcfc65700ecd3a130b845499844",
+        "declaration_hash": "5fe4ea21756179ba01d22ef865538f561f3d43f5426d97092cf550da2b4c81b0",
+        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let cli = TestCli::try_parse_from([\"sotp\", verb, \"phase-1\"])\n                .expect(\"a valid phase id must parse\");\n            let phase_id = match cli.command {\n                PhaseCommand::Explain(PhaseIdArgs { phase_id })\n                | PhaseCommand::Enter(PhaseEnterArgs { phase_id, .. }) => phase_id,\n                PhaseCommand::Validate(_) => panic!(\"expected a phase-id command\"),\n            };\n            assert_eq!(phase_id.as_declaration_id().as_str(), \"phase-1\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_phase_id_commands_parse_validated_phase_ids"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseValidateArgs",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseValidateArgs",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "d82677f8997712fe19d0dbe96630f4de9ff5bbb29a73c4bcfc35ada403dc2d58",
+        "declaration_hash": "af51184dcc26b2c7ce2b8257bf41413deb7e7dbff3078eeb9c50cf28c13c5b8d",
+        "anchor_text_hash": "3a64b29a92e9e9eeaf1a9ea27e22587c95af88cf00d71369188fd9b70d334f36"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(fs::read_to_string(&audit_path).expect(\"successful phase execution is recorded\"), \"pre-entrywriter\"); ... assert_eq!(exit, std::process::ExitCode::FAILURE); assert_eq!(fs::read_to_string(&audit_path).expect(\"blocked execution is recorded\"), \"first\"); ... assert_eq!(exit, std::process::ExitCode::FAILURE);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::tests",
+          "test_name": "test_phase_validate_is_registered_and_dispatched_at_top_level"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_execute_with_driver_runs_composed_phase_commands_in_order_and_fails_closed"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::phase_command::tests",
+          "test_name": "test_phase_composition_root_invalid_config_renders_validation_failure"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseValidateArgs",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseValidateArgs",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "f2da7eb7524b853d49a27337d43fa0b68bc16acad0754b39090f86eab743a7bf",
+        "declaration_hash": "af51184dcc26b2c7ce2b8257bf41413deb7e7dbff3078eeb9c50cf28c13c5b8d",
+        "anchor_text_hash": "05b8094316a1aacabb4bec26100b679daf53d5554267297214266776d1838398"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome.exit_code, 1);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_execute_with_driver_runs_composed_phase_commands_in_order_and_fails_closed"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::phase_command::tests",
+          "test_name": "test_phase_composition_root_invalid_config_renders_validation_failure"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseValidateArgs",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseValidateArgs",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "f2da7eb7524b853d49a27337d43fa0b68bc16acad0754b39090f86eab743a7bf",
+        "declaration_hash": "af51184dcc26b2c7ce2b8257bf41413deb7e7dbff3078eeb9c50cf28c13c5b8d",
+        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n                execute_with_driver(PhaseCommand::Validate(PhaseValidateArgs), &driver),\n                std::process::ExitCode::SUCCESS\n            );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::phase::tests",
+          "test_name": "test_execute_with_driver_runs_composed_phase_commands_in_order_and_fails_closed"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::phase_command::tests",
+          "test_name": "test_phase_composition_root_invalid_config_renders_validation_failure"
+        }
+      ]
+    },
+    {
+      "edge_id": {
         "entry_key": "PhaseCommandConfigLoaderPort",
         "anchor_id": {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
