@@ -226,6 +226,33 @@ fn test_parse_type_ref_array_length_constant_expression_is_evaluated() {
 }
 
 #[test]
+fn test_parse_type_ref_rejects_anonymous_const_argument() {
+    let mut ext_ids = HashMap::new();
+    let result = parse_type_ref(
+        "Trait<{ 1 + 2 }>",
+        &no_local,
+        100,
+        &ext_ids.clone(),
+        &mut |name: String| {
+            let id = 101 + ext_ids.len() as u32;
+            ext_ids.insert(name, id);
+            id
+        },
+    );
+    let error = match result {
+        Err(error) => error,
+        Ok(value) => format!("unexpected success: {value:?}"),
+    };
+    assert!(error.contains("anonymous const/block expressions"), "error: {error}");
+}
+
+#[test]
+fn test_parse_type_ref_braces_in_comments_are_accepted() {
+    let ty = parse("Vec</* { comment-only braces } */ u8>");
+    assert!(matches!(ty, Type::ResolvedPath(_)), "expected a parsed Vec type, got: {ty:?}");
+}
+
+#[test]
 fn test_parse_type_ref_array_length_expression_uses_usize_shift_semantics() {
     let ty = parse("[u8; 0x8000000000000000 << 1]");
     let Type::Array { len, .. } = ty else {

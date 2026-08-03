@@ -14,9 +14,8 @@ pub(crate) fn is_plain_generic_param_name(name: &str) -> bool {
 
 /// Validate the declaration context supplied to the lexical adapter.
 ///
-/// `input` is deliberately ignored: parsing and semantic interpretation of a
-/// type/bound expression belong to the existing `syn` boundary and to chain ③
-/// mismatch reporting, not to this lexical helper.
+/// Parsing and semantic interpretation of the input expression remain delegated to the
+/// existing `syn` boundary; this helper only validates the declared generic-name context.
 pub(crate) fn validate(_input: &str, generic_params: &[&str]) -> Result<(), String> {
     for name in generic_params {
         if !is_plain_generic_param_name(name) {

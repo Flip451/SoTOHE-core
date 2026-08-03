@@ -3186,6 +3186,131 @@
           "hash": "rvw1:sha256:b82e6e86814b84fcc623aef8e913bf3b1ef1f5c9f1f868ba886e830541724786",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T10:27:01Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/helpers.rs",
+              "line": 258,
+              "message": "`Expr::Block` is unconditionally collapsed to `{ _ }`, while its caller records `Constant.value` as `None` and downstream type-alias equality compares only `Constant.expr`. Consequently, catalogue target `Trait<{ 1 + 2 }>` and implementation target `Trait<{ 2 + 2 }>` both become `Trait<{ _ }>` and can incorrectly pass structural comparison. Preserve or evaluate the block value and add a negative unequal-block test.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:ae5e7334e30473f7466b3ac6c6a4b1eabc7c5e8f76fa6670aaa6f7da2cb278ef",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T10:36:02Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/helpers.rs",
+              "line": 261,
+              "message": "This serializes complex anonymous-const blocks from their source tail, but rustdoc's [`rendered_const`](https://chromium.googlesource.com/external/github.com/rust-lang/rust/+/d58061e6131f6141985faadb6794af540f81b1db/compiler/rustc_metadata/src/rmeta/encoder.rs) emits `{ _ }` for complex anonymous consts. Thus catalogue and implementation both using `Trait<{ 1 + 2 }>` become `{ 1 + 2 }` on the A side and `{ _ }` on the C side, causing a false mismatch. The parser-only tests do not exercise A↔C symmetry. Mirror rustdoc’s rendering and fail closed when its placeholder loses distinguishing information.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:f981189ecad43ece96cac5d7f043ce998d50f487a32dc2186ed310e353b6b63a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T10:56:06Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/structural_eq.rs",
+              "line": 236,
+              "message": "The anonymous-const guard examines only each associated-item constraint's binding and never recurses into `constraint.args`. A `{ _ }` constant nested in associated-item generic arguments therefore bypasses the fail-closed check; because type formatting also omits those arguments, aliases containing different anonymous const expressions can still compare equal and produce a false Blue signal. Inspect `constraint.args` recursively and add a nested-constraint regression test.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:ea9ad0e803bbf9ff61ac50525dfd1d16a6c2dc9bb1b1ceca3466fd4cd8ee1606",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T11:04:08Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/helpers.rs",
+              "line": 258,
+              "message": "`syn_expr_to_string` is shared by all `TypeRef` conversions, but this branch collapses every block const to the information-free `{ _ }` token while the new fail-closed check is applied only to `TypeAlias`. For example, a catalogue struct field using `Foo<{ 1 + 2 }>` and an implementation field using `Foo<{ 2 + 2 }>` can now both format as `Foo<{ _ }>` and incorrectly produce a Blue structural match. Preserve distinguishing source text or reject this placeholder in every structural comparison that consumes parsed types.",
+              "severity": "P0"
+            },
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/structural_eq.rs",
+              "line": 61,
+              "message": "Type-alias target equality still relies on `format_type`, whose associated-item constraint rendering omits `AssocItemConstraint.args`. The new guard catches `{ _ }` in those arguments, but ordinary semantic differences such as `Trait<Item<1> = u8>` versus `Trait<Item<2> = u8>` contain no placeholder and still render identically, producing a false Blue signal. Include associated-item arguments in the target comparison and add a non-placeholder regression test.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:517736b3ab27d5210cf0db74bde7c011af30b3f0920a3b22c59dbe4dd153236c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T11:15:04Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/structural_eq.rs",
+              "line": 420,
+              "message": "`collect_generic_arg_signatures` returns immediately for `GenericArgs::Parenthesized`, so it never traverses function-trait inputs or outputs. Associated-item arguments nested under a target such as `dyn Fn(&dyn Trait<Item<1> = u8>)` therefore remain omitted by `format_type`; changing `Item<1>` to `Item<2>` can still produce a false Blue match. Traverse parenthesized inputs and output recursively.",
+              "severity": "P0"
+            },
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/structural_eq.rs",
+              "line": 433,
+              "message": "Constraint-local signatures are sorted, but recursive signatures are appended directly to the shared vector while iterating constraints. Because associated constraints are order-independent, reordering equivalent constraints that contain nested associated arguments changes the recursive signature order and creates a false mismatch. Build each constraint's complete subtree signature before sorting, or sort the completed location-aware signatures.",
+              "severity": "P0"
+            },
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/structural_eq.rs",
+              "line": 344,
+              "message": "The new signatures embed raw `Path.path` values for dyn-trait, qualified-path, and bound locations, although primary structural equality uses `format_type` to normalize catalogue and rustdoc path representations. The same trait represented by a short path on one side and a canonical path on the other will now mismatch whenever it contains associated-item arguments. Normalize these location paths consistently with structural type comparison.",
+              "severity": "P0"
+            },
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/structural_eq.rs",
+              "line": 316,
+              "message": "The production portion of this module now extends through line 904, exceeding the repository's 700-line production-code maximum. Move the anonymous-const and alias-constraint comparison helpers into a focused sibling module; the test section remains exempt from the limit.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ffc8df4f74b77b47aaa5594f699875830dfc63af9a72d857873bac20183aabcb",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T11:26:13Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 21,
+              "message": "The raw brace scan rejects braces in any lexical context, not just anonymous const blocks. Valid inputs such as `Vec</* { */ u8>` or a const-generic character literal containing `{` are rejected before `syn` can parse them, regressing previously accepted TypeRefs. Parse the input first and reject actual `syn::Expr::Block` nodes instead of scanning characters; add a regression test for braces inside comments or literals.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:287fd9c975f73039705d5e89cbe69fd95c2e3587dccc6d7330cb0c20d0b0706d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T11:30:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1a10216f3b526f0af8dafb37d0095c039159fdca42c721eeb548584fd83d847b",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },

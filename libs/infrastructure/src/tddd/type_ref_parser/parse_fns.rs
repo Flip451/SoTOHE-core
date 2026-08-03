@@ -3,6 +3,7 @@
 use std::collections::HashMap;
 
 use rustdoc_types::{GenericBound, Id, Path, TraitBoundModifier, Type};
+use syn::visit::Visit;
 
 use super::constants::UNRESOLVED_CRATE_ID;
 use super::generic_tokens;
@@ -104,6 +105,7 @@ where
     validate_generic_identifier_ambiguities(type_ref_str, generic_params)?;
     let syn_type: syn::Type = syn::parse_str(type_ref_str)
         .map_err(|e| format!("syn parse error for `{type_ref_str}`: {e}"))?;
+    reject_anonymous_const_blocks_in_type(&syn_type)?;
     let mut ctx = ParseCtx {
         resolve_local,
         external_crate_ids,
@@ -189,6 +191,7 @@ where
     validate_generic_identifier_ambiguities(bound_str, generic_params)?;
     let syn_bound: syn::TypeParamBound =
         syn::parse_str(bound_str).map_err(|e| format!("syn parse error for `{bound_str}`: {e}"))?;
+    reject_anonymous_const_blocks_in_bound(&syn_bound)?;
 
     let mut ctx = ParseCtx {
         resolve_local,
@@ -215,6 +218,45 @@ where
             generic_params: vec![],
             modifier: TraitBoundModifier::None,
         }),
+    }
+}
+
+/// Rejects complex anonymous const blocks after `syn` has parsed the expression.
+///
+/// The lexical adapter must not manufacture rustdoc's information-free `{ _ }` placeholder:
+/// rustdoc does not retain enough data to distinguish two such blocks.  Visiting the parsed AST
+/// keeps this guard precise (braces in comments or literals are not mistaken for blocks) without
+/// reimplementing Rust's expression grammar.
+#[derive(Default)]
+struct AnonymousConstBlockVisitor {
+    found: bool,
+}
+
+impl<'ast> Visit<'ast> for AnonymousConstBlockVisitor {
+    fn visit_expr_block(&mut self, node: &'ast syn::ExprBlock) {
+        self.found = true;
+        syn::visit::visit_expr_block(self, node);
+    }
+}
+
+fn reject_anonymous_const_blocks_in_type(syntax: &syn::Type) -> Result<(), String> {
+    let mut visitor = AnonymousConstBlockVisitor::default();
+    visitor.visit_type(syntax);
+    reject_if_anonymous_const_block_found(visitor.found)
+}
+
+fn reject_anonymous_const_blocks_in_bound(syntax: &syn::TypeParamBound) -> Result<(), String> {
+    let mut visitor = AnonymousConstBlockVisitor::default();
+    visitor.visit_type_param_bound(syntax);
+    reject_if_anonymous_const_block_found(visitor.found)
+}
+
+fn reject_if_anonymous_const_block_found(found: bool) -> Result<(), String> {
+    if found {
+        Err("anonymous const/block expressions are not supported by lexical type comparison"
+            .to_owned())
+    } else {
+        Ok(())
     }
 }
 
