@@ -291,11 +291,11 @@
       }
     },
     {
-      "claim_hash": "19631289c40e81b27ba27bd2716a90e1f8af8ff3b97d4a7b76b4bdfed6dbbc6f",
+      "claim_hash": "aa93b3f693e33c368113a573d4594a12cf5d033701c11860501fabe000c684de",
       "evidence_hash": "d28cfa0cdb5eccf03844e008251a5e68fbc935d47cda27a0637e5834c472873d",
       "verdict": {
         "kind": "pass",
-        "citation": "literal かつ non-empty な argv 配列で表す canonical writer 一件、同形式の ordered pre-entry command 群"
+        "citation": "literal かつ non-empty な argv 配列"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -315,7 +315,7 @@
       }
     },
     {
-      "claim_hash": "19631289c40e81b27ba27bd2716a90e1f8af8ff3b97d4a7b76b4bdfed6dbbc6f",
+      "claim_hash": "aa93b3f693e33c368113a573d4594a12cf5d033701c11860501fabe000c684de",
       "evidence_hash": "fbef8ead42b1d6c5d92f7647463813d87f65da7bfc61396cd224712b31c31bd0",
       "verdict": {
         "kind": "pass",
@@ -339,11 +339,11 @@
       }
     },
     {
-      "claim_hash": "19631289c40e81b27ba27bd2716a90e1f8af8ff3b97d4a7b76b4bdfed6dbbc6f",
+      "claim_hash": "aa93b3f693e33c368113a573d4594a12cf5d033701c11860501fabe000c684de",
       "evidence_hash": "213840898b304208d16ca9f4c31b455230724c7df0d5ddb01097e2edccd94861",
       "verdict": {
         "kind": "pass",
-        "citation": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。"
+        "citation": "ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -363,11 +363,11 @@
       }
     },
     {
-      "claim_hash": "19631289c40e81b27ba27bd2716a90e1f8af8ff3b97d4a7b76b4bdfed6dbbc6f",
+      "claim_hash": "aa93b3f693e33c368113a573d4594a12cf5d033701c11860501fabe000c684de",
       "evidence_hash": "fcf6947ce3a1288ef78c920282154efdd8d7a5123976adbe3f41e1fd6b4540a2",
       "verdict": {
         "kind": "pass",
-        "citation": "config author/operator は公開 `bin/sotp` command の有効性と順序を所有し、engine は config に保存・解決された literal argv を書き換えず、subcommand grammar や command の意味論を解釈しない。"
+        "citation": "engine は config に保存・解決された literal argv を書き換えず、subcommand grammar や command の意味論を解釈しない"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -387,7 +387,7 @@
       }
     },
     {
-      "claim_hash": "19631289c40e81b27ba27bd2716a90e1f8af8ff3b97d4a7b76b4bdfed6dbbc6f",
+      "claim_hash": "aa93b3f693e33c368113a573d4594a12cf5d033701c11860501fabe000c684de",
       "evidence_hash": "eed55e184aa24849ff134ac46577b3efe86f7cc48072dacbfa95545682b2805d",
       "verdict": {
         "kind": "pass",
@@ -411,7 +411,7 @@
       }
     },
     {
-      "claim_hash": "8b810d492d745be15466341262130074c4c5de95ce7c76d97eade403cc7700b8",
+      "claim_hash": "4c2a2460acfb3805f64c911ae2510aeaf282035d83c9752f9617bddf03ef5308",
       "evidence_hash": "d28cfa0cdb5eccf03844e008251a5e68fbc935d47cda27a0637e5834c472873d",
       "verdict": {
         "kind": "pass",
@@ -435,7 +435,7 @@
       }
     },
     {
-      "claim_hash": "8b810d492d745be15466341262130074c4c5de95ce7c76d97eade403cc7700b8",
+      "claim_hash": "4c2a2460acfb3805f64c911ae2510aeaf282035d83c9752f9617bddf03ef5308",
       "evidence_hash": "fbef8ead42b1d6c5d92f7647463813d87f65da7bfc61396cd224712b31c31bd0",
       "verdict": {
         "kind": "pass",
@@ -459,11 +459,11 @@
       }
     },
     {
-      "claim_hash": "8b810d492d745be15466341262130074c4c5de95ce7c76d97eade403cc7700b8",
+      "claim_hash": "4c2a2460acfb3805f64c911ae2510aeaf282035d83c9752f9617bddf03ef5308",
       "evidence_hash": "213840898b304208d16ca9f4c31b455230724c7df0d5ddb01097e2edccd94861",
       "verdict": {
         "kind": "pass",
-        "citation": "ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに writer/pre-entry argv の先頭三要素が exactly `["
+        "citation": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに writer/pre-entry argv の先頭三要素が exactly `["
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -483,7 +483,7 @@
       }
     },
     {
-      "claim_hash": "8b810d492d745be15466341262130074c4c5de95ce7c76d97eade403cc7700b8",
+      "claim_hash": "4c2a2460acfb3805f64c911ae2510aeaf282035d83c9752f9617bddf03ef5308",
       "evidence_hash": "2be761837adb9975072173a0841bff11b2278f47b3d588641d778b0f97663766",
       "verdict": {
         "kind": "pass",
@@ -675,7 +675,7 @@
       }
     },
     {
-      "claim_hash": "cf874f61a8089dfcfc6c2cdfaf7a8c9897d6f6969a5cb2323fa36fd5bc7f671b",
+      "claim_hash": "7962885f986e1e99411a7be69d38048bd94c27fcbfb66a7059e5fa29cbbff521",
       "evidence_hash": "fbef8ead42b1d6c5d92f7647463813d87f65da7bfc61396cd224712b31c31bd0",
       "verdict": {
         "kind": "pass",
@@ -699,11 +699,11 @@
       }
     },
     {
-      "claim_hash": "cf874f61a8089dfcfc6c2cdfaf7a8c9897d6f6969a5cb2323fa36fd5bc7f671b",
+      "claim_hash": "7962885f986e1e99411a7be69d38048bd94c27fcbfb66a7059e5fa29cbbff521",
       "evidence_hash": "213840898b304208d16ca9f4c31b455230724c7df0d5ddb01097e2edccd94861",
       "verdict": {
         "kind": "pass",
-        "citation": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。"
+        "citation": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに writer/pre-entry argv の先頭三要素が exactly `［\"bin/sotp\", \"phase\", \"enter\"］`、`［\"bin/sotp\", \"review\", \"local\"］`、または `［\"bin/sotp\", \"review\", \"fix-local\"］` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -723,11 +723,11 @@
       }
     },
     {
-      "claim_hash": "cf874f61a8089dfcfc6c2cdfaf7a8c9897d6f6969a5cb2323fa36fd5bc7f671b",
+      "claim_hash": "7962885f986e1e99411a7be69d38048bd94c27fcbfb66a7059e5fa29cbbff521",
       "evidence_hash": "2be761837adb9975072173a0841bff11b2278f47b3d588641d778b0f97663766",
       "verdict": {
         "kind": "pass",
-        "citation": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。"
+        "citation": "invalid schema"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -843,7 +843,7 @@
       }
     },
     {
-      "claim_hash": "57f1a69552eda5f8ef86d9a2e7ac0214d7020a4b7064201d0711de990240c1e4",
+      "claim_hash": "ba3b72d28bb7a609be27e6eef2a8c9aaa4807ef52ba128f99f8cb2f5f739f429",
       "evidence_hash": "d28cfa0cdb5eccf03844e008251a5e68fbc935d47cda27a0637e5834c472873d",
       "verdict": {
         "kind": "pass",
@@ -867,11 +867,11 @@
       }
     },
     {
-      "claim_hash": "57f1a69552eda5f8ef86d9a2e7ac0214d7020a4b7064201d0711de990240c1e4",
+      "claim_hash": "ba3b72d28bb7a609be27e6eef2a8c9aaa4807ef52ba128f99f8cb2f5f739f429",
       "evidence_hash": "fbef8ead42b1d6c5d92f7647463813d87f65da7bfc61396cd224712b31c31bd0",
       "verdict": {
         "kind": "pass",
-        "citation": "phase と pre-review config は schema version、declaration id の一意性、non-empty literal argv、および positive integer かつ 3,600 seconds 以下の per-command timeout を fail-closed に検証する。"
+        "citation": "schema version、declaration id の一意性"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -887,30 +887,6 @@
           "section": "constraint",
           "element_id": "CN-01",
           "text_label": "phase と pre-review config は schema version、declaration id の一意性、non-empty literal argv、および positive integer かつ 3,600 seconds 以下の per-command timeout を fail-closed に検証する。phase command config validation と pre-review config validation は、configured writer、pre-entry、pre-review argv のいずれにも shared finite exact-literal-prefix recursion denylist を適用し、先頭三要素が exactly `[\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、または `[\"bin/sotp\", \"review\", \"fix-local\"]` である argv を configured command、writer、reviewer の起動前に non-zero で拒否する。"
-        }
-      }
-    },
-    {
-      "claim_hash": "57f1a69552eda5f8ef86d9a2e7ac0214d7020a4b7064201d0711de990240c1e4",
-      "evidence_hash": "213840898b304208d16ca9f4c31b455230724c7df0d5ddb01097e2edccd94861",
-      "verdict": {
-        "kind": "pass",
-        "citation": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
-          "section_key": "types",
-          "entry_key": "CommandDeclarationId"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "acceptance_criteria",
-          "element_id": "AC-01",
-          "text_label": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに writer/pre-entry argv の先頭三要素が exactly `[\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、または `[\"bin/sotp\", \"review\", \"fix-local\"]` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
         }
       }
     },
@@ -987,11 +963,11 @@
       }
     },
     {
-      "claim_hash": "7129fe2e446f448b41ad416a048b63cf21d7542b7b69b8433d4b031cc242fa04",
+      "claim_hash": "3fb0aa7dffbe898332d2a3e928f66559d4e860135a83873584806c79da200e0c",
       "evidence_hash": "5766f2233e51df7dd5a39554022688b7364647b79f00722e6c78f0cde48989fa",
       "verdict": {
         "kind": "pass",
-        "citation": "phase engine は repository root を cwd として pre-entry command を宣言順に実行"
+        "citation": "phase engine は repository root を cwd として pre-entry command を宣言順に実行し"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1011,11 +987,11 @@
       }
     },
     {
-      "claim_hash": "7129fe2e446f448b41ad416a048b63cf21d7542b7b69b8433d4b031cc242fa04",
+      "claim_hash": "3fb0aa7dffbe898332d2a3e928f66559d4e860135a83873584806c79da200e0c",
       "evidence_hash": "3a5e9bfe0d346bd4954b8a1b5e75e3144ca58519d0d0207e5f5861d453dfc660",
       "verdict": {
         "kind": "pass",
-        "citation": "dispatcher は後続 command、writer、または reviewer を起動せず、失敗した argv と outcome を operator が識別できる形で返す。"
+        "citation": "scope command が non-zero を返した場合、dispatcher は後続 command、writer、または reviewer を起動せず、失敗した argv と outcome を operator が識別できる形で返す。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1035,7 +1011,7 @@
       }
     },
     {
-      "claim_hash": "7129fe2e446f448b41ad416a048b63cf21d7542b7b69b8433d4b031cc242fa04",
+      "claim_hash": "3fb0aa7dffbe898332d2a3e928f66559d4e860135a83873584806c79da200e0c",
       "evidence_hash": "b49fb65c90adaab174287b910af03a5d2c7e928cd33ff55fd2b16efaa3957c33",
       "verdict": {
         "kind": "pass",
@@ -1059,11 +1035,11 @@
       }
     },
     {
-      "claim_hash": "7129fe2e446f448b41ad416a048b63cf21d7542b7b69b8433d4b031cc242fa04",
+      "claim_hash": "3fb0aa7dffbe898332d2a3e928f66559d4e860135a83873584806c79da200e0c",
       "evidence_hash": "2be761837adb9975072173a0841bff11b2278f47b3d588641d778b0f97663766",
       "verdict": {
         "kind": "pass",
-        "citation": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。"
+        "citation": "validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1083,11 +1059,11 @@
       }
     },
     {
-      "claim_hash": "e361c28861264c9ad1650b0c11de31aa71939092ef5a4eb4a146e1a6eed42a2d",
+      "claim_hash": "6270bc21fe9c8bb1b1a6350cd134a474071b386f145ab94aec871dd4a75a92f7",
       "evidence_hash": "d28cfa0cdb5eccf03844e008251a5e68fbc935d47cda27a0637e5834c472873d",
       "verdict": {
         "kind": "pass",
-        "citation": "command ごとの明示 timeout または約 60 分の既定 timeout を宣言する。"
+        "citation": "ならびに command ごとの明示 timeout または約 60 分の既定 timeout を宣言する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1107,11 +1083,11 @@
       }
     },
     {
-      "claim_hash": "e361c28861264c9ad1650b0c11de31aa71939092ef5a4eb4a146e1a6eed42a2d",
+      "claim_hash": "6270bc21fe9c8bb1b1a6350cd134a474071b386f145ab94aec871dd4a75a92f7",
       "evidence_hash": "fbef8ead42b1d6c5d92f7647463813d87f65da7bfc61396cd224712b31c31bd0",
       "verdict": {
         "kind": "pass",
-        "citation": "positive integer かつ 3,600 seconds 以下の per-command timeout を fail-closed に検証する"
+        "citation": "positive integer かつ 3,600 seconds 以下の per-command timeout"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1131,7 +1107,7 @@
       }
     },
     {
-      "claim_hash": "e361c28861264c9ad1650b0c11de31aa71939092ef5a4eb4a146e1a6eed42a2d",
+      "claim_hash": "6270bc21fe9c8bb1b1a6350cd134a474071b386f145ab94aec871dd4a75a92f7",
       "evidence_hash": "21d9371c5ac714d4a549a0fb8d87382c3bab75abdb2d63fe60fd48e84eaf8108",
       "verdict": {
         "kind": "pass",
@@ -1155,11 +1131,11 @@
       }
     },
     {
-      "claim_hash": "e361c28861264c9ad1650b0c11de31aa71939092ef5a4eb4a146e1a6eed42a2d",
+      "claim_hash": "6270bc21fe9c8bb1b1a6350cd134a474071b386f145ab94aec871dd4a75a92f7",
       "evidence_hash": "213840898b304208d16ca9f4c31b455230724c7df0d5ddb01097e2edccd94861",
       "verdict": {
         "kind": "pass",
-        "citation": "positive integer でないまたは 3,600 seconds を超える timeout"
+        "citation": "\"positive integer でないまたは 3,600 seconds を超える timeout\""
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1179,7 +1155,7 @@
       }
     },
     {
-      "claim_hash": "e361c28861264c9ad1650b0c11de31aa71939092ef5a4eb4a146e1a6eed42a2d",
+      "claim_hash": "6270bc21fe9c8bb1b1a6350cd134a474071b386f145ab94aec871dd4a75a92f7",
       "evidence_hash": "574c686246d7577d3ab00fe3d015a1ba12dac480d60fd748ff40da6e914bd3dc",
       "verdict": {
         "kind": "pass",
@@ -1635,11 +1611,11 @@
       }
     },
     {
-      "claim_hash": "5961443a540156aac96e84c89c16bd6d46b747ff430c82de579851f48030a071",
+      "claim_hash": "016e7b527431d1e448d7d64be7bc966c78cc6b92f889bab06997559a2383525d",
       "evidence_hash": "21d9371c5ac714d4a549a0fb8d87382c3bab75abdb2d63fe60fd48e84eaf8108",
       "verdict": {
         "kind": "pass",
-        "citation": "per command で stdout を最大 1 MiB (1,048,576 bytes)、stderr を独立に最大 1 MiB (1,048,576 bytes) capture する"
+        "citation": "per command で stdout を最大 1 MiB (1,048,576 bytes)、stderr を独立に最大 1 MiB (1,048,576 bytes) capture する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1659,7 +1635,7 @@
       }
     },
     {
-      "claim_hash": "5961443a540156aac96e84c89c16bd6d46b747ff430c82de579851f48030a071",
+      "claim_hash": "016e7b527431d1e448d7d64be7bc966c78cc6b92f889bab06997559a2383525d",
       "evidence_hash": "574c686246d7577d3ab00fe3d015a1ba12dac480d60fd748ff40da6e914bd3dc",
       "verdict": {
         "kind": "pass",
@@ -3699,11 +3675,11 @@
       }
     },
     {
-      "claim_hash": "ba82cd2e326daddfc21628ee14e90daaee9440d9f33319ddd075924881dfa609",
+      "claim_hash": "50b3041fba24708d09e12d5ef8b3f35b1e8132c9249b009a9912d6b5009aca2b",
       "evidence_hash": "fbef8ead42b1d6c5d92f7647463813d87f65da7bfc61396cd224712b31c31bd0",
       "verdict": {
         "kind": "pass",
-        "citation": "positive integer かつ 3,600 seconds 以下の per-command timeout"
+        "citation": "positive integer かつ 3,600 seconds 以下の per-command timeout を fail-closed に検証する"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -3723,7 +3699,7 @@
       }
     },
     {
-      "claim_hash": "ba82cd2e326daddfc21628ee14e90daaee9440d9f33319ddd075924881dfa609",
+      "claim_hash": "50b3041fba24708d09e12d5ef8b3f35b1e8132c9249b009a9912d6b5009aca2b",
       "evidence_hash": "21d9371c5ac714d4a549a0fb8d87382c3bab75abdb2d63fe60fd48e84eaf8108",
       "verdict": {
         "kind": "pass",
@@ -3747,7 +3723,7 @@
       }
     },
     {
-      "claim_hash": "ba82cd2e326daddfc21628ee14e90daaee9440d9f33319ddd075924881dfa609",
+      "claim_hash": "50b3041fba24708d09e12d5ef8b3f35b1e8132c9249b009a9912d6b5009aca2b",
       "evidence_hash": "213840898b304208d16ca9f4c31b455230724c7df0d5ddb01097e2edccd94861",
       "verdict": {
         "kind": "pass",
@@ -3771,11 +3747,11 @@
       }
     },
     {
-      "claim_hash": "ba82cd2e326daddfc21628ee14e90daaee9440d9f33319ddd075924881dfa609",
+      "claim_hash": "50b3041fba24708d09e12d5ef8b3f35b1e8132c9249b009a9912d6b5009aca2b",
       "evidence_hash": "2be761837adb9975072173a0841bff11b2278f47b3d588641d778b0f97663766",
       "verdict": {
         "kind": "pass",
-        "citation": "invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout"
+        "citation": "positive integer でないまたは 3,600 seconds を超える timeout"
       },
       "claim_origin": {
         "kind": "catalogue_entry",

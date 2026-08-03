@@ -16,31 +16,31 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CommandArgument | value_object | add | — | 🟡 | 🔵 |
-| CommandArgv | value_object | add | — | 🟡 | 🔵 |
-| CommandConfigSchemaVersion | value_object | add | — | 🟡 | 🔵 |
-| CommandDeclarationId | value_object | add | — | 🟡 | 🔵 |
-| CommandSequenceIndex | value_object | add | — | 🟡 | 🔵 |
-| CommandTimeoutSeconds | value_object | add | — | 🟡 | 🔵 |
-| ConfiguredCommand | value_object | add | — | 🟡 | 🔵 |
-| OutputCaptureLimitBytes | value_object | add | — | 🟡 | 🔵 |
+| CommandArgument | value_object | add | — | 🔵 | 🔵 |
+| CommandArgv | value_object | add | — | 🔵 | 🔵 |
+| CommandConfigSchemaVersion | value_object | add | — | 🔵 | 🔵 |
+| CommandDeclarationId | value_object | add | — | 🔵 | 🔵 |
+| CommandSequenceIndex | value_object | add | — | 🔵 | 🔵 |
+| CommandTimeoutSeconds | value_object | add | — | 🔵 | 🔵 |
+| ConfiguredCommand | value_object | add | — | 🔵 | 🔵 |
+| OutputCaptureLimitBytes | value_object | add | — | 🔵 | 🔵 |
 | PhaseCommandConfig | value_object | add | — | 🟡 | 🔵 |
 | PhaseCommandDeclaration | value_object | add | — | 🟡 | 🔵 |
 | PreReviewCommandConfig | value_object | add | — | 🔵 | 🔵 |
 | PreReviewScopeCommandDeclaration | value_object | add | — | 🔵 | 🔵 |
 | ProgramExitCode | value_object | add | — | 🔵 | 🔵 |
-| UnvalidatedTimeoutSeconds | value_object | add | — | 🟡 | 🔵 |
+| UnvalidatedTimeoutSeconds | value_object | add | — | 🔵 | 🔵 |
 
 ## Error Types
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CommandArgvValidationError | error_type | add | Empty, RecursiveInvocation | 🟡 | 🔵 |
+| CommandArgvValidationError | error_type | add | Empty, RecursiveInvocation | 🔵 | 🔵 |
 | CommandConfigLoadError | error_type | add | ReadFailed, DecodeFailed, Invalid | 🔵 | 🔵 |
-| CommandConfigValidationError | error_type | add | InvalidSchemaVersion, InvalidDeclarationId, InvalidReviewScope, DuplicateDeclaration, DuplicateScope, EmptyArgv, TimeoutOutOfRange, RecursiveInvocation | 🟡 | 🔵 |
-| CommandDeclarationIdValidationError | error_type | add | Empty | 🟡 | 🔵 |
-| CommandTimeoutValidationError | error_type | add | OutOfRange | 🟡 | 🔵 |
-| ConfiguredCommandValidationError | error_type | add | Argv, Timeout | 🟡 | 🔵 |
+| CommandConfigValidationError | error_type | add | InvalidSchemaVersion, InvalidDeclarationId, InvalidReviewScope, DuplicateDeclaration, DuplicateScope, EmptyArgv, TimeoutOutOfRange, RecursiveInvocation | 🔵 | 🔵 |
+| CommandDeclarationIdValidationError | error_type | add | Empty | 🔵 | 🔵 |
+| CommandTimeoutValidationError | error_type | add | OutOfRange | 🔵 | 🔵 |
+| ConfiguredCommandValidationError | error_type | add | Argv, Timeout | 🔵 | 🔵 |
 | CurrentReviewTrackResolveError | error_type | add | ResolveFailed | 🔵 | 🔵 |
 | PhaseCommandConfigValidationError | error_type | add | InvalidSchemaVersion, DuplicateDeclaration | 🟡 | 🔵 |
 | PhaseCommandEnterError | error_type | add | Config, UnknownPhase, Runner | 🟡 | 🔵 |

@@ -22,17 +22,23 @@ impl CommandArgument {
     }
 }
 
+impl AsRef<str> for CommandArgument {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CommandArgv(Vec<CommandArgument>);
 
 impl CommandArgv {
-    pub fn try_new(arguments: Vec<CommandArgument>) -> Result<Self, CommandConfigValidationError> {
+    pub fn try_new(arguments: Vec<CommandArgument>) -> Result<Self, CommandArgvValidationError> {
         if arguments.is_empty() {
-            return Err(CommandConfigValidationError::EmptyArgv);
+            return Err(CommandArgvValidationError::Empty);
         }
         let argv = Self(arguments);
         if let Some(prefix) = argv.recursive_prefix() {
-            return Err(CommandConfigValidationError::RecursiveInvocation { prefix });
+            return Err(CommandArgvValidationError::RecursiveInvocation { prefix });
         }
         Ok(argv)
     }
@@ -118,9 +124,9 @@ pub struct CommandTimeoutSeconds(u64);
 impl CommandTimeoutSeconds {
     pub fn try_new(
         seconds: UnvalidatedTimeoutSeconds,
-    ) -> Result<Self, CommandConfigValidationError> {
+    ) -> Result<Self, CommandTimeoutValidationError> {
         if seconds.0 == 0 || seconds.0 > MAX_TIMEOUT_SECONDS {
-            return Err(CommandConfigValidationError::TimeoutOutOfRange { seconds });
+            return Err(CommandTimeoutValidationError::OutOfRange { seconds });
         }
         Ok(Self(seconds.0))
     }
@@ -156,7 +162,7 @@ impl ConfiguredCommand {
     pub fn try_new(
         arguments: Vec<CommandArgument>,
         timeout_seconds: Option<UnvalidatedTimeoutSeconds>,
-    ) -> Result<Self, CommandConfigValidationError> {
+    ) -> Result<Self, ConfiguredCommandValidationError> {
         Ok(Self {
             argv: CommandArgv::try_new(arguments)?,
             timeout: match timeout_seconds {
@@ -178,17 +184,21 @@ impl ConfiguredCommand {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CommandDeclarationId(String);
 impl CommandDeclarationId {
-    pub fn try_new(value: String) -> Result<Self, CommandConfigValidationError> {
+    pub fn try_new(value: String) -> Result<Self, CommandDeclarationIdValidationError> {
         if value.trim().is_empty() {
-            return Err(CommandConfigValidationError::InvalidDeclarationId {
-                value: FreeText::new(value),
-            });
+            return Err(CommandDeclarationIdValidationError::Empty { value: FreeText::new(value) });
         }
         Ok(Self(value))
     }
     #[must_use]
     pub fn as_str(&self) -> &str {
         &self.0
+    }
+}
+
+impl AsRef<str> for CommandDeclarationId {
+    fn as_ref(&self) -> &str {
+        self.as_str()
     }
 }
 
@@ -226,6 +236,34 @@ impl CommandSequenceIndex {
 }
 
 #[derive(Debug, Error)]
+pub enum CommandArgvValidationError {
+    #[error("configured argv must not be empty")]
+    Empty,
+    #[error("recursive command invocation is forbidden")]
+    RecursiveInvocation { prefix: Vec<CommandArgument> },
+}
+
+#[derive(Debug, Error)]
+pub enum CommandTimeoutValidationError {
+    #[error("command timeout is outside the supported range: {}", seconds.as_u64())]
+    OutOfRange { seconds: UnvalidatedTimeoutSeconds },
+}
+
+#[derive(Debug, Error)]
+pub enum ConfiguredCommandValidationError {
+    #[error(transparent)]
+    Argv(#[from] CommandArgvValidationError),
+    #[error(transparent)]
+    Timeout(#[from] CommandTimeoutValidationError),
+}
+
+#[derive(Debug, Error)]
+pub enum CommandDeclarationIdValidationError {
+    #[error("invalid command declaration id: {value}")]
+    Empty { value: FreeText },
+}
+
+#[derive(Debug, Error)]
 pub enum CommandConfigValidationError {
     #[error("unsupported command configuration schema version: {actual:?}")]
     InvalidSchemaVersion { actual: CommandConfigSchemaVersion },
@@ -245,6 +283,32 @@ pub enum CommandConfigValidationError {
     RecursiveInvocation { prefix: Vec<CommandArgument> },
 }
 
+impl From<ConfiguredCommandValidationError> for CommandConfigValidationError {
+    fn from(error: ConfiguredCommandValidationError) -> Self {
+        match error {
+            ConfiguredCommandValidationError::Argv(CommandArgvValidationError::Empty) => {
+                Self::EmptyArgv
+            }
+            ConfiguredCommandValidationError::Argv(
+                CommandArgvValidationError::RecursiveInvocation { prefix },
+            ) => Self::RecursiveInvocation { prefix },
+            ConfiguredCommandValidationError::Timeout(
+                CommandTimeoutValidationError::OutOfRange { seconds },
+            ) => Self::TimeoutOutOfRange { seconds },
+        }
+    }
+}
+
+impl From<CommandDeclarationIdValidationError> for CommandConfigValidationError {
+    fn from(error: CommandDeclarationIdValidationError) -> Self {
+        match error {
+            CommandDeclarationIdValidationError::Empty { value } => {
+                Self::InvalidDeclarationId { value }
+            }
+        }
+    }
+}
+
 #[derive(Debug, Error)]
 pub enum CommandConfigLoadError {
     #[error("command configuration could not be read: {message}")]
@@ -259,8 +323,10 @@ pub enum CommandConfigLoadError {
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
     use super::{
-        CommandArgument, CommandArgv, CommandConfigSchemaVersion, CommandConfigValidationError,
-        CommandDeclarationId, CommandTimeoutSeconds, ConfiguredCommand, UnvalidatedTimeoutSeconds,
+        CommandArgument, CommandArgv, CommandArgvValidationError, CommandConfigSchemaVersion,
+        CommandConfigValidationError, CommandDeclarationId, CommandDeclarationIdValidationError,
+        CommandTimeoutSeconds, CommandTimeoutValidationError, ConfiguredCommand,
+        ConfiguredCommandValidationError, UnvalidatedTimeoutSeconds,
     };
 
     fn argv(values: &[&str]) -> Vec<CommandArgument> {
@@ -269,25 +335,20 @@ mod tests {
 
     #[test]
     fn test_command_argv_empty_arguments_is_rejected() {
-        assert!(matches!(
-            CommandArgv::try_new(Vec::new()),
-            Err(CommandConfigValidationError::EmptyArgv)
-        ));
+        assert!(matches!(CommandArgv::try_new(Vec::new()), Err(CommandArgvValidationError::Empty)));
     }
 
     #[test]
     fn test_command_argv_empty_array_is_rejected() {
         let empty_argv: Vec<CommandArgument> = Vec::new();
-        assert!(matches!(
-            CommandArgv::try_new(empty_argv),
-            Err(CommandConfigValidationError::EmptyArgv)
-        ));
+        assert!(matches!(CommandArgv::try_new(empty_argv), Err(CommandArgvValidationError::Empty)));
     }
 
     #[test]
     fn test_command_argument_preserves_empty_literal_and_argv_order() {
         let empty = CommandArgument::try_new(String::new());
         assert_eq!(empty.as_str(), "");
+        assert_eq!(empty.as_ref(), "");
         let command_argv = CommandArgv::try_new(argv(&["bin/sotp", "signal", "check"])).unwrap();
         let values: Vec<&str> =
             command_argv.arguments().iter().map(CommandArgument::as_str).collect();
@@ -298,7 +359,9 @@ mod tests {
     fn test_configured_command_recursive_prefix_is_rejected() {
         assert!(matches!(
             ConfiguredCommand::try_new(argv(&["bin/sotp", "phase", "enter"]), None),
-            Err(CommandConfigValidationError::RecursiveInvocation { .. })
+            Err(ConfiguredCommandValidationError::Argv(
+                CommandArgvValidationError::RecursiveInvocation { .. }
+            ))
         ));
     }
 
@@ -307,7 +370,9 @@ mod tests {
         for executable in ["./bin/sotp", "bin/./sotp", "bin/../bin/sotp", "sotp"] {
             assert!(matches!(
                 ConfiguredCommand::try_new(argv(&[executable, "review", "local"]), None),
-                Err(CommandConfigValidationError::RecursiveInvocation { .. })
+                Err(ConfiguredCommandValidationError::Argv(
+                    CommandArgvValidationError::RecursiveInvocation { .. }
+                ))
             ));
         }
     }
@@ -330,9 +395,9 @@ mod tests {
             3_600
         );
         let zero = CommandTimeoutSeconds::try_new(UnvalidatedTimeoutSeconds::new(0));
-        assert!(matches!(zero, Err(CommandConfigValidationError::TimeoutOutOfRange { .. })));
+        assert!(matches!(zero, Err(CommandTimeoutValidationError::OutOfRange { .. })));
         match CommandTimeoutSeconds::try_new(UnvalidatedTimeoutSeconds::new(3_601)) {
-            Err(CommandConfigValidationError::TimeoutOutOfRange { seconds }) => {
+            Err(CommandTimeoutValidationError::OutOfRange { seconds }) => {
                 assert_eq!(seconds.as_u64(), 3_601);
             }
             other => panic!("expected an out-of-range timeout error, got {other:?}"),
@@ -350,8 +415,10 @@ mod tests {
     fn test_declaration_id_empty_value_and_schema_version_validation_are_explicit() {
         assert!(matches!(
             CommandDeclarationId::try_new(" ".to_owned()),
-            Err(CommandConfigValidationError::InvalidDeclarationId { .. })
+            Err(CommandDeclarationIdValidationError::Empty { .. })
         ));
+        let declaration_id = CommandDeclarationId::try_new("phase-1".to_owned()).unwrap();
+        assert_eq!(declaration_id.as_ref(), "phase-1");
         assert!(CommandConfigSchemaVersion::new(1).validate().is_ok());
         assert!(matches!(
             CommandConfigSchemaVersion::new(2).validate(),

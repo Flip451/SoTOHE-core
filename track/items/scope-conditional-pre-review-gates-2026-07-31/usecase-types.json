@@ -15,6 +15,14 @@
             }
           ],
           "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
         }
       ],
       "type_name": "CommandArgument"
@@ -40,6 +48,19 @@
           "params": [],
           "receiver": "&self",
           "returns": "&[CommandArgument]"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "with_appended_arguments",
+          "params": [
+            {
+              "name": "additional",
+              "ty": "impl IntoIterator<Item = CommandArgument>"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Self"
         }
       ],
       "type_name": "CommandArgv"
@@ -146,6 +167,14 @@
             }
           ],
           "returns": "Result<Self, CommandDeclarationIdValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
         }
       ],
       "type_name": "CommandDeclarationId"
@@ -470,6 +499,19 @@
         }
       ],
       "type_name": "CommandConfigSchemaVersion"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "into_command_config_validation_error",
+          "params": [],
+          "receiver": "self",
+          "returns": "CommandConfigValidationError"
+        }
+      ],
+      "type_name": "PhaseCommandConfigValidationError"
     },
     {
       "methods": [
@@ -1314,10 +1356,6 @@
     },
     {
       "for_type": "CommandConfigValidationError",
-      "trait_ref": "core::convert::From<PhaseCommandConfigValidationError>"
-    },
-    {
-      "for_type": "CommandConfigValidationError",
       "trait_ref": "core::convert::From<PreReviewCommandConfigValidationError>"
     },
     {
@@ -1971,7 +2009,7 @@
         "shape": {
           "fields": [],
           "has_stripped_fields": true,
-          "kind": "plain"
+          "kind": "tuple"
         }
       },
       "methods": [],
@@ -2011,7 +2049,7 @@
         "shape": {
           "fields": [],
           "has_stripped_fields": true,
-          "kind": "plain"
+          "kind": "tuple"
         }
       },
       "methods": [],
@@ -2160,7 +2198,7 @@
         "shape": {
           "fields": [],
           "has_stripped_fields": true,
-          "kind": "plain"
+          "kind": "tuple"
         }
       },
       "methods": [],
@@ -2309,7 +2347,7 @@
         "shape": {
           "fields": [],
           "has_stripped_fields": true,
-          "kind": "plain"
+          "kind": "tuple"
         }
       },
       "methods": [],
@@ -2324,10 +2362,6 @@
         },
         {
           "anchor": "CN-01",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "AC-01",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]
@@ -2382,7 +2416,7 @@
         "shape": {
           "fields": [],
           "has_stripped_fields": true,
-          "kind": "plain"
+          "kind": "tuple"
         }
       },
       "methods": [],
@@ -2418,7 +2452,7 @@
         "shape": {
           "fields": [],
           "has_stripped_fields": true,
-          "kind": "plain"
+          "kind": "tuple"
         }
       },
       "methods": [],
@@ -2663,7 +2697,7 @@
         "shape": {
           "fields": [],
           "has_stripped_fields": true,
-          "kind": "plain"
+          "kind": "tuple"
         }
       },
       "methods": [],
@@ -3972,7 +4006,7 @@
         "shape": {
           "fields": [],
           "has_stripped_fields": true,
-          "kind": "plain"
+          "kind": "tuple"
         }
       },
       "methods": [],

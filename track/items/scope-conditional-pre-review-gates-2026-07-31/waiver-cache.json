@@ -208,7 +208,7 @@
       },
       "key": {
         "waived_reason_hash": "58402f1a681822a321e2acfb247b684c1e8d3cf32f3e215a63763c0fc6182b6e",
-        "declaration_hash": "5457e56b5ee58fe5698d48e226710fe41e1f3cfdb9bed56e13ec2aba840bbc86",
+        "declaration_hash": "80d3dde9cdb6f97c998131aa73a631e7782fee6f9fadae8699552177c368aa6c",
         "anchor_text_hash": "05b8094316a1aacabb4bec26100b679daf53d5554267297214266776d1838398"
       },
       "verdict": {
@@ -232,7 +232,7 @@
       },
       "key": {
         "waived_reason_hash": "34054518716435d23d175ce44a74179ab501ddef2280b76b5f66fa9a2d7bc3e4",
-        "declaration_hash": "5457e56b5ee58fe5698d48e226710fe41e1f3cfdb9bed56e13ec2aba840bbc86",
+        "declaration_hash": "80d3dde9cdb6f97c998131aa73a631e7782fee6f9fadae8699552177c368aa6c",
         "anchor_text_hash": "fa7e4f00724359c580b35833faf745f970a7f203d8fbd44a502a13e850af54b9"
       },
       "verdict": {
@@ -256,7 +256,7 @@
       },
       "key": {
         "waived_reason_hash": "92f27217a2897fc2ab3e0ebb1a100b6bc3316423783b5d8df884103e9f52edf4",
-        "declaration_hash": "5457e56b5ee58fe5698d48e226710fe41e1f3cfdb9bed56e13ec2aba840bbc86",
+        "declaration_hash": "80d3dde9cdb6f97c998131aa73a631e7782fee6f9fadae8699552177c368aa6c",
         "anchor_text_hash": "e44a2b38a1ce3bf278e618e41415dbd26068d287e4173facb0f0c39698f67474"
       },
       "verdict": {
@@ -280,12 +280,12 @@
       },
       "key": {
         "waived_reason_hash": "b12cda0caf5d15eac2ce3ad78d3603e065059f9118521567ea74df227e451bbb",
-        "declaration_hash": "5457e56b5ee58fe5698d48e226710fe41e1f3cfdb9bed56e13ec2aba840bbc86",
+        "declaration_hash": "80d3dde9cdb6f97c998131aa73a631e7782fee6f9fadae8699552177c368aa6c",
         "anchor_text_hash": "40dc60e9383fe78e784c70d0531f18bc574b03cbaa5710618f0fcdf56d3382f7"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: []"
+        "citation": "Opaque literal command-argument value (IN-03, AC-04)."
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -774,30 +774,6 @@
         "entry_key": "CommandDeclarationId",
         "anchor_id": {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-01"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "CommandDeclarationId",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:AC-01"
-      },
-      "key": {
-        "waived_reason_hash": "cd3ccb0a5343ce5da4f2cbb494573fa404757d5dc222a0b03cb44c6cff6f1813",
-        "declaration_hash": "a5a6dc185ec2a919d4d70458409478d960be30d7b58dd367cd0efa1b1b571a47",
-        "anchor_text_hash": "05b8094316a1aacabb4bec26100b679daf53d5554267297214266776d1838398"
-      },
-      "verdict": {
-        "kind": "waived",
-        "citation": "shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: []"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "entry_key": "CommandDeclarationId",
-        "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "CN-01"
         }
       },
@@ -808,12 +784,12 @@
       },
       "key": {
         "waived_reason_hash": "1a4f1b4beb3840269973090ab1c4b5da4952721abf125e5ed36bd105bbb296ae",
-        "declaration_hash": "a5a6dc185ec2a919d4d70458409478d960be30d7b58dd367cd0efa1b1b571a47",
+        "declaration_hash": "c3695d264070cdca0140edcebfd8d8b70bbb4263382efca5d83a6ffa1185a750",
         "anchor_text_hash": "e44a2b38a1ce3bf278e618e41415dbd26068d287e4173facb0f0c39698f67474"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: []"
+        "citation": "Validated phase-declaration identifier (IN-01, CN-01)."
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -832,12 +808,12 @@
       },
       "key": {
         "waived_reason_hash": "e70101cb8ab93df2b47e785d58207e64a86f8b6cd2d6d9bc36c30d8f736180e2",
-        "declaration_hash": "a5a6dc185ec2a919d4d70458409478d960be30d7b58dd367cd0efa1b1b571a47",
+        "declaration_hash": "c3695d264070cdca0140edcebfd8d8b70bbb4263382efca5d83a6ffa1185a750",
         "anchor_text_hash": "eb3acd9bc2b70f70d7e5b103ad0b2255c300e50456aaeadfd2f50815b79ff6cf"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "shape: Plain { fields: [], has_stripped_fields: true }, methods: []"
+        "citation": "role: ValueObject { invariants: [] }, kind: Struct(StructKind { shape: Tuple { fields: [], has_stripped_fields: true }, typestate: None }), methods: []"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -1000,12 +976,12 @@
       },
       "key": {
         "waived_reason_hash": "7088ab7211edb05acf4d9005be3cf8fa01765a7bf06a9821f82ff79dfcd9095c",
-        "declaration_hash": "4d172171ad939a988b9cdb618eae54d50e868b1a8463466562f530ce57a7a8a8",
+        "declaration_hash": "4caa79ad01a31b84aa1926885f8c07a340c8206c55b921efc938327cd33ed84c",
         "anchor_text_hash": "edb4e92dab097edf9daf4986f7e535467ff8962fca5911e37dec2e1756d33671"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "\"shape: Plain { fields: [], has_stripped_fields: true }\""
+        "citation": "Command-sequence position value (IN-02, CN-03)."
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -1024,12 +1000,12 @@
       },
       "key": {
         "waived_reason_hash": "13cf7fda462f31349fe8d143ba0e6840bb6c1b27a7406c202b0821ad41a7f5d2",
-        "declaration_hash": "4d172171ad939a988b9cdb618eae54d50e868b1a8463466562f530ce57a7a8a8",
+        "declaration_hash": "4caa79ad01a31b84aa1926885f8c07a340c8206c55b921efc938327cd33ed84c",
         "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "role: ValueObject { invariants: [] }, kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: []"
+        "citation": "\"validation 成功後だけ resolved scope の sequence を順番に dispatch し\""
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -1048,12 +1024,12 @@
       },
       "key": {
         "waived_reason_hash": "6519df604dc0d90b4d5a08910fb9b4d84a0a31a8bc5768171274464733776a14",
-        "declaration_hash": "4d172171ad939a988b9cdb618eae54d50e868b1a8463466562f530ce57a7a8a8",
+        "declaration_hash": "4caa79ad01a31b84aa1926885f8c07a340c8206c55b921efc938327cd33ed84c",
         "anchor_text_hash": "6166df4e5cb8aa348e839dc9faf6fdda9446f5782ff3880dec49513621a1e600"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None })"
+        "citation": "dispatcher は後続 command、writer、または reviewer を起動せず"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -1072,12 +1048,12 @@
       },
       "key": {
         "waived_reason_hash": "df7c36a642c16ee832c605054f0c668b9f5b955733b231319863afd043918b96",
-        "declaration_hash": "4d172171ad939a988b9cdb618eae54d50e868b1a8463466562f530ce57a7a8a8",
+        "declaration_hash": "4caa79ad01a31b84aa1926885f8c07a340c8206c55b921efc938327cd33ed84c",
         "anchor_text_hash": "ef72acacfb5dc440638dcb1eca6898bd3db2fbdd6150c1af28c56c8594a8958d"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "\"methods: []\""
+        "citation": "role: ValueObject { invariants: [] }, kind: Struct(StructKind { shape: Tuple { fields: [], has_stripped_fields: true }, typestate: None }), methods: []"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -1096,36 +1072,12 @@
       },
       "key": {
         "waived_reason_hash": "2f42210f87e790f1b63ad34bd16ebf87ec288e6dcfcc02520b2f2465ee70d6a4",
-        "declaration_hash": "64939d3332fec207d217a3319f87755edd1c8a02a373667a948fa65e2b4e384f",
+        "declaration_hash": "16f3ab9961716bad4def761b3fbcf0cccd157b03cedb628f092a60c5aa848502",
         "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
       },
       "verdict": {
         "kind": "waived",
         "citation": "methods: []"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "entry_key": "CommandTimeoutSeconds",
-        "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "CN-01"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "CommandTimeoutSeconds",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:CN-01"
-      },
-      "key": {
-        "waived_reason_hash": "ca02d5bf7323a2001d42bc920877981eaf3c794c8d6f75039240022b2d818623",
-        "declaration_hash": "64939d3332fec207d217a3319f87755edd1c8a02a373667a948fa65e2b4e384f",
-        "anchor_text_hash": "e44a2b38a1ce3bf278e618e41415dbd26068d287e4173facb0f0c39698f67474"
-      },
-      "verdict": {
-        "kind": "waived",
-        "citation": "phase と pre-review config は schema version、declaration id の一意性、non-empty literal argv、および positive integer かつ 3,600 seconds 以下の per-command timeout を fail-closed に検証する。"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -1144,12 +1096,12 @@
       },
       "key": {
         "waived_reason_hash": "daa11ce524dfdfb8bc3c9258d581b4a4bda80cce817102228bab5047288b0b33",
-        "declaration_hash": "64939d3332fec207d217a3319f87755edd1c8a02a373667a948fa65e2b4e384f",
+        "declaration_hash": "16f3ab9961716bad4def761b3fbcf0cccd157b03cedb628f092a60c5aa848502",
         "anchor_text_hash": "eb3acd9bc2b70f70d7e5b103ad0b2255c300e50456aaeadfd2f50815b79ff6cf"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "command ごとの明示 timeout または約 60 分の既定 timeout を宣言する。"
+        "citation": "role: ValueObject { invariants: [] }"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -1792,12 +1744,12 @@
       },
       "key": {
         "waived_reason_hash": "bcee752d9479f6a3625b1966fb7896011834aa81e9853d2f10f34128e4849557",
-        "declaration_hash": "2f50b9cc4108dc97af758723c99f6c991b75b9377651500cd2b3a6ce1c4cbb1b",
+        "declaration_hash": "94c75521f52e5e1613ce12f382b5b225c2a012402129163b188b2d896e68d668",
         "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "role: ValueObject ... kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None })"
+        "citation": "validate、explain、enter の CLI outcome により"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -1816,12 +1768,12 @@
       },
       "key": {
         "waived_reason_hash": "77089c74d982aebad2bc74ee6ada35a57fe3d64c647f1ad66a691ac7495a672c",
-        "declaration_hash": "2f50b9cc4108dc97af758723c99f6c991b75b9377651500cd2b3a6ce1c4cbb1b",
+        "declaration_hash": "94c75521f52e5e1613ce12f382b5b225c2a012402129163b188b2d896e68d668",
         "anchor_text_hash": "ca4264ace91339e8c6e987c4964bd99937e6d62d3b062c38cba5a5c8515d0f3a"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "\"shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: []\""
+        "citation": "Process-output capture-limit value (CN-02, AC-03)."
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -3222,30 +3174,6 @@
         "entry_key": "UnvalidatedTimeoutSeconds",
         "anchor_id": {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-01"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "UnvalidatedTimeoutSeconds",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:AC-01"
-      },
-      "key": {
-        "waived_reason_hash": "a547d3a0b8469158bced66bb404096227d79feb6b87a955a4366e98d67b60a35",
-        "declaration_hash": "6418917b747055741cabd3a0d70f7dfc899e9b3116989309eafb7f64c68fd3fe",
-        "anchor_text_hash": "05b8094316a1aacabb4bec26100b679daf53d5554267297214266776d1838398"
-      },
-      "verdict": {
-        "kind": "waived",
-        "citation": "methods: [], fields: []"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "entry_key": "UnvalidatedTimeoutSeconds",
-        "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "AC-05"
         }
       },
@@ -3256,12 +3184,12 @@
       },
       "key": {
         "waived_reason_hash": "adf320ee255397143e20035607b77ae7bdc85ac683506a1a263a88e813fec46c",
-        "declaration_hash": "6418917b747055741cabd3a0d70f7dfc899e9b3116989309eafb7f64c68fd3fe",
+        "declaration_hash": "b177882a06962c01dbe83ba84c07dcb519384248cc38f582642469035b4c69cc",
         "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "docs: Some(DocString(\"Unvalidated command-timeout input value (CN-01, CN-02).\")), invariants: []"
+        "citation": "\"Unvalidated command-timeout input value (CN-01, CN-02).\""
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -3280,12 +3208,12 @@
       },
       "key": {
         "waived_reason_hash": "22252293b2aea5ed848aba64d6187739c15d6e54a6bb795c29370aee0283210d",
-        "declaration_hash": "6418917b747055741cabd3a0d70f7dfc899e9b3116989309eafb7f64c68fd3fe",
+        "declaration_hash": "b177882a06962c01dbe83ba84c07dcb519384248cc38f582642469035b4c69cc",
         "anchor_text_hash": "e44a2b38a1ce3bf278e618e41415dbd26068d287e4173facb0f0c39698f67474"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "Unvalidated command-timeout input value (CN-01, CN-02)."
+        "citation": "\"Unvalidated command-timeout input value (CN-01, CN-02).\""
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -3304,7 +3232,7 @@
       },
       "key": {
         "waived_reason_hash": "fb525d297cd39d2808c37b9a3dfd1cb5f8c1fed8ab739ca473446ed58d203d60",
-        "declaration_hash": "6418917b747055741cabd3a0d70f7dfc899e9b3116989309eafb7f64c68fd3fe",
+        "declaration_hash": "b177882a06962c01dbe83ba84c07dcb519384248cc38f582642469035b4c69cc",
         "anchor_text_hash": "ca4264ace91339e8c6e987c4964bd99937e6d62d3b062c38cba5a5c8515d0f3a"
       },
       "verdict": {

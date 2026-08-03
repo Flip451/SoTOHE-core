@@ -9,7 +9,7 @@ GO-03 → T018、T019、T020、T021、T022、T023。
 GO-04 → T018、T020、T021、T022、T023。
 GO-05 → T017、T018、T019、T020、T021、T022。
 
-## Tasks (14/24 resolved)
+## Tasks (15/24 resolved)
 
 ### S0 — 確定済みの履歴 task
 
@@ -38,7 +38,7 @@ GO-05 → T017、T018、T019、T020、T021、T022。
 
 - [x] **T024**: `libs/domain/src/task_contract.rs` と `apps/cli-driver/src/task_contract.rs` の blocked outcome を validated `NonEmptyVec` payload に適応し、`CommandOutcome` render boundary の空 payload 拒否を unit tests で確認する。IN-08、AC-10。 (`60e6c796627cc98404bccaa2421920b227df04eb`)
 - [x] **T025**: `libs/usecase/src/program_runner.rs` の execution record を success / failure の refined wrapper と分類 outcome に適応し、成功、非 zero、output-limit、timeout の record tests を更新する。IN-02、IN-03、IN-04、CN-02、CN-03、AC-02、AC-03、AC-04、AC-05。 (`0ef1e23f055292df748e70fed583e8d121cc303a`)
-- [ ] **T026**: `libs/usecase/src/operator_command.rs` の validated argv / configured-command value objects と operation-specific configuration validation error vocabulary を catalogue shape に適応し、各 validation failure の tests を更新する。IN-01、IN-03、CN-01、AC-01、AC-04、AC-05。
+- [~] **T026**: `libs/usecase/src/operator_command.rs` の validated argv / configured-command value objects と operation-specific configuration validation error vocabulary を catalogue shape に適応し、各 validation failure の tests を更新する。IN-01、IN-03、CN-01、AC-01、AC-04、AC-05。
 - [ ] **T027**: `libs/usecase/src/phase_command.rs` の phase command config / declaration / loader-port、configuration validation error、validate command を catalogue shape に適応し、configuration validation tests を更新する。IN-01、IN-11、CN-01、AC-01、AC-13。
 - [ ] **T034**: `libs/usecase/src/phase_command.rs` の phase explanation と explain query を catalogue shape に適応し、explain result tests を更新する。IN-04、AC-03。
 - [ ] **T035**: `libs/usecase/src/phase_command.rs` の phase enter orchestration、host-bearing `PhaseEnterCommand`、enter outcome、shared service / interactor を catalogue shape に適応し、dispatch-boundary host forwarding と関連 tests を更新する。IN-02、IN-11、CN-03、AC-02、AC-13。
@@ -47,5 +47,5 @@ GO-05 → T017、T018、T019、T020、T021、T022。
 - [ ] **T030**: `apps/cli-driver/src/phase_command.rs` の `CommandOutcome`、`PhaseCommandDriver`、`PhaseCommandInput`、`PhaseIdArg` と関連 tests を catalogue shape に適応する。IN-04、IN-11、CN-03、AC-02、AC-03、AC-13。
 - [ ] **T036**: `apps/cli-composition/src/phase_command.rs` に `PhaseCompositionRoot` を追加し、phase configuration loader、phase service、phase driver の wiring と module registration、および composition-boundary tests を実装する。IN-04、AC-02、AC-03。
 - [ ] **T031**: `apps/cli/src/main.rs` の top-level `CliCommand`、`Phase` variant、dispatch arm と、`apps/cli/src/commands/phase.rs` の `PhaseCommand`、`PhaseEnterArgs`、`PhaseIdArgs`、validate args、`execute`、`execute_with_driver`、`input_from_command`、関連 tests を catalogue shape に適応する。IN-04、IN-11、AC-03、AC-13。
-- [~] **T032**: `libs/usecase/src/capability_exec.rs` の `CapabilityExecRequest`、`CapabilityExecInteractor`、`CapabilityExecService`、`apps/cli-driver/src/capability.rs` の `CapabilityExecDriverInput` と `CapabilityDriver`、`apps/cli-composition/src/capability.rs` の `CapabilityCompositionRoot`、`apps/cli/src/commands/capability.rs` の `CapabilityExecArgs` と `into_driver_input` を catalogue shape に適応する。`.harness/config/phase-commands.json` の phase writer argv と dispatch tests を更新する。IN-01、IN-04、IN-09、IN-10、IN-11、CN-01、AC-01、AC-03、AC-11、AC-12、AC-13。
+- [x] **T032**: `libs/usecase/src/capability_exec.rs` の `CapabilityExecRequest`、`CapabilityExecInteractor`、`CapabilityExecService`、`apps/cli-driver/src/capability.rs` の `CapabilityExecDriverInput` と `CapabilityDriver`、`apps/cli-composition/src/capability.rs` の `CapabilityCompositionRoot`、`apps/cli/src/commands/capability.rs` の `CapabilityExecArgs` と `into_driver_input` を catalogue shape に適応する。`.harness/config/phase-commands.json` の phase writer argv と dispatch tests を更新する。IN-01、IN-04、IN-09、IN-10、IN-11、CN-01、AC-01、AC-03、AC-11、AC-12、AC-13。 (`539602a5ba3f6ec65fb5bac5f6375d0713213b74`)
 - [ ] **T033**: `libs/infrastructure/src/operator_command_config.rs` の pre-review-gate configuration decode を更新し、pre-review DTO / review-scope decode / invalid-config tests を更新する。IN-05、AC-05。

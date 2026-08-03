@@ -1741,13 +1741,13 @@
         "item_identifier": "voluntary:IN-01"
       },
       "key": {
-        "bound_tests_set_hash": "4d07567348d92dd2dc6c1cb28b7769aced9c2d78ce045e2ee5fae6780be28e2d",
-        "declaration_hash": "5457e56b5ee58fe5698d48e226710fe41e1f3cfdb9bed56e13ec2aba840bbc86",
+        "bound_tests_set_hash": "d8e3642d38c8e88385dfe17035fe716df11d48723b7e796c11282c53b9c91829",
+        "declaration_hash": "80d3dde9cdb6f97c998131aa73a631e7782fee6f9fadae8699552177c368aa6c",
         "anchor_text_hash": "eb3acd9bc2b70f70d7e5b103ad0b2255c300e50456aaeadfd2f50815b79ff6cf"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let command_argv = CommandArgv::try_new(argv(&[\"bin/sotp\", \"signal\", \"check\"])).unwrap();\n        let values: Vec<&str> =\n            command_argv.arguments().iter().map(CommandArgument::as_str).collect();\n        assert_eq!(values, [\"bin/sotp\", \"signal\", \"check\"]);"
+        "citation": "assert_eq!(values, [\"bin/sotp\", \"signal\", \"check\"]);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -1772,13 +1772,13 @@
         "item_identifier": "voluntary:AC-01"
       },
       "key": {
-        "bound_tests_set_hash": "b4387be4757ad72fda7cd6fb3b79533ecf489be9c435be98b06da2d1dc5adc38",
-        "declaration_hash": "64763fa279fdc04aa7bbe9997855406d086b14fee38c4f18e4e0fc3579d19457",
+        "bound_tests_set_hash": "cad7a82be51e9f3aae6e0d44577877e4ee6ae02a784f69dd1222daab50345c56",
+        "declaration_hash": "1e318b2ef3f9e477717337863147fa1c9f9c024745835af5bab31d8378098321",
         "anchor_text_hash": "05b8094316a1aacabb4bec26100b679daf53d5554267297214266776d1838398"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(\n            CommandArgv::try_new(empty_argv),\n            Err(CommandConfigValidationError::EmptyArgv)\n        ));"
+        "citation": "assert!(matches!(CommandArgv::try_new(empty_argv), Err(CommandArgvValidationError::Empty)));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -1808,8 +1808,8 @@
         "item_identifier": "voluntary:AC-05"
       },
       "key": {
-        "bound_tests_set_hash": "5eb87cc3da284e47ef2d4ad2be85016e12c5fdf8ae04753d99da6ba1383a0905",
-        "declaration_hash": "64763fa279fdc04aa7bbe9997855406d086b14fee38c4f18e4e0fc3579d19457",
+        "bound_tests_set_hash": "c6e32012fc11e09a91cadf8065f51d63c84bd2ae26c34b27d1c142a2cfb17fc6",
+        "declaration_hash": "1e318b2ef3f9e477717337863147fa1c9f9c024745835af5bab31d8378098321",
         "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
       },
       "verdict": {
@@ -1844,13 +1844,13 @@
         "item_identifier": "voluntary:CN-01"
       },
       "key": {
-        "bound_tests_set_hash": "b5f4346864d6d36e8bd948ac2568ee9f361b468a98679a9d140f3cdf999521f4",
-        "declaration_hash": "64763fa279fdc04aa7bbe9997855406d086b14fee38c4f18e4e0fc3579d19457",
+        "bound_tests_set_hash": "c861ca0d20c483c1a325be80aeae6f7fa619e2f3b8ce72a43059cd8fba3f5b87",
+        "declaration_hash": "1e318b2ef3f9e477717337863147fa1c9f9c024745835af5bab31d8378098321",
         "anchor_text_hash": "e44a2b38a1ce3bf278e618e41415dbd26068d287e4173facb0f0c39698f67474"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(\n            CommandArgv::try_new(Vec::new()),\n            Err(CommandConfigValidationError::EmptyArgv)\n        ));"
+        "citation": "assert!(matches!(CommandArgv::try_new(Vec::new()), Err(CommandArgvValidationError::Empty)));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -1875,13 +1875,13 @@
         "item_identifier": "voluntary:IN-01"
       },
       "key": {
-        "bound_tests_set_hash": "2624394b97b06a2198d1225413cd07108774a9e38dbaca437684830b6533bc2c",
-        "declaration_hash": "64763fa279fdc04aa7bbe9997855406d086b14fee38c4f18e4e0fc3579d19457",
+        "bound_tests_set_hash": "eba75dd976d2819afdf8a490b2ed3befe303486fbd4d391026aa988409fa744b",
+        "declaration_hash": "1e318b2ef3f9e477717337863147fa1c9f9c024745835af5bab31d8378098321",
         "anchor_text_hash": "eb3acd9bc2b70f70d7e5b103ad0b2255c300e50456aaeadfd2f50815b79ff6cf"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let command_argv = CommandArgv::try_new(argv(&[\"bin/sotp\", \"signal\", \"check\"])).unwrap();\n        let values: Vec<&str> =\n            command_argv.arguments().iter().map(CommandArgument::as_str).collect();\n        assert_eq!(values, [\"bin/sotp\", \"signal\", \"check\"]);"
+        "citation": "let command_argv = CommandArgv::try_new(argv(&[\"bin/sotp\", \"signal\", \"check\"])).unwrap();\n        let values: Vec<&str> =\n            command_argv.arguments().iter().map(CommandArgument::as_str).collect();\n        assert_eq!(values, [\"bin/sotp\", \"signal\", \"check\"]);\n\n        let empty_argv: Vec<CommandArgument> = Vec::new();\n        assert!(matches!(CommandArgv::try_new(empty_argv), Err(CommandArgvValidationError::Empty)));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -1911,8 +1911,8 @@
         "item_identifier": "voluntary:AC-01"
       },
       "key": {
-        "bound_tests_set_hash": "a0eea3c61eb8ef0ff85937861858cd2c54d8802218964c54f64ca85ef06f1254",
-        "declaration_hash": "a64d33952293f5b8146b53e2893a4089614178fc766bdfff99ae716a79cb3207",
+        "bound_tests_set_hash": "cd628ada02bbb513a2069a51ede33d421b12711fcd25837b23335274c2dff5bb",
+        "declaration_hash": "22251b1402d1e1aed467a2bb513298c92fcfbe02417f7107e550104052d31c90",
         "anchor_text_hash": "05b8094316a1aacabb4bec26100b679daf53d5554267297214266776d1838398"
       },
       "verdict": {
@@ -1942,8 +1942,8 @@
         "item_identifier": "voluntary:AC-05"
       },
       "key": {
-        "bound_tests_set_hash": "a0eea3c61eb8ef0ff85937861858cd2c54d8802218964c54f64ca85ef06f1254",
-        "declaration_hash": "a64d33952293f5b8146b53e2893a4089614178fc766bdfff99ae716a79cb3207",
+        "bound_tests_set_hash": "cd628ada02bbb513a2069a51ede33d421b12711fcd25837b23335274c2dff5bb",
+        "declaration_hash": "22251b1402d1e1aed467a2bb513298c92fcfbe02417f7107e550104052d31c90",
         "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
       },
       "verdict": {
@@ -1973,8 +1973,8 @@
         "item_identifier": "voluntary:CN-01"
       },
       "key": {
-        "bound_tests_set_hash": "a0eea3c61eb8ef0ff85937861858cd2c54d8802218964c54f64ca85ef06f1254",
-        "declaration_hash": "a64d33952293f5b8146b53e2893a4089614178fc766bdfff99ae716a79cb3207",
+        "bound_tests_set_hash": "cd628ada02bbb513a2069a51ede33d421b12711fcd25837b23335274c2dff5bb",
+        "declaration_hash": "22251b1402d1e1aed467a2bb513298c92fcfbe02417f7107e550104052d31c90",
         "anchor_text_hash": "e44a2b38a1ce3bf278e618e41415dbd26068d287e4173facb0f0c39698f67474"
       },
       "verdict": {
@@ -2004,13 +2004,44 @@
         "item_identifier": "voluntary:AC-01"
       },
       "key": {
-        "bound_tests_set_hash": "1c5ac29682749785c041ce0239561373d95e4bec791866542c13fa6cc6f066ad",
-        "declaration_hash": "64939d3332fec207d217a3319f87755edd1c8a02a373667a948fa65e2b4e384f",
+        "bound_tests_set_hash": "eca4b062a7f7d05f6c621c68d1ed4453a95c5bcb3965943b9383e57aeda12c11",
+        "declaration_hash": "16f3ab9961716bad4def761b3fbcf0cccd157b03cedb628f092a60c5aa848502",
         "anchor_text_hash": "05b8094316a1aacabb4bec26100b679daf53d5554267297214266776d1838398"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(\n            CommandTimeoutSeconds::try_new(UnvalidatedTimeoutSeconds::new(3_600))\n                .unwrap()\n                .as_secs(),\n            3_600\n        );\n        let zero = CommandTimeoutSeconds::try_new(UnvalidatedTimeoutSeconds::new(0));\n        assert!(matches!(zero, Err(CommandConfigValidationError::TimeoutOutOfRange { .. })));\n        match CommandTimeoutSeconds::try_new(UnvalidatedTimeoutSeconds::new(3_601)) {\n            Err(CommandConfigValidationError::TimeoutOutOfRange { seconds }) => {\n                assert_eq!(seconds.as_u64(), 3_601);\n            }\n            other => panic!(\"expected an out-of-range timeout error, got {other:?}\"),\n        }"
+        "citation": "assert_eq!(\n            CommandTimeoutSeconds::try_new(UnvalidatedTimeoutSeconds::new(3_600))\n                .unwrap()\n                .as_secs(),\n            3_600\n        );\n        let zero = CommandTimeoutSeconds::try_new(UnvalidatedTimeoutSeconds::new(0));\n        assert!(matches!(zero, Err(CommandTimeoutValidationError::OutOfRange { .. })));\n        match CommandTimeoutSeconds::try_new(UnvalidatedTimeoutSeconds::new(3_601)) {\n            Err(CommandTimeoutValidationError::OutOfRange { seconds }) => {\n                assert_eq!(seconds.as_u64(), 3_601);\n            }\n            other => panic!(\"expected an out-of-range timeout error, got {other:?}\"),\n        }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::operator_command::tests",
+          "test_name": "test_command_timeout_bounds_and_error_value_are_preserved"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandTimeoutSeconds",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandTimeoutSeconds",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "eca4b062a7f7d05f6c621c68d1ed4453a95c5bcb3965943b9383e57aeda12c11",
+        "declaration_hash": "16f3ab9961716bad4def761b3fbcf0cccd157b03cedb628f092a60c5aa848502",
+        "anchor_text_hash": "e44a2b38a1ce3bf278e618e41415dbd26068d287e4173facb0f0c39698f67474"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            CommandTimeoutSeconds::try_new(UnvalidatedTimeoutSeconds::new(3_600))\n                .unwrap()\n                .as_secs(),\n            3_600\n        );\n        let zero = CommandTimeoutSeconds::try_new(UnvalidatedTimeoutSeconds::new(0));\n        assert!(matches!(zero, Err(CommandTimeoutValidationError::OutOfRange { .. })));\n        match CommandTimeoutSeconds::try_new(UnvalidatedTimeoutSeconds::new(3_601)) {\n            Err(CommandTimeoutValidationError::OutOfRange { seconds }) => {\n                assert_eq!(seconds.as_u64(), 3_601);\n            }\n            other => panic!(\"expected an out-of-range timeout error, got {other:?}\"),\n        }"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -2035,13 +2066,13 @@
         "item_identifier": "voluntary:CN-02"
       },
       "key": {
-        "bound_tests_set_hash": "24cab755e51214e1ae9a5af6640bd2af342486cba70ee57a0cfabea8d222bc97",
-        "declaration_hash": "64939d3332fec207d217a3319f87755edd1c8a02a373667a948fa65e2b4e384f",
+        "bound_tests_set_hash": "aaa64893d0ecf63b03e4970f1fd4f6ffbc7f1f6d3e0b7daab2b49ce2940d62d9",
+        "declaration_hash": "16f3ab9961716bad4def761b3fbcf0cccd157b03cedb628f092a60c5aa848502",
         "anchor_text_hash": "ca4264ace91339e8c6e987c4964bd99937e6d62d3b062c38cba5a5c8515d0f3a"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(\n            CommandTimeoutSeconds::try_new(UnvalidatedTimeoutSeconds::new(3_600))\n                .unwrap()\n                .as_secs(),\n            3_600\n        );\n        let zero = CommandTimeoutSeconds::try_new(UnvalidatedTimeoutSeconds::new(0));\n        assert!(matches!(zero, Err(CommandConfigValidationError::TimeoutOutOfRange { .. })));\n        match CommandTimeoutSeconds::try_new(UnvalidatedTimeoutSeconds::new(3_601)) {\n            Err(CommandConfigValidationError::TimeoutOutOfRange { seconds }) => {\n                assert_eq!(seconds.as_u64(), 3_601);\n            }\n            other => panic!(\"expected an out-of-range timeout error, got {other:?}\"),\n        }"
+        "citation": "CommandTimeoutSeconds::try_new(UnvalidatedTimeoutSeconds::new(3_600))\n                .unwrap()\n                .as_secs(),\n            3_600\n        );\n        let zero = CommandTimeoutSeconds::try_new(UnvalidatedTimeoutSeconds::new(0));\n        assert!(matches!(zero, Err(CommandTimeoutValidationError::OutOfRange { .. })));\n        match CommandTimeoutSeconds::try_new(UnvalidatedTimeoutSeconds::new(3_601)) {\n            Err(CommandTimeoutValidationError::OutOfRange { seconds }) => {\n                assert_eq!(seconds.as_u64(), 3_601);\n            }"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -2071,13 +2102,13 @@
         "item_identifier": "voluntary:AC-01"
       },
       "key": {
-        "bound_tests_set_hash": "1c5ac29682749785c041ce0239561373d95e4bec791866542c13fa6cc6f066ad",
+        "bound_tests_set_hash": "eca4b062a7f7d05f6c621c68d1ed4453a95c5bcb3965943b9383e57aeda12c11",
         "declaration_hash": "7383e09944b2f5f80f542f6b150cdd8cd7373a60d129aa0cf42e8cf53698acc5",
         "anchor_text_hash": "05b8094316a1aacabb4bec26100b679daf53d5554267297214266776d1838398"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(zero, Err(CommandConfigValidationError::TimeoutOutOfRange { .. }))); \n        match CommandTimeoutSeconds::try_new(UnvalidatedTimeoutSeconds::new(3_601)) {\n            Err(CommandConfigValidationError::TimeoutOutOfRange { seconds }) => {\n                assert_eq!(seconds.as_u64(), 3_601);\n            }"
+        "citation": "let zero = CommandTimeoutSeconds::try_new(UnvalidatedTimeoutSeconds::new(0));\n        assert!(matches!(zero, Err(CommandTimeoutValidationError::OutOfRange { .. })));\n        match CommandTimeoutSeconds::try_new(UnvalidatedTimeoutSeconds::new(3_601)) {\n            Err(CommandTimeoutValidationError::OutOfRange { seconds }) => {\n                assert_eq!(seconds.as_u64(), 3_601);\n            }\n            other => panic!(\"expected an out-of-range timeout error, got {other:?}\"),\n        }"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -2102,13 +2133,13 @@
         "item_identifier": "voluntary:AC-03"
       },
       "key": {
-        "bound_tests_set_hash": "1c5ac29682749785c041ce0239561373d95e4bec791866542c13fa6cc6f066ad",
+        "bound_tests_set_hash": "eca4b062a7f7d05f6c621c68d1ed4453a95c5bcb3965943b9383e57aeda12c11",
         "declaration_hash": "7383e09944b2f5f80f542f6b150cdd8cd7373a60d129aa0cf42e8cf53698acc5",
         "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let zero = CommandTimeoutSeconds::try_new(UnvalidatedTimeoutSeconds::new(0));\n        assert!(matches!(zero, Err(CommandConfigValidationError::TimeoutOutOfRange { .. })));\n        match CommandTimeoutSeconds::try_new(UnvalidatedTimeoutSeconds::new(3_601)) {\n            Err(CommandConfigValidationError::TimeoutOutOfRange { seconds }) => {\n                assert_eq!(seconds.as_u64(), 3_601);\n            }"
+        "citation": "assert!(matches!(zero, Err(CommandTimeoutValidationError::OutOfRange { .. }))); ... Err(CommandTimeoutValidationError::OutOfRange { seconds }) => { assert_eq!(seconds.as_u64(), 3_601); }"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -2219,6 +2250,42 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::operator_command_config::tests",
           "test_name": "test_current_track_resolver_accepts_track_branch_and_rejects_other_branch"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "UnvalidatedTimeoutSeconds",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "UnvalidatedTimeoutSeconds",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "684fdc3f3cb463a94dc549304ee484fe0cce1fd906a6f24fe7c6f85f491bcdcc",
+        "declaration_hash": "b177882a06962c01dbe83ba84c07dcb519384248cc38f582642469035b4c69cc",
+        "anchor_text_hash": "05b8094316a1aacabb4bec26100b679daf53d5554267297214266776d1838398"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            CommandTimeoutSeconds::try_new(UnvalidatedTimeoutSeconds::new(3_600))\n                .unwrap()\n                .as_secs(),\n            3_600\n        );\n        let zero = CommandTimeoutSeconds::try_new(UnvalidatedTimeoutSeconds::new(0));\n        assert!(matches!(zero, Err(CommandTimeoutValidationError::OutOfRange { .. })));\n        match CommandTimeoutSeconds::try_new(UnvalidatedTimeoutSeconds::new(3_601)) {\n            Err(CommandTimeoutValidationError::OutOfRange { seconds }) => {\n                assert_eq!(seconds.as_u64(), 3_601);\n            }\n            other => panic!(\"expected an out-of-range timeout error, got {other:?}\"),\n        }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::operator_command::tests",
+          "test_name": "test_command_timeout_bounds_and_error_value_are_preserved"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_decode_rejects_duplicate_scope_empty_argv_timeout_and_recursion"
         }
       ]
     },

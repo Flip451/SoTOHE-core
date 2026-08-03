@@ -107,14 +107,14 @@ pub fn decode_pre_review_command_config(
 fn decode_command(
     dto: ConfiguredCommandDto,
 ) -> Result<ConfiguredCommand, CommandConfigValidationError> {
-    ConfiguredCommand::try_new(
+    Ok(ConfiguredCommand::try_new(
         dto.argv
             .arguments
             .into_iter()
             .map(|argument| CommandArgument::try_new(argument.value))
             .collect(),
         dto.timeout_seconds.map(|timeout| UnvalidatedTimeoutSeconds::new(timeout.seconds)),
-    )
+    )?)
 }
 
 fn decode_scope(dto: ReviewScopeNameDto) -> Result<ScopeName, CommandConfigValidationError> {
