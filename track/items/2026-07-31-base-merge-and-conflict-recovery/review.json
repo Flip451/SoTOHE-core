@@ -1,63 +1,937 @@
 {
   "schema_version": 2,
   "scopes": {
-    "adr": {
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2 stages the conflict resolution before verification/review, contradicting the canonical commit workflow’s required `implement → review → stage → commit` order. This can leave the review artifact unstaged and makes the recovery SSoT inconsistent with the guarded commit contract; defer staging to `/track:commit` or explicitly stage only after the final review.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 22,
+              "category": "responsibility-boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:750c5518ab89ef3cb947ebc55e2c3ed53d0ea2bcb5b545e5e0128bebd68789a7",
+          "at": "2026-08-02T15:10:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5de7355cfef51287379f9817e36512d2056ca39bb0830aa08f91f3dfda2296ad",
+          "at": "2026-08-02T15:12:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5de7355cfef51287379f9817e36512d2056ca39bb0830aa08f91f3dfda2296ad",
+          "at": "2026-08-02T15:23:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5de7355cfef51287379f9817e36512d2056ca39bb0830aa08f91f3dfda2296ad",
+          "at": "2026-08-02T16:09:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:commit` is invoked without a commit message, but its canonical workflow explicitly enters proposal-only mode and stops when the message is omitted. The guarded commit therefore never runs. Generate an explicit recovery commit message and pass it to the commit workflow.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 39,
+              "category": "command_wiring"
+            },
+            {
+              "message": "The workflow prohibits staging the resolved conflicts and claims the commit workflow owns staging, while `.harness/workflows/track/commit.md` requires a correct, non-empty staged diff during its pre-commit step and stops otherwise. Add guarded staging after final review and before invoking the commit workflow, or align the commit contract consistently.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 22,
+              "category": "command_wiring"
+            },
+            {
+              "message": "The Codex adapter categorically says not to create commits, contradicting the canonical recovery workflow's required guarded commit. Restrict the prohibition to direct Git operations and explicitly delegate commit creation to `$track-commit`.",
+              "severity": "P1",
+              "file": ".agents/skills/track-recover/SKILL.md",
+              "line": 13,
+              "category": "adapter_ssot_sync"
+            },
+            {
+              "message": "This authorizes the orchestrator to edit arbitrary conflicted track artifacts directly. Conflicts can include sole-writer artifacts such as `spec.json`, type catalogues, and implementation-plan files, or CLI-owned rendered views. Route those files through their designated writer/regeneration surfaces while the orchestrator coordinates recovery.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 22,
+              "category": "responsibility_boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:5de7355cfef51287379f9817e36512d2056ca39bb0830aa08f91f3dfda2296ad",
+          "at": "2026-08-02T16:18:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR conflicts are routed only through `adr-editor`, but every in-track ADR edit must also follow the lifecycle-specific guardian lane and be immediately judged or re-audited by `adr-diagnoser`. As written, recovery can proceed to review and commit after an unadjudicated ADR merge resolution. Route ADR conflicts through the complete two-box adjudication workflow.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 24,
+              "category": "responsibility_boundary"
+            },
+            {
+              "message": "The workflow does not order multiple conflicted SoT artifacts or reconverge an edited upstream phase before invoking its downstream writer. `.harness/policies/sot-reentry-sequencing.md` requires ADR → spec → catalogues → impl-plan descent, with the applicable signal, semantic-verification, and scoped-review convergence before each downstream restart. Specify that sequential re-entry instead of resolving all writers first and reviewing only afterward.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 23,
+              "category": "convention_contradiction"
+            },
+            {
+              "message": "The Codex adapter still categorically prohibits creating commits even though the canonical recovery workflow requires a guarded commit. A compliant Codex invocation must therefore block before completing recovery. Limit the prohibition to direct Git operations and explicitly delegate commit creation to `$track-commit`.",
+              "severity": "P1",
+              "file": ".agents/skills/track-recover/SKILL.md",
+              "line": 13,
+              "category": "adapter_ssot_sync"
+            }
+          ],
+          "hash": "rvw1:sha256:7ef5b988b2db67fc91aee5a8c8ebd6305cff15a9a0e92ffe752916ca888fdf53",
+          "at": "2026-08-02T16:29:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Codex adapter cannot execute its canonical workflow: recovery edits files, stages them, and creates a guarded commit, but this adapter omits the `workspace-write` requirement used by every other mutating track skill and categorically prohibits commit creation. Declare the required sandbox and prohibit only direct Git operations while delegating the guarded commit to `$track-commit`.",
+              "severity": "P1",
+              "file": ".agents/skills/track-recover/SKILL.md",
+              "line": 11,
+              "category": "adapter_ssot_sync"
+            },
+            {
+              "message": "Sequential reconvergence deadlocks when multiple SoT files are conflicted. The workflow keeps downstream writers halted until an upstream scoped review completes, but that review always runs `task-contract-check` and `track-active-gate`, which parse and refresh downstream spec/catalogue/plan artifacts. Conflict markers in any still-unresolved downstream JSON make those pre-gates fail before the upstream review can start. Define a sanctioned preliminary marker-resolution lane or a recovery-safe scoped review path before enforcing phase-by-phase reconvergence.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 25,
+              "category": "command_wiring"
+            }
+          ],
+          "hash": "rvw1:sha256:ae031aab073444e2c7f97a69f3ad646c00c966045f299e8bb86d9b93e0d0951b",
+          "at": "2026-08-02T16:33:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Codex adapter still cannot execute the canonical recovery workflow: recovery edits files, stages them, and creates a guarded commit, but the adapter omits the `workspace-write` requirement used by other mutating track skills and categorically prohibits commit creation. Declare the required sandbox and prohibit only direct Git operations while delegating the guarded commit to `$track-commit`.",
+              "severity": "P1",
+              "file": ".agents/skills/track-recover/SKILL.md",
+              "line": 11,
+              "category": "adapter_ssot_sync"
+            },
+            {
+              "message": "The preparation lane asks downstream writer capabilities to create parse-only preliminary artifacts before their upstream has reconverged. This directly contradicts `.harness/policies/sot-reentry-sequencing.md`, which requires a writer with an unmet prerequisite to return without editing, and the writer contracts expose no non-semantic marker-removal mode. Introduce a sanctioned recovery surface for preliminary conflict-marker removal or another executable route instead of bypassing writer prerequisites.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 27,
+              "category": "convention_contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:aa0404de0ff557ba898fea4c119738833d71410ba7badb1104041fedd4bd7541",
+          "at": "2026-08-02T16:36:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Multi-SoT conflicts still deadlock. Before an upstream scoped review can establish reconvergence, `track-local-review-fix` runs global `task-contract-check` and `track-active-gate` processing that parses downstream spec/catalogue/plan inputs. If one of those downstream files still contains conflict markers, the upstream review cannot start; yet this rule forbids preliminary marker removal and prohibits dispatching the downstream writer before upstream reconvergence. Provide a sanctioned recovery path that can make all pre-gate inputs parseable without treating downstream phases as reconverged.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 41,
+              "category": "command_wiring"
+            }
+          ],
+          "hash": "rvw1:sha256:88437192ad1ecd0d5df9bd8cd6ecb166c9d8a835a3eb77cf19a836e7c30eccb7",
+          "at": "2026-08-02T16:40:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This lane directly overwrites sole-writer SoT artifacts through a generic file utility. Atomicity does not transfer ownership: `CLAUDE.md` reserves spec, catalogues, and plan artifacts exclusively for their writer capabilities, and `sot-reentry-sequencing.md` permits no such marker-removal exception. Remove this orchestrator write path or establish a properly authorized recovery surface consistent with those ownership contracts.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 45,
+              "category": "responsibility_boundary"
+            },
+            {
+              "message": "Making downstream files syntactically parseable is insufficient to unblock an upstream scoped review. `track-local-review-fix` also runs `task-contract-check` and `track-active-gate`, including signal calculation, catalogue lint, and catalogue checks; a parseable but temporarily inconsistent hunk selection can still fail these gates. Because downstream writers remain halted until upstream reconvergence, recovery still has no route past such failures. Provide a recovery-safe scoped pre-gate or another path that handles structural and signal inconsistency, not only conflict markers.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 41,
+              "category": "command_wiring"
+            }
+          ],
+          "hash": "rvw1:sha256:11f570eb759efe965f15acb5c57e12a4d721b9003f6f39ed2975072517487e3e",
+          "at": "2026-08-02T16:46:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The workflow dispatches a `track-recover` capability that does not exist in `agent-profiles.json`, `.harness/capabilities/`, or the Claude agent surface. `track-recover` is only the command/skill currently executing this workflow, so Codex self-dispatches recursively while Claude has no dispatch target. Keep this lane in the current orchestrator or introduce a separately registered capability with both provider adapters.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 42,
+              "category": "capability_routing"
+            },
+            {
+              "message": "The preparation lane still gives a second writer authority over `spec.json`, catalogues, and plan artifacts through a generic atomic-file command. Declaring `track-recover` the lane owner does not override the repository's one-file/one-writer invariant or the re-entry policy's sole exception, and `file write-atomic` enforces neither artifact ownership nor allowed conflict-hunk content. Route these writes through their designated writers or formally change the governing ownership contract.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 46,
+              "category": "responsibility_boundary"
+            },
+            {
+              "message": "Syntactic and structural hunk selection still does not guarantee that the mandatory pre-review dependencies pass. `task-contract-check` and `track-active-gate` enforce catalogue attribution, liveness, signal, and catalogue consistency; a parseable selected version can remain Red or structurally inconsistent with non-conflicting upstream merge changes. Because the actual downstream writer remains halted, this lane has no recovery path when those semantic gates fail.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 49,
+              "category": "command_wiring"
+            }
+          ],
+          "hash": "rvw1:sha256:90ee0602854e06a411b8e311ce72fee69f4820a75b68c5e7d0ba315b3daed33e",
+          "at": "2026-08-02T16:49:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The operator handoff contradicts the governing recovery decision and ownership model. ADR D2 requires the orchestrator to complete conflict editing without handing it to the user, while `CLAUDE.md` reserves these SoT files to designated writers; calling this an “explicitly permitted” exception does not establish one in either policy. Route recovery through an authorized writer/recovery surface or formally amend the governing decision and ownership policy.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 44,
+              "category": "responsibility_boundary"
+            },
+            {
+              "message": "The Codex adapter now duplicates the workflow’s blocker recovery, operator handoff, edit limit, and downstream-writer state. The governing ADR and adapter/SSoT policy restrict adapters to provider invocation, tool constraints, and reporting; this behavior belongs only in the workflow SSoT and is also absent from the Claude adapter. Remove the duplicated recovery semantics from the skill.",
+              "severity": "P1",
+              "file": ".agents/skills/track-recover/SKILL.md",
+              "line": 18,
+              "category": "adapter_ssot_sync"
+            },
+            {
+              "message": "The operator is limited to syntactic and structural repair, but the mandatory pre-review dependencies require more than executability: `task-contract-check` enforces attribution/liveness and `track-active-gate` enforces signal and catalogue consistency. A parseable hunk selection can therefore still fail before the scoped reviewer launches, while the designated downstream writer remains halted and semantic repair is forbidden. Define a valid route for these non-parse gate failures.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 46,
+              "category": "command_wiring"
+            }
+          ],
+          "hash": "rvw1:sha256:71a130fc121562b728ef3cb72359671f908a67df56a0f7f31cdda77ecf6a346d",
+          "at": "2026-08-02T16:51:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The claimed “D2 conflict-edit exception” authorizes the orchestrator to edit sole-writer artifacts directly. D2 makes the orchestrator responsible for driving recovery, but does not override CLAUDE.md’s one-file/one-writer invariant; `.harness/policies/sot-reentry-sequencing.md` also says the only artifact-edit exception is an impl-plan task transition and requires a separate ADR for additional exceptions. Conflict hunks in ADR/spec/catalogue/plan artifacts must remain routed through their designated writers unless the governing policy is explicitly changed.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 44,
+              "category": "responsibility-boundary"
+            },
+            {
+              "message": "Limiting preparation to syntactic and structural executability does not make an upstream scoped review runnable. `track-local-review-fix` unconditionally runs `task-contract-check` and `track-active-gate`, whose attribution, signal, and catalogue checks can fail on semantically stale downstream artifacts. Because this workflow simultaneously forbids dispatching the downstream writer until upstream review converges, a merge conflicting in multiple SoT layers can deadlock. Recovery needs a sanctioned chain-limited review path or preparation capable of satisfying the actual pre-gates.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 46,
+              "category": "workflow-liveness"
+            },
+            {
+              "message": "The selective-staging path is not preserved by the referenced commit workflow. After `git add-from-file` excludes unrelated changes, `/track:commit` runs `cargo make track-commit-message`, whose first operation is `bin/sotp git add-all`; those excluded changes are therefore staged and committed. Use a commit surface that preserves the allowlist or remove the ineffective selective-staging promise.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 71,
+              "category": "command-wiring"
+            },
+            {
+              "message": "This provider-neutral workflow directly invokes the Claude-specific `/track:review` and `/track:commit` adapter surfaces. The paired Codex entry points use `$track-review`/`$track-commit`, so a Codex adapter following this SSoT cannot execute these instructions as written. Refer to the neutral review and commit workflows, leaving slash/skill invocation syntax in each provider adapter.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 58,
+              "category": "adapter-ssot"
+            }
+          ],
+          "hash": "rvw1:sha256:0b8f4eaed24edf61da0b5dcb26b50fbdd0c3e34f3674cb2792ae9883d7a980d9",
+          "at": "2026-08-02T16:56:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This new exception lets the orchestrator directly edit any SoT artifact, contradicting the current hard one-file/one-writer invariant in `CLAUDE.md` and, for ADR conflicts, `.harness/policies/pre-track-adr-authoring.md`, which requires `adr-editor` and explicitly forbids orchestrator edits. Selecting an existing conflict hunk still changes authoritative content. Route preparation through the designated writer or propagate an explicitly approved responsibility-model change across those governing contracts.",
+              "severity": "P1",
+              "file": ".harness/policies/sot-reentry-sequencing.md",
+              "line": 37,
+              "category": "responsibility-boundary"
+            },
+            {
+              "message": "This operational policy directly cites a date-identified ADR. `.harness/policies/pre-track-adr-authoring.md` explicitly includes policies/workflows among operational instruction documents and forbids references such as `knowledge/adr/YYYY-MM-DD-HHMM-slug.md`; the operational rule must be self-contained and use only a generic index reference for background.",
+              "severity": "P1",
+              "file": ".harness/policies/sot-reentry-sequencing.md",
+              "line": 37,
+              "category": "convention-contradiction"
+            },
+            {
+              "message": "The source-repair lane only promises that global pre-review inputs become executable/parseable, but the scoped-review wrapper requires `task-contract-check` and `track-active-gate` to exit successfully. Those gates can reject stale downstream attribution, signals, or catalogue structure even after conflict markers are removed. Because the workflow forbids dispatching that downstream writer until the upstream scoped review converges, a multi-layer SoT conflict can still deadlock. Provide a sanctioned chain-limited review path or a preparation lane capable of satisfying the actual pre-gates.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 43,
+              "category": "workflow-liveness"
+            },
+            {
+              "message": "The provider-neutral workflow now embeds both providers’ adapter invocation syntax (`/track:review`, `$track-review`, `/track:commit`, and `$track-commit`). The harness-policy adapter/SSoT rule requires provider-specific launch details to remain in the adapters; other workflow SSoTs refer to sub-workflows neutrally. Refer only to the canonical review and commit workflow contracts here and let each adapter choose its invocation surface.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 54,
+              "category": "adapter-ssot"
+            }
+          ],
+          "hash": "rvw1:sha256:8092670b2e298b51793e583c4921cf7ae70d2f7fac4dc7f548ebd292bdba6672",
+          "at": "2026-08-02T17:00:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The conflict exception authorizes the orchestrator to write spec, catalogue, and plan artifacts, but their capability SSoTs still declare exclusive ownership—for example, `impl-planner.md` says nothing else ever writes its four artifacts. Updating this policy and CLAUDE.md alone leaves contradictory runtime authority. Route hunk preparation through the designated writers or synchronize the exception across every affected capability contract.",
+              "severity": "P1",
+              "file": ".harness/policies/sot-reentry-sequencing.md",
+              "line": 37,
+              "category": "responsibility-boundary"
+            },
+            {
+              "message": "The ADR exception permits direct orchestrator hunk selection without an immediate `adr-diagnoser` verdict. The same policy still defines `adr-editor` as the writer, the orchestrator as dispatch-only, requires immediate diagnosis of ADR edits, and its checklist still rejects direct orchestrator editing. Since choosing an existing hunk can change which decision text survives, this bypasses the two-box guardian lane. Route the repair through editor/diagnoser or update the complete role and lifecycle contract.",
+              "severity": "P1",
+              "file": ".harness/policies/pre-track-adr-authoring.md",
+              "line": 23,
+              "category": "responsibility-boundary"
+            },
+            {
+              "message": "Sequential recovery can still deadlock on a conflict spanning multiple SoT layers. An upstream scoped review invokes `track-local-review-fix`, which unconditionally requires global task-contract and track-active gates to pass; those gates may require semantic downstream regeneration. The workflow forbids dispatching that downstream writer before upstream review converges and permits preparation only from existing hunks without adding meaning. A legitimate conflict needing generated attribution or catalogue repair therefore cannot start either side. Provide a sanctioned chain-limited review wrapper or preparation route that can satisfy the real pre-gates.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 43,
+              "category": "workflow-liveness"
+            },
+            {
+              "message": "The exception’s completion condition is inconsistent across the scoped SSoTs. CLAUDE.md and the ADR policy say to make gates merely executable, the sequencing policy ultimately requires them to pass, while the recovery workflow says both “until executable” and “make all pre-gates pass”; its Step 2 table only requires parseability. Providers can therefore disagree whether an executable-but-failing gate permits progression or requires fail-closed termination. Define one canonical pass condition and reference it consistently.",
+              "severity": "P1",
+              "file": "CLAUDE.md",
+              "line": 65,
+              "category": "state-transition-drift"
+            }
+          ],
+          "hash": "rvw1:sha256:e8ce3d62370d697666c1f2d9fec98d773d2d1b5f27f1101c8f61b80c2ac4a91c",
+          "at": "2026-08-03T00:54:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2 defines mutually exclusive preparation routes. Lines 41–44 require every affected designated writer to run `conflict-preparation` before ordered review, while lines 49–50 assign hunk selection to the orchestrator and explicitly forbid dispatching a downstream writer during preparation; the sequencing policy instead describes orchestrator-first with writer fallback. Consolidate these into one deterministic order.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 41,
+              "category": "state-transition-drift"
+            },
+            {
+              "message": "`conflict-preparation` is not wired as an executable capability branch. The sequencing policy still says a writer with an unconverged upstream returns without working, and spec-designer, type-designer, and impl-planner retain those unconditional prerequisites even though preparation is invoked before reconvergence. Their normal pipelines also mandate semantic authoring steps; type-designer explicitly forbids skipping its fixed pipeline, and impl-planner lacks permission to run the promised view regeneration. Define mode-specific prerequisites, pipeline, tools, and output contracts.",
+              "severity": "P1",
+              "file": ".harness/policies/sot-reentry-sequencing.md",
+              "line": 37,
+              "category": "capability-wiring"
+            },
+            {
+              "message": "Even a correctly dispatched preparation mode can only select existing hunks and regenerate derived artifacts. The global pre-review dependencies can require new cross-artifact attribution or other semantic reconciliation to pass, but normal downstream writers remain halted until the upstream scoped review converges, and that review cannot start until those global gates pass. A valid multi-SoT conflict can therefore still deadlock; provide a chain-limited review route or a sanctioned writer path capable of satisfying the actual pre-gates.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 42,
+              "category": "workflow-liveness"
+            },
+            {
+              "message": "The ADR exception still conflicts with this policy’s role model and checklist. Line 23 permits the orchestrator to edit an ADR hunk directly, while the role table reserves all edits for `adr-editor` and makes the orchestrator dispatch-only; the bad example and review checklist also continue to reject every direct orchestrator ADR edit. An immediate diagnoser verdict does not resolve the writer-ownership contradiction. Route preparation through `adr-editor` or update every role, example, and checklist statement with the same explicit exception.",
+              "severity": "P1",
+              "file": ".harness/policies/pre-track-adr-authoring.md",
+              "line": 23,
+              "category": "responsibility-boundary"
+            },
+            {
+              "message": "The preparation completion condition remains inconsistent. CLAUDE.md and parts of the workflow say gates need only become executable, the sequencing policy and workflow failure branch require them to pass, and the Step 2 gate table requires only parseability. Providers can therefore disagree whether an executable-but-failing gate permits progression or requires termination. Define one canonical condition and reference it consistently.",
+              "severity": "P1",
+              "file": "CLAUDE.md",
+              "line": 65,
+              "category": "gate-semantics"
+            }
+          ],
+          "hash": "rvw1:sha256:90a2117f6d105024e6471ef3fb8ea88a954fc87b3e30fbae26b14b7b66bb6944",
+          "at": "2026-08-03T01:03:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The recovery state machine fails closed when hunk-only preparation cannot satisfy every global pre-gate. A non-overlapping base change can invalidate task-contract or signal state without creating a conflict hunk in the affected artifact; conflict-preparation cannot repair it, while normal semantic re-entry is not reached. This breaks autonomous recovery for valid base merges. Permit ordered normal writer/implementer reconciliation of base-induced drift before requiring all global pre-gates to pass.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 48,
+              "category": "workflow_state_machine"
+            },
+            {
+              "message": "Conflict-preparation requires impl-planner to regenerate derived views, but its permission contract still allows only `verify plan-artifact-refs` and `batch-plan check`, while explicitly forbidding `plan.md`. A compliant planner therefore cannot execute the required view regeneration. Authorize `bin/sotp track views sync` and its generated side effects, or assign regeneration to another authorized surface.",
+              "severity": "P1",
+              "file": ".harness/capabilities/impl-planner.md",
+              "line": 114,
+              "category": "permission_contract"
+            },
+            {
+              "message": "This exception authorizes the orchestrator to edit ADR conflict hunks, contradicting adr-editor's operational SSoT claim that it performs every in-track ADR write and the recovery workflow's sole-writer prohibition. Hunk selection mutates the ADR, so the harness now defines two writers for the same file. Route preparation through adr-editor or consistently redefine the ownership boundary.",
+              "severity": "P1",
+              "file": ".harness/policies/pre-track-adr-authoring.md",
+              "line": 23,
+              "category": "responsibility_boundary"
+            },
+            {
+              "message": "CLAUDE.md is declared to be a pointer map, yet this line duplicates the conflict-preparation sequence, gate list, failure constraint, and re-entry rule from the sequencing policy and recovery workflow. This creates a second operational SSoT and can drift independently. Keep only the invariant and pointers to the canonical policy/workflow.",
+              "severity": "P1",
+              "file": "CLAUDE.md",
+              "line": 65,
+              "category": "ssot_duplication"
+            }
+          ],
+          "hash": "rvw1:sha256:02d79dcf901e0413c17932ee4b865a64616da8b645eb0f0b0fd5a863fdc34b3d",
+          "at": "2026-08-03T01:15:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new base-drift route requires a chain-limited review before global pre-gates, but the canonical single-scope review surface still invokes `track-local-review-fix`, whose unconditional dependencies are `task-contract-check` and `track-active-gate`. No sanctioned review surface bypassing those gates is defined, so this recovery branch cannot execute when either global gate is the blocker. Add an explicit guarded review route for this exception or change the gate ordering.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 49,
+              "category": "command_wiring"
+            },
+            {
+              "message": "`conflict-preparation` permits only existing-hunk resolution and derived regeneration, but the capability still declares its full 13-step semantic design pipeline mandatory with no skipped steps. Mandatory steps such as feature declaration and catalogue generation/annotation can write meaning outside the conflict hunks; running them violates the preparation boundary, while skipping them violates this pipeline contract. Define a separate preparation pipeline or explicitly exempt this mode from the normal 13-step pipeline.",
+              "severity": "P1",
+              "file": ".harness/capabilities/type-designer.md",
+              "line": 91,
+              "category": "mode_contract"
+            },
+            {
+              "message": "Although conflict-preparation now permits `bin/sotp track views sync`, the same ownership block still lists `plan.md` and every other non-owned track artifact as forbidden writes. `views sync` necessarily regenerates `plan.md` and other generated views, so the planner cannot follow the required command without violating its write boundary. Exempt CLI-generated view side effects, as the spec/type capability contracts do, or assign regeneration elsewhere.",
+              "severity": "P1",
+              "file": ".harness/capabilities/impl-planner.md",
+              "line": 107,
+              "category": "permission_contract"
+            }
+          ],
+          "hash": "rvw1:sha256:ed83d30eab564320ad6f7e7dd9952b31cc3fe591dc98bec9fff61e5ff8c9652b",
+          "at": "2026-08-03T01:23:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This now restricts adr-editor to “semantic authoring”, but trigger 3 still assigns non-semantic typo/reference-path fixes to it, and the policy forbids orchestrator ADR edits outside conflict preparation. This leaves ordinary non-semantic ADR fixes with contradictory ownership; retain adr-editor ownership for both semantic and non-semantic edits while documenting only the narrow conflict exception separately.",
+              "severity": "P1",
+              "file": ".harness/capabilities/adr-editor.md",
+              "line": 16,
+              "category": "responsibility_boundary"
+            },
+            {
+              "message": "The purported chain-limited route only runs `ref-verify run`, which evaluates both chains, and never reads `ref-verify results --chain <affected-chain>`. This contradicts the sequencing policy that unrelated-chain findings or stale-artifact enumeration failures must not block upstream convergence, so recovery can recreate the deadlock this exception is meant to resolve. Add the chain-scoped result check and prescribed abort handling.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 57,
+              "category": "command_wiring"
+            },
+            {
+              "message": "Calling the inner `review local` command directly bypasses `adr-baseline check-review`, which the canonical review workflow requires before every reviewer dispatch and which the Makefile wrapper explicitly delegates to that workflow. The D2 route can therefore record a scoped—including ADR—verdict without validating the init ledger and stored copies. Run `bin/sotp adr-baseline check-review --track-id <id>` before this raw review invocation; it is independent of the intentionally bypassed global pre-gates.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 58,
+              "category": "review_gate_bypass"
+            }
+          ],
+          "hash": "rvw1:sha256:8cdaf718a3fad45b53cf1b120c9f4b345d06d04e054aae23de674edbfb5aa8f6",
+          "at": "2026-08-03T01:40:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The D2-only route invokes `review local` with `tmp/reviewer-runtime/briefing-<affected-scope>.md` but never performs the canonical review workflow's Step 3 that creates or refreshes this ephemeral file. A fresh recovery session therefore fails when the file is absent, while an existing pre-merge file can supply stale design intent and review constraints. Build the affected-scope briefing from the current post-merge SoT using the canonical Step 3 contract before this direct invocation.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 61,
+              "category": "command_wiring"
+            }
+          ],
+          "hash": "rvw1:sha256:ed58baf7f102697d38d51d0339efdb4969b8fe801d93f46ff79ae8d6980597ff",
+          "at": "2026-08-03T01:44:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca79f3623a6a76a8d4961481c444d472e8b131cdd5795038dde80b117ad7f7d7",
+          "at": "2026-08-03T01:50:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The recovery SSoT now dispatches `adr-editor` in `conflict-preparation` mode, but the capability's Invocation contract does not define that trigger/mode (and still says it has four triggers). This leaves ADR conflict preparation outside the capability contract and makes the dispatch wiring ambiguous.",
+              "severity": "P1",
+              "file": ".harness/capabilities/adr-editor.md",
+              "line": 31,
+              "category": "command-wiring"
+            }
+          ],
+          "hash": "rvw1:sha256:8f7ad5b5e50e121853d7434a80bab3d8ccf17388115cd4ed757ed8580ceee94b",
+          "at": "2026-08-03T07:40:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The recovery workflow says to dispatch `adr-editor` for every ADR conflict, but the capability contract permits `conflict-preparation` only when existing-hunk selection still leaves the required pre-gates unparseable, and normal mode requires upstream re-convergence. Because the workflow does not condition this dispatch on that gate or specify the mode, it can launch an unauthorized normal ADR edit during a conflict; align the dispatch with the conditional `conflict-preparation` route.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 31,
+              "category": "command-wiring"
+            }
+          ],
+          "hash": "rvw1:sha256:a8b600915a7a423b28d185acfe2112d3218fbd90409ff8e4177889aa35da0ab6",
+          "at": "2026-08-03T07:42:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The D2 chain-limited review command omits the required `--track-id <id>` argument. `bin/sotp review local` requires track id, round type, and group, so this recovery route fails at argument parsing instead of running the scoped review.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 70,
+              "category": "command-wiring"
+            }
+          ],
+          "hash": "rvw1:sha256:e54e54021a3051761945adacf256add02f0140cb9a15cf1182199c9aabc3cc51",
+          "at": "2026-08-03T07:45:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `conflict-preparation` mode permits resolving existing `*-types.json` conflict hunks, but the capability’s Rules still restrict `Edit` on those files to `$todo`/post-generation annotation only. In the intended conflict path, the type-designer is therefore instructed both to resolve hunks and not to edit them; add an explicit conflict-preparation exception to the Rule.",
+              "severity": "P1",
+              "file": ".harness/capabilities/type-designer.md",
+              "line": 484,
+              "category": "responsibility-boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:6ead71fe5b1df003d258f9275b5f9861d97991673ac6c941816d0f3874fe565b",
+          "at": "2026-08-03T07:48:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The workflow requires `adr-diagnoser` only in the branch that dispatches `adr-editor`, but the permitted direct orchestrator hunk-selection path can resolve an ADR conflict before that dispatch. The governing ADR policy requires an immediate diagnoser verdict whenever an ADR is touched, so this path can bypass the guardian; make the verdict unconditional for every ADR hunk edit.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 34,
+              "category": "responsibility-boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:2b232e21b5fe1cf24ccbfefb1ab280083b39caffcfe866dd308db9d79fc466a7",
+          "at": "2026-08-03T07:50:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The recovery workflow’s `conflict-preparation` dispatch tells the orchestrator to provide only the affected path, existing hunks, and no-new-meaning instruction, but `adr-editor`’s invocation contract also requires the originating input verbatim, resolved `merge_target`, and the explicit working-tree-only/no-commit/no-snapshot instruction. The recovery dispatch is therefore incomplete and cannot reliably satisfy the editor contract.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 33,
+              "category": "command-wiring"
+            }
+          ],
+          "hash": "rvw1:sha256:bc48ee71d9ef575a6c58d0332b2c24bd27e4db4e87c88c8496592929e8ca1a7c",
+          "at": "2026-08-03T07:52:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:584b967e3d83eaa521710470dbd08053093e1d3689b25e0087bd4acce7f32b15",
+          "at": "2026-08-03T07:54:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The provider-neutral workflow hard-codes the Claude-style `/track:review` invocation and later `/track:commit` (line 104), while the Codex adapter requires `$track-review` and `$track-commit`. This leaks provider-specific invocation details into the workflow SSoT and can route Codex recovery through the wrong surface; leave the invocation spelling entirely to each adapter.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 90,
+              "category": "adapter-SSoT consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:584b967e3d83eaa521710470dbd08053093e1d3689b25e0087bd4acce7f32b15",
+          "at": "2026-08-03T08:01:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a429f14b9d5cc0b62fbd3a6391cbc848a1049dd772fdd99dfecf9cad7f7aa9f6",
+          "at": "2026-08-03T08:20:02Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-06’s requirement that stash-pop “preserves the repository safety gates required for the restored worktree” does not identify which gates or observable checks establish compliance, leaving Phase 2/3 to invent the contract.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+              "line": 216,
+              "category": "acceptance criterion non-observable"
+            }
+          ],
+          "hash": "rvw1:sha256:d96c31dd688b8f7469f29f89ae0ebed068607ac107d385a51d8c936213fb97af",
+          "at": "2026-08-01T00:35:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d251b85b52d7071a8df8efebfa87e9383814697636ed8cdda82bb4009dfa5cee",
+          "at": "2026-08-01T00:38:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-06 contradicts IN-04 as written: a real `git stash` records stash commit objects and updates `refs/stash`, while a successful pop updates that ref again. Therefore stash/stash-pop cannot satisfy the blanket requirement to create no commit and update no ref. Clarify that branch history and branch refs must remain unchanged while permitting the stash-internal objects/ref required by D3.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+              "line": 216,
+              "category": "scope / acceptance_criteria contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d251b85b52d7071a8df8efebfa87e9383814697636ed8cdda82bb4009dfa5cee",
+          "at": "2026-08-01T00:41:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:99c34a083854c412260ecb88e8accdc3d671a36c78ab490dbb61a65cd3647484",
+          "at": "2026-08-01T00:44:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e5eb0df80593d31f3aabfdebd7984bbd743c1e8d5ed5d06b057148c3620c400d",
+          "at": "2026-08-01T00:46:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-04 requires post-merge cleanup after a conflict, while AC-12 and CN-07 explicitly prohibit clean-merge cleanup for conflict outcomes. The spec does not define whether AC-04 means the prohibited Views → Baseline → SyncBaseStamp sequence or a distinct recovery-only cleanup, leaving downstream implementation with contradictory behavior.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+              "line": 268,
+              "category": "scope / acceptance_criteria contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:cf55f964143a48775af8bb7867e30a610d65264264c0351727d92faefd7facc2",
+          "at": "2026-08-01T22:43:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-01 adds the requirement that cleanup use the exact merged base commit, but its cited decisions are the original ADR D1 and cleanup-state ADR D3. Those decisions establish cleanup and ordering, respectively; the exact-commit requirement is defined by cleanup-state ADR D1/D2, neither of which GO-01 cites. This leaves part of the goal unanchored to its cited decision set.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+              "line": 8,
+              "category": "goal not anchored to a decision"
+            }
+          ],
+          "hash": "rvw1:sha256:a57d774207e811b519ea738a4c88136676e307ff86d7882a22c19f035cdefe88",
+          "at": "2026-08-01T22:57:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d503c8c41ebe2072c29a376a70fcc3ff9bab869e78cd35d8e7c17a2d3e56d06f",
+          "at": "2026-08-01T23:08:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d503c8c41ebe2072c29a376a70fcc3ff9bab869e78cd35d8e7c17a2d3e56d06f",
+          "at": "2026-08-01T23:13:17Z"
+        }
+      ]
+    },
+    "usecase": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:cb666be156be4e5a74c73e23d8220f63bb3db8b8a08be26761cbad58085b2412",
-          "at": "2026-07-31T22:47:46Z"
+          "hash": "rvw1:sha256:8b7712d82979fe1cad57a7b3105cc648792eccc4e61e1213f18065a7ff7c7db6",
+          "at": "2026-08-01T09:11:10Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:cb666be156be4e5a74c73e23d8220f63bb3db8b8a08be26761cbad58085b2412",
-          "at": "2026-07-31T22:50:51Z"
+          "hash": "rvw1:sha256:8b7712d82979fe1cad57a7b3105cc648792eccc4e61e1213f18065a7ff7c7db6",
+          "at": "2026-08-01T09:18:01Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ccf80b721d965f8205f7454dbcd27c4ea12d2cfc166dd951f73cef9c2c11ea89",
-          "at": "2026-08-01T00:18:19Z"
+          "hash": "rvw1:sha256:be220219084742fef91ed9e0b68b678bed8be47abc05c5131b77820a844cf857",
+          "at": "2026-08-01T13:57:33Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ccf80b721d965f8205f7454dbcd27c4ea12d2cfc166dd951f73cef9c2c11ea89",
-          "at": "2026-08-01T00:21:10Z"
+          "hash": "rvw1:sha256:be220219084742fef91ed9e0b68b678bed8be47abc05c5131b77820a844cf857",
+          "at": "2026-08-01T14:20:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7d09579432c3c1bfdb61df153b7f5d087fb4f8cb616dd78ac94b41aa493f739e",
+          "at": "2026-08-01T15:49:37Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4b5cd74999751b16d7905643597f13b47efbfd4e85cba5d36ed91b5dac33d8d1",
-          "at": "2026-08-01T22:29:27Z"
+          "hash": "rvw1:sha256:cb333325ceeb1c35ab125d7cddd3fb82de2113433f49d6e699aaa96703fd45a4",
+          "at": "2026-08-02T09:00:57Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4b5cd74999751b16d7905643597f13b47efbfd4e85cba5d36ed91b5dac33d8d1",
-          "at": "2026-08-01T22:32:46Z"
+          "hash": "rvw1:sha256:cb333325ceeb1c35ab125d7cddd3fb82de2113433f49d6e699aaa96703fd45a4",
+          "at": "2026-08-02T10:19:15Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7bddfda3dd3200435c16ff2d56500f8c6dbb68984adf8d65dfff25502d5d34da",
-          "at": "2026-08-02T09:01:09Z"
+          "hash": "rvw1:sha256:a4319db72778da0832cf4de2e3ea01f52bde3d81e3ea519ab4d3dd805a23ba39",
+          "at": "2026-08-03T09:41:41Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7bddfda3dd3200435c16ff2d56500f8c6dbb68984adf8d65dfff25502d5d34da",
-          "at": "2026-08-02T10:16:16Z"
+          "hash": "rvw1:sha256:a4319db72778da0832cf4de2e3ea01f52bde3d81e3ea519ab4d3dd805a23ba39",
+          "at": "2026-08-03T10:03:12Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:21d211a08a8555004b6af5c4656cb2965942d73459c890f7e6d3d31bacc20f2a",
+          "at": "2026-08-01T09:10:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`BaseBranchName::try_new` does not enforce a merge-safe branch name. `validate_branch_ref` accepts option-like values such as `--abort` and other strings Git rejects as branch names. Since the snapshot stores only a `NonEmptyString`, such a value can become `BaseMergeDirection::source` and may be interpreted by the git adapter as an option instead of a merge source, defeating the direction guard. Add branch-name-specific validation and regression coverage for option-like/invalid refs.",
+              "severity": "P0",
+              "file": "libs/domain/src/branch_strategy.rs",
+              "line": 18,
+              "category": "broken invariant in newtype constructor"
+            }
+          ],
+          "hash": "rvw1:sha256:21d211a08a8555004b6af5c4656cb2965942d73459c890f7e6d3d31bacc20f2a",
+          "at": "2026-08-01T09:19:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `.lock` restriction is applied only to the end of the complete branch string. Git rejects any path component ending in `.lock`, so `BaseBranchName::try_new(\"feature.lock/topic\".into())` still succeeds even though it is not a valid branch reference. This leaves an invalid merge source representable. Validate `.lock` per slash-delimited component and add a nested-component regression test.",
+              "severity": "P1",
+              "file": "libs/domain/src/branch_strategy.rs",
+              "line": 45,
+              "category": "broken invariant in newtype constructor"
+            }
+          ],
+          "hash": "rvw1:sha256:b678bb6f4f5d863ac55516ab48d9536d488abc93acf9d12ab0a1dba74acf1da6",
+          "at": "2026-08-01T09:30:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f4c5ceaf26616b5f9b7e182a23b788d2ca96c327cac272552ae124437b194a30",
+          "at": "2026-08-01T09:36:03Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cb8f9ae379b18b9e407779476218192f29de916f40bd4250d6cd301226c01fab",
+          "at": "2026-08-02T15:10:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The CLI guard-path test bypasses the production composition-root/driver path by constructing `BaseMergeInteractor` directly inside the dispatch test closure. It can pass even if `TrackCompositionRoot::new().track_driver().handle_base_merge(...)` is wired incorrectly, so the required CLI boundary coverage is incomplete.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/dispatch.rs",
+              "line": 314,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:cb8f9ae379b18b9e407779476218192f29de916f40bd4250d6cd301226c01fab",
+          "at": "2026-08-02T15:23:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0e47fb7460d0fc2c6f29acd62cf9a3e425e7d8144bce813d08f6dd3ebd669198",
+          "at": "2026-08-02T15:32:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0e47fb7460d0fc2c6f29acd62cf9a3e425e7d8144bce813d08f6dd3ebd669198",
+          "at": "2026-08-02T15:45:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The recovery conformance test only includes and validates the Claude adapter. AC-05 requires `/track:recover` and `$track-recover` to ship together, so `.agents/skills/track-recover/SKILL.md` could be missing or diverge from the canonical workflow while this test remains green. Include the Codex adapter and validate its canonical-workflow reference and provider-only constraints too.",
+              "severity": "P1",
+              "file": "apps/cli/tests/operational_reference_cutover.rs",
+              "line": 183,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:0e47fb7460d0fc2c6f29acd62cf9a3e425e7d8144bce813d08f6dd3ebd669198",
+          "at": "2026-08-02T15:51:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7c6c4daaa6456362ed1be814e82f1066aa90be8ed0e5e59e63e09e154738382c",
+          "at": "2026-08-02T15:56:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e9e0c8d3fcf1398df0bf793da04d082fa87f36e56fcf5161a5a8d7c3882ae8b",
+          "at": "2026-08-03T08:08:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e9e0c8d3fcf1398df0bf793da04d082fa87f36e56fcf5161a5a8d7c3882ae8b",
+          "at": "2026-08-03T08:12:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a19b3b3afb3faa60ee15d45107104b8fb866c8968bdf164fe9157949bb8478e",
+          "at": "2026-08-03T09:41:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a19b3b3afb3faa60ee15d45107104b8fb866c8968bdf164fe9157949bb8478e",
+          "at": "2026-08-03T09:58:47Z"
         }
       ]
     },
@@ -1123,141 +1997,512 @@
         }
       ]
     },
-    "cli": {
+    "other": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:cb8f9ae379b18b9e407779476218192f29de916f40bd4250d6cd301226c01fab",
-          "at": "2026-08-02T15:10:10Z"
+          "hash": "rvw1:sha256:fb2f7e429b2d3257d2accfc1dc2b5a2aae2990a6b625404fb70ef0e21ee8d4e8",
+          "at": "2026-08-01T01:29:26Z"
         },
         {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The CLI guard-path test bypasses the production composition-root/driver path by constructing `BaseMergeInteractor` directly inside the dispatch test closure. It can pass even if `TrackCompositionRoot::new().track_driver().handle_base_merge(...)` is wired incorrectly, so the required CLI boundary coverage is incomplete.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/dispatch.rs",
-              "line": 314,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:cb8f9ae379b18b9e407779476218192f29de916f40bd4250d6cd301226c01fab",
-          "at": "2026-08-02T15:23:02Z"
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fb2f7e429b2d3257d2accfc1dc2b5a2aae2990a6b625404fb70ef0e21ee8d4e8",
+          "at": "2026-08-01T01:33:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fb2f7e429b2d3257d2accfc1dc2b5a2aae2990a6b625404fb70ef0e21ee8d4e8",
+          "at": "2026-08-01T01:46:40Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0e47fb7460d0fc2c6f29acd62cf9a3e425e7d8144bce813d08f6dd3ebd669198",
-          "at": "2026-08-02T15:32:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0e47fb7460d0fc2c6f29acd62cf9a3e425e7d8144bce813d08f6dd3ebd669198",
-          "at": "2026-08-02T15:45:57Z"
+          "hash": "rvw1:sha256:aef4333465fe0f58ae747a50e27ac879b6eede43bb7ba4a4e74ea5f966f39272",
+          "at": "2026-08-01T09:10:32Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The recovery conformance test only includes and validates the Claude adapter. AC-05 requires `/track:recover` and `$track-recover` to ship together, so `.agents/skills/track-recover/SKILL.md` could be missing or diverge from the canonical workflow while this test remains green. Include the Codex adapter and validate its canonical-workflow reference and provider-only constraints too.",
+              "message": "The TypeSignalsError → IN-05 record binds an invalid-layer diagnostic test, while none of its tests exercises the active-track-only guard or BranchTrackMismatch. Bind the existing active-track mismatch/track-ID propagation test so this edge proves IN-05's active-track restriction.",
               "severity": "P1",
-              "file": "apps/cli/tests/operational_reference_cutover.rs",
-              "line": 183,
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 23,
+              "category": "test coverage / weak edge binding"
+            },
+            {
+              "message": "The TypeSignalsError → AC-07 record covers isolated hash mismatches but omits the all-three-hashes-match cache-hit test required by the briefing's multi-test contract. Its malformed-cache test concerns AC-08 and cannot prove the successful reuse case for AC-07.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 25,
+              "category": "test coverage / incomplete edge evidence"
+            }
+          ],
+          "hash": "rvw1:sha256:aef4333465fe0f58ae747a50e27ac879b6eede43bb7ba4a4e74ea5f966f39272",
+          "at": "2026-08-01T09:17:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The updated TypeSignalsError → IN-05 and → AC-07 binding sets have not been re-evaluated by the host. `bin/sotp test-obligation check` fails with `TestChanged` drift for both edges, so the briefing’s frozen pass=32 verdict no longer covers the current file. Run the host-owned evaluation before treating this scope as green.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 23,
+              "category": "test-obligation gate / stale verdict"
+            }
+          ],
+          "hash": "rvw1:sha256:d7b0a439adde308b33de185e23412f08ebe5ea8f41d9ceb015add01cdd6a39c2",
+          "at": "2026-08-01T09:21:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d7b0a439adde308b33de185e23412f08ebe5ea8f41d9ceb015add01cdd6a39c2",
+          "at": "2026-08-01T09:49:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The bindings file omits the three newly derived voluntary edges for `EvaluateSignalsError` at spec anchors `IN-05`, `CN-04`, and `AC-09`. `bin/sotp test-obligation check --track-id 2026-07-31-base-merge-and-conflict-recovery` fails with exactly these unresolved edges. Add focused infrastructure tests, such as `test_map_evaluation_error_each_stage_preserves_execution_error_category` and the evaluator failure/cache-write tests, while preserving the existing records.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 31,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:d7b0a439adde308b33de185e23412f08ebe5ea8f41d9ceb015add01cdd6a39c2",
+          "at": "2026-08-01T11:52:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3444e758e644324cee7351fae50bb0a8341a93a6c8937e6fd351020996eb118e",
+          "at": "2026-08-01T11:56:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3444e758e644324cee7351fae50bb0a8341a93a6c8937e6fd351020996eb118e",
+          "at": "2026-08-01T12:01:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The BaseMergeInteractor fulfillment record includes `test_derive_base_merge_direction_active_track_uses_snapshot_base_branch`, which only exercises the domain constructor and never invokes BaseMergeInteractor. It is not direct evidence for this declaration.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 35,
+              "category": "test-obligation binding"
+            },
+            {
+              "message": "The BaseMergeGitPort fulfillment record lists the snapshot-source, reverse-direction, and non-track rejection tests, but each test returns from context validation before calling `BaseMergeGitPort::merge_base` and asserts that Git was not called. These tests do not directly exercise the bound trait method.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 40,
+              "category": "test-obligation binding"
+            },
+            {
+              "message": "The BaseMergeContextError AC-01 binding includes `test_derive_base_merge_direction_active_track_uses_snapshot_base_branch`, which exercises only domain direction derivation and cannot produce or inspect BaseMergeContextError. It is invalid direct evidence for this declaration/anchor intersection.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 63,
+              "category": "test-obligation binding"
+            }
+          ],
+          "hash": "rvw1:sha256:87f4e88d520018e67df9cbc5acfa1cdfcd16d4ea6715e6549d9ef5eb098fa9cd",
+          "at": "2026-08-01T14:01:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a9881690f8c17d162245e3165a4e94d63b242d37f12913317f432c09a355195",
+          "at": "2026-08-01T14:16:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The conflict-recovery waivers for BaseMergeInteractor and BaseMergeService (IN-03/CN-02/AC-04) hide an expressible T002 behavior: `execute` returns the typed `Conflicted` outcome and skips clean-merge cleanup. The fulfillment records already reference the test that proves this handoff. Resolve these edges with that test; only the downstream edit/review/commit workflow belongs elsewhere.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 42,
+              "category": "waiver_validity"
+            },
+            {
+              "message": "The guard waivers on the Interactor, ContextPort, and Service treat rejection as unexpressible because the command lacks raw source/direction fields. Their entry-local contract is nevertheless testable: context loading returns an authoritative direction or rejection, the interactor/service must avoid Git on rejection, and the clean path forwards the snapshot source and active-track target. The fulfillment records already list tests for those behaviors, so these waivers suppress T002 evidence.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 43,
+              "category": "waiver_validity"
+            },
+            {
+              "message": "The BaseMergeCommand × AC-02 binding is substitution evidence. `test_base_merge_execute_active_track_mismatch_returns_typed_error` uses a context double that ignores `workspace_root`, so it returns the same mismatch for any command and does not exercise the command declaration. Either bind a test proving the command's workspace selects the rejected context or waive this edge consistently with the adjacent CN-01 record.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 61,
+              "category": "binding_semantics"
+            },
+            {
+              "message": "The CN-01/AC-02 bindings for BaseMergeContextError and BaseMergeError cover only ActiveTrackMismatch, while both anchors also require source-mismatch, reverse-direction, and non-track rejection. Focused tests for those branches exist but are absent from these four records, so each voluntary binding resolves a multi-branch edge with only partial evidence.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 63,
+              "category": "test_coverage"
+            },
+            {
+              "message": "The cleanup/context port fulfillments do not verify their declared arguments. Every context double ignores `workspace_root`, and RecordingCleanup ignores both `workspace_root` and `track_id`; consequently the interactor could pass the wrong workspace or active-track id and all bound tests would still pass. Add recording assertions before claiming these method-contract obligations are fulfilled.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 36,
               "category": "test_coverage"
             }
           ],
-          "hash": "rvw1:sha256:0e47fb7460d0fc2c6f29acd62cf9a3e425e7d8144bce813d08f6dd3ebd669198",
-          "at": "2026-08-02T15:51:35Z"
+          "hash": "rvw1:sha256:6a9881690f8c17d162245e3165a4e94d63b242d37f12913317f432c09a355195",
+          "at": "2026-08-01T14:38:34Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7c6c4daaa6456362ed1be814e82f1066aa90be8ed0e5e59e63e09e154738382c",
-          "at": "2026-08-02T15:56:37Z"
+          "hash": "rvw1:sha256:75c63bcea506d9e6f5ff828f6c62d1f03c9e624907b268aa3c3a6f9576cdfcf4",
+          "at": "2026-08-01T15:56:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The shared infrastructure test is bound to all three `BaseMergeCleanupPort` methods, but it directly calls private baseline/stamp helpers and never invokes the port adapter (and it has no view-regeneration coverage). These bindings therefore falsely fulfill `regenerate_views` and do not exercise the declared trait methods; keep the test only on the applicable replacement/stamp obligations or add adapter-level tests.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 36,
+              "category": "test-coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:e413f934190ad8ed0934f2565a8b7a3126b7e7b7b8fb0821fdd92c383d6a913a",
+          "at": "2026-08-02T09:01:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `regenerate_views` fulfillment record omits `test_fs_base_merge_cleanup_baseline_replacement_isolated_at_exact_commit_and_atomically_published`, so the three `BaseMergeCleanupPort` records no longer all point to the required focused infrastructure evidence. Add the evidence to this record, or provide a dedicated infrastructure test that exercises view regeneration together with the exact-commit cleanup request.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 36,
+              "category": "test-coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:7800fd895bf89456c54206de08aa9e76fef86688c473cb271014c0b4a24bfe5c",
+          "at": "2026-08-02T09:09:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `regenerate_views` fulfillment record includes baseline-replacement tests and `test_fs_base_merge_cleanup_baseline_replacement_isolated_at_exact_commit_and_atomically_published`, but that infrastructure test directly exercises baseline/stamp helpers and never invokes view regeneration. These references do not exercise the declared method and falsely strengthen its fulfillment; remove them or bind a view-regeneration adapter test instead.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 36,
+              "category": "test-coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:e413f934190ad8ed0934f2565a8b7a3126b7e7b7b8fb0821fdd92c383d6a913a",
+          "at": "2026-08-02T09:15:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `regenerate_views` fulfillment record includes baseline-replacement tests and `test_fs_base_merge_cleanup_baseline_replacement_isolated_at_exact_commit_and_atomically_published`, but that infrastructure test directly exercises baseline/stamp helpers and never invokes view regeneration. These references do not exercise the declared method and falsely strengthen its fulfillment; remove them or bind a view-regeneration adapter test instead.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 36,
+              "category": "test-coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:e413f934190ad8ed0934f2565a8b7a3126b7e7b7b8fb0821fdd92c383d6a913a",
+          "at": "2026-08-02T09:15:46Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4e9e0c8d3fcf1398df0bf793da04d082fa87f36e56fcf5161a5a8d7c3882ae8b",
-          "at": "2026-08-03T08:08:33Z"
+          "hash": "rvw1:sha256:7800fd895bf89456c54206de08aa9e76fef86688c473cb271014c0b4a24bfe5c",
+          "at": "2026-08-02T09:22:08Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4e9e0c8d3fcf1398df0bf793da04d082fa87f36e56fcf5161a5a8d7c3882ae8b",
-          "at": "2026-08-03T08:12:08Z"
+          "hash": "rvw1:sha256:7800fd895bf89456c54206de08aa9e76fef86688c473cb271014c0b4a24bfe5c",
+          "at": "2026-08-02T10:23:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The newly added CLI bindings cite the removed test `test_track_command_merge_base_dispatches_snapshot_source_guard_failure_without_merge_success` at lines 162, 165, 166, and 169. The current test is `test_track_command_merge_base_dispatches_composition_root_guard_failure_without_merge_success`; update all affected bindings and refresh their verdicts.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 162,
+              "category": "missing-test-source"
+            },
+            {
+              "message": "The cleanup-adapter fulfillment and related existing edges now have stale frozen verdicts: the obligation check reports their bound test bodies changed since verdict freeze. Re-run host-owned evaluation; do not hand-edit verdict caches.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 151,
+              "category": "stale-verdict"
+            }
+          ],
+          "hash": "rvw1:sha256:6311123962732ad6f89c4a454025b83ee041df4543851f0367d7a8a32bbcb218",
+          "at": "2026-08-03T06:14:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `TrackCommand` bindings for AC-01 and AC-02 (lines 165–166) cite only `cli_driver::track::tests`. They omit the direct owning-layer CLI dispatch guard test `test_track_command_merge_base_dispatches_composition_root_guard_failure_without_merge_success`, which is already used for the same changed dispatch obligation. Add that CLI test to both command-level edges (retaining the driver tests where they cover the concrete guard details).",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 165,
+              "category": "insufficient-owning-layer-evidence"
+            }
+          ],
+          "hash": "rvw1:sha256:0c0c78afe7aedfc965ff4857b44d39fecb313eb739c14704bbf8bf7651cbd3d4",
+          "at": "2026-08-03T07:05:02Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6a19b3b3afb3faa60ee15d45107104b8fb866c8968bdf164fe9157949bb8478e",
-          "at": "2026-08-03T09:41:08Z"
+          "hash": "rvw1:sha256:5dd808d5f1b78efc3422129378e1129e53dab8aafb658541da21499b6c8b141d",
+          "at": "2026-08-03T07:13:21Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6a19b3b3afb3faa60ee15d45107104b8fb866c8968bdf164fe9157949bb8478e",
-          "at": "2026-08-03T09:58:47Z"
+          "hash": "rvw1:sha256:5dd808d5f1b78efc3422129378e1129e53dab8aafb658541da21499b6c8b141d",
+          "at": "2026-08-03T07:20:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5dd808d5f1b78efc3422129378e1129e53dab8aafb658541da21499b6c8b141d",
+          "at": "2026-08-03T08:05:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-06's GitStashError binding cites only a usecase fake-port propagation test, which cannot verify the concrete adapter's branch-ref guard or the command-path failure behavior. Add direct adapter/CLI failure coverage and bind it here.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 177,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:1d2de7767e3a33c2119cf69258bf54967b883c3e56d9fbf1425cef45bbff0aa3",
+          "at": "2026-08-03T09:41:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a4e95be9f7056c5faacc5332fa07119836ff38c9a80ab2031c95b26d755e2433",
+          "at": "2026-08-03T09:52:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The GitStashInteractor, GitStashPort, and GitStashService fulfillment records bind only the successful delegation test. Their edge-local verifier inputs therefore omit the existing forbidden-ref error-propagation test, leaving IN-04's safety-gate/error behavior unverified for these Result-returning APIs. Bind the focused error test to the applicable fulfillment records.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 170,
+              "category": "test_coverage"
+            },
+            {
+              "message": "FsGitStashAdapter's sole contract-conformance test verifies untracked restoration and the active branch name, but it never verifies that HEAD and all refs/heads remain unchanged after both push and pop or exercises ForbiddenBranchRefUpdate. A regression that mutates branch history or another branch ref could therefore leave the cited test green despite violating AC-06. Add and bind a concrete guard/failure-closed adapter test.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 173,
+              "category": "test_coverage"
+            },
+            {
+              "message": "The new bindings do not have fresh host-evaluated verdicts: `bin/sotp test-obligation check --track-id 2026-07-31-base-merge-and-conflict-recovery` currently fails with StaleVerdicts for all 20 new IN-04/AC-06 edges. T006 is already done, so this is not the accepted todo-lane warning and blocks the obligation gate. Run the host-owned evaluation and repair any rejected bindings before approval.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 170,
+              "category": "test_obligation_freshness"
+            }
+          ],
+          "hash": "rvw1:sha256:a4e95be9f7056c5faacc5332fa07119836ff38c9a80ab2031c95b26d755e2433",
+          "at": "2026-08-03T10:06:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:00e5bd632b58318a89af19ed58c0a59a1b01de125c35c5b95fb9af3c5e207166",
+          "at": "2026-08-03T10:27:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:00e5bd632b58318a89af19ed58c0a59a1b01de125c35c5b95fb9af3c5e207166",
+          "at": "2026-08-03T10:30:42Z"
         }
       ]
     },
-    "domain": {
+    "cli_driver": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:21d211a08a8555004b6af5c4656cb2965942d73459c890f7e6d3d31bacc20f2a",
-          "at": "2026-08-01T09:10:16Z"
+          "hash": "rvw1:sha256:b88697ff93d0b7c96eb67320efde05617b09b66378eae3af512fc1c87dcae6fe",
+          "at": "2026-08-02T15:10:45Z"
         },
         {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`BaseBranchName::try_new` does not enforce a merge-safe branch name. `validate_branch_ref` accepts option-like values such as `--abort` and other strings Git rejects as branch names. Since the snapshot stores only a `NonEmptyString`, such a value can become `BaseMergeDirection::source` and may be interpreted by the git adapter as an option instead of a merge source, defeating the direction guard. Add branch-name-specific validation and regression coverage for option-like/invalid refs.",
-              "severity": "P0",
-              "file": "libs/domain/src/branch_strategy.rs",
-              "line": 18,
-              "category": "broken invariant in newtype constructor"
-            }
-          ],
-          "hash": "rvw1:sha256:21d211a08a8555004b6af5c4656cb2965942d73459c890f7e6d3d31bacc20f2a",
-          "at": "2026-08-01T09:19:39Z"
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b88697ff93d0b7c96eb67320efde05617b09b66378eae3af512fc1c87dcae6fe",
+          "at": "2026-08-02T15:23:24Z"
         },
         {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `.lock` restriction is applied only to the end of the complete branch string. Git rejects any path component ending in `.lock`, so `BaseBranchName::try_new(\"feature.lock/topic\".into())` still succeeds even though it is not a valid branch reference. This leaves an invalid merge source representable. Validate `.lock` per slash-delimited component and add a nested-component regression test.",
-              "severity": "P1",
-              "file": "libs/domain/src/branch_strategy.rs",
-              "line": 45,
-              "category": "broken invariant in newtype constructor"
-            }
-          ],
-          "hash": "rvw1:sha256:b678bb6f4f5d863ac55516ab48d9536d488abc93acf9d12ab0a1dba74acf1da6",
-          "at": "2026-08-01T09:30:42Z"
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b88697ff93d0b7c96eb67320efde05617b09b66378eae3af512fc1c87dcae6fe",
+          "at": "2026-08-02T16:03:10Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f4c5ceaf26616b5f9b7e182a23b788d2ca96c327cac272552ae124437b194a30",
-          "at": "2026-08-01T09:36:03Z"
+          "hash": "rvw1:sha256:b88697ff93d0b7c96eb67320efde05617b09b66378eae3af512fc1c87dcae6fe",
+          "at": "2026-08-02T16:07:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new public `GitDriver::handle_stash` path has no driver-layer tests. Add injected-service tests covering Push/Pop command translation, success rendering, and service-error rendering/exit status.",
+              "severity": "P1",
+              "file": "apps/cli-driver/src/git.rs",
+              "line": 87,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:b3c1d88dc95cb19612168c9d330af8f1d750f3390b30278a720439ba271194fb",
+          "at": "2026-08-03T09:40:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:74b22b53abd28ae7ebc837b79500cfbf799368adfb0c15dec60f54e661c1d8aa",
+          "at": "2026-08-03T09:50:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:74b22b53abd28ae7ebc837b79500cfbf799368adfb0c15dec60f54e661c1d8aa",
+          "at": "2026-08-03T10:02:43Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1c15e00c9d57e3d1b6b7837e096db6b13217224842f46c7318b0141748f9dffc",
+          "at": "2026-08-01T09:10:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1c15e00c9d57e3d1b6b7837e096db6b13217224842f46c7318b0141748f9dffc",
+          "at": "2026-08-01T09:15:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da102509466b2fe733307e2213cf6aca51a7accea2bad9deb422abc4df300705",
+          "at": "2026-08-02T15:10:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da102509466b2fe733307e2213cf6aca51a7accea2bad9deb422abc4df300705",
+          "at": "2026-08-02T15:23:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da102509466b2fe733307e2213cf6aca51a7accea2bad9deb422abc4df300705",
+          "at": "2026-08-02T15:58:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da102509466b2fe733307e2213cf6aca51a7accea2bad9deb422abc4df300705",
+          "at": "2026-08-02T16:01:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ec71808c1505e4c0a4678f9e66d5a879b8cab49cb62b27d9763f85a905125472",
+          "at": "2026-08-03T09:41:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ec71808c1505e4c0a4678f9e66d5a879b8cab49cb62b27d9763f85a905125472",
+          "at": "2026-08-03T10:02:13Z"
         }
       ]
     },
@@ -1647,553 +2892,20 @@
           "findings": [],
           "hash": "rvw1:sha256:06cde54557dbc35170051d069ff41034cc35d3346ddf0baac7168addeb8055fa",
           "at": "2026-08-03T10:02:31Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-06’s requirement that stash-pop “preserves the repository safety gates required for the restored worktree” does not identify which gates or observable checks establish compliance, leaving Phase 2/3 to invent the contract.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
-              "line": 216,
-              "category": "acceptance criterion non-observable"
-            }
-          ],
-          "hash": "rvw1:sha256:d96c31dd688b8f7469f29f89ae0ebed068607ac107d385a51d8c936213fb97af",
-          "at": "2026-08-01T00:35:56Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d251b85b52d7071a8df8efebfa87e9383814697636ed8cdda82bb4009dfa5cee",
-          "at": "2026-08-01T00:38:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-06 contradicts IN-04 as written: a real `git stash` records stash commit objects and updates `refs/stash`, while a successful pop updates that ref again. Therefore stash/stash-pop cannot satisfy the blanket requirement to create no commit and update no ref. Clarify that branch history and branch refs must remain unchanged while permitting the stash-internal objects/ref required by D3.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
-              "line": 216,
-              "category": "scope / acceptance_criteria contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:d251b85b52d7071a8df8efebfa87e9383814697636ed8cdda82bb4009dfa5cee",
-          "at": "2026-08-01T00:41:51Z"
+          "hash": "rvw1:sha256:5f8f4c422ed88fef674543526dd139f9cc3a0c6ee026b9b55f60c37316255898",
+          "at": "2026-08-03T11:09:00Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:99c34a083854c412260ecb88e8accdc3d671a36c78ab490dbb61a65cd3647484",
-          "at": "2026-08-01T00:44:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e5eb0df80593d31f3aabfdebd7984bbd743c1e8d5ed5d06b057148c3620c400d",
-          "at": "2026-08-01T00:46:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-04 requires post-merge cleanup after a conflict, while AC-12 and CN-07 explicitly prohibit clean-merge cleanup for conflict outcomes. The spec does not define whether AC-04 means the prohibited Views → Baseline → SyncBaseStamp sequence or a distinct recovery-only cleanup, leaving downstream implementation with contradictory behavior.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
-              "line": 268,
-              "category": "scope / acceptance_criteria contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:cf55f964143a48775af8bb7867e30a610d65264264c0351727d92faefd7facc2",
-          "at": "2026-08-01T22:43:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "GO-01 adds the requirement that cleanup use the exact merged base commit, but its cited decisions are the original ADR D1 and cleanup-state ADR D3. Those decisions establish cleanup and ordering, respectively; the exact-commit requirement is defined by cleanup-state ADR D1/D2, neither of which GO-01 cites. This leaves part of the goal unanchored to its cited decision set.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
-              "line": 8,
-              "category": "goal not anchored to a decision"
-            }
-          ],
-          "hash": "rvw1:sha256:a57d774207e811b519ea738a4c88136676e307ff86d7882a22c19f035cdefe88",
-          "at": "2026-08-01T22:57:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d503c8c41ebe2072c29a376a70fcc3ff9bab869e78cd35d8e7c17a2d3e56d06f",
-          "at": "2026-08-01T23:08:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d503c8c41ebe2072c29a376a70fcc3ff9bab869e78cd35d8e7c17a2d3e56d06f",
-          "at": "2026-08-01T23:13:17Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1c15e00c9d57e3d1b6b7837e096db6b13217224842f46c7318b0141748f9dffc",
-          "at": "2026-08-01T09:10:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1c15e00c9d57e3d1b6b7837e096db6b13217224842f46c7318b0141748f9dffc",
-          "at": "2026-08-01T09:15:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:da102509466b2fe733307e2213cf6aca51a7accea2bad9deb422abc4df300705",
-          "at": "2026-08-02T15:10:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:da102509466b2fe733307e2213cf6aca51a7accea2bad9deb422abc4df300705",
-          "at": "2026-08-02T15:23:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:da102509466b2fe733307e2213cf6aca51a7accea2bad9deb422abc4df300705",
-          "at": "2026-08-02T15:58:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:da102509466b2fe733307e2213cf6aca51a7accea2bad9deb422abc4df300705",
-          "at": "2026-08-02T16:01:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ec71808c1505e4c0a4678f9e66d5a879b8cab49cb62b27d9763f85a905125472",
-          "at": "2026-08-03T09:41:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ec71808c1505e4c0a4678f9e66d5a879b8cab49cb62b27d9763f85a905125472",
-          "at": "2026-08-03T10:02:13Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fb2f7e429b2d3257d2accfc1dc2b5a2aae2990a6b625404fb70ef0e21ee8d4e8",
-          "at": "2026-08-01T01:29:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fb2f7e429b2d3257d2accfc1dc2b5a2aae2990a6b625404fb70ef0e21ee8d4e8",
-          "at": "2026-08-01T01:33:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fb2f7e429b2d3257d2accfc1dc2b5a2aae2990a6b625404fb70ef0e21ee8d4e8",
-          "at": "2026-08-01T01:46:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:aef4333465fe0f58ae747a50e27ac879b6eede43bb7ba4a4e74ea5f966f39272",
-          "at": "2026-08-01T09:10:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The TypeSignalsError → IN-05 record binds an invalid-layer diagnostic test, while none of its tests exercises the active-track-only guard or BranchTrackMismatch. Bind the existing active-track mismatch/track-ID propagation test so this edge proves IN-05's active-track restriction.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
-              "line": 23,
-              "category": "test coverage / weak edge binding"
-            },
-            {
-              "message": "The TypeSignalsError → AC-07 record covers isolated hash mismatches but omits the all-three-hashes-match cache-hit test required by the briefing's multi-test contract. Its malformed-cache test concerns AC-08 and cannot prove the successful reuse case for AC-07.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
-              "line": 25,
-              "category": "test coverage / incomplete edge evidence"
-            }
-          ],
-          "hash": "rvw1:sha256:aef4333465fe0f58ae747a50e27ac879b6eede43bb7ba4a4e74ea5f966f39272",
-          "at": "2026-08-01T09:17:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The updated TypeSignalsError → IN-05 and → AC-07 binding sets have not been re-evaluated by the host. `bin/sotp test-obligation check` fails with `TestChanged` drift for both edges, so the briefing’s frozen pass=32 verdict no longer covers the current file. Run the host-owned evaluation before treating this scope as green.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
-              "line": 23,
-              "category": "test-obligation gate / stale verdict"
-            }
-          ],
-          "hash": "rvw1:sha256:d7b0a439adde308b33de185e23412f08ebe5ea8f41d9ceb015add01cdd6a39c2",
-          "at": "2026-08-01T09:21:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d7b0a439adde308b33de185e23412f08ebe5ea8f41d9ceb015add01cdd6a39c2",
-          "at": "2026-08-01T09:49:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The bindings file omits the three newly derived voluntary edges for `EvaluateSignalsError` at spec anchors `IN-05`, `CN-04`, and `AC-09`. `bin/sotp test-obligation check --track-id 2026-07-31-base-merge-and-conflict-recovery` fails with exactly these unresolved edges. Add focused infrastructure tests, such as `test_map_evaluation_error_each_stage_preserves_execution_error_category` and the evaluator failure/cache-write tests, while preserving the existing records.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
-              "line": 31,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:d7b0a439adde308b33de185e23412f08ebe5ea8f41d9ceb015add01cdd6a39c2",
-          "at": "2026-08-01T11:52:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3444e758e644324cee7351fae50bb0a8341a93a6c8937e6fd351020996eb118e",
-          "at": "2026-08-01T11:56:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3444e758e644324cee7351fae50bb0a8341a93a6c8937e6fd351020996eb118e",
-          "at": "2026-08-01T12:01:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The BaseMergeInteractor fulfillment record includes `test_derive_base_merge_direction_active_track_uses_snapshot_base_branch`, which only exercises the domain constructor and never invokes BaseMergeInteractor. It is not direct evidence for this declaration.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
-              "line": 35,
-              "category": "test-obligation binding"
-            },
-            {
-              "message": "The BaseMergeGitPort fulfillment record lists the snapshot-source, reverse-direction, and non-track rejection tests, but each test returns from context validation before calling `BaseMergeGitPort::merge_base` and asserts that Git was not called. These tests do not directly exercise the bound trait method.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
-              "line": 40,
-              "category": "test-obligation binding"
-            },
-            {
-              "message": "The BaseMergeContextError AC-01 binding includes `test_derive_base_merge_direction_active_track_uses_snapshot_base_branch`, which exercises only domain direction derivation and cannot produce or inspect BaseMergeContextError. It is invalid direct evidence for this declaration/anchor intersection.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
-              "line": 63,
-              "category": "test-obligation binding"
-            }
-          ],
-          "hash": "rvw1:sha256:87f4e88d520018e67df9cbc5acfa1cdfcd16d4ea6715e6549d9ef5eb098fa9cd",
-          "at": "2026-08-01T14:01:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6a9881690f8c17d162245e3165a4e94d63b242d37f12913317f432c09a355195",
-          "at": "2026-08-01T14:16:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The conflict-recovery waivers for BaseMergeInteractor and BaseMergeService (IN-03/CN-02/AC-04) hide an expressible T002 behavior: `execute` returns the typed `Conflicted` outcome and skips clean-merge cleanup. The fulfillment records already reference the test that proves this handoff. Resolve these edges with that test; only the downstream edit/review/commit workflow belongs elsewhere.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
-              "line": 42,
-              "category": "waiver_validity"
-            },
-            {
-              "message": "The guard waivers on the Interactor, ContextPort, and Service treat rejection as unexpressible because the command lacks raw source/direction fields. Their entry-local contract is nevertheless testable: context loading returns an authoritative direction or rejection, the interactor/service must avoid Git on rejection, and the clean path forwards the snapshot source and active-track target. The fulfillment records already list tests for those behaviors, so these waivers suppress T002 evidence.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
-              "line": 43,
-              "category": "waiver_validity"
-            },
-            {
-              "message": "The BaseMergeCommand × AC-02 binding is substitution evidence. `test_base_merge_execute_active_track_mismatch_returns_typed_error` uses a context double that ignores `workspace_root`, so it returns the same mismatch for any command and does not exercise the command declaration. Either bind a test proving the command's workspace selects the rejected context or waive this edge consistently with the adjacent CN-01 record.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
-              "line": 61,
-              "category": "binding_semantics"
-            },
-            {
-              "message": "The CN-01/AC-02 bindings for BaseMergeContextError and BaseMergeError cover only ActiveTrackMismatch, while both anchors also require source-mismatch, reverse-direction, and non-track rejection. Focused tests for those branches exist but are absent from these four records, so each voluntary binding resolves a multi-branch edge with only partial evidence.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
-              "line": 63,
-              "category": "test_coverage"
-            },
-            {
-              "message": "The cleanup/context port fulfillments do not verify their declared arguments. Every context double ignores `workspace_root`, and RecordingCleanup ignores both `workspace_root` and `track_id`; consequently the interactor could pass the wrong workspace or active-track id and all bound tests would still pass. Add recording assertions before claiming these method-contract obligations are fulfilled.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
-              "line": 36,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:6a9881690f8c17d162245e3165a4e94d63b242d37f12913317f432c09a355195",
-          "at": "2026-08-01T14:38:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:75c63bcea506d9e6f5ff828f6c62d1f03c9e624907b268aa3c3a6f9576cdfcf4",
-          "at": "2026-08-01T15:56:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The shared infrastructure test is bound to all three `BaseMergeCleanupPort` methods, but it directly calls private baseline/stamp helpers and never invokes the port adapter (and it has no view-regeneration coverage). These bindings therefore falsely fulfill `regenerate_views` and do not exercise the declared trait methods; keep the test only on the applicable replacement/stamp obligations or add adapter-level tests.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
-              "line": 36,
-              "category": "test-coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:e413f934190ad8ed0934f2565a8b7a3126b7e7b7b8fb0821fdd92c383d6a913a",
-          "at": "2026-08-02T09:01:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `regenerate_views` fulfillment record omits `test_fs_base_merge_cleanup_baseline_replacement_isolated_at_exact_commit_and_atomically_published`, so the three `BaseMergeCleanupPort` records no longer all point to the required focused infrastructure evidence. Add the evidence to this record, or provide a dedicated infrastructure test that exercises view regeneration together with the exact-commit cleanup request.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
-              "line": 36,
-              "category": "test-coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:7800fd895bf89456c54206de08aa9e76fef86688c473cb271014c0b4a24bfe5c",
-          "at": "2026-08-02T09:09:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `regenerate_views` fulfillment record includes baseline-replacement tests and `test_fs_base_merge_cleanup_baseline_replacement_isolated_at_exact_commit_and_atomically_published`, but that infrastructure test directly exercises baseline/stamp helpers and never invokes view regeneration. These references do not exercise the declared method and falsely strengthen its fulfillment; remove them or bind a view-regeneration adapter test instead.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
-              "line": 36,
-              "category": "test-coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:e413f934190ad8ed0934f2565a8b7a3126b7e7b7b8fb0821fdd92c383d6a913a",
-          "at": "2026-08-02T09:15:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `regenerate_views` fulfillment record includes baseline-replacement tests and `test_fs_base_merge_cleanup_baseline_replacement_isolated_at_exact_commit_and_atomically_published`, but that infrastructure test directly exercises baseline/stamp helpers and never invokes view regeneration. These references do not exercise the declared method and falsely strengthen its fulfillment; remove them or bind a view-regeneration adapter test instead.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
-              "line": 36,
-              "category": "test-coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:e413f934190ad8ed0934f2565a8b7a3126b7e7b7b8fb0821fdd92c383d6a913a",
-          "at": "2026-08-02T09:15:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7800fd895bf89456c54206de08aa9e76fef86688c473cb271014c0b4a24bfe5c",
-          "at": "2026-08-02T09:22:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7800fd895bf89456c54206de08aa9e76fef86688c473cb271014c0b4a24bfe5c",
-          "at": "2026-08-02T10:23:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The newly added CLI bindings cite the removed test `test_track_command_merge_base_dispatches_snapshot_source_guard_failure_without_merge_success` at lines 162, 165, 166, and 169. The current test is `test_track_command_merge_base_dispatches_composition_root_guard_failure_without_merge_success`; update all affected bindings and refresh their verdicts.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
-              "line": 162,
-              "category": "missing-test-source"
-            },
-            {
-              "message": "The cleanup-adapter fulfillment and related existing edges now have stale frozen verdicts: the obligation check reports their bound test bodies changed since verdict freeze. Re-run host-owned evaluation; do not hand-edit verdict caches.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
-              "line": 151,
-              "category": "stale-verdict"
-            }
-          ],
-          "hash": "rvw1:sha256:6311123962732ad6f89c4a454025b83ee041df4543851f0367d7a8a32bbcb218",
-          "at": "2026-08-03T06:14:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `TrackCommand` bindings for AC-01 and AC-02 (lines 165–166) cite only `cli_driver::track::tests`. They omit the direct owning-layer CLI dispatch guard test `test_track_command_merge_base_dispatches_composition_root_guard_failure_without_merge_success`, which is already used for the same changed dispatch obligation. Add that CLI test to both command-level edges (retaining the driver tests where they cover the concrete guard details).",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
-              "line": 165,
-              "category": "insufficient-owning-layer-evidence"
-            }
-          ],
-          "hash": "rvw1:sha256:0c0c78afe7aedfc965ff4857b44d39fecb313eb739c14704bbf8bf7651cbd3d4",
-          "at": "2026-08-03T07:05:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5dd808d5f1b78efc3422129378e1129e53dab8aafb658541da21499b6c8b141d",
-          "at": "2026-08-03T07:13:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5dd808d5f1b78efc3422129378e1129e53dab8aafb658541da21499b6c8b141d",
-          "at": "2026-08-03T07:20:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5dd808d5f1b78efc3422129378e1129e53dab8aafb658541da21499b6c8b141d",
-          "at": "2026-08-03T08:05:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-06's GitStashError binding cites only a usecase fake-port propagation test, which cannot verify the concrete adapter's branch-ref guard or the command-path failure behavior. Add direct adapter/CLI failure coverage and bind it here.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
-              "line": 177,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:1d2de7767e3a33c2119cf69258bf54967b883c3e56d9fbf1425cef45bbff0aa3",
-          "at": "2026-08-03T09:41:57Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a4e95be9f7056c5faacc5332fa07119836ff38c9a80ab2031c95b26d755e2433",
-          "at": "2026-08-03T09:52:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The GitStashInteractor, GitStashPort, and GitStashService fulfillment records bind only the successful delegation test. Their edge-local verifier inputs therefore omit the existing forbidden-ref error-propagation test, leaving IN-04's safety-gate/error behavior unverified for these Result-returning APIs. Bind the focused error test to the applicable fulfillment records.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
-              "line": 170,
-              "category": "test_coverage"
-            },
-            {
-              "message": "FsGitStashAdapter's sole contract-conformance test verifies untracked restoration and the active branch name, but it never verifies that HEAD and all refs/heads remain unchanged after both push and pop or exercises ForbiddenBranchRefUpdate. A regression that mutates branch history or another branch ref could therefore leave the cited test green despite violating AC-06. Add and bind a concrete guard/failure-closed adapter test.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
-              "line": 173,
-              "category": "test_coverage"
-            },
-            {
-              "message": "The new bindings do not have fresh host-evaluated verdicts: `bin/sotp test-obligation check --track-id 2026-07-31-base-merge-and-conflict-recovery` currently fails with StaleVerdicts for all 20 new IN-04/AC-06 edges. T006 is already done, so this is not the accepted todo-lane warning and blocks the obligation gate. Run the host-owned evaluation and repair any rejected bindings before approval.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
-              "line": 170,
-              "category": "test_obligation_freshness"
-            }
-          ],
-          "hash": "rvw1:sha256:a4e95be9f7056c5faacc5332fa07119836ff38c9a80ab2031c95b26d755e2433",
-          "at": "2026-08-03T10:06:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:00e5bd632b58318a89af19ed58c0a59a1b01de125c35c5b95fb9af3c5e207166",
-          "at": "2026-08-03T10:27:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:00e5bd632b58318a89af19ed58c0a59a1b01de125c35c5b95fb9af3c5e207166",
-          "at": "2026-08-03T10:30:42Z"
+          "hash": "rvw1:sha256:5f8f4c422ed88fef674543526dd139f9cc3a0c6ee026b9b55f60c37316255898",
+          "at": "2026-08-03T11:12:56Z"
         }
       ]
     },
@@ -2771,761 +3483,63 @@
         }
       ]
     },
-    "usecase": {
+    "adr": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8b7712d82979fe1cad57a7b3105cc648792eccc4e61e1213f18065a7ff7c7db6",
-          "at": "2026-08-01T09:11:10Z"
+          "hash": "rvw1:sha256:cb666be156be4e5a74c73e23d8220f63bb3db8b8a08be26761cbad58085b2412",
+          "at": "2026-07-31T22:47:46Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8b7712d82979fe1cad57a7b3105cc648792eccc4e61e1213f18065a7ff7c7db6",
-          "at": "2026-08-01T09:18:01Z"
+          "hash": "rvw1:sha256:cb666be156be4e5a74c73e23d8220f63bb3db8b8a08be26761cbad58085b2412",
+          "at": "2026-07-31T22:50:51Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:be220219084742fef91ed9e0b68b678bed8be47abc05c5131b77820a844cf857",
-          "at": "2026-08-01T13:57:33Z"
+          "hash": "rvw1:sha256:ccf80b721d965f8205f7454dbcd27c4ea12d2cfc166dd951f73cef9c2c11ea89",
+          "at": "2026-08-01T00:18:19Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:be220219084742fef91ed9e0b68b678bed8be47abc05c5131b77820a844cf857",
-          "at": "2026-08-01T14:20:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7d09579432c3c1bfdb61df153b7f5d087fb4f8cb616dd78ac94b41aa493f739e",
-          "at": "2026-08-01T15:49:37Z"
+          "hash": "rvw1:sha256:ccf80b721d965f8205f7454dbcd27c4ea12d2cfc166dd951f73cef9c2c11ea89",
+          "at": "2026-08-01T00:21:10Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:cb333325ceeb1c35ab125d7cddd3fb82de2113433f49d6e699aaa96703fd45a4",
-          "at": "2026-08-02T09:00:57Z"
+          "hash": "rvw1:sha256:4b5cd74999751b16d7905643597f13b47efbfd4e85cba5d36ed91b5dac33d8d1",
+          "at": "2026-08-01T22:29:27Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:cb333325ceeb1c35ab125d7cddd3fb82de2113433f49d6e699aaa96703fd45a4",
-          "at": "2026-08-02T10:19:15Z"
+          "hash": "rvw1:sha256:4b5cd74999751b16d7905643597f13b47efbfd4e85cba5d36ed91b5dac33d8d1",
+          "at": "2026-08-01T22:32:46Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a4319db72778da0832cf4de2e3ea01f52bde3d81e3ea519ab4d3dd805a23ba39",
-          "at": "2026-08-03T09:41:41Z"
+          "hash": "rvw1:sha256:7bddfda3dd3200435c16ff2d56500f8c6dbb68984adf8d65dfff25502d5d34da",
+          "at": "2026-08-02T09:01:09Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a4319db72778da0832cf4de2e3ea01f52bde3d81e3ea519ab4d3dd805a23ba39",
-          "at": "2026-08-03T10:03:12Z"
-        }
-      ]
-    },
-    "cli_driver": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b88697ff93d0b7c96eb67320efde05617b09b66378eae3af512fc1c87dcae6fe",
-          "at": "2026-08-02T15:10:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b88697ff93d0b7c96eb67320efde05617b09b66378eae3af512fc1c87dcae6fe",
-          "at": "2026-08-02T15:23:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b88697ff93d0b7c96eb67320efde05617b09b66378eae3af512fc1c87dcae6fe",
-          "at": "2026-08-02T16:03:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b88697ff93d0b7c96eb67320efde05617b09b66378eae3af512fc1c87dcae6fe",
-          "at": "2026-08-02T16:07:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new public `GitDriver::handle_stash` path has no driver-layer tests. Add injected-service tests covering Push/Pop command translation, success rendering, and service-error rendering/exit status.",
-              "severity": "P1",
-              "file": "apps/cli-driver/src/git.rs",
-              "line": 87,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:b3c1d88dc95cb19612168c9d330af8f1d750f3390b30278a720439ba271194fb",
-          "at": "2026-08-03T09:40:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:74b22b53abd28ae7ebc837b79500cfbf799368adfb0c15dec60f54e661c1d8aa",
-          "at": "2026-08-03T09:50:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:74b22b53abd28ae7ebc837b79500cfbf799368adfb0c15dec60f54e661c1d8aa",
-          "at": "2026-08-03T10:02:43Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 2 stages the conflict resolution before verification/review, contradicting the canonical commit workflow’s required `implement → review → stage → commit` order. This can leave the review artifact unstaged and makes the recovery SSoT inconsistent with the guarded commit contract; defer staging to `/track:commit` or explicitly stage only after the final review.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/recover.md",
-              "line": 22,
-              "category": "responsibility-boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:750c5518ab89ef3cb947ebc55e2c3ed53d0ea2bcb5b545e5e0128bebd68789a7",
-          "at": "2026-08-02T15:10:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5de7355cfef51287379f9817e36512d2056ca39bb0830aa08f91f3dfda2296ad",
-          "at": "2026-08-02T15:12:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5de7355cfef51287379f9817e36512d2056ca39bb0830aa08f91f3dfda2296ad",
-          "at": "2026-08-02T15:23:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5de7355cfef51287379f9817e36512d2056ca39bb0830aa08f91f3dfda2296ad",
-          "at": "2026-08-02T16:09:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`/track:commit` is invoked without a commit message, but its canonical workflow explicitly enters proposal-only mode and stops when the message is omitted. The guarded commit therefore never runs. Generate an explicit recovery commit message and pass it to the commit workflow.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/recover.md",
-              "line": 39,
-              "category": "command_wiring"
-            },
-            {
-              "message": "The workflow prohibits staging the resolved conflicts and claims the commit workflow owns staging, while `.harness/workflows/track/commit.md` requires a correct, non-empty staged diff during its pre-commit step and stops otherwise. Add guarded staging after final review and before invoking the commit workflow, or align the commit contract consistently.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/recover.md",
-              "line": 22,
-              "category": "command_wiring"
-            },
-            {
-              "message": "The Codex adapter categorically says not to create commits, contradicting the canonical recovery workflow's required guarded commit. Restrict the prohibition to direct Git operations and explicitly delegate commit creation to `$track-commit`.",
-              "severity": "P1",
-              "file": ".agents/skills/track-recover/SKILL.md",
-              "line": 13,
-              "category": "adapter_ssot_sync"
-            },
-            {
-              "message": "This authorizes the orchestrator to edit arbitrary conflicted track artifacts directly. Conflicts can include sole-writer artifacts such as `spec.json`, type catalogues, and implementation-plan files, or CLI-owned rendered views. Route those files through their designated writer/regeneration surfaces while the orchestrator coordinates recovery.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/recover.md",
-              "line": 22,
-              "category": "responsibility_boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:5de7355cfef51287379f9817e36512d2056ca39bb0830aa08f91f3dfda2296ad",
-          "at": "2026-08-02T16:18:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "ADR conflicts are routed only through `adr-editor`, but every in-track ADR edit must also follow the lifecycle-specific guardian lane and be immediately judged or re-audited by `adr-diagnoser`. As written, recovery can proceed to review and commit after an unadjudicated ADR merge resolution. Route ADR conflicts through the complete two-box adjudication workflow.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/recover.md",
-              "line": 24,
-              "category": "responsibility_boundary"
-            },
-            {
-              "message": "The workflow does not order multiple conflicted SoT artifacts or reconverge an edited upstream phase before invoking its downstream writer. `.harness/policies/sot-reentry-sequencing.md` requires ADR → spec → catalogues → impl-plan descent, with the applicable signal, semantic-verification, and scoped-review convergence before each downstream restart. Specify that sequential re-entry instead of resolving all writers first and reviewing only afterward.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/recover.md",
-              "line": 23,
-              "category": "convention_contradiction"
-            },
-            {
-              "message": "The Codex adapter still categorically prohibits creating commits even though the canonical recovery workflow requires a guarded commit. A compliant Codex invocation must therefore block before completing recovery. Limit the prohibition to direct Git operations and explicitly delegate commit creation to `$track-commit`.",
-              "severity": "P1",
-              "file": ".agents/skills/track-recover/SKILL.md",
-              "line": 13,
-              "category": "adapter_ssot_sync"
-            }
-          ],
-          "hash": "rvw1:sha256:7ef5b988b2db67fc91aee5a8c8ebd6305cff15a9a0e92ffe752916ca888fdf53",
-          "at": "2026-08-02T16:29:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The Codex adapter cannot execute its canonical workflow: recovery edits files, stages them, and creates a guarded commit, but this adapter omits the `workspace-write` requirement used by every other mutating track skill and categorically prohibits commit creation. Declare the required sandbox and prohibit only direct Git operations while delegating the guarded commit to `$track-commit`.",
-              "severity": "P1",
-              "file": ".agents/skills/track-recover/SKILL.md",
-              "line": 11,
-              "category": "adapter_ssot_sync"
-            },
-            {
-              "message": "Sequential reconvergence deadlocks when multiple SoT files are conflicted. The workflow keeps downstream writers halted until an upstream scoped review completes, but that review always runs `task-contract-check` and `track-active-gate`, which parse and refresh downstream spec/catalogue/plan artifacts. Conflict markers in any still-unresolved downstream JSON make those pre-gates fail before the upstream review can start. Define a sanctioned preliminary marker-resolution lane or a recovery-safe scoped review path before enforcing phase-by-phase reconvergence.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/recover.md",
-              "line": 25,
-              "category": "command_wiring"
-            }
-          ],
-          "hash": "rvw1:sha256:ae031aab073444e2c7f97a69f3ad646c00c966045f299e8bb86d9b93e0d0951b",
-          "at": "2026-08-02T16:33:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The Codex adapter still cannot execute the canonical recovery workflow: recovery edits files, stages them, and creates a guarded commit, but the adapter omits the `workspace-write` requirement used by other mutating track skills and categorically prohibits commit creation. Declare the required sandbox and prohibit only direct Git operations while delegating the guarded commit to `$track-commit`.",
-              "severity": "P1",
-              "file": ".agents/skills/track-recover/SKILL.md",
-              "line": 11,
-              "category": "adapter_ssot_sync"
-            },
-            {
-              "message": "The preparation lane asks downstream writer capabilities to create parse-only preliminary artifacts before their upstream has reconverged. This directly contradicts `.harness/policies/sot-reentry-sequencing.md`, which requires a writer with an unmet prerequisite to return without editing, and the writer contracts expose no non-semantic marker-removal mode. Introduce a sanctioned recovery surface for preliminary conflict-marker removal or another executable route instead of bypassing writer prerequisites.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/recover.md",
-              "line": 27,
-              "category": "convention_contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:aa0404de0ff557ba898fea4c119738833d71410ba7badb1104041fedd4bd7541",
-          "at": "2026-08-02T16:36:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Multi-SoT conflicts still deadlock. Before an upstream scoped review can establish reconvergence, `track-local-review-fix` runs global `task-contract-check` and `track-active-gate` processing that parses downstream spec/catalogue/plan inputs. If one of those downstream files still contains conflict markers, the upstream review cannot start; yet this rule forbids preliminary marker removal and prohibits dispatching the downstream writer before upstream reconvergence. Provide a sanctioned recovery path that can make all pre-gate inputs parseable without treating downstream phases as reconverged.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/recover.md",
-              "line": 41,
-              "category": "command_wiring"
-            }
-          ],
-          "hash": "rvw1:sha256:88437192ad1ecd0d5df9bd8cd6ecb166c9d8a835a3eb77cf19a836e7c30eccb7",
-          "at": "2026-08-02T16:40:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This lane directly overwrites sole-writer SoT artifacts through a generic file utility. Atomicity does not transfer ownership: `CLAUDE.md` reserves spec, catalogues, and plan artifacts exclusively for their writer capabilities, and `sot-reentry-sequencing.md` permits no such marker-removal exception. Remove this orchestrator write path or establish a properly authorized recovery surface consistent with those ownership contracts.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/recover.md",
-              "line": 45,
-              "category": "responsibility_boundary"
-            },
-            {
-              "message": "Making downstream files syntactically parseable is insufficient to unblock an upstream scoped review. `track-local-review-fix` also runs `task-contract-check` and `track-active-gate`, including signal calculation, catalogue lint, and catalogue checks; a parseable but temporarily inconsistent hunk selection can still fail these gates. Because downstream writers remain halted until upstream reconvergence, recovery still has no route past such failures. Provide a recovery-safe scoped pre-gate or another path that handles structural and signal inconsistency, not only conflict markers.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/recover.md",
-              "line": 41,
-              "category": "command_wiring"
-            }
-          ],
-          "hash": "rvw1:sha256:11f570eb759efe965f15acb5c57e12a4d721b9003f6f39ed2975072517487e3e",
-          "at": "2026-08-02T16:46:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The workflow dispatches a `track-recover` capability that does not exist in `agent-profiles.json`, `.harness/capabilities/`, or the Claude agent surface. `track-recover` is only the command/skill currently executing this workflow, so Codex self-dispatches recursively while Claude has no dispatch target. Keep this lane in the current orchestrator or introduce a separately registered capability with both provider adapters.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/recover.md",
-              "line": 42,
-              "category": "capability_routing"
-            },
-            {
-              "message": "The preparation lane still gives a second writer authority over `spec.json`, catalogues, and plan artifacts through a generic atomic-file command. Declaring `track-recover` the lane owner does not override the repository's one-file/one-writer invariant or the re-entry policy's sole exception, and `file write-atomic` enforces neither artifact ownership nor allowed conflict-hunk content. Route these writes through their designated writers or formally change the governing ownership contract.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/recover.md",
-              "line": 46,
-              "category": "responsibility_boundary"
-            },
-            {
-              "message": "Syntactic and structural hunk selection still does not guarantee that the mandatory pre-review dependencies pass. `task-contract-check` and `track-active-gate` enforce catalogue attribution, liveness, signal, and catalogue consistency; a parseable selected version can remain Red or structurally inconsistent with non-conflicting upstream merge changes. Because the actual downstream writer remains halted, this lane has no recovery path when those semantic gates fail.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/recover.md",
-              "line": 49,
-              "category": "command_wiring"
-            }
-          ],
-          "hash": "rvw1:sha256:90ee0602854e06a411b8e311ce72fee69f4820a75b68c5e7d0ba315b3daed33e",
-          "at": "2026-08-02T16:49:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The operator handoff contradicts the governing recovery decision and ownership model. ADR D2 requires the orchestrator to complete conflict editing without handing it to the user, while `CLAUDE.md` reserves these SoT files to designated writers; calling this an “explicitly permitted” exception does not establish one in either policy. Route recovery through an authorized writer/recovery surface or formally amend the governing decision and ownership policy.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/recover.md",
-              "line": 44,
-              "category": "responsibility_boundary"
-            },
-            {
-              "message": "The Codex adapter now duplicates the workflow’s blocker recovery, operator handoff, edit limit, and downstream-writer state. The governing ADR and adapter/SSoT policy restrict adapters to provider invocation, tool constraints, and reporting; this behavior belongs only in the workflow SSoT and is also absent from the Claude adapter. Remove the duplicated recovery semantics from the skill.",
-              "severity": "P1",
-              "file": ".agents/skills/track-recover/SKILL.md",
-              "line": 18,
-              "category": "adapter_ssot_sync"
-            },
-            {
-              "message": "The operator is limited to syntactic and structural repair, but the mandatory pre-review dependencies require more than executability: `task-contract-check` enforces attribution/liveness and `track-active-gate` enforces signal and catalogue consistency. A parseable hunk selection can therefore still fail before the scoped reviewer launches, while the designated downstream writer remains halted and semantic repair is forbidden. Define a valid route for these non-parse gate failures.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/recover.md",
-              "line": 46,
-              "category": "command_wiring"
-            }
-          ],
-          "hash": "rvw1:sha256:71a130fc121562b728ef3cb72359671f908a67df56a0f7f31cdda77ecf6a346d",
-          "at": "2026-08-02T16:51:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The claimed “D2 conflict-edit exception” authorizes the orchestrator to edit sole-writer artifacts directly. D2 makes the orchestrator responsible for driving recovery, but does not override CLAUDE.md’s one-file/one-writer invariant; `.harness/policies/sot-reentry-sequencing.md` also says the only artifact-edit exception is an impl-plan task transition and requires a separate ADR for additional exceptions. Conflict hunks in ADR/spec/catalogue/plan artifacts must remain routed through their designated writers unless the governing policy is explicitly changed.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/recover.md",
-              "line": 44,
-              "category": "responsibility-boundary"
-            },
-            {
-              "message": "Limiting preparation to syntactic and structural executability does not make an upstream scoped review runnable. `track-local-review-fix` unconditionally runs `task-contract-check` and `track-active-gate`, whose attribution, signal, and catalogue checks can fail on semantically stale downstream artifacts. Because this workflow simultaneously forbids dispatching the downstream writer until upstream review converges, a merge conflicting in multiple SoT layers can deadlock. Recovery needs a sanctioned chain-limited review path or preparation capable of satisfying the actual pre-gates.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/recover.md",
-              "line": 46,
-              "category": "workflow-liveness"
-            },
-            {
-              "message": "The selective-staging path is not preserved by the referenced commit workflow. After `git add-from-file` excludes unrelated changes, `/track:commit` runs `cargo make track-commit-message`, whose first operation is `bin/sotp git add-all`; those excluded changes are therefore staged and committed. Use a commit surface that preserves the allowlist or remove the ineffective selective-staging promise.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/recover.md",
-              "line": 71,
-              "category": "command-wiring"
-            },
-            {
-              "message": "This provider-neutral workflow directly invokes the Claude-specific `/track:review` and `/track:commit` adapter surfaces. The paired Codex entry points use `$track-review`/`$track-commit`, so a Codex adapter following this SSoT cannot execute these instructions as written. Refer to the neutral review and commit workflows, leaving slash/skill invocation syntax in each provider adapter.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/recover.md",
-              "line": 58,
-              "category": "adapter-ssot"
-            }
-          ],
-          "hash": "rvw1:sha256:0b8f4eaed24edf61da0b5dcb26b50fbdd0c3e34f3674cb2792ae9883d7a980d9",
-          "at": "2026-08-02T16:56:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This new exception lets the orchestrator directly edit any SoT artifact, contradicting the current hard one-file/one-writer invariant in `CLAUDE.md` and, for ADR conflicts, `.harness/policies/pre-track-adr-authoring.md`, which requires `adr-editor` and explicitly forbids orchestrator edits. Selecting an existing conflict hunk still changes authoritative content. Route preparation through the designated writer or propagate an explicitly approved responsibility-model change across those governing contracts.",
-              "severity": "P1",
-              "file": ".harness/policies/sot-reentry-sequencing.md",
-              "line": 37,
-              "category": "responsibility-boundary"
-            },
-            {
-              "message": "This operational policy directly cites a date-identified ADR. `.harness/policies/pre-track-adr-authoring.md` explicitly includes policies/workflows among operational instruction documents and forbids references such as `knowledge/adr/YYYY-MM-DD-HHMM-slug.md`; the operational rule must be self-contained and use only a generic index reference for background.",
-              "severity": "P1",
-              "file": ".harness/policies/sot-reentry-sequencing.md",
-              "line": 37,
-              "category": "convention-contradiction"
-            },
-            {
-              "message": "The source-repair lane only promises that global pre-review inputs become executable/parseable, but the scoped-review wrapper requires `task-contract-check` and `track-active-gate` to exit successfully. Those gates can reject stale downstream attribution, signals, or catalogue structure even after conflict markers are removed. Because the workflow forbids dispatching that downstream writer until the upstream scoped review converges, a multi-layer SoT conflict can still deadlock. Provide a sanctioned chain-limited review path or a preparation lane capable of satisfying the actual pre-gates.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/recover.md",
-              "line": 43,
-              "category": "workflow-liveness"
-            },
-            {
-              "message": "The provider-neutral workflow now embeds both providers’ adapter invocation syntax (`/track:review`, `$track-review`, `/track:commit`, and `$track-commit`). The harness-policy adapter/SSoT rule requires provider-specific launch details to remain in the adapters; other workflow SSoTs refer to sub-workflows neutrally. Refer only to the canonical review and commit workflow contracts here and let each adapter choose its invocation surface.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/recover.md",
-              "line": 54,
-              "category": "adapter-ssot"
-            }
-          ],
-          "hash": "rvw1:sha256:8092670b2e298b51793e583c4921cf7ae70d2f7fac4dc7f548ebd292bdba6672",
-          "at": "2026-08-02T17:00:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The conflict exception authorizes the orchestrator to write spec, catalogue, and plan artifacts, but their capability SSoTs still declare exclusive ownership—for example, `impl-planner.md` says nothing else ever writes its four artifacts. Updating this policy and CLAUDE.md alone leaves contradictory runtime authority. Route hunk preparation through the designated writers or synchronize the exception across every affected capability contract.",
-              "severity": "P1",
-              "file": ".harness/policies/sot-reentry-sequencing.md",
-              "line": 37,
-              "category": "responsibility-boundary"
-            },
-            {
-              "message": "The ADR exception permits direct orchestrator hunk selection without an immediate `adr-diagnoser` verdict. The same policy still defines `adr-editor` as the writer, the orchestrator as dispatch-only, requires immediate diagnosis of ADR edits, and its checklist still rejects direct orchestrator editing. Since choosing an existing hunk can change which decision text survives, this bypasses the two-box guardian lane. Route the repair through editor/diagnoser or update the complete role and lifecycle contract.",
-              "severity": "P1",
-              "file": ".harness/policies/pre-track-adr-authoring.md",
-              "line": 23,
-              "category": "responsibility-boundary"
-            },
-            {
-              "message": "Sequential recovery can still deadlock on a conflict spanning multiple SoT layers. An upstream scoped review invokes `track-local-review-fix`, which unconditionally requires global task-contract and track-active gates to pass; those gates may require semantic downstream regeneration. The workflow forbids dispatching that downstream writer before upstream review converges and permits preparation only from existing hunks without adding meaning. A legitimate conflict needing generated attribution or catalogue repair therefore cannot start either side. Provide a sanctioned chain-limited review wrapper or preparation route that can satisfy the real pre-gates.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/recover.md",
-              "line": 43,
-              "category": "workflow-liveness"
-            },
-            {
-              "message": "The exception’s completion condition is inconsistent across the scoped SSoTs. CLAUDE.md and the ADR policy say to make gates merely executable, the sequencing policy ultimately requires them to pass, while the recovery workflow says both “until executable” and “make all pre-gates pass”; its Step 2 table only requires parseability. Providers can therefore disagree whether an executable-but-failing gate permits progression or requires fail-closed termination. Define one canonical pass condition and reference it consistently.",
-              "severity": "P1",
-              "file": "CLAUDE.md",
-              "line": 65,
-              "category": "state-transition-drift"
-            }
-          ],
-          "hash": "rvw1:sha256:e8ce3d62370d697666c1f2d9fec98d773d2d1b5f27f1101c8f61b80c2ac4a91c",
-          "at": "2026-08-03T00:54:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 2 defines mutually exclusive preparation routes. Lines 41–44 require every affected designated writer to run `conflict-preparation` before ordered review, while lines 49–50 assign hunk selection to the orchestrator and explicitly forbid dispatching a downstream writer during preparation; the sequencing policy instead describes orchestrator-first with writer fallback. Consolidate these into one deterministic order.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/recover.md",
-              "line": 41,
-              "category": "state-transition-drift"
-            },
-            {
-              "message": "`conflict-preparation` is not wired as an executable capability branch. The sequencing policy still says a writer with an unconverged upstream returns without working, and spec-designer, type-designer, and impl-planner retain those unconditional prerequisites even though preparation is invoked before reconvergence. Their normal pipelines also mandate semantic authoring steps; type-designer explicitly forbids skipping its fixed pipeline, and impl-planner lacks permission to run the promised view regeneration. Define mode-specific prerequisites, pipeline, tools, and output contracts.",
-              "severity": "P1",
-              "file": ".harness/policies/sot-reentry-sequencing.md",
-              "line": 37,
-              "category": "capability-wiring"
-            },
-            {
-              "message": "Even a correctly dispatched preparation mode can only select existing hunks and regenerate derived artifacts. The global pre-review dependencies can require new cross-artifact attribution or other semantic reconciliation to pass, but normal downstream writers remain halted until the upstream scoped review converges, and that review cannot start until those global gates pass. A valid multi-SoT conflict can therefore still deadlock; provide a chain-limited review route or a sanctioned writer path capable of satisfying the actual pre-gates.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/recover.md",
-              "line": 42,
-              "category": "workflow-liveness"
-            },
-            {
-              "message": "The ADR exception still conflicts with this policy’s role model and checklist. Line 23 permits the orchestrator to edit an ADR hunk directly, while the role table reserves all edits for `adr-editor` and makes the orchestrator dispatch-only; the bad example and review checklist also continue to reject every direct orchestrator ADR edit. An immediate diagnoser verdict does not resolve the writer-ownership contradiction. Route preparation through `adr-editor` or update every role, example, and checklist statement with the same explicit exception.",
-              "severity": "P1",
-              "file": ".harness/policies/pre-track-adr-authoring.md",
-              "line": 23,
-              "category": "responsibility-boundary"
-            },
-            {
-              "message": "The preparation completion condition remains inconsistent. CLAUDE.md and parts of the workflow say gates need only become executable, the sequencing policy and workflow failure branch require them to pass, and the Step 2 gate table requires only parseability. Providers can therefore disagree whether an executable-but-failing gate permits progression or requires termination. Define one canonical condition and reference it consistently.",
-              "severity": "P1",
-              "file": "CLAUDE.md",
-              "line": 65,
-              "category": "gate-semantics"
-            }
-          ],
-          "hash": "rvw1:sha256:90a2117f6d105024e6471ef3fb8ea88a954fc87b3e30fbae26b14b7b66bb6944",
-          "at": "2026-08-03T01:03:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The recovery state machine fails closed when hunk-only preparation cannot satisfy every global pre-gate. A non-overlapping base change can invalidate task-contract or signal state without creating a conflict hunk in the affected artifact; conflict-preparation cannot repair it, while normal semantic re-entry is not reached. This breaks autonomous recovery for valid base merges. Permit ordered normal writer/implementer reconciliation of base-induced drift before requiring all global pre-gates to pass.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/recover.md",
-              "line": 48,
-              "category": "workflow_state_machine"
-            },
-            {
-              "message": "Conflict-preparation requires impl-planner to regenerate derived views, but its permission contract still allows only `verify plan-artifact-refs` and `batch-plan check`, while explicitly forbidding `plan.md`. A compliant planner therefore cannot execute the required view regeneration. Authorize `bin/sotp track views sync` and its generated side effects, or assign regeneration to another authorized surface.",
-              "severity": "P1",
-              "file": ".harness/capabilities/impl-planner.md",
-              "line": 114,
-              "category": "permission_contract"
-            },
-            {
-              "message": "This exception authorizes the orchestrator to edit ADR conflict hunks, contradicting adr-editor's operational SSoT claim that it performs every in-track ADR write and the recovery workflow's sole-writer prohibition. Hunk selection mutates the ADR, so the harness now defines two writers for the same file. Route preparation through adr-editor or consistently redefine the ownership boundary.",
-              "severity": "P1",
-              "file": ".harness/policies/pre-track-adr-authoring.md",
-              "line": 23,
-              "category": "responsibility_boundary"
-            },
-            {
-              "message": "CLAUDE.md is declared to be a pointer map, yet this line duplicates the conflict-preparation sequence, gate list, failure constraint, and re-entry rule from the sequencing policy and recovery workflow. This creates a second operational SSoT and can drift independently. Keep only the invariant and pointers to the canonical policy/workflow.",
-              "severity": "P1",
-              "file": "CLAUDE.md",
-              "line": 65,
-              "category": "ssot_duplication"
-            }
-          ],
-          "hash": "rvw1:sha256:02d79dcf901e0413c17932ee4b865a64616da8b645eb0f0b0fd5a863fdc34b3d",
-          "at": "2026-08-03T01:15:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new base-drift route requires a chain-limited review before global pre-gates, but the canonical single-scope review surface still invokes `track-local-review-fix`, whose unconditional dependencies are `task-contract-check` and `track-active-gate`. No sanctioned review surface bypassing those gates is defined, so this recovery branch cannot execute when either global gate is the blocker. Add an explicit guarded review route for this exception or change the gate ordering.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/recover.md",
-              "line": 49,
-              "category": "command_wiring"
-            },
-            {
-              "message": "`conflict-preparation` permits only existing-hunk resolution and derived regeneration, but the capability still declares its full 13-step semantic design pipeline mandatory with no skipped steps. Mandatory steps such as feature declaration and catalogue generation/annotation can write meaning outside the conflict hunks; running them violates the preparation boundary, while skipping them violates this pipeline contract. Define a separate preparation pipeline or explicitly exempt this mode from the normal 13-step pipeline.",
-              "severity": "P1",
-              "file": ".harness/capabilities/type-designer.md",
-              "line": 91,
-              "category": "mode_contract"
-            },
-            {
-              "message": "Although conflict-preparation now permits `bin/sotp track views sync`, the same ownership block still lists `plan.md` and every other non-owned track artifact as forbidden writes. `views sync` necessarily regenerates `plan.md` and other generated views, so the planner cannot follow the required command without violating its write boundary. Exempt CLI-generated view side effects, as the spec/type capability contracts do, or assign regeneration elsewhere.",
-              "severity": "P1",
-              "file": ".harness/capabilities/impl-planner.md",
-              "line": 107,
-              "category": "permission_contract"
-            }
-          ],
-          "hash": "rvw1:sha256:ed83d30eab564320ad6f7e7dd9952b31cc3fe591dc98bec9fff61e5ff8c9652b",
-          "at": "2026-08-03T01:23:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This now restricts adr-editor to “semantic authoring”, but trigger 3 still assigns non-semantic typo/reference-path fixes to it, and the policy forbids orchestrator ADR edits outside conflict preparation. This leaves ordinary non-semantic ADR fixes with contradictory ownership; retain adr-editor ownership for both semantic and non-semantic edits while documenting only the narrow conflict exception separately.",
-              "severity": "P1",
-              "file": ".harness/capabilities/adr-editor.md",
-              "line": 16,
-              "category": "responsibility_boundary"
-            },
-            {
-              "message": "The purported chain-limited route only runs `ref-verify run`, which evaluates both chains, and never reads `ref-verify results --chain <affected-chain>`. This contradicts the sequencing policy that unrelated-chain findings or stale-artifact enumeration failures must not block upstream convergence, so recovery can recreate the deadlock this exception is meant to resolve. Add the chain-scoped result check and prescribed abort handling.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/recover.md",
-              "line": 57,
-              "category": "command_wiring"
-            },
-            {
-              "message": "Calling the inner `review local` command directly bypasses `adr-baseline check-review`, which the canonical review workflow requires before every reviewer dispatch and which the Makefile wrapper explicitly delegates to that workflow. The D2 route can therefore record a scoped—including ADR—verdict without validating the init ledger and stored copies. Run `bin/sotp adr-baseline check-review --track-id <id>` before this raw review invocation; it is independent of the intentionally bypassed global pre-gates.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/recover.md",
-              "line": 58,
-              "category": "review_gate_bypass"
-            }
-          ],
-          "hash": "rvw1:sha256:8cdaf718a3fad45b53cf1b120c9f4b345d06d04e054aae23de674edbfb5aa8f6",
-          "at": "2026-08-03T01:40:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The D2-only route invokes `review local` with `tmp/reviewer-runtime/briefing-<affected-scope>.md` but never performs the canonical review workflow's Step 3 that creates or refreshes this ephemeral file. A fresh recovery session therefore fails when the file is absent, while an existing pre-merge file can supply stale design intent and review constraints. Build the affected-scope briefing from the current post-merge SoT using the canonical Step 3 contract before this direct invocation.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/recover.md",
-              "line": 61,
-              "category": "command_wiring"
-            }
-          ],
-          "hash": "rvw1:sha256:ed58baf7f102697d38d51d0339efdb4969b8fe801d93f46ff79ae8d6980597ff",
-          "at": "2026-08-03T01:44:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ca79f3623a6a76a8d4961481c444d472e8b131cdd5795038dde80b117ad7f7d7",
-          "at": "2026-08-03T01:50:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The recovery SSoT now dispatches `adr-editor` in `conflict-preparation` mode, but the capability's Invocation contract does not define that trigger/mode (and still says it has four triggers). This leaves ADR conflict preparation outside the capability contract and makes the dispatch wiring ambiguous.",
-              "severity": "P1",
-              "file": ".harness/capabilities/adr-editor.md",
-              "line": 31,
-              "category": "command-wiring"
-            }
-          ],
-          "hash": "rvw1:sha256:8f7ad5b5e50e121853d7434a80bab3d8ccf17388115cd4ed757ed8580ceee94b",
-          "at": "2026-08-03T07:40:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The recovery workflow says to dispatch `adr-editor` for every ADR conflict, but the capability contract permits `conflict-preparation` only when existing-hunk selection still leaves the required pre-gates unparseable, and normal mode requires upstream re-convergence. Because the workflow does not condition this dispatch on that gate or specify the mode, it can launch an unauthorized normal ADR edit during a conflict; align the dispatch with the conditional `conflict-preparation` route.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/recover.md",
-              "line": 31,
-              "category": "command-wiring"
-            }
-          ],
-          "hash": "rvw1:sha256:a8b600915a7a423b28d185acfe2112d3218fbd90409ff8e4177889aa35da0ab6",
-          "at": "2026-08-03T07:42:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The D2 chain-limited review command omits the required `--track-id <id>` argument. `bin/sotp review local` requires track id, round type, and group, so this recovery route fails at argument parsing instead of running the scoped review.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/recover.md",
-              "line": 70,
-              "category": "command-wiring"
-            }
-          ],
-          "hash": "rvw1:sha256:e54e54021a3051761945adacf256add02f0140cb9a15cf1182199c9aabc3cc51",
-          "at": "2026-08-03T07:45:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `conflict-preparation` mode permits resolving existing `*-types.json` conflict hunks, but the capability’s Rules still restrict `Edit` on those files to `$todo`/post-generation annotation only. In the intended conflict path, the type-designer is therefore instructed both to resolve hunks and not to edit them; add an explicit conflict-preparation exception to the Rule.",
-              "severity": "P1",
-              "file": ".harness/capabilities/type-designer.md",
-              "line": 484,
-              "category": "responsibility-boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:6ead71fe5b1df003d258f9275b5f9861d97991673ac6c941816d0f3874fe565b",
-          "at": "2026-08-03T07:48:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The workflow requires `adr-diagnoser` only in the branch that dispatches `adr-editor`, but the permitted direct orchestrator hunk-selection path can resolve an ADR conflict before that dispatch. The governing ADR policy requires an immediate diagnoser verdict whenever an ADR is touched, so this path can bypass the guardian; make the verdict unconditional for every ADR hunk edit.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/recover.md",
-              "line": 34,
-              "category": "responsibility-boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:2b232e21b5fe1cf24ccbfefb1ab280083b39caffcfe866dd308db9d79fc466a7",
-          "at": "2026-08-03T07:50:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The recovery workflow’s `conflict-preparation` dispatch tells the orchestrator to provide only the affected path, existing hunks, and no-new-meaning instruction, but `adr-editor`’s invocation contract also requires the originating input verbatim, resolved `merge_target`, and the explicit working-tree-only/no-commit/no-snapshot instruction. The recovery dispatch is therefore incomplete and cannot reliably satisfy the editor contract.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/recover.md",
-              "line": 33,
-              "category": "command-wiring"
-            }
-          ],
-          "hash": "rvw1:sha256:bc48ee71d9ef575a6c58d0332b2c24bd27e4db4e87c88c8496592929e8ca1a7c",
-          "at": "2026-08-03T07:52:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:584b967e3d83eaa521710470dbd08053093e1d3689b25e0087bd4acce7f32b15",
-          "at": "2026-08-03T07:54:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The provider-neutral workflow hard-codes the Claude-style `/track:review` invocation and later `/track:commit` (line 104), while the Codex adapter requires `$track-review` and `$track-commit`. This leaks provider-specific invocation details into the workflow SSoT and can route Codex recovery through the wrong surface; leave the invocation spelling entirely to each adapter.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/recover.md",
-              "line": 90,
-              "category": "adapter-SSoT consistency"
-            }
-          ],
-          "hash": "rvw1:sha256:584b967e3d83eaa521710470dbd08053093e1d3689b25e0087bd4acce7f32b15",
-          "at": "2026-08-03T08:01:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a429f14b9d5cc0b62fbd3a6391cbc848a1049dd772fdd99dfecf9cad7f7aa9f6",
-          "at": "2026-08-03T08:20:02Z"
+          "hash": "rvw1:sha256:7bddfda3dd3200435c16ff2d56500f8c6dbb68984adf8d65dfff25502d5d34da",
+          "at": "2026-08-02T10:16:16Z"
         }
       ]
     }
