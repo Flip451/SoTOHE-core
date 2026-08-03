@@ -3098,6 +3098,50 @@
           "hash": "rvw1:sha256:7f3a15d4b440f84ae93ec71218e54f0d353b8221114f1aeec3e1db0c51b6585f",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T08:46:13Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_ctx.rs",
+              "line": 159,
+              "message": "Declared generic parameters return `Type::Generic` without checking `first_seg.arguments`. Consequently, syntactically accepted inputs such as `T<U>` or `T::<U>` are silently encoded as bare `T`, allowing a catalogue alias containing extra arguments to compare equal to an implementation using `T`. Reject or preserve non-empty arguments before this return.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_ctx.rs",
+              "line": 596,
+              "message": "The `Constraint(c)` conversion discards `c.generics` by always setting `args: None`. A valid bound such as `for<'a> Outer<Item<'a>: Bound>` therefore loses the associated-type application while rustdoc retains it, causing identical alias declarations to mismatch and distinct constraints to collapse. Convert `c.generics` as is already done for `AssocType` and `AssocConst`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:679a9bee80abf25c63eb7be4ddfa03f8a074b22ba67f5bb42459ec142249d0bd",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T08:53:21Z",
+          "findings": [
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_ctx.rs",
+              "line": 706,
+              "message": "This production module is now 706 lines and contains no `#[cfg(test)]` section, exceeding the repository’s hard 700-line production-code limit. Split conversion helpers into a submodule or reduce the production module below the cap.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:fa5019fc2b6f0f1a2aa9f121d11f2d410fe20f2542887e0f307f0d810cbc4ca0",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T09:02:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f9c7e0072c057d99285c28bf0a6172e012b554cc2943497e4c91f7d5fb2fa91b",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },

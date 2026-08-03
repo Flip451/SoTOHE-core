@@ -128,6 +128,9 @@ where
             };
             let first_name = normalized_ident_name(&first_seg.ident);
             if self.generic_params.iter().any(|generic| *generic == first_name) {
+                if !matches!(&first_seg.arguments, syn::PathArguments::None) {
+                    return unresolved_type("<generic_with_arguments>");
+                }
                 let mut projected = Type::Generic(first_name);
                 for segment in segments.iter().skip(1) {
                     let name = normalized_ident_name(&segment.ident);
@@ -153,8 +156,15 @@ where
             return unresolved_type("<empty_path>");
         };
         let name = normalized_ident_name(&first_seg.ident);
+        // A declaration's generic parameters shadow same-spelled catalogue types,
+        // matching Rust name resolution and rustdoc's `Type::Generic` output.
+        if self.generic_params.iter().any(|generic| *generic == name) {
+            if !matches!(&first_seg.arguments, syn::PathArguments::None) {
+                return unresolved_type("<generic_with_arguments>");
+            }
+            return Type::Generic(name);
+        }
 
-        // A catalogue declaration wins over a same-spelled generic parameter.
         if let Some(local_id) = (self.resolve_local)(&name) {
             let generic_args = self.convert_generic_args(&first_seg.arguments);
             return Type::ResolvedPath(Path {
@@ -162,13 +172,6 @@ where
                 id: local_id,
                 args: generic_args.map(Box::new),
             });
-        }
-
-        // Rustdoc removes `r#` from raw identifiers. A declared generic named
-        // like a primitive (`r#bool`) must therefore remain `Type::Generic`,
-        // rather than being classified as `Type::Primitive`.
-        if self.generic_params.iter().any(|g| *g == name) {
-            return Type::Generic(name);
         }
 
         // 1. Rust primitive?
@@ -576,9 +579,11 @@ where
                     .filter_map(|b| match b {
                         syn::TypeParamBound::Trait(tb) => {
                             let trait_path = ctx.resolve_trait_bound_path(&tb.path);
+                            let generic_params =
+                                bound_lifetimes_to_generic_params(tb.lifetimes.as_ref());
                             Some(GenericBound::TraitBound {
                                 trait_: trait_path,
-                                generic_params: vec![],
+                                generic_params,
                                 modifier: TraitBoundModifier::None,
                             })
                         }
@@ -593,7 +598,7 @@ where
                     .collect();
                 constraints.push(AssocItemConstraint {
                     name: normalized_ident_name(&c.ident),
-                    args: None,
+                    args: angle_bracketed_to_generic_args(ctx, &c.generics).map(Box::new),
                     binding: AssocItemConstraintKind::Constraint(bounds),
                 });
             }

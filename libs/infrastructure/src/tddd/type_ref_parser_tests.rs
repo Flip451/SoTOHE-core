@@ -2,7 +2,9 @@
 
 use std::collections::HashMap;
 
-use rustdoc_types::{GenericArg, GenericArgs, Id, Path, Type};
+use rustdoc_types::{
+    AssocItemConstraintKind, GenericArg, GenericArgs, GenericBound, Id, Path, Type,
+};
 
 use super::*;
 
@@ -124,6 +126,91 @@ fn test_parse_type_ref_unnamed_function_pointer_argument_uses_rustdoc_placeholde
         panic!("expected function pointer argument");
     };
     assert_eq!(function_pointer.sig.inputs.first().map(|input| input.0.as_str()), Some("_"));
+}
+
+#[test]
+fn test_parse_type_ref_generic_parameter_shadows_catalogue_type() {
+    let parsed = parse_type_ref_with_generics(
+        "T",
+        &|name| (name == "T").then_some(Id(42)),
+        100,
+        &HashMap::new(),
+        &mut |_| 101,
+        &["T"],
+    )
+    .unwrap();
+    assert!(matches!(parsed, Type::Generic(name) if name == "T"));
+}
+
+#[test]
+fn test_parse_type_ref_generic_parameter_with_arguments_is_unresolved() {
+    for type_ref in ["T<U>", "T::<U>", "T<U>::Item"] {
+        let ty = parse_with_generics(type_ref, &["T"]);
+        let Type::ResolvedPath(path) = ty else {
+            panic!("expected unresolved path for {type_ref}, got: {ty:?}");
+        };
+        assert_eq!(path.path, "<generic_with_arguments>");
+        assert_eq!(path.id, Id(UNRESOLVED_CRATE_ID));
+    }
+}
+
+#[test]
+fn test_parse_generic_bound_generic_argument_shadows_catalogue_type() {
+    let bound = parse_generic_bound_with_generics_preserving_spelling(
+        "Into<T>",
+        &|name| (name == "T").then_some(Id(42)),
+        100,
+        &HashMap::new(),
+        &mut |_| 101,
+        &["T"],
+    )
+    .unwrap();
+    let GenericBound::TraitBound { trait_, .. } = bound else {
+        panic!("expected trait bound");
+    };
+    let Some(GenericArgs::AngleBracketed { args, .. }) = trait_.args.as_deref() else {
+        panic!("expected Into angle-bracketed arguments");
+    };
+    assert!(matches!(args.first(), Some(GenericArg::Type(Type::Generic(name))) if name == "T"));
+}
+
+#[test]
+fn test_parse_type_ref_associated_constraint_preserves_hrtb_binder() {
+    let ty = parse("Outer<Item: for<'a> Tr<&'a str>>");
+    let Type::ResolvedPath(path) = ty else {
+        panic!("expected Outer resolved path");
+    };
+    let Some(GenericArgs::AngleBracketed { constraints, .. }) = path.args.as_deref() else {
+        panic!("expected Outer angle-bracketed arguments");
+    };
+    let Some(constraint) = constraints.first() else {
+        panic!("expected associated-type constraint");
+    };
+    let AssocItemConstraintKind::Constraint(bounds) = &constraint.binding else {
+        panic!("expected associated-type bound constraint");
+    };
+    let Some(GenericBound::TraitBound { generic_params, .. }) = bounds.first() else {
+        panic!("expected HRTB trait bound");
+    };
+    assert_eq!(generic_params.first().map(|param| param.name.as_str()), Some("'a"));
+}
+
+#[test]
+fn test_parse_type_ref_associated_constraint_preserves_associated_item_arguments() {
+    let ty = parse("Outer<Item<'a>: Bound>");
+    let Type::ResolvedPath(path) = ty else {
+        panic!("expected Outer resolved path");
+    };
+    let Some(GenericArgs::AngleBracketed { constraints, .. }) = path.args.as_deref() else {
+        panic!("expected Outer angle-bracketed arguments");
+    };
+    let Some(constraint) = constraints.first() else {
+        panic!("expected associated-type constraint");
+    };
+    let Some(GenericArgs::AngleBracketed { args, .. }) = constraint.args.as_deref() else {
+        panic!("expected associated-item arguments");
+    };
+    assert!(matches!(args.first(), Some(GenericArg::Lifetime(lifetime)) if lifetime == "'a"));
 }
 
 // -----------------------------------------------------------------------
