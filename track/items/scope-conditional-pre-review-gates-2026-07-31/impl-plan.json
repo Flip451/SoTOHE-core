@@ -132,7 +132,8 @@
     {
       "id": "T034",
       "description": "`libs/usecase/src/phase_command.rs` の phase explanation と explain query を catalogue shape に適応し、explain result tests を更新する。IN-04、AC-03。",
-      "status": "in_progress",
+      "status": "done",
+      "commit_hash": "2e6744ddd38b8618bf7da173bb567c5a631df7c4",
       "depends_on": [
         "T027"
       ]
@@ -189,7 +190,7 @@
     {
       "id": "T033",
       "description": "`libs/infrastructure/src/operator_command_config.rs` の pre-review-gate configuration decode を更新し、pre-review DTO / review-scope decode / invalid-config tests を更新する。IN-05、AC-05。",
-      "status": "todo",
+      "status": "in_progress",
       "depends_on": [
         "T026",
         "T029"

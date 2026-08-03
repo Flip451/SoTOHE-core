@@ -1289,13 +1289,13 @@
         "item_identifier": "trait_method:load"
       },
       "key": {
-        "bound_tests_set_hash": "6183d51212e829f4e3226e8e033e62f3a3417a6b43177ea60f345b23a8fa7aae",
+        "bound_tests_set_hash": "a499154d17515c3515ee7286fa99e5cc3594ea751cc2ad01fafa14d6ff7d02ed",
         "declaration_hash": "014db4f1dd7685eb038c5c291813217fd433819adf2d9d0c53a06c88712d022d",
         "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let pre_review =\n            FsPreReviewCommandConfigLoader::new().load(repo.path(), &track_id).unwrap();\n        let commands = pre_review\n            .commands_for(\n                &decode_scope(ReviewScopeNameDto { value: \"implementation\".to_owned() }).unwrap(),\n            )\n            .unwrap();\n        let argv: Vec<&str> =\n            commands[0].argv().arguments().iter().map(|argument| argument.as_str()).collect();\n        assert_eq!(argv, [\"bin/sotp\"]);"
+        "citation": "assert_eq!(argv, [\"bin/sotp\"]); ... assert_eq!(*runner.0.lock().unwrap(), vec![vec![\"first\"], vec![\"fail\"],]);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -1313,6 +1313,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::operator_command_config::tests",
           "test_name": "test_loader_rejects_unknown_schema_before_its_payload_shape"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_pre_review_loader_rejects_all_denylisted_prefixes_with_trailing_arguments"
         },
         {
           "layer": "usecase",
@@ -1340,13 +1345,13 @@
         "item_identifier": "trait_method:load"
       },
       "key": {
-        "bound_tests_set_hash": "6183d51212e829f4e3226e8e033e62f3a3417a6b43177ea60f345b23a8fa7aae",
+        "bound_tests_set_hash": "a499154d17515c3515ee7286fa99e5cc3594ea751cc2ad01fafa14d6ff7d02ed",
         "declaration_hash": "014db4f1dd7685eb038c5c291813217fd433819adf2d9d0c53a06c88712d022d",
         "anchor_text_hash": "e44a2b38a1ce3bf278e618e41415dbd26068d287e4173facb0f0c39698f67474"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "`assert!(matches!(\n            decode_pre_review_command_config(duplicate),\n            Err(CommandConfigValidationError::DuplicateScope(_))\n        ));` and `command(&[], None),\n            command(&[\"bin/sotp\", \"phase\", \"enter\"], None),\n            command(&[\"bin/sotp\", \"review\", \"local\"], None),\n            command(&[\"bin/sotp\", \"review\", \"fix-local\"], None),\n            command(&[\"bin/sotp\", \"signal\"], Some(0)),\n            command(&[\"bin/sotp\", \"signal\"], Some(3_601)),` and `assert_eq!(commands[0].timeout().as_secs(), 3_600);`"
+        "citation": "assert!(matches!(decode_pre_review_command_config(duplicate), Err(CommandConfigValidationError::DuplicateScope(_)))); ... command(&[], None), ... command(&[\"bin/sotp\", \"phase\", \"enter\"], None), ... command(&[\"bin/sotp\", \"review\", \"local\"], None), ... command(&[\"bin/sotp\", \"review\", \"fix-local\"], None), ... command(&[\"bin/sotp\", \"signal\"], Some(0)), ... command(&[\"bin/sotp\", \"signal\"], Some(3_601))"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -1364,6 +1369,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::operator_command_config::tests",
           "test_name": "test_loader_rejects_unknown_schema_before_its_payload_shape"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_pre_review_loader_rejects_all_denylisted_prefixes_with_trailing_arguments"
         },
         {
           "layer": "usecase",
@@ -1391,13 +1401,13 @@
         "item_identifier": "trait_method:load"
       },
       "key": {
-        "bound_tests_set_hash": "6183d51212e829f4e3226e8e033e62f3a3417a6b43177ea60f345b23a8fa7aae",
+        "bound_tests_set_hash": "a499154d17515c3515ee7286fa99e5cc3594ea751cc2ad01fafa14d6ff7d02ed",
         "declaration_hash": "014db4f1dd7685eb038c5c291813217fd433819adf2d9d0c53a06c88712d022d",
         "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "for invalid in [\n            command(&[], None),\n            command(&[\"bin/sotp\", \"phase\", \"enter\"], None),\n            command(&[\"bin/sotp\", \"review\", \"local\"], None),\n            command(&[\"bin/sotp\", \"review\", \"fix-local\"], None),\n            command(&[\"bin/sotp\", \"signal\"], Some(0)),\n            command(&[\"bin/sotp\", \"signal\"], Some(3_601)),\n        ] {"
+        "citation": "assert!(matches!(result, Err(CommandConfigLoadError::Invalid(CommandConfigValidationError::InvalidSchemaVersion { .. })))); ... assert!(decode_pre_review_command_config(config).is_err());"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -1415,6 +1425,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::operator_command_config::tests",
           "test_name": "test_loader_rejects_unknown_schema_before_its_payload_shape"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_pre_review_loader_rejects_all_denylisted_prefixes_with_trailing_arguments"
         },
         {
           "layer": "usecase",
@@ -1850,13 +1865,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "d8f52fc5ed4642fa008b8f282f8afaa53613675c6c0f15811fd34c01f10daee4",
+        "bound_tests_set_hash": "ede767b0b8dbf26fb2210f657df182735c1c5fe810a80434e43cb36be0dd8e8f",
         "declaration_hash": "70635ad33f29ce8827d8de3120436aac44079e81b9bf09084d3eec798b67074a",
         "anchor_text_hash": "e44a2b38a1ce3bf278e618e41415dbd26068d287e4173facb0f0c39698f67474"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(\n            decode_pre_review_command_config(duplicate),\n            Err(CommandConfigValidationError::DuplicateScope(_))\n        ));\n        for invalid in [\n            command(&[], None),\n            command(&[\"bin/sotp\", \"phase\", \"enter\"], None),\n            command(&[\"bin/sotp\", \"review\", \"local\"], None),\n            command(&[\"bin/sotp\", \"review\", \"fix-local\"], None),\n            command(&[\"bin/sotp\", \"signal\"], Some(0)),\n            command(&[\"bin/sotp\", \"signal\"], Some(3_601)),\n        ] {"
+        "citation": "for invalid in [\n            command(&[], None),\n            command(&[\"bin/sotp\", \"phase\", \"enter\"], None),\n            command(&[\"bin/sotp\", \"review\", \"local\"], None),\n            command(&[\"bin/sotp\", \"review\", \"fix-local\"], None),\n            command(&[\"bin/sotp\", \"signal\"], Some(0)),\n            command(&[\"bin/sotp\", \"signal\"], Some(3_601)),\n        ]"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -1874,6 +1889,16 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::operator_command_config::tests",
           "test_name": "test_decode_pre_review_config_rejects_unsupported_schema_version"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_decode_pre_review_config_rejects_invalid_review_scope"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_pre_review_loader_rejects_all_denylisted_prefixes_with_trailing_arguments"
         }
       ]
     },
@@ -1891,13 +1916,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "d8f52fc5ed4642fa008b8f282f8afaa53613675c6c0f15811fd34c01f10daee4",
+        "bound_tests_set_hash": "ede767b0b8dbf26fb2210f657df182735c1c5fe810a80434e43cb36be0dd8e8f",
         "declaration_hash": "70635ad33f29ce8827d8de3120436aac44079e81b9bf09084d3eec798b67074a",
         "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(\n            decode_pre_review_command_config(duplicate),\n            Err(CommandConfigValidationError::DuplicateScope(_))\n        )); ... assert!(decode_pre_review_command_config(config).is_err()); ... assert_eq!(\n            argv,\n            [\n                vec![\"bin/sotp\", \"signal\", \"calc-impl-catalog\"],\n                vec![\"bin/sotp\", \"signal\", \"check-impl-catalog\", \"--gate\", \"commit\",],\n            ]\n        ); ... assert_eq!(\n            commands.iter().map(|configured| configured.timeout().as_secs()).collect::<Vec<_>>(),\n            [45, 3_600]\n        ); ... Err(CommandConfigValidationError::InvalidSchemaVersion { .. })"
+        "citation": "assert!(matches!(\n            decode_pre_review_command_config(duplicate),\n            Err(CommandConfigValidationError::DuplicateScope(_))\n        ));\n        for invalid in [\n            command(&[], None),\n            command(&[\"bin/sotp\", \"phase\", \"enter\"], None),\n            command(&[\"bin/sotp\", \"review\", \"local\"], None),\n            command(&[\"bin/sotp\", \"review\", \"fix-local\"], None),\n            command(&[\"bin/sotp\", \"signal\"], Some(0)),\n            command(&[\"bin/sotp\", \"signal\"], Some(3_601)),\n        ]"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -1915,6 +1940,16 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::operator_command_config::tests",
           "test_name": "test_decode_pre_review_config_rejects_unsupported_schema_version"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_decode_pre_review_config_rejects_invalid_review_scope"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_pre_review_loader_rejects_all_denylisted_prefixes_with_trailing_arguments"
         }
       ]
     },
@@ -1932,13 +1967,13 @@
         "item_identifier": "trait_impl:usecase::pre_review_command::PreReviewCommandConfigLoaderPort"
       },
       "key": {
-        "bound_tests_set_hash": "b343882d1b12dfbd14c396dc3024e7ad2e6d2b2fde7e719fa1161ae97ee3485e",
+        "bound_tests_set_hash": "94e738d9e3353fc3384ff53f124d1abf7cbfb65aa41ef26e0222c759764baec7",
         "declaration_hash": "b135d7b835c794a7b27eeee648ceaea8407246dc0ecd0c72b2cae664643877ea",
         "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(argv, [\"bin/sotp\"]);"
+        "citation": "let pre_review =\n            FsPreReviewCommandConfigLoader::new().load(repo.path(), &track_id).unwrap();\n        let commands = pre_review\n            .commands_for(\n                &decode_scope(ReviewScopeNameDto { value: \"implementation\".to_owned() }).unwrap(),\n            )\n            .unwrap();\n        let argv: Vec<&str> =\n            commands[0].argv().arguments().iter().map(|argument| argument.as_str()).collect();\n        assert_eq!(argv, [\"bin/sotp\"]);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -1961,6 +1996,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::operator_command_config::tests",
           "test_name": "test_loader_rejects_unknown_schema_before_its_payload_shape"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_pre_review_loader_rejects_all_denylisted_prefixes_with_trailing_arguments"
         }
       ]
     },
@@ -1978,13 +2018,13 @@
         "item_identifier": "trait_impl:usecase::pre_review_command::PreReviewCommandConfigLoaderPort"
       },
       "key": {
-        "bound_tests_set_hash": "b343882d1b12dfbd14c396dc3024e7ad2e6d2b2fde7e719fa1161ae97ee3485e",
+        "bound_tests_set_hash": "94e738d9e3353fc3384ff53f124d1abf7cbfb65aa41ef26e0222c759764baec7",
         "declaration_hash": "b135d7b835c794a7b27eeee648ceaea8407246dc0ecd0c72b2cae664643877ea",
         "anchor_text_hash": "e44a2b38a1ce3bf278e618e41415dbd26068d287e4173facb0f0c39698f67474"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "for invalid in [\n            command(&[], None),\n            command(&[\"bin/sotp\", \"phase\", \"enter\"], None),\n            command(&[\"bin/sotp\", \"review\", \"local\"], None),\n            command(&[\"bin/sotp\", \"review\", \"fix-local\"], None),\n            command(&[\"bin/sotp\", \"signal\"], Some(0)),\n            command(&[\"bin/sotp\", \"signal\"], Some(3_601)),\n        ] { ... assert!(decode_pre_review_command_config(config).is_err()); }"
+        "citation": "for invalid in [\n            command(&[], None),\n            command(&[\"bin/sotp\", \"phase\", \"enter\"], None),\n            command(&[\"bin/sotp\", \"review\", \"local\"], None),\n            command(&[\"bin/sotp\", \"review\", \"fix-local\"], None),\n            command(&[\"bin/sotp\", \"signal\"], Some(0)),\n            command(&[\"bin/sotp\", \"signal\"], Some(3_601)),\n        ]"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -2007,6 +2047,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::operator_command_config::tests",
           "test_name": "test_loader_rejects_unknown_schema_before_its_payload_shape"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_pre_review_loader_rejects_all_denylisted_prefixes_with_trailing_arguments"
         }
       ]
     },
@@ -2024,13 +2069,13 @@
         "item_identifier": "trait_impl:usecase::pre_review_command::PreReviewCommandConfigLoaderPort"
       },
       "key": {
-        "bound_tests_set_hash": "b343882d1b12dfbd14c396dc3024e7ad2e6d2b2fde7e719fa1161ae97ee3485e",
+        "bound_tests_set_hash": "94e738d9e3353fc3384ff53f124d1abf7cbfb65aa41ef26e0222c759764baec7",
         "declaration_hash": "b135d7b835c794a7b27eeee648ceaea8407246dc0ecd0c72b2cae664643877ea",
         "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "FsPreReviewCommandConfigLoader::new().load(repo.path(), &track_id).unwrap();\n...\nassert_eq!(argv, [\"bin/sotp\"]);\nassert_eq!(commands[0].timeout().as_secs(), 3_600);"
+        "citation": "assert_eq!(argv, [\"bin/sotp\"]);\n        assert_eq!(commands[0].timeout().as_secs(), 3_600);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -2053,6 +2098,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::operator_command_config::tests",
           "test_name": "test_loader_rejects_unknown_schema_before_its_payload_shape"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_pre_review_loader_rejects_all_denylisted_prefixes_with_trailing_arguments"
         }
       ]
     },

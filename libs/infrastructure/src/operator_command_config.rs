@@ -389,6 +389,17 @@ mod tests {
         FsPhaseCommandConfigLoader::new().load(repo.path())
     }
 
+    fn load_pre_review_config(
+        source: &str,
+    ) -> Result<PreReviewCommandConfig, CommandConfigLoadError> {
+        let repo = tempfile::tempdir().unwrap();
+        let config = repo.path().join(".harness/config");
+        fs::create_dir_all(&config).unwrap();
+        fs::write(config.join("pre-review-gates.json"), source).unwrap();
+        FsPreReviewCommandConfigLoader::new()
+            .load(repo.path(), &TrackId::try_new("example-track").unwrap())
+    }
+
     fn phase_dto_with_pre_entry_command(command: &str) -> PhaseCommandConfigDto {
         serde_json::from_str(&format!(
             r#"{{
@@ -795,6 +806,50 @@ mod tests {
                 }],
             };
             assert!(decode_pre_review_command_config(config).is_err());
+        }
+    }
+
+    #[test]
+    fn test_decode_pre_review_config_rejects_invalid_review_scope() {
+        for scope in ["", "Other", "範囲"] {
+            let dto = PreReviewCommandConfigDto {
+                schema_version: CommandConfigSchemaVersionDto { version: 1 },
+                scopes: vec![PreReviewScopeCommandDeclarationDto {
+                    scope: ReviewScopeNameDto { value: scope.to_owned() },
+                    commands: Vec::new(),
+                }],
+            };
+
+            assert!(matches!(
+                decode_pre_review_command_config(dto),
+                Err(CommandConfigValidationError::InvalidReviewScope { .. })
+            ));
+        }
+    }
+
+    #[test]
+    fn test_pre_review_loader_rejects_all_denylisted_prefixes_with_trailing_arguments() {
+        for argv in [
+            r#"["bin/sotp", "phase", "enter", "implementation"]"#,
+            r#"["bin/sotp", "review", "local", "--scope", "infrastructure"]"#,
+            r#"["bin/sotp", "review", "fix-local", "--scope", "infrastructure"]"#,
+        ] {
+            let result = load_pre_review_config(&format!(
+                r#"{{
+                    "schema_version": 1,
+                    "scopes": [{{
+                        "scope": "infrastructure",
+                        "commands": [{{"argv": {argv}, "timeout_seconds": null}}]
+                    }}]
+                }}"#,
+            ));
+
+            assert!(matches!(
+                result,
+                Err(CommandConfigLoadError::Invalid(
+                    CommandConfigValidationError::RecursiveInvocation { .. }
+                ))
+            ));
         }
     }
 
