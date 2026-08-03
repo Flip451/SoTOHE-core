@@ -38,6 +38,7 @@ pub struct SystemSignalReportSourceAdapter;
 const MAX_BRANCH_NAME_BYTES: usize = 4 * 1024;
 const MAX_ADR_FILES: usize = 1_024;
 const MAX_ADR_TOTAL_BYTES: usize = 8 * 1024 * 1024;
+const MAX_TYPE_BASELINE_BYTES: u64 = 64 * 1024 * 1024;
 
 impl SystemSignalReportSourceAdapter {
     /// Creates the system-backed signal report source.
@@ -298,6 +299,21 @@ impl SystemSignalReportSourceAdapter {
                     SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog)
                 })?;
             if *document.cache_key().implementation_input_hash() != implementation_input_hash {
+                return Err(SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog));
+            }
+            // A baseline recapture can change reverse filtering without touching
+            // the catalogue or the implementation, so the cached signals are only
+            // current when all three cache-key hashes match the current inputs.
+            let baseline_text = crate::track_artifact::read_track_artifact(
+                &root.join("track/items"),
+                track_id,
+                &binding.baseline_file,
+                MAX_TYPE_BASELINE_BYTES,
+            )
+            .map_err(|_| SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog))?;
+            if *document.cache_key().baseline_hash()
+                != type_signals_codec::baseline_hash(baseline_text.as_bytes())
+            {
                 return Err(SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog));
             }
             validate_impl_catalog_coverage(&catalogue, &document)?;
@@ -717,6 +733,10 @@ mod tests {
         .expect("fixture signals must serialize")
     }
 
+    /// Bytes of the fixture type baseline; the persisted signal fixture's
+    /// `baseline_hash` must be the hash of exactly these bytes.
+    const FIXTURE_BASELINE_BYTES: &[u8] = b"fixture-baseline";
+
     fn fresh_impl_catalog_signals(root: &Path, catalogue_text: &str) -> String {
         let implementation_input_hash =
             crate::tddd::type_signals_evaluator::inputs::hash_workspace_inputs(
@@ -732,7 +752,7 @@ mod tests {
                 .as_digest()
                 .as_str(),
             "implementation_input_hash": implementation_input_hash.as_digest().as_str(),
-            "baseline_hash": type_signals_codec::baseline_hash(b"fixture-baseline")
+            "baseline_hash": type_signals_codec::baseline_hash(FIXTURE_BASELINE_BYTES)
                 .as_digest()
                 .as_str(),
             "signals": [{
@@ -782,6 +802,8 @@ mod tests {
             .expect("feature declaration fixture must be written");
         fs::write(track_dir.join("tddd-features-baseline.json"), feature_declaration)
             .expect("feature declaration baseline fixture must be written");
+        fs::write(track_dir.join("infrastructure-types-baseline.json"), FIXTURE_BASELINE_BYTES)
+            .expect("type baseline fixture must be written");
         catalogue.to_owned()
     }
 
@@ -1403,6 +1425,63 @@ mod tests {
         assert!(matches!(
             unsafe_reason,
             SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog)
+        ));
+    }
+
+    #[test]
+    fn test_signal_report_adapter_rejects_stale_type_baseline() {
+        let root = tempfile::tempdir().unwrap();
+        let track = TrackId::try_new("report-test").unwrap();
+        let track_dir = root.path().join("track/items/report-test");
+        let catalogue = prepare_catalogue_spec_source(root.path(), &track_dir);
+        let signals_path = track_dir.join("infrastructure-type-signals.json");
+        fs::write(&signals_path, fresh_impl_catalog_signals(root.path(), &catalogue)).unwrap();
+
+        // A baseline recapture changes reverse filtering without touching the
+        // catalogue or the implementation; the cached signals must go stale.
+        fs::write(track_dir.join("infrastructure-types-baseline.json"), b"recaptured-baseline")
+            .unwrap();
+        let stale_baseline =
+            SystemSignalReportSourceAdapter::read_impl_catalog(root.path(), &track)
+                .expect_err("changed type baseline must stale the persisted artifact");
+        assert!(matches!(
+            stale_baseline,
+            SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog)
+        ));
+    }
+
+    #[test]
+    fn test_signal_report_adapter_accepts_type_baseline_above_capability_exec_limit() {
+        let root = tempfile::tempdir().unwrap();
+        let track = TrackId::try_new("report-test").unwrap();
+        let track_dir = root.path().join("track/items/report-test");
+        let catalogue = prepare_catalogue_spec_source(root.path(), &track_dir);
+        let baseline =
+            vec![b'b'; crate::capability_exec::MAX_CAPABILITY_EXEC_TEXT_BYTES as usize + 1];
+        fs::write(track_dir.join("infrastructure-types-baseline.json"), &baseline).unwrap();
+
+        let mut signals: serde_json::Value =
+            serde_json::from_str(&fresh_impl_catalog_signals(root.path(), &catalogue)).unwrap();
+        signal_document_object(&mut signals).insert(
+            "baseline_hash".to_owned(),
+            serde_json::json!(type_signals_codec::baseline_hash(&baseline).as_digest().as_str()),
+        );
+        fs::write(
+            track_dir.join("infrastructure-type-signals.json"),
+            serde_json::to_string(&signals).unwrap(),
+        )
+        .unwrap();
+
+        let occurrences =
+            SystemSignalReportSourceAdapter::read_impl_catalog(root.path(), &track).unwrap();
+
+        assert!(matches!(
+            occurrences.as_slice(),
+            [SignalReportOccurrence {
+                chain: SignalReportChain::ImplCatalog,
+                level: SignalReportLevel::Yellow,
+                ..
+            }]
         ));
     }
 

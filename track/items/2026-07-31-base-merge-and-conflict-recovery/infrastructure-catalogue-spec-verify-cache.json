@@ -841,6 +841,78 @@
       }
     },
     {
+      "claim_hash": "07b8788cb48162bc61f6fd581b77888df4a753efe11c9f9735aafc83666228ad",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsCodecError",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "817b72909e99cba8c63ea6783688c285d7a31b1b957ac27e383020deabd3d2e4",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "For the currently active track only, evaluate and self-heal type-signals cache entries using catalogue declaration, implementation input, and actual baseline hashes."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "For the currently active track only, evaluate and self-heal type-signals cache entries using catalogue declaration, implementation input, and actual baseline hashes.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "07b8788cb48162bc61f6fd581b77888df4a753efe11c9f9735aafc83666228ad",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsCodecError",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "2c9b19622c3a0e2132e20416f8a2daea82bc3ee0d9fb04093e62f80c1db9eb47",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-04",
+          "section": "constraint",
+          "text_label": "Cache misses caused by hash mismatch or any cache decode failure must reevaluate and atomically overwrite only after success; missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures must fail closed."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "any cache decode failure must reevaluate and atomically overwrite only after success; missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures must fail closed.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "07b8788cb48162bc61f6fd581b77888df4a753efe11c9f9735aafc83666228ad",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsCodecError",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "6db977ec88a955486c701792d79190a537792e0c8f40534a9f7c5006d4f1a05e",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-08",
+          "section": "acceptance_criteria",
+          "text_label": "Any hash mismatch, missing cache, schema mismatch, missing required cache field, invalid cache value, or malformed cache JSON is treated as a cache miss; successful reevaluation atomically replaces the cache with the new result and all current hashes."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Any hash mismatch, missing cache, schema mismatch, missing required cache field, invalid cache value, or malformed cache JSON is treated as a cache miss;",
+        "kind": "pass"
+      }
+    },
+    {
       "claim_hash": "1e657dd622d3dba16705867ff63c48d67329feb42d68ed5498e7c037b95d567a",
       "claim_origin": {
         "data": {

@@ -1485,6 +1485,20 @@
           "hash": "rvw1:sha256:ba6b2c0c313e470937a577374f6d2b8b024b17ab940ba5f3226a5dbb2f40fe64",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T14:09:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:35d90a70607f6f675bde85eefe973d585eb12db33bb40cf9d432cf0d65875de8",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T14:12:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:35d90a70607f6f675bde85eefe973d585eb12db33bb40cf9d432cf0d65875de8",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -2605,6 +2619,49 @@
           "hash": "rvw1:sha256:066c53f11a813db13edbe8948e5b21fd22b8c9168449b76975c5ce405d74d76d",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T14:04:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2204ec3ee6e1ee356aab13df753df062e699cdaa3d5bbf76b636a9b53c5db6df",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T14:13:11Z",
+          "findings": [
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/signal_report/mod.rs",
+              "line": 308,
+              "message": "The new baseline freshness check reads rustdoc baselines through `read_text`, whose capability-exec limit is only 4 MiB, while type-signal evaluation supports baselines up to 64 MiB. The active infrastructure baseline is 10,362,686 bytes, so this rejects a valid current cache with `SourceUnavailable(ImplCatalog)` and makes the report unusable for normal tracks. Hash the baseline with the baseline-specific bounded byte reader/limit and add a regression test above 4 MiB.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:2204ec3ee6e1ee356aab13df753df062e699cdaa3d5bbf76b636a9b53c5db6df",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T14:22:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:671206ca10f8b3e1410077ccc472401ece7f25af20b9838fa02e3167d09f82c5",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T15:05:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d7437e2e22aacb8b3ce01a84246eabd79b38d565f98082b4095793d70edd9c4b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T15:14:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d7437e2e22aacb8b3ce01a84246eabd79b38d565f98082b4095793d70edd9c4b",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -3019,6 +3076,57 @@
           "at": "2026-08-03T13:23:15Z",
           "findings": [],
           "hash": "rvw1:sha256:b440ca3dc4870c0affe4d996a00be0a7d1047a1e6986466703a6f0e4a3918e62",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T15:06:03Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 188,
+              "message": "The AC-08 binding omits `test_execute_type_signals_invalid_signal_value_cache_replaces_it`, even though AC-08 explicitly requires invalid cache values to be treated as cache misses and atomically replaced. The test is present and bound to CN-04, but this acceptance-criterion edge remains unbound.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d74a407472c528e2eda0dc88b29bc4d449a3b99f87969fed7d411f7393346038",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T15:08:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:782df1e8f8d5e20cc7513c040cc63d568fb065bfdf5516143341eb88b02aed09",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T15:17:38Z",
+          "findings": [
+            {
+              "category": "test-obligation drift",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 188,
+              "message": "The AC-08 binding adds `test_execute_type_signals_invalid_signal_value_cache_replaces_it`, but its frozen fulfillment record still contains only the previous test set. `bin/sotp test-obligation check --track-id 2026-07-31-base-merge-and-conflict-recovery` currently fails with `TestChanged` for `TypeSignalsCodecError`/`AC-08`. Re-evaluate the finalized bindings and refresh the cache until the check passes.",
+              "severity": "P1"
+            },
+            {
+              "category": "branch-wide consistency",
+              "file": "package.json",
+              "line": 3,
+              "message": "These root manifests introduce an unreferenced `zenn-cli` dependency unrelated to this track; no tracked script, CI task, or documentation uses it. Guarded add-all would stage both files and unintentionally add a Node >=22 toolchain dependency to the Cargo workspace. Remove `package.json` and `package-lock.json`, or provide the missing explicitly scoped integration if intentional.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4515da230b101dc14c30cfb6c383be3bf600660491a44c820981704db960d4e5",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T15:23:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:782df1e8f8d5e20cc7513c040cc63d568fb065bfdf5516143341eb88b02aed09",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -3692,6 +3800,35 @@
           "at": "2026-08-03T10:58:05Z",
           "findings": [],
           "hash": "rvw1:sha256:3aef353438477f48bc60d2c2e9f84bf86a7babaff9b739c3f7c57203b4fdfc91",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T14:10:06Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+              "line": 630,
+              "message": "`TypeSignalsCodecError` の `docs` は fail-closed decoding と invalid confidence-signal behavior を散文で再記述しています。`.harness/policies/no-upstream-restatement.md` に従い、挙動契約は `spec_refs` のアンカーに委ね、docs は型・変更対象とアンカー参照に限定してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1015d617605c8a4d7cb67d07522b0aa80917a70e9f259d6bd8fa7183dc2e36f6",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T14:18:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:699ff309aae1262a8513fc560ccee016c796688528b4c6c2daca589c04b585b6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T14:25:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:699ff309aae1262a8513fc560ccee016c796688528b4c6c2daca589c04b585b6",
           "type": "final",
           "verdict": "zero_findings"
         }

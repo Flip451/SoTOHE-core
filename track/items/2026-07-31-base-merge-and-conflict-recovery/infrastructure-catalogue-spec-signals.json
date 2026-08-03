@@ -1,5 +1,5 @@
 {
-  "catalogue_declaration_hash": "fde4ce9cc8119297588cdce1cf5a1dbf44a423e41ec7310da930b4c9214a2501",
+  "catalogue_declaration_hash": "73fdb539a89d9da43db38bfab30579022c90eeb371a53be69e63f7390b018a2b",
   "schema_version": 1,
   "signals": [
     {
@@ -36,6 +36,11 @@
       "entry_hash": "25c47dfcc0072c1ebb06e881fffc78c4a8f967c9a7ad7799312b64aa50e832db",
       "signal": "blue",
       "type_name": "SyncBaseRecordSchemaVersion"
+    },
+    {
+      "entry_hash": "07b8788cb48162bc61f6fd581b77888df4a753efe11c9f9735aafc83666228ad",
+      "signal": "blue",
+      "type_name": "TypeSignalsCodecError"
     },
     {
       "entry_hash": "1e657dd622d3dba16705867ff63c48d67329feb42d68ed5498e7c037b95d567a",

@@ -5,7 +5,7 @@ use domain::tddd::type_signals_doc::{
     Sha256DigestError, TypeSignalsCacheKey, TypeSignalsDocument, TypeSignalsSchemaVersion,
     TypeSignalsSchemaVersionError,
 };
-use domain::{ConfidenceSignal, ContentHash, FreeText, Timestamp, TypeSignal};
+use domain::{ContentHash, FreeText, Timestamp, TypeSignal};
 use serde::{Deserialize, Serialize};
 use sha2::Digest;
 
@@ -28,6 +28,8 @@ pub enum TypeSignalsCodecError {
     InvalidTimestamp(FreeText),
     #[error("invalid {field} digest: {source}")]
     InvalidDigest { field: FreeText, source: Sha256DigestError },
+    #[error("invalid confidence signal value: {0}")]
+    InvalidSignal(FreeText),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -87,7 +89,7 @@ pub fn decode(json: &str) -> Result<TypeSignalsDocument, TypeSignalsCodecError> 
         schema_version,
         generated_at,
         cache_key,
-        dto.signals.into_iter().map(signal_from_dto).collect(),
+        dto.signals.into_iter().map(signal_from_dto).collect::<Result<Vec<_>, _>>()?,
     ))
 }
 
@@ -144,16 +146,20 @@ fn parse_digest(field: &str, value: String) -> Result<Sha256Digest, TypeSignalsC
     })
 }
 
-fn signal_from_dto(dto: TypeSignalDto) -> TypeSignal {
-    TypeSignal::new(
+fn signal_from_dto(dto: TypeSignalDto) -> Result<TypeSignal, TypeSignalsCodecError> {
+    // An unknown value must fail the decode: mapping it to a default would let
+    // an invalid cache document skip the cache-miss/self-healing path.
+    let signal = parse_confidence_signal(&dto.signal)
+        .ok_or_else(|| TypeSignalsCodecError::InvalidSignal(FreeText::new(dto.signal.clone())))?;
+    Ok(TypeSignal::new(
         dto.type_name,
         dto.kind_tag,
-        parse_confidence_signal(&dto.signal).unwrap_or(ConfidenceSignal::Red),
+        signal,
         dto.found_type,
         dto.found_items,
         dto.missing_items,
         dto.extra_items,
-    )
+    ))
 }
 
 fn signal_to_dto(signal: &TypeSignal) -> TypeSignalDto {
@@ -171,6 +177,8 @@ fn signal_to_dto(signal: &TypeSignal) -> TypeSignalDto {
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
+    use domain::ConfidenceSignal;
+
     use super::*;
 
     const DIGEST: &str = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
@@ -286,6 +294,33 @@ mod tests {
         .unwrap();
         payload.as_object_mut().unwrap().remove("baseline_hash");
         assert!(matches!(decode(&payload.to_string()), Err(TypeSignalsCodecError::Json(_))));
+    }
+
+    #[test]
+    fn test_decode_rejects_unknown_confidence_signal_value() {
+        let mut payload = serde_json::to_value(&TypeSignalsDocDto {
+            schema_version: domain::TYPE_SIGNALS_SCHEMA_VERSION,
+            generated_at: "2026-04-18T12:00:00Z".to_owned(),
+            declaration_hash: DIGEST.to_owned(),
+            implementation_input_hash: DIGEST.to_owned(),
+            baseline_hash: DIGEST.to_owned(),
+            signals: vec![signal_to_dto(&TypeSignal::new(
+                "Example",
+                "struct",
+                ConfidenceSignal::Blue,
+                true,
+                vec![],
+                vec![],
+                vec![],
+            ))],
+        })
+        .unwrap();
+        *payload.pointer_mut("/signals/0/signal").unwrap() =
+            serde_json::Value::String("bogus".to_owned());
+        assert!(
+            matches!(decode(&payload.to_string()), Err(TypeSignalsCodecError::InvalidSignal(_))),
+            "an unknown signal value must fail the decode instead of defaulting"
+        );
     }
 
     #[test]

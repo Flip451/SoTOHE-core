@@ -757,6 +757,44 @@ mod tests {
     }
 
     #[test]
+    fn test_execute_type_signals_invalid_signal_value_cache_replaces_it() {
+        let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
+        let path = signal_path(&items_dir, &track_id);
+        let current =
+            type_signals_codec::encode(&current_document(workspace.path(), &items_dir, &track_id))
+                .unwrap();
+        let mut invalid: serde_json::Value = serde_json::from_str(&current).unwrap();
+        invalid.as_object_mut().unwrap().insert(
+            "signals".to_owned(),
+            serde_json::json!([{
+                "type_name": "Example",
+                "kind_tag": "struct",
+                "signal": "bogus",
+                "found_type": true
+            }]),
+        );
+        let invalid_json = serde_json::to_string_pretty(&invalid).unwrap();
+        assert!(matches!(
+            type_signals_codec::decode(&invalid_json),
+            Err(type_signals_codec::TypeSignalsCodecError::InvalidSignal(_))
+        ));
+        std::fs::write(&path, invalid_json).unwrap();
+        let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
+
+        assert_eq!(
+            execute_with_observer(&items_dir, &track_id, workspace.path(), &binding, &observer)
+                .unwrap(),
+            ExitCode::SUCCESS
+        );
+        assert_eq!(observer.launches(), 1, "an invalid signal cache must be reevaluated");
+        let persisted =
+            type_signals_codec::decode(&std::fs::read_to_string(&path).unwrap()).unwrap();
+        let expected = current_document(workspace.path(), &items_dir, &track_id);
+        assert_eq!(persisted.cache_key(), expected.cache_key());
+        assert_eq!(persisted.signals(), expected.signals());
+    }
+
+    #[test]
     fn test_execute_type_signals_evaluation_failure_fails_closed_without_replacing_cache() {
         let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
         let original = write_current_cache(workspace.path(), &items_dir, &track_id);
