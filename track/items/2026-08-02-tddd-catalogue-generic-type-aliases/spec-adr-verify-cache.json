@@ -231,12 +231,12 @@
       }
     },
     {
-      "claim_hash": "10c9eb5615a095fd38ce1f834f7e4cbe57ac779ae19ed0bf5ef6fa31ae3911ec",
+      "claim_hash": "4bddcfb322b1921a89be2dbbd5b5872bf12c96fd720c412d5406344e63e3b27c",
       "claim_origin": {
         "data": {
           "element_id": "AC-02",
           "section": "acceptance_criteria",
-          "text_label": "catalogue lint は、alias entry のジェネリクス宣言が順序付きの型パラメータ列であり、各パラメータ名が空でない Rust 識別子、重複せず、各 bound が空でない型・trait 参照である場合に通過させる。これらを満たさない宣言は検証エラーとして報告する。"
+          "text_label": "catalogue lint は、alias entry のジェネリクス宣言が順序付きの型パラメータ列であり、各パラメータ名が空でない plain な非キーワード Rust 識別子（raw identifier 表記を含まない）、重複せず、各 bound が空でない型・trait 参照である場合に通過させる。これらを満たさない宣言は検証エラーとして報告する。"
         },
         "kind": "spec_element"
       },

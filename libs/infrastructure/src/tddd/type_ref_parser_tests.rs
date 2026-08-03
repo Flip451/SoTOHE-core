@@ -42,6 +42,12 @@ fn parse_local(s: &str) -> Type {
     parse_with(s, simple_local, 100)
 }
 
+fn parse_generic_projection(s: &str, generic_params: &[&str]) -> Type {
+    let mut emitted = |_name: String| 1_u32;
+    parse_type_ref_with_generics(s, &no_local, 100, &HashMap::new(), &mut emitted, generic_params)
+        .unwrap()
+}
+
 // -----------------------------------------------------------------------
 // AC-06: std prelude type auto-resolution
 // -----------------------------------------------------------------------
@@ -339,6 +345,45 @@ fn test_qualified_path_with_trailing_segments_returns_unresolved_marker() {
         }
         other => panic!("expected unresolved marker, got: {other:?}"),
     }
+}
+
+#[test]
+fn test_generic_projection_preserves_all_nested_segments() {
+    let ty = parse_generic_projection("T::Assoc::Nested", &["T"]);
+    assert_eq!(
+        ty,
+        Type::QualifiedPath {
+            name: "Nested".to_owned(),
+            self_type: Box::new(Type::QualifiedPath {
+                name: "Assoc".to_owned(),
+                self_type: Box::new(Type::Generic("T".to_owned())),
+                trait_: None,
+                args: None,
+            }),
+            trait_: None,
+            args: None,
+        }
+    );
+}
+
+#[test]
+fn test_absolute_path_with_generic_spelling_is_external_crate() {
+    let mut emitted = Vec::new();
+    let ty = parse_type_ref_with_generics(
+        "::T::option::Option<u8>",
+        &no_local,
+        100,
+        &HashMap::new(),
+        &mut |name: String| {
+            emitted.push(name);
+            101
+        },
+        &["T"],
+    )
+    .unwrap();
+
+    assert_eq!(emitted, vec!["T"]);
+    assert!(matches!(ty, Type::ResolvedPath(path) if path.path == "T::option::Option"));
 }
 
 // -----------------------------------------------------------------------

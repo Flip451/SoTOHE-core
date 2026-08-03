@@ -25,19 +25,22 @@
 //! (CN-08 / spec.json IN-09 / ADR 2 D9 / D10 / D11)
 
 mod constants;
+mod generic_tokens;
 mod helpers;
 mod parse_ctx;
 mod parse_fns;
+mod precise_capture;
 
 // ---------------------------------------------------------------------------
 // Re-exports — public surface of this module
 // ---------------------------------------------------------------------------
 
 pub(crate) use constants::UNRESOLVED_CRATE_ID;
+pub(crate) use generic_tokens::is_plain_generic_param_name;
 pub(crate) use helpers::{core_canonical_path, std_canonical_path};
 pub(crate) use parse_fns::{
-    parse_generic_bound, parse_syn_type, parse_syn_type_param_bound, parse_type_ref,
-    parse_type_ref_with_generics,
+    parse_generic_bound_with_generics, parse_syn_type, parse_syn_type_param_bound, parse_type_ref,
+    parse_type_ref_with_generics, validate_generic_identifier_ambiguities,
 };
 
 // ---------------------------------------------------------------------------

@@ -40,6 +40,7 @@ subgraph domain["domain"]
     direction TB
     T34_domain_domain_CatalogueLinterError__self[CatalogueLinterError]
     T34_domain_domain_CatalogueLinterError_DuplicateTypeAliasGenericParameter[DuplicateTypeAliasGenericParameter]
+    T34_domain_domain_CatalogueLinterError_InvalidTypeAliasGenericParameterName[InvalidTypeAliasGenericParameterName]
     T34_domain_domain_CatalogueLinterError_InvalidRuleConfig[InvalidRuleConfig]
     T34_domain_domain_CatalogueLinterError_UnknownLayer[UnknownLayer]
     T34_domain_domain_CatalogueLinterError_ScanFailed[ScanFailed]
@@ -71,6 +72,7 @@ subgraph cli["cli"]
 end
 F69_domain_domain_domain__tddd__catalogue_linter__evaluate_catalogue_lint --> T34_domain_domain_CatalogueLinterError__self
 class T34_domain_domain_CatalogueLinterError_DuplicateTypeAliasGenericParameter variant_node
+class T34_domain_domain_CatalogueLinterError_InvalidTypeAliasGenericParameterName variant_node
 class T34_domain_domain_CatalogueLinterError_InvalidRuleConfig variant_node
 class T34_domain_domain_CatalogueLinterError_UnknownLayer variant_node
 class T34_domain_domain_CatalogueLinterError_ScanFailed variant_node

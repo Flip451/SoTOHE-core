@@ -11,8 +11,9 @@ use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, ItemAction, Self
 use domain::tddd::catalogue_v2::traits::TraitImplDeclV2;
 use domain::tddd::catalogue_v2::variants::{FieldDecl, VariantDecl};
 use domain::tddd::catalogue_v2::{
-    AssocConstName, CatalogueDocument, CrateName, DeletionRecord, FieldName, FunctionName,
+    AssocConstName, BoundOp, CatalogueDocument, CrateName, DeletionRecord, FieldName, FunctionName,
     FunctionPath, MethodName, ModulePath, ParamName, TraitName, TypeName, TypeRef, VariantName,
+    WherePredicateDecl,
 };
 use rustdoc_types::{
     AssocItemConstraintKind, GenericArg, GenericArgs, GenericBound, GenericParamDefKind, Id,
@@ -1047,6 +1048,315 @@ fn test_encode_type_alias_target_generic_emits_type_generic() {
         "expected alias target Type::Generic(\"T\"), got: {:?}",
         ta.type_
     );
+}
+
+/// A type-alias target using an unqualified associated-type projection rooted
+/// at its declared generic (`type Alias<T: Iterator> = T::Item`) must encode
+/// as a `QualifiedPath` over `Type::Generic("T")`, not as an external crate
+/// path named `T::Item`.
+#[test]
+fn test_encode_type_alias_target_generic_projection_emits_qualified_path() {
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        TypeName::new("Alias").unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::TypeAlias {
+                target: TypeRef::new("T::Item").unwrap(),
+                generics: vec![MethodGenericParam {
+                    name: ParamName::new("T").unwrap(),
+                    bounds: vec![TypeRef::new("Iterator").unwrap()],
+                }],
+            },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let alias = ec
+        .krate()
+        .index
+        .values()
+        .find(|item| {
+            item.name.as_deref() == Some("Alias") && matches!(item.inner, ItemEnum::TypeAlias(_))
+        })
+        .expect("expected TypeAlias item for 'Alias'");
+    let ItemEnum::TypeAlias(alias) = &alias.inner else { panic!("expected TypeAlias") };
+    let Type::QualifiedPath { name, self_type, trait_, .. } = &alias.type_ else {
+        panic!("expected alias target T::Item to be a qualified path, got {:?}", alias.type_);
+    };
+    assert_eq!(name, "Item");
+    assert!(trait_.is_none());
+    assert_eq!(self_type.as_ref(), &Type::Generic("T".to_owned()));
+    assert!(
+        !ec.krate().external_crates.values().any(|external| external.name == "T"),
+        "generic projection prefix must not be registered as an external crate"
+    );
+}
+
+/// Keyword-named generic declarations are rejected before lexical comparison;
+/// the codec does not recreate Rust grammar to reinterpret `dyn::Item`.
+#[test]
+fn test_encode_type_alias_target_keyword_generic_projection_is_rejected() {
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        TypeName::new("Alias").unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::TypeAlias {
+                target: TypeRef::new("dyn::Item").unwrap(),
+                generics: vec![MethodGenericParam {
+                    name: ParamName::new("dyn").unwrap(),
+                    bounds: vec![],
+                }],
+            },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let error = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap_err();
+    assert!(matches!(error, domain::tddd::NewTypeGraphCodecError::InvalidTypeRef(_)));
+}
+
+/// Raw/keyword generic declarations are rejected; qself parsing is not used to
+/// infer a catalogue declaration that the lexical boundary has disallowed.
+#[test]
+fn test_encode_type_alias_target_qualified_path_keyword_qself_generics_is_rejected() {
+    let mut doc = make_doc("domain");
+    for (alias_name, generic_name, target) in [
+        ("AsAlias", "as", "<as as Trait>::Assoc"),
+        ("DynAlias", "dyn", "<dyn as Trait>::Assoc"),
+        ("ImplAlias", "impl", "<impl as Trait>::Assoc"),
+    ] {
+        doc.insert_type(
+            TypeName::new(alias_name).unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::TypeAlias {
+                    target: TypeRef::new(target).unwrap(),
+                    generics: vec![MethodGenericParam {
+                        name: ParamName::new(generic_name).unwrap(),
+                        bounds: vec![],
+                    }],
+                },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+    }
+
+    let error = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap_err();
+    assert!(matches!(error, domain::tddd::NewTypeGraphCodecError::InvalidTypeRef(_)));
+}
+
+/// Raw/keyword spellings are rejected at the catalogue boundary instead of
+/// being restored by a hand-written Rust grammar classifier.
+#[test]
+fn test_encode_type_alias_target_rustdoc_normalized_raw_generic_is_rejected() {
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        TypeName::new("Alias").unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::TypeAlias {
+                target: TypeRef::new("Vec<type>").unwrap(),
+                generics: vec![MethodGenericParam {
+                    name: ParamName::new("type").unwrap(),
+                    bounds: vec![],
+                }],
+            },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let error = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap_err();
+    assert!(matches!(error, domain::tddd::NewTypeGraphCodecError::InvalidTypeRef(_)));
+}
+
+/// A keyword-named generic is rejected even when it appears next to valid raw
+/// pointer syntax; the codec does not restore raw identifiers heuristically.
+#[test]
+fn test_encode_type_alias_target_const_pointer_keyword_generic_is_rejected() {
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        TypeName::new("Alias").unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::TypeAlias {
+                target: TypeRef::new("*const const").unwrap(),
+                generics: vec![MethodGenericParam {
+                    name: ParamName::new("const").unwrap(),
+                    bounds: vec![],
+                }],
+            },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let error = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap_err();
+    assert!(matches!(error, domain::tddd::NewTypeGraphCodecError::InvalidTypeRef(_)));
+}
+
+/// Keyword generic names in both targets and where predicates are rejected;
+/// no grammar-aware restoration is attempted for nested expressions.
+#[test]
+fn test_encode_type_alias_where_predicate_nested_keyword_generic_is_rejected() {
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        TypeName::new("Alias").unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::TypeAlias {
+                target: TypeRef::new("Vec<type>").unwrap(),
+                generics: vec![MethodGenericParam {
+                    name: ParamName::new("type").unwrap(),
+                    bounds: vec![],
+                }],
+            },
+            vec![],
+            vec![],
+            vec![WherePredicateDecl {
+                lhs: TypeRef::new("Vec<type>").unwrap(),
+                rhs: vec![TypeRef::new("Clone").unwrap()],
+                operator: BoundOp::Bound,
+            }],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let error = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap_err();
+    assert!(matches!(error, domain::tddd::NewTypeGraphCodecError::InvalidTypeRef(_)));
+}
+
+/// A keyword declaration is rejected even if the target expression itself has
+/// valid function-pointer syntax.
+#[test]
+fn test_encode_type_alias_target_with_keyword_syntax_and_keyword_generic_is_rejected() {
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        TypeName::new("Alias").unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::TypeAlias {
+                target: TypeRef::new("for<'a> fn(&'a str)").unwrap(),
+                generics: vec![MethodGenericParam {
+                    name: ParamName::new("for").unwrap(),
+                    bounds: vec![],
+                }],
+            },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let error = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap_err();
+    assert!(matches!(error, domain::tddd::NewTypeGraphCodecError::InvalidTypeRef(_)));
+}
+
+/// A `dyn` declaration is rejected rather than being inferred from a `dyn`
+/// trait-object target expression.
+#[test]
+fn test_encode_type_alias_target_with_leading_path_dyn_syntax_and_keyword_generic_is_rejected() {
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        TypeName::new("Alias").unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::TypeAlias {
+                target: TypeRef::new("dyn ::Trait<dyn>").unwrap(),
+                generics: vec![MethodGenericParam {
+                    name: ParamName::new("dyn").unwrap(),
+                    bounds: vec![],
+                }],
+            },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let error = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap_err();
+    assert!(matches!(error, domain::tddd::NewTypeGraphCodecError::InvalidTypeRef(_)));
+}
+
+/// A keyword declaration is rejected even when the target has a valid `dyn`
+/// trait-object lifetime bound.
+#[test]
+fn test_encode_type_alias_target_with_lifetime_dyn_syntax_and_keyword_generic_is_rejected() {
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        TypeName::new("Alias").unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::TypeAlias {
+                target: TypeRef::new("dyn 'static + Trait<dyn>").unwrap(),
+                generics: vec![MethodGenericParam {
+                    name: ParamName::new("dyn").unwrap(),
+                    bounds: vec![],
+                }],
+            },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let error = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap_err();
+    assert!(matches!(error, domain::tddd::NewTypeGraphCodecError::InvalidTypeRef(_)));
 }
 
 #[test]

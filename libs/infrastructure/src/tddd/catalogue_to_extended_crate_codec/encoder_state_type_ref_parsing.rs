@@ -10,7 +10,8 @@ use rustdoc_types::{ExternalCrate, GenericArg, GenericArgs, GenericBound, Id, Pa
 
 use crate::tddd::catalogue_to_extended_crate_codec_error::CatalogueToExtendedCrateCodecError;
 use crate::tddd::type_ref_parser::{
-    UNRESOLVED_CRATE_ID, parse_generic_bound, parse_type_ref, parse_type_ref_with_generics,
+    UNRESOLVED_CRATE_ID, parse_generic_bound_with_generics, parse_type_ref,
+    parse_type_ref_with_generics,
 };
 
 use super::encoder::EncoderState;
@@ -396,7 +397,7 @@ impl EncoderState {
     /// Encodes a bound string (e.g. `"Into<String>"`, `"Send"`, `"?Sized"`,
     /// `"'static"`, `"for<'a> Fn(&'a str)"`) into a `rustdoc_types::GenericBound`.
     ///
-    /// Uses `parse_generic_bound` (which parses via `syn::TypeParamBound`) so that
+    /// Uses `parse_generic_bound_with_generics` (which parses via `syn::TypeParamBound`) so that
     /// the set of accepted strings is identical between the decode path
     /// (`validate_bound_str` in `catalogue_document_codec`) and this encode path.
     /// Both use the same `syn::TypeParamBound` grammar, closing the round-trip hole
@@ -411,31 +412,34 @@ impl EncoderState {
     /// - Plain trait or `~const Trait` → `GenericBound::TraitBound { modifier: None/MaybeConst, ... }`.
     ///   (`~const` is nightly-only; the string `"~const "` prefix maps to `MaybeConst`
     ///   but `syn` v2 stable does not recognise it as a `TraitBoundModifier` variant —
-    ///   the `parse_generic_bound` fallback covers this case via `Err` propagation.)
+    ///   the `parse_generic_bound_with_generics` fallback covers this case via `Err` propagation.)
     ///
     /// # Errors
     ///
     /// Returns `CatalogueToExtendedCrateCodecError` if the bound string cannot be
     /// parsed as a `TypeParamBound` by `syn`.
-    pub(super) fn encode_bound_str(
+    pub(super) fn encode_bound_str_with_generics(
         &mut self,
         bound_str: &str,
+        generic_names: &[&str],
     ) -> Result<GenericBound, CatalogueToExtendedCrateCodecError> {
-        self.encode_bound_str_inner(bound_str, &[])
+        self.encode_bound_str_inner(bound_str, &[], generic_names)
     }
 
-    pub(super) fn encode_bound_str_with_suppressed_external_prefixes(
+    pub(super) fn encode_bound_str_with_suppressed_external_prefixes_and_generics(
         &mut self,
         bound_str: &str,
         suppressed_external_prefixes: &[&str],
+        generic_names: &[&str],
     ) -> Result<GenericBound, CatalogueToExtendedCrateCodecError> {
-        self.encode_bound_str_inner(bound_str, suppressed_external_prefixes)
+        self.encode_bound_str_inner(bound_str, suppressed_external_prefixes, generic_names)
     }
 
     fn encode_bound_str_inner(
         &mut self,
         bound_str: &str,
         suppressed_external_prefixes: &[&str],
+        generic_names: &[&str],
     ) -> Result<GenericBound, CatalogueToExtendedCrateCodecError> {
         // Handle `~const` prefix manually because stable syn v2 does not have a
         // `TraitBoundModifier::MaybeConst` variant.  Strip the prefix and encode
@@ -443,7 +447,8 @@ impl EncoderState {
         if let Some(inner) = bound_str.strip_prefix("~const ") {
             let inner = inner.trim_start();
             // Encode the inner trait path via parse_type_ref_str (no modifier prefix).
-            let ty = self.parse_type_ref_str_inner(inner, &[], suppressed_external_prefixes)?;
+            let ty =
+                self.parse_type_ref_str_inner(inner, generic_names, suppressed_external_prefixes)?;
             let trait_path = match ty {
                 Type::ResolvedPath(p) => p,
                 other => {
@@ -475,9 +480,9 @@ impl EncoderState {
             let ext_snapshot =
                 self.external_crate_ids_without_prefixes(suppressed_external_prefixes);
             let mut new_crate_names: Vec<String> = vec![];
-            let _ = parse_generic_bound(
+            let _ = parse_generic_bound_with_generics(
                 bound_str,
-                &|name: &str| local_snapshot.get(name).copied(),
+                &|name: &str| local_id_unless_generic(&local_snapshot, name, generic_names),
                 std_crate_id,
                 &ext_snapshot,
                 &mut |crate_name: String| {
@@ -489,6 +494,7 @@ impl EncoderState {
                     }
                     u32::MAX - 1
                 },
+                generic_names,
             )
             .map_err(|reason| CatalogueToExtendedCrateCodecError::InvalidTypeRef {
                 type_ref: bound_str.to_string(),
@@ -502,9 +508,9 @@ impl EncoderState {
         // Pass 2: encode with complete crate-id map.
         let local_snapshot2: HashMap<String, Id> = self.local_name_to_id.clone();
         let ext_snapshot2 = self.external_crate_ids_without_prefixes(suppressed_external_prefixes);
-        parse_generic_bound(
+        parse_generic_bound_with_generics(
             bound_str,
-            &|name: &str| local_snapshot2.get(name).copied(),
+            &|name: &str| local_id_unless_generic(&local_snapshot2, name, generic_names),
             std_crate_id,
             &ext_snapshot2,
             &mut |crate_name: String| {
@@ -514,6 +520,7 @@ impl EncoderState {
                     self.ensure_external_crate(crate_name)
                 }
             },
+            generic_names,
         )
         .map_err(|reason| CatalogueToExtendedCrateCodecError::InvalidTypeRef {
             type_ref: bound_str.to_string(),
@@ -533,7 +540,7 @@ impl EncoderState {
         bound_str: &str,
         generic_names: &[&str],
     ) -> Result<GenericBound, CatalogueToExtendedCrateCodecError> {
-        let raw = self.encode_bound_str(bound_str)?;
+        let raw = self.encode_bound_str_with_generics(bound_str, generic_names)?;
         let rewritten = if generic_names.is_empty() {
             raw
         } else {

@@ -30,6 +30,16 @@ pub(super) struct ParseCtx<'a, F, G> {
     pub(super) generic_params: &'a [&'a str],
 }
 
+/// Returns the catalogue/rustdoc spelling for a parsed identifier.
+///
+/// `syn` retains the `r#` marker on raw identifiers (`r#type`), while rustdoc
+/// exposes the normalized spelling (`type`).  The catalogue stores the latter,
+/// so every identifier that crosses this parser boundary is canonicalized.
+pub(super) fn normalized_ident_name(ident: &syn::Ident) -> String {
+    let name = ident.to_string();
+    name.strip_prefix("r#").unwrap_or(&name).to_owned()
+}
+
 impl<'a, F, G> ParseCtx<'a, F, G>
 where
     F: Fn(&str) -> Option<Id>,
@@ -96,10 +106,35 @@ where
             if segments.len() != qself.position.saturating_add(1) {
                 return unresolved_type("<qualified_path_trailing_segments>");
             }
-            let name = assoc_seg.ident.to_string();
+            let name = normalized_ident_name(&assoc_seg.ident);
             let args = self.convert_generic_args(&assoc_seg.arguments);
 
             return Type::QualifiedPath { name, self_type, trait_, args: args.map(Box::new) };
+        }
+
+        // A projection rooted at a declared generic (`T::Item`) is not a
+        // crate-prefixed path.  Rustdoc represents it as a QualifiedPath with
+        // a Generic self type and no explicit trait; handle it before the
+        // external-crate path branch so `T` is never registered as a crate.
+        if type_path.path.leading_colon.is_none() && segments.len() > 1 {
+            let Some(first_seg) = segments.first() else {
+                return unresolved_type("<empty_generic_projection>");
+            };
+            let first_name = normalized_ident_name(&first_seg.ident);
+            if self.generic_params.iter().any(|generic| *generic == first_name) {
+                let mut projected = Type::Generic(first_name);
+                for segment in segments.iter().skip(1) {
+                    let name = normalized_ident_name(&segment.ident);
+                    let args = self.convert_generic_args(&segment.arguments);
+                    projected = Type::QualifiedPath {
+                        name,
+                        self_type: Box::new(projected),
+                        trait_: None,
+                        args: args.map(Box::new),
+                    };
+                }
+                return projected;
+            }
         }
 
         // Multi-segment: first segment is a crate name prefix.
@@ -111,24 +146,9 @@ where
         let Some(first_seg) = segments.first() else {
             return unresolved_type("<empty_path>");
         };
-        let name = first_seg.ident.to_string();
+        let name = normalized_ident_name(&first_seg.ident);
 
-        // 1. Rust primitive?
-        if PRIMITIVE_TYPES.contains(&name.as_str()) {
-            return Type::Primitive(name);
-        }
-
-        // 2. Unit type `()`?  (expressed as empty-path in some syn versions)
-        if name == "()" {
-            return Type::Tuple(vec![]);
-        }
-
-        // 3. Local catalogue declaration?
-        //
-        // Checked BEFORE the `Self` keyword and the std prelude allowlist so that a
-        // catalogue type with the same spelling as a prelude item or the `Self` keyword
-        // (highly unusual but technically possible) is resolved to the local item id
-        // rather than silently mapped to a sentinel or std path.
+        // A catalogue declaration wins over a same-spelled generic parameter.
         if let Some(local_id) = (self.resolve_local)(&name) {
             let generic_args = self.convert_generic_args(&first_seg.arguments);
             return Type::ResolvedPath(Path {
@@ -138,18 +158,21 @@ where
             });
         }
 
-        // 3.5. Impl-block generic type parameter? (ADR 2026-06-18-0822 D2)
-        //
-        // If the name matches one of the caller-supplied `generic_params` names, it
-        // represents a type variable (e.g. `T` in `impl<T> Trait for T`). Encode it
-        // as `Type::Generic(name)` so that the A-codec representation matches the
-        // `Type::Generic` variant that rustdoc emits for generic type parameters.
-        //
-        // This step is placed AFTER `resolve_local` so that a catalogue type that
-        // happens to share a name with a generic parameter keeps its local-catalogue
-        // identity rather than being downgraded to a generic placeholder.
+        // Rustdoc removes `r#` from raw identifiers. A declared generic named
+        // like a primitive (`r#bool`) must therefore remain `Type::Generic`,
+        // rather than being classified as `Type::Primitive`.
         if self.generic_params.iter().any(|g| *g == name) {
             return Type::Generic(name);
+        }
+
+        // 1. Rust primitive?
+        if PRIMITIVE_TYPES.contains(&name.as_str()) {
+            return Type::Primitive(name);
+        }
+
+        // 2. Unit type `()`?  (expressed as empty-path in some syn versions)
+        if name == "()" {
+            return Type::Tuple(vec![]);
         }
 
         // 4. `Self` keyword — represents the implementing type. Encoded as a
@@ -190,11 +213,12 @@ where
         let Some(first_seg) = segments.first() else {
             return unresolved_type("<empty_crate_path>");
         };
-        let first_name = first_seg.ident.to_string();
+        let first_name = normalized_ident_name(&first_seg.ident);
         let Some(last_seg) = segments.last() else {
             return unresolved_type("<empty_crate_path>");
         };
-        let full_path = segments.iter().map(|s| s.ident.to_string()).collect::<Vec<_>>().join("::");
+        let full_path =
+            segments.iter().map(|s| normalized_ident_name(&s.ident)).collect::<Vec<_>>().join("::");
 
         // `crate`, `self`, `super` are Rust path keywords, not external crate names.
         // For relative/self-referential paths, attempt to resolve the last segment
@@ -202,7 +226,7 @@ where
         // registering a spurious `external_crates` entry.
         let is_path_keyword = matches!(first_name.as_str(), "crate" | "self" | "super");
         if is_path_keyword {
-            let last_name = last_seg.ident.to_string();
+            let last_name = normalized_ident_name(&last_seg.ident);
             let generic_args = self.convert_generic_args(&last_seg.arguments);
             if let Some(local_id) = (self.resolve_local)(&last_name) {
                 return Type::ResolvedPath(Path {
@@ -272,14 +296,15 @@ where
     /// `dyn serde::Serialize` are resolved consistently with plain path types.
     pub(super) fn resolve_trait_bound_path(&mut self, syn_path: &syn::Path) -> Path {
         let segments: Vec<_> = syn_path.segments.iter().collect();
-        let full_path = segments.iter().map(|s| s.ident.to_string()).collect::<Vec<_>>().join("::");
+        let full_path =
+            segments.iter().map(|s| normalized_ident_name(&s.ident)).collect::<Vec<_>>().join("::");
 
         // Multi-segment: treat first as a crate/module prefix.
         if segments.len() > 1 {
             let Some(first_seg_ref) = segments.first() else {
                 return Path { path: full_path, id: Id(UNRESOLVED_CRATE_ID), args: None };
             };
-            let first_name = first_seg_ref.ident.to_string();
+            let first_name = normalized_ident_name(&first_seg_ref.ident);
             let Some(last_seg) = segments.last() else {
                 return Path { path: full_path, id: Id(UNRESOLVED_CRATE_ID), args: None };
             };
@@ -287,7 +312,7 @@ where
 
             let is_path_keyword = matches!(first_name.as_str(), "crate" | "self" | "super");
             let id = if is_path_keyword {
-                let last_name = last_seg.ident.to_string();
+                let last_name = normalized_ident_name(&last_seg.ident);
                 if let Some(local_id) = (self.resolve_local)(&last_name) {
                     local_id
                 } else {
@@ -307,7 +332,7 @@ where
         let Some(first_seg) = segments.first() else {
             return Path { path: full_path, id: Id(UNRESOLVED_CRATE_ID), args: None };
         };
-        let name = first_seg.ident.to_string();
+        let name = normalized_ident_name(&first_seg.ident);
         let args = self.convert_generic_args(&first_seg.arguments);
 
         // Local catalogue?
@@ -372,6 +397,9 @@ where
                 syn::TypeParamBound::Lifetime(lt) => {
                     bounds.push(GenericBound::Outlives(format!("'{}", lt.ident)));
                 }
+                syn::TypeParamBound::PreciseCapture(capture) => {
+                    bounds.push(super::precise_capture::convert_precise_capture(capture));
+                }
                 _ => {}
             }
         }
@@ -393,7 +421,7 @@ where
                 let name = arg
                     .name
                     .as_ref()
-                    .map(|(n, _)| n.to_string())
+                    .map(|(n, _)| normalized_ident_name(n))
                     .unwrap_or_else(|| format!("_arg{i}"));
                 let ty = self.convert_type(&arg.ty);
                 (name, ty)
@@ -507,7 +535,7 @@ where
                 let ty = ctx.convert_type(&assoc.ty);
                 let inner_args = angle_bracketed_to_generic_args(ctx, &assoc.generics);
                 constraints.push(AssocItemConstraint {
-                    name: assoc.ident.to_string(),
+                    name: normalized_ident_name(&assoc.ident),
                     args: inner_args.map(Box::new),
                     binding: AssocItemConstraintKind::Equality(rustdoc_types::Term::Type(ty)),
                 });
@@ -519,7 +547,7 @@ where
                 let expr_str = expr_to_token_string(&assoc_const.value);
                 let inner_args = angle_bracketed_to_generic_args(ctx, &assoc_const.generics);
                 constraints.push(AssocItemConstraint {
-                    name: assoc_const.ident.to_string(),
+                    name: normalized_ident_name(&assoc_const.ident),
                     args: inner_args.map(Box::new),
                     binding: AssocItemConstraintKind::Equality(rustdoc_types::Term::Constant(
                         rustdoc_types::Constant {
@@ -546,11 +574,14 @@ where
                         syn::TypeParamBound::Lifetime(lt) => {
                             Some(GenericBound::Outlives(format!("'{}", lt.ident)))
                         }
+                        syn::TypeParamBound::PreciseCapture(capture) => {
+                            Some(super::precise_capture::convert_precise_capture(capture))
+                        }
                         _ => None,
                     })
                     .collect();
                 constraints.push(AssocItemConstraint {
-                    name: c.ident.to_string(),
+                    name: normalized_ident_name(&c.ident),
                     args: None,
                     binding: AssocItemConstraintKind::Constraint(bounds),
                 });

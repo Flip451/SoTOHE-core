@@ -18,7 +18,7 @@
         }
       ],
       "id": "AC-02",
-      "text": "catalogue lint は、alias entry のジェネリクス宣言が順序付きの型パラメータ列であり、各パラメータ名が空でない Rust 識別子、重複せず、各 bound が空でない型・trait 参照である場合に通過させる。これらを満たさない宣言は検証エラーとして報告する。"
+      "text": "catalogue lint は、alias entry のジェネリクス宣言が順序付きの型パラメータ列であり、各パラメータ名が空でない plain な非キーワード Rust 識別子（raw identifier 表記を含まない）、重複せず、各 bound が空でない型・trait 参照である場合に通過させる。これらを満たさない宣言は検証エラーとして報告する。"
     },
     {
       "adr_refs": [

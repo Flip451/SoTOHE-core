@@ -108,13 +108,29 @@
   "types": {
     "CatalogueLinterError": {
       "action": "modify",
-      "docs": "Catalogue-lint evaluation errors, extended with duplicate alias-generic-parameter rejection.",
+      "docs": "Catalogue-lint evaluation errors, including invalid and duplicate alias-generic-parameter rejection.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
         "variants": [
           {
             "name": "DuplicateTypeAliasGenericParameter",
+            "payload": {
+              "fields": [
+                {
+                  "name": "alias_name",
+                  "ty": "TypeName"
+                },
+                {
+                  "name": "parameter_name",
+                  "ty": "ParamName"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "InvalidTypeAliasGenericParameterName",
             "payload": {
               "fields": [
                 {

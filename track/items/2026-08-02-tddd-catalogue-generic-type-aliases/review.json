@@ -201,6 +201,100 @@
           "hash": "rvw1:sha256:c3fcd20ceb13cdf71a1244990e12a330d4c5e74406f04b7b8e2ed05bfa920cc0",
           "type": "final",
           "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T11:36:30Z",
+          "findings": [
+            {
+              "category": "broken invariant",
+              "file": "libs/domain/src/tddd/catalogue_linter.rs",
+              "line": 635,
+              "message": "Valid raw generic identifiers are rejected after rustdoc normalization. Rustdoc strips `r#`, so `type Alias<r#type> = r#type;` reaches the catalogue with parameter name `type`; this blacklist then returns `InvalidTypeAliasGenericParameterName`, preventing a valid alias from linting or matching its implementation. Preserve normalized keyword names (while still rejecting `_`, duplicates, and malformed bounds), or retain raw-identifier provenance.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7457485101f066f09b53371a6b2136f9d04aa2c288d491cd44ef015fc50cdd96",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T11:42:23Z",
+          "findings": [
+            {
+              "category": "broken invariant",
+              "file": "libs/domain/src/tddd/catalogue_linter.rs",
+              "line": 677,
+              "message": "The validator accepts `self`, `Self`, `super`, and `crate`, but Rust forbids these spellings even as raw identifiers (`r#self`, etc.). A catalogue alias using any of them therefore passes lint validation despite having no valid Rust declaration. Reject these four names in addition to `_`, while continuing to accept keywords that can be raw identifiers, and add a regression test.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:aea8ceb0d373c32c62cbb572f48df1f7a8daef1800c55b32796e84fb6c31d6a4",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T11:46:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:735334d8bcd8988bcbd99ef54b0c7c1aa3633d546b0dc1c1a3278d03938ac385",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T12:21:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:be6a91fb417ed47b95f4d91f92930266830b3e684f6bfd2c881813f7a42278b4",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T12:23:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:be6a91fb417ed47b95f4d91f92930266830b3e684f6bfd2c881813f7a42278b4",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T13:59:58Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8059fc14994ce095ce5a50a3971221973e5a2ec712c4aeccaf2ec9ade474491c",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T04:48:42Z",
+          "findings": [
+            {
+              "category": "broken invariant",
+              "file": "libs/domain/src/tddd/catalogue_linter.rs",
+              "line": 678,
+              "message": "The keyword boundary is incomplete: Rust's weak keywords `macro_rules`, `raw`, and `safe` are omitted even though `union` is rejected. Because all three satisfy `ParamName`'s character rules, aliases using them pass validation despite AC-02 requiring plain non-keyword parameter names. Reject these remaining weak-keyword spellings and cover them in the keyword regression test.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0e7d3b4cf8c2c21c1b3f4993f93d0d808cc1eac98f32740d28e991170314c309",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T04:51:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:259be293404cd9a42563e74a755e160580918188a037118a847c7ef31d5be4e2",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T05:14:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:03e2014f2fb3ca845fcac65c06558333f7456e5dfd94548cb882e7438fb7623e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T05:18:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:03e2014f2fb3ca845fcac65c06558333f7456e5dfd94548cb882e7438fb7623e",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -527,6 +621,20 @@
           "hash": "rvw1:sha256:7eea6d4727d251857655e4e53363e69f6a03c437de8c6b888e997004bfe9c35a",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T05:40:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0757be51a1f2dd75af5ba81b980d4f7c4203c3c5a7bf6efa3444df80bafd2d2e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T05:41:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0757be51a1f2dd75af5ba81b980d4f7c4203c3c5a7bf6efa3444df80bafd2d2e",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -764,6 +872,2101 @@
           "hash": "rvw1:sha256:0baf4c2eaa805421f1517377db7580683075ea795502f89da2b7cfecdc02bd37",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T12:21:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1201fbd48557705487d2f1750735b0f3a879cee165562d94078a6cc1d72886fc",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T12:30:36Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/validate.rs",
+              "line": 40,
+              "message": "Accepting rustdoc-normalized keywords here does not preserve enough information for extended-crate encoding. For valid `type Alias<r#type> = Vec<r#type>;`, the parameter becomes `type`; `Vec<type>` cannot be parsed by `syn`, while `Vec<r#type>` yields `r#type`, which does not match the stored generic name and is not encoded as `Type::Generic`. The false mismatch therefore remains whenever the raw parameter is referenced. Normalize raw identifiers during generic matching (or retain raw provenance) and add an end-to-end regression test.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1201fbd48557705487d2f1750735b0f3a879cee165562d94078a6cc1d72886fc",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T12:56:03Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 146,
+              "message": "The raw-keyword normalization is token-blind: when a declared generic is named `for` (from source `r#for`), a valid target such as `for<'a> fn(&'a str)` has its syntactic `for` rewritten to `r#for` and then fails `syn` parsing; the same collision affects syntax keywords such as `dyn`, `impl`, and `fn`. Restrict restoration to identifier-reference positions (or preserve raw-identifier provenance) and add collision tests.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture violation",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/helpers.rs",
+              "line": 475,
+              "message": "This edit pushes the production module from 699 to 702 lines, exceeding the repository's 700-line maximum; `bin/sotp verify module-size` reports this file as an error. Split or move helpers (or otherwise reduce the production module) so the structural gate passes.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:63943ff4da44f1d9f050928af9640963f4298fe06d4fa42b15a42084146a190a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T13:19:15Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/validate.rs",
+              "line": 40,
+              "message": "Accepting rustdoc-normalized keyword names here is still inconsistent with document-boundary syntax validation. A valid alias such as `type Alias<r#type, U: Into<r#type>> = ...` produces the normalized bound `Into<type>`, but decode and encode pass that directly to `validate_bound_str`, so `syn` rejects it before the generic-aware parser can restore `r#`. Make alias bound/where-predicate validation aware of the declared generic names and add round-trip coverage.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 176,
+              "message": "The syntax-position heuristic assumes `dyn` and `impl` syntax must be followed by an ASCII identifier, but Rust paths may start with `::`. With generic `dyn`, the valid normalized target `dyn ::Trait<dyn>` fails its direct parse at the inner reference; fallback then prefixes both tokens because the first is followed by `:`, producing `r#dyn::Trait<r#dyn>` and encoding a path instead of `Type::DynTrait`. Recognize the complete path grammar, including leading `::`, and add an end-to-end mixed-keyword test.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:79b3d068584d0f311338c62c18085b9e367b6605c71315bfdbbbd2543bdbf661",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T13:27:09Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/validate.rs",
+              "line": 40,
+              "message": "Accepting rustdoc-normalized keyword names here is still inconsistent with document-boundary syntax validation. A valid alias such as `type Alias<r#type, U: Into<r#type>> = ...` produces the normalized bound `Into<type>`, but decode and encode pass that directly to `validate_bound_str`, so `syn` rejects it before the generic-aware parser can restore `r#`. Make alias bound/where-predicate validation aware of the declared generic names and add round-trip coverage.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 178,
+              "message": "The syntax-position heuristic still assumes `dyn`/`impl` is followed immediately by a type path, but a valid bound list may begin with a lifetime. With generic `dyn`, normalized `dyn 'static + Trait<dyn>` fails direct parsing at the inner reference; fallback then rewrites the leading `dyn` too because the next token is `'`, so the valid source form `dyn 'static + Trait<r#dyn>` is rejected. Recognize the full trait-bound grammar and add this mixed lifetime/keyword case end-to-end.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c3dedc2203a3117669a58cc94761c0941c947dea5b5e0ce3eabeb4838fcfe4b1",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T13:44:52Z",
+          "findings": [
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs",
+              "line": 712,
+              "message": "現時点で、対象内の `decode.rs` が production 712 行となり、リポジトリの 700 行上限チェックに失敗することを確認しました。残りの差分について correctness の再判定を続けています。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:157af803e0b679a6ff9da7b99ff7ea8bcd324cfa481f9e6977a2b96add5d0aae",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T14:02:00Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_ctx.rs",
+              "line": 116,
+              "message": "Generic alias targets containing associated-type projections are misencoded. For example, `type Alias<T: Iterator> = T::Item` reaches this multi-segment branch before `generic_params` are consulted, registers `T` as an external crate, and emits `ResolvedPath(\"T::Item\")`; rustdoc emits a `QualifiedPath` whose self type is `Generic(\"T\")`, causing a false structural-equality mismatch. Recognize declared-generic prefixes as projections before external-crate or keyword-syntax parsing and add a target regression test.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9fb3fe3a4bbf25203c9736f4859564805224a41746e6c813ec41787be5308f60",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T14:11:12Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 78,
+              "message": "Keyword-named generic projections can still be parsed using the wrong grammar. For example, an alias declared as `type Alias<r#dyn: Iterator> = r#dyn::Item` is represented in the catalogue as `dyn::Item`, but the initial parse succeeds as trait-object syntax, so normalization and the generic-projection branch are skipped. The A-side emits `DynTrait` instead of rustdoc's `QualifiedPath` over `Generic(\"dyn\")`, causing a false structural mismatch. Disambiguate declared-generic projection prefixes before accepting the direct parse and add a regression test.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3c3b65b9c7243619148d228558933c9cd76bba98a8d3dfb80a6343577cd9c0ef",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T14:11:52Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 78,
+              "message": "A declared raw generic named `dyn` cannot be used in an associated-type projection. Rustdoc normalizes `r#dyn::Item` to `dyn::Item`, but `syn::parse_str` accepts that text as `dyn ::Item` trait-object syntax, so the fallback never restores `r#`. The codec then emits a `DynTrait` instead of `QualifiedPath { self_type: Generic(\"dyn\"), ... }`, breaking structural comparison for the alias. Handle normalized generic projections before accepting the direct parse (the same ambiguity applies to `impl`).",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3c3b65b9c7243619148d228558933c9cd76bba98a8d3dfb80a6343577cd9c0ef",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T14:18:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9d5fe06589bf16d97cc951c501000607f39e688ba1893724957309a37387050e",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T14:41:00Z",
+          "findings": [
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 168,
+              "message": "`normalize_generic_identifier_spelling` treats every otherwise-unhandled keyword occurrence as a generic reference. For a generic named `const`, the valid rustdoc-normalized target `*const const` (source: `*const r#const`) becomes `*r#const r#const`; the fallback original is also unparseable, so a valid alias is rejected. Distinguish pointer/reference modifiers such as `const` and `mut` from raw generic references.",
+              "severity": "P1"
+            },
+            {
+              "category": "codec-boundary-consistency",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs",
+              "line": 221,
+              "message": "Generic-aware validation now accepts nested keyword-generic references in alias where predicates, but the downstream extended-crate encoder parses non-bare where-clause LHS/RHS without passing the generic context. For example, an alias declaring generic `type` with LHS `Vec<type>` decodes successfully here but later fails `CatalogueToExtendedCrateCodec::encode`. Thread the alias generic names through where-form type parsing or keep this boundary fail-closed.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:250c8aa7865f7c984d384ea4cadd14935178132ad7c873a951d2c2fe2a675e17",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T14:57:19Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 210,
+              "message": "Keyword normalization mishandles qualified paths for keyword-named alias generics. For example, `<as as Trait>::Assoc` (source `<r#as as Trait>::Assoc`) becomes `<r#as r#as Trait>::Assoc`; the original spelling is also unparsable, so the extended-crate adapter rejects a valid alias. `dyn` and `impl` similarly remain syntax when used as the qself type before `as`. Preserve the qualified-path `as` delimiter while restoring the qself identifier.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c296148a5edf65aead063d6af12dcae98692ca345aebab09facbd7b1380a0eee",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T15:08:09Z",
+          "findings": [
+            {
+              "category": "data corruption",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 121,
+              "message": "The scanner treats every `\"` as a normal-string boundary and does not honor raw-string delimiters. With a generic named `type`, a valid normalized target such as `(type, Foo<{ r#\"x \" type\"#.len() }>)` is transformed to one whose raw-string contents contain `r#type`. The normalized form remains valid Rust, so fallback never occurs and the const-generic value is silently changed. Raw and byte-raw literals must be copied according to their complete hash-delimited token.",
+              "severity": "P0"
+            },
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 221,
+              "message": "Unhandled keywords default to generic-identifier rewriting even inside const-generic expressions. For example, normalized `(if, Foo<{ if true { 1 } else { 2 } }>)` for `type Alias<r#if>` rewrites both `if` tokens; the normalized form is invalid and the original cannot parse because of the bare generic reference, so a valid alias is rejected. Keyword restoration must distinguish embedded expression syntax from type-identifier positions.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 225,
+              "message": "Qualified-path detection remains limited to direct `<dyn as ...>`/`<impl as ...>` heads and a small set of preceding delimiter characters. A valid target such as `<*const dyn as Trait>::Assoc` (source `<*const r#dyn as Trait>::Assoc`) leaves `dyn` as syntax because it is not immediately after `<`, causing both parse attempts to fail. The `as` delimiter is likewise rewritten when the qself type ends in an unrecognized valid token such as `!`. Handle the complete qself type rather than relying on adjacent-character heuristics.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:244e89965dc4cf35178c4ff23f32e631beae3bcfe76ad1e98463231bfdb3f751",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T15:21:21Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 143,
+              "message": "Every apostrophe is probed as a character literal, and `char_literal_end` accepts arbitrary content through the next apostrophe. In `for<'a> fn(type, &'a str)` with alias generic `type`, the first lifetime therefore swallows `type` through the second lifetime marker, so it is never restored to `r#type`; both parse attempts reject the otherwise valid alias. Distinguish lifetime tokens from actual one-character/escaped character literals.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 166,
+              "message": "The normalizer copies entire braced const expressions without restoring any raw identifiers. A valid normalized target such as `(type, Foo<{ let type = 1; type }>)` for `type Alias<r#type>` requires the outer generic and the raw const-expression identifiers to regain `r#`; only the outer occurrence is repaired, leaving invalid expression syntax, while fallback fails on the outer bare keyword. Const-expression syntax must be tokenized rather than skipped wholesale.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 305,
+              "message": "Any `dyn` before a qualified path's `as` delimiter is now classified as a raw generic occurrence. This breaks genuine trait-object qself syntax when an alias also declares a generic named `dyn`: `(dyn, <dyn Trait as Foo>::Assoc)` should normalize only the first occurrence, but becomes `(r#dyn, <r#dyn Trait as Foo>::Assoc)` and is rejected. Require the qself occurrence itself to have generic-reference shape instead of treating every pre-delimiter `dyn` as generic.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a89eaf99977bcc52379881910c61fc5a9ac3441634c051b867ca3c5ece2397a9",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T15:28:12Z",
+          "findings": [
+            {
+              "category": "data corruption",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 377,
+              "message": "Unhandled expression keywords default to raw-identifier rewriting. With alias generic `true`, normalized `(true, Foo<{ if true { 1 } else { 2 } }>)` becomes `(r#true, Foo<{ if r#true { 1 } else { 2 } }>)`. This still parses, so fallback never runs and the boolean literal is silently encoded as an identifier expression, changing the const-generic semantics. Expression syntax such as `true`, `false`, casts, and other keywords must be distinguished from raw identifiers.",
+              "severity": "P0"
+            },
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 397,
+              "message": "The qself classifier treats any following `:` as evidence that `dyn` is a raw generic projection, even when whitespace makes it genuine trait-object syntax. Thus `(dyn, <dyn ::core::fmt::Debug as Foo>::Assoc)` for generic `dyn` normalizes the second occurrence to `r#dyn`, and both parse attempts reject a valid alias. Preserve spaced `dyn ::Trait` syntax inside qualified paths just as the non-qself branch does.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture violation",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 728,
+              "message": "Production code now runs through line 727 before the `#[cfg(test)]` block, exceeding the repository's 700-line maximum for production modules. Split the normalization/lexical helpers into a focused sibling module so this infrastructure module conforms to the architecture guideline.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:17b022733cbbc11a2e84b5e0c8ccaa6a217e555330f42b0f65272cd8a00a8296",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T15:43:14Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 148,
+              "message": "`is_const_expr_identifier_position` treats every unlisted keyword inside a const expression as a generic identifier. For example, the valid alias `type Alias<r#as> = (r#as, Foo<{ 1 as usize }>);` is normalized from `(as, Foo<{ 1 as usize }>)` to `(r#as, Foo<{ 1 r#as usize }>)`. The normalized parse then fails, while fallback parsing fails on the outer `as`, so extended-crate encoding rejects a valid generic alias. Const-expression syntax keywords need context-aware preservation instead of the catch-all branch.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:934de64365ef392ed41f0d07296e3d21775e3ee8c3c0756a276dde9cd41ea7bd",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T15:49:17Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 160,
+              "message": "The const-expression classifier does not recognize numeric literals as expression starts. For the valid alias `type Alias<r#if> = (r#if, Foo<{ if 1 == 1 { 1 } else { 2 } }>);`, the rustdoc-normalized target causes the inner syntax keyword `if` to be rewritten as `r#if`. The normalized parse then fails, while fallback parsing fails on the outer normalized generic name, so the adapter rejects a valid alias.",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 253,
+              "message": "Precise-capture `use<...>` syntax is not exempted from keyword restoration. For valid code such as `fn f<r#use>() -> impl Sized + use<r#use>`, the normalized return type `impl Sized + use<use>` becomes `impl Sized + r#use<r#use>`. `syn` accepts this as an ordinary trait bound, so the adapter silently emits a trait named `use` instead of the capture bound, corrupting the extended-crate structure.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:f3519c063734bccfe81cc671578b7da2de7f58e730f4941369ba538e0bf944f2",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T15:58:52Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_ctx.rs",
+              "line": 411,
+              "message": "`convert_impl_trait` silently drops `syn::TypeParamBound::PreciseCapture`. After the new normalizer makes rustdoc-normalized `impl Sized + use<use>` parse as `use<r#use>`, the encoded `Type::ImplTrait` loses that capture bound instead of emitting the available `GenericBound::Use`, causing structural drift from rustdoc output.",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 139,
+              "message": "The const-expression keyword heuristic corrupts valid raw identifiers. The `in` arm is inverted: a loop separator followed by an expression is marked as an identifier, while `let r#in = 1; r#in` in rustdoc-normalized form is left unescaped and rejected. Nearby hard-coded cases also misclassify raw `true`/`false` locals and patterned `let` syntax, so accepted keyword generic names cannot reliably round-trip through const-generic expressions.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:fd7e04add7637702e0c494396edd8830e7a06139a54ab4237112dbc9668757cd",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T16:17:38Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 188,
+              "message": "`const_expr_locals` makes every later token with the same spelling a raw identifier, even when it is Rust syntax. For valid `type Alias<r#true> = (r#true, Foo<{ let r#true = 1; if true { r#true } else { 0 } }>);`, the boolean literal in `if true` becomes `r#true`; the normalized form still parses, so the codec silently changes the const expression instead of falling back.",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 142,
+              "message": "The `let` classifier recognizes only a single identifier immediately followed by `=`. With a declared generic named `let`, valid syntax such as `let mut x = 1` or `let (x, y) = ...` is therefore rewritten to `r#let`, causing otherwise valid rustdoc-normalized alias targets to be rejected.",
+              "severity": "P0"
+            },
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_ctx.rs",
+              "line": 427,
+              "message": "The newly expanded `parse_ctx.rs` is 721 production lines and has no test-only section to exclude, exceeding the repository's explicit 700-line maximum. Move the precise-capture or generic-argument conversion helpers into a sibling module.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:bcfd578239fa3ec921f8b169c8db9ff47fbb984b7d0b3db92091b956d44bb2c5",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T16:30:04Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 163,
+              "message": "The local-binding state does not make keyword occurrence classification lossless. It is ignored for control/cast keywords, so valid `let r#if = 1; r#if + 1` leaves the reference unescaped; conversely it forces later `let` syntax and parenthesized boolean literals to raw identifiers, corrupting cases such as `let r#let = 1; let x = 2` and `if (true)`. These valid inputs are rejected or silently converted to a different const-expression AST.",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 252,
+              "message": "`collect_let_binding_names` treats every keyword-looking token in a pattern as a binding, including pattern modifiers. With an alias generic named `mut`, ordinary valid syntax `let mut x = 1` records `mut` as a local and is rewritten to invalid `let r#mut x = 1`; `ref` and keyword literal patterns have the same problem. Pattern bindings must be distinguished from modifiers and literals.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:cb876fe4b06217a650a831df8b18530ce6457dd8de896f0e5fe26e991b204138",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T16:39:19Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 181,
+              "message": "Local bindings are ignored for control-flow-shaped keywords. For valid Rust such as `type A<r#if> = (r#if, Foo<{ let r#if = 1; r#if + 1 }>);`, normalized input contains `let if = 1; if + 1`. The declaration is restored, but the reference is treated as `if` syntax because `+` counts as a condition start. The normalized parse fails, while fallback cannot parse the outer keyword generic, so the valid catalogue is rejected.",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 176,
+              "message": "The binding-pattern blacklist makes valid raw keyword bindings unrecoverable. For example, `let r#mut = 1` normalizes to `let mut = 1`, but `mut` is forcibly treated as syntax and is not recorded as a local. An alias using both a generic and local named `r#mut` therefore fails both normalized and fallback parsing. Pattern modifiers must be distinguished by grammar position rather than a fixed name blacklist.",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 214,
+              "message": "Once a local named `r#let` is recorded, every subsequent `let` token is classified as an identifier. In valid code such as `type A<r#let> = (r#let, Foo<{ let r#let = 1; let x = 2; r#let + x }>);`, the second declaration is rewritten from syntax to `r#let x = 2`, making parsing fail. Local-name tracking must not override an occurrence that has the grammar of a `let` statement.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:b5bfde5cf1951d868c6e6a29fa2724f2f3ba23ace094e72689d681eca1d71376",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T16:48:45Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_ctx.rs",
+              "line": 128,
+              "message": "Multi-level generic projections silently lose their intermediate segments. Valid Rust such as `type X<T> where T: Outer = T::Assoc::Nested` enters this branch, but only the first and last segments are retained, yielding a projection equivalent to `T::Nested`. This corrupts the extended-crate representation and breaks structural comparison with rustdoc.",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 159,
+              "message": "The `let` pattern scanner treats the first top-level `=` byte as an assignment without distinguishing operators such as `==`. For a valid normalized expression originating from `let r#let = 1; r#let == 1`, the reference `let == 1` is misclassified as a new `let` expression and is not restored to `r#let`, causing the valid alias target to fail parsing.",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 177,
+              "message": "`is_binding_pattern_modifier` accepts any following non-whitespace character because `next_identifier_end` advances even when started on punctuation. Consequently, a valid normalized tuple pattern such as `let (mut, x) = ...`, originating from `let (r#mut, x)`, treats `mut` as a modifier because it is followed by `,`; the raw binding is not restored or recorded and the valid catalogue is rejected.",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 191,
+              "message": "Boolean keyword spellings are unconditionally treated as literal patterns, although Rust permits raw bindings named `r#true` and `r#false`. A valid alias such as `type A<r#true> = (r#true, Foo<{ let r#true = 1; r#true + 1 }>);` is normalized into literal-pattern/literal-expression syntax instead of restoring the local identifier. Because this remains syntactically parseable, the codec can silently emit a semantically different const expression.",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 201,
+              "message": "Control-keyword classification still ignores the recorded local binding and relies only on the next character. For example, valid `let r#if = 2; r#if - 1` normalizes to `let if = 2; if - 1`; since `-` is considered a condition start, the reference is left as `if` syntax and parsing fails. The same issue affects other handled control/cast keywords followed by operators that can also begin expressions.",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 234,
+              "message": "Inside const-expression braces, every keyword not explicitly listed in this match is assumed to be a raw identifier. This corrupts genuine syntax when an alias generic has the same normalized name: for example, with a generic `r#return`, the `return` statement in `Foo<{ const fn f() -> usize { return 1; } f() }>` is rewritten to `r#return`, so valid Rust is rejected. Other unhandled expression/item keywords such as `fn`, `const`, `unsafe`, and `async` have the same failure mode.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:64ae66bd356d14c89c153ad473915ecd33771285dca9a4df50ad118a4361a3e9",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T16:59:00Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 146,
+              "message": "The `let` pattern scanner does not stop at a statement boundary and still mistakes compound operators whose `=` is the second character for an assignment. For valid `let r#let = 1; r#let + 1; let x = 2; x`, the normalized reference `let + 1` scans through the semicolon to the later `=`, is classified as `let` syntax, and is not restored. Expressions such as `r#let != 2` fail similarly.",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 264,
+              "message": "Boolean raw bindings are inferred from the initializer spelling, which cannot distinguish `let true = true` originating from a literal pattern versus `let r#true = true`. A valid alias using `let mut r#true = true; r#true = false` is classified as boolean literals, so its bindings and references are not restored and the codec parses a semantically different expression.",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 296,
+              "message": "The local-binding operator exception omits `*` and `&`, although both can follow a raw local in ordinary binary expressions. Valid `let r#if = 2; r#if * 2` therefore leaves the normalized reference as `if * 2`, treating it as a control-flow head and rejecting the alias. The same defect affects the other control/cast keyword branches using this helper.",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 257,
+              "message": "These syntax-shape branches return the classifier result backwards: `true` causes the caller to add `r#`, yet `const`, `unsafe`, `async`, and `fn` return true precisely when they have their syntax form. Thus a valid alias with a generic `r#fn` and an inner `const fn f()` rewrites the declaration to `r#fn f()`, while an ordinary raw local reference such as `r#const + 1` is left unescaped.",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 253,
+              "message": "A value-less `return;` is misclassified as an identifier because there is no following expression start, despite the comment saying statement-ending return is syntax. A valid alias containing `const fn f() { return; }` and declaring a generic named `r#return` consequently rewrites the statement to `r#return;` and fails parsing.",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 277,
+              "message": "Unlisted expression keywords still fall through to unconditional raw-identifier restoration. For example, valid `type A<r#break> = (r#break, Foo<{ loop { break 1; } }>);` rewrites the actual `break` statement to `r#break`, so the valid rustdoc-normalized alias is rejected. Other statement/item keywords handled only by the catch-all have the same failure mode.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:e32c8d7ece5a330651441541ec0caf1328300b147186ad4b468ca569be41988e",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T17:13:50Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 169,
+              "message": "`let_binding_pattern_end` mistakes compound assignments for `let` bindings because it excludes `==`, `=>`, `!=`, `<=`, and `>=`, but not `+=`, `-=`, and the other assignment operators. For example, valid source containing `let mut r#let = 1; r#let += 1; r#let` is normalized to `let += 1`, classified as a new declaration, and then rejected by both parser attempts. Exclude every compound-assignment operator before accepting `=` as a pattern terminator.",
+              "severity": "P0"
+            },
+            {
+              "category": "data_corruption",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 206,
+              "message": "Boolean literal patterns are unconditionally rewritten as raw identifiers. With a declared `r#true` generic, valid syntax such as `let true = true` becomes `let r#true = true`; the normalized parse succeeds, so this silently changes a literal pattern into a local binding and alters the encoded const expression.",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 306,
+              "message": "Known raw locals followed by postfix indexing or calls are still treated as control-flow keywords because the local-binding override omits `[` and `(`. Thus valid source such as `let r#if = [2]; r#if[0]` is normalized to the invalid `if[0]`, causing an otherwise valid alias target to return `InvalidTypeRef`.",
+              "severity": "P0"
+            },
+            {
+              "category": "data_corruption",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 254,
+              "message": "A known local named `return` is always treated as the statement keyword when followed by `;`, `}`, or end-of-input. Valid source such as `let r#return = 1; r#return` therefore becomes `let r#return = 1; return`; `syn` accepts the latter as control flow, so encoding silently changes the const expression instead of preserving the local reference.",
+              "severity": "P0"
+            },
+            {
+              "category": "data_corruption",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 280,
+              "message": "The `break`/`continue`/`yield` branch restores a known local only before a short list of arithmetic operators. A bare tail reference such as `let r#break = 1; r#break` is left as `break`; `syn` accepts that control-flow expression, silently changing the encoded const argument.",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 287,
+              "message": "The catch-all branch raw-prefixes every unclassified keyword even when it is real const-block syntax. For example, an alias declaring `r#struct` and using `(r#struct, Foo<{ struct X; 1 }>)` has the item keyword changed to `r#struct`; the normalized parse then fails, while the fallback cannot parse the normalized outer generic reference. Syntax-aware handling is required for the remaining keywords that are valid inside const blocks.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:f6c42dc2ab2c290dd3feb2db12425a682dbe071ba66b519bb18d797a1158a1ac",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T17:28:32Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 297,
+              "message": "The `let` classifier ignores `is_local_binding`, so a valid assignment to a raw local such as `let r#let = 1; r#let = 2; r#let` is normalized to `let = 2` and misclassified as another declaration. The scanner also still misses `&=`, `|=`, and `^=`. These valid alias targets consequently fail both parser attempts.",
+              "severity": "P0"
+            },
+            {
+              "category": "data_corruption",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 264,
+              "message": "Boolean patterns are distinguished from raw bindings solely by whether the initializer's first identifier equals the pattern token. This still changes `let true = 1 == 1` into a raw binding, while the indistinguishable valid raw binding `let r#true = true` is treated as a literal pattern and never recorded as a local. Both cases can parse successfully with different ASTs, silently corrupting the encoded const expression.",
+              "severity": "P0"
+            },
+            {
+              "category": "data_corruption",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 169,
+              "message": "Local bindings are stored in one set for the entire outer const expression and are cleared only when brace depth reaches zero. A raw keyword local declared in an inner block therefore remains visible after that block; for example, after `{ let r#true = false; }`, a later boolean literal `true` is rewritten as the now-out-of-scope `r#true`. The resulting AST is silently different from the source.",
+              "severity": "P0"
+            },
+            {
+              "category": "data_corruption",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 287,
+              "message": "For `break`, `continue`, and `yield`, a known local is restored only when the following token is not considered an expression start. Thus valid local expressions such as `let r#break = 2; r#break - 1` or `r#break[0]` remain `break - 1`/`break[0]`; `syn` accepts them as control flow with a value, silently changing the const expression.",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 298,
+              "message": "Actual block-item keywords not covered by the explicit match arms are raw-prefixed by the catch-all branch. For an alias declaring `r#use` or `r#static`, valid targets containing `use core::mem;` or `static X: usize = 1;` become `r#use ...`/`r#static ...`; normalization fails, and the original fallback cannot parse another normalized reference to that generic.",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 317,
+              "message": "The known-local override for control-like keywords does not recognize a following cast keyword. Valid expressions such as `let r#as = 1u8; r#as as usize` (similarly `r#if as usize` or `r#in as usize`) leave the local token as syntax, producing an invalid normalized target and an `InvalidTypeRef` for valid Rust.",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 292,
+              "message": "The `struct`/`enum`/`trait`/`impl`/`type`/`mod` branch assumes any following identifier means item syntax, even for a recorded local. Consequently a valid expression such as `let r#type = 1u8; r#type as usize` is left as `type as usize` and cannot be encoded.",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 477,
+              "message": "Pointer/reference modifiers are recognized only when immediately preceded by `*` or `&` and followed by an identifier. This corrupts valid forms whose pointee starts with another type delimiter (`*const [r#const]`, `&mut [r#mut]`) and lifetime-bearing references such as `&'static mut r#mut`: the syntax modifier itself is rewritten to `r#const`/`r#mut`, so valid aliases are rejected.",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 467,
+              "message": "The qualified-path angle scanner treats every `>` except `->` as a generic delimiter and does not account for const-expression braces or comparison operators. With a generic named `as`, the valid target `(r#as, <Foo<{ 1 > 0 }> as Trait>::Assoc)` loses track of the enclosing angle range, raw-prefixes the actual `as` delimiter, and then fails both normalized and fallback parsing.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:740bf5578bd67d7a71a6595f5636c3cc53caad3661d36ac140e078ec4a44aedd",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T17:38:55Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 264,
+              "message": "Boolean binding detection guesses from the initializer's first token. For a generic named `true`, the normalized form of `let r#true = true; if r#true { 1 } else { 0 }` is classified as a literal pattern, so the local is never recorded and both occurrences become boolean literals. Parsing still succeeds but silently changes the const expression's AST and name resolution.",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 291,
+              "message": "A local named `break` is treated as control-flow syntax when followed by operators that can begin a break operand. For example, normalization of `let r#break = 2usize; r#break - 1usize` leaves the second occurrence as `break - 1usize`; `syn` accepts that as an `ExprBreak`, silently corrupting the intended const expression.",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 318,
+              "message": "The default const-expression classification treats every unhandled keyword as a generic reference, including actual syntax such as `extern` and `move`. A target combining a generic named `extern` with `unsafe extern \"C\" { ... }` therefore rewrites the block keyword to `r#extern`; the normalized parse fails, causing an otherwise valid alias target to be rejected.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:b9cd236a93471b36e56912baed3cc37c4fb16240eaf19949a005e594dfe10b46",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T17:50:25Z",
+          "findings": [
+            {
+              "category": "data_corruption",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 264,
+              "message": "Boolean-pattern detection infers raw-identifier intent from the initializer's first token. For a generic named `true`, the rustdoc-normalized form of `let r#true = true; if r#true { 1 } else { 0 }` is classified as a literal pattern, so the local is never recorded and the condition becomes the boolean literal. Parsing succeeds but silently changes the const expression's AST and name resolution. Preserve raw-origin information or reject this ambiguous spelling instead of guessing from the initializer.",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 224,
+              "message": "Keyword-named locals cannot be restored when used as control-flow operands. For example, a valid target containing `let r#if = true; if r#if { 1 } else { 0 }` normalizes to `let r#if = true; if if { 1 } else { 0 }`: both `if` tokens are classified as syntax because they are followed by expression/block starters, and the alias is rejected. The classifier must distinguish the control-flow head from a known local used as its condition.",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 271,
+              "message": "The const-expression classifier applies expression-specific keyword rules to item/type syntax inside const blocks. With a generic named `const`, a valid target such as `(const, Foo<{ const X: usize = 1; X }>)` rewrites the item introducer to `r#const` because this branch only recognizes `const { ... }` and `const fn`; normalized parsing then fails while the original spelling cannot parse the outer generic reference. Ordinary const items—and similarly type syntax nested in const blocks—must remain syntax.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:e643f62659b25e85e0117b21eb5deda57c765eb3759deb535e3c111535291dd7",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T17:58:15Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 105,
+              "message": "The ambiguity pre-scan skips raw strings but not ordinary string/byte-string/character literals. With a generic named `true`, a valid target such as `(true, Foo<{ \"let true =\".len() }>)` scans the text inside the string as a `let true` pattern and returns `ambiguous boolean keyword binding`, rejecting input that contains no binding at all. Apply the same literal skipping used by the normalizer before interpreting tokens.",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 224,
+              "message": "Keyword-named locals still cannot be restored when used as control-flow operands. The rustdoc-normalized form of `let r#if = true; if r#if { 1 } else { 0 }` becomes `let r#if = true; if if { 1 } else { 0 }`: the condition occurrence is classified as another control-flow head because it is followed by `{`, so the otherwise valid alias target is rejected.",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 271,
+              "message": "The broadened `const` syntax check treats any following identifier as evidence that `const` is syntax, even for a known local. Consequently, `let r#const = 1usize; r#const as usize` normalizes the declaration but leaves the cast operand as `const as usize`, causing parsing to fail. Known locals followed by `as` must remain raw identifiers while actual const-item introducers stay syntax.",
+              "severity": "P0"
+            },
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 753,
+              "message": "Production code in this module now occupies 752 lines before the `#[cfg(test)]` block, exceeding the repository's explicit 700-line production-module maximum. Move the lexical/ambiguity normalization machinery into a focused submodule so the production module returns below the enforced architecture limit.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b9a7ffca9c4818a13a9a720f60c573adf868d16761f19fbb880ca1562c9515b1",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T18:13:44Z",
+          "findings": [
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_ctx.rs",
+              "line": 124,
+              "message": "The generic-projection branch ignores `type_path.path.leading_colon`. For `type Alias<T> = (T, ::T::option::Option<u8>)`, the absolute second path denotes an external crate even though its first segment matches the generic name, but this code emits nested `QualifiedPath` values rooted at `Type::Generic(\"T\")` and never registers the external crate. Only classify paths without a leading `::` as generic projections.",
+              "severity": "P0"
+            },
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 319,
+              "message": "The const-expression classifier does not recognize an ABI-less foreign block because `extern` is considered syntax only before a quoted ABI or `fn`/`crate`/`type`. Consequently, with a generic named `extern`, the valid normalized target `(extern, Foo<{ unsafe extern { static X: u8; } 0usize }>)` becomes invalid `unsafe r#extern { ... }`; the original also cannot parse because the first `extern` needs restoration, so encoding rejects a valid alias. Preserve `extern` when the next token is `{`.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:3fdbf511321ac4804bef559a99fe87e48c90b7df8d0465c0f1594b6cf1bfee64",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T18:19:20Z",
+          "findings": [
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 279,
+              "message": "The const-expression keyword classifier still recognizes only a subset of legal Rust syntax. For example, with a generic named `unsafe`, `(unsafe, Foo<{ unsafe extern { static X: u8; } 0usize }>)` rewrites the foreign-block introducer to `r#unsafe`; similarly, `pub const` is misclassified by the `pub` branch, grouped `use {core::mem}` by the `use` branch, and a nested item's `where` clause by the default branch. These are valid compiling alias targets, but the normalized form and original form then both fail `syn` because the outer generic reference requires restoration. The normalizer must preserve all syntactic keyword positions rather than relying on this incomplete item grammar.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:29b341b7968ab13d23f50c22992a8c80b6fbdbaba454c1e7aebfe0f7b3903cbd",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T18:25:09Z",
+          "findings": [
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 199,
+              "message": "Dispatching every keyword inside `{...}` to the const-expression classifier is too coarse because const blocks may contain local items with their own type grammar. For a generic named `dyn`, the valid normalized target `(dyn, Foo<{ type X = dyn Tr; 0usize }>)` should restore only the first occurrence, but this path also turns the trait-object syntax into `type X = r#dyn Tr`, so both the normalized and original strings fail parsing. The same defect affects constructs such as `for<'a>` bounds and `fn(...)` types inside local items. Track nested item/type context instead of treating all brace contents as expressions.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:1773caa41ebab1e7f4e7b26c07c7eb666b17a5cb7557128b32228ec485ffdf0e",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T18:40:03Z",
+          "findings": [
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 458,
+              "message": "A declared generic named `fn` is still mis-normalized inside nested item type grammar. For `(fn, Foo<{ type X = fn(); 0usize }>)`, this branch rewrites the function-pointer keyword to `r#fn`; `syn` accepts `r#fn()` as a parenthesized path, so the parser-backed repair considers `(r#fn, Foo<{ type X = r#fn(); 0usize }>)` valid and silently changes the const expression's type instead of preserving `fn()`. Recognize function-pointer syntax inside nested item types rather than relying only on parse success.",
+              "severity": "P0"
+            },
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 199,
+              "message": "The repair refuses all inputs containing more than 14 matching keyword tokens, making valid alias handling depend on token count. For example, a generic named `dyn` with target `(dyn, Foo<{ type X0 = dyn Tr; ... type X13 = dyn Tr; 0usize }>)` has 15 spans: the initial classifier corrupts the nested `dyn` syntax, this cutoff disables repair, and the original spelling cannot parse because of the outer normalized generic. The valid raw source is therefore rejected; use a context-aware or otherwise total repair strategy without this arbitrary acceptance limit.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:dbd6b71f843a74f8d2ed9afbf42b3d6082c5e66ab1c8518a1ed27b9f1d530b70",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T18:46:12Z",
+          "findings": [
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 276,
+              "message": "`repair_candidate` now explores both raw and non-raw spellings recursively with no bound, yielding 2^N `syn` parses for N matching tokens. A malformed catalogue where-predicate LHS containing 30 occurrences of a declared keyword generic such as `type` can therefore trigger over a billion parse attempts during decode; larger inputs can also exhaust the call stack. Replace the exhaustive search with bounded, context-aware parsing that does not reject otherwise valid long inputs.",
+              "severity": "P0"
+            },
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 462,
+              "message": "The new `fn(` heuristic still misclassifies function-pointer syntax after common type delimiters such as `(`, `[`, `&`, and `*const`. For example, the valid normalized target `(fn, Foo<{ type X = (fn(),); 0usize }>)` becomes `(r#fn, Foo<{ type X = (r#fn(),); 0usize }>)`. Because `syn` accepts `r#fn()` as a parenthesized path, the repair treats this corrupted form as valid and the codec silently changes the const expression's type structure. Preserve `fn(` as nested type syntax unless the token is known to be a value binding.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:da0e31dbb57ae89dfb9a0a45c56aa1f6182367b9380b35077e7a47d900d86705",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T19:00:19Z",
+          "findings": [
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 350,
+              "message": "Inside const blocks, this `fn(` branch still treats a function-pointer type preceded by `(` as a raw generic reference. For example, the valid normalized target `(fn, [u8; core::mem::size_of::<(fn(),)>()])` for an alias declaring generic `fn` is rewritten to `(r#fn, [u8; core::mem::size_of::<(r#fn(),)>()])`. That spelling parses, so the fallback never restores the original and the codec silently emits different semantics. Nested type contexts such as turbofish arguments need to preserve `fn` syntax.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:8f6117086ea8dc3befc3ae1afba4e373abdba8f241deba4fe8215a58f93bb9d0",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T19:05:42Z",
+          "findings": [
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 199,
+              "message": "Expression context is inferred only from `{...}` depth, so unbraced array-length expressions are processed as type syntax. For the valid alias `type A<r#if> = (r#if, [u8; if true { 1 } else { 2 }]);`, the rustdoc-normalized target contains two `if` tokens; this code correctly rawifies the generic reference but also rewrites the array-length `if` to `r#if`, after which the normalized parse fails and the original still cannot parse the generic reference. Track expression contexts such as array lengths independently of brace depth.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:b14f1a846fb1c24794fa2b8a03eb4517b63459c7491f0cb397073dcff73105a4",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T19:10:33Z",
+          "findings": [
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 194,
+              "message": "Every semicolon marks the current array as having entered its length expression, even when that semicolon is nested inside a const block in the element type. For example, in the valid target `(dyn, [Wrapper<Foo<{ let x = 0; x }>, dyn Trait>; 1])`, the `let` semicolon flips the outer array state early; with generic `dyn`, the following trait-object keyword is then rewritten to `r#dyn`, and both parse attempts fail. Only treat a semicolon at the array bracket's own delimiter depth as its element/length separator.",
+              "severity": "P0"
+            },
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 348,
+              "message": "The `fn(` expression classifier restores a raw identifier only for names collected from `let` bindings, ignoring unambiguous path segments. A valid alias such as `type A<r#fn> = (r#fn, [u8; crate::r#fn()]);` has normalized target `(fn, [u8; crate::fn()])`; the generic reference is repaired, but this branch leaves the qualified function name as the `fn` keyword, so both parse attempts reject the alias. A token following `::` must be treated as an identifier here.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:4e145f8e18e5666f12066f46d5c23bce8564debcd5a6416259cd55b3a05d1a2f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T19:19:51Z",
+          "findings": [
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 287,
+              "message": "The const-expression classifier only records `let` bindings, so calls to keyword-named local items are mistaken for control-flow syntax. For example, the valid alias `type A<r#if> = (r#if, [u8; { const fn r#if() -> usize { 1 } r#if() }]);` reaches this boundary with normalized `if` spellings; the declaration is repaired, but the final `if()` is left unescaped because it is not in `const_expr_locals`, causing `syn` to reject a valid alias target. Track keyword-named item declarations/usages in const blocks or otherwise recognize this call as an identifier.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:0c1c8a1a891882e5dc159884b51f94493fc2ca7b3852751e445254581c4dc36c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T19:28:35Z",
+          "findings": [
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 493,
+              "message": "Once a keyword spelling is recorded as a local, the condition classifier treats `(` as evidence that the token is an identifier before considering whether it is a statement-head keyword. Consequently the valid alias `type A<r#if> = (r#if, [u8; { let r#if = 0usize; if (true) { 1 } else { r#if } }]);` has its real control-flow `if` rewritten to `r#if`, and `syn` rejects the normalized target. Preserve control-flow heads even when a same-spelled raw local is in scope.",
+              "severity": "P0"
+            },
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 261,
+              "message": "Const-expression local tracking only collects simple item names and `let` patterns; closure and function parameter bindings are not registered. For a valid target such as `(r#if, [u8; (|r#if: fn() -> usize| r#if())(one)])`, the normalized closure parameter is repaired because it precedes `:`, but the body call remains `if()` and is misread as control-flow syntax, causing the adapter to reject the alias. Track parameter and other pattern bindings in the appropriate lexical scope.",
+              "severity": "P0"
+            },
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 129,
+              "message": "Function item discovery requires the item name to be followed immediately by `(`, so it misses generic functions whose name is followed by `<...>`. The valid alias `type A<r#if> = (r#if, [u8; { const fn r#if<T>(_: T) -> usize { 1 } r#if(0) }]);` therefore does not register the local function; its subsequent normalized `if(0)` remains unescaped and `syn` rejects the target. Skip an optional generic-parameter list before checking the function parameter list.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:a92c9b8524759a2f7888037302faf9d31e393b0888458c77506bbe0020b354b3",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T19:40:30Z",
+          "findings": [
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 160,
+              "message": "`generic_parameter_list_end` treats every `>` as an angle-bracket terminator, including the `>` in a function-trait return arrow. Therefore the valid alias `type A<r#if> = (r#if, [u8; { const fn r#if<F: Fn() -> usize>(_: F) -> usize { 1 } r#if(|| 0) }]);` does not register the nested function name, leaves the normalized call as `if(...)`, and is rejected by `syn`. Skip `->` and opaque literal/token regions while locating the generic-list terminator.",
+              "severity": "P0"
+            },
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 696,
+              "message": "`parenthesized_condition_has_block` counts delimiters inside character literals. With the valid alias `type A<r#if> = (r#if, [u8; { let r#if = 0usize; if (')' == ')') { 1 } else { r#if } }]);`, the first literal `)` is mistaken for the condition's closing delimiter, so the real control-flow `if` is rewritten as `r#if` and the adapter rejects the target. Treat raw strings, strings, byte strings, and character literals as opaque while scanning the condition.",
+              "severity": "P0"
+            },
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 207,
+              "message": "`closure_body_end` likewise counts delimiters inside character literals and can end a closure binding scope too early. For example, in the valid target `(r#if, [u8; (|r#if: char| ((r#if == ')') as usize) + (r#if as usize))('x')])`, the literal `)` causes the tracked scope to end before the second `r#if`, leaving that occurrence as control-flow syntax and making `syn` reject the alias. Reuse the literal-skipping logic while scanning closure bodies.",
+              "severity": "P0"
+            },
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 1,
+              "message": "This production-only module is 852 lines and has no `#[cfg(test)]` section, exceeding the repository's 700-line production-module maximum. Split the closure/binding and delimiter-scanning helpers into focused submodules.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 714,
+              "message": "Production code runs through line 713 before the `#[cfg(test)]` block, exceeding the repository's 700-line production-module maximum. Extract the generic-identifier normalization or bound-parsing implementation into a separate module.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e64329fa1c753a347f58697bb6ff5ede223f2b8e39b5fab8e473c9f8909c061c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T20:01:13Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical_bindings.rs",
+              "line": 52,
+              "message": "`generic_parameter_list_end` treats every `>` except an arrow as a nesting delimiter, including `>` inside character literals or nested const-generic expressions. With generic `if`, a target containing `const fn if<F: Trait<{ '>' as usize }>>(_: F) -> usize { 1 } if(value)` closes the scan early, fails to register the raw-identifier function, and then rejects the otherwise valid normalized target at the later call. The scan must skip literals and respect nested expression delimiters.",
+              "severity": "P0"
+            },
+            {
+              "category": "data_corruption",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 280,
+              "message": "The normalizer rewrites keyword-looking tokens inside macro token trees. For a declared generic `type`, `(type, [u8; stringify!(type).len()])` becomes `(r#type, [u8; stringify!(r#type).len()])`; because this still parses, the codec silently changes the macro input and resulting constant expression. Macro token trees must be treated as opaque or rejected when their spelling is ambiguous.",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 351,
+              "message": "Let-pattern names are always inserted into the enclosing brace scope, although bindings introduced by `if let` and `while let` expire with their controlled body. For example, with generic `where`, an `if let Some(where) = ... { ... }` followed by `struct S<T> where T: Copy {}` leaves `where` marked as a local and rewrites the later grammar keyword to `r#where`, rejecting a valid normalized alias target. Conditional let bindings need body-scoped expiration.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:82fc7b253fc6221f196fb573a3acd05217a65373e54efeca2bbd93c51a099824",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T20:17:18Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 261,
+              "message": "`is_local_binding` only consults `let`, closure, and item scopes; match-arm pattern bindings are never registered. For an accepted keyword generic such as `if`, the valid rustdoc-normalized target `(if, [u8; { match Some(true) { Some(if) => if if { 1 } else { 0 }, None => 0 } }])` should reconstruct the arm as `Some(r#if) => if r#if ...`. Instead the condition remains keyword syntax and both parse attempts fail, rejecting a representable type alias. Track match-arm bindings for the arm's scope.",
+              "severity": "P0"
+            },
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 1,
+              "message": "This new production module is 812 lines and has no test-only section, exceeding the repository's 700-line maximum for production modules. Split the lexical scanner into cohesive submodules to satisfy the module-size architecture constraint.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7f2e4c3bb9568e017e5f44bd549b013648ff4837531041810e27799d1ea79d41",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T20:47:40Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical_match.rs",
+              "line": 126,
+              "message": "`pattern_keyword_names` treats a boolean literal in a match pattern as a binding whenever a generic is named `true` or `false`. For example, rustdoc-normalized `match false { true => 1, false => 0 }` with generic `r#true` is rewritten to `match false { r#true => 1, false => 0 }`, changing the first arm into a catch-all and silently changing the const expression's value. Match patterns need the same ambiguity rejection already applied to `let` patterns.",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 269,
+              "message": "The binding environment omits `for` patterns and nested function parameters. A valid const expression such as `for r#if in 0..1 { let _ = r#if; }` is rendered by rustdoc as `for if in ...`; because `if` is absent from `is_local_binding`, it remains control-flow syntax and `syn` rejects the otherwise valid alias target. Collect these binders with their lexical scopes before normalization.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:554f42d5f05af5120e6d075f9033da70672bfdfdf8184b6cdef7203428325c41",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T21:13:33Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical_bindings.rs",
+              "line": 416,
+              "message": "Boolean `for`-pattern binders are discarded from the recorded scope. For a generic named `r#true`, rustdoc-normalized input such as `for true in [false] { if true { ... } }` has its pattern restored to `r#true`, but the body occurrence remains the literal `true`. The normalized expression still parses, so the alias is encoded with different semantics. Reject these ambiguous boolean loop patterns or retain the binder throughout the loop body.",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 476,
+              "message": "Generic-bound parsing normalizes before parsing without applying the boolean-binding ambiguity checks used by `parse_type_ref_with_generics`. A bound containing `Bound<{ match false { true => if true { 0 } else { 1 }, false => 2 } }>` for a generic originally named `r#true` is therefore accepted as literal boolean patterns instead of the original binder, silently changing the const expression. Apply the same fail-closed ambiguity validation to bound parsing and validation.",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 269,
+              "message": "Every `for` token in a const expression is treated as a possible loop head. `for_binding_scope` does not distinguish an HRTB such as `for<'a> fn(&'a ())` and scans across item/block boundaries until a later loop's `in`. With a generic named `r#fn`, it consequently rewrites the HRTB and intervening function-item `fn` tokens to `r#fn`; the normalized parse fails, and the fallback cannot repair the rustdoc-stripped generic reference. Recognize actual `for PAT in` grammar and stop the scan at the enclosing expression/item boundary.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:96b28a8c6480766ba33ec4b5d491b54c1ccd98e6bea0b87312b216b1d049957f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T21:28:15Z",
+          "findings": [
+            {
+              "category": "semantic-corruption",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 85,
+              "message": "The ambiguity gate covers `let`, `for`, and `match` patterns but not closures or nested function parameters, even though the normalizer rewrites those binders. With generic `true`, `(true, [u8; (|true: bool| if true { 1 } else { 0 })(false)])` is accepted; the parameter becomes `r#true` while `if true` remains a literal, silently changing the original raw-identifier expression. Reject ambiguous boolean spellings in every supported binder before normalization.",
+              "severity": "P0"
+            },
+            {
+              "category": "valid-input-rejection",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical_binding_scan.rs",
+              "line": 63,
+              "message": "The ambiguity scanner descends into macro token trees, unlike the normalizer which treats macro invocations as opaque. A valid target such as `(true, Foo<{ stringify!(let true = 1).len() }>)` is therefore rejected because the tokens inside `stringify!` are mistaken for an actual binding. Skip complete macro invocations in all ambiguity scanners.",
+              "severity": "P1"
+            },
+            {
+              "category": "validation-symmetry",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/validate.rs",
+              "line": 39,
+              "message": "Codec validation normalizes and parses generic-aware bounds/types without applying the parser's ambiguity checks. For example, an alias generic named `true` with bound `Trait<{ let true = 1; true }>` passes document decode/encode validation but is later rejected by extended-crate encoding. Reuse the same fail-closed validation at both boundaries so accepted catalogue documents remain encodable.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c24805e0ec810ac117dee1839ac108cfe0892bab854ed99b1e4871b23aea74c1",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T21:50:58Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 327,
+              "message": "Boolean const arguments are normalized as type parameters. With generic `true`, the rustdoc-normalized target `(true, Foo<true>)` (source `(r#true, Foo<true>)`) becomes `(r#true, Foo<r#true>)`, changing `GenericArg::Const(true)` into a generic type argument and producing an incorrect extended-crate graph. Recognize or reject ambiguous unbraced boolean const arguments before restoring raw identifiers.",
+              "severity": "P1"
+            },
+            {
+              "category": "input validation",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical_binding_scan.rs",
+              "line": 223,
+              "message": "The boolean-parameter ambiguity check treats every `fn(...)` as a binding-pattern list, including bare function-pointer types. Consequently, generic `true` with target `fn(true) -> true`—the normalized form of valid `fn(r#true) -> r#true`—is rejected before normalization. Distinguish function items and actual parameter patterns from bare-function input types and type annotations.",
+              "severity": "P1"
+            },
+            {
+              "category": "input validation",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical_match.rs",
+              "line": 37,
+              "message": "Match-arm ambiguity checking scans everything before `=>`, including the guard, as a pattern. For generic `true`, a valid target containing `Some(_) if true => ...` is rejected because the guard literal is mistaken for an ambiguous binding. Stop pattern scanning at the top-level guard `if` and exclude opaque macro token trees.",
+              "severity": "P1"
+            },
+            {
+              "category": "validation symmetry",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/encode.rs",
+              "line": 161,
+              "message": "Alias where-predicates are serialized without the generic-aware validation used by decoding. An in-memory alias declaring generic `true` with an ambiguous predicate such as `Trait<{ let true = 1; true }>` encodes successfully, but decoding that emitted JSON returns `InvalidEntry`, breaking the codec round-trip contract. Derive the effective alias generics and apply the same generic-aware predicate validation on encode.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6711889cfb854d9cae8678905856ab59ea956a25a8858157c954b32ec2c37e0f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T22:12:22Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical_binding_scan.rs",
+              "line": 352,
+              "message": "`generic_close_is_delimited` excludes `+`. For an alias generic named `r#true`, the normalized target `dyn Trait<true> + Send` therefore bypasses ambiguity detection and is rewritten as `dyn Trait<r#true> + Send`, silently changing a const argument into `Type::Generic(\"true\")`. Treat `+` as a valid post-generic delimiter so this ambiguous input fails closed.",
+              "severity": "P0"
+            },
+            {
+              "category": "validation",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical_binding_scan.rs",
+              "line": 286,
+              "message": "The generic-argument ambiguity scan searches the entire `<...>` range, including braced const expressions. Consequently, a valid and explicitly disambiguated target such as `(true, Foo<{ true }>)` is rejected whenever the alias declares generic `r#true`. Restrict detection to unbraced generic arguments.",
+              "severity": "P1"
+            },
+            {
+              "category": "round_trip",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/encode.rs",
+              "line": 168,
+              "message": "Only aliases supply generic names when encoding type-entry where predicates. A generic struct or enum such as `Container<r#type> where r#type: Clone` decodes successfully using its entry generics, but encoding validates `type` with an empty context and rejects it. Non-alias type entries must pass `entry.generics()` to the predicate validator too.",
+              "severity": "P1"
+            },
+            {
+              "category": "validation",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical_binding_scan.rs",
+              "line": 225,
+              "message": "The parameter ambiguity check scans complete parameter lists rather than just their pattern portions. Thus a type annotation such as `_: true` in normalized `const fn f<true: Copy>(_: true)` is reported as an ambiguous boolean binding, although the colon makes it unambiguously a type reference. Split each parameter at its top-level colon before scanning.",
+              "severity": "P1"
+            },
+            {
+              "category": "validation",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical_match.rs",
+              "line": 168,
+              "message": "Match-pattern scanning does not skip macro invocation token trees. With generic `r#true`, the valid array length `match true { pat!(true) => 1, _ => 0 }` is rejected because the literal inside `pat!(...)` is treated as an exposed pattern token, even though the normalizer otherwise treats macro invocations as opaque. Skip macro invocations during this scan.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:79f68785c90d51582ca8420e495f3005779dac6fbd29e5c587b19606f612cd84",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T22:33:30Z",
+          "findings": [
+            {
+              "category": "semantic_corruption",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical_binding_scan.rs",
+              "line": 387,
+              "message": "`generic_angle_close` treats every `>` as an angle-bracket close even inside `{...}`. For the valid normalized target `(true, Foo<{ 8 >> 2 }, true>)` with generic `true`, the first shift operator is mistaken for the generic close, so the ambiguity check misses the trailing boolean const and normalization rewrites it to `r#true`, encoding a type argument instead of a const argument. Track nested brace/parenthesis/bracket and macro-token-tree depth before consuming `>`.",
+              "severity": "P0"
+            },
+            {
+              "category": "round_trip",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/encode.rs",
+              "line": 411,
+              "message": "The generic-less wrapper is still used by method, trait, function, and impl encoders even though those declarations carry their own generic lists. A valid normalized declaration such as generic `type` with `where type: Clone` now fails the newly added syntax validation because `type` is parsed without its generic context; corresponding decode callers have the same omission. Pass each declaration's generic names to the generic-aware converter.",
+              "severity": "P1"
+            },
+            {
+              "category": "validation",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical_binding_scan.rs",
+              "line": 235,
+              "message": "Every single `|` is treated as a possible closure opener. In a valid const expression such as `true | true | false`, the two bitwise-OR operators are paired as closure delimiters and the middle literal is rejected as an ambiguous parameter whenever the alias declares generic `true`. Require an expression context that can actually begin a closure before scanning closure parameters.",
+              "severity": "P1"
+            },
+            {
+              "category": "validation",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical_binding_scan.rs",
+              "line": 122,
+              "message": "The inner `let`-pattern scan does not skip macro invocation token trees. Consequently a valid target containing `if let pat!(true) = true` is rejected when the alias has generic `true`, even though the normalizer preserves macro invocations verbatim and the other ambiguity scans treat them as opaque. Advance past `macro_invocation_end` within this scan as well.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3b87b4cd8be9a5318466e20fb5bd1b97a125992068ecd72064c586c42e7fd60a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T22:56:06Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical_binding_scan.rs",
+              "line": 462,
+              "message": "The ambiguity scanner treats identifiers inside comments as live tokens. For example, an alias declaring generic `true` with the valid target `Foo</* true */ u8>` is rejected as an ambiguous boolean argument even though the only argument is `u8`. Line and block comments must be skipped as opaque lexical regions before testing identifiers.",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical_bindings.rs",
+              "line": 77,
+              "message": "`generic_parameter_list_end` increments angle depth for `<` inside parentheses/brackets/braces but ignores the corresponding `>` there. Consequently a nested item such as `fn f<T: Fn(Foo<u8>)>(...)` never yields a parameter scope; keyword-named parameters used in its body can then be left as control-flow syntax, rejecting an otherwise valid alias target. Apply the delimiter-depth guard symmetrically to `<` and `>`.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs",
+              "line": 702,
+              "message": "This production module is 702 lines despite the repository's hard 700-line maximum, and its extraction comment incorrectly claims the split keeps it within budget. Move the remaining responsibility or trailing declaration context into the new helper module so the production file is at most 700 lines.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:76404ca32e3c72c7c029bd211e7cea26aa7bd4173c2f9755a3619352bb91ca14",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T23:08:44Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical_match.rs",
+              "line": 146,
+              "message": "The match-pattern ambiguity scanner skips literals but not comments. With a generic named `true`, valid input such as `(true, [u8; { match 0 { /* true */ _ => 1 } }])` is rejected because `pattern_contains_boolean_literal` treats `true` inside the comment as an arm pattern. Skip line and nested block comments throughout the match scanner before inspecting tokens or delimiters.",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/normalizer_helpers.rs",
+              "line": 46,
+              "message": "Keyword-position lookahead ignores comments, so comment-separated syntax keywords are rewritten as generic identifiers. For example, with generic `dyn`, `dyn /* comment */ Trait<dyn>` becomes `r#dyn /* comment */ Trait<r#dyn>` and fails parsing; the fallback also fails on the normalized inner generic, rejecting the valid source-equivalent `dyn /* comment */ Trait<r#dyn>`. Make the lookahead and main normalizer treat comments as opaque whitespace.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0cf0a7a17ae54998f6d9974f7cccc95ef5589dd8110ff67fdbcf6c8eafe33b09",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T23:21:16Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 152,
+              "message": "The main identifier normalizer still does not treat comments as opaque, even though the new helper scanners do. Comment delimiters therefore mutate its brace/array/parenthesis state: with generic `dyn`, valid normalized input `/* { */ dyn Trait<dyn>` (source-equivalent to `/* { */ dyn Trait<r#dyn>`) enters const-expression mode from the brace inside the comment and rewrites the syntax `dyn`, causing parsing to fail. Copy comments wholesale with `comment_end` before updating lexical state or inspecting identifiers.",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical_binding_scan.rs",
+              "line": 391,
+              "message": "The fail-closed boolean-ambiguity check can be bypassed when a comment separates a type path from its generic arguments. For generic `true`, `Foo /* comment */ <true>` makes `looks_like_generic_open` see the comment terminator `/` instead of `Foo`, so ambiguity validation passes and normalization silently converts the possible boolean const argument into `Foo<r#true>`/`Type::Generic`. Make the generic-open and close delimiter checks skip comments as well as whitespace.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6e0adb542384c0dacde4485f48184c46b268320d4208fdf2c696cb7d188a1133",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T23:31:00Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical_binding_scan.rs",
+              "line": 533,
+              "message": "The ambiguity scan treats every top-level `true`/`false` token inside angle brackets as a boolean argument, including associated-item bindings such as `dyn Trait<true = u8>`. When an alias generic is named `true`, this valid spelling could be losslessly normalized to `r#true`, but validation rejects it before normalization. Inspect the token's syntactic role and only reject standalone ambiguous boolean arguments.",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical_binding_scan.rs",
+              "line": 490,
+              "message": "The generic-close delimiter list excludes `(`. Consequently, an alias target such as `[u8; core::mem::size_of::<true>()]` with generic `true` bypasses ambiguity validation; const-expression normalization then preserves `true` as a boolean literal, silently changing the intended `::<r#true>()` type argument. Recognize turbofish call continuations or otherwise validate the argument role before accepting it.",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/normalizer_helpers.rs",
+              "line": 265,
+              "message": "Pointer/reference modifier detection skips whitespace but not comments. For a generic named `const`, normalized input `* /* comment */ const const` should become `* /* comment */ const r#const`; instead the first `const` is misclassified and rawified too, causing a valid type to be rejected. Determine the preceding syntactic token while treating comments as trivia.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3d73065f9df69d4fb888bd48d671785e7f6f91fffd8fddfaeebbcaef32ef3d06",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T23:42:00Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical_binding_scan.rs",
+              "line": 535,
+              "message": "The boolean-argument ambiguity check exempts associated equality bindings ending in `=`, but not associated bound constraints ending in `:`. With an alias generic named `true`, the valid normalized target `dyn Trait<true: Send>` can be losslessly restored to `dyn Trait<r#true: Send>`, yet it is rejected as an ambiguous boolean argument. Exempt syntactically named associated constraints as well as equality bindings.",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical_binding_scan.rs",
+              "line": 490,
+              "message": "The generic-close delimiter list still excludes `{`. A const expression such as `S::<true> { value: 0 }` therefore bypasses fail-closed ambiguity detection when `true` is an alias generic; normalization leaves it as a boolean const argument instead of detecting the possible `::<r#true>` type argument. Recognize struct-literal continuations after turbofish generic lists.",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical_binding_scan.rs",
+              "line": 67,
+              "message": "Binding-pattern modifier detection skips whitespace but not comments. For a generic named `mut`, the valid normalized target `[mut; { let mut /* comment */ value = 0; 1 }]` is transformed into an invalid `let r#mut ... value` pattern; the original fallback also cannot parse the unraw element type, so the adapter rejects a valid alias. Treat comments as trivia when locating the identifier following `mut`/`ref`/`box`.",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical_bindings.rs",
+              "line": 282,
+              "message": "The `for`-pattern boundary scan does not skip comments, so an `in` token inside a comment terminates the pattern early. For an alias generic named `true`, `[true; { for /* in */ true in 0..1 {} 1 }]` then bypasses the boolean-binding ambiguity gate and is parsed with `true` as a literal pattern rather than the normalized `r#true` binding. Make comments opaque while locating the real `in` separator.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:057c67d649b2f3ded208e10d34ab3636c50baebd3f57361a77b769457269d414",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T23:48:56Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 117,
+              "message": "`next_identifier` skips whitespace but not comments. In an alias target such as `[true; { const fn /* comment */ f(true: usize) { } 0 }]` with generic `true`, the normalizer cannot recognize `fn` as syntax and rewrites it to `r#fn`; the normalized parse then fails, while the original fallback cannot parse the unraw element type. Treat comments as trivia in identifier lookahead.",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 138,
+              "message": "`macro_invocation_end` counts delimiters inside comments. For `[u8; m!(/* ) */ Foo<true>)]` with generic `true`, it ends the opaque macro at the commented `)`, after which the ambiguity scanner examines `Foo<true>` and rejects an invocation that should remain opaque. Skip comments while matching macro delimiters.",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical_bindings.rs",
+              "line": 590,
+              "message": "Binding-scope delimiter matching does not skip comments. A parameter list such as `const fn f(/* ) */ true: usize)` is truncated at the commented `)`, so a boolean-named generic binding bypasses ambiguity validation and is interpreted as a literal pattern. The same issue affects brace-based and closure-body scope tracking. Make comments opaque in the delimiter walkers.",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 388,
+              "message": "`collect_let_binding_names` scans identifiers inside comments. With generic `return`, `[return; { const fn f() { let /* return */ x = 0; return; } 0 }]` falsely records a local named `return`, causing the real control-flow keyword to be rewritten as `r#return` and silently changing the parsed expression. Skip comments before collecting binding names.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7e7c32c57e7433d0190d65027a820bb0f77578cb00d66988f040ad368c979c05",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T00:07:21Z",
+          "findings": [
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 109,
+              "message": "Comment-separated syntax is still misclassified because this lookahead skips only whitespace. For example, an alias target equivalent to `[r#loop; { loop /* comment */ {} }]` is normalized from `[loop; { loop /* comment */ {} }]` by changing the loop-expression keyword to `r#loop`; the normalized parse fails, while the original spelling cannot parse the generic element type. Valid keyword-generic aliases containing comments are therefore rejected. Make this shared lookahead skip comments as well as whitespace.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical_bindings.rs",
+              "line": 10,
+              "message": "`item_binding_name` treats the first `/` of a comment as the item name. With a target such as `[if; { const fn /* comment */ if() -> usize { 1 } if() }]`, the keyword-named function is not registered as a local binding, so its declaration/call is not restored to `r#if` and the valid alias is rejected. Skip comments while locating the name after an item keyword.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical_bindings.rs",
+              "line": 114,
+              "message": "The closure-parameter terminator scan does not treat comments or literals as opaque, so a `|` inside a comment prematurely closes the parameter list. A keyword-named parameter appearing afterward is then omitted from the closure scope; for example, the body call in `|x /* | */, fn: fn()| fn()` remains `fn()` instead of `r#fn()`, rejecting or changing a valid normalized alias target.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical.rs",
+              "line": 173,
+              "message": "Conditional-let scope detection is not comment-aware: `previous_identifier` cannot recognize `if /* comment */ let`, and the subsequent body scan also counts braces inside comments. The binding is consequently promoted to the entire const-expression scope or given the wrong end, which can rawify later syntax—for example, a local `r#fn` from the conditional can cause a following `type X = fn()` to become `type X = r#fn()`. This rejects or semantically changes valid alias targets.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical_binding_scan.rs",
+              "line": 331,
+              "message": "The boolean-parameter ambiguity scanner interprets delimiters inside comments. In `fn f(/* : */ true: usize)`, the colon in the comment terminates `parameter_segment_contains_boolean` before the normalized `true` parameter, so the required fail-closed ambiguity error is bypassed and the parser can silently treat the raw identifier as a boolean literal pattern. Both parameter-segmentation loops need comment/literal skipping.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical_binding_scan.rs",
+              "line": 520,
+              "message": "The generic-close whitelist omits valid expression continuations such as the `as` cast keyword and several operators. Thus a normalized ambiguous argument in `f::<true> as fn()` is not examined when `true` is also a declared generic name; the adapter silently encodes it as the boolean const argument even when the source used the type argument `r#true`. Determine generic closure from Rust token context or include all valid continuations so the ambiguity gate remains fail-closed.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:fc07b7478b99412ed54e4777e05c1ea2840e42b9663f1871a95fa59875ccbda7",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T00:58:35Z",
+          "findings": [
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 87,
+              "message": "The `fn` rule only preserves a named function item when the name is immediately followed by a parenthesis group. A valid nested item such as `fn f<T>() {}` has `<` after the name, so with a generic named `fn` the syntax keyword is rewritten to `r#fn`. An alias target such as `(fn, [u8; { fn f<T>() {} 0 }])` is therefore rejected even though its raw-identifier source is valid.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 102,
+              "message": "`mut`, `ref`, and `box` are preserved as modifiers only when the immediately preceding token is `let`. This rewrites ordinary type/pattern modifiers: for example, normalized `&mut mut` for `type Alias<r#mut> = &mut r#mut` becomes `&r#mut r#mut` and cannot parse. Modifier detection must cover reference and nested-pattern grammar, not just `let mut`.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 104,
+              "message": "The `as` rule rewrites every ordinary cast delimiter because the preceding token is normally the expression, not another `as`. With a declared generic named `as`, a target containing both the generic type and an unrelated `0 as usize` cast changes the cast keyword to `r#as`, making a valid alias fail parsing. The cast delimiter needs to be recognized from its syntactic position.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 110,
+              "message": "Several control-flow keyword rules recognize only one narrow following-token shape. For example, `if (condition)` is rewritten because the condition is a parenthesis group, `else if` is rewritten because `if` is not a brace group, and `return 0`/`break 1` are rewritten because they are not immediately followed by `;`. When the alias declares the corresponding keyword generic, these valid constructs inside const expressions become invalid raw-identifier expressions.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 114,
+              "message": "The `in` separator is preserved only when its immediately preceding token is `for`, but every real `for` loop has a pattern between those tokens. Consequently, with a generic named `in`, even `for _ in 0..1` is normalized to `for _ r#in 0..1`. Valid alias targets containing a loop—such as one inside a nested function in a const block—are rejected.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 117,
+              "message": "Unhandled keywords are always restored as raw identifiers, even when they are syntax. This silently changes a precise-capture bound such as `use<use>` (for a generic named `use`) into the syntactically valid trait path `r#use<r#use>`, so `GenericBound::Use` is encoded as `TraitBound`. It also rejects nested items such as `type X = u8` when `type` is a declared generic. Syntax keywords need contextual handling rather than the unconditional default.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 23,
+              "message": "Whitespace-separated absolute trait paths are repaired only when `dyn`/`impl` begins the entire input. In a nested type such as `Box<dyn ::Trait>`, `dyn` is rewritten to `r#dyn` when `dyn` is also a generic name, and the post-processing at the start of `normalize` does not restore it. The adapter then silently encodes a projection rooted at the generic instead of the intended trait object.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 173,
+              "message": "Boolean ambiguity validation rejects every normalized `true` or `false` token outside an associated binding, regardless of grammatical position. This rejects unambiguous supported declarations such as `type Alias<r#true> = r#true`, whose catalogue target is the bare type `true`; a boolean literal cannot occupy that top-level type position. The fail-closed check must distinguish genuinely ambiguous generic/const positions from type-only positions.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7778e628185ae6519bc4c6175cefeb2134ca324d0fc903c1f9f7f015c3f4c7cd",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T01:21:45Z",
+          "findings": [
+            {
+              "category": "codec correctness",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/encode.rs",
+              "line": 379,
+              "message": "Nested methods are validated using only their method-level generics. For a trait/impl/type generic named `r#type`, a method predicate such as `Vec<type>: Clone` or a method-generic bound containing `type` is rejected because enclosing generic names are absent; decoding has the same omission. Combine enclosing and method generic contexts in both codec directions.",
+              "severity": "P1"
+            },
+            {
+              "category": "codec correctness",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs",
+              "line": 646,
+              "message": "Trait generics are decoded after supertrait bounds and are not passed to associated-type/const decoders. Consequently, an encoded trait such as `trait Foo<r#type>: Super<r#type>` (or an associated item using that parameter) emits normalized `type` spellings that the decoder rejects, breaking encode/decode symmetry.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 34,
+              "message": "Boolean ambiguity validation exempts only an exact bare type. Unambiguous type-position uses such as `&'static true`, `fn(true)`, or `(true,)` are rejected whenever `true` is a declared raw generic, even though these positions cannot represent boolean expressions and can safely be restored to `r#true`.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 304,
+              "message": "The boolean scanner treats any declared boolean keyword followed by `=` inside angle brackets as an associated binding. In a valid const argument such as `Assert<{ true == false }>` with a generic named `r#true`, validation therefore passes and normalization rewrites the literal to `r#true`, silently changing the encoded type instead of failing closed.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 111,
+              "message": "The `const` classifier treats every occurrence following `&` as syntax, although references have no `const` modifier. A valid raw-generic type such as `fn(&r#const)` is normalized by rustdoc to `fn(&const)` and is left unescaped here, so both parse attempts fail.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 137,
+              "message": "Declared generics named `return`, `break`, or `continue` are restored only when directly followed by `:`. Ordinary references such as `Vec<return>` therefore remain keywords and cannot be parsed, rejecting valid aliases declared with `r#return` (and equivalently `r#break`/`r#continue`).",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 140,
+              "message": "The `type` branch assumes any following identifier denotes a type-item declaration. This misclassifies qualified-self references: `<type as Trait>::Assoc` from an alias generic `r#type` is left unchanged and rejected by `syn`. Several other syntax-head branches have the same qself failure, so qself detection must precede keyword-specific classification.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 173,
+              "message": "A binding/reference modifier is recognized only when its next token is an identifier. In `&mut (mut,)` for a generic named `r#mut`, the first `mut` is valid modifier syntax but is followed by a parenthesized group, so it is rewritten to `r#mut`; the normalized form and the original normalized rustdoc spelling both fail to parse.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 217,
+              "message": "Whitespace-path restoration compares occurrence indexes from all source keyword tokens against indexes from only rewritten raw tokens. With `(dyn, Box<dyn Trait>, Box<dyn ::core::fmt::Debug>)`, the intervening unchanged `dyn Trait` shifts the source index, so the final trait-object `dyn` remains `r#dyn` and is encoded as a generic projection instead of a `DynTrait`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1d0b5f51237ce78b8c311f2e954e04aea222ae8cc0e2660419fd9dd6b1b5eeba",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T01:46:40Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 359,
+              "message": "The boolean ambiguity gate mistakes the `=` in a match fat arrow for an associated binding because it excludes `==` but not `=>`. With a declared generic named `true`, `(true, Foo<{ match FLAG { true => 1, false => 0 } }>)` passes validation and normalization changes the boolean pattern to the identifier binding `r#true`, silently altering semantics.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 401,
+              "message": "A comma is always classified as introducing a type position, even inside generic arguments where the following argument may be a const. For generic `true`, `(true, Foo<0, true>)` is accepted and normalized to `(r#true, Foo<0, r#true>)`, converting the boolean const argument into a type argument.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 364,
+              "message": "The ambiguity validator rejects `use<true>` when `true` is a declared raw generic, although a precise-capture argument is unambiguously an identifier or lifetime and the new precise-capture converter supports it. This prevents valid keyword-generic bounds from round-tripping.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 177,
+              "message": "`qself_type_identifier` does not require the candidate identifier to follow `<`; it marks any non-leading keyword with a later top-level `as` as a qself type. For example, with generic `if`, `(if, Foo<{ let flag = true; if flag as usize != 0 { 1 } else { 0 } }>)` rewrites the real `if` keyword to `r#if`, making the valid type unparseable.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 313,
+              "message": "Source occurrence counting ignores already-raw identifiers while output occurrence counting includes them. Mixed input such as `(r#dyn, dyn ::Trait<dyn>)` shifts the occurrence indexes, removes the user's first raw marker, and fails to restore the actual whitespace-sensitive `dyn` syntax occurrence, so a valid type cannot be parsed despite the API promise to preserve raw spellings.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 122,
+              "message": "Every declared-generic occurrence of `const` is rewritten unless preceded by `*`, including real const-item syntax. With generic `const`, `(const, Foo<{ const N: usize = 0; N }>)` rewrites both occurrences, making the nested item invalid; fallback parsing also fails on the normalized outer generic.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 134,
+              "message": "The control-flow syntax detector only recognizes a few operand shapes. Valid blocks such as `let (x, y) = ...`, `if !flag`, `match 0`, and `for (_, _) in values` have their syntax keywords rewritten when the same spelling is a declared generic, causing otherwise valid catalogue type references to be rejected.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs",
+              "line": 716,
+              "message": "This production module is 716 lines and has no test-only section, exceeding the repository's explicit 700-line maximum for production modules. The extraction into `decode_assoc.rs` and `decode_impls.rs` therefore does not yet satisfy the infrastructure architecture gate.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:711cb265ca181ba9841e970db201ae89a784c3509588fd2cd1a11aa845840902",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T02:19:15Z",
+          "findings": [
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_ctx.rs",
+              "line": 152,
+              "message": "Resolve declared generics before primitive types. For `type Alias<r#bool> = r#bool`, rustdoc-normalized `bool` is returned as `Type::Primitive(\"bool\")` before `generic_params` is consulted, while rustdoc emits `Type::Generic(\"bool\")`; valid aliases using primitive-spelled generic names therefore fail structural equality.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 428,
+              "message": "Do not classify every angle-depth-zero boolean token as a type. With a declared `r#true` generic, normalized `(true, [u8; true as usize])` passes validation and the array-length literal is rewritten to `r#true`, changing the encoded constant expression instead of failing closed.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 93,
+              "message": "Exclude lifetime identifiers from raw-generic restoration. A valid declaration such as `type Alias<r#static: 'static> = r#static` rewrites the lifetime bound to `'r#static`; lifetime conversion then preserves that spelling instead of rustdoc's `'static`, causing a false structural mismatch.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 175,
+              "message": "Recognize nested block-item keywords before the default rawification branch. For a valid target such as `(r#static, [u8; { static N: usize = 1; N }])`, rustdoc normalization removes the first `r#`, after which this code also rewrites the item head to `r#static N`; normalized parsing fails and fallback parsing cannot parse the bare outer `static`, so a valid catalogue is rejected.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/decode_impls.rs",
+              "line": 84,
+              "message": "Seed duplicate detection with `outer_generic_names`. The decoder currently accepts an enclosing `T` and a nested method generic also named `T` (for example `trait Service<T> { fn run<T>(); }`), although Rust rejects this with E0403, allowing an impossible declaration through the adapter boundary.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 98,
+              "message": "Do not assume every keyword immediately after `<` in a qualified path is the generic qself identifier. With a generic named `r#fn` and target `(r#fn, <fn() as Marker>::Assoc)`, rustdoc-normalized input causes both `fn` tokens to be rawified; the normalized form is invalid while the original cannot parse the first bare `fn`, so a valid source declaration is rejected.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:11a9aeea2da1458aa369adf917de823767a589b3515b980163e3bacb1065ea8b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T02:33:55Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 103,
+              "message": "A valid qself whose self type begins with trait-object syntax is mistaken for a keyword-named generic. For example, with a generic named `dyn`, the rustdoc-normalized target `(dyn, <dyn Marker as Other>::Assoc)` needs only the first occurrence restored. `qself_type_identifier` also forces the second `dyn` to `r#dyn`, making the normalized qself invalid, while parsing the original fails on the actual generic occurrence. Valid aliases combining a `dyn` generic with a trait-object qself are therefore rejected.",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 183,
+              "message": "The keyword-preservation rules omit legal block items such as `struct`, `enum`, `trait`, `mod`, and `use`. For example, rustdoc-normalized `type Alias<r#struct> = (r#struct, [u8; { struct S; 0 }]);` is rewritten with both occurrences as `r#struct`, corrupting the local item declaration. The normalized form is invalid and the original cannot parse because of the real generic occurrence, so valid catalogue input is rejected.",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 477,
+              "message": "Boolean keyword generics in nested array or slice element position are incorrectly classified as ambiguous. For `Option<[r#true; 1]>`, rustdoc supplies `Option<[true; 1]>`; recursion enters the bracket group's contents at nonzero angle depth, but the opening bracket is no longer present as a token, so the `previous == '['` check can never recognize `true` as the element type. Validation rejects this valid alias before raw-identifier restoration can occur.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0a5c67f9351d376ac74d7403db01fe37cc1bae69cee23d8f62ad9f37b39b518f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T02:42:30Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 105,
+              "message": "The qself syntax exemption for `dyn` only handles an identifier immediately after `dyn`. A valid lifetime-first trait object such as `type Alias<r#dyn> = (r#dyn, <dyn 'static + Marker as Other>::Assoc);` reaches this branch with `'` as the next token, so the qself occurrence is incorrectly restored to `r#dyn`. The normalized form is invalid, while parsing the original rustdoc spelling fails on the actual generic occurrence, causing a valid alias to be rejected.",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 190,
+              "message": "Nested item heads are now preserved, but syntax within those items is still rewritten. For example, in the valid alias `type Alias<r#where> = (r#where, [u8; { fn f<T>() where T: Copy {} 0 }]);`, the outer `where` must become `r#where` while the function's `where` clause must remain syntax. The default branch rewrites both, making normalized parsing fail; fallback parsing also fails on the real generic occurrence. Valid catalogue targets containing nested items with keyword clauses or modifiers are therefore still rejected.",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 459,
+              "message": "The array-length ambiguity scan loses its `in_length` state when it enters a nested group. Consequently, a valid source such as `type Alias<r#true> = (r#true, [u8; (true as usize)]);` is not rejected after rustdoc normalizes both occurrences to `true`: the parenthesized literal is missed by `contains_array_length_boolean`, then treated as a type-position occurrence and rewritten to `r#true`. This bypasses the intended fail-closed gate and changes the array-length expression instead of reporting the ambiguity.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:257a502f98658baf09e8c708d7046a25cbb7e66b88c15066728e3e9db11fd587",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T02:55:02Z",
+          "findings": [
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 191,
+              "message": "The keyword restorer still rewrites valid syntax tokens that are not covered by the special cases. For example, with a generic named `async`, the valid target `(async, [u8; { async fn f() {} 0 }])` restores both occurrences to `r#async`; the nested item becomes invalid, while parsing the original also fails at the generic reference. Lifetime- or qself-leading nested `where` clauses have the same problem. Legitimate rustdoc-normalized aliases are therefore rejected.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 495,
+              "message": "Boolean ambiguity detection does not recognize all unambiguous type positions. For a generic named `true`, a valid target such as `Box<*const true>` is rejected because the pointee follows `const` rather than one of the predecessors checked here; `<true as Trait>::Assoc` is similarly rejected after `<`. These positions cannot contain boolean literals and should be normalized as raw type identifiers instead of failing closed.",
+              "severity": "P1"
+            },
+            {
+              "category": "codec-symmetry",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/encode.rs",
+              "line": 384,
+              "message": "The combined outer/method generic context is used to validate where predicates during encoding, but method generic bounds are still serialized through the infallible `method_generic_params_to_dtos`. The decoder now validates those bounds with the combined context, so an in-memory declaration such as generic `true` with bound `Marker<true>` encodes successfully and then cannot decode due to the ambiguity gate. Apply the same generic-aware validation on encode for method/function/trait/impl generic declarations.",
+              "severity": "P1"
+            },
+            {
+              "category": "codec-symmetry",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/encode.rs",
+              "line": 512,
+              "message": "Trait encoding computes `generic_names` but does not use them when serializing associated-type bounds/defaults, associated-const types, or supertrait bounds, although decoding now validates all of those fields with that context. A trait with generic `true` and an ambiguous field such as associated-const type `Option<true>` therefore encodes JSON that the decoder rejects. These fields need symmetric generic-aware encode validation.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3d2d9ef89d2a56be1999cba38e2239ddaf6b0ef3323d586e26054ade6d6fd575",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T03:06:59Z",
+          "findings": [
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 197,
+              "message": "The keyword normalizer preserves `where` only when its next token is an identifier. Valid nested clauses can instead begin with a lifetime or qualified type, such as `fn f<'a>() where 'a: 'static {}` or `where <T as Trait>::Assoc: Copy`. If the alias also declares a raw generic named `where`, the normalizer rewrites both the generic reference and this syntax token to `r#where`; normalized parsing fails, while fallback parsing fails on the unescaped generic reference. Valid aliases are therefore rejected at the conversion boundary.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 506,
+              "message": "Boolean-named generics behind `*mut` are incorrectly classified as ambiguous. For example, `Box<*mut true>` with a declared raw generic named `true` is unambiguously a type, but the scanner recognizes `*const` and not `*mut`, so conversion rejects a valid alias before normalization.",
+              "severity": "P1"
+            },
+            {
+              "category": "codec-symmetry",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/encode.rs",
+              "line": 168,
+              "message": "Non-alias `TypeEntry` generic declarations are serialized without encode-side validation. A struct or enum containing a malformed generic bound such as `T U` therefore encodes successfully, but decoding the resulting document rejects that same bound. Validate entry-level generics before converting methods, kind, and predicates to preserve codec symmetry.",
+              "severity": "P1"
+            },
+            {
+              "category": "codec-symmetry",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/encode.rs",
+              "line": 499,
+              "message": "`validate_generic_params_for_encode` validates bounds but never rejects duplicate names or method generics that shadow outer generics. Trait, function, impl, and method declarations can consequently encode duplicate/shadowing parameters that `method_generics_from_dtos_with_outer_generics` rejects when decoding the generated document.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:5dbc94641bcc3ec00413903083da219f8e3be0576eb2840049d0f6c773754c6d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T03:14:24Z",
+          "findings": [
+            {
+              "category": "codec-symmetry",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/decode_impls.rs",
+              "line": 53,
+              "message": "Decode constructs generic parameters with `ParamName::new` and checks bounds and duplicates, but it does not apply the generic-name validation now enforced during encode. Because `ParamName` accepts `_`, a struct, trait, function, impl, or method with a generic named `_` can decode successfully, while encoding the resulting document rejects it. This also admits an illegal Rust declaration at the input boundary; apply the same `is_valid_generic_param_name` check to all decoded generic declarations.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 134,
+              "message": "The keyword normalizer still rewrites valid syntax when a raw generic has the same spelling. For example, `type Alias<r#async> = (r#async, [u8; { async unsafe fn f() {} 0 }]);` is valid, but the nested `async` is rewritten because only `async fn`, `async move`, and blocks are recognized. Stable `move` closures and `pub` nested items are likewise always rewritten by the default branch. The normalized parse then fails, and fallback parsing cannot parse the unescaped generic reference, so valid aliases are rejected.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/encode.rs",
+              "line": 701,
+              "message": "This production-only module is now 701 lines, exceeding the repository's hard 700-line production-module limit. Split the encode validation/conversion helpers into a sibling module to restore the architecture constraint.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ef7c0a23112ff79a34987630de8449abdada88251222e6d579530b17426e6d73",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T03:23:42Z",
+          "findings": [
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 134,
+              "message": "The keyword normalizer preserves only a subset of valid `async`/`const` syntax. For example, with a normalized raw generic named `async`, the valid alias target `(async, [u8; { async extern \"C\" fn f() {} 0 }])` rewrites the nested item keyword to `r#async`; `async ||` closures and `const extern` functions fail similarly. The normalized parse then fails, while the fallback cannot parse the unescaped generic occurrence, so extended-crate encoding rejects valid source-derived aliases. Preserve the complete function-qualifier and async-closure contexts before restoring keyword generics.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:330276da1b521a4184c52faf4e2c57ac1fbcbbd15aaec29294bf858757b14598",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T03:29:22Z",
+          "findings": [
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 98,
+              "message": "`should_restore` still rewrites several stable Rust syntax occurrences as generic identifiers. For example, a valid source alias with generic `r#unsafe` and target `(r#unsafe, [u8; { unsafe trait Marker {} 0 }])` is normalized into a target containing `r#unsafe trait`, so both parse attempts fail. The same problem remains for `static mut` and `pub union`; postfix `.await` is silently changed to `.r#await`, altering the encoded array-length expression. This causes valid rustdoc-normalized aliases to be rejected or structurally corrupted. Recognize these stable syntax contexts before restoring raw generic spelling.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:23eaf9f24c32357fdfd94c1ca62698d04e45e45b7df222db6d100cccdaee60ed",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T03:34:29Z",
+          "findings": [
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 149,
+              "message": "The generic-keyword restorer still misclassifies raw-pointer `mut` as a generic reference. For a valid alias such as `type Alias<r#mut> = (r#mut, *mut u8);`, rustdoc's normalized target `(mut, *mut u8)` is rewritten to `(r#mut, *r#mut u8)` because `binding_modifier_syntax` does not recognize a preceding `*`. The rewritten parse fails, and the original normalized spelling cannot serve as fallback because its first `mut` is not a valid type, so the infrastructure adapter rejects a valid catalogue entry. Preserve `mut` after `*` and add an end-to-end regression test.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0fa2ac7fb5b29b2f47a4f9faa616e0eea7f8c210bd6606518c70503203b0b52e",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T03:43:54Z",
+          "findings": [
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 98,
+              "message": "Keyword restoration still misclassifies several stable Rust syntax positions as generic references. For example, with a declared generic named `as`, the valid Edition-2024 alias `type A<r#as> = (r#as, [u8; { fn f() { let _ = 0usize as *const u8; } 0 }]);` reaches the codec without `r#`; the cast operator is rewritten to `r#as`, so the normalized parse fails, while fallback parsing fails on the outer bare generic. The current match arms similarly reject valid aliases containing `for &pattern`, `use ::path`, `unsafe static`, or `async move {}` alongside the corresponding keyword-named generic. Make syntax-position recognition complete for these stable forms and add end-to-end cases.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 171,
+              "message": "Inside brace groups, several branches unconditionally preserve keywords as syntax, even when they occur in raw-identifier positions. A valid alias such as `type A<r#if> = (r#if, [u8; { fn f<r#if>() {} 0 }]);` is normalized to use bare `if`; the inner generic declaration is left unchanged because `in_const_group` is true, making the normalized parse fail, and fallback also fails on the outer bare `if`. The same problem affects `let`, `match`, `while`, `loop`, `else`, `return`, `break`, `continue`, and `in`. Disambiguate their actual token position within brace groups instead of treating every occurrence as control-flow syntax.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:324f6a3134f689b2bed2b9af831d1490b9500055a69f2d00f6e7fab519811479",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T03:50:22Z",
+          "findings": [
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 113,
+              "message": "Keyword normalization misclassifies a valid `for` loop whose irrefutable pattern is a bracket group. For example, with generic parameter `r#for`, a target containing `for [x] in [[1]]` rewrites the loop keyword to `r#for`; the normalized parse then fails, while fallback parsing fails on the other rustdoc-normalized generic references, rejecting a valid catalogue type.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 273,
+              "message": "`inside_angle_group` treats every unmatched `<` token as a generic delimiter, including comparison operators. In a valid const expression such as `1 < if !false { 2 } else { 3 }`, the `if` is consequently treated as a generic identifier and rewritten to `r#if`. When the target also contains a normalized keyword generic, both the normalized and fallback parses fail, rejecting valid input.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 219,
+              "message": "The `use` branch preserves any `use` followed by `:` inside a const group, so a rustdoc-normalized raw generic projection such as `r#use::Assoc` remains the invalid spelling `use::Assoc`. A valid target containing a nested `fn f<r#use: Tr>(_: r#use::Assoc)` therefore fails normalized parsing, and fallback parsing also fails on other normalized `use` generic references.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4aa63dc134c49ad61a8acc02f84fe62e3ee943cc849d0b5eb8ed9c2b1d193db4",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T04:01:58Z",
+          "findings": [
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 186,
+              "message": "The const-block keyword guard loses the surrounding type context when recursion enters a nested group. For example, the valid alias target `(if, [u8; { type X<if> = (if,); 0 }])` with generic `if` restores the declaration's `<if>` but leaves the nested tuple's `if` as a keyword, so both the normalized parse and original fallback fail. Valid aliases containing nested type items are therefore rejected.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_ctx.rs",
+              "line": 424,
+              "message": "Named bare-function arguments bypass `normalized_ident_name`. For `type A<r#if> = fn(r#if: r#if) -> r#if`, normalization makes syn retain the name as `r#if`, and this code emits that spelling even though rustdoc/catalogue identifiers use `if`, causing structural-equality mismatches.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 479,
+              "message": "Boolean ambiguity validation disables all type-position recognition inside const groups, including unambiguous nested generic declarations. The valid target `(true, C<{ type X<true> = (true,); 0 }>)` with generic `true` is rejected at `<true>` before normalization, so valid raw-identifier aliases cannot be encoded.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c0e0a4884cdcec35b4f2ba57e91489c14696f663f779a9b6268b7ce2b3773ffc",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T04:15:18Z",
+          "findings": [
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 188,
+              "message": "The syntax-keyword lookahead recognizes only a subset of valid Rust expression starts. For example, with a generic named `match`, the valid target `(match, C<{ match 0 { _ => 0 } }>)` rewrites the inner `match` to `r#match` because a literal is not accepted here. The normalized parse then fails, while the original fallback cannot parse the outer normalized generic reference, so the valid alias is rejected.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 483,
+              "message": "Boolean ambiguity validation treats every parenthesized group encountered at positive angle depth as a type-tuple context, even when it is inside an explicit const block. Thus `(true, C<{ (true) }>)` with generic `true` passes validation and the normalizer rewrites the boolean literal to `r#true`; the adapter emits a const path with `is_literal=false` instead of the source boolean literal, causing incorrect structural comparison rather than failing closed.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 580,
+              "message": "The nested generic-declaration detector omits `union`. A valid alias containing `union X<r#true> { value: ManuallyDrop<r#true> }` inside an anonymous const is normalized to `union X<true> ...`, but `<true>` is classified as an ambiguous const argument and rejected before raw-identifier restoration. Include union declarations in this declaration-position check.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:8a04250646337bb7adaa7369307c054c56fb397bbc4610e6276d157b493c3d12",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T04:32:09Z",
+          "findings": [
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 11,
+              "message": "The infrastructure codec rejects keyword-named generics such as `type`, although rustdoc removes `r#` from valid raw identifiers and the domain contract explicitly accepts the normalized form. A valid alias like `type Alias<r#type> = Box<r#type>` is therefore rejected during DTO decoding, preventing codec/lint and implementation comparison from round-tripping.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3cd77bb53f9d22e14ea5f6a942e74b7a8440ea8f8b10dbc48c2f4ab36b93daf8",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T04:34:44Z",
+          "findings": [
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 11,
+              "message": "The infrastructure codec rejects keyword-named generics such as `type`, although rustdoc removes `r#` from valid raw identifiers and the domain contract accepts the normalized form. A valid alias like `type Alias<r#type> = Box<r#type>` is rejected during encode/decode, breaking codec round-tripping and implementation comparison.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3cd77bb53f9d22e14ea5f6a942e74b7a8440ea8f8b10dbc48c2f4ab36b93daf8",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T04:36:30Z",
+          "findings": [
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/generic_tokens.rs",
+              "line": 11,
+              "message": "The infrastructure codec rejects keyword-named generics such as `type`, although rustdoc removes `r#` from valid raw identifiers and the domain contract accepts the normalized form. A valid alias like `type Alias<r#type> = Box<r#type>` is rejected during encode/decode, breaking codec round-tripping and implementation comparison.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3cd77bb53f9d22e14ea5f6a942e74b7a8440ea8f8b10dbc48c2f4ab36b93daf8",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T04:38:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3cd77bb53f9d22e14ea5f6a942e74b7a8440ea8f8b10dbc48c2f4ab36b93daf8",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T04:46:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3cd77bb53f9d22e14ea5f6a942e74b7a8440ea8f8b10dbc48c2f4ab36b93daf8",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T04:54:31Z",
+          "findings": [
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_type_ref_parsing.rs",
+              "line": 523,
+              "message": "Generic parameters do not shadow same-named catalogue types inside qualified bound arguments. `encode_bound_str_inner` passes the unfiltered local-type resolver into `parse_generic_bound_with_generics`; with a local type `T`, a valid alias bound such as `Into<<T as Iterator>::Item>` therefore encodes the qualified path's self type as the local `ResolvedPath` instead of `Type::Generic(\"T\")`. The later bound rewrite does not recurse into `Type::QualifiedPath`, so structural equality falsely reports a mismatch against rustdoc. Filter both bound-parser passes with `local_id_unless_generic` (as the type-reference path already does), or recursively rewrite qualified paths.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:34e23a16fee9cb921d1a29ac7771a85b0d4196afb1d7726c6064e133b0847b0d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T04:57:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b5b4c5e554e460128f76e099c0ab681153998530a1fc4a8d95919eebd7ab77d1",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T05:19:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b5b4c5e554e460128f76e099c0ab681153998530a1fc4a8d95919eebd7ab77d1",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T05:26:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b5b4c5e554e460128f76e099c0ab681153998530a1fc4a8d95919eebd7ab77d1",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -867,6 +3070,92 @@
           "hash": "rvw1:sha256:64adf21c8df0e56a1480a1dc965b77a65c48c060542c170a19455373eb0c1853",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T11:50:29Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/test-bindings.json",
+              "line": 91,
+              "message": "This newly added binding names a test that no longer exists; the same stale name also appears at lines 330 and 432. The current tests are `test_evaluate_catalogue_lint_rejects_non_raw_type_alias_generic_parameter_names` and `test_evaluate_catalogue_lint_accepts_rustdoc_normalized_raw_type_alias_generic_parameter`. Consequently, `bin/sotp test-obligation check` fails with four `bound test source not found` drifts affecting the fulfillment and AC-02/IN-02 edges. Bind these edges to the appropriate current executable tests.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:2fd9886e3963d69a9a74f4e81c5127ee899acca10f1738f83e6c56ee755821ae",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T11:54:13Z",
+          "findings": [
+            {
+              "category": "test_traceability",
+              "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/test-bindings.json",
+              "line": 91,
+              "message": "The updated AC-02/IN-02 and fulfillment evidence omits `test_evaluate_catalogue_lint_accepts_rustdoc_normalized_raw_type_alias_generic_parameter`, which exercises the distinct success branch that accepts a raw identifier after rustdoc removes its `r#` prefix. The current bindings cover ordinary identifiers and rejection cases only, so this load-bearing behavior can regress without invalidating the bound evidence. Add the test to the relevant binding lists.",
+              "severity": "P1"
+            },
+            {
+              "category": "test_traceability",
+              "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/test-bindings.json",
+              "line": 499,
+              "message": "Each `CatalogueLinterError` edge still binds only the duplicate-parameter test, although the current catalogue modification also adds `InvalidTypeAliasGenericParameterName`. The non-raw and wildcard tests exercise that new variant but are bound only to `TypeKindV2`/the function fulfillment, allowing the AC-02, CN-03, and IN-02 error-type edges to be approved without evidence for the new variant. Include the invalid-name tests in all three `CatalogueLinterError` records.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ba1a1f2e56705b2620822028f4bed5366a03d2c3a35664a45e4cfa20a65ca291",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-02T11:56:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:51774bfeb40fbf4de73216898bb099240e1a1edad13602b1873bb5208f10d019",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T12:20:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:55d76734a889637674cd5865780de1f06e3fdfd5dc01ee1048391d3d815204c1",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T12:23:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:55d76734a889637674cd5865780de1f06e3fdfd5dc01ee1048391d3d815204c1",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T12:47:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:eb4754e9e883a008e6ade6762950a1dfe6aef0a56c59b9e9dddc4fe73ac87e1c",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T13:13:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dd6ce5c6106adf5b2cfa6151a37d6736cd8b071079d72fdf6ad5da7bdd1da680",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T14:22:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fd03bd5a02652b1a02dc8885deadb1e955ba6f2fc156aef8939d009cb6c3a9e3",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T05:29:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:110c093fab7a20d82c06cd777d8529fa6379933ad542a57f6b812f7c2fea8fdd",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -898,6 +3187,13 @@
           "at": "2026-08-02T01:09:58Z",
           "findings": [],
           "hash": "rvw1:sha256:fb369761b10bf5695f4ffc5c33c0d1448c72f812a4665ae29d07de1686a7b276",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T04:59:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c2375412130f94714f71134243a53f4c310b43fdc472bd025a82033bef43623b",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -1024,6 +3320,13 @@
           "at": "2026-08-02T08:14:52Z",
           "findings": [],
           "hash": "rvw1:sha256:1085f42e786740073c9272c387e41eda148aa2cf2bdcf7486cb9d117cb67ec06",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-02T12:01:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5dc6d235e3114faf3683e73b76c54d49053b9ea0683498d5d9e5f8eda6e66ad8",
           "type": "final",
           "verdict": "zero_findings"
         }

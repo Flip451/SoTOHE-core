@@ -154,7 +154,7 @@ impl EncoderState {
                         // compare equal in `build_where_form_view`.
                         proj
                     } else {
-                        let raw = self.parse_type_ref_str(lhs_str)?;
+                        let raw = self.parse_type_ref_str_with_generics(lhs_str, generic_names)?;
                         rewrite_generic_types(raw, generic_names)
                     }
                 } else {
@@ -212,7 +212,8 @@ impl EncoderState {
                         if let Some(proj) = try_build_generic_projection(rhs_str, generic_names) {
                             proj
                         } else {
-                            let raw = self.parse_type_ref_str(rhs_str)?;
+                            let raw =
+                                self.parse_type_ref_str_with_generics(rhs_str, generic_names)?;
                             rewrite_generic_types(raw, generic_names)
                         }
                     } else {

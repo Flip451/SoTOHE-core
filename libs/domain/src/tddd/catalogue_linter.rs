@@ -41,6 +41,9 @@ use crate::tddd::primitive_occurrence_scanner::{
 #[path = "catalogue_linter_role.rs"]
 mod role;
 
+#[path = "catalogue_linter_generic.rs"]
+mod generic;
+
 /// Re-export so that consumers of `catalogue_linter` see `RoleKind` at the
 /// expected path without knowing about the `role` submodule.
 pub use role::RoleKind;
@@ -576,6 +579,16 @@ pub enum CatalogueLinterError {
         parameter_name: crate::tddd::catalogue_v2::identifiers::ParamName,
     },
 
+    /// A type alias declares a generic parameter name that cannot be used as a
+    /// declaration in the catalogue's Rust-facing representation.
+    #[error("type alias '{alias_name}' declares invalid generic parameter '{parameter_name}'")]
+    InvalidTypeAliasGenericParameterName {
+        /// Name of the alias containing the invalid declaration.
+        alias_name: crate::tddd::catalogue_v2::identifiers::TypeName,
+        /// Name rejected at the alias declaration boundary.
+        parameter_name: crate::tddd::catalogue_v2::identifiers::ParamName,
+    },
+
     /// The linter rule configuration is invalid and prevents execution.
     #[error("invalid linter rule configuration: {0}")]
     InvalidRuleConfig(FreeText),
@@ -622,6 +635,12 @@ fn validate_type_alias_generic_parameters<S: PrimitiveOccurrenceScanner>(
 
         let mut seen = std::collections::BTreeSet::new();
         for generic in generics {
+            if !is_valid_type_alias_generic_parameter_name(generic.name.as_str()) {
+                return Err(CatalogueLinterError::InvalidTypeAliasGenericParameterName {
+                    alias_name: alias_name.clone(),
+                    parameter_name: generic.name.clone(),
+                });
+            }
             if !seen.insert(generic.name.clone()) {
                 return Err(CatalogueLinterError::DuplicateTypeAliasGenericParameter {
                     alias_name: alias_name.clone(),
@@ -653,6 +672,13 @@ fn validate_type_alias_generic_parameters<S: PrimitiveOccurrenceScanner>(
     Ok(())
 }
 
+/// Returns whether an alias generic name is a plain identifier suitable for a
+/// catalogue declaration. Raw identifiers and keyword spellings are rejected
+/// so chain ③ can remain lexical.
+fn is_valid_type_alias_generic_parameter_name(name: &str) -> bool {
+    generic::is_plain_generic_identifier(name)
+}
+
 /// Evaluate catalogue-lint rules after validating every alias generic declaration.
 ///
 /// The wrapper preserves the original pure evaluator API while enforcing the
@@ -670,10 +696,6 @@ pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner>(
     }
     eval::evaluate_catalogue_lint(rules, all_catalogues, target_layer_id, scanner)
 }
-
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
 
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::indexing_slicing, clippy::panic)]
@@ -755,7 +777,8 @@ mod tests {
             _primitives: NonEmptyVec<PrimitiveName>,
             position: PrimitiveOccurrencePosition,
         ) -> Result<PrimitiveOccurrenceReport, PrimitiveOccurrenceScanError> {
-            if position == PrimitiveOccurrencePosition::Bound && type_ref.as_str().starts_with('<')
+            if position == PrimitiveOccurrencePosition::Bound
+                && (type_ref.as_str().starts_with('<') || type_ref.as_str().trim().is_empty())
             {
                 return Err(PrimitiveOccurrenceScanError::ParseFailure { type_ref });
             }
@@ -1630,6 +1653,38 @@ mod tests {
     }
 
     #[test]
+    fn test_evaluate_catalogue_lint_rejects_blank_type_alias_generic_bound() {
+        let mut catalogue = make_doc("domain");
+        catalogue.insert_type(
+            TypeName::new("BlankBoundAlias").unwrap(),
+            make_type_entry_with_kind(
+                DataRole::value_object(),
+                TypeKindV2::TypeAlias {
+                    target: TypeRef::new("Wrapper<T>").unwrap(),
+                    // `TypeRef` rejects the empty string at construction time; whitespace is
+                    // the representable blank-bound equivalent at this domain boundary.
+                    generics: vec![MethodGenericParam {
+                        name: ParamName::new("T").unwrap(),
+                        bounds: vec![TypeRef::new(" ").unwrap()],
+                    }],
+                },
+            ),
+        );
+        let all_catalogues = all_catalogues_single(&catalogue);
+        let target_layer = layer("domain");
+
+        let result =
+            evaluate_catalogue_lint(&[], &all_catalogues, &target_layer, &AliasBoundSyntaxScanner);
+
+        assert!(matches!(
+            result,
+            Err(CatalogueLinterError::ScanFailed(
+                PrimitiveOccurrenceScanError::ParseFailure { type_ref }
+            )) if type_ref.as_str() == " "
+        ));
+    }
+
+    #[test]
     fn test_evaluate_catalogue_lint_rejects_duplicate_type_alias_generic_parameter_in_any_catalogue()
      {
         let target_catalogue = make_doc("domain");
@@ -1660,6 +1715,121 @@ mod tests {
                 alias_name,
                 parameter_name,
             }) if alias_name.as_str() == "DuplicateAlias" && parameter_name.as_str() == "T"
+        ));
+    }
+
+    #[test]
+    fn test_evaluate_catalogue_lint_rejects_keyword_type_alias_generic_parameter() {
+        let mut catalogue = make_doc("domain");
+        catalogue.insert_type(
+            TypeName::new("KeywordAlias").unwrap(),
+            make_type_entry_with_kind(
+                DataRole::value_object(),
+                TypeKindV2::TypeAlias {
+                    target: TypeRef::new("Box<type>").unwrap(),
+                    generics: vec![MethodGenericParam {
+                        name: ParamName::new("type").unwrap(),
+                        bounds: vec![],
+                    }],
+                },
+            ),
+        );
+        let all_catalogues = all_catalogues_single(&catalogue);
+        let target_layer = layer("domain");
+
+        let result =
+            evaluate_catalogue_lint(&[], &all_catalogues, &target_layer, &StubPrimitiveScanner);
+
+        assert!(matches!(
+            result,
+            Err(CatalogueLinterError::InvalidTypeAliasGenericParameterName {
+                alias_name,
+                parameter_name,
+            }) if alias_name.as_str() == "KeywordAlias" && parameter_name.as_str() == "type"
+        ));
+    }
+
+    #[test]
+    fn test_evaluate_catalogue_lint_rejects_keyword_type_alias_generic_parameter_names() {
+        for parameter_name in [
+            "as",
+            "async",
+            "await",
+            "const",
+            "dyn",
+            "fn",
+            "for",
+            "impl",
+            "match",
+            "type",
+            "union",
+            "macro_rules",
+            "raw",
+            "safe",
+            "where",
+            "self",
+            "Self",
+            "super",
+            "crate",
+        ] {
+            let mut catalogue = make_doc("domain");
+            catalogue.insert_type(
+                TypeName::new("ReservedAlias").unwrap(),
+                make_type_entry_with_kind(
+                    DataRole::value_object(),
+                    TypeKindV2::TypeAlias {
+                        target: TypeRef::new("Box<T>").unwrap(),
+                        generics: vec![MethodGenericParam {
+                            name: ParamName::new(parameter_name).unwrap(),
+                            bounds: vec![],
+                        }],
+                    },
+                ),
+            );
+            let all_catalogues = all_catalogues_single(&catalogue);
+            let target_layer = layer("domain");
+
+            let result =
+                evaluate_catalogue_lint(&[], &all_catalogues, &target_layer, &StubPrimitiveScanner);
+
+            assert!(matches!(
+                result,
+                Err(CatalogueLinterError::InvalidTypeAliasGenericParameterName {
+                    parameter_name: rejected_name,
+                    ..
+                }) if rejected_name.as_str() == parameter_name
+            ));
+        }
+    }
+
+    #[test]
+    fn test_evaluate_catalogue_lint_rejects_wildcard_type_alias_generic_parameter() {
+        let mut catalogue = make_doc("domain");
+        catalogue.insert_type(
+            TypeName::new("WildcardAlias").unwrap(),
+            make_type_entry_with_kind(
+                DataRole::value_object(),
+                TypeKindV2::TypeAlias {
+                    target: TypeRef::new("Box<_>").unwrap(),
+                    generics: vec![MethodGenericParam {
+                        name: ParamName::new("_").unwrap(),
+                        bounds: vec![],
+                    }],
+                },
+            ),
+        );
+        let all_catalogues = all_catalogues_single(&catalogue);
+        let target_layer = layer("domain");
+
+        let result =
+            evaluate_catalogue_lint(&[], &all_catalogues, &target_layer, &StubPrimitiveScanner);
+
+        assert!(matches!(
+            result,
+            Err(CatalogueLinterError::InvalidTypeAliasGenericParameterName {
+                alias_name,
+                parameter_name,
+            }) if alias_name.as_str() == "WildcardAlias" && parameter_name.as_str() == "_"
         ));
     }
 

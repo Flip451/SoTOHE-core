@@ -1,7 +1,7 @@
 {
   "entries": [
     {
-      "claim_hash": "2efa798afdf637a897df5d6029aca5671d862338376d899fdd6467b3abe75592",
+      "claim_hash": "8992b6f021d74e817d1c141cf1e848d337b7d9316b6c5777c65cd7c8fab07605",
       "claim_origin": {
         "data": {
           "entry_key": "CatalogueLinterError",
@@ -10,12 +10,12 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "10c9eb5615a095fd38ce1f834f7e4cbe57ac779ae19ed0bf5ef6fa31ae3911ec",
+      "evidence_hash": "4bddcfb322b1921a89be2dbbd5b5872bf12c96fd720c412d5406344e63e3b27c",
       "evidence_origin": {
         "data": {
           "element_id": "AC-02",
           "section": "acceptance_criteria",
-          "text_label": "catalogue lint は、alias entry のジェネリクス宣言が順序付きの型パラメータ列であり、各パラメータ名が空でない Rust 識別子、重複せず、各 bound が空でない型・trait 参照である場合に通過させる。これらを満たさない宣言は検証エラーとして報告する。"
+          "text_label": "catalogue lint は、alias entry のジェネリクス宣言が順序付きの型パラメータ列であり、各パラメータ名が空でない plain な非キーワード Rust 識別子（raw identifier 表記を含まない）、重複せず、各 bound が空でない型・trait 参照である場合に通過させる。これらを満たさない宣言は検証エラーとして報告する。"
         },
         "kind": "spec_element"
       },
@@ -25,7 +25,7 @@
       }
     },
     {
-      "claim_hash": "2efa798afdf637a897df5d6029aca5671d862338376d899fdd6467b3abe75592",
+      "claim_hash": "8992b6f021d74e817d1c141cf1e848d337b7d9316b6c5777c65cd7c8fab07605",
       "claim_origin": {
         "data": {
           "entry_key": "CatalogueLinterError",
@@ -44,12 +44,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "lint は空の名前・重複した名前・空の bound を検証エラーとして報告する。",
+        "citation": "schema は宣言列・パラメータ名・bound 参照を復号できない入力を拒否し、lint は空の名前・重複した名前・空の bound を検証エラーとして報告する。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "2efa798afdf637a897df5d6029aca5671d862338376d899fdd6467b3abe75592",
+      "claim_hash": "8992b6f021d74e817d1c141cf1e848d337b7d9316b6c5777c65cd7c8fab07605",
       "claim_origin": {
         "data": {
           "entry_key": "CatalogueLinterError",
@@ -130,17 +130,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "10c9eb5615a095fd38ce1f834f7e4cbe57ac779ae19ed0bf5ef6fa31ae3911ec",
+      "evidence_hash": "4bddcfb322b1921a89be2dbbd5b5872bf12c96fd720c412d5406344e63e3b27c",
       "evidence_origin": {
         "data": {
           "element_id": "AC-02",
           "section": "acceptance_criteria",
-          "text_label": "catalogue lint は、alias entry のジェネリクス宣言が順序付きの型パラメータ列であり、各パラメータ名が空でない Rust 識別子、重複せず、各 bound が空でない型・trait 参照である場合に通過させる。これらを満たさない宣言は検証エラーとして報告する。"
+          "text_label": "catalogue lint は、alias entry のジェネリクス宣言が順序付きの型パラメータ列であり、各パラメータ名が空でない plain な非キーワード Rust 識別子（raw identifier 表記を含まない）、重複せず、各 bound が空でない型・trait 参照である場合に通過させる。これらを満たさない宣言は検証エラーとして報告する。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "catalogue lint は、alias entry のジェネリクス宣言が順序付きの型パラメータ列であり、各パラメータ名が空でない Rust 識別子、重複せず、各 bound が空でない型・trait 参照である場合に通過させる。",
+        "citation": "alias entry のジェネリクス宣言が順序付きの型パラメータ列であり",
         "kind": "pass"
       }
     },

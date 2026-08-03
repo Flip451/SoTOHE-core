@@ -28,7 +28,7 @@ signals: { blue: 14, yellow: 0, red: 0 }
 
 ## Acceptance Criteria
 - [ ] [AC-01] ジェネリクスパラメータを持つ alias をカタログで宣言して読み書きでき、パラメータを持たない既存 alias も従来どおり読み書き・評価できる。 [adr: knowledge/adr/2026-07-29-0839-catalogue-generic-type-alias.md#D1] [tasks: T001, T002, T004]
-- [ ] [AC-02] catalogue lint は、alias entry のジェネリクス宣言が順序付きの型パラメータ列であり、各パラメータ名が空でない Rust 識別子、重複せず、各 bound が空でない型・trait 参照である場合に通過させる。これらを満たさない宣言は検証エラーとして報告する。 [adr: knowledge/adr/2026-07-29-0839-catalogue-generic-type-alias.md#D1] [tasks: T002]
+- [ ] [AC-02] catalogue lint は、alias entry のジェネリクス宣言が順序付きの型パラメータ列であり、各パラメータ名が空でない plain な非キーワード Rust 識別子（raw identifier 表記を含まない）、重複せず、各 bound が空でない型・trait 参照である場合に通過させる。これらを満たさない宣言は検証エラーとして報告する。 [adr: knowledge/adr/2026-07-29-0839-catalogue-generic-type-alias.md#D1] [tasks: T002]
 - [ ] [AC-03] カタログと実装が同じジェネリクスパラメータ表記の alias を宣言すると catalogue-to-implementation 照合が一致として評価する。 [adr: knowledge/adr/2026-07-29-0839-catalogue-generic-type-alias.md#D1] [tasks: T003]
 - [ ] [AC-04] 実装側の alias がカタログのジェネリクスパラメータ正規表記と異なる場合、catalogue-to-implementation 照合は mismatch を報告する。 [adr: knowledge/adr/2026-07-29-0839-catalogue-generic-type-alias.md#D1] [tasks: T003]
 - [ ] [AC-05] 既存の generic type alias を含む実装に対して、拡張前の照合結果を変えないことを確認する回帰検証がある。 [adr: knowledge/adr/2026-07-29-0839-catalogue-generic-type-alias.md#D1] [tasks: T004]
@@ -41,4 +41,3 @@ signals: { blue: 14, yellow: 0, red: 0 }
 
 ### Stage 1: Spec Signals
 🔵 14  🟡 0  🔴 0
-
