@@ -1,14 +1,20 @@
 //! Filesystem and git adapters for guarded base merges, plus their persistence codec.
 
-use std::fs;
+use std::fs::{self, OpenOptions};
 use std::path::{Path, PathBuf};
 use std::process::{Output, Stdio};
 use std::sync::Arc;
 use std::time::{SystemTime, UNIX_EPOCH};
 
+#[cfg(unix)]
+use std::os::unix::fs::OpenOptionsExt;
+#[cfg(windows)]
+use std::os::windows::fs::OpenOptionsExt;
+
 use domain::branch_strategy::{BaseBranchName, BaseMergeDirection, derive_base_merge_direction};
 use domain::tddd::catalogue_v2::RustdocBaselineCapturePort;
 use domain::{CommitHash, TrackBranch, TrackId};
+use fs4::fs_std::FileExt as _;
 use usecase::base_merge::{
     BaseMergeAttemptOutcome, BaseMergeCleanupPort, BaseMergeCleanupRequest, BaseMergeContextError,
     BaseMergeContextPort, BaseMergeGitError, BaseMergeGitPort, BaselineReplacementError,
@@ -33,9 +39,15 @@ const MAX_SYNC_BASE_RECORD_BYTES: u64 = 64 * 1024;
 pub(super) const BASELINE_REPLACEMENT_PHASE_MARKER: &str = ".sotp-baseline-replacement-phase";
 
 mod cleanup_tree;
+mod merge_state_probe;
 mod publication;
 mod sync_base;
 mod sync_base_record;
+
+use merge_state_probe::{
+    base_commit_is_merged_into_head, has_unmerged_paths, merge_head_is_present,
+    merge_head_matches_commit,
+};
 
 #[cfg(test)]
 use cleanup_tree::replace_tree;
@@ -106,7 +118,16 @@ impl BaseMergeGitPort for FsBaseMergeGitAdapter {
     ) -> Result<BaseMergeAttemptOutcome, BaseMergeGitError> {
         let repository_root =
             resolve_workspace_repository_root(workspace_root).map_err(git_execution_error)?;
+        let locked_branch =
+            read_current_track_branch(&repository_root).map_err(git_execution_error)?;
+        let track_id = track_id_from_branch(&locked_branch).map_err(git_execution_error)?;
+        let _merge_lock = acquire_base_merge_lock(&repository_root, &track_id)?;
         let current = read_current_track_branch(&repository_root).map_err(git_execution_error)?;
+        if current != locked_branch {
+            return Err(git_execution_error(
+                "active track branch changed while acquiring merge lock",
+            ));
+        }
         let authoritative_direction = load_authoritative_direction(&repository_root, &current)
             .map_err(git_execution_error)?;
         if current != *authoritative_direction.active_track() {
@@ -118,17 +139,36 @@ impl BaseMergeGitPort for FsBaseMergeGitAdapter {
             ));
         }
 
+        // Only a conflict created by this guarded merge may authorize the
+        // recovery workflow: refuse to run over pre-existing merge state, so
+        // an interrupted earlier merge or unrelated unmerged entries are never
+        // adjudicated as this operation's Conflicted outcome.
+        if merge_head_is_present(&repository_root)? {
+            return Err(git_execution_error("a merge is already in progress"));
+        }
+        if has_unmerged_paths(&repository_root)? {
+            return Err(git_execution_error("worktree has pre-existing unmerged paths"));
+        }
+
         let base_commit = resolve_base_commit(&repository_root, authoritative_direction.source())?;
         let output = match run_guarded_merge(&repository_root, &base_commit) {
             Ok(output) => output,
             Err(_) => return adjudicate_merge_after_runner_error(&repository_root, base_commit),
         };
         if output.status.success() {
+            if merge_head_is_present(&repository_root)? || has_unmerged_paths(&repository_root)? {
+                return Err(git_execution_error(
+                    "guarded git merge reported success with unresolved merge state",
+                ));
+            }
             return Ok(BaseMergeAttemptOutcome::Clean { base_commit });
         }
 
-        if has_unmerged_paths(&repository_root)? {
-            return Ok(BaseMergeAttemptOutcome::Conflicted);
+        if output.status.code() == Some(1) && has_unmerged_paths(&repository_root)? {
+            if merge_head_matches_commit(&repository_root, &base_commit)? {
+                return Ok(BaseMergeAttemptOutcome::Conflicted);
+            }
+            return Err(git_execution_error("guarded git merge left unrelated unmerged paths"));
         }
 
         Err(git_execution_error("guarded git merge failed"))
@@ -574,7 +614,9 @@ fn adjudicate_merge_after_runner_error(
     base_commit: CommitHash,
 ) -> Result<BaseMergeAttemptOutcome, BaseMergeGitError> {
     if has_unmerged_paths(repository_root)? {
-        return Ok(BaseMergeAttemptOutcome::Conflicted);
+        return Err(git_execution_error(
+            "guarded git merge runner failed with unresolved merge state",
+        ));
     }
     if merge_head_is_present(repository_root)? {
         return Err(git_execution_error("guarded git merge ended with an unresolved merge state"));
@@ -585,49 +627,43 @@ fn adjudicate_merge_after_runner_error(
     Err(git_execution_error("guarded git merge could not be adjudicated after runner failure"))
 }
 
-fn merge_head_is_present(repository_root: &Path) -> Result<bool, BaseMergeGitError> {
-    let output = isolated_bounded_git_output(
-        repository_root,
-        &["rev-parse", "--verify", "--quiet", "MERGE_HEAD^{commit}"],
-        MAX_BASE_MERGE_GIT_OUTPUT_BYTES,
-    )
-    .map_err(|_| git_execution_error("merge state could not be inspected"))?;
-    match output.status.code() {
-        Some(0) => Ok(true),
-        Some(1) => Ok(false),
-        _ => Err(git_execution_error("merge state could not be inspected")),
-    }
-}
-
-fn base_commit_is_merged_into_head(
+fn acquire_base_merge_lock(
     repository_root: &Path,
-    base_commit: &CommitHash,
-) -> Result<bool, BaseMergeGitError> {
-    let output = isolated_bounded_git_output(
-        repository_root,
-        &["merge-base", "--is-ancestor", base_commit.as_ref(), "HEAD"],
-        MAX_BASE_MERGE_GIT_OUTPUT_BYTES,
-    )
-    .map_err(|_| git_execution_error("merged HEAD could not be inspected"))?;
-    match output.status.code() {
-        Some(0) => Ok(true),
-        Some(1) => Ok(false),
-        _ => Err(git_execution_error("merged HEAD could not be inspected")),
+    track_id: &TrackId,
+) -> Result<fs::File, BaseMergeGitError> {
+    let items_dir = repository_root.join("track/items");
+    crate::track::symlink_guard::reject_symlinks_up_to_root(&items_dir)
+        .map_err(|_| git_execution_error("base merge lock path is unavailable"))?;
+    let track_dir = items_dir.join(track_id.as_ref());
+    crate::track::symlink_guard::reject_symlinks_below(&track_dir, &items_dir)
+        .map_err(|_| git_execution_error("base merge lock path is unavailable"))?;
+    if !track_dir.is_dir() {
+        return Err(git_execution_error("base merge lock path is unavailable"));
     }
+    let lock_path = track_dir.join("metadata.json.lock");
+    crate::track::symlink_guard::reject_symlinks_below(&lock_path, &items_dir)
+        .map_err(|_| git_execution_error("base merge lock path is unavailable"))?;
+    let lock_file = open_base_merge_lock_file(&lock_path)
+        .map_err(|_| git_execution_error("base merge lock path is unavailable"))?;
+    lock_file
+        .try_lock_exclusive()
+        .map_err(|_| git_execution_error("another guarded base merge is in progress"))?;
+    Ok(lock_file)
 }
 
-fn has_unmerged_paths(repository_root: &Path) -> Result<bool, BaseMergeGitError> {
-    let output = isolated_bounded_git_output(
-        repository_root,
-        &["diff", "--quiet", "--diff-filter=U", "--"],
-        1,
-    )
-    .map_err(|_| git_execution_error("merge conflict state could not be inspected"))?;
-    match output.status.code() {
-        Some(0) => Ok(false),
-        Some(1) => Ok(true),
-        _ => Err(git_execution_error("merge conflict state could not be inspected")),
-    }
+fn open_base_merge_lock_file(lock_path: &Path) -> std::io::Result<fs::File> {
+    let mut options = OpenOptions::new();
+    options.create(true).read(true).write(true).truncate(false);
+    #[cfg(unix)]
+    options.custom_flags(libc::O_NOFOLLOW | libc::O_CLOEXEC);
+    #[cfg(windows)]
+    options.custom_flags(0x0020_0000);
+    #[cfg(not(any(unix, windows)))]
+    return Err(std::io::Error::new(
+        std::io::ErrorKind::Unsupported,
+        "atomic no-follow lock open is unavailable on this platform",
+    ));
+    options.open(lock_path)
 }
 
 fn context_unavailable(detail: &'static str) -> BaseMergeContextError {
@@ -1013,6 +1049,103 @@ mod tests {
             .output()
             .unwrap();
         assert!(String::from_utf8_lossy(&status.stdout).contains("UU conflict.txt"));
+    }
+
+    #[test]
+    fn test_fs_base_merge_git_rejects_pre_existing_merge_in_progress() {
+        let fixture = setup_repository("adapter-test", "develop");
+        let root = fixture.path();
+        let direction = FsBaseMergeContextAdapter::new().load_direction(root).unwrap();
+
+        let head = std::process::Command::new("git")
+            .args(["rev-parse", "HEAD"])
+            .current_dir(root)
+            .output()
+            .unwrap();
+        std::fs::write(
+            root.join(".git/MERGE_HEAD"),
+            String::from_utf8_lossy(&head.stdout).as_bytes(),
+        )
+        .unwrap();
+        let result = FsBaseMergeGitAdapter::new().merge_base(root, &direction);
+
+        assert!(
+            matches!(result, Err(BaseMergeGitError::Execution(_))),
+            "a pre-existing MERGE_HEAD must refuse the merge instead of adjudicating it"
+        );
+    }
+
+    #[test]
+    fn test_fs_base_merge_git_rejects_malformed_pre_existing_merge_head() {
+        let fixture = setup_repository("adapter-test", "develop");
+        let root = fixture.path();
+        let direction = FsBaseMergeContextAdapter::new().load_direction(root).unwrap();
+
+        std::fs::write(root.join(".git/MERGE_HEAD"), "not-a-commit\n").unwrap();
+        let result = FsBaseMergeGitAdapter::new().merge_base(root, &direction);
+
+        assert!(
+            matches!(result, Err(BaseMergeGitError::Execution(_))),
+            "a malformed MERGE_HEAD must fail closed instead of being treated as absent"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_open_base_merge_lock_file_rejects_symlink() {
+        let fixture = tempfile::tempdir().unwrap();
+        let target = fixture.path().join("target.lock");
+        let link = fixture.path().join("metadata.json.lock");
+        std::fs::write(&target, b"target").unwrap();
+        std::os::unix::fs::symlink(&target, &link).unwrap();
+
+        assert!(open_base_merge_lock_file(&link).is_err());
+    }
+
+    #[test]
+    fn test_fs_base_merge_git_rejects_pre_existing_unmerged_paths() {
+        let fixture = tempfile::tempdir().unwrap();
+        let root = fixture.path();
+        git(root, &["init", "--quiet", "--initial-branch=develop"]);
+        git(root, &["config", "user.email", "test@example.com"]);
+        git(root, &["config", "user.name", "Base Merge Test"]);
+        std::fs::write(root.join("conflict.txt"), "initial\n").unwrap();
+        git(root, &["add", "conflict.txt"]);
+        git(root, &["commit", "--quiet", "-m", "initial"]);
+        git(root, &["switch", "--quiet", "-c", "track/conflict-test"]);
+        std::fs::write(root.join("conflict.txt"), "track\n").unwrap();
+        git(root, &["add", "conflict.txt"]);
+        git(root, &["commit", "--quiet", "-m", "track conflict"]);
+        git(root, &["switch", "--quiet", "develop"]);
+        std::fs::write(root.join("conflict.txt"), "base\n").unwrap();
+        git(root, &["add", "conflict.txt"]);
+        git(root, &["commit", "--quiet", "-m", "base conflict"]);
+        git(root, &["switch", "--quiet", "track/conflict-test"]);
+        write_metadata(root, "conflict-test", "develop");
+        let direction = FsBaseMergeContextAdapter::new().load_direction(root).unwrap();
+        // Establish unmerged entries from an unrelated merge, then drop its
+        // MERGE_HEAD so only the unmerged index remains.
+        let merge = std::process::Command::new("git")
+            .args(["merge", "--no-ff", "--no-edit", "develop"])
+            .current_dir(root)
+            .output()
+            .unwrap();
+        assert!(!merge.status.success(), "the fixture merge must conflict");
+        std::fs::remove_file(root.join(".git/MERGE_HEAD")).unwrap();
+
+        let base_commit = resolve_base_commit(root, direction.source()).unwrap();
+        let adjudicated = adjudicate_merge_after_runner_error(root, base_commit);
+        assert!(
+            matches!(adjudicated, Err(BaseMergeGitError::Execution(_))),
+            "unmerged paths without this merge's MERGE_HEAD must fail closed"
+        );
+
+        let result = FsBaseMergeGitAdapter::new().merge_base(root, &direction);
+
+        assert!(
+            matches!(result, Err(BaseMergeGitError::Execution(_))),
+            "pre-existing unmerged paths must refuse the merge instead of reporting Conflicted"
+        );
     }
 
     #[test]

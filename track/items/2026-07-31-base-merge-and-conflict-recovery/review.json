@@ -2662,6 +2662,116 @@
           "hash": "rvw1:sha256:d7437e2e22aacb8b3ce01a84246eabd79b38d565f98082b4095793d70edd9c4b",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T15:38:06Z",
+          "findings": [
+            {
+              "category": "adapter correctness / TOCTOU",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 133,
+              "message": "The pre-existing-state checks are not atomic with `run_guarded_merge`: another process can create an unrelated merge/unmerged index state after lines 125–129 but before line 133. If the merge then fails, `adjudicate_merge_after_runner_error` returns `Conflicted` solely from the post-failure unmerged paths check (line 587), authorizing recovery for state this invocation did not create. The guarded operation needs serialization or provenance-aware/atomic state handling across the check and merge.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:02b67d3d3c4dd7cc5cc54f593166291ce96a5e0e91406afc9fb62f0ad3ec192a",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T15:47:53Z",
+          "findings": [
+            {
+              "category": "adapter correctness / TOCTOU",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 133,
+              "message": "The preflight checks and `run_guarded_merge` are not atomic. Another process can create an unrelated merge/unmerged index state after lines 125–129 but before line 133; after the merge fails, lines 146–148 or 595–598 accept any `MERGE_HEAD` equal to the requested base and return `Conflicted`, even though this invocation did not create it. Serialize the guarded operation or use provenance/state handling that covers the entire check-to-adjudication window.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:044a28ddf84595356d688d43ff5470798eb36d90e1f665cddf2ea432c4b8375a",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T15:57:34Z",
+          "findings": [
+            {
+              "category": "symlink not rejected at boundary / lock bypass",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 629,
+              "message": "`acquire_base_merge_lock` performs `reject_symlinks_below(&lock_path, ...)` and then opens the path separately with `OpenOptions::open`. A concurrent replacement can swap `metadata.json.lock` to a symlink between these operations; `open` follows it, allowing the guarded-merge lock to target an attacker-selected file or bypass serialization. Open the lock with an atomic no-follow primitive (for example `O_NOFOLLOW`) and fail closed.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:bdd014a6f92da4e7ce91d2d0a9180b1a2b5e5c4146e6b88452552119bda8d3e5",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T16:06:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:19dd9fab6bd8278fa7c69cec6b290a87511100f8f2ed76be1890f0435fe3893c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T16:14:32Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 683,
+              "message": "`--verify --quiet` exits 1 both when `MERGE_HEAD` is absent and when it exists but is malformed or cannot resolve to a commit. Treating every exit 1 as `None` lets the adapter start over pre-existing merge state instead of failing closed; the runner-error path can even adjudicate `Clean` when the base is already an ancestor. Detect raw `MERGE_HEAD` presence separately and reject invalid contents.",
+              "severity": "P1"
+            },
+            {
+              "category": "concurrency correctness",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 118,
+              "message": "The post-lock branch read shadows the branch used to select the lock without comparing them. If HEAD changes from track A to track B in this window, validation can proceed against B while holding A's `metadata.json.lock`, so B's merge/metadata operations are not serialized. Reject any change from the locked branch or acquire the lock corresponding to the re-read branch.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture violation",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 618,
+              "message": "The added production helpers increase this module to 726 non-test lines, exceeding the configured 700-line hard limit. `bin/sotp verify module-size` now fails for this file, so the new merge-state/locking implementation must be extracted into a sibling module.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:19dd9fab6bd8278fa7c69cec6b290a87511100f8f2ed76be1890f0435fe3893c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T16:27:32Z",
+          "findings": [
+            {
+              "category": "architecture violation",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 624,
+              "message": "This patch grows the production portion of the module to 764 lines, exceeding the configured 700-line hard limit. `bin/sotp verify module-size` fails on this file, so the new merge locking/state helpers must be extracted into a sibling module before the required gate can pass.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3a3a43c58fc7a063488946a937b4a27c1f9f1e129497113e2e2ec546ca9bb693",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T16:33:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cddf6fe12db21fa79be87f663906c5f70c87d1820e46253dba05063a23e04e48",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T16:36:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cddf6fe12db21fa79be87f663906c5f70c87d1820e46253dba05063a23e04e48",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
