@@ -2904,6 +2904,78 @@
         "citation": "TypeEntry { action: Add, role: Dto, kind: Struct(StructKind { shape: Tuple { fields: [TypeRef(\"String\")], has_stripped_fields: false }, typestate: None }), methods: [], generics: [], where_predicates: [], module_path: ModulePath([Identifier(\"task_contract_codec\")]), docs: Some(DocString(\"Transparent serde mirror for a task-contract catalogue-entry key (IN-07, AC-08).\")), spec_refs: [SpecRef { file: \"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json\", anchor: SpecElementId(\"IN-07\") }, SpecRef { file: \"track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json\", anchor: SpecElementId(\"AC-08\") }], informal_grounds: [] }"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandInput",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandInput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-04"
+      },
+      "key": {
+        "waived_reason_hash": "23db180b32a6ea1e046ad4d069cfea395e98e289614f12ca0a26fa04e1cc7a67",
+        "declaration_hash": "a12873bd615a6166a0c6efc27f2d23a7f3184a25f4a7077f4be345ea72060e9c",
+        "anchor_text_hash": "3a64b29a92e9e9eeaf1a9ea27e22587c95af88cf00d71369188fd9b70d334f36"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"role: Dto\"; \"methods: []\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandInput",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandInput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "waived_reason_hash": "3f888eb72671ac4ebe8a9dbcd9412ac99f07011a5e34bb183a05f3eeb7e5cfe3",
+        "declaration_hash": "a12873bd615a6166a0c6efc27f2d23a7f3184a25f4a7077f4be345ea72060e9c",
+        "anchor_text_hash": "edb4e92dab097edf9daf4986f7e535467ff8962fca5911e37dec2e1756d33671"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PhaseCommandInput",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandInput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "waived_reason_hash": "1a3e8c32c98aa8135a381d82631b5b06a5020c1938d23a39938c169cdd302c29",
+        "declaration_hash": "a12873bd615a6166a0c6efc27f2d23a7f3184a25f4a7077f4be345ea72060e9c",
+        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     }
   ]
 }

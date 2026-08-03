@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "c3592b78429a273d40fa81edc91585b5cc5afacaf5a7aa01a5284b245cb85a60",
+  "catalogue_declaration_hash": "5b99b0339808abbd935435d869150db25ecadf5a241583c466fd8e7828dd0340",
   "signals": [
     {
       "type_name": "CapabilityDriver",
@@ -20,7 +20,7 @@
     {
       "type_name": "PhaseCommandDriver",
       "signal": "blue",
-      "entry_hash": "40f22f6fc5218e2b48dd21325d1c38e1407fa16fbaba79f761f1d55b7cd894ab"
+      "entry_hash": "9120887564f93a2ad27f4dca8855179001e8504db2454069383aa686a9562882"
     },
     {
       "type_name": "PhaseCommandInput",
@@ -30,7 +30,7 @@
     {
       "type_name": "PhaseIdArg",
       "signal": "blue",
-      "entry_hash": "9c58223c89dbded0cbbc322fcc9b3a15b78f06ee4d42c136afce8f58063e2913"
+      "entry_hash": "3643415a2d5e6b767dab3be49f568e1188560910a41b121656f1571262d76028"
     }
   ]
 }

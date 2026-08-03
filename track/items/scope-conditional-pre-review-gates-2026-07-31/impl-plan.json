@@ -140,8 +140,9 @@
     },
     {
       "id": "T035",
-      "description": "`libs/usecase/src/phase_command.rs` の phase enter orchestration、host-bearing `PhaseEnterCommand`、enter outcome、shared service / interactor を catalogue shape に適応する。dispatch-boundary host forwarding と、provider-neutral configured command と actual invoked argv を分離して `ProgramExecutionRecord` に監査記録する処理、および関連 tests を更新する。IN-02、IN-11、CN-03、AC-02、AC-13。",
-      "status": "in_progress",
+      "description": "`libs/usecase/src/phase_command.rs` の phase enter orchestration、host-bearing `PhaseEnterCommand`、enter outcome、shared service / interactor、`ProgramExecutionRecord` と関連 tests を catalogue shape に適応する。IN-02、IN-11、CN-03、AC-02、AC-13。",
+      "status": "done",
+      "commit_hash": "6d04e3ced70556127af5ae7e577b88e374fc4e93",
       "depends_on": [
         "T034"
       ]
@@ -167,7 +168,7 @@
     {
       "id": "T030",
       "description": "`apps/cli-driver/src/phase_command.rs` の `CommandOutcome`、`PhaseCommandDriver`、`PhaseCommandInput`、`PhaseIdArg` と関連 tests を catalogue shape に適応する。IN-04、IN-11、CN-03、AC-02、AC-03、AC-13。",
-      "status": "todo",
+      "status": "in_progress",
       "depends_on": [
         "T035"
       ]

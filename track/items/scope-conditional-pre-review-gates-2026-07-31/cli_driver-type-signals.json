@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-03T03:54:28Z",
-  "declaration_hash": "c3592b78429a273d40fa81edc91585b5cc5afacaf5a7aa01a5284b245cb85a60",
-  "implementation_input_hash": "5f80f4350cc90781bd2ed534e99728a85b50bb26d621fa53775bb9773bf74cbe",
+  "generated_at": "2026-08-03T13:49:16Z",
+  "declaration_hash": "5b99b0339808abbd935435d869150db25ecadf5a241583c466fd8e7828dd0340",
+  "implementation_input_hash": "4f94f2cdf7f8c9f0ca22951b8bd2bc093d9729e7c38129f69a0173da36d3d588",
   "signals": [
     {
       "type_name": "CapabilityExecDriverInput",
@@ -13,18 +13,18 @@
     {
       "type_name": "PhaseCommandDriver",
       "kind_tag": "primary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Debug"
       ]
     },
     {
       "type_name": "PhaseCommandInput",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -34,9 +34,9 @@
     {
       "type_name": "PhaseIdArg",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",

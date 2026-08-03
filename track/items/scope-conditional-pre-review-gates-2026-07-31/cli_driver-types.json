@@ -336,13 +336,8 @@
       "kind": {
         "kind": "struct",
         "shape": {
-          "fields": [
-            {
-              "name": "service",
-              "ty": "Arc<dyn usecase::phase_command::PhaseCommandService>"
-            }
-          ],
-          "has_stripped_fields": false,
+          "fields": [],
+          "has_stripped_fields": true,
           "kind": "plain"
         }
       },
@@ -453,18 +448,13 @@
     },
     "PhaseIdArg": {
       "action": "add",
-      "docs": "CLI transport wrapper for a usecase-owned phase identifier (IN-04, AC-03).",
+      "docs": "CLI transport wrapper for a usecase-owned phase identifier (IN-04).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
         "shape": {
-          "fields": [
-            {
-              "name": "value",
-              "ty": "usecase::operator_command::CommandDeclarationId"
-            }
-          ],
-          "has_stripped_fields": false,
+          "fields": [],
+          "has_stripped_fields": true,
           "kind": "plain"
         }
       },
@@ -476,10 +466,6 @@
       "spec_refs": [
         {
           "anchor": "IN-04",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "AC-03",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]

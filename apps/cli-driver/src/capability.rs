@@ -27,7 +27,7 @@ impl core::str::FromStr for CapabilityNameArg {
 
 /// CLI-boundary mirror of a validated host provider name.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ProviderNameArg(ProviderName);
+pub struct ProviderNameArg(pub(crate) ProviderName);
 
 impl core::str::FromStr for ProviderNameArg {
     type Err = String;

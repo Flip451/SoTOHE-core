@@ -4,7 +4,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| PhaseCommandInput | enum | add | Validate, Explain, Enter | 🟡 | 🔵 |
+| PhaseCommandInput | enum | add | Validate, Explain, Enter | 🔵 | 🔵 |
 
 ## DTOs
 
@@ -12,12 +12,12 @@
 |------|------|--------|---------|--------|----------|
 | CapabilityExecDriverInput | dto | modify | — | 🔵 | 🔵 |
 | CommandOutcome | dto | reference | — | 🔵 | 🔵 |
-| PhaseIdArg | dto | add | — | 🟡 | 🔵 |
+| PhaseIdArg | dto | add | — | 🔵 | 🔵 |
 
 ## Primary Adapters
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | CapabilityDriver | primary_adapter | reference | — | 🔵 | 🔵 |
-| PhaseCommandDriver | primary_adapter | add | — | 🟡 | 🔵 |
+| PhaseCommandDriver | primary_adapter | add | — | 🔵 | 🔵 |
 
