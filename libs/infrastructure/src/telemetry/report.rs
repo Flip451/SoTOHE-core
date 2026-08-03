@@ -6,7 +6,6 @@
 //! (CN-04).
 
 use std::collections::HashMap;
-use std::fs::{File, OpenOptions};
 use std::io::{self, BufRead};
 use std::path::{Path, PathBuf};
 
@@ -38,7 +37,8 @@ pub struct TelemetryReportSnapshot {
     pub errors: Vec<TelemetryErrorEntry>,
     /// Hook block events projected from `HookBlock` JSONL events.
     pub hook_blocks: Vec<TelemetryHookBlockEntry>,
-    /// Number of lines skipped (broken JSON or unknown `schema_version`).
+    /// Number of input lines that could not be retained (broken JSON, unknown
+    /// `schema_version`, oversized records, or projection-cardinality caps).
     pub skipped_lines: TelemetrySkippedLineCount,
     /// Per-command execution metrics parsed from persisted command records.
     pub command_metrics: Vec<CommandExecutionMetric>,
@@ -126,13 +126,10 @@ const KNOWN_SCHEMA_VERSIONS: &[u32] = &[1];
 /// Largest JSONL record accepted by the report reader; bounds corrupted or attacker input.
 const MAX_TELEMETRY_RECORD_BYTES: usize = 64 * 1024;
 
-/// The maximum amount of telemetry input accepted by one aggregation. Together
-/// with the per-record limit, this bounds all report collections because every
-/// retained output entry originates from at least one accepted input record.
-const MAX_TELEMETRY_INPUT_BYTES: usize = 1024 * 1024;
-
-/// One active file plus positive `u16` rotation suffixes bounds directory traversal and memory.
-const MAX_TELEMETRY_LOG_DIRECTORY_ENTRIES: usize = u16::MAX as usize + 1;
+/// Maximum number of distinct report rows retained per projection. Aggregation
+/// continues streaming after the cap, counting omitted rows instead of
+/// rejecting an otherwise valid append-only log.
+const MAX_TELEMETRY_RETAINED_ENTRIES: usize = 8_192;
 
 /// The version envelope is decoded before a full event payload.  This lets the
 /// reader reject future versions without accidentally accepting their fields
@@ -146,14 +143,6 @@ enum BoundedLineRead {
     EndOfFile,
     Line,
     Oversized,
-    InputBudgetExhausted,
-}
-
-/// Result of attempting to join the writer's lock protocol without mutating a
-/// read-only telemetry directory.
-enum ReadLock {
-    Present(File),
-    Absent,
 }
 
 fn is_known_schema_version(v: u32) -> bool {
@@ -197,15 +186,13 @@ impl TelemetryReport {
         &self,
         track_id: &TrackId,
     ) -> Result<TelemetryReportSnapshot, TelemetryReportError> {
-        self.aggregate_with_lock_retry(track_id, true)
+        self.aggregate_once(track_id)
     }
 
-    /// Performs one aggregation, retrying once when a writer creates its lock
-    /// while the legacy lockless compatibility path is reading.
-    fn aggregate_with_lock_retry(
+    /// Performs one bounded snapshot aggregation of the canonical JSONL file.
+    fn aggregate_once(
         &self,
         track_id: &TrackId,
-        retry_lockless_read: bool,
     ) -> Result<TelemetryReportSnapshot, TelemetryReportError> {
         let track_id_text = track_id.as_ref();
         let track_dir = self.items_dir.join(track_id_text);
@@ -266,13 +253,7 @@ impl TelemetryReport {
             }
         }
 
-        let lock = self.acquire_read_lock(&logs_dir)?;
-        let lock_was_absent = matches!(&lock, ReadLock::Absent);
-        let _lock = match lock {
-            ReadLock::Present(file) => Some(file),
-            ReadLock::Absent => None,
-        };
-        let aggregation_result = (|| {
+        (|| {
             let log_paths = self.telemetry_log_paths(&logs_dir)?;
             if log_paths.is_empty() {
                 return Ok(empty_output());
@@ -284,33 +265,30 @@ impl TelemetryReport {
             let mut hook_blocks: Vec<TelemetryHookBlockEntry> = Vec::new();
             let mut command_map: HashMap<SotpCommandIdentity, (u64, u64, u64)> = HashMap::new();
             let mut skipped_lines: u64 = 0;
-            let mut remaining_input_bytes = MAX_TELEMETRY_INPUT_BYTES;
-
             for log_path in log_paths {
                 let file =
                     open_read_no_follow(&log_path).map_err(|e| TelemetryReportError::Io {
                         path: log_path.display().to_string(),
                         message: e.to_string(),
                     })?;
+                let mut remaining_snapshot_bytes = file
+                    .metadata()
+                    .map_err(|e| TelemetryReportError::Io {
+                        path: log_path.display().to_string(),
+                        message: e.to_string(),
+                    })?
+                    .len();
                 let mut reader = io::BufReader::new(file);
                 let mut line = Vec::new();
 
                 loop {
                     line.clear();
-                    match read_bounded_line(&mut reader, &mut line, &mut remaining_input_bytes)
+                    match read_bounded_line(&mut reader, &mut line, &mut remaining_snapshot_bytes)
                         .map_err(|e| TelemetryReportError::Io {
-                            path: log_path.display().to_string(),
-                            message: e.to_string(),
-                        })? {
+                        path: log_path.display().to_string(),
+                        message: e.to_string(),
+                    })? {
                         BoundedLineRead::EndOfFile => break,
-                        BoundedLineRead::InputBudgetExhausted => {
-                            return Err(TelemetryReportError::Io {
-                                path: log_path.display().to_string(),
-                                message: format!(
-                                    "telemetry report input exceeds the {MAX_TELEMETRY_INPUT_BYTES}-byte limit"
-                                ),
-                            });
-                        }
                         BoundedLineRead::Oversized => {
                             skipped_lines = skipped_lines.saturating_add(1);
                             continue;
@@ -339,27 +317,51 @@ impl TelemetryReport {
                                 exit_code,
                                 ..
                             } => {
-                                let Ok(identity) = SotpCommandIdentity::try_new(command.clone())
+                                // The pre-instrumentation writer persisted command labels
+                                // without the binary name (for example, `track transition`),
+                                // while the common CLI boundary now records `sotp track
+                                // transition`.  Use the established label as the aggregate key
+                                // so a track's history remains one logical metric.
+                                let metric_command =
+                                    command.strip_prefix("sotp ").unwrap_or(&command);
+                                let Ok(identity) =
+                                    SotpCommandIdentity::try_new(metric_command.to_owned())
                                 else {
                                     skipped_lines = skipped_lines.saturating_add(1);
                                     continue;
                                 };
+                                let mut projection_truncated = false;
 
-                                let entry = phase_map.entry(command.clone()).or_insert((0, 0));
-                                entry.0 = entry.0.saturating_add(duration_ms);
-                                entry.1 = entry.1.saturating_add(1);
+                                if phase_map.contains_key(&command)
+                                    || phase_map.len() < MAX_TELEMETRY_RETAINED_ENTRIES
+                                {
+                                    let entry = phase_map.entry(command.clone()).or_insert((0, 0));
+                                    entry.0 = entry.0.saturating_add(duration_ms);
+                                    entry.1 = entry.1.saturating_add(1);
+                                } else {
+                                    projection_truncated = true;
+                                }
 
                                 // Command metrics are projected from the same
                                 // established TrackSubcommand event that is
                                 // already stored in telemetry.jsonl. No
                                 // separate command-trace record format is
                                 // accepted or written.
-                                let metric = command_map.entry(identity).or_insert((0, 0, 0));
-                                metric.0 = metric.0.saturating_add(1);
-                                if exit_code != 0 {
-                                    metric.1 = metric.1.saturating_add(1);
+                                if command_map.contains_key(&identity)
+                                    || command_map.len() < MAX_TELEMETRY_RETAINED_ENTRIES
+                                {
+                                    let metric = command_map.entry(identity).or_insert((0, 0, 0));
+                                    metric.0 = metric.0.saturating_add(1);
+                                    if exit_code != 0 {
+                                        metric.1 = metric.1.saturating_add(1);
+                                    }
+                                    metric.2 = metric.2.saturating_add(duration_ms);
+                                } else {
+                                    projection_truncated = true;
                                 }
-                                metric.2 = metric.2.saturating_add(duration_ms);
+                                if projection_truncated {
+                                    skipped_lines = skipped_lines.saturating_add(1);
+                                }
                             }
                             TelemetryEvent::NonZeroExit {
                                 timestamp,
@@ -368,15 +370,24 @@ impl TelemetryReport {
                                 error_chain,
                                 ..
                             } => {
-                                errors.push(TelemetryErrorEntry {
-                                    timestamp,
-                                    command,
-                                    exit_code,
-                                    error_chain,
-                                });
+                                if errors.len() < MAX_TELEMETRY_RETAINED_ENTRIES {
+                                    errors.push(TelemetryErrorEntry {
+                                        timestamp,
+                                        command,
+                                        exit_code,
+                                        error_chain,
+                                    });
+                                } else {
+                                    skipped_lines = skipped_lines.saturating_add(1);
+                                }
                             }
                             TelemetryEvent::HookBlock { timestamp, hook_name, .. } => {
-                                hook_blocks.push(TelemetryHookBlockEntry { timestamp, hook_name });
+                                if hook_blocks.len() < MAX_TELEMETRY_RETAINED_ENTRIES {
+                                    hook_blocks
+                                        .push(TelemetryHookBlockEntry { timestamp, hook_name });
+                                } else {
+                                    skipped_lines = skipped_lines.saturating_add(1);
+                                }
                             }
                             _ => {}
                         },
@@ -420,23 +431,7 @@ impl TelemetryReport {
             };
 
             Ok(snapshot)
-        })();
-
-        // A writer creates and retains this lock before rotating files. Legacy
-        // read-only archives legitimately lack it, but if it appeared during a
-        // lockless read, discard both successful and failed mixed-generation
-        // attempts and retry under the writer's shared-lock protocol.
-        if lock_was_absent && self.lock_file_exists(&logs_dir)? {
-            if retry_lockless_read {
-                return self.aggregate_with_lock_retry(track_id, false);
-            }
-            return Err(TelemetryReportError::Io {
-                path: logs_dir.join("telemetry.jsonl.lock").display().to_string(),
-                message: "telemetry lock changed during lockless report aggregation".to_owned(),
-            });
-        }
-
-        aggregation_result
+        })()
     }
 
     fn guard_path(&self, path: &Path) -> Result<bool, TelemetryReportError> {
@@ -446,122 +441,28 @@ impl TelemetryReport {
         })
     }
 
-    fn acquire_read_lock(&self, logs_dir: &Path) -> Result<ReadLock, TelemetryReportError> {
-        let lock_path = logs_dir.join("telemetry.jsonl.lock");
-        self.guard_path(&lock_path)?;
-
-        let mut options = OpenOptions::new();
-        options.read(true);
-        #[cfg(unix)]
-        {
-            use std::os::unix::fs::OpenOptionsExt as _;
-
-            options.custom_flags(libc::O_NOFOLLOW | libc::O_CLOEXEC | libc::O_NONBLOCK);
-        }
-        let file = match options.open(&lock_path) {
-            Ok(file) => file,
-            Err(e) if e.kind() == io::ErrorKind::NotFound => return Ok(ReadLock::Absent),
-            Err(e) => {
-                return Err(TelemetryReportError::Io {
-                    path: lock_path.display().to_string(),
-                    message: e.to_string(),
-                });
-            }
-        };
-        let metadata = file.metadata().map_err(|e| TelemetryReportError::Io {
-            path: lock_path.display().to_string(),
-            message: e.to_string(),
-        })?;
-        if !metadata.is_file() {
-            return Err(TelemetryReportError::Io {
-                path: lock_path.display().to_string(),
-                message: "not a regular file".to_owned(),
-            });
-        }
-        fs4::fs_std::FileExt::lock_shared(&file).map_err(|e| TelemetryReportError::Io {
-            path: lock_path.display().to_string(),
-            message: e.to_string(),
-        })?;
-        Ok(ReadLock::Present(file))
-    }
-
-    fn lock_file_exists(&self, logs_dir: &Path) -> Result<bool, TelemetryReportError> {
-        let lock_path = logs_dir.join("telemetry.jsonl.lock");
-        self.guard_path(&lock_path)?;
-        match std::fs::symlink_metadata(&lock_path) {
-            Ok(_) => Ok(true),
-            Err(error) if error.kind() == io::ErrorKind::NotFound => Ok(false),
+    fn telemetry_log_paths(&self, logs_dir: &Path) -> Result<Vec<PathBuf>, TelemetryReportError> {
+        let active = logs_dir.join("telemetry.jsonl");
+        self.guard_path(&active)?;
+        match std::fs::symlink_metadata(&active) {
+            Ok(metadata) if metadata.is_file() => Ok(vec![active]),
+            Ok(_) => Err(TelemetryReportError::Io {
+                path: active.display().to_string(),
+                message: "not a file".to_owned(),
+            }),
+            Err(error) if error.kind() == io::ErrorKind::NotFound => Ok(Vec::new()),
             Err(error) => Err(TelemetryReportError::Io {
-                path: lock_path.display().to_string(),
+                path: active.display().to_string(),
                 message: error.to_string(),
             }),
         }
-    }
-
-    fn telemetry_log_paths(&self, logs_dir: &Path) -> Result<Vec<PathBuf>, TelemetryReportError> {
-        let entries = std::fs::read_dir(logs_dir).map_err(|e| TelemetryReportError::Io {
-            path: logs_dir.display().to_string(),
-            message: e.to_string(),
-        })?;
-        let mut active = None;
-        let mut rotated = Vec::new();
-
-        for (entry_count, entry) in entries.enumerate() {
-            if entry_count >= MAX_TELEMETRY_LOG_DIRECTORY_ENTRIES {
-                return Err(TelemetryReportError::Io {
-                    path: logs_dir.display().to_string(),
-                    message: "too many telemetry log directory entries".to_owned(),
-                });
-            }
-            let entry = entry.map_err(|e| TelemetryReportError::Io {
-                path: logs_dir.display().to_string(),
-                message: e.to_string(),
-            })?;
-            let path = entry.path();
-            let file_name = entry.file_name();
-            if file_name == "telemetry.jsonl" {
-                active = Some(path);
-            } else if let Some(generation) = file_name
-                .to_str()
-                .and_then(|name| name.strip_prefix("telemetry.jsonl."))
-                .and_then(|suffix| suffix.parse::<u16>().ok())
-                .filter(|generation| *generation > 0)
-            {
-                rotated.push((generation, path));
-            }
-        }
-
-        rotated.sort_by(|(left, _), (right, _)| right.cmp(left));
-        let mut paths: Vec<PathBuf> = rotated.into_iter().map(|(_, path)| path).collect();
-        if let Some(active) = active {
-            paths.push(active);
-        }
-        for path in &paths {
-            self.guard_path(path)?;
-            match std::fs::symlink_metadata(path) {
-                Ok(metadata) if metadata.is_file() => {}
-                Ok(_) => {
-                    return Err(TelemetryReportError::Io {
-                        path: path.display().to_string(),
-                        message: "not a file".to_owned(),
-                    });
-                }
-                Err(e) => {
-                    return Err(TelemetryReportError::Io {
-                        path: path.display().to_string(),
-                        message: e.to_string(),
-                    });
-                }
-            }
-        }
-        Ok(paths)
     }
 }
 
 fn read_bounded_line<R: BufRead>(
     reader: &mut R,
     line: &mut Vec<u8>,
-    remaining_input_bytes: &mut usize,
+    remaining_snapshot_bytes: &mut u64,
 ) -> io::Result<BoundedLineRead> {
     let mut saw_bytes = false;
     let mut oversized = false;
@@ -575,11 +476,15 @@ fn read_bounded_line<R: BufRead>(
                 BoundedLineRead::EndOfFile
             });
         }
-        if *remaining_input_bytes == 0 {
-            return Ok(BoundedLineRead::InputBudgetExhausted);
+        if *remaining_snapshot_bytes == 0 {
+            return Ok(if saw_bytes {
+                if oversized { BoundedLineRead::Oversized } else { BoundedLineRead::Line }
+            } else {
+                BoundedLineRead::EndOfFile
+            });
         }
-
-        let permitted = buffer.len().min(*remaining_input_bytes);
+        let permitted =
+            buffer.len().min((*remaining_snapshot_bytes).try_into().unwrap_or(usize::MAX));
         let available = buffer.get(..permitted).ok_or_else(|| {
             io::Error::new(io::ErrorKind::InvalidData, "invalid telemetry reader buffer range")
         })?;
@@ -597,7 +502,7 @@ fn read_bounded_line<R: BufRead>(
             oversized = true;
         }
         reader.consume(consumed);
-        *remaining_input_bytes = remaining_input_bytes.saturating_sub(consumed);
+        *remaining_snapshot_bytes = remaining_snapshot_bytes.saturating_sub(consumed as u64);
         if has_newline {
             return Ok(if oversized { BoundedLineRead::Oversized } else { BoundedLineRead::Line });
         }
@@ -623,7 +528,7 @@ fn open_read_no_follow(path: &Path) -> io::Result<std::fs::File> {
 #[allow(clippy::unwrap_used, clippy::indexing_slicing, clippy::panic)]
 mod tests {
     use super::*;
-    use std::io::Write;
+    use std::io::{Cursor, Write};
     use tempfile::TempDir;
 
     fn write_jsonl<L>(dir: &std::path::Path, track_id: &str, lines: &[L])
@@ -633,20 +538,6 @@ mod tests {
         let logs_dir = dir.join(track_id).join("logs");
         std::fs::create_dir_all(&logs_dir).unwrap();
         let mut file = std::fs::File::create(logs_dir.join("telemetry.jsonl")).unwrap();
-        for line in lines {
-            file.write_all(line.as_ref()).unwrap();
-            file.write_all(b"\n").unwrap();
-        }
-    }
-
-    fn write_rotated_jsonl<L>(dir: &std::path::Path, track_id: &str, generation: u64, lines: &[L])
-    where
-        L: AsRef<[u8]>,
-    {
-        let logs_dir = dir.join(track_id).join("logs");
-        std::fs::create_dir_all(&logs_dir).unwrap();
-        let mut file =
-            std::fs::File::create(logs_dir.join(format!("telemetry.jsonl.{generation}"))).unwrap();
         for line in lines {
             file.write_all(line.as_ref()).unwrap();
             file.write_all(b"\n").unwrap();
@@ -712,11 +603,12 @@ mod tests {
 
     #[test]
     fn test_aggregate_persisted_command_records_produces_typed_metrics() {
+        let new_success_line = r#"{"event_type":"TrackSubcommand","schema_version":1,"track_id":"t","command":"sotp track plan","exit_code":0,"duration_ms":40,"timestamp":"2026-06-10T00:00:00Z"}"#;
         let tmp = TempDir::new().unwrap();
         write_jsonl(
             tmp.path(),
             "t",
-            &[COMMAND_SUCCESS_LINE, COMMAND_SUCCESS_LINE, COMMAND_FAILURE_LINE],
+            &[COMMAND_SUCCESS_LINE, COMMAND_SUCCESS_LINE, COMMAND_FAILURE_LINE, new_success_line],
         );
 
         let report = TelemetryReport::new(tmp.path().to_path_buf());
@@ -725,10 +617,104 @@ mod tests {
         assert_eq!(output.command_metrics.len(), 1);
         let metric = output.command_metrics.first().unwrap();
         assert_eq!(metric.command().as_str(), "track plan");
-        assert_eq!(*metric.executions().as_ref(), 3);
+        assert_eq!(*metric.executions().as_ref(), 4);
         assert_eq!(*metric.failures().as_ref(), 1);
-        assert_eq!(*metric.total_duration().as_ref(), 320);
-        assert_eq!(metric.failure_rate().value(), 3_333);
+        assert_eq!(*metric.total_duration().as_ref(), 360);
+        assert_eq!(metric.failure_rate().value(), 2_500);
+    }
+
+    #[test]
+    fn test_aggregate_ignores_noncanonical_rotated_file() {
+        let tmp = TempDir::new().unwrap();
+        write_jsonl(tmp.path(), "t", &[COMMAND_SUCCESS_LINE]);
+        std::fs::write(tmp.path().join("t/logs/telemetry.jsonl.1"), COMMAND_FAILURE_LINE).unwrap();
+
+        let output =
+            TelemetryReport::new(tmp.path().to_path_buf()).aggregate(&track_id("t")).unwrap();
+
+        let metric = output.command_metrics.first().unwrap();
+        assert_eq!(*metric.executions().as_ref(), 1);
+        assert_eq!(*metric.failures().as_ref(), 0);
+    }
+
+    #[test]
+    fn test_aggregate_streams_append_only_log_beyond_one_megabyte() {
+        let tmp = TempDir::new().unwrap();
+        let lines = vec![COMMAND_SUCCESS_LINE; 10_000];
+        write_jsonl(tmp.path(), "t", &lines);
+
+        let output =
+            TelemetryReport::new(tmp.path().to_path_buf()).aggregate(&track_id("t")).unwrap();
+
+        let metric = output.command_metrics.first().unwrap();
+        assert_eq!(*metric.executions().as_ref(), 10_000);
+        assert_eq!(*metric.failures().as_ref(), 0);
+    }
+
+    #[test]
+    fn test_aggregate_caps_unique_command_projection_once_per_omitted_record() {
+        let tmp = TempDir::new().unwrap();
+        let lines = (0..=MAX_TELEMETRY_RETAINED_ENTRIES)
+            .map(|index| {
+                format!(
+                    "{{\"event_type\":\"TrackSubcommand\",\"schema_version\":1,\"track_id\":\"t\",\"command\":\"track command-{index}\",\"exit_code\":0,\"duration_ms\":1,\"timestamp\":\"2026-06-10T00:00:00Z\"}}"
+                )
+            })
+            .collect::<Vec<_>>();
+        write_jsonl(tmp.path(), "t", &lines);
+
+        let output =
+            TelemetryReport::new(tmp.path().to_path_buf()).aggregate(&track_id("t")).unwrap();
+
+        assert_eq!(output.phase_durations.len(), MAX_TELEMETRY_RETAINED_ENTRIES);
+        assert_eq!(output.command_metrics.len(), MAX_TELEMETRY_RETAINED_ENTRIES);
+        assert_eq!(*output.skipped_lines.as_ref(), 1);
+    }
+
+    #[test]
+    fn test_aggregate_caps_error_and_hook_projections() {
+        let tmp = TempDir::new().unwrap();
+        let error_lines = (0..=MAX_TELEMETRY_RETAINED_ENTRIES)
+            .map(|index| {
+                format!(
+                    "{{\"event_type\":\"NonZeroExit\",\"schema_version\":1,\"track_id\":\"t\",\"command\":\"track error-{index}\",\"exit_code\":1,\"error_chain\":\"failed\",\"timestamp\":\"2026-06-10T00:00:00Z\"}}"
+                )
+            })
+            .chain((0..=MAX_TELEMETRY_RETAINED_ENTRIES).map(|index| {
+                format!(
+                    "{{\"event_type\":\"HookBlock\",\"schema_version\":1,\"track_id\":\"t\",\"hook_name\":\"hook-{index}\",\"timestamp\":\"2026-06-10T00:00:00Z\"}}"
+                )
+            }))
+            .collect::<Vec<_>>();
+        write_jsonl(tmp.path(), "t", &error_lines);
+
+        let output =
+            TelemetryReport::new(tmp.path().to_path_buf()).aggregate(&track_id("t")).unwrap();
+
+        assert_eq!(output.errors.len(), MAX_TELEMETRY_RETAINED_ENTRIES);
+        assert_eq!(output.hook_blocks.len(), MAX_TELEMETRY_RETAINED_ENTRIES);
+        assert_eq!(*output.skipped_lines.as_ref(), 2);
+    }
+
+    #[test]
+    fn test_read_bounded_line_honors_captured_snapshot_length() {
+        let first = b"{\"event_type\":\"TrackSubcommand\"}\n";
+        let second = b"{\"event_type\":\"TrackSubcommand\",\"extra\":\"appended\"}\n";
+        let mut reader =
+            io::BufReader::new(Cursor::new([first.as_slice(), second.as_slice()].concat()));
+        let mut remaining = first.len() as u64;
+        let mut line = Vec::new();
+
+        assert!(matches!(
+            read_bounded_line(&mut reader, &mut line, &mut remaining),
+            Ok(BoundedLineRead::Line)
+        ));
+        assert_eq!(line, first);
+        line.clear();
+        assert!(matches!(
+            read_bounded_line(&mut reader, &mut line, &mut remaining),
+            Ok(BoundedLineRead::EndOfFile)
+        ));
     }
 
     #[test]
@@ -893,58 +879,6 @@ mod tests {
         assert_eq!(output.phase_durations.first().unwrap().total_ms, 1200);
     }
 
-    #[test]
-    fn test_aggregate_includes_retained_rotated_generations() {
-        let tmp = TempDir::new().unwrap();
-        write_rotated_jsonl(tmp.path(), "t", 2, &[COMMAND_SUCCESS_LINE]);
-        write_rotated_jsonl(tmp.path(), "t", 1, &[COMMAND_FAILURE_LINE]);
-        write_jsonl(tmp.path(), "t", &[COMMAND_SUCCESS_LINE]);
-
-        let output =
-            TelemetryReport::new(tmp.path().to_path_buf()).aggregate(&track_id("t")).unwrap();
-
-        let metric = output.command_metrics.first().unwrap();
-        assert_eq!(*metric.executions().as_ref(), 3);
-        assert_eq!(*metric.failures().as_ref(), 1);
-        assert_eq!(*metric.total_duration().as_ref(), 320);
-    }
-
-    #[test]
-    fn test_aggregate_ignores_rotated_generation_outside_writer_domain() {
-        let tmp = TempDir::new().unwrap();
-        write_rotated_jsonl(tmp.path(), "t", u64::from(u16::MAX) + 1, &[COMMAND_FAILURE_LINE]);
-        write_jsonl(tmp.path(), "t", &[COMMAND_SUCCESS_LINE]);
-
-        let output =
-            TelemetryReport::new(tmp.path().to_path_buf()).aggregate(&track_id("t")).unwrap();
-
-        let metric = output.command_metrics.first().unwrap();
-        assert_eq!(*metric.executions().as_ref(), 1);
-        assert_eq!(*metric.failures().as_ref(), 0);
-    }
-
-    #[test]
-    fn test_aggregate_total_input_budget_returns_typed_failure() {
-        let tmp = TempDir::new().unwrap();
-        let logs_dir = tmp.path().join("t").join("logs");
-        std::fs::create_dir_all(&logs_dir).unwrap();
-        let record = format!("{COMMAND_SUCCESS_LINE}\n");
-        let record_count = MAX_TELEMETRY_INPUT_BYTES / record.len() + 1;
-        let mut input = Vec::with_capacity(record.len() * record_count);
-        for _ in 0..record_count {
-            input.extend_from_slice(record.as_bytes());
-        }
-        std::fs::write(logs_dir.join("telemetry.jsonl"), input).unwrap();
-
-        let result = TelemetryReport::new(tmp.path().to_path_buf()).aggregate(&track_id("t"));
-
-        assert!(matches!(
-            result,
-            Err(TelemetryReportError::Io { message, .. })
-                if message.contains("input exceeds the 1048576-byte limit")
-        ));
-    }
-
     #[cfg(unix)]
     #[test]
     fn test_aggregate_without_lock_file_reads_read_only_logs_directory() {
@@ -964,19 +898,16 @@ mod tests {
     }
 
     #[test]
-    fn test_aggregate_non_regular_lock_returns_io_error() {
+    fn test_aggregate_ignores_stray_lock_file() {
         let tmp = TempDir::new().unwrap();
         write_jsonl(tmp.path(), "t", &[COMMAND_SUCCESS_LINE]);
         let lock_path = tmp.path().join("t").join("logs").join("telemetry.jsonl.lock");
         std::fs::create_dir(&lock_path).unwrap();
 
-        let result = TelemetryReport::new(tmp.path().to_path_buf()).aggregate(&track_id("t"));
+        let output =
+            TelemetryReport::new(tmp.path().to_path_buf()).aggregate(&track_id("t")).unwrap();
 
-        assert!(matches!(
-            result,
-            Err(TelemetryReportError::Io { path, message })
-                if path.ends_with("telemetry.jsonl.lock") && message == "not a regular file"
-        ));
+        assert_eq!(output.command_metrics.len(), 1);
     }
 
     #[test]
@@ -994,25 +925,6 @@ mod tests {
         assert_eq!(*output.skipped_lines.as_ref(), 1);
         assert!(output.command_metrics.is_empty());
         assert!(output.phase_durations.is_empty());
-    }
-
-    #[cfg(unix)]
-    #[test]
-    fn test_aggregate_symlinked_rotated_generation_returns_io_error() {
-        let tmp = TempDir::new().unwrap();
-        let outside = TempDir::new().unwrap();
-        let logs_dir = tmp.path().join("t").join("logs");
-        std::fs::create_dir_all(&logs_dir).unwrap();
-        std::fs::write(outside.path().join("telemetry.jsonl.1"), COMMAND_SUCCESS_LINE).unwrap();
-        std::os::unix::fs::symlink(
-            outside.path().join("telemetry.jsonl.1"),
-            logs_dir.join("telemetry.jsonl.1"),
-        )
-        .unwrap();
-
-        let result = TelemetryReport::new(tmp.path().to_path_buf()).aggregate(&track_id("t"));
-
-        assert!(matches!(result, Err(TelemetryReportError::Io { .. })));
     }
 
     /// Missing telemetry.jsonl for an existing track returns empty output.

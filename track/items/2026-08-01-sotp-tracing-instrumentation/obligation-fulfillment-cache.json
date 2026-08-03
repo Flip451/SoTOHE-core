@@ -437,13 +437,13 @@
         "item_identifier": "voluntary:IN-03"
       },
       "key": {
-        "bound_tests_set_hash": "e4b9afcc8280be5eb1560d0e54c4fdc23361c2fb1b6f909f9f4fde28072ace92",
+        "bound_tests_set_hash": "e91185169941301913bea433e0389762a72377de1f56d0e7309fbae239a37289",
         "declaration_hash": "1ea441b310c43de24d5ce9e2092cf29cf75c9483adfe1b5fabb2adf2c0ce9a9d",
         "anchor_text_hash": "c6df563b04a97af62f3ffd6b5611d9f27c65d91d68cc71d5c033703c2757d41f"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(*metric.executions().as_ref(), 3);\n        assert_eq!(*metric.failures().as_ref(), 1);\n        assert_eq!(*metric.total_duration().as_ref(), 320);\n        assert_eq!(metric.failure_rate().value(), 3_333);"
+        "citation": "assert_eq!(*metric.executions().as_ref(), 4);\n        assert_eq!(*metric.failures().as_ref(), 1);\n        assert_eq!(*metric.total_duration().as_ref(), 360);\n        assert_eq!(metric.failure_rate().value(), 2_500);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -473,13 +473,13 @@
         "item_identifier": "voluntary:AC-02"
       },
       "key": {
-        "bound_tests_set_hash": "63e5390e0fde9c4e37cf3c63f2d21a0d6b95d479ddcdffdcfb838522ce551610",
+        "bound_tests_set_hash": "f33b6165a4ec83ba0f1b924d95f31ae1f5da2a8f88f93fe5707419567dce4aea",
         "declaration_hash": "1ea441b310c43de24d5ce9e2092cf29cf75c9483adfe1b5fabb2adf2c0ce9a9d",
         "anchor_text_hash": "2281d423f88ab65f04dd389564bb99b37fa8d85ccc47cc6f7cf89090396c0c85"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(*metric.executions().as_ref(), 3);\n        assert_eq!(*metric.failures().as_ref(), 1);\n        assert_eq!(*metric.total_duration().as_ref(), 320);\n        assert_eq!(metric.failure_rate().value(), 3_333);"
+        "citation": "assert_eq!(*metric.executions().as_ref(), 4);\n        assert_eq!(*metric.failures().as_ref(), 1);\n        assert_eq!(*metric.total_duration().as_ref(), 360);\n        assert_eq!(metric.failure_rate().value(), 2_500);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -1471,7 +1471,7 @@
         "item_identifier": "trait_method:report"
       },
       "key": {
-        "bound_tests_set_hash": "98de544d29952ee0cd1f7f005ee3362995d202de347b32c4801a2a3b97e1cd95",
+        "bound_tests_set_hash": "b8f79711b0cf2a708319790d35bea2d74218f8bdb4413583cb57a99e56fff117",
         "declaration_hash": "24ddcb83759958b8e4f49fe9871fde51833d19c710bbc5ac6e922764cd0469bc",
         "anchor_text_hash": "c6df563b04a97af62f3ffd6b5611d9f27c65d91d68cc71d5c033703c2757d41f"
       },
@@ -1522,13 +1522,13 @@
         "item_identifier": "trait_method:report"
       },
       "key": {
-        "bound_tests_set_hash": "98de544d29952ee0cd1f7f005ee3362995d202de347b32c4801a2a3b97e1cd95",
+        "bound_tests_set_hash": "b8f79711b0cf2a708319790d35bea2d74218f8bdb4413583cb57a99e56fff117",
         "declaration_hash": "24ddcb83759958b8e4f49fe9871fde51833d19c710bbc5ac6e922764cd0469bc",
         "anchor_text_hash": "2281d423f88ab65f04dd389564bb99b37fa8d85ccc47cc6f7cf89090396c0c85"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(output.command_metrics.len(), 1);\n        assert_eq!(output.command_metrics.first().map(|metric| *metric.executions().as_ref()),\n            Some(4));\n        assert_eq!(output.command_metrics.first().map(|metric| *metric.total_duration().as_ref()),\n            Some(240));\n        assert_eq!(output.command_metrics.first().map(|metric| metric.failure_rate().value()),\n            Some(2_500));"
+        "citation": "assert_eq!(*metric.executions().as_ref(), 2);\n        assert_eq!(*metric.failures().as_ref(), 1);\n        assert_eq!(*metric.total_duration().as_ref(), 200);\n        assert_eq!(metric.failure_rate().value(), 5_000);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [

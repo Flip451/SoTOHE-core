@@ -1,534 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8506571ec0dcb04ec4dbcb52a9677844f3d2a365452fbc71e215c4e4da1f2bf3",
-          "at": "2026-08-01T08:46:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8506571ec0dcb04ec4dbcb52a9677844f3d2a365452fbc71e215c4e4da1f2bf3",
-          "at": "2026-08-01T08:49:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This binding overclaims AC-01: the referenced test only constructs an in-memory failure result and asserts its exit code; it does not execute a command or verify local JSONL recording. Remove the AC-01 binding or bind it to an entrypoint/persistence integration test.",
-              "severity": "P1",
-              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
-              "line": 16,
-              "category": "test-obligation-evidence"
-            },
-            {
-              "message": "This binding overclaims IN-01: the referenced test only constructs a CommandTraceRecord and checks fields; it does not prove common-entrypoint instrumentation across `sotp` commands. Remove the IN-01 binding or bind it to the later entrypoint integration evidence.",
-              "severity": "P1",
-              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
-              "line": 29,
-              "category": "test-obligation-evidence"
-            },
-            {
-              "message": "This binding overclaims AC-01: the referenced test only validates fields on an in-memory CommandTraceRecord and does not verify that executing a command generates a local JSONL record. Remove the AC-01 binding or replace it with end-to-end recording evidence.",
-              "severity": "P1",
-              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
-              "line": 39,
-              "category": "test-obligation-evidence"
-            }
-          ],
-          "hash": "rvw1:sha256:970c2057079fb215e801c8e4ad3e932909f57647c3be773bf0435076f3d34b32",
-          "at": "2026-08-01T12:38:05Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:27f6c5ad4be8d2d9cb477a40b26d266330c97aa98f51e96ea2a4b45cbc87e5cf",
-          "at": "2026-08-01T12:41:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1a317cc34f0e7858375a7c77e18ac8ab7f5c9f02e16c84cbcbbede2c0e87dae3",
-          "at": "2026-08-01T12:44:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The current binding set lacks fresh verifier coverage. `bin/sotp test-obligation results` reports `stale=4 verdict_absent=3` for completed tasks, and `test-obligation check` exits 1 with declaration drift. The three newly converted waivers—including this AC-01 record—have no matching waiver verdicts. Re-run host evaluation and require a fresh successful check before accepting this artifact.",
-              "severity": "P1",
-              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
-              "line": 14,
-              "category": "test-obligation-freshness"
-            }
-          ],
-          "hash": "rvw1:sha256:1a317cc34f0e7858375a7c77e18ac8ab7f5c9f02e16c84cbcbbede2c0e87dae3",
-          "at": "2026-08-01T12:50:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1a317cc34f0e7858375a7c77e18ac8ab7f5c9f02e16c84cbcbbede2c0e87dae3",
-          "at": "2026-08-01T12:55:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1a317cc34f0e7858375a7c77e18ac8ab7f5c9f02e16c84cbcbbede2c0e87dae3",
-          "at": "2026-08-01T12:58:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:02eaabfd9816f5f6dbd4c661e3ea0289abf07b11abc4893178e3407c2cf44e7a",
-          "at": "2026-08-01T14:38:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:02eaabfd9816f5f6dbd4c661e3ea0289abf07b11abc4893178e3407c2cf44e7a",
-          "at": "2026-08-01T14:45:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e314640844447b5698c9126b1eacb48a338b6f871a277cd0c22e6fe90c31c27d",
-          "at": "2026-08-01T16:26:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e314640844447b5698c9126b1eacb48a338b6f871a277cd0c22e6fe90c31c27d",
-          "at": "2026-08-01T16:30:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The added T004 bindings do not currently satisfy the required obligation gate: `test-obligation check` reports declaration drift for `CommandTraceFileSizeLimitBytes` and `CommandTraceRetainedFileCount` on IN-04/CN-02, so the expected pass/resolved_edges=36 result is not met. Refresh the frozen verdict through the supported workflow after aligning declarations; do not hand-edit the cache.",
-              "severity": "P1",
-              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
-              "line": 141,
-              "category": "test-obligation"
-            }
-          ],
-          "hash": "rvw1:sha256:9dee50c8d8acef44c91493dfd9b273e8d97b38c89efe4a20a93d023565b7b20b",
-          "at": "2026-08-01T19:40:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9dee50c8d8acef44c91493dfd9b273e8d97b38c89efe4a20a93d023565b7b20b",
-          "at": "2026-08-01T19:47:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9dee50c8d8acef44c91493dfd9b273e8d97b38c89efe4a20a93d023565b7b20b",
-          "at": "2026-08-01T19:51:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "After the Phase 2/3 re-entry, T004 owns only rotation-policy construction and T005 owns JSONL persistence, but this waiver and the related reasons on lines 40 and 50 still assign local record writing to T004. Update all three ownership references to T005 so the binding artifact is consistent with the current implementation plan.",
-              "severity": "P1",
-              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
-              "line": 17,
-              "category": "cross-commit-consistency"
-            }
-          ],
-          "hash": "rvw1:sha256:9dee50c8d8acef44c91493dfd9b273e8d97b38c89efe4a20a93d023565b7b20b",
-          "at": "2026-08-01T20:01:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8f7c15d0b15fe9ec29fce043d6150ef8f3988afb94e62c016cae905983584703",
-          "at": "2026-08-01T20:07:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:934922f9e1516ca16b18d7f3ec27cb5c467084ba2d332b4b3c80a86d842504b3",
-          "at": "2026-08-01T20:36:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:934922f9e1516ca16b18d7f3ec27cb5c467084ba2d332b4b3c80a86d842504b3",
-          "at": "2026-08-01T20:49:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "CN-04's voluntary binding covers unknown-schema fail-open handling but omits the existing malformed-record test `test_aggregate_malformed_command_record_is_skipped_and_counted`; bind both concrete failure modes so the constraint's evidence is complete.",
-              "severity": "P1",
-              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
-              "line": 129,
-              "category": "test-obligation-evidence"
-            }
-          ],
-          "hash": "rvw1:sha256:486dd1055a2250d6d48eeb30f312271687cb6f065ad727f1a0ec4c4cfdb44c78",
-          "at": "2026-08-01T21:38:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:94016988a8fbf3e892b1d9d728825baf07a01545534b11339249ad7a8e528dd3",
-          "at": "2026-08-01T21:42:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:94016988a8fbf3e892b1d9d728825baf07a01545534b11339249ad7a8e528dd3",
-          "at": "2026-08-01T21:57:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:76f37330739c3496e0c38b78c0b0c29118cedd88eca0d555e50d4a2b765d9e96",
-          "at": "2026-08-01T23:29:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:76f37330739c3496e0c38b78c0b0c29118cedd88eca0d555e50d4a2b765d9e96",
-          "at": "2026-08-02T00:19:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:76f37330739c3496e0c38b78c0b0c29118cedd88eca0d555e50d4a2b765d9e96",
-          "at": "2026-08-02T00:24:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `CommandTraceDriver` IN-01 obligation is still waived, even though the briefing explicitly requires IN-01 to bind to the exact driver success/write-failure tests. The added `CommandTraceHandleOutcome` bindings do not replace that driver-level binding because they attribute evidence to a different catalogue entry. Remove the waiver and bind `CommandTraceDriver` IN-01 to both named driver tests.",
-              "severity": "P1",
-              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
-              "line": 255,
-              "category": "test-obligation-binding"
-            }
-          ],
-          "hash": "rvw1:sha256:895ae3038fb7c8b5712631818adc0dea7b8e8178270fd0a792bdb8519de1e5f9",
-          "at": "2026-08-02T01:22:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dd3b645f34c065b85a5ed85b836eccc6eb096472d148e943670e704ff9c8601b",
-          "at": "2026-08-02T01:24:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a590aa8cc63e9184adde7925f68f59745793d4c5970b473d3f4682618f292832",
-          "at": "2026-08-02T02:51:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a590aa8cc63e9184adde7925f68f59745793d4c5970b473d3f4682618f292832",
-          "at": "2026-08-02T03:04:15Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:825309b82e3c66ff9aeb8543506d4744f8d7c956cd4f4c31b5637553ed68c30a",
-          "at": "2026-08-02T03:52:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:825309b82e3c66ff9aeb8543506d4744f8d7c956cd4f4c31b5637553ed68c30a",
-          "at": "2026-08-02T04:04:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:038409cd4131402ac367fa5de7cbe04238b61ea92a698105db54df09cddc30ab",
-          "at": "2026-08-02T04:32:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:038409cd4131402ac367fa5de7cbe04238b61ea92a698105db54df09cddc30ab",
-          "at": "2026-08-02T04:49:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9906d97a1d8b8b09705f2574fc3eeb07288f76807aa8417862fba2c077d266f2",
-          "at": "2026-08-02T06:28:42Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3a1faad1bc3465aa418806ba17e3d0dde520c6bdf8404139841b0d389a1d7b04",
-          "at": "2026-08-02T15:53:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3a1faad1bc3465aa418806ba17e3d0dde520c6bdf8404139841b0d389a1d7b04",
-          "at": "2026-08-02T16:17:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f7d72f3868709123569eec090fe4b6b8b71829db556a2b148e10dadf45161f24",
-          "at": "2026-08-02T16:31:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f7d72f3868709123569eec090fe4b6b8b71829db556a2b148e10dadf45161f24",
-          "at": "2026-08-02T16:38:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The sole OUT-02 binding is not real no-rotation evidence. `test_telemetry_archived_service_reuses_telemetry_jsonl_without_rotation` injects a recording mock and never creates a telemetry file, so its assertion that `telemetry.1.jsonl` does not exist is vacuous. The same test is reused by both archived-service fulfillments. Bind a filesystem/archive integration test that verifies only `telemetry.jsonl` is produced.",
-              "severity": "P1",
-              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
-              "line": 8,
-              "category": "test_coverage"
-            },
-            {
-              "message": "The archived-path bindings do not cover the fire-and-forget outcome contract. They test successful routing and service-level error propagation, but none drives an archive telemetry write failure through the command entrypoint and verifies that the original command exit remains unchanged; all cited outcome-preservation tests exercise only active emission. Add and bind an archived-write-failure regression test.",
-              "severity": "P1",
-              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
-              "line": 30,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:f7d72f3868709123569eec090fe4b6b8b71829db556a2b148e10dadf45161f24",
-          "at": "2026-08-02T16:48:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f7d72f3868709123569eec090fe4b6b8b71829db556a2b148e10dadf45161f24",
-          "at": "2026-08-02T17:08:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The OUT-02 single-sink/no-rotation evidence remains vacuous. The cited usecase test injects `RecordingArchivedPort`, performs no filesystem write, and checks for `telemetry.1.jsonl` beneath a path that was never created; it would pass even if the real adapter created command-trace or rotated files. Bind a current-route filesystem test that verifies the archive logs directory contains only `telemetry.jsonl`.",
-              "severity": "P1",
-              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
-              "line": 8,
-              "category": "test_coverage"
-            },
-            {
-              "message": "The `TelemetryEmitInteractor` fulfillment is grounded in the fire-and-forget outcome constraint but covers write failures only on active emission. No bound test makes the archived `EmitArchivedCurrentCommand` path fail and verifies that the completed archive command's original exit remains unchanged. Add and bind an archived-write-failure outcome regression test.",
-              "severity": "P1",
-              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
-              "line": 27,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:f7d72f3868709123569eec090fe4b6b8b71829db556a2b148e10dadf45161f24",
-          "at": "2026-08-02T17:12:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6bd3230748076a162020246aa41e3f719113c933b4eb1659d24726f53114205c",
-          "at": "2026-08-02T17:30:04Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6bd3230748076a162020246aa41e3f719113c933b4eb1659d24726f53114205c",
-          "at": "2026-08-02T17:33:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The updated bindings are not fresh: `bin/sotp test-obligation check` fails with `TestChanged` drifts for the `TelemetryAggregateService` and `TelemetryArchivedService` OUT-02 edges, and results report three stale in-progress verdicts. Re-evaluate these records and obtain a passing check before accepting the binding artifact.",
-              "severity": "P1",
-              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
-              "line": 8,
-              "category": "artifact_freshness"
-            },
-            {
-              "message": "The new archive-failure outcome tests are bound only to `TelemetryArchivedService` obligations whose sole spec anchor is OUT-02 (no alternate sink or rotation), so those tests do not address that edge and remain absent from the `TelemetryEmitInteractor` fulfillment that actually cites CN-02's fire-and-forget outcome constraint. Add the archive failure tests to the line-27 fulfillment (or correct the upstream attribution) so the evidence is edge-local.",
-              "severity": "P1",
-              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
-              "line": 27,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:6bd3230748076a162020246aa41e3f719113c933b4eb1659d24726f53114205c",
-          "at": "2026-08-02T17:37:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d8c3c1f9168d224d703e02e5007982b0c6acff30075540f9bd3652a76af365a6",
-          "at": "2026-08-02T18:18:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d8c3c1f9168d224d703e02e5007982b0c6acff30075540f9bd3652a76af365a6",
-          "at": "2026-08-02T18:22:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The newly added TelemetryDriver IN-01/AC-01 bindings are not fresh: `bin/sotp test-obligation check` fails with `DeclChanged` drift for both edges, and cached results report `stale=2` for in-progress records. Re-evaluate and freeze these bindings through the supported workflow before accepting this artifact.",
-              "severity": "P1",
-              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
-              "line": 7,
-              "category": "test-obligation-freshness"
-            }
-          ],
-          "hash": "rvw1:sha256:4a5f15c68791add8f9580cf3f4d740a1e92c3b3fffc7d7357e1289da53b96c67",
-          "at": "2026-08-02T19:11:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4a5f15c68791add8f9580cf3f4d740a1e92c3b3fffc7d7357e1289da53b96c67",
-          "at": "2026-08-02T19:14:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4a5f15c68791add8f9580cf3f4d740a1e92c3b3fffc7d7357e1289da53b96c67",
-          "at": "2026-08-02T19:16:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This manifest is synchronized to an obsolete obligation/catalogue snapshot. `sotp test-obligation check` now fails with 11 added, 3 removed, and 6 changed obligations; it still binds removed entries (`TelemetryArchivedService::emit_archived_current`, `command_context_from_args`, and `should_emit_completion`) whose cited tests no longer exist, while omitting new obligations such as `TelemetryAggregateInteractor`, `TelemetryArchiveRoutePort`, and `TelemetryClockPort`. Regenerate the obligations, rebuild these bindings against the current catalogues/task contract, and re-evaluate them.",
-              "severity": "P1",
-              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
-              "line": 29,
-              "category": "test-obligation-freshness"
-            }
-          ],
-          "hash": "rvw1:sha256:4a5f15c68791add8f9580cf3f4d740a1e92c3b3fffc7d7357e1289da53b96c67",
-          "at": "2026-08-03T08:41:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "OUT-02 requires evidence that archive completion introduces neither another command-trace sink nor file rotation, but the cited test uses a recording fake and merely checks that a path which was never written (`telemetry.1.jsonl`) does not exist. It cannot detect the real archive adapter changing filenames or rotating output. The existing end-to-end `cli::tests::test_archive_telemetry_emit_writes_to_archived_track_logs` verifies the actual archive directory contains only `telemetry.jsonl`, yet it is not enrolled anywhere in this manifest. Bind that integration test to OUT-02 and the archived-emission fulfillment so the planning evidence covers the real filesystem behavior.",
-              "severity": "P1",
-              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
-              "line": 361,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:dccf6b04d196631e00b666a1502ab87ae5b1a7fc54dbb2cd1c0a7607a8444880",
-          "at": "2026-08-03T10:57:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:da74a7a4ad3812447219fa691c871b822371b50bda2cea654f35434e9208ab5b",
-          "at": "2026-08-03T11:07:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The current catalogue adds logic obligations for `cli::telemetry_completion_eligible` and `cli::telemetry_track_display_only`, with corresponding tests already present, but this manifest ends without fulfillment records for either function. Consequently `sotp test-obligation check` fails with `added=2` and reports both obligations missing from the derived artifact; re-derive the obligations, add bindings for the eligibility/display-only tests, and re-evaluate the resulting records.",
-              "severity": "P1",
-              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
-              "line": 1199,
-              "category": "test_obligation_freshness"
-            }
-          ],
-          "hash": "rvw1:sha256:47e54f5d85fc6da3a3821d95f917215621c07066b1b438141dc8cdccbf3d7661",
-          "at": "2026-08-03T16:39:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0f346d44e5dbf2c74bd61fedf4a1551c84cde6ca23290d321c6a44cd63b91fea",
-          "at": "2026-08-03T16:45:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8805ea80d647a4733754ed446282b313921cc308fb31ffe5467c4cf8ffd3418f",
-          "at": "2026-08-03T17:22:50Z"
-        }
-      ]
-    },
     "usecase": {
       "rounds": [
         {
@@ -788,6 +260,779 @@
           "findings": [],
           "hash": "rvw1:sha256:bfd6ce14ef5229c955a6c7a271f0ee0306093fbaa68747d0dc6acdd57be7f575",
           "at": "2026-08-03T15:12:52Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f3fe4e078e4884e3f8b9369724e9515823540304b25649abd9769a07522e15c4",
+          "at": "2026-08-02T04:25:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f3fe4e078e4884e3f8b9369724e9515823540304b25649abd9769a07522e15c4",
+          "at": "2026-08-02T04:35:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`current_dir()` errors are silently replaced with `.`. This can write the trace to an unintended relative location or hide a repository-root resolution failure; preserve the original exit while reporting the trace setup error instead.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 315,
+              "category": "missing_error_handling"
+            },
+            {
+              "message": "This runtime JSONL log is included in the diff even though command-trace logs are intended to be non-version-controlled. The existing ignore rule for `track/logs/` does not cover `apps/cli/track/logs/`, so historical invocations are committed and future CLI runs can dirty the source tree.",
+              "severity": "P1",
+              "file": "apps/cli/track/logs/command-trace.jsonl",
+              "line": 1,
+              "category": "runtime_artifact"
+            }
+          ],
+          "hash": "rvw1:sha256:2dcd75601c2c7c551d72a9645ffefea48aa1a9dd8b017c1300a695fda7bbe1b9",
+          "at": "2026-08-02T05:57:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2d2b6fe03de5a94c99610c4e0f67b0a4b47d75d25f231497cfa1f104aaa3316d",
+          "at": "2026-08-02T06:19:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The production-only `SOTP_TELEMETRY=0` early return bypasses `CommandTraceCompositionRoot` and the driver entirely. This contradicts IN-01/AC-01 and the briefing’s requirement that every completed top-level command use the real tracing path; existing CI tasks and spawned-command tests set this variable, so those executions produce no trace. Redirect test traces to an isolated sink instead of disabling the mandatory instrumentation.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 315,
+              "category": "correctness"
+            },
+            {
+              "message": "The new wrapper performs command classification, exit-result conversion, duration calculation, trace-record construction, environment inspection, and CWD-based root selection inside the bin layer. This violates the CLI thin-bin boundary; it also treats an arbitrary CWD as `project_root`, so nested-CWD or explicit `--workspace-root`/`--project-root` invocations write traces under the wrong directory. Move completed-command transformation and repository-root resolution behind `cli_driver`/`cli_composition`, leaving `run_cli_with` as dispatch-and-emit integration.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 192,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:2d2b6fe03de5a94c99610c4e0f67b0a4b47d75d25f231497cfa1f104aaa3316d",
+          "at": "2026-08-02T06:38:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`run_cli_with` now performs telemetry orchestration in the bin: it classifies top-level commands, resolves the writer, converts exit codes, and emits `TrackSubcommand`/`NonZeroExit` events. This violates the thin-bin boundary and the briefing's requirement that context resolution and event construction remain behind the composition/driver layers.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 283,
+              "category": "architecture_violation"
+            },
+            {
+              "message": "Common-command telemetry always resolves `track/items` relative to the process CWD, ignoring explicit `--items-dir`, `--workspace-root`, or `--project-root` inputs used by non-`Track` commands such as `catalog`, `verify`, and `catalogue-lint`. Invoking those commands against another repository can therefore append telemetry to the wrong track or emit nothing.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 284,
+              "category": "incorrect_path_resolution"
+            },
+            {
+              "message": "Successful archive commands no longer honor `SOTP_TELEMETRY_DIR`: this branch always sends `EmitArchivedTrackSubcommand`, whose usecase writes to the repository's archived-track log, whereas the existing override path required emitting through the resolved writer. With the override set, archive telemetry is written to the wrong sink.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 344,
+              "category": "environment_handling"
+            }
+          ],
+          "hash": "rvw1:sha256:6496f3d917d822dcb1510c2bf6e5a22a887f18a43fd6851a8c51eb41639ed1ae",
+          "at": "2026-08-02T10:57:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`run_cli_with` still owns telemetry-specific command identity mapping, timing setup, and command-context selection before dispatch. This is orchestration metadata that the briefing requires the composition/driver boundary to own, and it makes the thin bin responsible for maintaining a large exhaustive command map.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 186,
+              "category": "architecture_violation"
+            },
+            {
+              "message": "`telemetry_items_dir_for_command` falls back to `track/items` for commands with their own non-default items roots, including `telemetry report`, `task-contract`, and review commands. Those commands can operate on an explicit `--items-dir`, but completion telemetry is then resolved against the wrong repository/path.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 305,
+              "category": "incorrect_path_resolution"
+            }
+          ],
+          "hash": "rvw1:sha256:b6ee8e7ddde841555cc5cfa75af1fad46ec9e889bb817d2acb8fba7d8517e3dd",
+          "at": "2026-08-02T12:02:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `top_level_telemetry_identity!` and `top_level_telemetry_items_dir!` macros make `apps/cli` own exhaustive command-shape matching, command identity construction, and telemetry context selection. This is telemetry orchestration that the thin-bin boundary and briefing require the composition/driver layers to own; it also forces review command DTO fields to become `pub(crate)` solely for bin access.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 180,
+              "category": "architecture_violation"
+            },
+            {
+              "message": "The items-dir macro still falls back to `track/items` for top-level commands with explicit repository roots, notably `signal` commands accepting `--workspace-root`/`--project-root`. Running such a command against another repository can append completion telemetry to the CWD repository or omit it instead of the repository being operated on.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 219,
+              "category": "incorrect_path_resolution"
+            }
+          ],
+          "hash": "rvw1:sha256:47746e6737ffc4e2f5b39d920a167be73a65c5f6fc7e6a7852947c7674044bc2",
+          "at": "2026-08-02T12:32:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9b126bdd2a17799d77c9913f7e3d7448624b432e864debf15762792d26290703",
+          "at": "2026-08-02T15:50:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9b126bdd2a17799d77c9913f7e3d7448624b432e864debf15762792d26290703",
+          "at": "2026-08-02T15:53:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The in-process dispatch test helpers force `is_track_command` to `false` and run most tests in the ambient repository CWD. On a `track/<id>` checkout, every such test invokes `EmitCompletedCommand` and appends a synthetic `sotp test` event to the developer's real `track/items/<id>/logs/telemetry.jsonl`, contaminating active-track telemetry and making tests depend on repository state. Run these tests in an isolated temporary repository or disable telemetry for the test harness.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 607,
+              "category": "test_isolation"
+            }
+          ],
+          "hash": "rvw1:sha256:9b126bdd2a17799d77c9913f7e3d7448624b432e864debf15762792d26290703",
+          "at": "2026-08-02T16:11:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4252b8851d6c6ec791e5ecc3a741b45819cd3678d11aacffaea3f77b29e4bbcb",
+          "at": "2026-08-02T16:12:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4252b8851d6c6ec791e5ecc3a741b45819cd3678d11aacffaea3f77b29e4bbcb",
+          "at": "2026-08-02T16:17:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4252b8851d6c6ec791e5ecc3a741b45819cd3678d11aacffaea3f77b29e4bbcb",
+          "at": "2026-08-02T16:31:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4252b8851d6c6ec791e5ecc3a741b45819cd3678d11aacffaea3f77b29e4bbcb",
+          "at": "2026-08-02T16:39:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`is_track_command` is the only eligibility check, so every non-`track` command emits completion telemetry. This records explicitly pure-display commands such as `sotp telemetry report` and information-only `find-similar`, contrary to IN-01 and ADR D4’s pure-display exclusion. Determine eligibility from the typed command through the driver/usecase rather than treating all non-track commands as recordable.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 254,
+              "category": "correctness"
+            },
+            {
+              "message": "A successful archive with an explicit `--track-id` is routed through `EmitArchivedCommand` using that argument without branch-bound attribution. Because archive can succeed from `main`, this writes a track telemetry record on a non-track branch; from `track/A`, archiving B attributes the event to B instead of the current branch A. This violates IN-04/AC-04. Archive telemetry must first confirm and use the current track branch while retaining the archived destination path.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 324,
+              "category": "correctness"
+            },
+            {
+              "message": "`execute_track_with_telemetry` still performs command classification, display/archive branching, track-ID selection, timing orchestration, command execution, and telemetry-input selection. Together with the top-level `if !is_track_command` decision, this is business logic in the bin layer, violating the CLI thin-bin policy. Move completion eligibility and active/archive routing into `cli_driver`/usecase so the binary only constructs one typed input, dispatches it, emits the outcome, and preserves the exit code.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 300,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:4252b8851d6c6ec791e5ecc3a741b45819cd3678d11aacffaea3f77b29e4bbcb",
+          "at": "2026-08-02T16:47:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:897e7916049d48b396585c36e3bb39d790c5a833eb072abaf41b894424f65832",
+          "at": "2026-08-02T17:08:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The raw-argv eligibility result used here does not match the typed command semantics. It suppresses non-display gates with no dedicated emitter, including `catalogue-lint check-active-track`, `task-contract check`, `batch-plan check`, `catalog check`, aggregate `signal check`, and `test-obligation evaluate`; meanwhile pure output commands such as `review classify`, `review files`, `signal report`, `test-obligation results`, and `bindings-skeleton` remain eligible. Required completion records are therefore dropped while excluded display commands are recorded. Classify the parsed variants through the driver and add coverage for both categories.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 276,
+              "category": "correctness"
+            },
+            {
+              "message": "A successful archive now unconditionally sends `EmitArchivedCurrentCommand`. That archived adapter does not consult the existing `TelemetryConfig`, so `SOTP_TELEMETRY=0` still appends or creates the archived log, and `SOTP_TELEMETRY_DIR` is ignored in favor of `track/archive/<id>/logs/telemetry.jsonl`. Preserve the kill switch and output override by routing archive completion through the existing env-aware writer policy.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 317,
+              "category": "correctness"
+            },
+            {
+              "message": "`run_cli_with_context!` times an arbitrary command, dispatches it, and conditionally performs a second driver call; `execute_track_with_telemetry` additionally classifies display/archive variants and selects active versus archived telemetry inputs. This is multi-step application orchestration and business branching in the bin layer, contrary to the CLI thin-bin policy. Move completion instrumentation and track lifecycle routing behind `cli_driver`/usecase so the binary remains parse → one driver handle → emit.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 253,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:897e7916049d48b396585c36e3bb39d790c5a833eb072abaf41b894424f65832",
+          "at": "2026-08-02T17:19:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fd11c864f628bf93d881cc2adcd647666362143e2c1df1ceb9dbc7a30ec463c2",
+          "at": "2026-08-02T17:30:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fd11c864f628bf93d881cc2adcd647666362143e2c1df1ceb9dbc7a30ec463c2",
+          "at": "2026-08-02T17:35:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The raw-argv eligibility result is still incomplete for pure-display commands: unrecognized families default to eligible, so every `arch` variant (`tree`, `tree-full`, `members`, and `direct-checks`) and explicitly read-only commands such as `conventions resolve` append completion telemetry on a track branch. These commands only render/list information and should be excluded under the stated pure-display policy. Derive eligibility from the parsed command variants, or cover every display-only family in the driver classifier and its tests.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 276,
+              "category": "correctness"
+            },
+            {
+              "message": "`run_cli_with_context!` measures and executes a command and then conditionally invokes a second telemetry driver, while `execute_track_with_telemetry` additionally classifies display/archive variants and chooses active versus archived telemetry inputs. This remains multi-step application orchestration and business branching in the bin layer, contrary to the CLI thin-bin policy. Move completion instrumentation and track lifecycle routing behind `cli_driver`/usecase so the binary only parses input, performs one driver dispatch, and emits its `CommandOutcome`.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 253,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:fd11c864f628bf93d881cc2adcd647666362143e2c1df1ceb9dbc7a30ec463c2",
+          "at": "2026-08-02T17:39:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d4d4ebd007e86038554a89fbc6d5b2e99ab8b18002c7846693e8cf71ee5bd3aa",
+          "at": "2026-08-02T18:19:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Verify` is marked eligible for generic completion even though `execute_verify_with_telemetry` already emits its dedicated `GateEval`. With telemetry enabled on a track branch, every verify command therefore also appends a `TrackSubcommand` and, on failure, a `NonZeroExit`, polluting metrics with duplicate lifecycle records. Exclude `CliCommand::Verify` and update the policy test accordingly.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/telemetry_policy.rs",
+              "line": 43,
+              "category": "correctness"
+            },
+            {
+              "message": "The new common wrapper executes the selected command and then conditionally performs a second telemetry-driver dispatch. Together with the CLI-owned eligibility classifier, this places business policy and multi-step orchestration in the binary, violating the required parse → one `driver.handle(input)` → emit thin-bin boundary. Move command execution plus completion telemetry orchestration behind a driver/usecase boundary.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 253,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:d4d4ebd007e86038554a89fbc6d5b2e99ab8b18002c7846693e8cf71ee5bd3aa",
+          "at": "2026-08-02T18:24:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`run_cli_with_context!` executes and times an arbitrary command, then conditionally performs a second telemetry-driver dispatch; CLI code also decides generic eligibility and active/archive routing. This is business branching and multi-step orchestration outside the required thin-bin boundary. The cited ADR 2026-07-03-0446 D1/D2 narrowly exempts CLI-gate `GateEval` instrumentation, not generic `TrackSubcommand` telemetry for arbitrary commands. Move this orchestration outside the binary or explicitly extend the architecture decision.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 253,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:e49cc0ea2985f3a317d0bfa3e07bc90c0a0bdcc443784df98bf66b5d302e40e3",
+          "at": "2026-08-02T18:31:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Moving the eligibility branch into `TelemetryDriver::emit_completed_command` does not make this a thin-bin emit step: the binary still classifies command eligibility, starts the timer, dispatches the application command, and then invokes a second application driver; `execute_track_with_telemetry` likewise performs display/archive routing. This remains business branching and multi-step orchestration. ADR 2026-07-03-0446 D1/D2 exempts only CLI-gate `GateEval` instrumentation, not generic `TrackSubcommand` telemetry for arbitrary commands. Move the generic completion lifecycle outside the binary or explicitly extend the architecture decision.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 253,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:a3d338010f5744ea2a58e28e40d7ec314751743b5acb433119d412910882c4fc",
+          "at": "2026-08-02T18:50:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cebf02805c9efcc44b2d9650483c72770aebb54bd491f359585db190627eb659",
+          "at": "2026-08-02T19:05:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_with_error_chain` runs before the telemetry driver resolves the current branch. For branch-changing variants this uses post-command state: a successful `track switch-base` ends on the base branch, so `EmitCompletedCommand` silently drops the required completion event; conversely, `track branch create/switch` can write telemetry even when invoked from a non-track branch. Capture and validate the source track context before dispatch and pass it through the typed telemetry input.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 306,
+              "category": "telemetry"
+            }
+          ],
+          "hash": "rvw1:sha256:cebf02805c9efcc44b2d9650483c72770aebb54bd491f359585db190627eb659",
+          "at": "2026-08-02T19:19:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`run_cli_with_context!` bypasses the briefing's typed `TelemetryInput::ExecuteAndEmit` entrypoint: the binary resolves the source track, starts timing, executes the command, and then separately dispatches `EmitCompletedCommand`. This leaves the required completion lifecycle orchestration in `apps/cli` and means the designated typed-dispatch boundary is not used. Route the common completion path through `ExecuteAndEmit`, keeping only dedicated lifecycle paths separate.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 189,
+              "category": "architecture / typed-dispatch"
+            }
+          ],
+          "hash": "rvw1:sha256:3fe04a9633fbe5cdaaa78bcc55318c1a2f32ddbd3794b3c86226e085be93328e",
+          "at": "2026-08-02T20:39:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3fe04a9633fbe5cdaaa78bcc55318c1a2f32ddbd3794b3c86226e085be93328e",
+          "at": "2026-08-02T20:43:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new generic completion path resolves the telemetry writer directly in the CLI macro before dispatch (`resolve_telemetry_writer` at lines 190-191), and the track path repeats the same resolution at line 315. This makes the bin own branch/context and writer resolution, contrary to the briefing's thin-bin boundary; pass only typed context/input to the telemetry driver and let composition/driver layers resolve the repository and track.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 190,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:89518a6a9dcf3e98d74afce8e5822b7ccefe987cb2682f629ce5508b23c58bff",
+          "at": "2026-08-02T21:17:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:35d947dc6abc84456fdb31c31db34533de884024f356985660878d71770e7159",
+          "at": "2026-08-02T21:23:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`run_cli_with_context!` starts timing, dispatches the application command, and then conditionally invokes a second telemetry driver; the track wrapper additionally classifies display/archive variants and selects the telemetry input. This is multi-step application orchestration and business branching in the bin layer, contrary to the required parse → typed driver dispatch → emit boundary. Move the completion lifecycle, eligibility policy, and track routing behind `cli_driver`/usecase.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 247,
+              "category": "architecture"
+            },
+            {
+              "message": "`execute_with_error_chain` runs before `EmitCompletedCommand` is submitted with `source_track_id: None`, so branch attribution is resolved from post-command state. A successful `track switch-base` started on `track/*` ends on the base branch and silently loses its completion event, while `track branch create/switch` invoked from a non-track branch can append to the newly entered track. Capture the source branch context before execution behind the driver/composition boundary and preserve it through emission.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 327,
+              "category": "telemetry"
+            }
+          ],
+          "hash": "rvw1:sha256:35d947dc6abc84456fdb31c31db34533de884024f356985660878d71770e7159",
+          "at": "2026-08-02T21:31:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2c89e8d47622ee47dfe07a3d84d3ec0e160d2272fcc729213b52e600ddb60e6",
+          "at": "2026-08-02T22:20:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Common completion eligibility remains an exhaustive business-policy match in the CLI layer, and `main` converts that result into `Active` versus `Ineligible`. The briefing explicitly requires eligibility to be delegated to `cli_driver`; move this classification behind the typed driver boundary so the bin only supplies parsed command context.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/telemetry_policy.rs",
+              "line": 10,
+              "category": "architecture"
+            },
+            {
+              "message": "The track wrapper still classifies display-only variants, bypasses the lifecycle driver for them, and selects `Archive` versus `Active` itself. `run_track_with_completion` therefore receives a policy decision already made by the bin instead of owning track eligibility and routing as required by the briefing.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 311,
+              "category": "architecture"
+            },
+            {
+              "message": "Mapping an explicit archive target directly to `TelemetryCompletionRoute::Archive` loses branch-bound attribution. The driver emits to that target after success even when no track was active before dispatch, so `track archive --track-id B` from `main` creates or updates B's telemetry, while invoking it from `track/A` attributes the event to B instead of A. Gate archive emission on the captured source branch and retain source-track attribution.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 321,
+              "category": "telemetry"
+            },
+            {
+              "message": "The unconditional archive route uses the archived-track adapter, which does not consult the existing `TelemetryConfig`. Consequently a successful archive still writes when `SOTP_TELEMETRY=0` and ignores `SOTP_TELEMETRY_DIR`, regressing the existing archive telemetry policy. Preserve the kill switch and configured sink when routing archive completion.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 321,
+              "category": "environment_handling"
+            }
+          ],
+          "hash": "rvw1:sha256:f93491239df8cfcb1a50a9c039abec56f57c6e143c887f52c0a92141e5db580b",
+          "at": "2026-08-02T22:59:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`run_cli_with` derives the telemetry identity from raw process argv rather than the parsed command. Positional payloads and values for unrecognized options become part of the identity: `review classify apps/cli/src/main.rs` misses the exact display-only exclusion, while `review codex-local --prompt <text>` can persist the inline prompt in `telemetry.jsonl`. Use a payload-free typed/normalized command identity and cover positional and option-value cases.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 290,
+              "category": "correctness/security"
+            },
+            {
+              "message": "The common completion integration has no path to render telemetry append failures, so a failed write is silently swallowed while only the original exit code is returned. The append-failure regression likewise asserts exit preservation but no stderr diagnostic, contrary to the briefing's explicit trace-failure diagnostic requirement. Preserve the command exit while surfacing a driver-provided diagnostic.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 188,
+              "category": "missing_error_handling"
+            }
+          ],
+          "hash": "rvw1:sha256:61158dc5686532966d4d5369be0a57cd07f411935e7ed2155e1cc24e7aee07f6",
+          "at": "2026-08-03T01:11:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The common completion lifecycle is still implemented in the CLI macro: it derives eligibility from raw command-name strings, computes the duration and exit-code value, constructs `EmitCompletedCommand`, and decides whether to emit. The briefing requires this timing, eligibility, conversion, and emission orchestration to be delegated to `cli_driver`.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 244,
+              "category": "architecture"
+            },
+            {
+              "message": "The track wrapper still performs lifecycle orchestration in the bin by classifying display commands, resolving the archive track ID with `resolve_track_id_for_write`, timing execution, selecting archive versus completion events, and converting the exit code before invoking the driver. These context and event decisions belong in the track driver/composition path.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 325,
+              "category": "architecture"
+            },
+            {
+              "message": "The raw-string completion eligibility table does not exclude `verify` commands. Every `sotp verify ...` command therefore emits the generic completion event in addition to `execute_verify_with_telemetry`'s dedicated `GateEval` event, violating the briefing's gate-specific telemetry policy and duplicating telemetry records.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 247,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:11980e1d94e8f4b06266159b9e6eafb1f5b790386deff5860759602877b1e411",
+          "at": "2026-08-03T03:35:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:11980e1d94e8f4b06266159b9e6eafb1f5b790386deff5860759602877b1e411",
+          "at": "2026-08-03T03:35:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The common completion lifecycle remains in the CLI macro: it manually derives eligibility from command-name strings, starts timing, converts exit/duration values, and constructs/emits `EmitCompletedCommand`. The briefing requires these lifecycle decisions and emission to be delegated to `cli_driver`.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 186,
+              "category": "architecture"
+            },
+            {
+              "message": "The CLI resolves branch telemetry context directly with `cli_composition::telemetry_wiring::resolve_telemetry_writer` before dispatch, both for generic completion and track commands. This performs repository/writer context resolution in the bin instead of passing typed context to the driver, contrary to the stated layer boundary.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 205,
+              "category": "architecture"
+            },
+            {
+              "message": "The track wrapper still owns display classification, archive-specific routing, timing, exit-code conversion, and track-id resolution. In particular, `resolve_track_id_for_write(...).ok()` silently discards resolution errors; a successful archive can then skip its telemetry event entirely when the ID is unavailable.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 336,
+              "category": "error-handling"
+            }
+          ],
+          "hash": "rvw1:sha256:2ba1e5a32f8bd87b916d78291732e20d19f716269fb3b38d61b58ed688af67c2",
+          "at": "2026-08-03T04:14:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The CLI directly calls `resolve_telemetry_writer` at the common completion boundary, constructing/resolving telemetry writer state in the binary instead of passing typed context through the driver boundary. The same bypass is repeated in the track wrapper.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 205,
+              "category": "architecture"
+            },
+            {
+              "message": "Archive track-ID resolution is converted to `Option` with `.ok()`. If resolution fails, the successful archive path silently skips `EmitArchivedTrackSubcommand`, so completion telemetry is omitted without surfacing the error.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 355,
+              "category": "error-handling"
+            }
+          ],
+          "hash": "rvw1:sha256:2ba1e5a32f8bd87b916d78291732e20d19f716269fb3b38d61b58ed688af67c2",
+          "at": "2026-08-03T04:23:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d0c66543b7f79ad89dc745bcf27472f242f53fd0f38b0e63b357af9304d0dae",
+          "at": "2026-08-03T04:36:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track_command_label` returns labels such as `\"track resolve\"`, but the display-only predicate compares them with `\"sotp track resolve\"`. None of the listed display commands therefore take the early return; they perform telemetry resolution and append completion events despite being explicitly excluded. Match the actual labels or classify the typed variants directly.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 340,
+              "category": "correctness"
+            },
+            {
+              "message": "A successful archive now unconditionally uses `EmitArchivedTrackSubcommand`. That archived emitter writes directly under `track/archive/.../logs` without applying `TelemetryConfig`, so `SOTP_TELEMETRY=0` no longer disables the write and `SOTP_TELEMETRY_DIR` is ignored. Restore configuration-aware routing and cover both environment cases.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 365,
+              "category": "environment_handling"
+            },
+            {
+              "message": "The in-process dispatch helpers now pass the eligible identity `\"sotp test\"` and no longer suppress or isolate completion telemetry. Tests using these helpers from an active `track/*` checkout append synthetic events to the repository's real telemetry log and can race with tests modifying telemetry environment variables. Run them in isolated non-track repositories or use an explicitly ineligible test context.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 620,
+              "category": "test_isolation"
+            }
+          ],
+          "hash": "rvw1:sha256:0d0c66543b7f79ad89dc745bcf27472f242f53fd0f38b0e63b357af9304d0dae",
+          "at": "2026-08-03T04:45:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe12c82bcfb56770b4122e5d6efd562b6dbe05ee4f8175dc54896031ce883739",
+          "at": "2026-08-03T05:06:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe12c82bcfb56770b4122e5d6efd562b6dbe05ee4f8175dc54896031ce883739",
+          "at": "2026-08-03T05:09:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe12c82bcfb56770b4122e5d6efd562b6dbe05ee4f8175dc54896031ce883739",
+          "at": "2026-08-03T06:13:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The common entrypoint still owns the completed-command lifecycle: it classifies eligibility, resolves the active track, starts timing, converts the exit code, constructs `EmitCompletedCommand`, and emits it. The briefing and thin-bin policy require this orchestration to live behind `cli_driver`; the CLI should only pass parsed context and dispatch while preserving the returned exit result.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 186,
+              "category": "architecture"
+            },
+            {
+              "message": "The track path also duplicates driver/infrastructure policy: this helper reads telemetry environment configuration and chooses the active-versus-archive persistence route, while `execute_track_with_telemetry` separately handles display eligibility, branch context, timing, result conversion, and emission. Delegate that lifecycle and sink selection to `cli_driver`/infrastructure, leaving only track command parsing and dispatch in the binary.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 345,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:e8c161a9abb92b67e661787a9a572672f77016de4367dd7a276a253144cc9249",
+          "at": "2026-08-03T06:42:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a34e38ca134956251189dd7397d64db2131e187f387c6fb4e010e5b9b036a115",
+          "at": "2026-08-03T07:02:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`command_identity_from_args` produces identities such as `sotp track archive`, but the completion lifecycle recognizes track commands only when the value starts with `track `. The prefixed value instead reaches `completion_eligible`, which rejects top-level `track` and returns immediately after dispatch. Consequently every real `sotp track ...` invocation skips active-track capture and completion/archive telemetry; the new archive tests pass `track archive` directly and miss the production path. Normalize the identity consistently before handing it to the driver.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 186,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:145f74e36f7dd88430de61237dd8046720cb51ae50754c8affa4bd9d70449291",
+          "at": "2026-08-03T10:18:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:145f74e36f7dd88430de61237dd8046720cb51ae50754c8affa4bd9d70449291",
+          "at": "2026-08-03T10:39:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Successful `track archive` commands now use the generic `EmitCompletedCommand` path. After dispatch has moved `track/items/<id>` to `track/archive/<id>`, this active-track emitter writes to `track/items/<id>/logs/telemetry.jsonl`, recreating the active directory and splitting the archived track's telemetry history. Restore success-archive routing through `EmitArchivedTrackSubcommand` (failed archives can retain active routing), and test it by executing an actual archive rather than invoking the telemetry driver directly.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 258,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:bdca17ce4591b1eb337d261cadf62a71d720b6caec21a87060caa3367125fdf2",
+          "at": "2026-08-03T15:38:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Successful archives now always use `EmitArchivedTrackSubcommand`, which derives `<repo>/track/archive/<id>/logs` and does not honor `SOTP_TELEMETRY_DIR`. Consequently, `sotp track archive` writes into the archived track even when telemetry was explicitly redirected to an isolated output directory. Preserve the previous override check and use the override-aware completed-command emitter when it is set, or make the archived emitter honor the configuration. The new override test invokes `EmitCompletedCommand` directly, so it never exercises this production branch.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 264,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:5dfe62516003b3a310dcc9e0484040612ccbcfd1b0bde4225c998813fdbc1901",
+          "at": "2026-08-03T15:45:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`items_dir_from_args(&argv)` reparses raw arguments without respecting Clap's `--` delimiter. For example, `sotp track add-task --track-id current -- --items-dir=/other/repo/track/items` treats the final token as the task description during dispatch, but telemetry treats it as the repository path. The command therefore operates on the current repository while its completion can be written to another repository's active track or omitted. Derive telemetry context from the parsed command, or make the resolver stop at `--`, and add a regression for option-looking positional payloads.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 312,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:6c1b59d99d0dec4cfd5ebcff31cac148064281acc66cda4a6ada217f3ffc5065",
+          "at": "2026-08-03T15:54:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6c1b59d99d0dec4cfd5ebcff31cac148064281acc66cda4a6ada217f3ffc5065",
+          "at": "2026-08-03T15:58:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9d991d78efd952efa5021d8adeaccd8b1325b89d144b5d8aae573308a2e17835",
+          "at": "2026-08-03T17:10:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b96a76fe7ce802ee98bcfc1ff83712a44fe0e11ca40ac4f13907d53c2b4e856e",
+          "at": "2026-08-03T18:07:18Z"
         }
       ]
     },
@@ -2526,267 +2771,93 @@
           "findings": [],
           "hash": "rvw1:sha256:fea5393e81b4749430e4ca7d494f8f20546913319b827d97b698f745d9ce558f",
           "at": "2026-08-03T16:58:51Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9abbab096bc1da7224b0d0fce22ba8188cbb62f2d8f477b7d567bb47a952496b",
-          "at": "2026-08-02T03:47:52Z"
         },
         {
           "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9abbab096bc1da7224b0d0fce22ba8188cbb62f2d8f477b7d567bb47a952496b",
-          "at": "2026-08-02T03:58:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c50c891fda8f40e98e458f412c6dcb8505bcaf5d62bf7ac8188c89784e6a88d7",
-          "at": "2026-08-02T06:21:33Z"
-        },
-        {
-          "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`TelemetryCompositionRoot::telemetry_driver` now constructs `FsTelemetryEmitDynamicAdapter::new()` without selecting or injecting the repository-local trace output path. The prior composition root owned that path selection; removing `command_trace` and relying on a zero-argument adapter moves path policy out of the composition root and cannot preserve the required `track/logs/command-trace.jsonl` location relative to the supplied project root.",
+              "message": "The 1 MiB total-input budget makes a valid append-only telemetry log permanently unreportable once it crosses that size: `aggregate` returns `Io` before producing any metrics. The writer has no total-size cap or approved rotation policy, so ordinary track history can eventually trigger this, violating AC-02 and OUT-02's compatibility constraint. Preserve streaming compatibility while bounding retained output/cardinality instead of rejecting the complete log.",
               "severity": "P1",
-              "file": "apps/cli-composition/src/telemetry.rs",
-              "line": 70,
-              "category": "wiring"
+              "file": "libs/infrastructure/src/telemetry/report.rs",
+              "line": 307,
+              "category": "correctness"
+            },
+            {
+              "message": "`telemetry_log_paths` now treats every `telemetry.jsonl.<u16>` file as canonical input even though the writer only appends `telemetry.jsonl` and OUT-02 excludes a new rotation policy or compatibility-reader change. A stale backup such as `telemetry.jsonl.1` will therefore be aggregated, double-counting executions, failures, and durations. Read only the canonical file unless the source-of-truth contract and writer define the same rotation protocol.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/telemetry/report.rs",
+              "line": 532,
+              "category": "architecture"
             }
           ],
-          "hash": "rvw1:sha256:9b2e8af710fcbc791cf3224b1d4f6f4fb857ae3394b733dc8481d562814f8b0d",
-          "at": "2026-08-02T15:53:38Z"
+          "hash": "rvw1:sha256:ba7ac532b4e13512d01839232b397789a053f24bb270a3ddc81197f06031eacb",
+          "at": "2026-08-03T18:54:33Z"
         },
         {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9b2e8af710fcbc791cf3224b1d4f6f4fb857ae3394b733dc8481d562814f8b0d",
-          "at": "2026-08-02T16:11:09Z"
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The reader still implements a dead rotation-lock protocol: it opens `telemetry.jsonl.lock`, may block indefinitely in `lock_shared`, and can fail a valid canonical report because of a stray lock file. No telemetry writer creates or observes this lock, and OUT-02 excludes a rotation policy. Remove the lock/retry path so aggregation consults only canonical `telemetry.jsonl`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/telemetry/report.rs",
+              "line": 265,
+              "category": "architecture"
+            },
+            {
+              "message": "Projection-cap omissions are incorrectly added to `skipped_lines`, whose contract and rendered output describe unparseable or unknown-schema input lines. One valid `TrackSubcommand` omitted from both full maps is counted twice—once here and again for `command_map`—so the reported skipped-record count is false. Represent projection truncation separately, count each input record at most once, and add cap-boundary coverage.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/telemetry/report.rs",
+              "line": 350,
+              "category": "correctness"
+            },
+            {
+              "message": "After removing the 1 MiB budget, aggregation reads until the live file reaches EOF without fixing a snapshot length. Because the canonical file is append-only and its writer does not share this reader's lock, a concurrent appender can keep the loop supplied indefinitely; retained-cardinality limits do not bound I/O work. Capture the file length when opened and stream at most that snapshot, which still supports logs larger than 1 MiB.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/telemetry/report.rs",
+              "line": 292,
+              "category": "error-handling"
+            }
+          ],
+          "hash": "rvw1:sha256:4d7e2507ca4a953b9940c837a9c34662dcb385c5cfe9f6bf9003f2f7d58a93e1",
+          "at": "2026-08-03T19:04:35Z"
         },
         {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9b2e8af710fcbc791cf3224b1d4f6f4fb857ae3394b733dc8481d562814f8b0d",
-          "at": "2026-08-02T16:18:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9b2e8af710fcbc791cf3224b1d4f6f4fb857ae3394b733dc8481d562814f8b0d",
-          "at": "2026-08-02T16:31:15Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9b2e8af710fcbc791cf3224b1d4f6f4fb857ae3394b733dc8481d562814f8b0d",
-          "at": "2026-08-02T16:38:57Z"
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The retained-cardinality boundary has no regression coverage. The >1 MiB test repeats one command, so none of the four projection caps execute and the exactly-once `skipped_lines` behavior is unverified. Add cap-plus-one tests for unique phase/command identities and capped error/hook projections, asserting retained lengths and truncation counts.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/telemetry/report.rs",
+              "line": 132,
+              "category": "test"
+            },
+            {
+              "message": "No test verifies the fixed-length snapshot boundary. The large-log test finishes writing before aggregation, so it would still pass if aggregation later consumed records appended after `metadata().len()`. Add a deterministic reader or concurrent-append test proving a complete record beyond the captured length is excluded.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/telemetry/report.rs",
+              "line": 274,
+              "category": "test"
+            }
+          ],
+          "hash": "rvw1:sha256:3f4e8fa9629f3c726da2e1792e9530c2b07b21935dbec2dbb76b2543b5a0fe56",
+          "at": "2026-08-03T19:13:10Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:9b2e8af710fcbc791cf3224b1d4f6f4fb857ae3394b733dc8481d562814f8b0d",
-          "at": "2026-08-02T16:42:59Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:95ca0f3e7fdf379292761209cdbca805e1e4d50b805dbd02a71a406b8085aac9",
-          "at": "2026-08-02T17:08:03Z"
+          "hash": "rvw1:sha256:1aa0b8f28260473bd6d3acc4eb0a5b12e09268e9aecce575575d4ba3a6b9f3b9",
+          "at": "2026-08-03T19:15:48Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:95ca0f3e7fdf379292761209cdbca805e1e4d50b805dbd02a71a406b8085aac9",
-          "at": "2026-08-02T17:11:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:95ca0f3e7fdf379292761209cdbca805e1e4d50b805dbd02a71a406b8085aac9",
-          "at": "2026-08-02T19:16:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e13bd901d88d1d48c997b72020665ef1c5bac2ca487bdea579a03a971b0292f2",
-          "at": "2026-08-03T08:20:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e13bd901d88d1d48c997b72020665ef1c5bac2ca487bdea579a03a971b0292f2",
-          "at": "2026-08-03T10:41:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:64d2f307b5098b67fc1b26b3deb320c2c7c4acf513b03499a6759a7fa26b56c3",
-          "at": "2026-08-03T15:33:21Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e5fd22cc4b56991d32e6e4d9dd3fd700b2e2cb7e02af5cd248028423f0163949",
-          "at": "2026-08-01T07:02:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e5fd22cc4b56991d32e6e4d9dd3fd700b2e2cb7e02af5cd248028423f0163949",
-          "at": "2026-08-01T07:05:04Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e5fd22cc4b56991d32e6e4d9dd3fd700b2e2cb7e02af5cd248028423f0163949",
-          "at": "2026-08-01T07:50:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e5fd22cc4b56991d32e6e4d9dd3fd700b2e2cb7e02af5cd248028423f0163949",
-          "at": "2026-08-01T07:53:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:353367f31fdf361c4996447d43a5ecc6a92a21f7c9895a33e17929f420811646",
-          "at": "2026-08-01T09:09:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:353367f31fdf361c4996447d43a5ecc6a92a21f7c9895a33e17929f420811646",
-          "at": "2026-08-01T09:13:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:34fa4360038f5a946d0779f1f5ceb1115dda5abfacb303ad871ab4e67d00bfc3",
-          "at": "2026-08-01T15:10:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:34fa4360038f5a946d0779f1f5ceb1115dda5abfacb303ad871ab4e67d00bfc3",
-          "at": "2026-08-01T15:12:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:31967305f3b30a716b534bdeb24b01fd8657cb31ac0041e05f5aa78b57091381",
-          "at": "2026-08-02T15:53:57Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:31967305f3b30a716b534bdeb24b01fd8657cb31ac0041e05f5aa78b57091381",
-          "at": "2026-08-02T16:11:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:31967305f3b30a716b534bdeb24b01fd8657cb31ac0041e05f5aa78b57091381",
-          "at": "2026-08-02T16:17:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:31967305f3b30a716b534bdeb24b01fd8657cb31ac0041e05f5aa78b57091381",
-          "at": "2026-08-02T16:31:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:31967305f3b30a716b534bdeb24b01fd8657cb31ac0041e05f5aa78b57091381",
-          "at": "2026-08-02T16:38:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:31967305f3b30a716b534bdeb24b01fd8657cb31ac0041e05f5aa78b57091381",
-          "at": "2026-08-02T16:41:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:31967305f3b30a716b534bdeb24b01fd8657cb31ac0041e05f5aa78b57091381",
-          "at": "2026-08-02T17:08:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:31967305f3b30a716b534bdeb24b01fd8657cb31ac0041e05f5aa78b57091381",
-          "at": "2026-08-02T17:11:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:31967305f3b30a716b534bdeb24b01fd8657cb31ac0041e05f5aa78b57091381",
-          "at": "2026-08-02T19:16:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:31967305f3b30a716b534bdeb24b01fd8657cb31ac0041e05f5aa78b57091381",
-          "at": "2026-08-03T08:32:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:31967305f3b30a716b534bdeb24b01fd8657cb31ac0041e05f5aa78b57091381",
-          "at": "2026-08-03T10:14:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:31967305f3b30a716b534bdeb24b01fd8657cb31ac0041e05f5aa78b57091381",
-          "at": "2026-08-03T16:46:18Z"
+          "hash": "rvw1:sha256:ee9048f340c577f7f66238cbf6815517f6d45b63858fc431d1a0c0569ee1b09f",
+          "at": "2026-08-03T19:40:27Z"
         }
       ]
     },
@@ -3789,6 +3860,795 @@
         }
       ]
     },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9abbab096bc1da7224b0d0fce22ba8188cbb62f2d8f477b7d567bb47a952496b",
+          "at": "2026-08-02T03:47:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9abbab096bc1da7224b0d0fce22ba8188cbb62f2d8f477b7d567bb47a952496b",
+          "at": "2026-08-02T03:58:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c50c891fda8f40e98e458f412c6dcb8505bcaf5d62bf7ac8188c89784e6a88d7",
+          "at": "2026-08-02T06:21:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TelemetryCompositionRoot::telemetry_driver` now constructs `FsTelemetryEmitDynamicAdapter::new()` without selecting or injecting the repository-local trace output path. The prior composition root owned that path selection; removing `command_trace` and relying on a zero-argument adapter moves path policy out of the composition root and cannot preserve the required `track/logs/command-trace.jsonl` location relative to the supplied project root.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/telemetry.rs",
+              "line": 70,
+              "category": "wiring"
+            }
+          ],
+          "hash": "rvw1:sha256:9b2e8af710fcbc791cf3224b1d4f6f4fb857ae3394b733dc8481d562814f8b0d",
+          "at": "2026-08-02T15:53:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9b2e8af710fcbc791cf3224b1d4f6f4fb857ae3394b733dc8481d562814f8b0d",
+          "at": "2026-08-02T16:11:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9b2e8af710fcbc791cf3224b1d4f6f4fb857ae3394b733dc8481d562814f8b0d",
+          "at": "2026-08-02T16:18:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9b2e8af710fcbc791cf3224b1d4f6f4fb857ae3394b733dc8481d562814f8b0d",
+          "at": "2026-08-02T16:31:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9b2e8af710fcbc791cf3224b1d4f6f4fb857ae3394b733dc8481d562814f8b0d",
+          "at": "2026-08-02T16:38:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9b2e8af710fcbc791cf3224b1d4f6f4fb857ae3394b733dc8481d562814f8b0d",
+          "at": "2026-08-02T16:42:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:95ca0f3e7fdf379292761209cdbca805e1e4d50b805dbd02a71a406b8085aac9",
+          "at": "2026-08-02T17:08:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:95ca0f3e7fdf379292761209cdbca805e1e4d50b805dbd02a71a406b8085aac9",
+          "at": "2026-08-02T17:11:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:95ca0f3e7fdf379292761209cdbca805e1e4d50b805dbd02a71a406b8085aac9",
+          "at": "2026-08-02T19:16:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e13bd901d88d1d48c997b72020665ef1c5bac2ca487bdea579a03a971b0292f2",
+          "at": "2026-08-03T08:20:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e13bd901d88d1d48c997b72020665ef1c5bac2ca487bdea579a03a971b0292f2",
+          "at": "2026-08-03T10:41:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:64d2f307b5098b67fc1b26b3deb320c2c7c4acf513b03499a6759a7fa26b56c3",
+          "at": "2026-08-03T15:33:21Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e5fd22cc4b56991d32e6e4d9dd3fd700b2e2cb7e02af5cd248028423f0163949",
+          "at": "2026-08-01T07:02:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e5fd22cc4b56991d32e6e4d9dd3fd700b2e2cb7e02af5cd248028423f0163949",
+          "at": "2026-08-01T07:05:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e5fd22cc4b56991d32e6e4d9dd3fd700b2e2cb7e02af5cd248028423f0163949",
+          "at": "2026-08-01T07:50:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e5fd22cc4b56991d32e6e4d9dd3fd700b2e2cb7e02af5cd248028423f0163949",
+          "at": "2026-08-01T07:53:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:353367f31fdf361c4996447d43a5ecc6a92a21f7c9895a33e17929f420811646",
+          "at": "2026-08-01T09:09:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:353367f31fdf361c4996447d43a5ecc6a92a21f7c9895a33e17929f420811646",
+          "at": "2026-08-01T09:13:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:34fa4360038f5a946d0779f1f5ceb1115dda5abfacb303ad871ab4e67d00bfc3",
+          "at": "2026-08-01T15:10:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:34fa4360038f5a946d0779f1f5ceb1115dda5abfacb303ad871ab4e67d00bfc3",
+          "at": "2026-08-01T15:12:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:31967305f3b30a716b534bdeb24b01fd8657cb31ac0041e05f5aa78b57091381",
+          "at": "2026-08-02T15:53:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:31967305f3b30a716b534bdeb24b01fd8657cb31ac0041e05f5aa78b57091381",
+          "at": "2026-08-02T16:11:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:31967305f3b30a716b534bdeb24b01fd8657cb31ac0041e05f5aa78b57091381",
+          "at": "2026-08-02T16:17:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:31967305f3b30a716b534bdeb24b01fd8657cb31ac0041e05f5aa78b57091381",
+          "at": "2026-08-02T16:31:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:31967305f3b30a716b534bdeb24b01fd8657cb31ac0041e05f5aa78b57091381",
+          "at": "2026-08-02T16:38:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:31967305f3b30a716b534bdeb24b01fd8657cb31ac0041e05f5aa78b57091381",
+          "at": "2026-08-02T16:41:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:31967305f3b30a716b534bdeb24b01fd8657cb31ac0041e05f5aa78b57091381",
+          "at": "2026-08-02T17:08:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:31967305f3b30a716b534bdeb24b01fd8657cb31ac0041e05f5aa78b57091381",
+          "at": "2026-08-02T17:11:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:31967305f3b30a716b534bdeb24b01fd8657cb31ac0041e05f5aa78b57091381",
+          "at": "2026-08-02T19:16:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:31967305f3b30a716b534bdeb24b01fd8657cb31ac0041e05f5aa78b57091381",
+          "at": "2026-08-03T08:32:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:31967305f3b30a716b534bdeb24b01fd8657cb31ac0041e05f5aa78b57091381",
+          "at": "2026-08-03T10:14:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:31967305f3b30a716b534bdeb24b01fd8657cb31ac0041e05f5aa78b57091381",
+          "at": "2026-08-03T16:46:18Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8506571ec0dcb04ec4dbcb52a9677844f3d2a365452fbc71e215c4e4da1f2bf3",
+          "at": "2026-08-01T08:46:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8506571ec0dcb04ec4dbcb52a9677844f3d2a365452fbc71e215c4e4da1f2bf3",
+          "at": "2026-08-01T08:49:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This binding overclaims AC-01: the referenced test only constructs an in-memory failure result and asserts its exit code; it does not execute a command or verify local JSONL recording. Remove the AC-01 binding or bind it to an entrypoint/persistence integration test.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
+              "line": 16,
+              "category": "test-obligation-evidence"
+            },
+            {
+              "message": "This binding overclaims IN-01: the referenced test only constructs a CommandTraceRecord and checks fields; it does not prove common-entrypoint instrumentation across `sotp` commands. Remove the IN-01 binding or bind it to the later entrypoint integration evidence.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
+              "line": 29,
+              "category": "test-obligation-evidence"
+            },
+            {
+              "message": "This binding overclaims AC-01: the referenced test only validates fields on an in-memory CommandTraceRecord and does not verify that executing a command generates a local JSONL record. Remove the AC-01 binding or replace it with end-to-end recording evidence.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
+              "line": 39,
+              "category": "test-obligation-evidence"
+            }
+          ],
+          "hash": "rvw1:sha256:970c2057079fb215e801c8e4ad3e932909f57647c3be773bf0435076f3d34b32",
+          "at": "2026-08-01T12:38:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:27f6c5ad4be8d2d9cb477a40b26d266330c97aa98f51e96ea2a4b45cbc87e5cf",
+          "at": "2026-08-01T12:41:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a317cc34f0e7858375a7c77e18ac8ab7f5c9f02e16c84cbcbbede2c0e87dae3",
+          "at": "2026-08-01T12:44:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The current binding set lacks fresh verifier coverage. `bin/sotp test-obligation results` reports `stale=4 verdict_absent=3` for completed tasks, and `test-obligation check` exits 1 with declaration drift. The three newly converted waivers—including this AC-01 record—have no matching waiver verdicts. Re-run host evaluation and require a fresh successful check before accepting this artifact.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
+              "line": 14,
+              "category": "test-obligation-freshness"
+            }
+          ],
+          "hash": "rvw1:sha256:1a317cc34f0e7858375a7c77e18ac8ab7f5c9f02e16c84cbcbbede2c0e87dae3",
+          "at": "2026-08-01T12:50:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a317cc34f0e7858375a7c77e18ac8ab7f5c9f02e16c84cbcbbede2c0e87dae3",
+          "at": "2026-08-01T12:55:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a317cc34f0e7858375a7c77e18ac8ab7f5c9f02e16c84cbcbbede2c0e87dae3",
+          "at": "2026-08-01T12:58:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:02eaabfd9816f5f6dbd4c661e3ea0289abf07b11abc4893178e3407c2cf44e7a",
+          "at": "2026-08-01T14:38:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:02eaabfd9816f5f6dbd4c661e3ea0289abf07b11abc4893178e3407c2cf44e7a",
+          "at": "2026-08-01T14:45:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e314640844447b5698c9126b1eacb48a338b6f871a277cd0c22e6fe90c31c27d",
+          "at": "2026-08-01T16:26:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e314640844447b5698c9126b1eacb48a338b6f871a277cd0c22e6fe90c31c27d",
+          "at": "2026-08-01T16:30:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The added T004 bindings do not currently satisfy the required obligation gate: `test-obligation check` reports declaration drift for `CommandTraceFileSizeLimitBytes` and `CommandTraceRetainedFileCount` on IN-04/CN-02, so the expected pass/resolved_edges=36 result is not met. Refresh the frozen verdict through the supported workflow after aligning declarations; do not hand-edit the cache.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
+              "line": 141,
+              "category": "test-obligation"
+            }
+          ],
+          "hash": "rvw1:sha256:9dee50c8d8acef44c91493dfd9b273e8d97b38c89efe4a20a93d023565b7b20b",
+          "at": "2026-08-01T19:40:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9dee50c8d8acef44c91493dfd9b273e8d97b38c89efe4a20a93d023565b7b20b",
+          "at": "2026-08-01T19:47:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9dee50c8d8acef44c91493dfd9b273e8d97b38c89efe4a20a93d023565b7b20b",
+          "at": "2026-08-01T19:51:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "After the Phase 2/3 re-entry, T004 owns only rotation-policy construction and T005 owns JSONL persistence, but this waiver and the related reasons on lines 40 and 50 still assign local record writing to T004. Update all three ownership references to T005 so the binding artifact is consistent with the current implementation plan.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
+              "line": 17,
+              "category": "cross-commit-consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:9dee50c8d8acef44c91493dfd9b273e8d97b38c89efe4a20a93d023565b7b20b",
+          "at": "2026-08-01T20:01:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8f7c15d0b15fe9ec29fce043d6150ef8f3988afb94e62c016cae905983584703",
+          "at": "2026-08-01T20:07:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:934922f9e1516ca16b18d7f3ec27cb5c467084ba2d332b4b3c80a86d842504b3",
+          "at": "2026-08-01T20:36:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:934922f9e1516ca16b18d7f3ec27cb5c467084ba2d332b4b3c80a86d842504b3",
+          "at": "2026-08-01T20:49:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-04's voluntary binding covers unknown-schema fail-open handling but omits the existing malformed-record test `test_aggregate_malformed_command_record_is_skipped_and_counted`; bind both concrete failure modes so the constraint's evidence is complete.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
+              "line": 129,
+              "category": "test-obligation-evidence"
+            }
+          ],
+          "hash": "rvw1:sha256:486dd1055a2250d6d48eeb30f312271687cb6f065ad727f1a0ec4c4cfdb44c78",
+          "at": "2026-08-01T21:38:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:94016988a8fbf3e892b1d9d728825baf07a01545534b11339249ad7a8e528dd3",
+          "at": "2026-08-01T21:42:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:94016988a8fbf3e892b1d9d728825baf07a01545534b11339249ad7a8e528dd3",
+          "at": "2026-08-01T21:57:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:76f37330739c3496e0c38b78c0b0c29118cedd88eca0d555e50d4a2b765d9e96",
+          "at": "2026-08-01T23:29:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:76f37330739c3496e0c38b78c0b0c29118cedd88eca0d555e50d4a2b765d9e96",
+          "at": "2026-08-02T00:19:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:76f37330739c3496e0c38b78c0b0c29118cedd88eca0d555e50d4a2b765d9e96",
+          "at": "2026-08-02T00:24:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `CommandTraceDriver` IN-01 obligation is still waived, even though the briefing explicitly requires IN-01 to bind to the exact driver success/write-failure tests. The added `CommandTraceHandleOutcome` bindings do not replace that driver-level binding because they attribute evidence to a different catalogue entry. Remove the waiver and bind `CommandTraceDriver` IN-01 to both named driver tests.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
+              "line": 255,
+              "category": "test-obligation-binding"
+            }
+          ],
+          "hash": "rvw1:sha256:895ae3038fb7c8b5712631818adc0dea7b8e8178270fd0a792bdb8519de1e5f9",
+          "at": "2026-08-02T01:22:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dd3b645f34c065b85a5ed85b836eccc6eb096472d148e943670e704ff9c8601b",
+          "at": "2026-08-02T01:24:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a590aa8cc63e9184adde7925f68f59745793d4c5970b473d3f4682618f292832",
+          "at": "2026-08-02T02:51:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a590aa8cc63e9184adde7925f68f59745793d4c5970b473d3f4682618f292832",
+          "at": "2026-08-02T03:04:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:825309b82e3c66ff9aeb8543506d4744f8d7c956cd4f4c31b5637553ed68c30a",
+          "at": "2026-08-02T03:52:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:825309b82e3c66ff9aeb8543506d4744f8d7c956cd4f4c31b5637553ed68c30a",
+          "at": "2026-08-02T04:04:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:038409cd4131402ac367fa5de7cbe04238b61ea92a698105db54df09cddc30ab",
+          "at": "2026-08-02T04:32:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:038409cd4131402ac367fa5de7cbe04238b61ea92a698105db54df09cddc30ab",
+          "at": "2026-08-02T04:49:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9906d97a1d8b8b09705f2574fc3eeb07288f76807aa8417862fba2c077d266f2",
+          "at": "2026-08-02T06:28:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3a1faad1bc3465aa418806ba17e3d0dde520c6bdf8404139841b0d389a1d7b04",
+          "at": "2026-08-02T15:53:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3a1faad1bc3465aa418806ba17e3d0dde520c6bdf8404139841b0d389a1d7b04",
+          "at": "2026-08-02T16:17:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f7d72f3868709123569eec090fe4b6b8b71829db556a2b148e10dadf45161f24",
+          "at": "2026-08-02T16:31:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f7d72f3868709123569eec090fe4b6b8b71829db556a2b148e10dadf45161f24",
+          "at": "2026-08-02T16:38:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The sole OUT-02 binding is not real no-rotation evidence. `test_telemetry_archived_service_reuses_telemetry_jsonl_without_rotation` injects a recording mock and never creates a telemetry file, so its assertion that `telemetry.1.jsonl` does not exist is vacuous. The same test is reused by both archived-service fulfillments. Bind a filesystem/archive integration test that verifies only `telemetry.jsonl` is produced.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
+              "line": 8,
+              "category": "test_coverage"
+            },
+            {
+              "message": "The archived-path bindings do not cover the fire-and-forget outcome contract. They test successful routing and service-level error propagation, but none drives an archive telemetry write failure through the command entrypoint and verifies that the original command exit remains unchanged; all cited outcome-preservation tests exercise only active emission. Add and bind an archived-write-failure regression test.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
+              "line": 30,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:f7d72f3868709123569eec090fe4b6b8b71829db556a2b148e10dadf45161f24",
+          "at": "2026-08-02T16:48:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f7d72f3868709123569eec090fe4b6b8b71829db556a2b148e10dadf45161f24",
+          "at": "2026-08-02T17:08:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The OUT-02 single-sink/no-rotation evidence remains vacuous. The cited usecase test injects `RecordingArchivedPort`, performs no filesystem write, and checks for `telemetry.1.jsonl` beneath a path that was never created; it would pass even if the real adapter created command-trace or rotated files. Bind a current-route filesystem test that verifies the archive logs directory contains only `telemetry.jsonl`.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
+              "line": 8,
+              "category": "test_coverage"
+            },
+            {
+              "message": "The `TelemetryEmitInteractor` fulfillment is grounded in the fire-and-forget outcome constraint but covers write failures only on active emission. No bound test makes the archived `EmitArchivedCurrentCommand` path fail and verifies that the completed archive command's original exit remains unchanged. Add and bind an archived-write-failure outcome regression test.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
+              "line": 27,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:f7d72f3868709123569eec090fe4b6b8b71829db556a2b148e10dadf45161f24",
+          "at": "2026-08-02T17:12:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6bd3230748076a162020246aa41e3f719113c933b4eb1659d24726f53114205c",
+          "at": "2026-08-02T17:30:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6bd3230748076a162020246aa41e3f719113c933b4eb1659d24726f53114205c",
+          "at": "2026-08-02T17:33:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The updated bindings are not fresh: `bin/sotp test-obligation check` fails with `TestChanged` drifts for the `TelemetryAggregateService` and `TelemetryArchivedService` OUT-02 edges, and results report three stale in-progress verdicts. Re-evaluate these records and obtain a passing check before accepting the binding artifact.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
+              "line": 8,
+              "category": "artifact_freshness"
+            },
+            {
+              "message": "The new archive-failure outcome tests are bound only to `TelemetryArchivedService` obligations whose sole spec anchor is OUT-02 (no alternate sink or rotation), so those tests do not address that edge and remain absent from the `TelemetryEmitInteractor` fulfillment that actually cites CN-02's fire-and-forget outcome constraint. Add the archive failure tests to the line-27 fulfillment (or correct the upstream attribution) so the evidence is edge-local.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
+              "line": 27,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:6bd3230748076a162020246aa41e3f719113c933b4eb1659d24726f53114205c",
+          "at": "2026-08-02T17:37:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d8c3c1f9168d224d703e02e5007982b0c6acff30075540f9bd3652a76af365a6",
+          "at": "2026-08-02T18:18:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d8c3c1f9168d224d703e02e5007982b0c6acff30075540f9bd3652a76af365a6",
+          "at": "2026-08-02T18:22:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The newly added TelemetryDriver IN-01/AC-01 bindings are not fresh: `bin/sotp test-obligation check` fails with `DeclChanged` drift for both edges, and cached results report `stale=2` for in-progress records. Re-evaluate and freeze these bindings through the supported workflow before accepting this artifact.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
+              "line": 7,
+              "category": "test-obligation-freshness"
+            }
+          ],
+          "hash": "rvw1:sha256:4a5f15c68791add8f9580cf3f4d740a1e92c3b3fffc7d7357e1289da53b96c67",
+          "at": "2026-08-02T19:11:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4a5f15c68791add8f9580cf3f4d740a1e92c3b3fffc7d7357e1289da53b96c67",
+          "at": "2026-08-02T19:14:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4a5f15c68791add8f9580cf3f4d740a1e92c3b3fffc7d7357e1289da53b96c67",
+          "at": "2026-08-02T19:16:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This manifest is synchronized to an obsolete obligation/catalogue snapshot. `sotp test-obligation check` now fails with 11 added, 3 removed, and 6 changed obligations; it still binds removed entries (`TelemetryArchivedService::emit_archived_current`, `command_context_from_args`, and `should_emit_completion`) whose cited tests no longer exist, while omitting new obligations such as `TelemetryAggregateInteractor`, `TelemetryArchiveRoutePort`, and `TelemetryClockPort`. Regenerate the obligations, rebuild these bindings against the current catalogues/task contract, and re-evaluate them.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
+              "line": 29,
+              "category": "test-obligation-freshness"
+            }
+          ],
+          "hash": "rvw1:sha256:4a5f15c68791add8f9580cf3f4d740a1e92c3b3fffc7d7357e1289da53b96c67",
+          "at": "2026-08-03T08:41:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "OUT-02 requires evidence that archive completion introduces neither another command-trace sink nor file rotation, but the cited test uses a recording fake and merely checks that a path which was never written (`telemetry.1.jsonl`) does not exist. It cannot detect the real archive adapter changing filenames or rotating output. The existing end-to-end `cli::tests::test_archive_telemetry_emit_writes_to_archived_track_logs` verifies the actual archive directory contains only `telemetry.jsonl`, yet it is not enrolled anywhere in this manifest. Bind that integration test to OUT-02 and the archived-emission fulfillment so the planning evidence covers the real filesystem behavior.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
+              "line": 361,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:dccf6b04d196631e00b666a1502ab87ae5b1a7fc54dbb2cd1c0a7607a8444880",
+          "at": "2026-08-03T10:57:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da74a7a4ad3812447219fa691c871b822371b50bda2cea654f35434e9208ab5b",
+          "at": "2026-08-03T11:07:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The current catalogue adds logic obligations for `cli::telemetry_completion_eligible` and `cli::telemetry_track_display_only`, with corresponding tests already present, but this manifest ends without fulfillment records for either function. Consequently `sotp test-obligation check` fails with `added=2` and reports both obligations missing from the derived artifact; re-derive the obligations, add bindings for the eligibility/display-only tests, and re-evaluate the resulting records.",
+              "severity": "P1",
+              "file": "track/items/2026-08-01-sotp-tracing-instrumentation/test-bindings.json",
+              "line": 1199,
+              "category": "test_obligation_freshness"
+            }
+          ],
+          "hash": "rvw1:sha256:47e54f5d85fc6da3a3821d95f917215621c07066b1b438141dc8cdccbf3d7661",
+          "at": "2026-08-03T16:39:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0f346d44e5dbf2c74bd61fedf4a1551c84cde6ca23290d321c6a44cd63b91fea",
+          "at": "2026-08-03T16:45:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8805ea80d647a4733754ed446282b313921cc308fb31ffe5467c4cf8ffd3418f",
+          "at": "2026-08-03T17:22:50Z"
+        }
+      ]
+    },
     "cli_driver": {
       "rounds": [
         {
@@ -4385,779 +5245,50 @@
           "findings": [],
           "hash": "rvw1:sha256:c730890a635664f026423605ee56e12de09d43f43d407d909792c0773ce1ed46",
           "at": "2026-08-03T18:26:04Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f3fe4e078e4884e3f8b9369724e9515823540304b25649abd9769a07522e15c4",
-          "at": "2026-08-02T04:25:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f3fe4e078e4884e3f8b9369724e9515823540304b25649abd9769a07522e15c4",
-          "at": "2026-08-02T04:35:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`current_dir()` errors are silently replaced with `.`. This can write the trace to an unintended relative location or hide a repository-root resolution failure; preserve the original exit while reporting the trace setup error instead.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 315,
-              "category": "missing_error_handling"
-            },
-            {
-              "message": "This runtime JSONL log is included in the diff even though command-trace logs are intended to be non-version-controlled. The existing ignore rule for `track/logs/` does not cover `apps/cli/track/logs/`, so historical invocations are committed and future CLI runs can dirty the source tree.",
-              "severity": "P1",
-              "file": "apps/cli/track/logs/command-trace.jsonl",
-              "line": 1,
-              "category": "runtime_artifact"
-            }
-          ],
-          "hash": "rvw1:sha256:2dcd75601c2c7c551d72a9645ffefea48aa1a9dd8b017c1300a695fda7bbe1b9",
-          "at": "2026-08-02T05:57:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2d2b6fe03de5a94c99610c4e0f67b0a4b47d75d25f231497cfa1f104aaa3316d",
-          "at": "2026-08-02T06:19:50Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The production-only `SOTP_TELEMETRY=0` early return bypasses `CommandTraceCompositionRoot` and the driver entirely. This contradicts IN-01/AC-01 and the briefing’s requirement that every completed top-level command use the real tracing path; existing CI tasks and spawned-command tests set this variable, so those executions produce no trace. Redirect test traces to an isolated sink instead of disabling the mandatory instrumentation.",
+              "message": "`option_path` converts every argument through `to_string_lossy()` and reconstructs `--items-dir=…`, `--workspace-root=…`, and `--project-root=…` values from that lossy string. Clap accepts non-UTF-8 paths as `PathBuf`, so a valid equals-form path can be silently changed, causing telemetry to resolve a different repository or omit the completion event. Preserve the original `OsString` path bytes when splitting equals-form options.",
               "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 315,
+              "file": "apps/cli-driver/src/telemetry.rs",
+              "line": 50,
               "category": "correctness"
             },
             {
-              "message": "The new wrapper performs command classification, exit-result conversion, duration calculation, trace-record construction, environment inspection, and CWD-based root selection inside the bin layer. This violates the CLI thin-bin boundary; it also treats an arbitrary CWD as `project_root`, so nested-CWD or explicit `--workspace-root`/`--project-root` invocations write traces under the wrong directory. Move completed-command transformation and repository-root resolution behind `cli_driver`/`cli_composition`, leaving `run_cli_with` as dispatch-and-emit integration.",
+              "message": "The current patch removes the incorrect `verify catalogue-spec-refs` assertion but adds no assertion for its corrected behavior. Consequently, the required `--workspace-root=/other/repository` → `/other/repository/track/items` path is unprotected, and reclassifying this command as independent would pass the current tests. Add a positive regression case alongside the independent graph-command cases.",
               "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 192,
-              "category": "architecture"
+              "file": "apps/cli-driver/src/telemetry.rs",
+              "line": 418,
+              "category": "test"
             }
           ],
-          "hash": "rvw1:sha256:2d2b6fe03de5a94c99610c4e0f67b0a4b47d75d25f231497cfa1f104aaa3316d",
-          "at": "2026-08-02T06:38:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`run_cli_with` now performs telemetry orchestration in the bin: it classifies top-level commands, resolves the writer, converts exit codes, and emits `TrackSubcommand`/`NonZeroExit` events. This violates the thin-bin boundary and the briefing's requirement that context resolution and event construction remain behind the composition/driver layers.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 283,
-              "category": "architecture_violation"
-            },
-            {
-              "message": "Common-command telemetry always resolves `track/items` relative to the process CWD, ignoring explicit `--items-dir`, `--workspace-root`, or `--project-root` inputs used by non-`Track` commands such as `catalog`, `verify`, and `catalogue-lint`. Invoking those commands against another repository can therefore append telemetry to the wrong track or emit nothing.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 284,
-              "category": "incorrect_path_resolution"
-            },
-            {
-              "message": "Successful archive commands no longer honor `SOTP_TELEMETRY_DIR`: this branch always sends `EmitArchivedTrackSubcommand`, whose usecase writes to the repository's archived-track log, whereas the existing override path required emitting through the resolved writer. With the override set, archive telemetry is written to the wrong sink.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 344,
-              "category": "environment_handling"
-            }
-          ],
-          "hash": "rvw1:sha256:6496f3d917d822dcb1510c2bf6e5a22a887f18a43fd6851a8c51eb41639ed1ae",
-          "at": "2026-08-02T10:57:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`run_cli_with` still owns telemetry-specific command identity mapping, timing setup, and command-context selection before dispatch. This is orchestration metadata that the briefing requires the composition/driver boundary to own, and it makes the thin bin responsible for maintaining a large exhaustive command map.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 186,
-              "category": "architecture_violation"
-            },
-            {
-              "message": "`telemetry_items_dir_for_command` falls back to `track/items` for commands with their own non-default items roots, including `telemetry report`, `task-contract`, and review commands. Those commands can operate on an explicit `--items-dir`, but completion telemetry is then resolved against the wrong repository/path.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 305,
-              "category": "incorrect_path_resolution"
-            }
-          ],
-          "hash": "rvw1:sha256:b6ee8e7ddde841555cc5cfa75af1fad46ec9e889bb817d2acb8fba7d8517e3dd",
-          "at": "2026-08-02T12:02:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `top_level_telemetry_identity!` and `top_level_telemetry_items_dir!` macros make `apps/cli` own exhaustive command-shape matching, command identity construction, and telemetry context selection. This is telemetry orchestration that the thin-bin boundary and briefing require the composition/driver layers to own; it also forces review command DTO fields to become `pub(crate)` solely for bin access.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 180,
-              "category": "architecture_violation"
-            },
-            {
-              "message": "The items-dir macro still falls back to `track/items` for top-level commands with explicit repository roots, notably `signal` commands accepting `--workspace-root`/`--project-root`. Running such a command against another repository can append completion telemetry to the CWD repository or omit it instead of the repository being operated on.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 219,
-              "category": "incorrect_path_resolution"
-            }
-          ],
-          "hash": "rvw1:sha256:47746e6737ffc4e2f5b39d920a167be73a65c5f6fc7e6a7852947c7674044bc2",
-          "at": "2026-08-02T12:32:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9b126bdd2a17799d77c9913f7e3d7448624b432e864debf15762792d26290703",
-          "at": "2026-08-02T15:50:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9b126bdd2a17799d77c9913f7e3d7448624b432e864debf15762792d26290703",
-          "at": "2026-08-02T15:53:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The in-process dispatch test helpers force `is_track_command` to `false` and run most tests in the ambient repository CWD. On a `track/<id>` checkout, every such test invokes `EmitCompletedCommand` and appends a synthetic `sotp test` event to the developer's real `track/items/<id>/logs/telemetry.jsonl`, contaminating active-track telemetry and making tests depend on repository state. Run these tests in an isolated temporary repository or disable telemetry for the test harness.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 607,
-              "category": "test_isolation"
-            }
-          ],
-          "hash": "rvw1:sha256:9b126bdd2a17799d77c9913f7e3d7448624b432e864debf15762792d26290703",
-          "at": "2026-08-02T16:11:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4252b8851d6c6ec791e5ecc3a741b45819cd3678d11aacffaea3f77b29e4bbcb",
-          "at": "2026-08-02T16:12:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4252b8851d6c6ec791e5ecc3a741b45819cd3678d11aacffaea3f77b29e4bbcb",
-          "at": "2026-08-02T16:17:57Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4252b8851d6c6ec791e5ecc3a741b45819cd3678d11aacffaea3f77b29e4bbcb",
-          "at": "2026-08-02T16:31:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4252b8851d6c6ec791e5ecc3a741b45819cd3678d11aacffaea3f77b29e4bbcb",
-          "at": "2026-08-02T16:39:37Z"
+          "hash": "rvw1:sha256:b8ce739d58a393d06c23717bc115147ae18f3762bb79346901543b54c5a14245",
+          "at": "2026-08-03T18:45:14Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`is_track_command` is the only eligibility check, so every non-`track` command emits completion telemetry. This records explicitly pure-display commands such as `sotp telemetry report` and information-only `find-similar`, contrary to IN-01 and ADR D4’s pure-display exclusion. Determine eligibility from the typed command through the driver/usecase rather than treating all non-track commands as recordable.",
+              "message": "The new bounded-projection explanation is untested. Existing report tests cover `Skipped lines: 0` and the nonzero count, but none assert that a nonzero result documents retained-output/projection truncation. Removing this newly required explanation would therefore pass the suite. Add a report test with `skipped_lines > 0` that asserts the truncation/cap text.",
               "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 254,
-              "category": "correctness"
-            },
-            {
-              "message": "A successful archive with an explicit `--track-id` is routed through `EmitArchivedCommand` using that argument without branch-bound attribution. Because archive can succeed from `main`, this writes a track telemetry record on a non-track branch; from `track/A`, archiving B attributes the event to B instead of the current branch A. This violates IN-04/AC-04. Archive telemetry must first confirm and use the current track branch while retaining the archived destination path.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 324,
-              "category": "correctness"
-            },
-            {
-              "message": "`execute_track_with_telemetry` still performs command classification, display/archive branching, track-ID selection, timing orchestration, command execution, and telemetry-input selection. Together with the top-level `if !is_track_command` decision, this is business logic in the bin layer, violating the CLI thin-bin policy. Move completion eligibility and active/archive routing into `cli_driver`/usecase so the binary only constructs one typed input, dispatches it, emits the outcome, and preserves the exit code.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 300,
-              "category": "architecture"
+              "file": "apps/cli-driver/src/telemetry.rs",
+              "line": 330,
+              "category": "test"
             }
           ],
-          "hash": "rvw1:sha256:4252b8851d6c6ec791e5ecc3a741b45819cd3678d11aacffaea3f77b29e4bbcb",
-          "at": "2026-08-02T16:47:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:897e7916049d48b396585c36e3bb39d790c5a833eb072abaf41b894424f65832",
-          "at": "2026-08-02T17:08:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The raw-argv eligibility result used here does not match the typed command semantics. It suppresses non-display gates with no dedicated emitter, including `catalogue-lint check-active-track`, `task-contract check`, `batch-plan check`, `catalog check`, aggregate `signal check`, and `test-obligation evaluate`; meanwhile pure output commands such as `review classify`, `review files`, `signal report`, `test-obligation results`, and `bindings-skeleton` remain eligible. Required completion records are therefore dropped while excluded display commands are recorded. Classify the parsed variants through the driver and add coverage for both categories.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 276,
-              "category": "correctness"
-            },
-            {
-              "message": "A successful archive now unconditionally sends `EmitArchivedCurrentCommand`. That archived adapter does not consult the existing `TelemetryConfig`, so `SOTP_TELEMETRY=0` still appends or creates the archived log, and `SOTP_TELEMETRY_DIR` is ignored in favor of `track/archive/<id>/logs/telemetry.jsonl`. Preserve the kill switch and output override by routing archive completion through the existing env-aware writer policy.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 317,
-              "category": "correctness"
-            },
-            {
-              "message": "`run_cli_with_context!` times an arbitrary command, dispatches it, and conditionally performs a second driver call; `execute_track_with_telemetry` additionally classifies display/archive variants and selects active versus archived telemetry inputs. This is multi-step application orchestration and business branching in the bin layer, contrary to the CLI thin-bin policy. Move completion instrumentation and track lifecycle routing behind `cli_driver`/usecase so the binary remains parse → one driver handle → emit.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 253,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:897e7916049d48b396585c36e3bb39d790c5a833eb072abaf41b894424f65832",
-          "at": "2026-08-02T17:19:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fd11c864f628bf93d881cc2adcd647666362143e2c1df1ceb9dbc7a30ec463c2",
-          "at": "2026-08-02T17:30:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fd11c864f628bf93d881cc2adcd647666362143e2c1df1ceb9dbc7a30ec463c2",
-          "at": "2026-08-02T17:35:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The raw-argv eligibility result is still incomplete for pure-display commands: unrecognized families default to eligible, so every `arch` variant (`tree`, `tree-full`, `members`, and `direct-checks`) and explicitly read-only commands such as `conventions resolve` append completion telemetry on a track branch. These commands only render/list information and should be excluded under the stated pure-display policy. Derive eligibility from the parsed command variants, or cover every display-only family in the driver classifier and its tests.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 276,
-              "category": "correctness"
-            },
-            {
-              "message": "`run_cli_with_context!` measures and executes a command and then conditionally invokes a second telemetry driver, while `execute_track_with_telemetry` additionally classifies display/archive variants and chooses active versus archived telemetry inputs. This remains multi-step application orchestration and business branching in the bin layer, contrary to the CLI thin-bin policy. Move completion instrumentation and track lifecycle routing behind `cli_driver`/usecase so the binary only parses input, performs one driver dispatch, and emits its `CommandOutcome`.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 253,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:fd11c864f628bf93d881cc2adcd647666362143e2c1df1ceb9dbc7a30ec463c2",
-          "at": "2026-08-02T17:39:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d4d4ebd007e86038554a89fbc6d5b2e99ab8b18002c7846693e8cf71ee5bd3aa",
-          "at": "2026-08-02T18:19:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`Verify` is marked eligible for generic completion even though `execute_verify_with_telemetry` already emits its dedicated `GateEval`. With telemetry enabled on a track branch, every verify command therefore also appends a `TrackSubcommand` and, on failure, a `NonZeroExit`, polluting metrics with duplicate lifecycle records. Exclude `CliCommand::Verify` and update the policy test accordingly.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/telemetry_policy.rs",
-              "line": 43,
-              "category": "correctness"
-            },
-            {
-              "message": "The new common wrapper executes the selected command and then conditionally performs a second telemetry-driver dispatch. Together with the CLI-owned eligibility classifier, this places business policy and multi-step orchestration in the binary, violating the required parse → one `driver.handle(input)` → emit thin-bin boundary. Move command execution plus completion telemetry orchestration behind a driver/usecase boundary.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 253,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:d4d4ebd007e86038554a89fbc6d5b2e99ab8b18002c7846693e8cf71ee5bd3aa",
-          "at": "2026-08-02T18:24:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`run_cli_with_context!` executes and times an arbitrary command, then conditionally performs a second telemetry-driver dispatch; CLI code also decides generic eligibility and active/archive routing. This is business branching and multi-step orchestration outside the required thin-bin boundary. The cited ADR 2026-07-03-0446 D1/D2 narrowly exempts CLI-gate `GateEval` instrumentation, not generic `TrackSubcommand` telemetry for arbitrary commands. Move this orchestration outside the binary or explicitly extend the architecture decision.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 253,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:e49cc0ea2985f3a317d0bfa3e07bc90c0a0bdcc443784df98bf66b5d302e40e3",
-          "at": "2026-08-02T18:31:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Moving the eligibility branch into `TelemetryDriver::emit_completed_command` does not make this a thin-bin emit step: the binary still classifies command eligibility, starts the timer, dispatches the application command, and then invokes a second application driver; `execute_track_with_telemetry` likewise performs display/archive routing. This remains business branching and multi-step orchestration. ADR 2026-07-03-0446 D1/D2 exempts only CLI-gate `GateEval` instrumentation, not generic `TrackSubcommand` telemetry for arbitrary commands. Move the generic completion lifecycle outside the binary or explicitly extend the architecture decision.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 253,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:a3d338010f5744ea2a58e28e40d7ec314751743b5acb433119d412910882c4fc",
-          "at": "2026-08-02T18:50:50Z"
+          "hash": "rvw1:sha256:ac44b052334094458e80cc91a01b1c2fc2898967bfa1b3788350e4897f88c80a",
+          "at": "2026-08-03T19:19:41Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:cebf02805c9efcc44b2d9650483c72770aebb54bd491f359585db190627eb659",
-          "at": "2026-08-02T19:05:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`execute_with_error_chain` runs before the telemetry driver resolves the current branch. For branch-changing variants this uses post-command state: a successful `track switch-base` ends on the base branch, so `EmitCompletedCommand` silently drops the required completion event; conversely, `track branch create/switch` can write telemetry even when invoked from a non-track branch. Capture and validate the source track context before dispatch and pass it through the typed telemetry input.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 306,
-              "category": "telemetry"
-            }
-          ],
-          "hash": "rvw1:sha256:cebf02805c9efcc44b2d9650483c72770aebb54bd491f359585db190627eb659",
-          "at": "2026-08-02T19:19:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`run_cli_with_context!` bypasses the briefing's typed `TelemetryInput::ExecuteAndEmit` entrypoint: the binary resolves the source track, starts timing, executes the command, and then separately dispatches `EmitCompletedCommand`. This leaves the required completion lifecycle orchestration in `apps/cli` and means the designated typed-dispatch boundary is not used. Route the common completion path through `ExecuteAndEmit`, keeping only dedicated lifecycle paths separate.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 189,
-              "category": "architecture / typed-dispatch"
-            }
-          ],
-          "hash": "rvw1:sha256:3fe04a9633fbe5cdaaa78bcc55318c1a2f32ddbd3794b3c86226e085be93328e",
-          "at": "2026-08-02T20:39:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3fe04a9633fbe5cdaaa78bcc55318c1a2f32ddbd3794b3c86226e085be93328e",
-          "at": "2026-08-02T20:43:57Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new generic completion path resolves the telemetry writer directly in the CLI macro before dispatch (`resolve_telemetry_writer` at lines 190-191), and the track path repeats the same resolution at line 315. This makes the bin own branch/context and writer resolution, contrary to the briefing's thin-bin boundary; pass only typed context/input to the telemetry driver and let composition/driver layers resolve the repository and track.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 190,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:89518a6a9dcf3e98d74afce8e5822b7ccefe987cb2682f629ce5508b23c58bff",
-          "at": "2026-08-02T21:17:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:35d947dc6abc84456fdb31c31db34533de884024f356985660878d71770e7159",
-          "at": "2026-08-02T21:23:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`run_cli_with_context!` starts timing, dispatches the application command, and then conditionally invokes a second telemetry driver; the track wrapper additionally classifies display/archive variants and selects the telemetry input. This is multi-step application orchestration and business branching in the bin layer, contrary to the required parse → typed driver dispatch → emit boundary. Move the completion lifecycle, eligibility policy, and track routing behind `cli_driver`/usecase.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 247,
-              "category": "architecture"
-            },
-            {
-              "message": "`execute_with_error_chain` runs before `EmitCompletedCommand` is submitted with `source_track_id: None`, so branch attribution is resolved from post-command state. A successful `track switch-base` started on `track/*` ends on the base branch and silently loses its completion event, while `track branch create/switch` invoked from a non-track branch can append to the newly entered track. Capture the source branch context before execution behind the driver/composition boundary and preserve it through emission.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 327,
-              "category": "telemetry"
-            }
-          ],
-          "hash": "rvw1:sha256:35d947dc6abc84456fdb31c31db34533de884024f356985660878d71770e7159",
-          "at": "2026-08-02T21:31:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a2c89e8d47622ee47dfe07a3d84d3ec0e160d2272fcc729213b52e600ddb60e6",
-          "at": "2026-08-02T22:20:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Common completion eligibility remains an exhaustive business-policy match in the CLI layer, and `main` converts that result into `Active` versus `Ineligible`. The briefing explicitly requires eligibility to be delegated to `cli_driver`; move this classification behind the typed driver boundary so the bin only supplies parsed command context.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/telemetry_policy.rs",
-              "line": 10,
-              "category": "architecture"
-            },
-            {
-              "message": "The track wrapper still classifies display-only variants, bypasses the lifecycle driver for them, and selects `Archive` versus `Active` itself. `run_track_with_completion` therefore receives a policy decision already made by the bin instead of owning track eligibility and routing as required by the briefing.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 311,
-              "category": "architecture"
-            },
-            {
-              "message": "Mapping an explicit archive target directly to `TelemetryCompletionRoute::Archive` loses branch-bound attribution. The driver emits to that target after success even when no track was active before dispatch, so `track archive --track-id B` from `main` creates or updates B's telemetry, while invoking it from `track/A` attributes the event to B instead of A. Gate archive emission on the captured source branch and retain source-track attribution.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 321,
-              "category": "telemetry"
-            },
-            {
-              "message": "The unconditional archive route uses the archived-track adapter, which does not consult the existing `TelemetryConfig`. Consequently a successful archive still writes when `SOTP_TELEMETRY=0` and ignores `SOTP_TELEMETRY_DIR`, regressing the existing archive telemetry policy. Preserve the kill switch and configured sink when routing archive completion.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 321,
-              "category": "environment_handling"
-            }
-          ],
-          "hash": "rvw1:sha256:f93491239df8cfcb1a50a9c039abec56f57c6e143c887f52c0a92141e5db580b",
-          "at": "2026-08-02T22:59:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`run_cli_with` derives the telemetry identity from raw process argv rather than the parsed command. Positional payloads and values for unrecognized options become part of the identity: `review classify apps/cli/src/main.rs` misses the exact display-only exclusion, while `review codex-local --prompt <text>` can persist the inline prompt in `telemetry.jsonl`. Use a payload-free typed/normalized command identity and cover positional and option-value cases.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 290,
-              "category": "correctness/security"
-            },
-            {
-              "message": "The common completion integration has no path to render telemetry append failures, so a failed write is silently swallowed while only the original exit code is returned. The append-failure regression likewise asserts exit preservation but no stderr diagnostic, contrary to the briefing's explicit trace-failure diagnostic requirement. Preserve the command exit while surfacing a driver-provided diagnostic.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 188,
-              "category": "missing_error_handling"
-            }
-          ],
-          "hash": "rvw1:sha256:61158dc5686532966d4d5369be0a57cd07f411935e7ed2155e1cc24e7aee07f6",
-          "at": "2026-08-03T01:11:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The common completion lifecycle is still implemented in the CLI macro: it derives eligibility from raw command-name strings, computes the duration and exit-code value, constructs `EmitCompletedCommand`, and decides whether to emit. The briefing requires this timing, eligibility, conversion, and emission orchestration to be delegated to `cli_driver`.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 244,
-              "category": "architecture"
-            },
-            {
-              "message": "The track wrapper still performs lifecycle orchestration in the bin by classifying display commands, resolving the archive track ID with `resolve_track_id_for_write`, timing execution, selecting archive versus completion events, and converting the exit code before invoking the driver. These context and event decisions belong in the track driver/composition path.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 325,
-              "category": "architecture"
-            },
-            {
-              "message": "The raw-string completion eligibility table does not exclude `verify` commands. Every `sotp verify ...` command therefore emits the generic completion event in addition to `execute_verify_with_telemetry`'s dedicated `GateEval` event, violating the briefing's gate-specific telemetry policy and duplicating telemetry records.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 247,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:11980e1d94e8f4b06266159b9e6eafb1f5b790386deff5860759602877b1e411",
-          "at": "2026-08-03T03:35:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:11980e1d94e8f4b06266159b9e6eafb1f5b790386deff5860759602877b1e411",
-          "at": "2026-08-03T03:35:57Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The common completion lifecycle remains in the CLI macro: it manually derives eligibility from command-name strings, starts timing, converts exit/duration values, and constructs/emits `EmitCompletedCommand`. The briefing requires these lifecycle decisions and emission to be delegated to `cli_driver`.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 186,
-              "category": "architecture"
-            },
-            {
-              "message": "The CLI resolves branch telemetry context directly with `cli_composition::telemetry_wiring::resolve_telemetry_writer` before dispatch, both for generic completion and track commands. This performs repository/writer context resolution in the bin instead of passing typed context to the driver, contrary to the stated layer boundary.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 205,
-              "category": "architecture"
-            },
-            {
-              "message": "The track wrapper still owns display classification, archive-specific routing, timing, exit-code conversion, and track-id resolution. In particular, `resolve_track_id_for_write(...).ok()` silently discards resolution errors; a successful archive can then skip its telemetry event entirely when the ID is unavailable.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 336,
-              "category": "error-handling"
-            }
-          ],
-          "hash": "rvw1:sha256:2ba1e5a32f8bd87b916d78291732e20d19f716269fb3b38d61b58ed688af67c2",
-          "at": "2026-08-03T04:14:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The CLI directly calls `resolve_telemetry_writer` at the common completion boundary, constructing/resolving telemetry writer state in the binary instead of passing typed context through the driver boundary. The same bypass is repeated in the track wrapper.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 205,
-              "category": "architecture"
-            },
-            {
-              "message": "Archive track-ID resolution is converted to `Option` with `.ok()`. If resolution fails, the successful archive path silently skips `EmitArchivedTrackSubcommand`, so completion telemetry is omitted without surfacing the error.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 355,
-              "category": "error-handling"
-            }
-          ],
-          "hash": "rvw1:sha256:2ba1e5a32f8bd87b916d78291732e20d19f716269fb3b38d61b58ed688af67c2",
-          "at": "2026-08-03T04:23:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0d0c66543b7f79ad89dc745bcf27472f242f53fd0f38b0e63b357af9304d0dae",
-          "at": "2026-08-03T04:36:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`track_command_label` returns labels such as `\"track resolve\"`, but the display-only predicate compares them with `\"sotp track resolve\"`. None of the listed display commands therefore take the early return; they perform telemetry resolution and append completion events despite being explicitly excluded. Match the actual labels or classify the typed variants directly.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 340,
-              "category": "correctness"
-            },
-            {
-              "message": "A successful archive now unconditionally uses `EmitArchivedTrackSubcommand`. That archived emitter writes directly under `track/archive/.../logs` without applying `TelemetryConfig`, so `SOTP_TELEMETRY=0` no longer disables the write and `SOTP_TELEMETRY_DIR` is ignored. Restore configuration-aware routing and cover both environment cases.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 365,
-              "category": "environment_handling"
-            },
-            {
-              "message": "The in-process dispatch helpers now pass the eligible identity `\"sotp test\"` and no longer suppress or isolate completion telemetry. Tests using these helpers from an active `track/*` checkout append synthetic events to the repository's real telemetry log and can race with tests modifying telemetry environment variables. Run them in isolated non-track repositories or use an explicitly ineligible test context.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 620,
-              "category": "test_isolation"
-            }
-          ],
-          "hash": "rvw1:sha256:0d0c66543b7f79ad89dc745bcf27472f242f53fd0f38b0e63b357af9304d0dae",
-          "at": "2026-08-03T04:45:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fe12c82bcfb56770b4122e5d6efd562b6dbe05ee4f8175dc54896031ce883739",
-          "at": "2026-08-03T05:06:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fe12c82bcfb56770b4122e5d6efd562b6dbe05ee4f8175dc54896031ce883739",
-          "at": "2026-08-03T05:09:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fe12c82bcfb56770b4122e5d6efd562b6dbe05ee4f8175dc54896031ce883739",
-          "at": "2026-08-03T06:13:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The common entrypoint still owns the completed-command lifecycle: it classifies eligibility, resolves the active track, starts timing, converts the exit code, constructs `EmitCompletedCommand`, and emits it. The briefing and thin-bin policy require this orchestration to live behind `cli_driver`; the CLI should only pass parsed context and dispatch while preserving the returned exit result.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 186,
-              "category": "architecture"
-            },
-            {
-              "message": "The track path also duplicates driver/infrastructure policy: this helper reads telemetry environment configuration and chooses the active-versus-archive persistence route, while `execute_track_with_telemetry` separately handles display eligibility, branch context, timing, result conversion, and emission. Delegate that lifecycle and sink selection to `cli_driver`/infrastructure, leaving only track command parsing and dispatch in the binary.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 345,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:e8c161a9abb92b67e661787a9a572672f77016de4367dd7a276a253144cc9249",
-          "at": "2026-08-03T06:42:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a34e38ca134956251189dd7397d64db2131e187f387c6fb4e010e5b9b036a115",
-          "at": "2026-08-03T07:02:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`command_identity_from_args` produces identities such as `sotp track archive`, but the completion lifecycle recognizes track commands only when the value starts with `track `. The prefixed value instead reaches `completion_eligible`, which rejects top-level `track` and returns immediately after dispatch. Consequently every real `sotp track ...` invocation skips active-track capture and completion/archive telemetry; the new archive tests pass `track archive` directly and miss the production path. Normalize the identity consistently before handing it to the driver.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 186,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:145f74e36f7dd88430de61237dd8046720cb51ae50754c8affa4bd9d70449291",
-          "at": "2026-08-03T10:18:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:145f74e36f7dd88430de61237dd8046720cb51ae50754c8affa4bd9d70449291",
-          "at": "2026-08-03T10:39:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Successful `track archive` commands now use the generic `EmitCompletedCommand` path. After dispatch has moved `track/items/<id>` to `track/archive/<id>`, this active-track emitter writes to `track/items/<id>/logs/telemetry.jsonl`, recreating the active directory and splitting the archived track's telemetry history. Restore success-archive routing through `EmitArchivedTrackSubcommand` (failed archives can retain active routing), and test it by executing an actual archive rather than invoking the telemetry driver directly.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 258,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:bdca17ce4591b1eb337d261cadf62a71d720b6caec21a87060caa3367125fdf2",
-          "at": "2026-08-03T15:38:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Successful archives now always use `EmitArchivedTrackSubcommand`, which derives `<repo>/track/archive/<id>/logs` and does not honor `SOTP_TELEMETRY_DIR`. Consequently, `sotp track archive` writes into the archived track even when telemetry was explicitly redirected to an isolated output directory. Preserve the previous override check and use the override-aware completed-command emitter when it is set, or make the archived emitter honor the configuration. The new override test invokes `EmitCompletedCommand` directly, so it never exercises this production branch.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 264,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:5dfe62516003b3a310dcc9e0484040612ccbcfd1b0bde4225c998813fdbc1901",
-          "at": "2026-08-03T15:45:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`items_dir_from_args(&argv)` reparses raw arguments without respecting Clap's `--` delimiter. For example, `sotp track add-task --track-id current -- --items-dir=/other/repo/track/items` treats the final token as the task description during dispatch, but telemetry treats it as the repository path. The command therefore operates on the current repository while its completion can be written to another repository's active track or omitted. Derive telemetry context from the parsed command, or make the resolver stop at `--`, and add a regression for option-looking positional payloads.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 312,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:6c1b59d99d0dec4cfd5ebcff31cac148064281acc66cda4a6ada217f3ffc5065",
-          "at": "2026-08-03T15:54:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6c1b59d99d0dec4cfd5ebcff31cac148064281acc66cda4a6ada217f3ffc5065",
-          "at": "2026-08-03T15:58:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9d991d78efd952efa5021d8adeaccd8b1325b89d144b5d8aae573308a2e17835",
-          "at": "2026-08-03T17:10:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b96a76fe7ce802ee98bcfc1ff83712a44fe0e11ca40ac4f13907d53c2b4e856e",
-          "at": "2026-08-03T18:07:18Z"
+          "hash": "rvw1:sha256:3e27a096a6c9ade7446a49319a537664cee1110ff4f9d1976f3eda36c2beaa60",
+          "at": "2026-08-03T19:22:36Z"
         }
       ]
     }

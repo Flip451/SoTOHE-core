@@ -22,10 +22,9 @@ use crate::render::CommandOutcome;
 /// Explicit `--items-dir` always wins. Commands that use `--workspace-root` as
 /// their repository root derive the canonical `<root>/track/items` path from
 /// it. Commands that expose an independent `--items-dir` (for example
-/// `dry write`, track graph renderers, and `verify catalogue-spec-refs`) keep
-/// that option's default when only `--workspace-root` is present. A project
-/// root is used as the same canonical repository anchor when no workspace
-/// root is supplied.
+/// `dry write` and track graph renderers) keep that option's default when only
+/// `--workspace-root` is present. A project root is used as the same canonical
+/// repository anchor when no workspace root is supplied.
 #[must_use]
 pub fn items_dir_from_args(args: &[OsString]) -> PathBuf {
     option_path(args, "--items-dir")
@@ -36,9 +35,7 @@ pub fn items_dir_from_args(args: &[OsString]) -> PathBuf {
                     && matches!(
                         args.get(2).and_then(|arg| arg.to_str()),
                         Some("type-graph" | "baseline-graph" | "contract-map")
-                    ))
-                || (args.get(1).is_some_and(|arg| arg == "verify")
-                    && args.get(2).is_some_and(|arg| arg == "catalogue-spec-refs"));
+                    ));
             (!has_independent_items_dir)
                 .then(|| option_path(args, "--workspace-root"))
                 .flatten()
@@ -49,6 +46,7 @@ pub fn items_dir_from_args(args: &[OsString]) -> PathBuf {
 }
 
 fn option_path(args: &[OsString], name: &str) -> Option<PathBuf> {
+    let equals_prefix = format!("{name}=");
     for (index, arg) in args.iter().enumerate().skip(1) {
         let text = arg.to_string_lossy();
         // Clap treats everything after `--` as positional payload.  Do not
@@ -58,8 +56,28 @@ fn option_path(args: &[OsString], name: &str) -> Option<PathBuf> {
         if text == "--" {
             break;
         }
-        if let Some(value) = text.strip_prefix(&format!("{name}=")) {
-            return Some(PathBuf::from(value));
+        #[cfg(unix)]
+        let equals_value = {
+            use std::os::unix::ffi::{OsStrExt, OsStringExt};
+
+            arg.as_bytes()
+                .strip_prefix(equals_prefix.as_bytes())
+                .map(|value| PathBuf::from(OsString::from_vec(value.to_vec())))
+        };
+        #[cfg(windows)]
+        let equals_value = {
+            use std::os::windows::ffi::{OsStrExt, OsStringExt};
+
+            let arg_units = arg.encode_wide().collect::<Vec<_>>();
+            let prefix_units = equals_prefix.encode_utf16().collect::<Vec<_>>();
+            arg_units
+                .strip_prefix(&prefix_units)
+                .map(|value| PathBuf::from(OsString::from_wide(value)))
+        };
+        #[cfg(not(any(unix, windows)))]
+        let equals_value = text.strip_prefix(&equals_prefix).map(PathBuf::from);
+        if let Some(value) = equals_value {
+            return Some(value);
         }
         if text == name {
             return args.get(index + 1).map(PathBuf::from);
@@ -312,7 +330,10 @@ fn format_report(track_id: &str, output: &TelemetryReportOutput) -> String {
     let skipped_lines = output.skipped_lines.as_ref();
     lines.push(format!("Skipped lines: {skipped_lines}"));
     if *skipped_lines > 0 {
-        lines.push("  (parse failure or unknown schema_version)".to_owned());
+        lines.push(
+            "  (parse failure, unknown schema_version, oversized record, or retained-output cap)"
+                .to_owned(),
+        );
     }
     lines.push(String::new());
 
@@ -426,15 +447,42 @@ mod tests {
             OsString::from("--workspace-root"),
             OsString::from("/other/repository"),
         ];
-        let verify_args = vec![
+        assert_eq!(items_dir_from_args(&baseline_graph_args), PathBuf::from("track/items"));
+    }
+
+    #[test]
+    fn test_items_dir_from_args_derives_verify_catalogue_items_from_workspace_root() {
+        let args = vec![
             OsString::from("sotp"),
             OsString::from("verify"),
             OsString::from("catalogue-spec-refs"),
             OsString::from("--workspace-root=/other/repository"),
         ];
 
-        assert_eq!(items_dir_from_args(&baseline_graph_args), PathBuf::from("track/items"));
-        assert_eq!(items_dir_from_args(&verify_args), PathBuf::from("track/items"));
+        assert_eq!(items_dir_from_args(&args), PathBuf::from("/other/repository/track/items"));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_items_dir_from_args_preserves_non_utf8_equals_path_bytes() {
+        use std::os::unix::ffi::OsStringExt;
+
+        let mut workspace_arg = OsString::from("--workspace-root=");
+        workspace_arg.push(OsString::from_vec(b"/other/\xff/repository".to_vec()));
+        let args = vec![
+            OsString::from("sotp"),
+            OsString::from("track"),
+            OsString::from("baseline-capture"),
+            workspace_arg,
+        ];
+
+        let items_dir = items_dir_from_args(&args);
+        assert!(
+            items_dir
+                .as_os_str()
+                .as_encoded_bytes()
+                .starts_with(b"/other/\xff/repository/track/items")
+        );
     }
 
     #[test]
@@ -822,6 +870,29 @@ mod tests {
                 .as_deref()
                 .is_some_and(|report| report.contains("  (no command data recorded)"))
         );
+    }
+
+    #[test]
+    fn test_telemetry_report_nonzero_skipped_lines_explain_projection_cap() {
+        let service = Arc::new(MetricsService {
+            report: TelemetryReportOutput {
+                phase_durations: Vec::new(),
+                errors: Vec::new(),
+                hook_blocks: Vec::new(),
+                skipped_lines: TelemetrySkippedLineCount::from(1),
+                command_metrics: Vec::new(),
+            },
+        });
+        let driver = build_driver(service);
+
+        let outcome = driver.handle(TelemetryInput::Report(TelemetryReportInput {
+            track_id: "test-track".to_owned(),
+            items_dir: PathBuf::from("track/items"),
+        }));
+
+        let report = outcome.stdout.expect("successful report has stdout");
+        assert!(report.contains("Skipped lines: 1"));
+        assert!(report.contains("retained-output cap"));
     }
 
     #[test]
