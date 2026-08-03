@@ -57,7 +57,7 @@
         "role": "Interactor"
       },
       "brief": "Author a result test covering 'entry' of PreReviewCommandDispatchInteractor",
-      "declaration_hash": "a65ba2b8d3e5b2a77ef45875d113db26416e2210d9fa6ad2481cab6164709d90",
+      "declaration_hash": "288f9d0ffef0d37b48fb7f0da8aceeafd1dfcdb1a0441a4833df10915e585b75",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -93,7 +93,7 @@
         "role": "Interactor"
       },
       "brief": "Author a result test covering 'entry' of PreReviewCommandGatedReviewInteractor",
-      "declaration_hash": "47b3d7e2b0b425b903d42abe13da315cdaeef1114c0f6e37b380bb444ce578a1",
+      "declaration_hash": "32ef42b598ed621aa8fff347453c73e5d31e0b550217bff9a271fa6b3ccece58",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",

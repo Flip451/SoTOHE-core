@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-02T22:49:07Z",
-  "declaration_hash": "74f5ce9f11c6090882e4880cfee2d37788c07f8e7f4c0b5193d03f1bd7a5e001",
-  "implementation_input_hash": "ffd95c32ccf4e9974d1d8e4e693a7c11abe714048dac9a5469c95c3350f926c3",
+  "generated_at": "2026-08-02T23:55:10Z",
+  "declaration_hash": "8ae999e542ae3cacb895c4cbbab8e6cec59cda472f082f271b18b3d81f6f7d66",
+  "implementation_input_hash": "5f5430809580b8e582f8c0cea82d45ff00e92f2f2653a452971ab55c49bd36e5",
   "signals": [
     {
       "type_name": "CapturedProgramOutput",
@@ -98,13 +98,13 @@
       "found_items": [
         "Debug",
         "Display",
-        "Error"
+        "Error",
+        "From<PreReviewCommandConfigValidationError>"
       ],
       "missing_items": [
         "From<CommandDeclarationIdValidationError>",
         "From<ConfiguredCommandValidationError>",
-        "From<PhaseCommandConfigValidationError>",
-        "From<PreReviewCommandConfigValidationError>"
+        "From<PhaseCommandConfigValidationError>"
       ]
     },
     {
@@ -381,7 +381,7 @@
     {
       "type_name": "PreReviewCommandConfig",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "Clone",
@@ -399,9 +399,9 @@
     {
       "type_name": "PreReviewCommandConfigValidationError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Debug",
         "Display",
         "Error"
@@ -422,7 +422,7 @@
     {
       "type_name": "PreReviewCommandDispatchError",
       "kind_tag": "error_type",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "Debug",
@@ -436,7 +436,7 @@
     {
       "type_name": "PreReviewCommandDispatchInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "PreReviewCommandDispatchService"
@@ -463,7 +463,7 @@
     {
       "type_name": "PreReviewCommandGatedReviewInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "ReviewService"

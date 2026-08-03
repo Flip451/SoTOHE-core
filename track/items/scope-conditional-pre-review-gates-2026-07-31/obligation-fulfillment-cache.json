@@ -16,24 +16,24 @@
       },
       "key": {
         "bound_tests_set_hash": "f4074bc2f97a3f11a2ad59daededf65107d7fa45e7de8e6a0d3e1741a46a7a4d",
-        "declaration_hash": "a65ba2b8d3e5b2a77ef45875d113db26416e2210d9fa6ad2481cab6164709d90",
+        "declaration_hash": "288f9d0ffef0d37b48fb7f0da8aceeafd1dfcdb1a0441a4833df10915e585b75",
         "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(*runner.0.lock().unwrap(), vec![vec![\"first\"], vec![\"fail\"],]); ... assert_eq!(failed_argv, [\"fail\"]); ... assert_eq!(*runner.0.lock().unwrap(), vec![vec![\"bin/sotp\", \"signal\", \"calc-impl-catalog\"], vec![\"bin/sotp\", \"signal\", \"check-impl-catalog\", \"--gate\", \"commit\"], vec![\"bin/sotp\", \"task-contract\", \"coverage\"], vec![\"bin/sotp\", \"task-contract\", \"check\"]]);"
+        "citation": "assert_eq!(\n            *runner.0.lock().unwrap(),\n            vec![\n                vec![\"bin/sotp\", \"signal\", \"calc-impl-catalog\"],\n                vec![\"bin/sotp\", \"signal\", \"check-impl-catalog\", \"--gate\", \"commit\"],\n                vec![\"bin/sotp\", \"task-contract\", \"coverage\"],\n                vec![\"bin/sotp\", \"task-contract\", \"check\"],\n            ]\n        );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
         {
           "layer": "usecase",
           "module_path": "usecase::pre_review_command::tests",
-          "test_name": "test_pre_review_command_dispatch_uses_configured_arguments_and_stops_at_failure"
+          "test_name": "test_pre_review_command_dispatch_returns_first_failure_with_completed_successes"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::pre_review_command::tests",
-          "test_name": "test_pre_review_command_dispatch_runs_implementation_gates_in_declaration_order"
+          "test_name": "test_pre_review_command_dispatch_returns_successful_records_in_declaration_order"
         }
       ]
     },
@@ -52,24 +52,24 @@
       },
       "key": {
         "bound_tests_set_hash": "f4074bc2f97a3f11a2ad59daededf65107d7fa45e7de8e6a0d3e1741a46a7a4d",
-        "declaration_hash": "a65ba2b8d3e5b2a77ef45875d113db26416e2210d9fa6ad2481cab6164709d90",
+        "declaration_hash": "288f9d0ffef0d37b48fb7f0da8aceeafd1dfcdb1a0441a4833df10915e585b75",
         "anchor_text_hash": "6166df4e5cb8aa348e839dc9faf6fdda9446f5782ff3880dec49513621a1e600"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(failed_argv, [\"fail\"]);\n            }\n            other => panic!(\"expected a failed pre-review command, got {other:?}\"),\n        }\n        assert_eq!(*runner.0.lock().unwrap(), vec![vec![\"first\"], vec![\"fail\"],]);"
+        "citation": "assert!(matches!(\n                    failed.as_ref().outcome,\n                    ProgramRunOutcome::Exited { ref exit_code, .. } if exit_code.as_i32() != 0\n                ));\n                let failed_argv: Vec<&str> = failed\n                    .as_ref()\n                    .command\n                    .argv()\n                    .arguments()\n                    .iter()\n                    .map(CommandArgument::as_str)\n                    .collect();\n                assert_eq!(failed_argv, [\"fail\"]); ... assert_eq!(*runner.0.lock().unwrap(), vec![vec![\"first\"], vec![\"fail\"],]);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
         {
           "layer": "usecase",
           "module_path": "usecase::pre_review_command::tests",
-          "test_name": "test_pre_review_command_dispatch_uses_configured_arguments_and_stops_at_failure"
+          "test_name": "test_pre_review_command_dispatch_returns_first_failure_with_completed_successes"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::pre_review_command::tests",
-          "test_name": "test_pre_review_command_dispatch_runs_implementation_gates_in_declaration_order"
+          "test_name": "test_pre_review_command_dispatch_returns_successful_records_in_declaration_order"
         }
       ]
     },
@@ -88,7 +88,7 @@
       },
       "key": {
         "bound_tests_set_hash": "f4074bc2f97a3f11a2ad59daededf65107d7fa45e7de8e6a0d3e1741a46a7a4d",
-        "declaration_hash": "a65ba2b8d3e5b2a77ef45875d113db26416e2210d9fa6ad2481cab6164709d90",
+        "declaration_hash": "288f9d0ffef0d37b48fb7f0da8aceeafd1dfcdb1a0441a4833df10915e585b75",
         "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
       },
       "verdict": {
@@ -100,12 +100,12 @@
         {
           "layer": "usecase",
           "module_path": "usecase::pre_review_command::tests",
-          "test_name": "test_pre_review_command_dispatch_uses_configured_arguments_and_stops_at_failure"
+          "test_name": "test_pre_review_command_dispatch_returns_first_failure_with_completed_successes"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::pre_review_command::tests",
-          "test_name": "test_pre_review_command_dispatch_runs_implementation_gates_in_declaration_order"
+          "test_name": "test_pre_review_command_dispatch_returns_successful_records_in_declaration_order"
         }
       ]
     },
@@ -124,24 +124,24 @@
       },
       "key": {
         "bound_tests_set_hash": "f4074bc2f97a3f11a2ad59daededf65107d7fa45e7de8e6a0d3e1741a46a7a4d",
-        "declaration_hash": "a65ba2b8d3e5b2a77ef45875d113db26416e2210d9fa6ad2481cab6164709d90",
+        "declaration_hash": "288f9d0ffef0d37b48fb7f0da8aceeafd1dfcdb1a0441a4833df10915e585b75",
         "anchor_text_hash": "3503592124957ba7751cc28fe43d9a296d963b754b236386592298f341297962"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(*runner.0.lock().unwrap(), vec![vec![\"bin/sotp\", \"signal\", \"calc-impl-catalog\"], vec![\"bin/sotp\", \"signal\", \"check-impl-catalog\", \"--gate\", \"commit\"], vec![\"bin/sotp\", \"task-contract\", \"coverage\"], vec![\"bin/sotp\", \"task-contract\", \"check\"], ]);"
+        "citation": "assert_eq!(\\n            *runner.0.lock().unwrap(),\\n            vec![\\n                vec![\"bin/sotp\", \"signal\", \"calc-impl-catalog\"],\\n                vec![\"bin/sotp\", \"signal\", \"check-impl-catalog\", \"--gate\", \"commit\"],\\n                vec![\"bin/sotp\", \"task-contract\", \"coverage\"],\\n                vec![\"bin/sotp\", \"task-contract\", \"check\"],\\n            ]\\n        ); ... assert_eq!(*runner.0.lock().unwrap(), vec![vec![\"first\"], vec![\"fail\"],]);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
         {
           "layer": "usecase",
           "module_path": "usecase::pre_review_command::tests",
-          "test_name": "test_pre_review_command_dispatch_uses_configured_arguments_and_stops_at_failure"
+          "test_name": "test_pre_review_command_dispatch_returns_first_failure_with_completed_successes"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::pre_review_command::tests",
-          "test_name": "test_pre_review_command_dispatch_runs_implementation_gates_in_declaration_order"
+          "test_name": "test_pre_review_command_dispatch_returns_successful_records_in_declaration_order"
         }
       ]
     },
@@ -159,13 +159,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "2b5254485130ad140571ff0cd3450ba116461a9b09f06ad3fadf569ec76f7e84",
-        "declaration_hash": "47b3d7e2b0b425b903d42abe13da315cdaeef1114c0f6e37b380bb444ce578a1",
+        "bound_tests_set_hash": "db08f76ab02dbc08d5e8053ddee20d1cd7b2ec267043d15bbb8d9069ac1d259a",
+        "declaration_hash": "32ef42b598ed621aa8fff347453c73e5d31e0b550217bff9a271fa6b3ccece58",
         "anchor_text_hash": "1bdc49e667cc6de452e55bc963fab3fb5d694e9f3ecb6cbf3fd5fee32248afe8"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(review.0.load(Ordering::SeqCst), 0); ... assert_eq!(*runner.invocations.lock().unwrap(), vec![vec![\"bin/sotp\", \"signal\", \"calc-impl-catalog\"], vec![\"bin/sotp\", \"signal\", \"check-impl-catalog\", \"--gate\", \"commit\"]]); ... assert_eq!(review.0.load(Ordering::SeqCst), 1); ... assert!(runner.0.lock().unwrap().is_empty());"
+        "citation": "assert_eq!(*runner.invocations.lock().unwrap(), vec![vec![\"bin/sotp\", \"signal\", \"calc-impl-catalog\"], vec![\"bin/sotp\", \"signal\", \"check-impl-catalog\", \"--gate\", \"commit\"], vec![\"bin/sotp\", \"task-contract\", \"coverage\"], vec![\"bin/sotp\", \"task-contract\", \"check\"]]); ... assert_eq!(review.0.load(Ordering::SeqCst), 1); ... assert_eq!(*runner.0.lock().unwrap(), Vec::new());"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -175,14 +175,19 @@
           "test_name": "test_pre_review_gated_review_runs_implementation_gates_in_order_and_stops_on_failure"
         },
         {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::operator_command_config::tests",
-          "test_name": "test_decode_rejects_duplicate_scope_empty_argv_timeout_and_recursion"
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_command::tests",
+          "test_name": "test_pre_review_gated_review_runs_all_implementation_gates_then_reviews_on_success"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::pre_review_command::tests",
-          "test_name": "test_pre_review_gated_review_allows_empty_planning_scope_without_gate_execution"
+          "test_name": "test_pre_review_gated_review_rejects_invalid_configuration_without_reviewer_start"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_command::tests",
+          "test_name": "test_pre_review_gated_review_allows_planning_scope_without_downstream_liveness_artifacts"
         }
       ]
     },
@@ -200,13 +205,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "2b5254485130ad140571ff0cd3450ba116461a9b09f06ad3fadf569ec76f7e84",
-        "declaration_hash": "47b3d7e2b0b425b903d42abe13da315cdaeef1114c0f6e37b380bb444ce578a1",
+        "bound_tests_set_hash": "db08f76ab02dbc08d5e8053ddee20d1cd7b2ec267043d15bbb8d9069ac1d259a",
+        "declaration_hash": "32ef42b598ed621aa8fff347453c73e5d31e0b550217bff9a271fa6b3ccece58",
         "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(\\n            *runner.invocations.lock().unwrap(),\\n            vec![\\n                vec![\"bin/sotp\", \"signal\", \"calc-impl-catalog\"],\\n                vec![\"bin/sotp\", \"signal\", \"check-impl-catalog\", \"--gate\", \"commit\"],\\n            ]\\n        );"
+        "citation": "assert_eq!(\n            *runner.invocations.lock().unwrap(),\n            vec![\n                vec![\"bin/sotp\", \"signal\", \"calc-impl-catalog\"],\n                vec![\"bin/sotp\", \"signal\", \"check-impl-catalog\", \"--gate\", \"commit\"],\n                vec![\"bin/sotp\", \"task-contract\", \"coverage\"],\n                vec![\"bin/sotp\", \"task-contract\", \"check\"],\n            ]\n        );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -216,14 +221,19 @@
           "test_name": "test_pre_review_gated_review_runs_implementation_gates_in_order_and_stops_on_failure"
         },
         {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::operator_command_config::tests",
-          "test_name": "test_decode_rejects_duplicate_scope_empty_argv_timeout_and_recursion"
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_command::tests",
+          "test_name": "test_pre_review_gated_review_runs_all_implementation_gates_then_reviews_on_success"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::pre_review_command::tests",
-          "test_name": "test_pre_review_gated_review_allows_empty_planning_scope_without_gate_execution"
+          "test_name": "test_pre_review_gated_review_rejects_invalid_configuration_without_reviewer_start"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_command::tests",
+          "test_name": "test_pre_review_gated_review_allows_planning_scope_without_downstream_liveness_artifacts"
         }
       ]
     },
@@ -241,8 +251,8 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "2b5254485130ad140571ff0cd3450ba116461a9b09f06ad3fadf569ec76f7e84",
-        "declaration_hash": "47b3d7e2b0b425b903d42abe13da315cdaeef1114c0f6e37b380bb444ce578a1",
+        "bound_tests_set_hash": "db08f76ab02dbc08d5e8053ddee20d1cd7b2ec267043d15bbb8d9069ac1d259a",
+        "declaration_hash": "32ef42b598ed621aa8fff347453c73e5d31e0b550217bff9a271fa6b3ccece58",
         "anchor_text_hash": "6166df4e5cb8aa348e839dc9faf6fdda9446f5782ff3880dec49513621a1e600"
       },
       "verdict": {
@@ -257,14 +267,19 @@
           "test_name": "test_pre_review_gated_review_runs_implementation_gates_in_order_and_stops_on_failure"
         },
         {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::operator_command_config::tests",
-          "test_name": "test_decode_rejects_duplicate_scope_empty_argv_timeout_and_recursion"
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_command::tests",
+          "test_name": "test_pre_review_gated_review_runs_all_implementation_gates_then_reviews_on_success"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::pre_review_command::tests",
-          "test_name": "test_pre_review_gated_review_allows_empty_planning_scope_without_gate_execution"
+          "test_name": "test_pre_review_gated_review_rejects_invalid_configuration_without_reviewer_start"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_command::tests",
+          "test_name": "test_pre_review_gated_review_allows_planning_scope_without_downstream_liveness_artifacts"
         }
       ]
     },
@@ -282,13 +297,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "2b5254485130ad140571ff0cd3450ba116461a9b09f06ad3fadf569ec76f7e84",
-        "declaration_hash": "47b3d7e2b0b425b903d42abe13da315cdaeef1114c0f6e37b380bb444ce578a1",
+        "bound_tests_set_hash": "db08f76ab02dbc08d5e8053ddee20d1cd7b2ec267043d15bbb8d9069ac1d259a",
+        "declaration_hash": "32ef42b598ed621aa8fff347453c73e5d31e0b550217bff9a271fa6b3ccece58",
         "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(output.exit_code, 1);\n        assert!(output.stderr.as_deref().unwrap_or(\"\").contains(\"check-impl-catalog\"));\n        assert_eq!(review.0.load(Ordering::SeqCst), 0);"
+        "citation": "assert_eq!(review.0.load(Ordering::SeqCst), 0);\nassert_eq!(\n    *runner.invocations.lock().unwrap(),\n    vec![\n        vec![\"bin/sotp\", \"signal\", \"calc-impl-catalog\"],\n        vec![\"bin/sotp\", \"signal\", \"check-impl-catalog\", \"--gate\", \"commit\"],\n    ]\n);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -298,14 +313,19 @@
           "test_name": "test_pre_review_gated_review_runs_implementation_gates_in_order_and_stops_on_failure"
         },
         {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::operator_command_config::tests",
-          "test_name": "test_decode_rejects_duplicate_scope_empty_argv_timeout_and_recursion"
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_command::tests",
+          "test_name": "test_pre_review_gated_review_runs_all_implementation_gates_then_reviews_on_success"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::pre_review_command::tests",
-          "test_name": "test_pre_review_gated_review_allows_empty_planning_scope_without_gate_execution"
+          "test_name": "test_pre_review_gated_review_rejects_invalid_configuration_without_reviewer_start"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_command::tests",
+          "test_name": "test_pre_review_gated_review_allows_planning_scope_without_downstream_liveness_artifacts"
         }
       ]
     },
@@ -323,13 +343,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "2b5254485130ad140571ff0cd3450ba116461a9b09f06ad3fadf569ec76f7e84",
-        "declaration_hash": "47b3d7e2b0b425b903d42abe13da315cdaeef1114c0f6e37b380bb444ce578a1",
+        "bound_tests_set_hash": "db08f76ab02dbc08d5e8053ddee20d1cd7b2ec267043d15bbb8d9069ac1d259a",
+        "declaration_hash": "32ef42b598ed621aa8fff347453c73e5d31e0b550217bff9a271fa6b3ccece58",
         "anchor_text_hash": "897363e3ebbc289d408049d6e8e15a724f7e598c52d2bc1e8d8de039a28a5678"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "vec![PreReviewScopeCommandDeclaration::new(scope(\"spec\"), Vec::new())] ... assert_eq!(output.exit_code, 0);\nassert_eq!(review.0.load(Ordering::SeqCst), 1);\nassert!(runner.0.lock().unwrap().is_empty());"
+        "citation": "// The inner reviewer ran exactly once and produced its output, with no\n        // configured command executed first — the planning scope required no\n        // downstream implementation liveness and no task-contract artifact.\n        assert_eq!(review.0.load(Ordering::SeqCst), 1);\n        assert!(runner.0.lock().unwrap().is_empty());"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -339,14 +359,19 @@
           "test_name": "test_pre_review_gated_review_runs_implementation_gates_in_order_and_stops_on_failure"
         },
         {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::operator_command_config::tests",
-          "test_name": "test_decode_rejects_duplicate_scope_empty_argv_timeout_and_recursion"
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_command::tests",
+          "test_name": "test_pre_review_gated_review_runs_all_implementation_gates_then_reviews_on_success"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::pre_review_command::tests",
-          "test_name": "test_pre_review_gated_review_allows_empty_planning_scope_without_gate_execution"
+          "test_name": "test_pre_review_gated_review_rejects_invalid_configuration_without_reviewer_start"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_command::tests",
+          "test_name": "test_pre_review_gated_review_allows_planning_scope_without_downstream_liveness_artifacts"
         }
       ]
     },
@@ -364,13 +389,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "2b5254485130ad140571ff0cd3450ba116461a9b09f06ad3fadf569ec76f7e84",
-        "declaration_hash": "47b3d7e2b0b425b903d42abe13da315cdaeef1114c0f6e37b380bb444ce578a1",
+        "bound_tests_set_hash": "db08f76ab02dbc08d5e8053ddee20d1cd7b2ec267043d15bbb8d9069ac1d259a",
+        "declaration_hash": "32ef42b598ed621aa8fff347453c73e5d31e0b550217bff9a271fa6b3ccece58",
         "anchor_text_hash": "3503592124957ba7751cc28fe43d9a296d963b754b236386592298f341297962"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(review.0.load(Ordering::SeqCst), 0);\nassert_eq!(\n    *runner.invocations.lock().unwrap(),\n    vec![\n        vec![\"bin/sotp\", \"signal\", \"calc-impl-catalog\"],\n        vec![\"bin/sotp\", \"signal\", \"check-impl-catalog\", \"--gate\", \"commit\"],\n    ]\n);"
+        "citation": "vec![\"bin/sotp\", \"signal\", \"calc-impl-catalog\"], vec![\"bin/sotp\", \"signal\", \"check-impl-catalog\", \"--gate\", \"commit\"], vec![\"bin/sotp\", \"task-contract\", \"coverage\"], vec![\"bin/sotp\", \"task-contract\", \"check\"]"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -380,14 +405,19 @@
           "test_name": "test_pre_review_gated_review_runs_implementation_gates_in_order_and_stops_on_failure"
         },
         {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::operator_command_config::tests",
-          "test_name": "test_decode_rejects_duplicate_scope_empty_argv_timeout_and_recursion"
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_command::tests",
+          "test_name": "test_pre_review_gated_review_runs_all_implementation_gates_then_reviews_on_success"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::pre_review_command::tests",
-          "test_name": "test_pre_review_gated_review_allows_empty_planning_scope_without_gate_execution"
+          "test_name": "test_pre_review_gated_review_rejects_invalid_configuration_without_reviewer_start"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_command::tests",
+          "test_name": "test_pre_review_gated_review_allows_planning_scope_without_downstream_liveness_artifacts"
         }
       ]
     },
@@ -423,7 +453,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::pre_review_command::tests",
-          "test_name": "test_pre_review_command_dispatch_uses_configured_arguments_and_stops_at_failure"
+          "test_name": "test_pre_review_command_dispatch_returns_first_failure_with_completed_successes"
         },
         {
           "layer": "cli_composition",
@@ -464,7 +494,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::pre_review_command::tests",
-          "test_name": "test_pre_review_command_dispatch_uses_configured_arguments_and_stops_at_failure"
+          "test_name": "test_pre_review_command_dispatch_returns_first_failure_with_completed_successes"
         },
         {
           "layer": "cli_composition",
@@ -515,7 +545,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::pre_review_command::tests",
-          "test_name": "test_pre_review_command_dispatch_uses_configured_arguments_and_stops_at_failure"
+          "test_name": "test_pre_review_command_dispatch_returns_first_failure_with_completed_successes"
         },
         {
           "layer": "cli_composition",
@@ -566,7 +596,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::pre_review_command::tests",
-          "test_name": "test_pre_review_command_dispatch_uses_configured_arguments_and_stops_at_failure"
+          "test_name": "test_pre_review_command_dispatch_returns_first_failure_with_completed_successes"
         },
         {
           "layer": "cli_composition",
@@ -617,7 +647,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::pre_review_command::tests",
-          "test_name": "test_pre_review_command_dispatch_uses_configured_arguments_and_stops_at_failure"
+          "test_name": "test_pre_review_command_dispatch_returns_first_failure_with_completed_successes"
         },
         {
           "layer": "cli_composition",
@@ -668,7 +698,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::pre_review_command::tests",
-          "test_name": "test_pre_review_command_dispatch_uses_configured_arguments_and_stops_at_failure"
+          "test_name": "test_pre_review_command_dispatch_returns_first_failure_with_completed_successes"
         },
         {
           "layer": "cli_composition",
@@ -704,12 +734,12 @@
         {
           "layer": "usecase",
           "module_path": "usecase::pre_review_command::tests",
-          "test_name": "test_pre_review_command_dispatch_uses_configured_arguments_and_stops_at_failure"
+          "test_name": "test_pre_review_command_dispatch_returns_first_failure_with_completed_successes"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::pre_review_command::tests",
-          "test_name": "test_pre_review_command_dispatch_runs_implementation_gates_in_declaration_order"
+          "test_name": "test_pre_review_command_dispatch_returns_successful_records_in_declaration_order"
         }
       ]
     },
@@ -740,12 +770,12 @@
         {
           "layer": "usecase",
           "module_path": "usecase::pre_review_command::tests",
-          "test_name": "test_pre_review_command_dispatch_uses_configured_arguments_and_stops_at_failure"
+          "test_name": "test_pre_review_command_dispatch_returns_first_failure_with_completed_successes"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::pre_review_command::tests",
-          "test_name": "test_pre_review_command_dispatch_runs_implementation_gates_in_declaration_order"
+          "test_name": "test_pre_review_command_dispatch_returns_successful_records_in_declaration_order"
         }
       ]
     },
@@ -776,12 +806,12 @@
         {
           "layer": "usecase",
           "module_path": "usecase::pre_review_command::tests",
-          "test_name": "test_pre_review_command_dispatch_uses_configured_arguments_and_stops_at_failure"
+          "test_name": "test_pre_review_command_dispatch_returns_first_failure_with_completed_successes"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::pre_review_command::tests",
-          "test_name": "test_pre_review_command_dispatch_runs_implementation_gates_in_declaration_order"
+          "test_name": "test_pre_review_command_dispatch_returns_successful_records_in_declaration_order"
         }
       ]
     },
@@ -812,12 +842,12 @@
         {
           "layer": "usecase",
           "module_path": "usecase::pre_review_command::tests",
-          "test_name": "test_pre_review_command_dispatch_uses_configured_arguments_and_stops_at_failure"
+          "test_name": "test_pre_review_command_dispatch_returns_first_failure_with_completed_successes"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::pre_review_command::tests",
-          "test_name": "test_pre_review_command_dispatch_runs_implementation_gates_in_declaration_order"
+          "test_name": "test_pre_review_command_dispatch_returns_successful_records_in_declaration_order"
         }
       ]
     },
@@ -1647,7 +1677,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::pre_review_command::tests",
-          "test_name": "test_pre_review_command_dispatch_uses_configured_arguments_and_stops_at_failure"
+          "test_name": "test_pre_review_command_dispatch_returns_first_failure_with_completed_successes"
         },
         {
           "layer": "cli_composition",
@@ -1688,7 +1718,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::pre_review_command::tests",
-          "test_name": "test_pre_review_command_dispatch_uses_configured_arguments_and_stops_at_failure"
+          "test_name": "test_pre_review_command_dispatch_returns_first_failure_with_completed_successes"
         },
         {
           "layer": "cli_composition",

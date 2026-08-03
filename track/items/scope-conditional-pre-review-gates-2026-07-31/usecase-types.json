@@ -3112,18 +3112,34 @@
               "kind": "tuple"
             }
           },
-          {
-            "name": "TrackResolution",
-            "payload": {
-              "fields": [
-                "CurrentReviewTrackResolveError"
-              ],
-              "kind": "tuple"
-            }
-          },
-          {
-            "name": "Runner",
-            "payload": {
+        {
+          "name": "TrackResolution",
+          "payload": {
+            "fields": [
+              "CurrentReviewTrackResolveError"
+            ],
+            "kind": "tuple"
+          }
+        },
+        {
+          "name": "TrackMismatch",
+          "payload": {
+            "fields": [
+              {
+                "name": "explicit",
+                "ty": "domain::TrackId"
+              },
+              {
+                "name": "resolved",
+                "ty": "domain::TrackId"
+              }
+            ],
+            "kind": "struct"
+          }
+        },
+        {
+          "name": "Runner",
+          "payload": {
               "fields": [
                 "ProgramRunnerError"
               ],
@@ -3159,21 +3175,8 @@
       "kind": {
         "kind": "struct",
         "shape": {
-          "fields": [
-            {
-              "name": "config_loader",
-              "ty": "Arc<dyn PreReviewCommandConfigLoaderPort>"
-            },
-            {
-              "name": "track_resolver",
-              "ty": "Arc<dyn CurrentReviewTrackResolverPort>"
-            },
-            {
-              "name": "runner",
-              "ty": "Arc<dyn ProgramRunnerPort>"
-            }
-          ],
-          "has_stripped_fields": false,
+          "fields": [],
+          "has_stripped_fields": true,
           "kind": "plain"
         }
       },
@@ -3269,17 +3272,8 @@
       "kind": {
         "kind": "struct",
         "shape": {
-          "fields": [
-            {
-              "name": "inner",
-              "ty": "Arc<dyn review_v2::ReviewService>"
-            },
-            {
-              "name": "dispatcher",
-              "ty": "Arc<dyn PreReviewCommandDispatchService>"
-            }
-          ],
-          "has_stripped_fields": false,
+          "fields": [],
+          "has_stripped_fields": true,
           "kind": "plain"
         }
       },

@@ -101,6 +101,7 @@ pub fn decode_pre_review_command_config(
         CommandConfigSchemaVersion::new(dto.schema_version.version),
         scopes,
     )
+    .map_err(CommandConfigValidationError::from)
 }
 
 fn decode_command(
@@ -151,6 +152,7 @@ impl PreReviewCommandConfigLoaderPort for FsPreReviewCommandConfigLoader {
             CommandConfigSchemaVersion::new(version.schema_version.version),
             Vec::new(),
         )
+        .map_err(CommandConfigValidationError::from)
         .map_err(CommandConfigLoadError::from)?;
         let dto = serde_json::from_str(&source).map_err(decode_failed)?;
         decode_pre_review_command_config(dto).map_err(CommandConfigLoadError::from)

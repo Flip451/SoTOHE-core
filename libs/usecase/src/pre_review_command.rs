@@ -48,11 +48,15 @@ impl PreReviewCommandConfig {
     pub fn try_new(
         schema_version: CommandConfigSchemaVersion,
         scopes: Vec<PreReviewScopeCommandDeclaration>,
-    ) -> Result<Self, CommandConfigValidationError> {
-        schema_version.validate()?;
+    ) -> Result<Self, PreReviewCommandConfigValidationError> {
+        if schema_version.validate().is_err() {
+            return Err(PreReviewCommandConfigValidationError::InvalidSchemaVersion {
+                actual: schema_version,
+            });
+        }
         for (index, declaration) in scopes.iter().enumerate() {
             if scopes.iter().take(index).any(|prior| prior.scope == declaration.scope) {
-                return Err(CommandConfigValidationError::DuplicateScope(
+                return Err(PreReviewCommandConfigValidationError::DuplicateScope(
                     declaration.scope.clone(),
                 ));
             }
@@ -65,6 +69,28 @@ impl PreReviewCommandConfig {
             .iter()
             .find(|declaration| declaration.scope == *scope)
             .map(PreReviewScopeCommandDeclaration::commands)
+    }
+}
+
+/// Validation failures that can arise while assembling pre-review configuration.
+#[derive(Debug, Error)]
+pub enum PreReviewCommandConfigValidationError {
+    #[error("unsupported command configuration schema version: {actual:?}")]
+    InvalidSchemaVersion { actual: CommandConfigSchemaVersion },
+    #[error("duplicate review scope: {0}")]
+    DuplicateScope(ScopeName),
+}
+
+impl From<PreReviewCommandConfigValidationError> for CommandConfigValidationError {
+    fn from(error: PreReviewCommandConfigValidationError) -> Self {
+        match error {
+            PreReviewCommandConfigValidationError::InvalidSchemaVersion { actual } => {
+                Self::InvalidSchemaVersion { actual }
+            }
+            PreReviewCommandConfigValidationError::DuplicateScope(scope) => {
+                Self::DuplicateScope(scope)
+            }
+        }
     }
 }
 
@@ -156,10 +182,9 @@ impl PreReviewCommandDispatchService for PreReviewCommandDispatchInteractor {
     ) -> Result<PreReviewCommandDispatchOutcome, PreReviewCommandDispatchError> {
         let track_id = match command.track {
             ReviewTrackSelector::Explicit(track_id) => {
-                // The configured commands resolve their own track from the
-                // current branch, so an explicit selection that differs from
-                // the branch track would run the gates against a different
-                // track than the review; fail closed on the mismatch.
+                // Pre-review commands resolve their track from the current
+                // branch. Reject a different explicit review selection so the
+                // gate and review cannot observe different track artifacts.
                 let resolved = self.track_resolver.resolve(&command.repository_root)?;
                 if resolved != track_id {
                     return Err(PreReviewCommandDispatchError::TrackMismatch {
@@ -372,10 +397,7 @@ mod tests {
     use domain::TrackId;
     use domain::review_v2::{MainScopeName, ScopeName};
 
-    use crate::operator_command::{
-        CommandArgument, CommandConfigSchemaVersion, CommandConfigValidationError,
-        ConfiguredCommand,
-    };
+    use crate::operator_command::{CommandArgument, CommandConfigSchemaVersion, ConfiguredCommand};
     use crate::program_runner::{
         CapturedProgramOutput, ClassifiedProgramExecutionRecord, FailedProgramExecutionRecord,
         ProgramExecutionRecord, ProgramExitCode, ProgramInvocation, ProgramOutputStream,
@@ -387,10 +409,11 @@ mod tests {
 
     use super::{
         CurrentReviewTrackResolveError, CurrentReviewTrackResolverPort, PreReviewCommandConfig,
-        PreReviewCommandConfigLoaderPort, PreReviewCommandDispatchCommand,
-        PreReviewCommandDispatchInteractor, PreReviewCommandDispatchOutcome,
-        PreReviewCommandDispatchService, PreReviewCommandGatedReviewInteractor,
-        PreReviewScopeCommandDeclaration, ReviewScopeSelector, ReviewTrackSelector,
+        PreReviewCommandConfigLoaderPort, PreReviewCommandConfigValidationError,
+        PreReviewCommandDispatchCommand, PreReviewCommandDispatchInteractor,
+        PreReviewCommandDispatchOutcome, PreReviewCommandDispatchService,
+        PreReviewCommandGatedReviewInteractor, PreReviewScopeCommandDeclaration,
+        ReviewScopeSelector, ReviewTrackSelector,
     };
 
     fn scope(value: &str) -> ScopeName {
@@ -431,7 +454,15 @@ mod tests {
         ];
         assert!(matches!(
             PreReviewCommandConfig::try_new(CommandConfigSchemaVersion::new(1), declarations),
-            Err(CommandConfigValidationError::DuplicateScope(_))
+            Err(PreReviewCommandConfigValidationError::DuplicateScope(_))
+        ));
+    }
+
+    #[test]
+    fn test_pre_review_command_config_reports_pre_review_specific_validation_errors() {
+        assert!(matches!(
+            PreReviewCommandConfig::try_new(CommandConfigSchemaVersion::new(2), Vec::new()),
+            Err(PreReviewCommandConfigValidationError::InvalidSchemaVersion { .. })
         ));
     }
 
@@ -525,7 +556,7 @@ mod tests {
     }
 
     #[test]
-    fn test_pre_review_command_dispatch_uses_configured_arguments_and_stops_at_failure() {
+    fn test_pre_review_command_dispatch_returns_first_failure_with_completed_successes() {
         let config = PreReviewCommandConfig::try_new(
             CommandConfigSchemaVersion::new(1),
             vec![PreReviewScopeCommandDeclaration::new(
@@ -570,7 +601,7 @@ mod tests {
     }
 
     #[test]
-    fn test_pre_review_command_dispatch_runs_implementation_gates_in_declaration_order() {
+    fn test_pre_review_command_dispatch_returns_successful_records_in_declaration_order() {
         let config = PreReviewCommandConfig::try_new(
             CommandConfigSchemaVersion::new(1),
             vec![PreReviewScopeCommandDeclaration::new(
@@ -717,6 +748,7 @@ mod tests {
             Arc::new(FixedTrackResolver),
             runner.clone(),
         );
+
         let result = dispatcher.dispatch(PreReviewCommandDispatchCommand {
             repository_root: PathBuf::from("/repo"),
             track: ReviewTrackSelector::Explicit(
@@ -724,6 +756,7 @@ mod tests {
             ),
             scope: ReviewScopeSelector::Named(MainScopeName::new("implementation").unwrap()),
         });
+
         assert!(matches!(result, Err(super::PreReviewCommandDispatchError::TrackMismatch { .. })));
         assert!(runner.0.lock().unwrap().is_empty());
     }
@@ -998,8 +1031,128 @@ mod tests {
         );
     }
 
+    /// When every implementation gate succeeds, the gated review runs the full
+    /// four-command sequence to completion — `calc-impl-catalog`,
+    /// `check-impl-catalog`, `task-contract coverage`, then
+    /// `task-contract check`, in declaration order — and only then starts the
+    /// reviewer.
     #[test]
-    fn test_pre_review_gated_review_allows_empty_planning_scope_without_gate_execution() {
+    fn test_pre_review_gated_review_runs_all_implementation_gates_then_reviews_on_success() {
+        let review = Arc::new(CountingReview(AtomicUsize::new(0)));
+        let success = || ProgramRunOutcome::Exited {
+            exit_code: ProgramExitCode::new(0),
+            output: CapturedProgramOutput { stdout: Vec::new(), stderr: Vec::new() },
+        };
+        let runner = Arc::new(OutcomeRecordingRunner {
+            outcomes: Mutex::new(std::collections::VecDeque::from([
+                success(),
+                success(),
+                success(),
+                success(),
+            ])),
+            invocations: Mutex::new(Vec::new()),
+        });
+        let config = PreReviewCommandConfig::try_new(
+            CommandConfigSchemaVersion::new(1),
+            vec![PreReviewScopeCommandDeclaration::new(
+                scope("implementation"),
+                vec![
+                    command_argv(&["bin/sotp", "signal", "calc-impl-catalog"]),
+                    command_argv(&["bin/sotp", "signal", "check-impl-catalog", "--gate", "commit"]),
+                    command_argv(&["bin/sotp", "task-contract", "coverage"]),
+                    command_argv(&["bin/sotp", "task-contract", "check"]),
+                ],
+            )],
+        )
+        .unwrap();
+        let dispatcher = Arc::new(PreReviewCommandDispatchInteractor::new(
+            Arc::new(StaticLoader(config)),
+            Arc::new(FixedTrackResolver),
+            runner.clone(),
+        ));
+        let gated = PreReviewCommandGatedReviewInteractor::new(review.clone(), dispatcher);
+
+        let output = gated.run_local(
+            None,
+            60,
+            None,
+            None,
+            Some("test-track".to_owned()),
+            "fast".to_owned(),
+            "implementation".to_owned(),
+            PathBuf::from("track/items"),
+        );
+
+        assert_eq!(output.exit_code, 0);
+        assert_eq!(output.stdout.as_deref(), Some("reviewed"));
+        assert_eq!(review.0.load(Ordering::SeqCst), 1);
+        assert_eq!(
+            *runner.invocations.lock().unwrap(),
+            vec![
+                vec!["bin/sotp", "signal", "calc-impl-catalog"],
+                vec!["bin/sotp", "signal", "check-impl-catalog", "--gate", "commit"],
+                vec!["bin/sotp", "task-contract", "coverage"],
+                vec!["bin/sotp", "task-contract", "check"],
+            ]
+        );
+    }
+
+    struct FailingLoader;
+    impl PreReviewCommandConfigLoaderPort for FailingLoader {
+        fn load(
+            &self,
+            _repository_root: &Path,
+            _track_id: &TrackId,
+        ) -> Result<PreReviewCommandConfig, crate::operator_command::CommandConfigLoadError>
+        {
+            Err(crate::operator_command::CommandConfigLoadError::DecodeFailed {
+                message: domain::FreeText::new("configuration is not valid JSON"),
+            })
+        }
+    }
+
+    /// An invalid pre-review-gates configuration fails the gated review closed:
+    /// the dispatch reports the configuration error, no configured command
+    /// runs, and the reviewer is never started.
+    #[test]
+    fn test_pre_review_gated_review_rejects_invalid_configuration_without_reviewer_start() {
+        let review = Arc::new(CountingReview(AtomicUsize::new(0)));
+        let runner = Arc::new(RecordingRunner(Mutex::new(Vec::new())));
+        let dispatcher = Arc::new(PreReviewCommandDispatchInteractor::new(
+            Arc::new(FailingLoader),
+            Arc::new(FixedTrackResolver),
+            runner.clone(),
+        ));
+        let gated = PreReviewCommandGatedReviewInteractor::new(review.clone(), dispatcher);
+
+        let output = gated.run_local(
+            None,
+            60,
+            None,
+            None,
+            Some("test-track".to_owned()),
+            "fast".to_owned(),
+            "implementation".to_owned(),
+            PathBuf::from("track/items"),
+        );
+
+        assert_eq!(output.exit_code, 1);
+        assert!(
+            output.stderr.as_deref().unwrap_or("").contains("pre-review command dispatch failed")
+        );
+        assert_eq!(review.0.load(Ordering::SeqCst), 0);
+        assert!(runner.0.lock().unwrap().is_empty());
+    }
+
+    /// A planning/SoT scope (`spec`) whose matrix row declares an empty command
+    /// vector starts the reviewer even though NO downstream implementation
+    /// artifact exists anywhere in this environment: the collaborators supply
+    /// no task-contract document, no impl-catalog signal document, and no
+    /// liveness evaluation — the recording runner proves that zero configured
+    /// commands executed, so no downstream liveness or task-contract gate could
+    /// have been consulted before the reviewer started.
+    #[test]
+    fn test_pre_review_gated_review_allows_planning_scope_without_downstream_liveness_artifacts() {
         let review = Arc::new(CountingReview(AtomicUsize::new(0)));
         let runner = Arc::new(RecordingRunner(Mutex::new(Vec::new())));
         let config = PreReviewCommandConfig::try_new(
@@ -1025,7 +1178,11 @@ mod tests {
             PathBuf::from("track/items"),
         );
 
+        // The inner reviewer ran exactly once and produced its output, with no
+        // configured command executed first — the planning scope required no
+        // downstream implementation liveness and no task-contract artifact.
         assert_eq!(output.exit_code, 0);
+        assert_eq!(output.stdout.as_deref(), Some("reviewed"));
         assert_eq!(review.0.load(Ordering::SeqCst), 1);
         assert!(runner.0.lock().unwrap().is_empty());
     }

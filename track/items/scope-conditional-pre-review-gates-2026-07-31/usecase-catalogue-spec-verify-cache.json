@@ -2403,7 +2403,7 @@
       }
     },
     {
-      "claim_hash": "b2f5481fe7feaeceba4bb0e048df30587cb147af32ad86bd4467486381c492e1",
+      "claim_hash": "c0eda485a6ed772686783ab28e6601bc0496ba7da3253554f926d6d69b522773",
       "evidence_hash": "2d1947e7251b3b41bd334fd9a540772c7a828fc41758b05a4aeccc4aebb29fcb",
       "verdict": {
         "kind": "pass",
@@ -2427,7 +2427,7 @@
       }
     },
     {
-      "claim_hash": "b2f5481fe7feaeceba4bb0e048df30587cb147af32ad86bd4467486381c492e1",
+      "claim_hash": "c0eda485a6ed772686783ab28e6601bc0496ba7da3253554f926d6d69b522773",
       "evidence_hash": "d2d038fd353544f17e7a06349e641179077a9bf3489237160b864e9f69642820",
       "verdict": {
         "kind": "pass",
@@ -2451,11 +2451,11 @@
       }
     },
     {
-      "claim_hash": "b2f5481fe7feaeceba4bb0e048df30587cb147af32ad86bd4467486381c492e1",
+      "claim_hash": "c0eda485a6ed772686783ab28e6601bc0496ba7da3253554f926d6d69b522773",
       "evidence_hash": "2be761837adb9975072173a0841bff11b2278f47b3d588641d778b0f97663766",
       "verdict": {
         "kind": "pass",
-        "citation": "invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または configured argv の先頭三要素が exactly [\"bin/sotp\", \"phase\", \"enter\"]、[\"bin/sotp\", \"review\", \"local\"]、もしくは [\"bin/sotp\", \"review\", \"fix-local\"] である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。"
+        "citation": "`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または configured argv の先頭三要素が exactly `[\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、もしくは `[\"bin/sotp\", \"review\", \"fix-local\"]` である recursion は deterministically non-zero で拒否し"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -2475,7 +2475,7 @@
       }
     },
     {
-      "claim_hash": "13989e4014bb514f585a77625454b58e214fe851a2fc84736d4820c88ce08f70",
+      "claim_hash": "8e8663e945e754dc0df6177b2aa740e8a64ec63cc9e3723452ecb3f1569c855b",
       "evidence_hash": "d2d038fd353544f17e7a06349e641179077a9bf3489237160b864e9f69642820",
       "verdict": {
         "kind": "pass",
@@ -2499,7 +2499,7 @@
       }
     },
     {
-      "claim_hash": "13989e4014bb514f585a77625454b58e214fe851a2fc84736d4820c88ce08f70",
+      "claim_hash": "8e8663e945e754dc0df6177b2aa740e8a64ec63cc9e3723452ecb3f1569c855b",
       "evidence_hash": "3a5e9bfe0d346bd4954b8a1b5e75e3144ca58519d0d0207e5f5861d453dfc660",
       "verdict": {
         "kind": "pass",
@@ -2523,7 +2523,7 @@
       }
     },
     {
-      "claim_hash": "13989e4014bb514f585a77625454b58e214fe851a2fc84736d4820c88ce08f70",
+      "claim_hash": "8e8663e945e754dc0df6177b2aa740e8a64ec63cc9e3723452ecb3f1569c855b",
       "evidence_hash": "2be761837adb9975072173a0841bff11b2278f47b3d588641d778b0f97663766",
       "verdict": {
         "kind": "pass",
@@ -2547,7 +2547,7 @@
       }
     },
     {
-      "claim_hash": "13989e4014bb514f585a77625454b58e214fe851a2fc84736d4820c88ce08f70",
+      "claim_hash": "8e8663e945e754dc0df6177b2aa740e8a64ec63cc9e3723452ecb3f1569c855b",
       "evidence_hash": "d0f30d4ab455e24767d843ecdc8b43030b44ec715b9ca194ba2c7f84ff396fd8",
       "verdict": {
         "kind": "pass",
@@ -2667,7 +2667,7 @@
       }
     },
     {
-      "claim_hash": "e8672890fd2d055ba58b60c6e1b939c61fefba87d433f1696d754dff47435d81",
+      "claim_hash": "1618d44eb77c862d5e0208bd2774ce8730aba10a40d0e32f17fe64647ce1eabd",
       "evidence_hash": "c5c354a53a8bb35d22102c5fceb5a1a9c4d09371c531ad0bcc494426712ebd29",
       "verdict": {
         "kind": "pass",
@@ -2691,7 +2691,7 @@
       }
     },
     {
-      "claim_hash": "e8672890fd2d055ba58b60c6e1b939c61fefba87d433f1696d754dff47435d81",
+      "claim_hash": "1618d44eb77c862d5e0208bd2774ce8730aba10a40d0e32f17fe64647ce1eabd",
       "evidence_hash": "d2d038fd353544f17e7a06349e641179077a9bf3489237160b864e9f69642820",
       "verdict": {
         "kind": "pass",
@@ -2715,7 +2715,7 @@
       }
     },
     {
-      "claim_hash": "e8672890fd2d055ba58b60c6e1b939c61fefba87d433f1696d754dff47435d81",
+      "claim_hash": "1618d44eb77c862d5e0208bd2774ce8730aba10a40d0e32f17fe64647ce1eabd",
       "evidence_hash": "3a5e9bfe0d346bd4954b8a1b5e75e3144ca58519d0d0207e5f5861d453dfc660",
       "verdict": {
         "kind": "pass",
@@ -2739,11 +2739,11 @@
       }
     },
     {
-      "claim_hash": "e8672890fd2d055ba58b60c6e1b939c61fefba87d433f1696d754dff47435d81",
+      "claim_hash": "1618d44eb77c862d5e0208bd2774ce8730aba10a40d0e32f17fe64647ce1eabd",
       "evidence_hash": "2be761837adb9975072173a0841bff11b2278f47b3d588641d778b0f97663766",
       "verdict": {
         "kind": "pass",
-        "citation": "validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
+        "citation": "`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または configured argv の先頭三要素が exactly `["
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -2763,7 +2763,7 @@
       }
     },
     {
-      "claim_hash": "e8672890fd2d055ba58b60c6e1b939c61fefba87d433f1696d754dff47435d81",
+      "claim_hash": "1618d44eb77c862d5e0208bd2774ce8730aba10a40d0e32f17fe64647ce1eabd",
       "evidence_hash": "d6764ba1d77c3187ae808aa73610199b9f3650d54d3fcba5ab91b44911ce6444",
       "verdict": {
         "kind": "pass",
@@ -2787,7 +2787,7 @@
       }
     },
     {
-      "claim_hash": "e8672890fd2d055ba58b60c6e1b939c61fefba87d433f1696d754dff47435d81",
+      "claim_hash": "1618d44eb77c862d5e0208bd2774ce8730aba10a40d0e32f17fe64647ce1eabd",
       "evidence_hash": "d0f30d4ab455e24767d843ecdc8b43030b44ec715b9ca194ba2c7f84ff396fd8",
       "verdict": {
         "kind": "pass",

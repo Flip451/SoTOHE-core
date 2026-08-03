@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "74f5ce9f11c6090882e4880cfee2d37788c07f8e7f4c0b5193d03f1bd7a5e001",
+  "catalogue_declaration_hash": "8ae999e542ae3cacb895c4cbbab8e6cec59cda472f082f271b18b3d81f6f7d66",
   "signals": [
     {
       "type_name": "CapturedProgramOutput",
@@ -165,12 +165,12 @@
     {
       "type_name": "PreReviewCommandDispatchError",
       "signal": "blue",
-      "entry_hash": "b2f5481fe7feaeceba4bb0e048df30587cb147af32ad86bd4467486381c492e1"
+      "entry_hash": "c0eda485a6ed772686783ab28e6601bc0496ba7da3253554f926d6d69b522773"
     },
     {
       "type_name": "PreReviewCommandDispatchInteractor",
       "signal": "blue",
-      "entry_hash": "13989e4014bb514f585a77625454b58e214fe851a2fc84736d4820c88ce08f70"
+      "entry_hash": "8e8663e945e754dc0df6177b2aa740e8a64ec63cc9e3723452ecb3f1569c855b"
     },
     {
       "type_name": "PreReviewCommandDispatchOutcome",
@@ -180,7 +180,7 @@
     {
       "type_name": "PreReviewCommandGatedReviewInteractor",
       "signal": "blue",
-      "entry_hash": "e8672890fd2d055ba58b60c6e1b939c61fefba87d433f1696d754dff47435d81"
+      "entry_hash": "1618d44eb77c862d5e0208bd2774ce8730aba10a40d0e32f17fe64647ce1eabd"
     },
     {
       "type_name": "PreReviewScopeCommandDeclaration",

@@ -15,13 +15,13 @@
         "item_identifier": "trait_method:resolve"
       },
       "key": {
-        "waived_reason_hash": "ff7b7caf03ddac63509eef66d0cf85ca7c74515c0af14f1c3c097a8ada82dee7",
+        "waived_reason_hash": "9918fd8788a3d33c094d28d93a5d0d43d09ab716271eb9a64736be141670cc00",
         "declaration_hash": "41038e6d501f9fe8f7e515fe66c2468a266a0e995411d90f44ae556ac0db94e1",
         "anchor_text_hash": "ef72acacfb5dc440638dcb1eca6898bd3db2fbdd6150c1af28c56c8594a8958d"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "\"Synchronous repository-state track resolver for the sequential CLI path (IN-02, IN-05).\""
+        "citation": "Synchronous repository-state track resolver for the sequential CLI path (IN-02, IN-05)."
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -39,13 +39,13 @@
         "item_identifier": "trait_impl:usecase::pre_review_command::CurrentReviewTrackResolverPort"
       },
       "key": {
-        "waived_reason_hash": "a033d2961cc63f54d49d246f20f1d30df81d5775a33a7c613da19cfe19fe4a2e",
+        "waived_reason_hash": "95dabea6537bc6c3974624bc12adcc194a3fa73f7bc79310c85720fba5149fb0",
         "declaration_hash": "a49ba4e758d5fe9aa9c404597b7eb0b115bd61519aea4eeca9a47e7d9a347f9f",
         "anchor_text_hash": "ef72acacfb5dc440638dcb1eca6898bd3db2fbdd6150c1af28c56c8594a8958d"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "Synchronous repository-state track resolver for the sequential CLI path (IN-02, IN-05)."
+        "citation": "trait_impl: TraitImplDeclV2 { action: Add, trait_ref: TypeRef(\"usecase::pre_review_command::CurrentReviewTrackResolverPort\"), for_type: TypeRef(\"GitCurrentReviewTrackResolver\") }"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -2224,12 +2224,12 @@
       },
       "key": {
         "waived_reason_hash": "e7f1fc4d73dab746b68ccf92cdf3b9d2c234d368210c8a595af9c4e754f261ba",
-        "declaration_hash": "ed13c20af2031c176e184a5594da2af2dfb4081d20dfe20f8e8c0a9906577863",
+        "declaration_hash": "2b230d201eb2e793522f4abb3a723e3249f5c0f00184e2f7c602fa9f16afc7a2",
         "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "role: ErrorType, kind: Enum { variants: [...] }, methods: []"
+        "citation": "methods: []"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -2248,12 +2248,12 @@
       },
       "key": {
         "waived_reason_hash": "74a5db1e6343c042fca07e0224a1ab2b819c46bc3a4599d1e0dcb3c09ee49cfa",
-        "declaration_hash": "ed13c20af2031c176e184a5594da2af2dfb4081d20dfe20f8e8c0a9906577863",
+        "declaration_hash": "2b230d201eb2e793522f4abb3a723e3249f5c0f00184e2f7c602fa9f16afc7a2",
         "anchor_text_hash": "0203a405476f817ab74879ed006ba32454744fc289e4c38e0d204f4d9ddc995b"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "\"methods: []\""
+        "citation": "methods: []"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -2272,12 +2272,12 @@
       },
       "key": {
         "waived_reason_hash": "8609107c31d46021a9c2dd90d97db84e31298198841123c75c63e76f71f13d1a",
-        "declaration_hash": "ed13c20af2031c176e184a5594da2af2dfb4081d20dfe20f8e8c0a9906577863",
+        "declaration_hash": "2b230d201eb2e793522f4abb3a723e3249f5c0f00184e2f7c602fa9f16afc7a2",
         "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "role: ErrorType, kind: Enum"
+        "citation": "methods: []"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },

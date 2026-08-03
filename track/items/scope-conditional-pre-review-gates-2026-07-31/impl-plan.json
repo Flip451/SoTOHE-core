@@ -111,7 +111,8 @@
     {
       "id": "T025",
       "description": "`libs/usecase/src/program_runner.rs` の execution record を success / failure の refined wrapper と分類 outcome に適応し、成功、非 zero、output-limit、timeout の record tests を更新する。IN-02、IN-03、IN-04、CN-02、CN-03、AC-02、AC-03、AC-04、AC-05。",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "0ef1e23f055292df748e70fed583e8d121cc303a"
     },
     {
       "id": "T026",
@@ -145,7 +146,7 @@
     {
       "id": "T028",
       "description": "`libs/usecase/src/pre_review_command.rs` を refined execution record、pre-review-specific configuration error、dispatch outcome / explanation consumer shape に適応し、success と first-failure dispatch tests を更新する。IN-05、CN-01、CN-03、AC-05、AC-07。",
-      "status": "todo",
+      "status": "in_progress",
       "depends_on": [
         "T025"
       ]

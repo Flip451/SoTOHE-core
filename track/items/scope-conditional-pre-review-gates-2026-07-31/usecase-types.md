@@ -26,7 +26,7 @@
 | OutputCaptureLimitBytes | value_object | add | — | 🟡 | 🔵 |
 | PhaseCommandConfig | value_object | add | — | 🟡 | 🔵 |
 | PhaseCommandDeclaration | value_object | add | — | 🟡 | 🔵 |
-| PreReviewCommandConfig | value_object | add | — | 🟡 | 🔵 |
+| PreReviewCommandConfig | value_object | add | — | 🔵 | 🔵 |
 | PreReviewScopeCommandDeclaration | value_object | add | — | 🔵 | 🔵 |
 | ProgramExitCode | value_object | add | — | 🔵 | 🔵 |
 | UnvalidatedTimeoutSeconds | value_object | add | — | 🟡 | 🔵 |
@@ -45,8 +45,8 @@
 | PhaseCommandConfigValidationError | error_type | add | InvalidSchemaVersion, DuplicateDeclaration | 🟡 | 🔵 |
 | PhaseCommandEnterError | error_type | add | Config, UnknownPhase, Runner | 🟡 | 🔵 |
 | PhaseCommandExplainError | error_type | add | Config, UnknownPhase | 🟡 | 🔵 |
-| PreReviewCommandConfigValidationError | error_type | add | InvalidSchemaVersion, DuplicateScope | 🟡 | 🔵 |
-| PreReviewCommandDispatchError | error_type | add | Config, UnknownScope, TrackResolution, Runner | 🟡 | 🔵 |
+| PreReviewCommandConfigValidationError | error_type | add | InvalidSchemaVersion, DuplicateScope | 🔵 | 🔵 |
+| PreReviewCommandDispatchError | error_type | add | Config, UnknownScope, TrackResolution, TrackMismatch, Runner | 🔵 | 🔵 |
 | ProgramRunnerError | error_type | add | SpawnFailed, WaitFailed, TerminateFailed | 🔵 | 🔵 |
 
 ## Secondary Ports
@@ -70,8 +70,8 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | PhaseCommandInteractor | interactor | add | — | 🟡 | 🔵 |
-| PreReviewCommandDispatchInteractor | interactor | add | — | 🟡 | 🔵 |
-| PreReviewCommandGatedReviewInteractor | interactor | add | — | 🟡 | 🔵 |
+| PreReviewCommandDispatchInteractor | interactor | add | — | 🔵 | 🔵 |
+| PreReviewCommandGatedReviewInteractor | interactor | add | — | 🔵 | 🔵 |
 
 ## DTOs
 
