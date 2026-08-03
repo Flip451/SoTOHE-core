@@ -1132,6 +1132,54 @@ fn test_encode_type_alias_generic_bound_preserves_catalogue_spelling() {
 }
 
 #[test]
+fn test_encode_type_alias_generic_bound_preserves_unknown_abi_literal_quotes() {
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        TypeName::new("Alias").unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::TypeAlias {
+                target: TypeRef::new("T").unwrap(),
+                generics: vec![MethodGenericParam {
+                    name: ParamName::new("T").unwrap(),
+                    bounds: vec![TypeRef::new("Outer<extern \"efiapi\" fn()>").unwrap()],
+                }],
+            },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let alias = ec.krate().index.values().find(|item| {
+        item.name.as_deref() == Some("Alias") && matches!(item.inner, ItemEnum::TypeAlias(_))
+    });
+    let ItemEnum::TypeAlias(ref ta) = alias.expect("expected TypeAlias").inner else {
+        panic!("expected TypeAlias")
+    };
+    let Some(WherePredicate::BoundPredicate { bounds, .. }) = ta.generics.where_predicates.first()
+    else {
+        panic!("expected alias bound predicate")
+    };
+    let Some(GenericBound::TraitBound { trait_, .. }) = bounds.first() else {
+        panic!("expected trait bound")
+    };
+    let Some(GenericArgs::AngleBracketed { args, .. }) = trait_.args.as_deref() else {
+        panic!("expected Outer generic arguments")
+    };
+    let Some(GenericArg::Type(Type::FunctionPointer(function_pointer))) = args.first() else {
+        panic!("expected function pointer generic argument")
+    };
+    assert_eq!(function_pointer.header.abi, rustdoc_types::Abi::Other("\"efiapi\"".to_owned()));
+}
+
+#[test]
 fn test_encode_type_alias_where_subject_preserves_catalogue_spelling() {
     let mut doc = make_doc("domain");
     doc.insert_type(

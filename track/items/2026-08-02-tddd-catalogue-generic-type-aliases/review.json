@@ -4056,6 +4056,35 @@
           "hash": "rvw1:sha256:f5c38538e887f459a47bd94251c8c9f2e9028f2839be251784d442bc05d76d19",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T21:10:19Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_ctx.rs",
+              "line": 640,
+              "message": "Unknown ABI names must be canonicalized, not copied with `ToTokens`. Valid spellings such as `extern r\"efiapi\" fn()` retain the raw/escaped token here, while rustdoc constructs `Abi::Other` from canonical `ExternAbi::to_string()` output. The A-side therefore stores `r\"efiapi\"` but the C-side stores `\"efiapi\"`, causing a false structural mismatch. Build the quoted value from `LitStr::value()` or reject noncanonical literals. See the [rustdoc conversion](https://github.com/rust-lang/rust/blob/main/src/librustdoc/json/conversions.rs).",
+              "severity": "P1"
+            },
+            {
+              "category": "input validation",
+              "file": "libs/infrastructure/src/tddd/syn_primitive_occurrence_scanner.rs",
+              "line": 138,
+              "message": "After stripping `~const`, this accepts payloads outside the supported plain-trait-path grammar: `~const 'static` returns an empty report, while `~const ?Sized` and HRTB forms are also accepted. The catalogue linter uses this scanner to validate alias generic-bound syntax, so malformed declarations can pass lint even though the document codec's `validate_maybe_const_bound` rejects them. Return `ParseFailure` unless the stripped payload has the same supported shape as that validator.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e4d4ae6f65b6a596d2c5c0dc7576c20de7d854d0cc1bd034fa5ea0f5492842f2",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T21:16:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e8c3a68449518a4b6b8bdc4c4c11f1255b1854ef6f5e8e243aeceff65f111c34",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },

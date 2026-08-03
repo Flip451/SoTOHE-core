@@ -354,6 +354,21 @@ fn test_parse_type_ref_explicit_rust_abi_matches_rustdoc_abi() {
 }
 
 #[test]
+fn test_parse_type_ref_unknown_abi_preserves_rustdoc_literal_quotes() {
+    let ty = parse("Trait<extern \"efiapi\" fn()>");
+    let Type::ResolvedPath(path) = ty else {
+        panic!("expected Trait resolved path");
+    };
+    let Some(GenericArgs::AngleBracketed { args, .. }) = path.args.as_deref() else {
+        panic!("expected angle-bracketed arguments");
+    };
+    let Some(GenericArg::Type(Type::FunctionPointer(function_pointer))) = args.first() else {
+        panic!("expected function pointer argument");
+    };
+    assert_eq!(function_pointer.header.abi, rustdoc_types::Abi::Other("\"efiapi\"".to_owned()));
+}
+
+#[test]
 fn test_parse_type_ref_preserving_spelling_rejects_raw_identifiers() {
     let result = parse_type_ref_with_generics_preserving_spelling(
         "r#Clone",

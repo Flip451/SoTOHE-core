@@ -628,7 +628,11 @@ pub(super) fn syn_abi_to_rustdoc_abi(abi: Option<&syn::Abi>) -> rustdoc_types::A
         "sysv64-unwind" => rustdoc_types::Abi::SysV64 { unwind: true },
         "system" => rustdoc_types::Abi::System { unwind: false },
         "system-unwind" => rustdoc_types::Abi::System { unwind: true },
-        other => rustdoc_types::Abi::Other(other.to_string()),
+        // rustdoc preserves the canonical literal spelling for ABI names
+        // outside its enumerated set (for example `"efiapi"`).  `other` is
+        // sourced from `LitStr::value()`, so raw/escaped literal spellings are
+        // normalized before the quotes are restored.
+        other => rustdoc_types::Abi::Other(format!("\"{other}\"")),
     }
 }
 
