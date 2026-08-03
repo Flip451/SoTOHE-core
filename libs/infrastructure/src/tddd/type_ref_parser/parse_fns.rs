@@ -595,14 +595,26 @@ fn reject_unsupported_const_bound_modifier(bound_str: &str) -> Result<(), String
 }
 
 fn contains_const_bound_modifier(tokens: TokenStream) -> bool {
-    tokens.into_iter().any(|token| match token {
-        TokenTree::Ident(ident) if ident == "const" => true,
-        TokenTree::Group(group) => {
-            (group.delimiter() == Delimiter::Bracket && is_const_modifier_tokens(group.stream()))
-                || contains_const_bound_modifier(group.stream())
+    // A `const` identifier immediately after `*` is raw-pointer type syntax
+    // (`*const u8`), not a bound modifier; every other bare `const` stays
+    // fail-closed as modifier syntax alongside the `[const]` token group.
+    let mut after_star = false;
+    for token in tokens {
+        match &token {
+            TokenTree::Ident(ident) if *ident == "const" && !after_star => return true,
+            TokenTree::Group(group) => {
+                if (group.delimiter() == Delimiter::Bracket
+                    && is_const_modifier_tokens(group.stream()))
+                    || contains_const_bound_modifier(group.stream())
+                {
+                    return true;
+                }
+            }
+            _ => {}
         }
-        _ => false,
-    })
+        after_star = matches!(&token, TokenTree::Punct(punct) if punct.as_char() == '*');
+    }
+    false
 }
 
 fn is_const_modifier_tokens(tokens: TokenStream) -> bool {
@@ -673,5 +685,21 @@ mod tests {
             assert!(super::reject_unsupported_const_bound_modifier(input).is_err());
         }
         assert!(super::reject_unsupported_const_bound_modifier("[constant] Clone").is_ok());
+    }
+
+    #[test]
+    fn test_raw_pointer_const_is_not_a_bound_modifier() {
+        for input in ["Outer<*const u8>", "Outer<fn(*const u8)>", "Outer<*const u8, *mut u8>"] {
+            assert!(
+                super::reject_unsupported_const_bound_modifier(input).is_ok(),
+                "raw-pointer `const` must not be treated as a bound modifier: {input}"
+            );
+        }
+        for input in ["const Clone", "Outer<~const Clone>"] {
+            assert!(
+                super::reject_unsupported_const_bound_modifier(input).is_err(),
+                "modifier-position `const` must fail closed: {input}"
+            );
+        }
     }
 }

@@ -460,6 +460,31 @@ fn test_parse_type_ref_generic_parameter_with_arguments_is_unresolved() {
 }
 
 #[test]
+fn test_parse_generic_bound_raw_pointer_const_argument_is_supported() {
+    assert!(validate_lexical_generic_bound("Outer<*const u8>", &[]).is_ok());
+    let bound = parse_generic_bound_with_generics_preserving_spelling(
+        "Outer<*const u8>",
+        &no_local,
+        100,
+        &HashMap::new(),
+        &mut |_| 101,
+        &[],
+    )
+    .unwrap();
+    let GenericBound::TraitBound { trait_, .. } = bound else {
+        panic!("expected trait bound");
+    };
+    let Some(GenericArgs::AngleBracketed { args, .. }) = trait_.args.as_deref() else {
+        panic!("expected Outer angle-bracketed arguments");
+    };
+    let Some(GenericArg::Type(Type::RawPointer { is_mutable, type_ })) = args.first() else {
+        panic!("expected raw pointer generic argument");
+    };
+    assert!(!is_mutable, "expected `*const` raw pointer");
+    assert!(matches!(type_.as_ref(), Type::Primitive(name) if name == "u8"));
+}
+
+#[test]
 fn test_parse_generic_bound_generic_argument_shadows_catalogue_type() {
     let bound = parse_generic_bound_with_generics_preserving_spelling(
         "Into<T>",
