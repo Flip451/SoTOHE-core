@@ -204,6 +204,10 @@
       "trait_ref": "usecase::git_stash::GitStashPort"
     },
     {
+      "for_type": "FsGitStashAdapter",
+      "trait_ref": "core::default::Default"
+    },
+    {
       "action": "reference",
       "for_type": "TypeSignalsExecutorAdapter",
       "trait_ref": "core::fmt::Debug"

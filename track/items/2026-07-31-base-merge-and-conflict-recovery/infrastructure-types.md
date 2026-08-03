@@ -25,7 +25,7 @@
 | FsBaseMergeCleanupAdapter | secondary_adapter | add | impl BaseMergeCleanupPort | 🔵 | 🔵 |
 | FsBaseMergeContextAdapter | secondary_adapter | add | impl BaseMergeContextPort | 🔵 | 🔵 |
 | FsBaseMergeGitAdapter | secondary_adapter | add | impl BaseMergeGitPort | 🔵 | 🔵 |
-| FsGitStashAdapter | secondary_adapter | add | impl GitStashPort | 🟡 | 🔵 |
+| FsGitStashAdapter | secondary_adapter | add | impl GitStashPort, impl Default | 🔵 | 🔵 |
 | TypeSignalsExecutorAdapter | secondary_adapter | reference | impl Debug, impl Default, impl TypeSignalsExecutorPort | 🔵 | 🔵 |
 
 ## Free Functions

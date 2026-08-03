@@ -22,6 +22,18 @@ pub enum GitCommand {
     Sync,
     /// Unstage paths (remove from git index without discarding worktree changes).
     Unstage(UnstageArgs),
+    /// Save or restore the worktree through the guarded stash wrapper.
+    #[command(subcommand)]
+    Stash(GitStashAction),
+}
+
+/// Guarded stash operations.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Subcommand)]
+pub enum GitStashAction {
+    /// Save tracked and untracked worktree changes.
+    Push,
+    /// Restore the most recent saved worktree.
+    Pop,
 }
 
 #[derive(Debug, Args)]
@@ -65,6 +77,13 @@ pub fn execute(cmd: GitCommand) -> ExitCode {
         }
         GitCommand::Sync => cli_driver::git::GitInput::Sync,
         GitCommand::Unstage(args) => cli_driver::git::GitInput::Unstage { paths: args.paths },
+        GitCommand::Stash(action) => {
+            let input = match action {
+                GitStashAction::Push => cli_driver::git::GitStashInput::Push,
+                GitStashAction::Pop => cli_driver::git::GitStashInput::Pop,
+            };
+            return driver_outcome_to_exit(driver.handle_stash(input));
+        }
     };
     driver_outcome_to_exit(driver.handle(input))
 }
@@ -463,5 +482,53 @@ mod tests {
             cleanup: false,
         }));
         assert_ne!(exit, ExitCode::SUCCESS, "should reject transient automation directory");
+    }
+
+    #[test]
+    fn stash_push_and_pop_round_trip_untracked_artifact_without_branch_change() {
+        let _lock = cwd_lock().lock().unwrap();
+        let dir = init_repo();
+        fs::write(dir.path().join("tracked.txt"), "base\n").unwrap();
+        run_git(dir.path(), &["add", "tracked.txt"]);
+        run_git(dir.path(), &["commit", "-m", "initial"]);
+        fs::write(dir.path().join("tracked.txt"), "changed\n").unwrap();
+        fs::write(dir.path().join("track-artifact.json"), "artifact\n").unwrap();
+        let before = run_git_output(dir.path(), &["rev-parse", "HEAD"]);
+
+        let _guard = CurrentDirGuard::change_to(dir.path());
+        assert_eq!(
+            super::execute(super::GitCommand::Stash(super::GitStashAction::Push)),
+            ExitCode::SUCCESS
+        );
+        assert!(!dir.path().join("track-artifact.json").exists());
+        assert_eq!(run_git_output(dir.path(), &["rev-parse", "HEAD"]), before);
+
+        assert_eq!(
+            super::execute(super::GitCommand::Stash(super::GitStashAction::Pop)),
+            ExitCode::SUCCESS
+        );
+        assert_eq!(
+            fs::read_to_string(dir.path().join("track-artifact.json")).unwrap(),
+            "artifact\n"
+        );
+        assert_eq!(
+            run_git_output(dir.path(), &["rev-parse", "--abbrev-ref", "HEAD"]).trim(),
+            "main"
+        );
+    }
+
+    #[test]
+    fn stash_pop_without_saved_worktree_returns_failure() {
+        let _lock = cwd_lock().lock().unwrap();
+        let dir = init_repo();
+        fs::write(dir.path().join("tracked.txt"), "base\n").unwrap();
+        run_git(dir.path(), &["add", "tracked.txt"]);
+        run_git(dir.path(), &["commit", "-m", "initial"]);
+
+        let _guard = CurrentDirGuard::change_to(dir.path());
+        assert_ne!(
+            super::execute(super::GitCommand::Stash(super::GitStashAction::Pop)),
+            ExitCode::SUCCESS
+        );
     }
 }

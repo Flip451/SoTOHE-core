@@ -1,8 +1,8 @@
 {
   "schema_version": 4,
-  "generated_at": "2026-08-02T15:03:50Z",
+  "generated_at": "2026-08-03T09:48:43Z",
   "declaration_hash": "40152f45c2c888785a0628d1205fc353a44e67a6e317c336062ae1fa572bc136",
-  "implementation_input_hash": "c063d4e5efa2710f39bf5483a0ed9e78d527287aeb553a97ea789a26fb90e53e",
+  "implementation_input_hash": "1085458bc402e1d43852cfa84484c4f3a65968a1b9e8e4e3596fa3631cbc0fcb",
   "baseline_hash": "1ed9aa28dd241bacf4b2773c9a0563343fed5ddf01dfa2d8c15bca1794581dc5",
   "signals": [
     {
@@ -14,15 +14,15 @@
     {
       "type_name": "GitDriver",
       "kind_tag": "primary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
       "type_name": "GitStashInput",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Copy",
         "Debug",

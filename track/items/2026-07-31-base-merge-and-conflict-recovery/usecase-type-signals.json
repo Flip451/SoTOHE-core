@@ -1,8 +1,8 @@
 {
   "schema_version": 4,
-  "generated_at": "2026-08-02T08:48:15Z",
+  "generated_at": "2026-08-03T09:38:01Z",
   "declaration_hash": "a11bce450ec3179e54d691ab1c70565ba687a869f4a42f9962d0229f64158d3e",
-  "implementation_input_hash": "801f34084a8a3d67577a49988c0f49c069dcbd6ff97189f9eb23c1669f6a7e88",
+  "implementation_input_hash": "ad11141b52f68aedf93d2918582553b2a8a8e0aa3abfd8cc2be8aee7d08262aa",
   "baseline_hash": "b6ea45923fb0c899652e55346695062b570c173e489820e030c671f46b17c41b",
   "signals": [
     {
@@ -134,9 +134,9 @@
     {
       "type_name": "GitStashCommand",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Copy",
         "Debug",
@@ -147,9 +147,9 @@
     {
       "type_name": "GitStashError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Debug",
         "Display",
         "Error"
@@ -158,23 +158,23 @@
     {
       "type_name": "GitStashInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "GitStashService"
       ]
     },
     {
       "type_name": "GitStashPort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "GitStashService",
       "kind_tag": "application_service",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "PostMergeCleanupError",

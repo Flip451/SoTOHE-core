@@ -1,8 +1,8 @@
 {
   "schema_version": 4,
-  "generated_at": "2026-08-03T06:02:20Z",
-  "declaration_hash": "ef2e87cd5a6f4a9f24b3127326761c7b7d9f4661413b9e00da8e046f915b0ed9",
-  "implementation_input_hash": "ee0dbcec610c681479dd88829530b031b6f17929fb323f9c208573cb7a2ba609",
+  "generated_at": "2026-08-03T10:42:52Z",
+  "declaration_hash": "fde4ce9cc8119297588cdce1cf5a1dbf44a423e41ec7310da930b4c9214a2501",
+  "implementation_input_hash": "afd9c9b9be2b38fb8b799171bafe47c15b0560ac3015d3d59f3c4bb59e126e6d",
   "baseline_hash": "b52e74766c05f7fc413f6eb8219885a763c3ed4deb69ac3b6669ad68beb1c93b",
   "signals": [
     {
@@ -41,9 +41,10 @@
     {
       "type_name": "FsGitStashAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Default",
         "usecase::git_stash::GitStashPort"
       ]
     },

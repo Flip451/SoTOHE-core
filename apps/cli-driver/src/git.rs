@@ -6,6 +6,7 @@
 use std::path::PathBuf;
 use std::sync::Arc;
 
+use usecase::git_stash::{GitStashCommand, GitStashService};
 use usecase::git_workflow::GitWorkflowService;
 
 use crate::render::CommandOutcome;
@@ -52,6 +53,15 @@ pub enum GitInput {
     CurrentBranchTrackIdStrict,
 }
 
+/// Typed primary-adapter input for guarded stash operations.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GitStashInput {
+    /// Save tracked and untracked worktree changes.
+    Push,
+    /// Restore the most recent saved worktree.
+    Pop,
+}
+
 // ---------------------------------------------------------------------------
 // Driver
 // ---------------------------------------------------------------------------
@@ -61,12 +71,28 @@ pub enum GitInput {
 /// Holds an injected [`GitWorkflowService`]; exposes `handle(input) -> CommandOutcome`.
 pub struct GitDriver {
     service: Arc<dyn GitWorkflowService>,
+    stash_service: Arc<dyn GitStashService>,
 }
 
 impl GitDriver {
-    /// Create a new `GitDriver` with the given git workflow service.
-    pub fn new(service: Arc<dyn GitWorkflowService>) -> Self {
-        Self { service }
+    /// Create a new `GitDriver` with the git workflow and stash services.
+    pub fn new(
+        service: Arc<dyn GitWorkflowService>,
+        stash_service: Arc<dyn GitStashService>,
+    ) -> Self {
+        Self { service, stash_service }
+    }
+
+    /// Handle a guarded stash command.
+    pub fn handle_stash(&self, input: GitStashInput) -> CommandOutcome {
+        let command = match input {
+            GitStashInput::Push => GitStashCommand::Push,
+            GitStashInput::Pop => GitStashCommand::Pop,
+        };
+        match self.stash_service.execute(command) {
+            Ok(()) => CommandOutcome::success(None),
+            Err(error) => CommandOutcome::failure(Some(error.to_string())),
+        }
     }
 
     /// Handle a git command.
@@ -141,5 +167,120 @@ impl GitDriver {
             Ok(None) => CommandOutcome::success(None),
             Err(e) => CommandOutcome::failure(Some(e.to_string())),
         }
+    }
+}
+
+#[cfg(test)]
+#[allow(clippy::expect_used, clippy::panic, clippy::unwrap_used)]
+mod tests {
+    use std::path::{Path, PathBuf};
+    use std::sync::{Arc, Mutex};
+
+    use usecase::git_stash::{GitStashCommand, GitStashError, GitStashService};
+    use usecase::git_workflow::{DiagnosticText, GitWorkflowError, GitWorkflowService};
+
+    use super::{GitDriver, GitStashInput};
+
+    struct UnusedWorkflowService;
+
+    impl GitWorkflowService for UnusedWorkflowService {
+        fn stage_all(&self) -> Result<(), GitWorkflowError> {
+            unused_workflow_call()
+        }
+
+        fn stage_from_file(&self, _path: &Path, _cleanup: bool) -> Result<(), GitWorkflowError> {
+            unused_workflow_call()
+        }
+
+        fn commit_from_file(
+            &self,
+            _path: &Path,
+            _cleanup: bool,
+            _track_dir: Option<&Path>,
+        ) -> Result<(), GitWorkflowError> {
+            unused_workflow_call()
+        }
+
+        fn note_from_file(&self, _path: &Path, _cleanup: bool) -> Result<(), GitWorkflowError> {
+            unused_workflow_call()
+        }
+
+        fn unstage(&self, _paths: &[PathBuf]) -> Result<(), GitWorkflowError> {
+            unused_workflow_call()
+        }
+
+        fn current_branch_track_id(&self) -> Result<Option<domain::TrackId>, GitWorkflowError> {
+            unused_workflow_call()
+        }
+
+        fn sync_current_branch(&self) -> Result<(), GitWorkflowError> {
+            unused_workflow_call()
+        }
+    }
+
+    fn unused_workflow_call<T>() -> Result<T, GitWorkflowError> {
+        Err(GitWorkflowError::Message(DiagnosticText::new(
+            "workflow service must not be called by stash handling",
+        )))
+    }
+
+    struct RecordingStashService {
+        commands: Mutex<Vec<GitStashCommand>>,
+        fail: bool,
+    }
+
+    impl RecordingStashService {
+        fn succeeding() -> Self {
+            Self { commands: Mutex::new(Vec::new()), fail: false }
+        }
+
+        fn failing() -> Self {
+            Self { commands: Mutex::new(Vec::new()), fail: true }
+        }
+    }
+
+    impl GitStashService for RecordingStashService {
+        fn execute(&self, command: GitStashCommand) -> Result<(), GitStashError> {
+            self.commands.lock().unwrap().push(command);
+            if self.fail { Err(GitStashError::ForbiddenBranchRefUpdate) } else { Ok(()) }
+        }
+    }
+
+    fn driver(stash_service: Arc<dyn GitStashService>) -> GitDriver {
+        GitDriver::new(Arc::new(UnusedWorkflowService), stash_service)
+    }
+
+    #[test]
+    fn test_handle_stash_push_and_pop_translate_and_render_success() {
+        let stash_service = Arc::new(RecordingStashService::succeeding());
+        let driver = driver(stash_service.clone());
+
+        let push = driver.handle_stash(GitStashInput::Push);
+        let pop = driver.handle_stash(GitStashInput::Pop);
+
+        assert_eq!(push.stdout, None);
+        assert_eq!(push.stderr, None);
+        assert_eq!(push.exit_code, 0);
+        assert_eq!(pop.stdout, None);
+        assert_eq!(pop.stderr, None);
+        assert_eq!(pop.exit_code, 0);
+        assert_eq!(
+            *stash_service.commands.lock().unwrap(),
+            vec![GitStashCommand::Push, GitStashCommand::Pop]
+        );
+    }
+
+    #[test]
+    fn test_handle_stash_service_error_renders_failure_exit_status() {
+        let stash_service = Arc::new(RecordingStashService::failing());
+        let outcome = driver(stash_service.clone()).handle_stash(GitStashInput::Push);
+
+        assert_eq!(outcome.stdout, None);
+        assert_eq!(
+            outcome.stderr.as_deref(),
+            Some("guarded stash attempted a forbidden branch-ref update")
+        );
+        assert_eq!(outcome.exit_code, 1);
+        assert_eq!(*stash_service.commands.lock().unwrap(), vec![GitStashCommand::Push]);
     }
 }

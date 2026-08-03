@@ -1,14 +1,14 @@
 {
   "schema_version": 4,
-  "generated_at": "2026-08-02T15:31:36Z",
+  "generated_at": "2026-08-03T09:38:24Z",
   "declaration_hash": "b689bf0c1d67cd634ccb9e4758b4ddc7f0de76fbbbb7090f0b04a357d29b454e",
-  "implementation_input_hash": "a137cdc46956173e8ccaed24ccae058d2c55a8415d9473cb9028b73c01051d1d",
+  "implementation_input_hash": "16f2ed605fabe081da030cb2d531baf86be39e437d6fab8c39597fef0a947d5a",
   "baseline_hash": "0b3f70e8a07eae8bcd9f9555fa5ccbec320c8dcbe7671e6e91c0dd38e93010e7",
   "signals": [
     {
       "type_name": "GitCommand",
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "Debug",
@@ -19,9 +19,9 @@
     {
       "type_name": "GitStashAction",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Copy",
         "Debug",

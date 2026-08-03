@@ -4,7 +4,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| GitStashInput | enum | add | Push, Pop | 🟡 | 🔵 |
+| GitStashInput | enum | add | Push, Pop | 🔵 | 🔵 |
 
 ## DTOs
 
@@ -16,6 +16,6 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| GitDriver | primary_adapter | modify | — | 🟡 | 🔵 |
+| GitDriver | primary_adapter | modify | — | 🔵 | 🔵 |
 | TrackDriver | primary_adapter | modify | — | 🔵 | 🔵 |
 

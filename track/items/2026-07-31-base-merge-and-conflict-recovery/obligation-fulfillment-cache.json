@@ -9193,6 +9193,801 @@
           "test_name": "test_track_driver_handle_base_merge_real_interactor_rejects_snapshot_source_before_ports"
         }
       ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "GitStashInteractor",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "GitStashInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "528ebf4e2687f0b4e1197139cdbd01e8db0aa502a7ade260158f678f08ab47f9",
+        "declaration_hash": "e562e4becadd7ea28f4b37b5b8370a2d74020cbd4a5d1b2b1c04ed20f3e9ac93",
+        "anchor_text_hash": "b5d163e91e323fd07ab964864063be407546f503d16ce8629b8e240169f2e0aa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "adapter.execute(GitStashCommand::Push).expect(\"stash push must succeed\");\n        assert!(!repo.path().join(\"untracked.txt\").exists());\n\n        adapter.execute(GitStashCommand::Pop).expect(\"stash pop must succeed\");\n        assert_eq!(\n            fs::read_to_string(repo.path().join(\"untracked.txt\"))\n                .expect(\"untracked file must be restored\"),\n            \"saved\\n\"\n        );\n\n        assert_eq!(branch_state(repo.path()), before);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_push_and_pop_delegate_to_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_propagates_forbidden_ref_update"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_includes_untracked_and_pop_restores_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_and_pop_preserve_head_and_branch_refs"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::git::tests",
+          "test_name": "stash_push_and_pop_round_trip_untracked_artifact_without_branch_change"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "GitStashInteractor",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "GitStashInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "528ebf4e2687f0b4e1197139cdbd01e8db0aa502a7ade260158f678f08ab47f9",
+        "declaration_hash": "e562e4becadd7ea28f4b37b5b8370a2d74020cbd4a5d1b2b1c04ed20f3e9ac93",
+        "anchor_text_hash": "47cc60b9f722a6b03d4c5c5f1343d68f83028cd4462e2680fbd1abd399403cea"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "interactor.execute(GitStashCommand::Push).unwrap();\n        interactor.execute(GitStashCommand::Pop).unwrap();\n\n        assert_eq!(\n            *port.commands.lock().unwrap(),\n            vec![GitStashCommand::Push, GitStashCommand::Pop]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_push_and_pop_delegate_to_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_propagates_forbidden_ref_update"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_includes_untracked_and_pop_restores_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_and_pop_preserve_head_and_branch_refs"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::git::tests",
+          "test_name": "stash_push_and_pop_round_trip_untracked_artifact_without_branch_change"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "GitStashPort",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "GitStashPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:execute"
+      },
+      "key": {
+        "bound_tests_set_hash": "528ebf4e2687f0b4e1197139cdbd01e8db0aa502a7ade260158f678f08ab47f9",
+        "declaration_hash": "8eede41fe72ae42889292a3e7b09335f2a9b7c21cd37730092649b10dda2b974",
+        "anchor_text_hash": "b5d163e91e323fd07ab964864063be407546f503d16ce8629b8e240169f2e0aa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "fs::write(repo.path().join(\"untracked.txt\"), \"saved\\n\"); ... adapter.execute(GitStashCommand::Push).expect(\"stash push must succeed\"); assert!(!repo.path().join(\"untracked.txt\").exists()); ... adapter.execute(GitStashCommand::Pop).expect(\"stash pop must succeed\"); ... fs::read_to_string(repo.path().join(\"untracked.txt\")) ... \"saved\\n\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_push_and_pop_delegate_to_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_propagates_forbidden_ref_update"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_includes_untracked_and_pop_restores_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_and_pop_preserve_head_and_branch_refs"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::git::tests",
+          "test_name": "stash_push_and_pop_round_trip_untracked_artifact_without_branch_change"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "GitStashPort",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "GitStashPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:execute"
+      },
+      "key": {
+        "bound_tests_set_hash": "528ebf4e2687f0b4e1197139cdbd01e8db0aa502a7ade260158f678f08ab47f9",
+        "declaration_hash": "8eede41fe72ae42889292a3e7b09335f2a9b7c21cd37730092649b10dda2b974",
+        "anchor_text_hash": "47cc60b9f722a6b03d4c5c5f1343d68f83028cd4462e2680fbd1abd399403cea"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"assert!(!dir.path().join(\\\"track-artifact.json\\\").exists());\\n        assert_eq!(run_git_output(dir.path(), &[\\\"rev-parse\\\", \\\"HEAD\\\"]), before);\\n\\n        assert_eq!(\\n            super::execute(super::GitCommand::Stash(super::GitStashAction::Pop)),\\n            ExitCode::SUCCESS\\n        );\\n        assert_eq!(\\n            fs::read_to_string(dir.path().join(\\\"track-artifact.json\\\")).unwrap(),\\n            \\\"artifact\\\\n\\\"\\n        );\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_push_and_pop_delegate_to_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_propagates_forbidden_ref_update"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_includes_untracked_and_pop_restores_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_and_pop_preserve_head_and_branch_refs"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::git::tests",
+          "test_name": "stash_push_and_pop_round_trip_untracked_artifact_without_branch_change"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "GitStashService",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "GitStashService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:execute"
+      },
+      "key": {
+        "bound_tests_set_hash": "528ebf4e2687f0b4e1197139cdbd01e8db0aa502a7ade260158f678f08ab47f9",
+        "declaration_hash": "8207b19f5741c65fa30a5198cddf17539cbd6ad9ee5fe5272474462e83149f35",
+        "anchor_text_hash": "b5d163e91e323fd07ab964864063be407546f503d16ce8629b8e240169f2e0aa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "fs::write(repo.path().join(\"untracked.txt\"), \"saved\\n\").expect(\"untracked file must be written\");\n\n        let _cwd = CurrentDirGuard::enter(repo.path());\n        let adapter = FsGitStashAdapter::new();\n        adapter.execute(GitStashCommand::Push).expect(\"stash push must succeed\");\n        assert!(!repo.path().join(\"untracked.txt\").exists());\n\n        adapter.execute(GitStashCommand::Pop).expect(\"stash pop must succeed\");\n        assert_eq!(\n            fs::read_to_string(repo.path().join(\"untracked.txt\"))\n                .expect(\"untracked file must be restored\"),\n            \"saved\\n\"\n        );\n\n        assert_eq!(branch_state(repo.path()), before);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_push_and_pop_delegate_to_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_propagates_forbidden_ref_update"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_includes_untracked_and_pop_restores_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_and_pop_preserve_head_and_branch_refs"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::git::tests",
+          "test_name": "stash_push_and_pop_round_trip_untracked_artifact_without_branch_change"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "GitStashService",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "GitStashService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:execute"
+      },
+      "key": {
+        "bound_tests_set_hash": "528ebf4e2687f0b4e1197139cdbd01e8db0aa502a7ade260158f678f08ab47f9",
+        "declaration_hash": "8207b19f5741c65fa30a5198cddf17539cbd6ad9ee5fe5272474462e83149f35",
+        "anchor_text_hash": "47cc60b9f722a6b03d4c5c5f1343d68f83028cd4462e2680fbd1abd399403cea"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            super::execute(super::GitCommand::Stash(super::GitStashAction::Push)),\n            ExitCode::SUCCESS\n        );\n        assert!(!dir.path().join(\"track-artifact.json\").exists());\n        assert_eq!(run_git_output(dir.path(), &[\"rev-parse\", \"HEAD\"]), before);\n\n        assert_eq!(\n            super::execute(super::GitCommand::Stash(super::GitStashAction::Pop)),\n            ExitCode::SUCCESS\n        );\n        assert_eq!(\n            fs::read_to_string(dir.path().join(\"track-artifact.json\")).unwrap(),\n            \"artifact\\n\"\n        );\n        assert_eq!(\n            run_git_output(dir.path(), &[\"rev-parse\", \"--abbrev-ref\", \"HEAD\"]).trim(),\n            \"main\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_push_and_pop_delegate_to_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_propagates_forbidden_ref_update"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_includes_untracked_and_pop_restores_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_and_pop_preserve_head_and_branch_refs"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::git::tests",
+          "test_name": "stash_push_and_pop_round_trip_untracked_artifact_without_branch_change"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsGitStashAdapter",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsGitStashAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::git_stash::GitStashPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "116735cff3b94828dcbcd1a64edd26d98d2b79ed50c2d09e4aa6f713c8c242dc",
+        "declaration_hash": "b3579f9ab6ff77820ccb62e5cba63340d45a9afff6067c287937c488d8aea82b",
+        "anchor_text_hash": "b5d163e91e323fd07ab964864063be407546f503d16ce8629b8e240169f2e0aa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "adapter.execute(GitStashCommand::Push).expect(\"stash push must succeed\");\n        assert!(!repo.path().join(\"untracked.txt\").exists());\n\n        adapter.execute(GitStashCommand::Pop).expect(\"stash pop must succeed\");\n        assert_eq!(\n            fs::read_to_string(repo.path().join(\"untracked.txt\"))\n                .expect(\"untracked file must be restored\"),\n            \"saved\\n\"\n        );\n\n        assert_eq!(branch_state(repo.path()), before);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_includes_untracked_and_pop_restores_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_and_pop_preserve_head_and_branch_refs"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsGitStashAdapter",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsGitStashAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::git_stash::GitStashPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "116735cff3b94828dcbcd1a64edd26d98d2b79ed50c2d09e4aa6f713c8c242dc",
+        "declaration_hash": "b3579f9ab6ff77820ccb62e5cba63340d45a9afff6067c287937c488d8aea82b",
+        "anchor_text_hash": "47cc60b9f722a6b03d4c5c5f1343d68f83028cd4462e2680fbd1abd399403cea"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "adapter.execute(GitStashCommand::Push).expect(\"stash push must succeed\");\n        assert!(!repo.path().join(\"untracked.txt\").exists());\n...\nadapter.execute(GitStashCommand::Pop).expect(\"stash pop must succeed\");\n...\nfs::read_to_string(repo.path().join(\"untracked.txt\"))\n                .expect(\"untracked file must be restored\"),\n            \"saved\\n\"\n...\nlet before = branch_state(repo.path());\n...\nassert_eq!(branch_state(repo.path()), before);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_includes_untracked_and_pop_restores_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_and_pop_preserve_head_and_branch_refs"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "GitStashCommand",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "GitStashCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "1d843112732f47629228ae3c480b6dc2bae2fbb04eba3bc1ddd2127035874c5d",
+        "declaration_hash": "54b034826e199ed3a9d79505eaf17892f66fec0edfcebaace9a89c2f39e58867",
+        "anchor_text_hash": "b5d163e91e323fd07ab964864063be407546f503d16ce8629b8e240169f2e0aa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "interactor.execute(GitStashCommand::Push).unwrap();\n        interactor.execute(GitStashCommand::Pop).unwrap();\n\n        assert_eq!(\n            *port.commands.lock().unwrap(),\n            vec![GitStashCommand::Push, GitStashCommand::Pop]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_push_and_pop_delegate_to_port"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "GitStashCommand",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "GitStashCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "c81186024ffb7016752c244a9fd5580a38ae82dc0165fb8f8fa4024e859d9124",
+        "declaration_hash": "54b034826e199ed3a9d79505eaf17892f66fec0edfcebaace9a89c2f39e58867",
+        "anchor_text_hash": "47cc60b9f722a6b03d4c5c5f1343d68f83028cd4462e2680fbd1abd399403cea"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "adapter.execute(GitStashCommand::Push).expect(\"stash push must succeed\");\nassert!(!repo.path().join(\"untracked.txt\").exists());\n\nadapter.execute(GitStashCommand::Pop).expect(\"stash pop must succeed\");\nassert_eq!(\n    fs::read_to_string(repo.path().join(\"untracked.txt\"))\n        .expect(\"untracked file must be restored\"),\n    \"saved\\n\"\n);\n\nlet before = branch_state(repo.path());\n\nadapter.execute(GitStashCommand::Push).expect(\"stash push must succeed\");\nassert_eq!(branch_state(repo.path()), before);\n\nadapter.execute(GitStashCommand::Pop).expect(\"stash pop must succeed\");\nassert_eq!(branch_state(repo.path()), before);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_includes_untracked_and_pop_restores_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_and_pop_preserve_head_and_branch_refs"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_pop_without_saved_worktree_returns_unavailable"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "GitStashError",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "GitStashError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "af5175e6e25364b7d49c6235d7c9dd520000e4bb0cc3e1e7300034c38af62941",
+        "declaration_hash": "6ae245db93084adc4b93f12af23136dfc7ff80845b6aab0d6b4270ce58bf9582",
+        "anchor_text_hash": "b5d163e91e323fd07ab964864063be407546f503d16ce8629b8e240169f2e0aa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            interactor.execute(GitStashCommand::Push),\n            Err(GitStashError::ForbiddenBranchRefUpdate)\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_propagates_forbidden_ref_update"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "GitStashError",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "GitStashError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "6a3b0df674437535a4ad68c70d9c7a7be7e4f5a68e5ac20c71587f7b67ec2920",
+        "declaration_hash": "6ae245db93084adc4b93f12af23136dfc7ff80845b6aab0d6b4270ce58bf9582",
+        "anchor_text_hash": "47cc60b9f722a6b03d4c5c5f1343d68f83028cd4462e2680fbd1abd399403cea"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            interactor.execute(GitStashCommand::Push),\n            Err(GitStashError::ForbiddenBranchRefUpdate)\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_propagates_forbidden_ref_update"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_pop_without_saved_worktree_returns_unavailable"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::git::tests",
+          "test_name": "stash_pop_without_saved_worktree_returns_failure"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "GitDriver",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "GitDriver",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "de96d049373903f0d23cc28a0704db47cfdbd594a499d8e93c7dd2a926e54b64",
+        "declaration_hash": "5a8e6a968a339169828a760f5fa77fc305a4970b6bb53258e2be075e5dad4067",
+        "anchor_text_hash": "b5d163e91e323fd07ab964864063be407546f503d16ce8629b8e240169f2e0aa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(!dir.path().join(\"track-artifact.json\").exists());\n...\nassert_eq!(\n    fs::read_to_string(dir.path().join(\"track-artifact.json\")).unwrap(),\n    \"artifact\\n\"\n);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::git::tests",
+          "test_name": "test_handle_stash_push_and_pop_translate_and_render_success"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::git::tests",
+          "test_name": "stash_push_and_pop_round_trip_untracked_artifact_without_branch_change"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::git::tests",
+          "test_name": "stash_pop_without_saved_worktree_returns_failure"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "GitDriver",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "GitDriver",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "f39061a311ecff5be35e49889688a18188337ef09858d21b96617506ae2d929a",
+        "declaration_hash": "5a8e6a968a339169828a760f5fa77fc305a4970b6bb53258e2be075e5dad4067",
+        "anchor_text_hash": "47cc60b9f722a6b03d4c5c5f1343d68f83028cd4462e2680fbd1abd399403cea"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            fs::read_to_string(dir.path().join(\"track-artifact.json\")).unwrap(),\n            \"artifact\\n\"\n        );\n        assert_eq!(\n            run_git_output(dir.path(), &[\"rev-parse\", \"--abbrev-ref\", \"HEAD\"]).trim(),\n            \"main\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::git::tests",
+          "test_name": "test_handle_stash_push_and_pop_translate_and_render_success"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::git::tests",
+          "test_name": "test_handle_stash_service_error_renders_failure_exit_status"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::git::tests",
+          "test_name": "stash_push_and_pop_round_trip_untracked_artifact_without_branch_change"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::git::tests",
+          "test_name": "stash_pop_without_saved_worktree_returns_failure"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "GitStashInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "GitStashInput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "cfb57e08feab645aaba5b754c1a0213a41fbc692da6f30c4d6588a92bbf669d5",
+        "declaration_hash": "cade63c8a351ba5b2856438211642e80bec089b82a01cd48f2e81f287e9fbd88",
+        "anchor_text_hash": "b5d163e91e323fd07ab964864063be407546f503d16ce8629b8e240169f2e0aa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(!dir.path().join(\"track-artifact.json\").exists());\n        assert_eq!(run_git_output(dir.path(), &[\"rev-parse\", \"HEAD\"]), before);\n\n        assert_eq!(\n            super::execute(super::GitCommand::Stash(super::GitStashAction::Pop)),\n            ExitCode::SUCCESS\n        );\n        assert_eq!(\n            fs::read_to_string(dir.path().join(\"track-artifact.json\")).unwrap(),\n            \"artifact\\n\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::git::tests",
+          "test_name": "stash_push_and_pop_round_trip_untracked_artifact_without_branch_change"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "GitStashInput",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "GitStashInput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "cfb57e08feab645aaba5b754c1a0213a41fbc692da6f30c4d6588a92bbf669d5",
+        "declaration_hash": "cade63c8a351ba5b2856438211642e80bec089b82a01cd48f2e81f287e9fbd88",
+        "anchor_text_hash": "47cc60b9f722a6b03d4c5c5f1343d68f83028cd4462e2680fbd1abd399403cea"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            super::execute(super::GitCommand::Stash(super::GitStashAction::Push)),\n            ExitCode::SUCCESS\n        );\n        assert!(!dir.path().join(\"track-artifact.json\").exists());\n        assert_eq!(run_git_output(dir.path(), &[\"rev-parse\", \"HEAD\"]), before);\n\n        assert_eq!(\n            super::execute(super::GitCommand::Stash(super::GitStashAction::Pop)),\n            ExitCode::SUCCESS\n        );\n        assert_eq!(\n            fs::read_to_string(dir.path().join(\"track-artifact.json\")).unwrap(),\n            \"artifact\\n\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::git::tests",
+          "test_name": "stash_push_and_pop_round_trip_untracked_artifact_without_branch_change"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "GitCommand",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "GitCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "cfb57e08feab645aaba5b754c1a0213a41fbc692da6f30c4d6588a92bbf669d5",
+        "declaration_hash": "b3fb002a2d30f2ce25aea88c778ddacffd69d9b4a3fcd51c9069e51bbf2e0df8",
+        "anchor_text_hash": "b5d163e91e323fd07ab964864063be407546f503d16ce8629b8e240169f2e0aa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            super::execute(super::GitCommand::Stash(super::GitStashAction::Push)),\n            ExitCode::SUCCESS\n        );\n        assert!(!dir.path().join(\"track-artifact.json\").exists());\n        assert_eq!(run_git_output(dir.path(), &[\"rev-parse\", \"HEAD\"]), before);\n\n        assert_eq!(\n            super::execute(super::GitCommand::Stash(super::GitStashAction::Pop)),\n            ExitCode::SUCCESS\n        );\n        assert_eq!(\n            fs::read_to_string(dir.path().join(\"track-artifact.json\")).unwrap(),\n            \"artifact\\n\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::git::tests",
+          "test_name": "stash_push_and_pop_round_trip_untracked_artifact_without_branch_change"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "GitCommand",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "GitCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "cfb57e08feab645aaba5b754c1a0213a41fbc692da6f30c4d6588a92bbf669d5",
+        "declaration_hash": "b3fb002a2d30f2ce25aea88c778ddacffd69d9b4a3fcd51c9069e51bbf2e0df8",
+        "anchor_text_hash": "47cc60b9f722a6b03d4c5c5f1343d68f83028cd4462e2680fbd1abd399403cea"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            super::execute(super::GitCommand::Stash(super::GitStashAction::Push)),\n            ExitCode::SUCCESS\n        );\n        assert!(!dir.path().join(\"track-artifact.json\").exists());\n        assert_eq!(run_git_output(dir.path(), &[\"rev-parse\", \"HEAD\"]), before);\n\n        assert_eq!(\n            super::execute(super::GitCommand::Stash(super::GitStashAction::Pop)),\n            ExitCode::SUCCESS\n        );\n        assert_eq!(\n            fs::read_to_string(dir.path().join(\"track-artifact.json\")).unwrap(),\n            \"artifact\\n\"\n        );\n        assert_eq!(\n            run_git_output(dir.path(), &[\"rev-parse\", \"--abbrev-ref\", \"HEAD\"]).trim(),\n            \"main\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::git::tests",
+          "test_name": "stash_push_and_pop_round_trip_untracked_artifact_without_branch_change"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "GitStashAction",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "GitStashAction",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "cfb57e08feab645aaba5b754c1a0213a41fbc692da6f30c4d6588a92bbf669d5",
+        "declaration_hash": "b91c0c216c9cebe862711613951fb02bb42130573f31626c548c6f2c50a6d621",
+        "anchor_text_hash": "b5d163e91e323fd07ab964864063be407546f503d16ce8629b8e240169f2e0aa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(!dir.path().join(\"track-artifact.json\").exists());\nassert_eq!(\n    super::execute(super::GitCommand::Stash(super::GitStashAction::Pop)),\n    ExitCode::SUCCESS\n);\nassert_eq!(\n    fs::read_to_string(dir.path().join(\"track-artifact.json\")).unwrap(),\n    \"artifact\\n\"\n);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::git::tests",
+          "test_name": "stash_push_and_pop_round_trip_untracked_artifact_without_branch_change"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "GitStashAction",
+        "anchor_id": {
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "GitStashAction",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "cfb57e08feab645aaba5b754c1a0213a41fbc692da6f30c4d6588a92bbf669d5",
+        "declaration_hash": "b91c0c216c9cebe862711613951fb02bb42130573f31626c548c6f2c50a6d621",
+        "anchor_text_hash": "47cc60b9f722a6b03d4c5c5f1343d68f83028cd4462e2680fbd1abd399403cea"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            super::execute(super::GitCommand::Stash(super::GitStashAction::Push)),\n            ExitCode::SUCCESS\n        );\n        assert!(!dir.path().join(\"track-artifact.json\").exists());\n        assert_eq!(run_git_output(dir.path(), &[\"rev-parse\", \"HEAD\"]), before);\n\n        assert_eq!(\n            super::execute(super::GitCommand::Stash(super::GitStashAction::Pop)),\n            ExitCode::SUCCESS\n        );\n        assert_eq!(\n            fs::read_to_string(dir.path().join(\"track-artifact.json\")).unwrap(),\n            \"artifact\\n\"\n        );\n        assert_eq!(\n            run_git_output(dir.path(), &[\"rev-parse\", \"--abbrev-ref\", \"HEAD\"]).trim(),\n            \"main\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::git::tests",
+          "test_name": "stash_push_and_pop_round_trip_untracked_artifact_without_branch_change"
+        }
+      ]
     }
   ]
 }

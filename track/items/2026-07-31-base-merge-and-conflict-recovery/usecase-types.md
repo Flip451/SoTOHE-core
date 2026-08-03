@@ -6,7 +6,7 @@
 |------|------|--------|---------|--------|----------|
 | BaseMergeAttemptOutcome | enum | add | Clean, Conflicted | 🔵 | 🔵 |
 | BaseMergeOutcome | enum | add | Completed, Conflicted | 🔵 | 🔵 |
-| GitStashCommand | enum | add | Push, Pop | 🟡 | 🔵 |
+| GitStashCommand | enum | add | Push, Pop | 🔵 | 🔵 |
 
 ## Error Types
 
@@ -16,7 +16,7 @@
 | BaseMergeError | error_type | add | Context, ActiveTrackMismatch, Git, PostMergeCleanup | 🔵 | 🔵 |
 | BaseMergeGitError | error_type | add | Execution | 🔵 | 🔵 |
 | BaselineReplacementError | error_type | add | Isolation, Generation, Validation, Publish, Restoration | 🔵 | 🔵 |
-| GitStashError | error_type | add | ForbiddenBranchRefUpdate, Unavailable | 🟡 | 🔵 |
+| GitStashError | error_type | add | ForbiddenBranchRefUpdate, Unavailable | 🔵 | 🔵 |
 | PostMergeCleanupError | error_type | add | Views, Baseline, SyncBaseStamp | 🔵 | 🔵 |
 | SyncBaseRecordError | error_type | add | Generation, Validation, Write, Replacement | 🔵 | 🔵 |
 | TypeSignalsError | error_type | modify | BranchTrackMismatch, LayerBindingsLoad, NoLayers, FeatureDeclaration, AuthoritativeInputFailed, EvaluationFailed, CacheWriteFailed, InconsistentRequest | 🔵 | 🔵 |
@@ -30,7 +30,7 @@
 | BaseMergeCleanupPort | secondary_port | add | fn regenerate_views(&self, request: &BaseMergeCleanupRequest) -> Result<(), ViewsRegenerationError>, fn replace_baselines(&self, request: &BaseMergeCleanupRequest) -> Result<(), BaselineReplacementError>, fn write_sync_base_record(&self, request: &BaseMergeCleanupRequest) -> Result<(), SyncBaseRecordError> | 🔵 | 🔵 |
 | BaseMergeContextPort | secondary_port | add | fn load_direction(&self, workspace_root: &std::path::Path) -> Result<domain::branch_strategy::BaseMergeDirection, BaseMergeContextError> | 🔵 | 🔵 |
 | BaseMergeGitPort | secondary_port | add | fn merge_base(&self, workspace_root: &std::path::Path, direction: &domain::branch_strategy::BaseMergeDirection) -> Result<BaseMergeAttemptOutcome, BaseMergeGitError> | 🔵 | 🔵 |
-| GitStashPort | secondary_port | add | fn execute(&self, command: GitStashCommand) -> Result<(), GitStashError> | 🟡 | 🔵 |
+| GitStashPort | secondary_port | add | fn execute(&self, command: GitStashCommand) -> Result<(), GitStashError> | 🔵 | 🔵 |
 | TypeSignalsExecutorPort | secondary_port | reference | fn evaluate_layer(&self, items_dir: &std::path::Path, track_id: &domain::TrackId, workspace_root: &std::path::Path, binding: &domain::tddd::catalogue_v2::TdddLayerBinding, features: &[domain::tddd::CargoFeatureName]) -> Result<(), TypeSignalsExecutionError> | 🔵 | 🔵 |
 
 ## Application Services
@@ -38,14 +38,14 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | BaseMergeService | application_service | add | fn execute(&self, command: BaseMergeCommand) -> Result<BaseMergeOutcome, BaseMergeError> | 🔵 | 🔵 |
-| GitStashService | application_service | add | fn execute(&self, command: GitStashCommand) -> Result<(), GitStashError> | 🟡 | 🔵 |
+| GitStashService | application_service | add | fn execute(&self, command: GitStashCommand) -> Result<(), GitStashError> | 🔵 | 🔵 |
 
 ## Interactors
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | BaseMergeInteractor | interactor | add | — | 🔵 | 🔵 |
-| GitStashInteractor | interactor | add | — | 🟡 | 🔵 |
+| GitStashInteractor | interactor | add | — | 🔵 | 🔵 |
 | TypeSignalsInteractor | interactor | reference | — | 🔵 | 🔵 |
 
 ## DTOs

@@ -63,6 +63,7 @@ pub mod track;
 pub(crate) mod track_artifact;
 pub use dry_check::noop_approval::NoOpDryApprovalService;
 pub use dry_check::recording_agent::RecordingDryAgent;
+pub use git_cli::stash_adapter::FsGitStashAdapter;
 pub use git_cli::workflow_adapter::FsGitWorkflowAdapter;
 pub use pr_review::SystemSleepAdapter;
 #[cfg(feature = "semantic-dup")]
