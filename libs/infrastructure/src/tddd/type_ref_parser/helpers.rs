@@ -266,7 +266,40 @@ pub(crate) fn syn_expr_to_string(expr: &syn::Expr) -> String {
 /// cannot be represented as a simple token string.
 #[must_use]
 pub(crate) fn array_len_to_string(expr: &syn::Expr) -> String {
-    expr_to_token_string(expr)
+    evaluate_usize_const_expr(expr)
+        .map_or_else(|| expr_to_token_string(expr), |value| value.to_string())
+}
+
+/// Evaluates array-length expressions using Rust's target-width `usize` semantics.
+///
+/// Expressions that cannot be represented without overflowing are kept as tokens
+/// instead of being folded to a value that could differ from rustdoc output.
+fn evaluate_usize_const_expr(expr: &syn::Expr) -> Option<usize> {
+    match expr {
+        syn::Expr::Lit(lit_expr) => match &lit_expr.lit {
+            syn::Lit::Int(value) => value.base10_digits().parse().ok(),
+            _ => None,
+        },
+        syn::Expr::Paren(paren_expr) => evaluate_usize_const_expr(&paren_expr.expr),
+        syn::Expr::Binary(binary_expr) => {
+            let left = evaluate_usize_const_expr(&binary_expr.left)?;
+            let right = evaluate_usize_const_expr(&binary_expr.right)?;
+            match &binary_expr.op {
+                syn::BinOp::Add(_) => left.checked_add(right),
+                syn::BinOp::Sub(_) => left.checked_sub(right),
+                syn::BinOp::Mul(_) => left.checked_mul(right),
+                syn::BinOp::Div(_) => left.checked_div(right),
+                syn::BinOp::Rem(_) => left.checked_rem(right),
+                syn::BinOp::BitAnd(_) => Some(left & right),
+                syn::BinOp::BitOr(_) => Some(left | right),
+                syn::BinOp::BitXor(_) => Some(left ^ right),
+                syn::BinOp::Shl(_) => left.checked_shl(u32::try_from(right).ok()?),
+                syn::BinOp::Shr(_) => left.checked_shr(u32::try_from(right).ok()?),
+                _ => None,
+            }
+        }
+        _ => None,
+    }
 }
 
 /// Renders a `syn::Expr` as a token string suitable for embedding in a type

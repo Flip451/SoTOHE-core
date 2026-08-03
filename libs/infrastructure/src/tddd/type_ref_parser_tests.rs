@@ -217,6 +217,24 @@ fn test_parse_type_ref_fn_bound_explicit_unit_output_normalizes_to_none() {
 }
 
 #[test]
+fn test_parse_type_ref_array_length_constant_expression_is_evaluated() {
+    let ty = parse("[u8; 1 + 2]");
+    let Type::Array { len, .. } = ty else {
+        panic!("expected array type");
+    };
+    assert_eq!(len, "3");
+}
+
+#[test]
+fn test_parse_type_ref_array_length_expression_uses_usize_shift_semantics() {
+    let ty = parse("[u8; 0x8000000000000000 << 1]");
+    let Type::Array { len, .. } = ty else {
+        panic!("expected array type");
+    };
+    assert_eq!(len, "0");
+}
+
+#[test]
 fn test_parse_type_ref_associated_constraint_preserves_associated_item_arguments() {
     let ty = parse("Outer<Item<'a>: Bound>");
     let Type::ResolvedPath(path) = ty else {

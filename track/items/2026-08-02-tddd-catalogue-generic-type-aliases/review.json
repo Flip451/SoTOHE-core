@@ -3164,6 +3164,28 @@
           "hash": "rvw1:sha256:fe9297650b3f873afbe8d99634deb0cf3cd14b7e48fc9e7746fef08870b4f896",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T09:59:48Z",
+          "findings": [
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/helpers.rs",
+              "line": 292,
+              "message": "The constant evaluator uses u128 arithmetic, but array lengths are evaluated as target-width usize. Left shifts can therefore produce a different value from Rust: on a 64-bit target, `[u8; 0x8000000000000000 << 1]` has length 0, while this code encodes `18446744073709551616`. That causes false structural mismatches against rustdoc output. Evaluate with the target usize semantics (or decline to fold expressions whose semantics cannot be reproduced).",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7c21bbc93096806c841d76042a40918430eeacda77b49e738b5106676dc3fae8",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T10:06:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b82e6e86814b84fcc623aef8e913bf3b1ef1f5c9f1f868ba886e830541724786",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
