@@ -19,13 +19,31 @@ use crate::render::CommandOutcome;
 /// normalized by the binary from clap's parsed subcommand tree; only the path
 /// extraction belongs at this driver boundary.
 ///
-/// Explicit `--items-dir`, `--workspace-root`, and `--project-root` options are
-/// honoured so telemetry remains anchored to the repository being operated on
-/// rather than the process CWD.
+/// Explicit `--items-dir` always wins. Commands that use `--workspace-root` as
+/// their repository root derive the canonical `<root>/track/items` path from
+/// it. Commands that expose an independent `--items-dir` (for example
+/// `dry write`, track graph renderers, and `verify catalogue-spec-refs`) keep
+/// that option's default when only `--workspace-root` is present. A project
+/// root is used as the same canonical repository anchor when no workspace
+/// root is supplied.
 #[must_use]
 pub fn items_dir_from_args(args: &[OsString]) -> PathBuf {
     option_path(args, "--items-dir")
-        .or_else(|| option_path(args, "--workspace-root").map(|root| root.join("track/items")))
+        .or_else(|| {
+            let has_independent_items_dir = (args.get(1).is_some_and(|arg| arg == "dry")
+                && args.get(2).is_some_and(|arg| arg == "write"))
+                || (args.get(1).is_some_and(|arg| arg == "track")
+                    && matches!(
+                        args.get(2).and_then(|arg| arg.to_str()),
+                        Some("type-graph" | "baseline-graph" | "contract-map")
+                    ))
+                || (args.get(1).is_some_and(|arg| arg == "verify")
+                    && args.get(2).is_some_and(|arg| arg == "catalogue-spec-refs"));
+            (!has_independent_items_dir)
+                .then(|| option_path(args, "--workspace-root"))
+                .flatten()
+                .map(|root| root.join("track/items"))
+        })
         .or_else(|| option_path(args, "--project-root").map(|root| root.join("track/items")))
         .unwrap_or_else(|| PathBuf::from("track/items"))
 }
@@ -346,6 +364,77 @@ mod tests {
         ];
 
         assert_eq!(items_dir_from_args(&args), PathBuf::from("track/items"));
+    }
+
+    #[test]
+    fn test_items_dir_from_args_does_not_treat_workspace_root_as_items_dir() {
+        let args = vec![
+            OsString::from("sotp"),
+            OsString::from("dry"),
+            OsString::from("write"),
+            OsString::from("--workspace-root"),
+            OsString::from("/other/repository"),
+        ];
+
+        assert_eq!(items_dir_from_args(&args), PathBuf::from("track/items"));
+    }
+
+    #[test]
+    fn test_items_dir_from_args_derives_track_root_for_workspace_commands() {
+        let baseline_args = vec![
+            OsString::from("sotp"),
+            OsString::from("track"),
+            OsString::from("baseline-capture"),
+            OsString::from("--workspace-root"),
+            OsString::from("/other/repository"),
+        ];
+        let lint_args = vec![
+            OsString::from("sotp"),
+            OsString::from("track"),
+            OsString::from("lint"),
+            OsString::from("--workspace-root=/other/repository"),
+        ];
+
+        assert_eq!(
+            items_dir_from_args(&baseline_args),
+            PathBuf::from("/other/repository/track/items")
+        );
+        assert_eq!(items_dir_from_args(&lint_args), PathBuf::from("/other/repository/track/items"));
+    }
+
+    #[test]
+    fn test_items_dir_from_args_prefers_explicit_items_dir_over_workspace_root() {
+        let args = vec![
+            OsString::from("sotp"),
+            OsString::from("verify"),
+            OsString::from("catalogue-spec-refs"),
+            OsString::from("--workspace-root"),
+            OsString::from("/other/repository"),
+            OsString::from("--items-dir"),
+            OsString::from("/explicit/items"),
+        ];
+
+        assert_eq!(items_dir_from_args(&args), PathBuf::from("/explicit/items"));
+    }
+
+    #[test]
+    fn test_items_dir_from_args_keeps_independent_default_for_workspace_options() {
+        let baseline_graph_args = vec![
+            OsString::from("sotp"),
+            OsString::from("track"),
+            OsString::from("baseline-graph"),
+            OsString::from("--workspace-root"),
+            OsString::from("/other/repository"),
+        ];
+        let verify_args = vec![
+            OsString::from("sotp"),
+            OsString::from("verify"),
+            OsString::from("catalogue-spec-refs"),
+            OsString::from("--workspace-root=/other/repository"),
+        ];
+
+        assert_eq!(items_dir_from_args(&baseline_graph_args), PathBuf::from("track/items"));
+        assert_eq!(items_dir_from_args(&verify_args), PathBuf::from("track/items"));
     }
 
     #[test]

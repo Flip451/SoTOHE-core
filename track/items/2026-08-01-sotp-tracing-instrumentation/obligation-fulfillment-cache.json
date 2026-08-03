@@ -2878,13 +2878,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "1874e7ec68ec7196468fe808369111b6258da47e5ab56f73ef857f0d15b7717d",
+        "bound_tests_set_hash": "8c960ee21b419d98edd12ab3e4b22675bde1068c64d46e23e6565d9e37d8fba4",
         "declaration_hash": "6e6f56e1903fea05a384bb153af0c07bbbe9197473cfe4d4837c83d3aabd5d35",
         "anchor_text_hash": "c2c7f968ad201efcf6c2b0e52aa82c94b1eb77f3361dde7b9293d7a063785050"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(telemetry_completion_eligible(\"track spec-design\"));\n        assert!(telemetry_completion_eligible(\"dry write\"));\n        assert!(!telemetry_completion_eligible(\"track resolve\"));\n        assert!(!telemetry_completion_eligible(\"telemetry report\"));\n        assert!(!telemetry_completion_eligible(\"review results\"));"
+        "citation": "assert!(telemetry_completion_eligible(\"track spec-design\"));\n        assert!(telemetry_completion_eligible(\"dry write\"));\n        assert!(telemetry_completion_eligible(\"verify layers\"));\n\n        assert!(!telemetry_completion_eligible(\"track resolve\"));\n        assert!(!telemetry_completion_eligible(\"telemetry report\"));\n        assert!(!telemetry_completion_eligible(\"review results\"));\n        assert!(!telemetry_completion_eligible(\"verify results\"));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -2914,13 +2914,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "1874e7ec68ec7196468fe808369111b6258da47e5ab56f73ef857f0d15b7717d",
+        "bound_tests_set_hash": "8c960ee21b419d98edd12ab3e4b22675bde1068c64d46e23e6565d9e37d8fba4",
         "declaration_hash": "6e6f56e1903fea05a384bb153af0c07bbbe9197473cfe4d4837c83d3aabd5d35",
         "anchor_text_hash": "a82002a20538715fb2af0c1c3db399e871fceefcd8962ed2a36028e50a15329f"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(telemetry_completion_eligible(\"track spec-design\"));\n        assert!(telemetry_completion_eligible(\"dry write\"));\n        assert!(!telemetry_completion_eligible(\"track resolve\"));\n        assert!(!telemetry_completion_eligible(\"telemetry report\"));\n        assert!(!telemetry_completion_eligible(\"review results\"));"
+        "citation": "assert!(telemetry_completion_eligible(\"track spec-design\"));\n        assert!(telemetry_completion_eligible(\"dry write\"));\n        assert!(telemetry_completion_eligible(\"verify layers\"));\n        assert!(!telemetry_completion_eligible(\"track resolve\"));\n        assert!(!telemetry_completion_eligible(\"telemetry report\"));\n        assert!(!telemetry_completion_eligible(\"review results\"));\n        assert!(!telemetry_completion_eligible(\"verify results\"));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -2950,13 +2950,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "1874e7ec68ec7196468fe808369111b6258da47e5ab56f73ef857f0d15b7717d",
+        "bound_tests_set_hash": "8c960ee21b419d98edd12ab3e4b22675bde1068c64d46e23e6565d9e37d8fba4",
         "declaration_hash": "d841ef78bcfed69904ca7dc7d73e8abe42d3f4cdf1a757e77471ab6812155523",
         "anchor_text_hash": "c2c7f968ad201efcf6c2b0e52aa82c94b1eb77f3361dde7b9293d7a063785050"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(telemetry_completion_eligible(\"track spec-design\"));\n        assert!(telemetry_completion_eligible(\"dry write\"));\n        assert!(!telemetry_completion_eligible(\"track resolve\"));\n        assert!(!telemetry_completion_eligible(\"telemetry report\"));\n        assert!(!telemetry_completion_eligible(\"review results\"));"
+        "citation": "assert!(telemetry_completion_eligible(\"track spec-design\"));\n        assert!(telemetry_completion_eligible(\"dry write\"));\n        assert!(telemetry_completion_eligible(\"verify layers\"));\n\n        assert!(!telemetry_completion_eligible(\"track resolve\"));\n        assert!(!telemetry_completion_eligible(\"telemetry report\"));\n        assert!(!telemetry_completion_eligible(\"review results\"));\n        assert!(!telemetry_completion_eligible(\"verify results\"));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -2986,13 +2986,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "1874e7ec68ec7196468fe808369111b6258da47e5ab56f73ef857f0d15b7717d",
+        "bound_tests_set_hash": "8c960ee21b419d98edd12ab3e4b22675bde1068c64d46e23e6565d9e37d8fba4",
         "declaration_hash": "d841ef78bcfed69904ca7dc7d73e8abe42d3f4cdf1a757e77471ab6812155523",
         "anchor_text_hash": "a82002a20538715fb2af0c1c3db399e871fceefcd8962ed2a36028e50a15329f"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(telemetry_completion_eligible(\"track spec-design\"));\n        assert!(telemetry_completion_eligible(\"dry write\"));\n\n        assert!(!telemetry_completion_eligible(\"track resolve\"));\n        assert!(!telemetry_completion_eligible(\"telemetry report\"));\n        assert!(!telemetry_completion_eligible(\"review results\"));"
+        "citation": "assert!(telemetry_completion_eligible(\"track spec-design\"));\n        assert!(telemetry_completion_eligible(\"dry write\"));\n        assert!(telemetry_completion_eligible(\"verify layers\"));\n\n        assert!(!telemetry_completion_eligible(\"track resolve\"));\n        assert!(!telemetry_completion_eligible(\"telemetry report\"));\n        assert!(!telemetry_completion_eligible(\"review results\"));\n        assert!(!telemetry_completion_eligible(\"verify results\"));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [

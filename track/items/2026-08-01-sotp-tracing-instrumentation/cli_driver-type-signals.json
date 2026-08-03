@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-03T15:59:20Z",
+  "generated_at": "2026-08-03T18:28:51Z",
   "declaration_hash": "093d6b35702f39db8708db3d320494ac4e67808fcc9f3af69c846f85df146880",
-  "implementation_input_hash": "33265f1d823c2d9fa4dfe382b0dbe43de01f02b7457e09b526c657f465ba31eb",
+  "implementation_input_hash": "81d760ab9ef3bc540537819dac7803d0e5bcf1859c924ebdcde9cf6fefdda4bb",
   "signals": [
     {
       "type_name": "TelemetryDriver",

@@ -259,7 +259,20 @@ macro_rules! run_cli_with_context {
             let archived_track_id = (normalized == "track archive"
                 && exit_code == ExitCode::SUCCESS)
                 .then(|| source_track_id.as_ref().cloned())
-                .flatten();
+                .flatten()
+                .filter(|_| {
+                    // The archive factory intentionally writes to the existing
+                    // archive-local path. When the active telemetry config is
+                    // redirected or disabled, use the active writer instead
+                    // so its override/kill-switch semantics still apply.
+                    let override_set = std::env::var("SOTP_TELEMETRY_DIR")
+                        .map(|value| !value.is_empty())
+                        .unwrap_or(false);
+                    let disabled = std::env::var("SOTP_TELEMETRY")
+                        .map(|value| value.trim() == "0")
+                        .unwrap_or(false);
+                    !override_set && !disabled
+                });
             if let Some(track_id) = archived_track_id {
                 let _ = telemetry_driver.handle(TelemetryInput::EmitArchivedTrackSubcommand {
                     items_dir: telemetry_items_dir,
@@ -337,8 +350,14 @@ fn command_identity_from_args(args: &[std::ffi::OsString]) -> String {
 /// payload through `TelemetryInput::EmitCompletedCommand`.
 fn telemetry_completion_eligible(subcommand: &str) -> bool {
     let top_level = subcommand.split_whitespace().next().unwrap_or_default();
-    if matches!(top_level, "arch" | "track" | "hook" | "verify" | "find-similar" | "telemetry") {
-        return top_level == "track" && !telemetry_track_display_only(subcommand);
+    if top_level == "track" {
+        return !telemetry_track_display_only(subcommand);
+    }
+    if top_level == "verify" {
+        return subcommand != "verify results";
+    }
+    if matches!(top_level, "arch" | "hook" | "find-similar" | "telemetry") {
+        return false;
     }
     !matches!(
         subcommand,
@@ -854,6 +873,7 @@ mod tests {
     fn test_telemetry_completion_eligible_accepts_track_workflow_commands() {
         assert!(telemetry_completion_eligible("track spec-design"));
         assert!(telemetry_completion_eligible("dry write"));
+        assert!(telemetry_completion_eligible("verify layers"));
     }
 
     #[test]
@@ -861,6 +881,7 @@ mod tests {
         assert!(!telemetry_completion_eligible("track resolve"));
         assert!(!telemetry_completion_eligible("telemetry report"));
         assert!(!telemetry_completion_eligible("review results"));
+        assert!(!telemetry_completion_eligible("verify results"));
     }
 
     // ── CliCommand::Dry entrypoint dispatch routing ───────────────────────────
@@ -1137,6 +1158,110 @@ mod tests {
             value.get("timestamp").is_some(),
             "timestamp field must be present in the JSONL line"
         );
+    }
+
+    #[test]
+    fn test_archive_completion_telemetry_kill_switch_writes_no_active_log() {
+        let _guard = process_env_lock().lock().unwrap();
+        let dir = TempDir::new().unwrap();
+        let root = dir.path();
+        let track_id = "archive-telemetry-disabled";
+        seed_repo(root, &format!("track/{track_id}"));
+        let items_dir = root.join("track").join("items");
+        let track_dir = items_dir.join(track_id);
+        fs::create_dir_all(&track_dir).unwrap();
+        fs::create_dir_all(root.join("track").join("archive")).unwrap();
+        fs::write(root.join(".gitignore"), "track/items/*/logs/\n").unwrap();
+        fs::write(track_dir.join("tracked.txt"), "archive fixture\n").unwrap();
+        run_git(root, &["add", ".gitignore", "track/items/archive-telemetry-disabled/tracked.txt"]);
+        run_git(root, &["commit", "-m", "archive fixture", "--no-gpg-sign"]);
+        let active_log = items_dir.join(track_id).join("logs/telemetry.jsonl");
+        let archived_log =
+            root.join("track").join("archive").join(track_id).join("logs").join("telemetry.jsonl");
+        let items_dir_text = items_dir.to_string_lossy().into_owned();
+
+        temp_env::with_vars([("SOTP_TELEMETRY", Some("0")), ("SOTP_TELEMETRY_DIR", None)], || {
+            run_in_dir(root, || {
+                let cli = Cli::try_parse_from([
+                    "sotp",
+                    "track",
+                    "archive",
+                    "--track-id",
+                    track_id,
+                    "--items-dir",
+                    items_dir_text.as_str(),
+                ])
+                .unwrap();
+                let exit = run_cli_with_context!(
+                    cli,
+                    |_command| ExitCode::FAILURE,
+                    |_command| ExitCode::FAILURE,
+                    "sotp track archive".to_owned(),
+                    items_dir.clone(),
+                );
+                assert_eq!(exit, ExitCode::SUCCESS);
+            });
+        });
+
+        assert!(!active_log.exists());
+        assert!(!archived_log.exists());
+    }
+
+    #[test]
+    fn test_archive_completion_telemetry_uses_configured_output_directory() {
+        let _guard = process_env_lock().lock().unwrap();
+        let dir = TempDir::new().unwrap();
+        let root = dir.path();
+        let track_id = "archive-telemetry-override";
+        seed_repo(root, &format!("track/{track_id}"));
+        let items_dir = root.join("track").join("items");
+        let track_dir = items_dir.join(track_id);
+        fs::create_dir_all(&track_dir).unwrap();
+        fs::create_dir_all(root.join("track").join("archive")).unwrap();
+        fs::write(root.join(".gitignore"), "track/items/*/logs/\n").unwrap();
+        fs::write(track_dir.join("tracked.txt"), "archive fixture\n").unwrap();
+        run_git(root, &["add", ".gitignore", "track/items/archive-telemetry-override/tracked.txt"]);
+        run_git(root, &["commit", "-m", "archive fixture", "--no-gpg-sign"]);
+        let active_log = items_dir.join(track_id).join("logs/telemetry.jsonl");
+        let archived_log =
+            root.join("track").join("archive").join(track_id).join("logs").join("telemetry.jsonl");
+        let output_dir = root.join("telemetry-override");
+        let output_dir_text = output_dir.to_string_lossy().into_owned();
+        let items_dir_text = items_dir.to_string_lossy().into_owned();
+
+        temp_env::with_vars(
+            [("SOTP_TELEMETRY", Some("1")), ("SOTP_TELEMETRY_DIR", Some(output_dir_text.as_str()))],
+            || {
+                run_in_dir(root, || {
+                    let cli = Cli::try_parse_from([
+                        "sotp",
+                        "track",
+                        "archive",
+                        "--track-id",
+                        track_id,
+                        "--items-dir",
+                        items_dir_text.as_str(),
+                    ])
+                    .unwrap();
+                    let exit = run_cli_with_context!(
+                        cli,
+                        |_command| ExitCode::FAILURE,
+                        |_command| ExitCode::FAILURE,
+                        "sotp track archive".to_owned(),
+                        items_dir.clone(),
+                    );
+                    assert_eq!(exit, ExitCode::SUCCESS);
+                });
+            },
+        );
+
+        let line = fs::read_to_string(output_dir.join("telemetry.jsonl")).unwrap();
+        let value: serde_json::Value = serde_json::from_str(line.trim()).unwrap();
+        assert_eq!(value["event_type"], "TrackSubcommand");
+        assert_eq!(value["track_id"], track_id);
+        assert_eq!(value["command"], "sotp track archive");
+        assert!(!active_log.exists());
+        assert!(!archived_log.exists());
     }
 
     // ── CliCommand::Conventions entrypoint dispatch routing ──────────────────
