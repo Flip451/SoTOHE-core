@@ -3547,6 +3547,42 @@
           "hash": "rvw1:sha256:ae7569d33f70fc14316a52621eae04978a9d4a8bfcfbb8b4bbf942e4fd47932b",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T15:56:20Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_ctx.rs",
+              "line": 98,
+              "message": "Qualified paths reconstruct their trait prefix with `leading_colon: None`. In preserving-spelling mode, a valid alias bound containing `<T as ::std::ops::Deref>::Target` is therefore encoded as `std::ops::Deref`, while rustdoc retains `::std::ops::Deref`, producing a false lexical mismatch. Preserve the original leading colon and add a qself regression test.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture violation",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_ctx.rs",
+              "line": 531,
+              "message": "Adding `is_literal_const_expr` pushes this production module from the 700-line maximum to 721 lines. The repository guidelines make 700 a hard module-size cap, and this file has no exempt test block. Split or relocate the helper/conversion logic to restore compliance.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6185e02caa1f652bb144ea086ea81d486aa1c98c983c11cd6c7f22fc1396d58c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T16:02:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6f10d3b201095a479e8acbf3e25b30d6f75142449c7efd09a3536b43630dfc34",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T16:15:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:28aeb980897ac8f213efa82378ed29d0d1d9e51cc742663488febda85c27c2d0",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },

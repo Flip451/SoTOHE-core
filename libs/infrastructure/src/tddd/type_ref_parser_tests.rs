@@ -137,6 +137,7 @@ fn test_parse_type_ref_const_negative_integer_argument_preserves_literal() {
         panic!("expected const integer argument");
     };
     assert_eq!(constant.expr, "-1");
+    assert!(constant.is_literal, "negative integer literals must retain rustdoc's literal flag");
 }
 
 #[test]
@@ -335,6 +336,29 @@ fn test_parse_generic_bound_preserves_leading_colon() {
         };
         assert_eq!(trait_.path, expected);
     }
+}
+
+#[test]
+fn test_parse_generic_bound_preserves_nested_leading_colon() {
+    let bound = parse_generic_bound_with_generics_preserving_spelling(
+        "Into<::std::vec::Vec<T>>",
+        &no_local,
+        100,
+        &HashMap::new(),
+        &mut |_| 101,
+        &["T"],
+    )
+    .unwrap();
+    let GenericBound::TraitBound { trait_, .. } = bound else {
+        panic!("expected trait bound");
+    };
+    let Some(GenericArgs::AngleBracketed { args, .. }) = trait_.args.as_deref() else {
+        panic!("expected angle-bracketed bound arguments");
+    };
+    let Some(GenericArg::Type(Type::ResolvedPath(path))) = args.first() else {
+        panic!("expected nested resolved path argument");
+    };
+    assert_eq!(path.path, "::std::vec::Vec");
 }
 
 #[test]
@@ -650,6 +674,23 @@ fn test_qualified_path_without_generic_args() {
             args: None,
         }
     );
+}
+
+#[test]
+fn test_qualified_path_preserves_absolute_trait_prefix_in_lexical_mode() {
+    let ty = parse_type_ref_with_generics_preserving_spelling(
+        "<T as ::std::ops::Deref>::Target",
+        &no_local,
+        100,
+        &HashMap::new(),
+        &mut |_| 101,
+        &["T"],
+    )
+    .unwrap();
+    let Type::QualifiedPath { trait_: Some(trait_path), .. } = ty else {
+        panic!("expected qualified path with a trait prefix");
+    };
+    assert_eq!(trait_path.path, "::std::ops::Deref");
 }
 
 /// `Vec<<T as Trait>::Item>` — QualifiedPath nested inside generic args of Vec.

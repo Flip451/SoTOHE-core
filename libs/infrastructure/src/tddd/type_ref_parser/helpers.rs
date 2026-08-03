@@ -268,6 +268,11 @@ pub(crate) fn syn_expr_to_string(expr: &syn::Expr) -> String {
     }
 }
 
+pub(super) fn is_literal_const_expr(expr: &syn::Expr) -> bool {
+    matches!(expr, syn::Expr::Lit(_))
+        || matches!(expr, syn::Expr::Unary(unary) if matches!(unary.op, syn::UnOp::Neg(_)) && matches!(&*unary.expr, syn::Expr::Lit(lit) if matches!(lit.lit, syn::Lit::Int(_))))
+}
+
 /// Converts a `syn::Expr` const array length to a string representation.
 ///
 /// Preserves integer literals verbatim, named constants, and supported binary

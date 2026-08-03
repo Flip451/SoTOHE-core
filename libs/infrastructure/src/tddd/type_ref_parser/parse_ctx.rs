@@ -9,8 +9,8 @@ use rustdoc_types::{
 
 use super::constants::{PRIMITIVE_TYPES, STD_PRELUDE_TYPES, UNRESOLVED_CRATE_ID};
 use super::helpers::{
-    array_len_to_string, expr_to_token_string, std_canonical_path, syn_expr_to_string,
-    unresolved_type,
+    array_len_to_string, expr_to_token_string, is_literal_const_expr, std_canonical_path,
+    syn_expr_to_string, unresolved_type,
 };
 
 // ---------------------------------------------------------------------------
@@ -92,10 +92,10 @@ where
             let trait_ = if qself.position == 0 {
                 None
             } else {
-                // Reconstruct a `syn::Path` from the prefix segments and resolve it.
                 let prefix_segs: syn::punctuated::Punctuated<syn::PathSegment, syn::Token![::]> =
                     type_path.path.segments.iter().take(qself.position).cloned().collect();
-                let trait_syn_path = syn::Path { leading_colon: None, segments: prefix_segs };
+                let leading_colon = type_path.path.leading_colon;
+                let trait_syn_path = syn::Path { leading_colon, segments: prefix_segs };
                 Some(self.resolve_trait_bound_path(&trait_syn_path))
             };
 
@@ -142,7 +142,7 @@ where
 
         // Multi-segment: first segment is a crate name prefix.
         if segments.len() > 1 {
-            return self.convert_crate_prefixed_path(&segments);
+            return self.convert_crate_prefixed_path(type_path);
         }
 
         // Single-segment. We already checked `segments.is_empty()` above.
@@ -212,8 +212,8 @@ where
         })
     }
 
-    fn convert_crate_prefixed_path(&mut self, segments: &[&syn::PathSegment]) -> Type {
-        // Caller guarantees segments.len() > 1 (multi-segment path).
+    fn convert_crate_prefixed_path(&mut self, type_path: &syn::TypePath) -> Type {
+        let segments: Vec<_> = type_path.path.segments.iter().collect();
         let Some(first_seg) = segments.first() else {
             return unresolved_type("<empty_crate_path>");
         };
@@ -221,13 +221,13 @@ where
         let Some(last_seg) = segments.last() else {
             return unresolved_type("<empty_crate_path>");
         };
-        let full_path =
+        let mut full_path =
             segments.iter().map(|s| normalized_ident_name(&s.ident)).collect::<Vec<_>>().join("::");
+        if self.preserve_prelude_spelling && type_path.path.leading_colon.is_some() {
+            full_path.insert_str(0, "::");
+        }
 
-        // `crate`, `self`, `super` are Rust path keywords, not external crate names.
-        // For relative/self-referential paths, attempt to resolve the last segment
-        // against the local catalogue; fall back to an unresolved marker without
-        // registering a spurious `external_crates` entry.
+        // Resolve path keywords against the local catalogue; otherwise use an unresolved marker.
         let is_path_keyword = matches!(first_name.as_str(), "crate" | "self" | "super");
         if is_path_keyword {
             let last_name = normalized_ident_name(&last_seg.ident);
@@ -508,7 +508,7 @@ where
                 Some(GenericArg::Const(rustdoc_types::Constant {
                     expr: expr_str,
                     value: None,
-                    is_literal: matches!(expr, syn::Expr::Lit(_)),
+                    is_literal: is_literal_const_expr(expr),
                 }))
             }
             // `AssocType`, `AssocConst`, and `Constraint` are handled upstream in
@@ -567,7 +567,7 @@ where
                         rustdoc_types::Constant {
                             expr: expr_str.clone(),
                             value: Some(expr_str),
-                            is_literal: matches!(&assoc_const.value, syn::Expr::Lit(_)),
+                            is_literal: is_literal_const_expr(&assoc_const.value),
                         },
                     )),
                 });
