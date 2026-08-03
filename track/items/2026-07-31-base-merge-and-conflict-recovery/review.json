@@ -1,6 +1,82 @@
 {
   "schema_version": 2,
   "scopes": {
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cb8f9ae379b18b9e407779476218192f29de916f40bd4250d6cd301226c01fab",
+          "at": "2026-08-02T15:10:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The CLI guard-path test bypasses the production composition-root/driver path by constructing `BaseMergeInteractor` directly inside the dispatch test closure. It can pass even if `TrackCompositionRoot::new().track_driver().handle_base_merge(...)` is wired incorrectly, so the required CLI boundary coverage is incomplete.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/dispatch.rs",
+              "line": 314,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:cb8f9ae379b18b9e407779476218192f29de916f40bd4250d6cd301226c01fab",
+          "at": "2026-08-02T15:23:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0e47fb7460d0fc2c6f29acd62cf9a3e425e7d8144bce813d08f6dd3ebd669198",
+          "at": "2026-08-02T15:32:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0e47fb7460d0fc2c6f29acd62cf9a3e425e7d8144bce813d08f6dd3ebd669198",
+          "at": "2026-08-02T15:45:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The recovery conformance test only includes and validates the Claude adapter. AC-05 requires `/track:recover` and `$track-recover` to ship together, so `.agents/skills/track-recover/SKILL.md` could be missing or diverge from the canonical workflow while this test remains green. Include the Codex adapter and validate its canonical-workflow reference and provider-only constraints too.",
+              "severity": "P1",
+              "file": "apps/cli/tests/operational_reference_cutover.rs",
+              "line": 183,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:0e47fb7460d0fc2c6f29acd62cf9a3e425e7d8144bce813d08f6dd3ebd669198",
+          "at": "2026-08-02T15:51:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7c6c4daaa6456362ed1be814e82f1066aa90be8ed0e5e59e63e09e154738382c",
+          "at": "2026-08-02T15:56:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e9e0c8d3fcf1398df0bf793da04d082fa87f36e56fcf5161a5a8d7c3882ae8b",
+          "at": "2026-08-03T08:08:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e9e0c8d3fcf1398df0bf793da04d082fa87f36e56fcf5161a5a8d7c3882ae8b",
+          "at": "2026-08-03T08:12:08Z"
+        }
+      ]
+    },
     "cli_driver": {
       "rounds": [
         {
@@ -78,534 +154,6 @@
           "findings": [],
           "hash": "rvw1:sha256:f4c5ceaf26616b5f9b7e182a23b788d2ca96c327cac272552ae124437b194a30",
           "at": "2026-08-01T09:36:03Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1c15e00c9d57e3d1b6b7837e096db6b13217224842f46c7318b0141748f9dffc",
-          "at": "2026-08-01T09:10:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1c15e00c9d57e3d1b6b7837e096db6b13217224842f46c7318b0141748f9dffc",
-          "at": "2026-08-01T09:15:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:da102509466b2fe733307e2213cf6aca51a7accea2bad9deb422abc4df300705",
-          "at": "2026-08-02T15:10:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:da102509466b2fe733307e2213cf6aca51a7accea2bad9deb422abc4df300705",
-          "at": "2026-08-02T15:23:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:da102509466b2fe733307e2213cf6aca51a7accea2bad9deb422abc4df300705",
-          "at": "2026-08-02T15:58:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:da102509466b2fe733307e2213cf6aca51a7accea2bad9deb422abc4df300705",
-          "at": "2026-08-02T16:01:19Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fb2f7e429b2d3257d2accfc1dc2b5a2aae2990a6b625404fb70ef0e21ee8d4e8",
-          "at": "2026-08-01T01:29:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fb2f7e429b2d3257d2accfc1dc2b5a2aae2990a6b625404fb70ef0e21ee8d4e8",
-          "at": "2026-08-01T01:33:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fb2f7e429b2d3257d2accfc1dc2b5a2aae2990a6b625404fb70ef0e21ee8d4e8",
-          "at": "2026-08-01T01:46:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:aef4333465fe0f58ae747a50e27ac879b6eede43bb7ba4a4e74ea5f966f39272",
-          "at": "2026-08-01T09:10:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The TypeSignalsError → IN-05 record binds an invalid-layer diagnostic test, while none of its tests exercises the active-track-only guard or BranchTrackMismatch. Bind the existing active-track mismatch/track-ID propagation test so this edge proves IN-05's active-track restriction.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
-              "line": 23,
-              "category": "test coverage / weak edge binding"
-            },
-            {
-              "message": "The TypeSignalsError → AC-07 record covers isolated hash mismatches but omits the all-three-hashes-match cache-hit test required by the briefing's multi-test contract. Its malformed-cache test concerns AC-08 and cannot prove the successful reuse case for AC-07.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
-              "line": 25,
-              "category": "test coverage / incomplete edge evidence"
-            }
-          ],
-          "hash": "rvw1:sha256:aef4333465fe0f58ae747a50e27ac879b6eede43bb7ba4a4e74ea5f966f39272",
-          "at": "2026-08-01T09:17:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The updated TypeSignalsError → IN-05 and → AC-07 binding sets have not been re-evaluated by the host. `bin/sotp test-obligation check` fails with `TestChanged` drift for both edges, so the briefing’s frozen pass=32 verdict no longer covers the current file. Run the host-owned evaluation before treating this scope as green.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
-              "line": 23,
-              "category": "test-obligation gate / stale verdict"
-            }
-          ],
-          "hash": "rvw1:sha256:d7b0a439adde308b33de185e23412f08ebe5ea8f41d9ceb015add01cdd6a39c2",
-          "at": "2026-08-01T09:21:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d7b0a439adde308b33de185e23412f08ebe5ea8f41d9ceb015add01cdd6a39c2",
-          "at": "2026-08-01T09:49:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The bindings file omits the three newly derived voluntary edges for `EvaluateSignalsError` at spec anchors `IN-05`, `CN-04`, and `AC-09`. `bin/sotp test-obligation check --track-id 2026-07-31-base-merge-and-conflict-recovery` fails with exactly these unresolved edges. Add focused infrastructure tests, such as `test_map_evaluation_error_each_stage_preserves_execution_error_category` and the evaluator failure/cache-write tests, while preserving the existing records.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
-              "line": 31,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:d7b0a439adde308b33de185e23412f08ebe5ea8f41d9ceb015add01cdd6a39c2",
-          "at": "2026-08-01T11:52:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3444e758e644324cee7351fae50bb0a8341a93a6c8937e6fd351020996eb118e",
-          "at": "2026-08-01T11:56:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3444e758e644324cee7351fae50bb0a8341a93a6c8937e6fd351020996eb118e",
-          "at": "2026-08-01T12:01:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The BaseMergeInteractor fulfillment record includes `test_derive_base_merge_direction_active_track_uses_snapshot_base_branch`, which only exercises the domain constructor and never invokes BaseMergeInteractor. It is not direct evidence for this declaration.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
-              "line": 35,
-              "category": "test-obligation binding"
-            },
-            {
-              "message": "The BaseMergeGitPort fulfillment record lists the snapshot-source, reverse-direction, and non-track rejection tests, but each test returns from context validation before calling `BaseMergeGitPort::merge_base` and asserts that Git was not called. These tests do not directly exercise the bound trait method.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
-              "line": 40,
-              "category": "test-obligation binding"
-            },
-            {
-              "message": "The BaseMergeContextError AC-01 binding includes `test_derive_base_merge_direction_active_track_uses_snapshot_base_branch`, which exercises only domain direction derivation and cannot produce or inspect BaseMergeContextError. It is invalid direct evidence for this declaration/anchor intersection.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
-              "line": 63,
-              "category": "test-obligation binding"
-            }
-          ],
-          "hash": "rvw1:sha256:87f4e88d520018e67df9cbc5acfa1cdfcd16d4ea6715e6549d9ef5eb098fa9cd",
-          "at": "2026-08-01T14:01:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6a9881690f8c17d162245e3165a4e94d63b242d37f12913317f432c09a355195",
-          "at": "2026-08-01T14:16:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The conflict-recovery waivers for BaseMergeInteractor and BaseMergeService (IN-03/CN-02/AC-04) hide an expressible T002 behavior: `execute` returns the typed `Conflicted` outcome and skips clean-merge cleanup. The fulfillment records already reference the test that proves this handoff. Resolve these edges with that test; only the downstream edit/review/commit workflow belongs elsewhere.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
-              "line": 42,
-              "category": "waiver_validity"
-            },
-            {
-              "message": "The guard waivers on the Interactor, ContextPort, and Service treat rejection as unexpressible because the command lacks raw source/direction fields. Their entry-local contract is nevertheless testable: context loading returns an authoritative direction or rejection, the interactor/service must avoid Git on rejection, and the clean path forwards the snapshot source and active-track target. The fulfillment records already list tests for those behaviors, so these waivers suppress T002 evidence.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
-              "line": 43,
-              "category": "waiver_validity"
-            },
-            {
-              "message": "The BaseMergeCommand × AC-02 binding is substitution evidence. `test_base_merge_execute_active_track_mismatch_returns_typed_error` uses a context double that ignores `workspace_root`, so it returns the same mismatch for any command and does not exercise the command declaration. Either bind a test proving the command's workspace selects the rejected context or waive this edge consistently with the adjacent CN-01 record.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
-              "line": 61,
-              "category": "binding_semantics"
-            },
-            {
-              "message": "The CN-01/AC-02 bindings for BaseMergeContextError and BaseMergeError cover only ActiveTrackMismatch, while both anchors also require source-mismatch, reverse-direction, and non-track rejection. Focused tests for those branches exist but are absent from these four records, so each voluntary binding resolves a multi-branch edge with only partial evidence.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
-              "line": 63,
-              "category": "test_coverage"
-            },
-            {
-              "message": "The cleanup/context port fulfillments do not verify their declared arguments. Every context double ignores `workspace_root`, and RecordingCleanup ignores both `workspace_root` and `track_id`; consequently the interactor could pass the wrong workspace or active-track id and all bound tests would still pass. Add recording assertions before claiming these method-contract obligations are fulfilled.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
-              "line": 36,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:6a9881690f8c17d162245e3165a4e94d63b242d37f12913317f432c09a355195",
-          "at": "2026-08-01T14:38:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:75c63bcea506d9e6f5ff828f6c62d1f03c9e624907b268aa3c3a6f9576cdfcf4",
-          "at": "2026-08-01T15:56:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The shared infrastructure test is bound to all three `BaseMergeCleanupPort` methods, but it directly calls private baseline/stamp helpers and never invokes the port adapter (and it has no view-regeneration coverage). These bindings therefore falsely fulfill `regenerate_views` and do not exercise the declared trait methods; keep the test only on the applicable replacement/stamp obligations or add adapter-level tests.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
-              "line": 36,
-              "category": "test-coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:e413f934190ad8ed0934f2565a8b7a3126b7e7b7b8fb0821fdd92c383d6a913a",
-          "at": "2026-08-02T09:01:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `regenerate_views` fulfillment record omits `test_fs_base_merge_cleanup_baseline_replacement_isolated_at_exact_commit_and_atomically_published`, so the three `BaseMergeCleanupPort` records no longer all point to the required focused infrastructure evidence. Add the evidence to this record, or provide a dedicated infrastructure test that exercises view regeneration together with the exact-commit cleanup request.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
-              "line": 36,
-              "category": "test-coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:7800fd895bf89456c54206de08aa9e76fef86688c473cb271014c0b4a24bfe5c",
-          "at": "2026-08-02T09:09:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `regenerate_views` fulfillment record includes baseline-replacement tests and `test_fs_base_merge_cleanup_baseline_replacement_isolated_at_exact_commit_and_atomically_published`, but that infrastructure test directly exercises baseline/stamp helpers and never invokes view regeneration. These references do not exercise the declared method and falsely strengthen its fulfillment; remove them or bind a view-regeneration adapter test instead.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
-              "line": 36,
-              "category": "test-coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:e413f934190ad8ed0934f2565a8b7a3126b7e7b7b8fb0821fdd92c383d6a913a",
-          "at": "2026-08-02T09:15:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `regenerate_views` fulfillment record includes baseline-replacement tests and `test_fs_base_merge_cleanup_baseline_replacement_isolated_at_exact_commit_and_atomically_published`, but that infrastructure test directly exercises baseline/stamp helpers and never invokes view regeneration. These references do not exercise the declared method and falsely strengthen its fulfillment; remove them or bind a view-regeneration adapter test instead.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
-              "line": 36,
-              "category": "test-coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:e413f934190ad8ed0934f2565a8b7a3126b7e7b7b8fb0821fdd92c383d6a913a",
-          "at": "2026-08-02T09:15:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7800fd895bf89456c54206de08aa9e76fef86688c473cb271014c0b4a24bfe5c",
-          "at": "2026-08-02T09:22:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7800fd895bf89456c54206de08aa9e76fef86688c473cb271014c0b4a24bfe5c",
-          "at": "2026-08-02T10:23:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The newly added CLI bindings cite the removed test `test_track_command_merge_base_dispatches_snapshot_source_guard_failure_without_merge_success` at lines 162, 165, 166, and 169. The current test is `test_track_command_merge_base_dispatches_composition_root_guard_failure_without_merge_success`; update all affected bindings and refresh their verdicts.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
-              "line": 162,
-              "category": "missing-test-source"
-            },
-            {
-              "message": "The cleanup-adapter fulfillment and related existing edges now have stale frozen verdicts: the obligation check reports their bound test bodies changed since verdict freeze. Re-run host-owned evaluation; do not hand-edit verdict caches.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
-              "line": 151,
-              "category": "stale-verdict"
-            }
-          ],
-          "hash": "rvw1:sha256:6311123962732ad6f89c4a454025b83ee041df4543851f0367d7a8a32bbcb218",
-          "at": "2026-08-03T06:14:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `TrackCommand` bindings for AC-01 and AC-02 (lines 165–166) cite only `cli_driver::track::tests`. They omit the direct owning-layer CLI dispatch guard test `test_track_command_merge_base_dispatches_composition_root_guard_failure_without_merge_success`, which is already used for the same changed dispatch obligation. Add that CLI test to both command-level edges (retaining the driver tests where they cover the concrete guard details).",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
-              "line": 165,
-              "category": "insufficient-owning-layer-evidence"
-            }
-          ],
-          "hash": "rvw1:sha256:0c0c78afe7aedfc965ff4857b44d39fecb313eb739c14704bbf8bf7651cbd3d4",
-          "at": "2026-08-03T07:05:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5dd808d5f1b78efc3422129378e1129e53dab8aafb658541da21499b6c8b141d",
-          "at": "2026-08-03T07:13:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5dd808d5f1b78efc3422129378e1129e53dab8aafb658541da21499b6c8b141d",
-          "at": "2026-08-03T07:20:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5dd808d5f1b78efc3422129378e1129e53dab8aafb658541da21499b6c8b141d",
-          "at": "2026-08-03T08:05:11Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cb666be156be4e5a74c73e23d8220f63bb3db8b8a08be26761cbad58085b2412",
-          "at": "2026-07-31T22:47:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cb666be156be4e5a74c73e23d8220f63bb3db8b8a08be26761cbad58085b2412",
-          "at": "2026-07-31T22:50:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ccf80b721d965f8205f7454dbcd27c4ea12d2cfc166dd951f73cef9c2c11ea89",
-          "at": "2026-08-01T00:18:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ccf80b721d965f8205f7454dbcd27c4ea12d2cfc166dd951f73cef9c2c11ea89",
-          "at": "2026-08-01T00:21:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4b5cd74999751b16d7905643597f13b47efbfd4e85cba5d36ed91b5dac33d8d1",
-          "at": "2026-08-01T22:29:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4b5cd74999751b16d7905643597f13b47efbfd4e85cba5d36ed91b5dac33d8d1",
-          "at": "2026-08-01T22:32:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7bddfda3dd3200435c16ff2d56500f8c6dbb68984adf8d65dfff25502d5d34da",
-          "at": "2026-08-02T09:01:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7bddfda3dd3200435c16ff2d56500f8c6dbb68984adf8d65dfff25502d5d34da",
-          "at": "2026-08-02T10:16:16Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-06’s requirement that stash-pop “preserves the repository safety gates required for the restored worktree” does not identify which gates or observable checks establish compliance, leaving Phase 2/3 to invent the contract.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
-              "line": 216,
-              "category": "acceptance criterion non-observable"
-            }
-          ],
-          "hash": "rvw1:sha256:d96c31dd688b8f7469f29f89ae0ebed068607ac107d385a51d8c936213fb97af",
-          "at": "2026-08-01T00:35:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d251b85b52d7071a8df8efebfa87e9383814697636ed8cdda82bb4009dfa5cee",
-          "at": "2026-08-01T00:38:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-06 contradicts IN-04 as written: a real `git stash` records stash commit objects and updates `refs/stash`, while a successful pop updates that ref again. Therefore stash/stash-pop cannot satisfy the blanket requirement to create no commit and update no ref. Clarify that branch history and branch refs must remain unchanged while permitting the stash-internal objects/ref required by D3.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
-              "line": 216,
-              "category": "scope / acceptance_criteria contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:d251b85b52d7071a8df8efebfa87e9383814697636ed8cdda82bb4009dfa5cee",
-          "at": "2026-08-01T00:41:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:99c34a083854c412260ecb88e8accdc3d671a36c78ab490dbb61a65cd3647484",
-          "at": "2026-08-01T00:44:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e5eb0df80593d31f3aabfdebd7984bbd743c1e8d5ed5d06b057148c3620c400d",
-          "at": "2026-08-01T00:46:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-04 requires post-merge cleanup after a conflict, while AC-12 and CN-07 explicitly prohibit clean-merge cleanup for conflict outcomes. The spec does not define whether AC-04 means the prohibited Views → Baseline → SyncBaseStamp sequence or a distinct recovery-only cleanup, leaving downstream implementation with contradictory behavior.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
-              "line": 268,
-              "category": "scope / acceptance_criteria contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:cf55f964143a48775af8bb7867e30a610d65264264c0351727d92faefd7facc2",
-          "at": "2026-08-01T22:43:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "GO-01 adds the requirement that cleanup use the exact merged base commit, but its cited decisions are the original ADR D1 and cleanup-state ADR D3. Those decisions establish cleanup and ordering, respectively; the exact-commit requirement is defined by cleanup-state ADR D1/D2, neither of which GO-01 cites. This leaves part of the goal unanchored to its cited decision set.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
-              "line": 8,
-              "category": "goal not anchored to a decision"
-            }
-          ],
-          "hash": "rvw1:sha256:a57d774207e811b519ea738a4c88136676e307ff86d7882a22c19f035cdefe88",
-          "at": "2026-08-01T22:57:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d503c8c41ebe2072c29a376a70fcc3ff9bab869e78cd35d8e7c17a2d3e56d06f",
-          "at": "2026-08-01T23:08:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d503c8c41ebe2072c29a376a70fcc3ff9bab869e78cd35d8e7c17a2d3e56d06f",
-          "at": "2026-08-01T23:13:17Z"
         }
       ]
     },
@@ -1239,13 +787,320 @@
         }
       ]
     },
-    "cli": {
+    "impl-plan": {
       "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 description names only a layer-level target, not a file or symbol; an executor must invent the implementation boundary.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 6,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T002 description does not identify target files or symbols; its implementation boundary is left to the executor.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 12,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T003 description does not identify target files or symbols for the filesystem adapters.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 19,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T004 description names command surfaces but no target file or symbol, leaving the CLI implementation boundary unspecified.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 26,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T005 description names workflow/adapters generically but does not identify the target files or symbols.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 33,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T006 description names layers and surfaces but no target files or symbols for the stash implementation.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 40,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T007 description does not identify the target file or symbol for cache identity and reuse changes.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 46,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T008 description does not identify the target file or symbol for the fail-closed reevaluation changes.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 52,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T009 description does not identify the target file or symbol for baseline hashing and cache persistence.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 59,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T001 restates the behavior contract that only the recorded base branch may flow into the active track branch; retain the operation target and anchor instead, per .harness/policies/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T003 restates clean-merge post-processing and conflict handoff behavior in prose; this is upstream behavior-contract text prohibited by .harness/policies/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 19,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T005 restates the provider-adapter behavior limitation in prose; cite OS-02/AC-05 without duplicating that contract, per .harness/policies/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 33,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T006 restates AC-06's artifact-preservation and branch-mutation contract in prose; this violates .harness/policies/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 40,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T007 restates mismatch-safe cache behavior in prose; retain the target operation and anchors without duplicating the upstream contract.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 46,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T008 restates the fail-closed behavior contract in prose; this is prohibited upstream restatement under .harness/policies/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 52,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T009 restates malformed/stale-cache reevaluation and atomic replacement behavior in prose; cite the anchors instead, per .harness/policies/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 59,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:c7828c74e28ec1f5b75565e55aa9ba32cee365e86ab6fde26bf32bdb0156c2bd",
+          "at": "2026-08-01T04:03:56Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:cb8f9ae379b18b9e407779476218192f29de916f40bd4250d6cd301226c01fab",
+          "hash": "rvw1:sha256:b79132a630b24a2365f0233f4f2f1a142dbf3a95482a51b9db9a85a4729aba0e",
+          "at": "2026-08-01T04:11:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b79132a630b24a2365f0233f4f2f1a142dbf3a95482a51b9db9a85a4729aba0e",
+          "at": "2026-08-01T04:16:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T008 の説明に「actual baseline hash flows through the port and participates in the three-hash reuse decision」という挙動契約の再記述がある。変更対象・操作・アンカーだけに留め、詳細な挙動は AC-07〜AC-09 に委ねるべき。See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 53,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T009 の説明に「read and hash the actual baseline, persist all three hashes, and treat missing, malformed, or schema-incompatible cache data as a miss」という挙動契約の再記述がある。変更対象・操作・アンカーだけに留めるべき。See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 61,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:4931d545aff53ee77e28657e1732dcd56e5e52ad8ed92d0ec8cb6d851e5ec1d1",
+          "at": "2026-08-01T04:52:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cd95bb0e2490d91fe99e1857842f1be4aa0ca25b91de731317650c812148d4d0",
+          "at": "2026-08-01T05:06:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cd95bb0e2490d91fe99e1857842f1be4aa0ca25b91de731317650c812148d4d0",
+          "at": "2026-08-01T05:11:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0f8832f649239c83573f57ebb2e10f027b92e5659f7c31c4e7172ad29f36a5bb",
+          "at": "2026-08-01T07:20:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0f8832f649239c83573f57ebb2e10f027b92e5659f7c31c4e7172ad29f36a5bb",
+          "at": "2026-08-01T07:23:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2a14c04114070e835837e299d580a0c5aae00ddb89760dc803dbaed5675c7c4e",
+          "at": "2026-08-01T09:10:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2a14c04114070e835837e299d580a0c5aae00ddb89760dc803dbaed5675c7c4e",
+          "at": "2026-08-01T09:14:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T009 の説明に「so the adapter maps authoritative-input, evaluation, and cache-write error variants directly」という上流の挙動契約の再記述がある。変更対象・操作・アンカーだけに留め、詳細な挙動は AC-07〜AC-09 に委ねるべき。See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 61,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:f1d8cea458f52cd1b67d8c05ccfa67bf251ff6b20f45913076dfd2ffe87d05f2",
+          "at": "2026-08-01T11:14:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:04a9de89b4882e627b4fce69519854e5b3c4cddb5637bab93b6f3458ad7aec40",
+          "at": "2026-08-01T11:34:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:04a9de89b4882e627b4fce69519854e5b3c4cddb5637bab93b6f3458ad7aec40",
+          "at": "2026-08-01T11:37:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69fc55c506663ae7b8514c30a95f9441a2a8d9f7875f0f946719b459bbc5a505",
+          "at": "2026-08-01T13:58:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69fc55c506663ae7b8514c30a95f9441a2a8d9f7875f0f946719b459bbc5a505",
+          "at": "2026-08-01T14:24:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T010 restates upstream behavior/design prose instead of limiting the task text to target + operation + anchor: “exact-commit single git-port outcome,” “stage-specific failure/persisted-record boundary,” and “preserving the completed T002 delivery history.” Rewrite the description per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 75,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S1 restates upstream cleanup behavior and rationale: “T010 repairs the current-catalogue exact-commit cleanup contract and stage-specific failure/persisted-record boundary before T003 and T011 consume it.” Keep the section to target + operation + anchor cites and remove this behavioral prose.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 100,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:532af7766c69661ce96f5bd6de15fbcc641031bf4cf86afb48b65012f2b372a5",
+          "at": "2026-08-02T09:01:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T010’s task-contract attribution includes `BaseMergeError`, `BaseMergeCleanupRequest`, `PostMergeCleanupError`, `ViewsRegenerationError`, `BaselineReplacementError`, and `SyncBaseRecordError`, but its description names only the outcome, cleanup/git ports, and sync-base record adapter. The description must explicitly identify the attributed error/request symbols it modifies, or the extra attributions must be moved to a task that claims them.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/task-contract.json",
+              "line": 64,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:af44a4fbf1aa018f4c5e263220e9af8456883e9266766467baec41f43af672fb",
+          "at": "2026-08-02T09:09:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T010 explicitly claims AC-03 in its task description, but `task-coverage.json` maps AC-03 only to T002, T003, T004, and T011. Add T010 to AC-03’s mapping so the task’s declared acceptance-criterion ownership agrees with the coverage artifact.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/task-coverage.json",
+              "line": 28,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:a121ccef4c1392b5d234ea12ed812dcdcebe98d878bb291ee64b3d2f002a0b0a",
+          "at": "2026-08-02T09:15:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4db8fe834b560edc79ab6e40754e8a17b81e778d6abf12411a5dd2444091656b",
+          "at": "2026-08-02T09:25:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4db8fe834b560edc79ab6e40754e8a17b81e778d6abf12411a5dd2444091656b",
+          "at": "2026-08-02T10:19:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a5247485b3477693efc7a6faae9736d12dd5135236ac637ad1d0883cd0163a3c",
           "at": "2026-08-02T15:10:10Z"
         },
         {
@@ -1253,65 +1108,440 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The CLI guard-path test bypasses the production composition-root/driver path by constructing `BaseMergeInteractor` directly inside the dispatch test closure. It can pass even if `TrackCompositionRoot::new().track_driver().handle_base_merge(...)` is wired incorrectly, so the required CLI boundary coverage is incomplete.",
+              "message": "T010's description names the sync-base record adapter but does not claim adding or updating `SyncBaseRecordSchemaVersion` or `SyncBaseRecord`, while `task-contract.json` attributes both catalogue entries to T010. This leaves the executable task boundary inconsistent with its contract attribution; explicitly include those DTO/schema types in T010 or move their ownership.",
               "severity": "P1",
-              "file": "apps/cli/src/commands/track/dispatch.rs",
-              "line": 314,
-              "category": "testing"
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/task-contract.json",
+              "line": 76,
+              "category": "task-contract attribution mismatch"
             }
           ],
-          "hash": "rvw1:sha256:cb8f9ae379b18b9e407779476218192f29de916f40bd4250d6cd301226c01fab",
-          "at": "2026-08-02T15:23:02Z"
+          "hash": "rvw1:sha256:a5247485b3477693efc7a6faae9736d12dd5135236ac637ad1d0883cd0163a3c",
+          "at": "2026-08-02T15:23:17Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0e47fb7460d0fc2c6f29acd62cf9a3e425e7d8144bce813d08f6dd3ebd669198",
-          "at": "2026-08-02T15:32:10Z"
+          "hash": "rvw1:sha256:207183b12263acab80a1eaec35ae1da5c897f04c6a062e3353fb4560db73c371",
+          "at": "2026-08-02T15:38:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:207183b12263acab80a1eaec35ae1da5c897f04c6a062e3353fb4560db73c371",
+          "at": "2026-08-02T15:44:27Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0e47fb7460d0fc2c6f29acd62cf9a3e425e7d8144bce813d08f6dd3ebd669198",
-          "at": "2026-08-02T15:45:57Z"
+          "hash": "rvw1:sha256:290eb07ac1c81667997d576e9c6debdee801c2bb590096062f96c7f68bfc4527",
+          "at": "2026-08-03T06:09:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:290eb07ac1c81667997d576e9c6debdee801c2bb590096062f96c7f68bfc4527",
+          "at": "2026-08-03T06:12:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0b6922f303f7da685b0f9e5058eb052fbaac63ed44c9df91b79af0a1c7a7f1d0",
+          "at": "2026-08-03T08:36:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0b6922f303f7da685b0f9e5058eb052fbaac63ed44c9df91b79af0a1c7a7f1d0",
+          "at": "2026-08-03T08:40:15Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cb666be156be4e5a74c73e23d8220f63bb3db8b8a08be26761cbad58085b2412",
+          "at": "2026-07-31T22:47:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cb666be156be4e5a74c73e23d8220f63bb3db8b8a08be26761cbad58085b2412",
+          "at": "2026-07-31T22:50:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ccf80b721d965f8205f7454dbcd27c4ea12d2cfc166dd951f73cef9c2c11ea89",
+          "at": "2026-08-01T00:18:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ccf80b721d965f8205f7454dbcd27c4ea12d2cfc166dd951f73cef9c2c11ea89",
+          "at": "2026-08-01T00:21:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4b5cd74999751b16d7905643597f13b47efbfd4e85cba5d36ed91b5dac33d8d1",
+          "at": "2026-08-01T22:29:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4b5cd74999751b16d7905643597f13b47efbfd4e85cba5d36ed91b5dac33d8d1",
+          "at": "2026-08-01T22:32:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7bddfda3dd3200435c16ff2d56500f8c6dbb68984adf8d65dfff25502d5d34da",
+          "at": "2026-08-02T09:01:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7bddfda3dd3200435c16ff2d56500f8c6dbb68984adf8d65dfff25502d5d34da",
+          "at": "2026-08-02T10:16:16Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fb2f7e429b2d3257d2accfc1dc2b5a2aae2990a6b625404fb70ef0e21ee8d4e8",
+          "at": "2026-08-01T01:29:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fb2f7e429b2d3257d2accfc1dc2b5a2aae2990a6b625404fb70ef0e21ee8d4e8",
+          "at": "2026-08-01T01:33:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fb2f7e429b2d3257d2accfc1dc2b5a2aae2990a6b625404fb70ef0e21ee8d4e8",
+          "at": "2026-08-01T01:46:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aef4333465fe0f58ae747a50e27ac879b6eede43bb7ba4a4e74ea5f966f39272",
+          "at": "2026-08-01T09:10:32Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The recovery conformance test only includes and validates the Claude adapter. AC-05 requires `/track:recover` and `$track-recover` to ship together, so `.agents/skills/track-recover/SKILL.md` could be missing or diverge from the canonical workflow while this test remains green. Include the Codex adapter and validate its canonical-workflow reference and provider-only constraints too.",
+              "message": "The TypeSignalsError → IN-05 record binds an invalid-layer diagnostic test, while none of its tests exercises the active-track-only guard or BranchTrackMismatch. Bind the existing active-track mismatch/track-ID propagation test so this edge proves IN-05's active-track restriction.",
               "severity": "P1",
-              "file": "apps/cli/tests/operational_reference_cutover.rs",
-              "line": 183,
-              "category": "test_coverage"
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 23,
+              "category": "test coverage / weak edge binding"
+            },
+            {
+              "message": "The TypeSignalsError → AC-07 record covers isolated hash mismatches but omits the all-three-hashes-match cache-hit test required by the briefing's multi-test contract. Its malformed-cache test concerns AC-08 and cannot prove the successful reuse case for AC-07.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 25,
+              "category": "test coverage / incomplete edge evidence"
             }
           ],
-          "hash": "rvw1:sha256:0e47fb7460d0fc2c6f29acd62cf9a3e425e7d8144bce813d08f6dd3ebd669198",
-          "at": "2026-08-02T15:51:35Z"
+          "hash": "rvw1:sha256:aef4333465fe0f58ae747a50e27ac879b6eede43bb7ba4a4e74ea5f966f39272",
+          "at": "2026-08-01T09:17:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The updated TypeSignalsError → IN-05 and → AC-07 binding sets have not been re-evaluated by the host. `bin/sotp test-obligation check` fails with `TestChanged` drift for both edges, so the briefing’s frozen pass=32 verdict no longer covers the current file. Run the host-owned evaluation before treating this scope as green.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 23,
+              "category": "test-obligation gate / stale verdict"
+            }
+          ],
+          "hash": "rvw1:sha256:d7b0a439adde308b33de185e23412f08ebe5ea8f41d9ceb015add01cdd6a39c2",
+          "at": "2026-08-01T09:21:59Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7c6c4daaa6456362ed1be814e82f1066aa90be8ed0e5e59e63e09e154738382c",
-          "at": "2026-08-02T15:56:37Z"
+          "hash": "rvw1:sha256:d7b0a439adde308b33de185e23412f08ebe5ea8f41d9ceb015add01cdd6a39c2",
+          "at": "2026-08-01T09:49:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The bindings file omits the three newly derived voluntary edges for `EvaluateSignalsError` at spec anchors `IN-05`, `CN-04`, and `AC-09`. `bin/sotp test-obligation check --track-id 2026-07-31-base-merge-and-conflict-recovery` fails with exactly these unresolved edges. Add focused infrastructure tests, such as `test_map_evaluation_error_each_stage_preserves_execution_error_category` and the evaluator failure/cache-write tests, while preserving the existing records.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 31,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:d7b0a439adde308b33de185e23412f08ebe5ea8f41d9ceb015add01cdd6a39c2",
+          "at": "2026-08-01T11:52:11Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4e9e0c8d3fcf1398df0bf793da04d082fa87f36e56fcf5161a5a8d7c3882ae8b",
-          "at": "2026-08-03T08:08:33Z"
+          "hash": "rvw1:sha256:3444e758e644324cee7351fae50bb0a8341a93a6c8937e6fd351020996eb118e",
+          "at": "2026-08-01T11:56:40Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4e9e0c8d3fcf1398df0bf793da04d082fa87f36e56fcf5161a5a8d7c3882ae8b",
-          "at": "2026-08-03T08:12:08Z"
+          "hash": "rvw1:sha256:3444e758e644324cee7351fae50bb0a8341a93a6c8937e6fd351020996eb118e",
+          "at": "2026-08-01T12:01:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The BaseMergeInteractor fulfillment record includes `test_derive_base_merge_direction_active_track_uses_snapshot_base_branch`, which only exercises the domain constructor and never invokes BaseMergeInteractor. It is not direct evidence for this declaration.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 35,
+              "category": "test-obligation binding"
+            },
+            {
+              "message": "The BaseMergeGitPort fulfillment record lists the snapshot-source, reverse-direction, and non-track rejection tests, but each test returns from context validation before calling `BaseMergeGitPort::merge_base` and asserts that Git was not called. These tests do not directly exercise the bound trait method.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 40,
+              "category": "test-obligation binding"
+            },
+            {
+              "message": "The BaseMergeContextError AC-01 binding includes `test_derive_base_merge_direction_active_track_uses_snapshot_base_branch`, which exercises only domain direction derivation and cannot produce or inspect BaseMergeContextError. It is invalid direct evidence for this declaration/anchor intersection.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 63,
+              "category": "test-obligation binding"
+            }
+          ],
+          "hash": "rvw1:sha256:87f4e88d520018e67df9cbc5acfa1cdfcd16d4ea6715e6549d9ef5eb098fa9cd",
+          "at": "2026-08-01T14:01:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a9881690f8c17d162245e3165a4e94d63b242d37f12913317f432c09a355195",
+          "at": "2026-08-01T14:16:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The conflict-recovery waivers for BaseMergeInteractor and BaseMergeService (IN-03/CN-02/AC-04) hide an expressible T002 behavior: `execute` returns the typed `Conflicted` outcome and skips clean-merge cleanup. The fulfillment records already reference the test that proves this handoff. Resolve these edges with that test; only the downstream edit/review/commit workflow belongs elsewhere.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 42,
+              "category": "waiver_validity"
+            },
+            {
+              "message": "The guard waivers on the Interactor, ContextPort, and Service treat rejection as unexpressible because the command lacks raw source/direction fields. Their entry-local contract is nevertheless testable: context loading returns an authoritative direction or rejection, the interactor/service must avoid Git on rejection, and the clean path forwards the snapshot source and active-track target. The fulfillment records already list tests for those behaviors, so these waivers suppress T002 evidence.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 43,
+              "category": "waiver_validity"
+            },
+            {
+              "message": "The BaseMergeCommand × AC-02 binding is substitution evidence. `test_base_merge_execute_active_track_mismatch_returns_typed_error` uses a context double that ignores `workspace_root`, so it returns the same mismatch for any command and does not exercise the command declaration. Either bind a test proving the command's workspace selects the rejected context or waive this edge consistently with the adjacent CN-01 record.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 61,
+              "category": "binding_semantics"
+            },
+            {
+              "message": "The CN-01/AC-02 bindings for BaseMergeContextError and BaseMergeError cover only ActiveTrackMismatch, while both anchors also require source-mismatch, reverse-direction, and non-track rejection. Focused tests for those branches exist but are absent from these four records, so each voluntary binding resolves a multi-branch edge with only partial evidence.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 63,
+              "category": "test_coverage"
+            },
+            {
+              "message": "The cleanup/context port fulfillments do not verify their declared arguments. Every context double ignores `workspace_root`, and RecordingCleanup ignores both `workspace_root` and `track_id`; consequently the interactor could pass the wrong workspace or active-track id and all bound tests would still pass. Add recording assertions before claiming these method-contract obligations are fulfilled.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 36,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:6a9881690f8c17d162245e3165a4e94d63b242d37f12913317f432c09a355195",
+          "at": "2026-08-01T14:38:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:75c63bcea506d9e6f5ff828f6c62d1f03c9e624907b268aa3c3a6f9576cdfcf4",
+          "at": "2026-08-01T15:56:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The shared infrastructure test is bound to all three `BaseMergeCleanupPort` methods, but it directly calls private baseline/stamp helpers and never invokes the port adapter (and it has no view-regeneration coverage). These bindings therefore falsely fulfill `regenerate_views` and do not exercise the declared trait methods; keep the test only on the applicable replacement/stamp obligations or add adapter-level tests.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 36,
+              "category": "test-coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:e413f934190ad8ed0934f2565a8b7a3126b7e7b7b8fb0821fdd92c383d6a913a",
+          "at": "2026-08-02T09:01:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `regenerate_views` fulfillment record omits `test_fs_base_merge_cleanup_baseline_replacement_isolated_at_exact_commit_and_atomically_published`, so the three `BaseMergeCleanupPort` records no longer all point to the required focused infrastructure evidence. Add the evidence to this record, or provide a dedicated infrastructure test that exercises view regeneration together with the exact-commit cleanup request.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 36,
+              "category": "test-coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:7800fd895bf89456c54206de08aa9e76fef86688c473cb271014c0b4a24bfe5c",
+          "at": "2026-08-02T09:09:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `regenerate_views` fulfillment record includes baseline-replacement tests and `test_fs_base_merge_cleanup_baseline_replacement_isolated_at_exact_commit_and_atomically_published`, but that infrastructure test directly exercises baseline/stamp helpers and never invokes view regeneration. These references do not exercise the declared method and falsely strengthen its fulfillment; remove them or bind a view-regeneration adapter test instead.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 36,
+              "category": "test-coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:e413f934190ad8ed0934f2565a8b7a3126b7e7b7b8fb0821fdd92c383d6a913a",
+          "at": "2026-08-02T09:15:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `regenerate_views` fulfillment record includes baseline-replacement tests and `test_fs_base_merge_cleanup_baseline_replacement_isolated_at_exact_commit_and_atomically_published`, but that infrastructure test directly exercises baseline/stamp helpers and never invokes view regeneration. These references do not exercise the declared method and falsely strengthen its fulfillment; remove them or bind a view-regeneration adapter test instead.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 36,
+              "category": "test-coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:e413f934190ad8ed0934f2565a8b7a3126b7e7b7b8fb0821fdd92c383d6a913a",
+          "at": "2026-08-02T09:15:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7800fd895bf89456c54206de08aa9e76fef86688c473cb271014c0b4a24bfe5c",
+          "at": "2026-08-02T09:22:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7800fd895bf89456c54206de08aa9e76fef86688c473cb271014c0b4a24bfe5c",
+          "at": "2026-08-02T10:23:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The newly added CLI bindings cite the removed test `test_track_command_merge_base_dispatches_snapshot_source_guard_failure_without_merge_success` at lines 162, 165, 166, and 169. The current test is `test_track_command_merge_base_dispatches_composition_root_guard_failure_without_merge_success`; update all affected bindings and refresh their verdicts.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 162,
+              "category": "missing-test-source"
+            },
+            {
+              "message": "The cleanup-adapter fulfillment and related existing edges now have stale frozen verdicts: the obligation check reports their bound test bodies changed since verdict freeze. Re-run host-owned evaluation; do not hand-edit verdict caches.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 151,
+              "category": "stale-verdict"
+            }
+          ],
+          "hash": "rvw1:sha256:6311123962732ad6f89c4a454025b83ee041df4543851f0367d7a8a32bbcb218",
+          "at": "2026-08-03T06:14:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `TrackCommand` bindings for AC-01 and AC-02 (lines 165–166) cite only `cli_driver::track::tests`. They omit the direct owning-layer CLI dispatch guard test `test_track_command_merge_base_dispatches_composition_root_guard_failure_without_merge_success`, which is already used for the same changed dispatch obligation. Add that CLI test to both command-level edges (retaining the driver tests where they cover the concrete guard details).",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 165,
+              "category": "insufficient-owning-layer-evidence"
+            }
+          ],
+          "hash": "rvw1:sha256:0c0c78afe7aedfc965ff4857b44d39fecb313eb739c14704bbf8bf7651cbd3d4",
+          "at": "2026-08-03T07:05:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5dd808d5f1b78efc3422129378e1129e53dab8aafb658541da21499b6c8b141d",
+          "at": "2026-08-03T07:13:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5dd808d5f1b78efc3422129378e1129e53dab8aafb658541da21499b6c8b141d",
+          "at": "2026-08-03T07:20:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5dd808d5f1b78efc3422129378e1129e53dab8aafb658541da21499b6c8b141d",
+          "at": "2026-08-03T08:05:11Z"
         }
       ]
     },
@@ -1925,6 +2155,105 @@
           "findings": [],
           "hash": "rvw1:sha256:cb333325ceeb1c35ab125d7cddd3fb82de2113433f49d6e699aaa96703fd45a4",
           "at": "2026-08-02T10:19:15Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-06’s requirement that stash-pop “preserves the repository safety gates required for the restored worktree” does not identify which gates or observable checks establish compliance, leaving Phase 2/3 to invent the contract.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+              "line": 216,
+              "category": "acceptance criterion non-observable"
+            }
+          ],
+          "hash": "rvw1:sha256:d96c31dd688b8f7469f29f89ae0ebed068607ac107d385a51d8c936213fb97af",
+          "at": "2026-08-01T00:35:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d251b85b52d7071a8df8efebfa87e9383814697636ed8cdda82bb4009dfa5cee",
+          "at": "2026-08-01T00:38:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-06 contradicts IN-04 as written: a real `git stash` records stash commit objects and updates `refs/stash`, while a successful pop updates that ref again. Therefore stash/stash-pop cannot satisfy the blanket requirement to create no commit and update no ref. Clarify that branch history and branch refs must remain unchanged while permitting the stash-internal objects/ref required by D3.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+              "line": 216,
+              "category": "scope / acceptance_criteria contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d251b85b52d7071a8df8efebfa87e9383814697636ed8cdda82bb4009dfa5cee",
+          "at": "2026-08-01T00:41:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:99c34a083854c412260ecb88e8accdc3d671a36c78ab490dbb61a65cd3647484",
+          "at": "2026-08-01T00:44:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e5eb0df80593d31f3aabfdebd7984bbd743c1e8d5ed5d06b057148c3620c400d",
+          "at": "2026-08-01T00:46:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-04 requires post-merge cleanup after a conflict, while AC-12 and CN-07 explicitly prohibit clean-merge cleanup for conflict outcomes. The spec does not define whether AC-04 means the prohibited Views → Baseline → SyncBaseStamp sequence or a distinct recovery-only cleanup, leaving downstream implementation with contradictory behavior.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+              "line": 268,
+              "category": "scope / acceptance_criteria contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:cf55f964143a48775af8bb7867e30a610d65264264c0351727d92faefd7facc2",
+          "at": "2026-08-01T22:43:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-01 adds the requirement that cleanup use the exact merged base commit, but its cited decisions are the original ADR D1 and cleanup-state ADR D3. Those decisions establish cleanup and ordering, respectively; the exact-commit requirement is defined by cleanup-state ADR D1/D2, neither of which GO-01 cites. This leaves part of the goal unanchored to its cited decision set.",
+              "severity": "P1",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+              "line": 8,
+              "category": "goal not anchored to a decision"
+            }
+          ],
+          "hash": "rvw1:sha256:a57d774207e811b519ea738a4c88136676e307ff86d7882a22c19f035cdefe88",
+          "at": "2026-08-01T22:57:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d503c8c41ebe2072c29a376a70fcc3ff9bab869e78cd35d8e7c17a2d3e56d06f",
+          "at": "2026-08-01T23:08:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d503c8c41ebe2072c29a376a70fcc3ff9bab869e78cd35d8e7c17a2d3e56d06f",
+          "at": "2026-08-01T23:13:17Z"
         }
       ]
     },
@@ -2933,364 +3262,49 @@
         }
       ]
     },
-    "impl-plan": {
+    "cli_composition": {
       "rounds": [
         {
           "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T001 description names only a layer-level target, not a file or symbol; an executor must invent the implementation boundary.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
-              "line": 6,
-              "category": "task description non-executable"
-            },
-            {
-              "message": "T002 description does not identify target files or symbols; its implementation boundary is left to the executor.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
-              "line": 12,
-              "category": "task description non-executable"
-            },
-            {
-              "message": "T003 description does not identify target files or symbols for the filesystem adapters.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
-              "line": 19,
-              "category": "task description non-executable"
-            },
-            {
-              "message": "T004 description names command surfaces but no target file or symbol, leaving the CLI implementation boundary unspecified.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
-              "line": 26,
-              "category": "task description non-executable"
-            },
-            {
-              "message": "T005 description names workflow/adapters generically but does not identify the target files or symbols.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
-              "line": 33,
-              "category": "task description non-executable"
-            },
-            {
-              "message": "T006 description names layers and surfaces but no target files or symbols for the stash implementation.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
-              "line": 40,
-              "category": "task description non-executable"
-            },
-            {
-              "message": "T007 description does not identify the target file or symbol for cache identity and reuse changes.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
-              "line": 46,
-              "category": "task description non-executable"
-            },
-            {
-              "message": "T008 description does not identify the target file or symbol for the fail-closed reevaluation changes.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
-              "line": 52,
-              "category": "task description non-executable"
-            },
-            {
-              "message": "T009 description does not identify the target file or symbol for baseline hashing and cache persistence.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
-              "line": 59,
-              "category": "task description non-executable"
-            },
-            {
-              "message": "T001 restates the behavior contract that only the recorded base branch may flow into the active track branch; retain the operation target and anchor instead, per .harness/policies/no-upstream-restatement.md.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
-              "line": 6,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T003 restates clean-merge post-processing and conflict handoff behavior in prose; this is upstream behavior-contract text prohibited by .harness/policies/no-upstream-restatement.md.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
-              "line": 19,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T005 restates the provider-adapter behavior limitation in prose; cite OS-02/AC-05 without duplicating that contract, per .harness/policies/no-upstream-restatement.md.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
-              "line": 33,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T006 restates AC-06's artifact-preservation and branch-mutation contract in prose; this violates .harness/policies/no-upstream-restatement.md.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
-              "line": 40,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T007 restates mismatch-safe cache behavior in prose; retain the target operation and anchors without duplicating the upstream contract.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
-              "line": 46,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T008 restates the fail-closed behavior contract in prose; this is prohibited upstream restatement under .harness/policies/no-upstream-restatement.md.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
-              "line": 52,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T009 restates malformed/stale-cache reevaluation and atomic replacement behavior in prose; cite the anchors instead, per .harness/policies/no-upstream-restatement.md.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
-              "line": 59,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:c7828c74e28ec1f5b75565e55aa9ba32cee365e86ab6fde26bf32bdb0156c2bd",
-          "at": "2026-08-01T04:03:56Z"
-        },
-        {
-          "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b79132a630b24a2365f0233f4f2f1a142dbf3a95482a51b9db9a85a4729aba0e",
-          "at": "2026-08-01T04:11:46Z"
+          "hash": "rvw1:sha256:1c15e00c9d57e3d1b6b7837e096db6b13217224842f46c7318b0141748f9dffc",
+          "at": "2026-08-01T09:10:15Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b79132a630b24a2365f0233f4f2f1a142dbf3a95482a51b9db9a85a4729aba0e",
-          "at": "2026-08-01T04:16:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T008 の説明に「actual baseline hash flows through the port and participates in the three-hash reuse decision」という挙動契約の再記述がある。変更対象・操作・アンカーだけに留め、詳細な挙動は AC-07〜AC-09 に委ねるべき。See `.harness/policies/no-upstream-restatement.md`.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
-              "line": 53,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T009 の説明に「read and hash the actual baseline, persist all three hashes, and treat missing, malformed, or schema-incompatible cache data as a miss」という挙動契約の再記述がある。変更対象・操作・アンカーだけに留めるべき。See `.harness/policies/no-upstream-restatement.md`.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
-              "line": 61,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:4931d545aff53ee77e28657e1732dcd56e5e52ad8ed92d0ec8cb6d851e5ec1d1",
-          "at": "2026-08-01T04:52:48Z"
+          "hash": "rvw1:sha256:1c15e00c9d57e3d1b6b7837e096db6b13217224842f46c7318b0141748f9dffc",
+          "at": "2026-08-01T09:15:53Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:cd95bb0e2490d91fe99e1857842f1be4aa0ca25b91de731317650c812148d4d0",
-          "at": "2026-08-01T05:06:44Z"
+          "hash": "rvw1:sha256:da102509466b2fe733307e2213cf6aca51a7accea2bad9deb422abc4df300705",
+          "at": "2026-08-02T15:10:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da102509466b2fe733307e2213cf6aca51a7accea2bad9deb422abc4df300705",
+          "at": "2026-08-02T15:23:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da102509466b2fe733307e2213cf6aca51a7accea2bad9deb422abc4df300705",
+          "at": "2026-08-02T15:58:35Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:cd95bb0e2490d91fe99e1857842f1be4aa0ca25b91de731317650c812148d4d0",
-          "at": "2026-08-01T05:11:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0f8832f649239c83573f57ebb2e10f027b92e5659f7c31c4e7172ad29f36a5bb",
-          "at": "2026-08-01T07:20:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0f8832f649239c83573f57ebb2e10f027b92e5659f7c31c4e7172ad29f36a5bb",
-          "at": "2026-08-01T07:23:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2a14c04114070e835837e299d580a0c5aae00ddb89760dc803dbaed5675c7c4e",
-          "at": "2026-08-01T09:10:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2a14c04114070e835837e299d580a0c5aae00ddb89760dc803dbaed5675c7c4e",
-          "at": "2026-08-01T09:14:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T009 の説明に「so the adapter maps authoritative-input, evaluation, and cache-write error variants directly」という上流の挙動契約の再記述がある。変更対象・操作・アンカーだけに留め、詳細な挙動は AC-07〜AC-09 に委ねるべき。See `.harness/policies/no-upstream-restatement.md`.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
-              "line": 61,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:f1d8cea458f52cd1b67d8c05ccfa67bf251ff6b20f45913076dfd2ffe87d05f2",
-          "at": "2026-08-01T11:14:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:04a9de89b4882e627b4fce69519854e5b3c4cddb5637bab93b6f3458ad7aec40",
-          "at": "2026-08-01T11:34:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:04a9de89b4882e627b4fce69519854e5b3c4cddb5637bab93b6f3458ad7aec40",
-          "at": "2026-08-01T11:37:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:69fc55c506663ae7b8514c30a95f9441a2a8d9f7875f0f946719b459bbc5a505",
-          "at": "2026-08-01T13:58:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:69fc55c506663ae7b8514c30a95f9441a2a8d9f7875f0f946719b459bbc5a505",
-          "at": "2026-08-01T14:24:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T010 restates upstream behavior/design prose instead of limiting the task text to target + operation + anchor: “exact-commit single git-port outcome,” “stage-specific failure/persisted-record boundary,” and “preserving the completed T002 delivery history.” Rewrite the description per `.harness/policies/no-upstream-restatement.md`.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
-              "line": 75,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "Section S1 restates upstream cleanup behavior and rationale: “T010 repairs the current-catalogue exact-commit cleanup contract and stage-specific failure/persisted-record boundary before T003 and T011 consume it.” Keep the section to target + operation + anchor cites and remove this behavioral prose.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
-              "line": 100,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:532af7766c69661ce96f5bd6de15fbcc641031bf4cf86afb48b65012f2b372a5",
-          "at": "2026-08-02T09:01:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T010’s task-contract attribution includes `BaseMergeError`, `BaseMergeCleanupRequest`, `PostMergeCleanupError`, `ViewsRegenerationError`, `BaselineReplacementError`, and `SyncBaseRecordError`, but its description names only the outcome, cleanup/git ports, and sync-base record adapter. The description must explicitly identify the attributed error/request symbols it modifies, or the extra attributions must be moved to a task that claims them.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/task-contract.json",
-              "line": 64,
-              "category": "task-contract attribution mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:af44a4fbf1aa018f4c5e263220e9af8456883e9266766467baec41f43af672fb",
-          "at": "2026-08-02T09:09:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T010 explicitly claims AC-03 in its task description, but `task-coverage.json` maps AC-03 only to T002, T003, T004, and T011. Add T010 to AC-03’s mapping so the task’s declared acceptance-criterion ownership agrees with the coverage artifact.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/task-coverage.json",
-              "line": 28,
-              "category": "task-coverage gap"
-            }
-          ],
-          "hash": "rvw1:sha256:a121ccef4c1392b5d234ea12ed812dcdcebe98d878bb291ee64b3d2f002a0b0a",
-          "at": "2026-08-02T09:15:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4db8fe834b560edc79ab6e40754e8a17b81e778d6abf12411a5dd2444091656b",
-          "at": "2026-08-02T09:25:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4db8fe834b560edc79ab6e40754e8a17b81e778d6abf12411a5dd2444091656b",
-          "at": "2026-08-02T10:19:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a5247485b3477693efc7a6faae9736d12dd5135236ac637ad1d0883cd0163a3c",
-          "at": "2026-08-02T15:10:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T010's description names the sync-base record adapter but does not claim adding or updating `SyncBaseRecordSchemaVersion` or `SyncBaseRecord`, while `task-contract.json` attributes both catalogue entries to T010. This leaves the executable task boundary inconsistent with its contract attribution; explicitly include those DTO/schema types in T010 or move their ownership.",
-              "severity": "P1",
-              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/task-contract.json",
-              "line": 76,
-              "category": "task-contract attribution mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:a5247485b3477693efc7a6faae9736d12dd5135236ac637ad1d0883cd0163a3c",
-          "at": "2026-08-02T15:23:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:207183b12263acab80a1eaec35ae1da5c897f04c6a062e3353fb4560db73c371",
-          "at": "2026-08-02T15:38:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:207183b12263acab80a1eaec35ae1da5c897f04c6a062e3353fb4560db73c371",
-          "at": "2026-08-02T15:44:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:290eb07ac1c81667997d576e9c6debdee801c2bb590096062f96c7f68bfc4527",
-          "at": "2026-08-03T06:09:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:290eb07ac1c81667997d576e9c6debdee801c2bb590096062f96c7f68bfc4527",
-          "at": "2026-08-03T06:12:30Z"
+          "hash": "rvw1:sha256:da102509466b2fe733307e2213cf6aca51a7accea2bad9deb422abc4df300705",
+          "at": "2026-08-02T16:01:19Z"
         }
       ]
     }
