@@ -125,6 +125,154 @@ fn test_parse_type_ref_const_byte_argument_preserves_literal() {
 }
 
 #[test]
+fn test_parse_type_ref_const_string_argument_preserves_quotes_and_escapes() {
+    let ty = parse(r#"Marker<"\x78">"#);
+    let Type::ResolvedPath(path) = ty else {
+        panic!("expected Marker resolved path");
+    };
+    let Some(GenericArgs::AngleBracketed { args, .. }) = path.args.as_deref() else {
+        panic!("expected angle-bracketed arguments");
+    };
+    let Some(GenericArg::Const(constant)) = args.first() else {
+        panic!("expected const string argument");
+    };
+    assert_eq!(constant.expr, r#""\x78""#);
+}
+
+#[test]
+fn test_parse_type_ref_const_char_argument_preserves_escape_spelling() {
+    let ty = parse(r#"Marker<'\x78'>"#);
+    let Type::ResolvedPath(path) = ty else {
+        panic!("expected Marker resolved path");
+    };
+    let Some(GenericArgs::AngleBracketed { args, .. }) = path.args.as_deref() else {
+        panic!("expected angle-bracketed arguments");
+    };
+    let Some(GenericArg::Const(constant)) = args.first() else {
+        panic!("expected const character argument");
+    };
+    assert_eq!(constant.expr, r#"'\x78'"#);
+}
+
+#[test]
+fn test_parse_type_ref_simple_const_blocks_match_rustdoc_spelling() {
+    let literal = parse_type_ref_with_generics_preserving_spelling(
+        "Marker<{ 1 }>",
+        &no_local,
+        100,
+        &HashMap::new(),
+        &mut |_| 101,
+        &[],
+    )
+    .unwrap();
+    let generic = parse_type_ref_with_generics_preserving_spelling(
+        "Marker<{ N }>",
+        &no_local,
+        100,
+        &HashMap::new(),
+        &mut |_| 101,
+        &["N"],
+    )
+    .unwrap();
+    let unit = parse_type_ref_with_generics_preserving_spelling(
+        "Marker<{ () }>",
+        &no_local,
+        100,
+        &HashMap::new(),
+        &mut |_| 101,
+        &[],
+    )
+    .unwrap();
+    let const_expr = |ty: Type| {
+        let Type::ResolvedPath(path) = ty else {
+            panic!("expected Marker resolved path");
+        };
+        let Some(GenericArgs::AngleBracketed { args, .. }) = path.args.as_deref() else {
+            panic!("expected angle-bracketed arguments");
+        };
+        let Some(GenericArg::Const(constant)) = args.first() else {
+            panic!("expected const argument");
+        };
+        constant.expr.clone()
+    };
+    assert_eq!(const_expr(literal), "{ 1 }");
+    assert_eq!(const_expr(generic), "{ N }");
+    assert_eq!(const_expr(unit), "{ () }");
+}
+
+#[test]
+fn test_parse_type_ref_preserves_absolute_single_segment_paths() {
+    let ty = parse_type_ref_with_generics_preserving_spelling(
+        "Into<::Local>",
+        &no_local,
+        100,
+        &HashMap::new(),
+        &mut |_| 101,
+        &[],
+    )
+    .unwrap();
+    let Type::ResolvedPath(path) = ty else {
+        panic!("expected Into resolved path");
+    };
+    let Some(GenericArgs::AngleBracketed { args, .. }) = path.args.as_deref() else {
+        panic!("expected angle-bracketed arguments");
+    };
+    let Some(GenericArg::Type(Type::ResolvedPath(argument))) = args.first() else {
+        panic!("expected resolved path argument");
+    };
+    assert_eq!(argument.path, "::Local");
+}
+
+#[test]
+fn test_parse_type_ref_assoc_const_matches_rustdoc_metadata() {
+    let ty = parse(r#"Trait<FLAG = true>"#);
+    let Type::ResolvedPath(path) = ty else {
+        panic!("expected Trait resolved path");
+    };
+    let Some(GenericArgs::AngleBracketed { constraints, .. }) = path.args.as_deref() else {
+        panic!("expected angle-bracketed constraints");
+    };
+    let Some(constraint) = constraints.first() else {
+        panic!("expected associated-const constraint");
+    };
+    let AssocItemConstraintKind::Equality(rustdoc_types::Term::Constant(constant)) =
+        &constraint.binding
+    else {
+        panic!("expected associated-const equality");
+    };
+    assert_eq!(constant.expr, "true");
+    assert_eq!(constant.value, None);
+    assert!(!constant.is_literal);
+}
+
+#[test]
+fn test_parse_type_ref_assoc_type_equality_remains_a_type() {
+    let ty = parse_type_ref_with_generics_preserving_spelling(
+        "Trait<Item = Self>",
+        &no_local,
+        100,
+        &HashMap::new(),
+        &mut |_| 101,
+        &[],
+    )
+    .unwrap();
+    let Type::ResolvedPath(path) = ty else {
+        panic!("expected Trait resolved path");
+    };
+    let Some(GenericArgs::AngleBracketed { constraints, .. }) = path.args.as_deref() else {
+        panic!("expected associated-type constraint");
+    };
+    let Some(constraint) = constraints.first() else {
+        panic!("expected associated-type constraint");
+    };
+    assert!(matches!(
+        &constraint.binding,
+        AssocItemConstraintKind::Equality(rustdoc_types::Term::Type(Type::ResolvedPath(path)))
+            if path.path == "Self"
+    ));
+}
+
+#[test]
 fn test_parse_type_ref_const_negative_integer_argument_preserves_literal() {
     let ty = parse("Marker<-1>");
     let Type::ResolvedPath(path) = ty else {
@@ -188,6 +336,86 @@ fn test_parse_type_ref_unnamed_function_pointer_argument_uses_rustdoc_placeholde
         panic!("expected function pointer argument");
     };
     assert_eq!(function_pointer.sig.inputs.first().map(|input| input.0.as_str()), Some("_"));
+}
+
+#[test]
+fn test_parse_type_ref_explicit_rust_abi_matches_rustdoc_abi() {
+    let ty = parse("Trait<extern \"Rust\" fn()>");
+    let Type::ResolvedPath(path) = ty else {
+        panic!("expected Trait resolved path");
+    };
+    let Some(GenericArgs::AngleBracketed { args, .. }) = path.args.as_deref() else {
+        panic!("expected angle-bracketed arguments");
+    };
+    let Some(GenericArg::Type(Type::FunctionPointer(function_pointer))) = args.first() else {
+        panic!("expected function pointer argument");
+    };
+    assert_eq!(function_pointer.header.abi, rustdoc_types::Abi::Rust);
+}
+
+#[test]
+fn test_parse_type_ref_preserving_spelling_rejects_raw_identifiers() {
+    let result = parse_type_ref_with_generics_preserving_spelling(
+        "r#Clone",
+        &no_local,
+        100,
+        &HashMap::new(),
+        &mut |_| 101,
+        &[],
+    );
+    assert!(result.is_err(), "raw identifiers must fail closed in lexical mode");
+}
+
+#[test]
+fn test_parse_type_ref_preserving_spelling_keeps_ambiguous_argument_lexeme() {
+    let ambiguous = parse_type_ref_with_generics_preserving_spelling(
+        "Marker<N>",
+        &no_local,
+        100,
+        &HashMap::new(),
+        &mut |_| 101,
+        &[],
+    );
+    let Type::ResolvedPath(path) = ambiguous.unwrap() else {
+        panic!("expected Marker resolved path");
+    };
+    let Some(GenericArgs::AngleBracketed { args, .. }) = path.args.as_deref() else {
+        panic!("expected angle-bracketed arguments");
+    };
+    assert!(matches!(
+        args.first(),
+        Some(GenericArg::Type(Type::ResolvedPath(path))) if path.path == "N"
+    ));
+
+    assert!(
+        parse_type_ref_with_generics_preserving_spelling(
+            "Into<UserId>",
+            &simple_local,
+            100,
+            &HashMap::new(),
+            &mut |_| 101,
+            &[],
+        )
+        .is_ok()
+    );
+    assert!(validate_lexical_generic_bound("Marker<N>", &[]).is_ok());
+    assert!(validate_lexical_generic_bound("Into<String>", &[]).is_ok());
+
+    for modifier in ["[const] Clone", "[ const ] Clone", "for<'a> [const] Clone", "const Clone"] {
+        let result = parse_generic_bound_with_generics_preserving_spelling(
+            modifier,
+            &no_local,
+            100,
+            &HashMap::new(),
+            &mut |_| 101,
+            &[],
+        );
+        assert!(
+            result.is_err(),
+            "unrepresentable const bound modifier must fail closed: {modifier}"
+        );
+    }
+    assert!(validate_lexical_generic_bound("~const Clone", &[]).is_ok());
 }
 
 #[test]
@@ -446,18 +674,29 @@ fn test_parse_generic_bound_rejects_unsupported_const_expression() {
 }
 
 #[test]
-fn test_parse_type_ref_rejects_anonymous_const_argument() {
-    let mut ext_ids = HashMap::new();
-    let result = parse_type_ref(
+fn test_parse_type_ref_ordinary_preserves_complex_const_tokens() {
+    let ty = parse("Trait<{ 1 + 2 }>");
+    let Type::ResolvedPath(path) = ty else {
+        panic!("expected Trait resolved path");
+    };
+    let Some(GenericArgs::AngleBracketed { args, .. }) = path.args.as_deref() else {
+        panic!("expected angle-bracketed arguments");
+    };
+    let Some(GenericArg::Const(constant)) = args.first() else {
+        panic!("expected const argument");
+    };
+    assert_eq!(constant.expr, "{ 1 + 2 }");
+}
+
+#[test]
+fn test_parse_type_ref_preserving_spelling_rejects_complex_const_block() {
+    let result = parse_type_ref_with_generics_preserving_spelling(
         "Trait<{ 1 + 2 }>",
         &no_local,
         100,
-        &ext_ids.clone(),
-        &mut |name: String| {
-            let id = 101 + ext_ids.len() as u32;
-            ext_ids.insert(name, id);
-            id
-        },
+        &HashMap::new(),
+        &mut |_| 101,
+        &[],
     );
     let error = match result {
         Err(error) => error,

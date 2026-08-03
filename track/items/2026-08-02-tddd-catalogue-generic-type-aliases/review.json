@@ -3782,6 +3782,280 @@
           "hash": "rvw1:sha256:59b1b66008be18afad441ac0451d3874a04b90788c8c4d56b299904e922793e9",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T18:47:31Z",
+          "findings": [
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_ctx.rs",
+              "line": 36,
+              "message": "`normalized_ident_name` strips `r#` from every path even in spelling-preserving mode. A valid bound such as `r#Clone` is therefore encoded as `Clone`, allowing an implementation spelled `Clone` to compare equal despite the lexical contract and the briefing’s explicit prohibition on recreating rustdoc’s raw-identifier elision. Preserve the marker in lexical mode or reject raw identifiers at the catalogue boundary.",
+              "severity": "P1"
+            },
+            {
+              "category": "serde_codec_break",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_ctx.rs",
+              "line": 507,
+              "message": "`convert_generic_arg` uses `syn_expr_to_string`, whose string-literal branch removes quotes and decodes escapes. Because lexical validation accepts string constants, `Marker<\"x\">` is encoded with `Constant.expr == \"x\"` instead of the quoted rustdoc expression, causing identical generic-alias bounds to mismatch. Use token-preserving rendering and add quoted/escaped-string coverage.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_ctx.rs",
+              "line": 569,
+              "message": "Associated-const equality unconditionally records `value: Some(expr)` and source-derived literal metadata. Rustdoc represents RHS terms such as `Trait<FLAG = true>` with different `Constant` metadata (notably no evaluated value), while alias comparison serializes these fields exactly. Consequently identical catalogue and implementation bounds cannot compare equal. Mirror rustdoc’s metadata or reject this syntax fail-closed.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a06e7218c173a7f76dac107719df6d038b9fa1502f36f0583d133821989dfb9a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T19:10:24Z",
+          "findings": [
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 358,
+              "message": "[P1] Preserve representable simple const blocks — `visit_expr_block` rejects every block, including `{ 1 }` and `{ N }`. Rustdoc preserves simple block expressions and substitutes `{ _ }` only for complex ones, so valid aliases such as `Marker<{ N }>` now fail instead of round-tripping. Reject only blocks whose contents rustdoc erases. See [rustdoc's `rendered_const`](https://doc.rust-lang.org/stable/nightly-rustc/rustc_metadata/fn.rendered_const.html).",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/helpers.rs",
+              "line": 250,
+              "message": "[P1] Preserve character-literal token spelling — Both renderers decode `LitChar` and re-emit it with `Debug`, so an escaped spelling such as `'\\x78'` becomes `'x'`. Rustdoc retains literal source text to preserve character escapes; consequently identical catalogue and compiler aliases can compare unequal. Use the original token stream as already done for strings and bytes.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_ctx.rs",
+              "line": 501,
+              "message": "[P1] Do not treat ambiguous bare const arguments as types — Syn parses the bare `N` in `Marker<N>` as `GenericArgument::Type` because it lacks the trait's parameter metadata, while rustdoc emits `GenericArg::Const` when `N` names a const. Serializing this variant makes the same source bound structurally unequal during alias comparison. Preserve the argument lexeme or reject/reclassify the ambiguity using context.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 329,
+              "message": "[P1] Preserve conditionally-const bound modifiers — Syn accepts `[const] Clone` but does not retain `[const]` in its `TraitBoundModifier`, so this match emits `None` while rustdoc represents the bound as `MaybeConst`. Identical alias bounds therefore mismatch compiler output. Detect the modifier from the original string and emit `MaybeConst`, or reject it during validation instead of silently losing it. See [rustdoc's modifier representation](https://doc.rust-lang.org/stable/nightly-rustc/rustdoc_json_types/enum.TraitBoundModifier.html).",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:bf9fa2e500ef0e97027bfdaf4434f31372e485056f79f9b4351e870654632aa8",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T19:28:17Z",
+          "findings": [
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 109,
+              "message": "[P1] Restrict anonymous-const rejection to lexical mode — This check runs before `preserve_prelude_spelling` is considered, and `validate_legacy_type_ref` applies the same check. Consequently ordinary parsing and existing non-generic aliases such as `Marker<{ 1 + 2 }>` now fail even though the pre-change adapter accepted them. The briefing requires legacy aliases to remain unchanged; apply this fail-closed restriction only to the new lexical comparison path. The equivalent unconditional bound check at line 318 also regresses non-alias bounds.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/helpers.rs",
+              "line": 264,
+              "message": "[P1] Retain braces around path-valued simple const blocks — The path special case converts `{ N }` to `N`, while rustdoc retains simple blocks as blocks. Identical catalogue/compiler declarations therefore compare unequal, and `{ N }` collides with the distinct unbraced spelling `N`; the new test at line 190 enshrines the wrong result. Always render the block wrapper. See [rustdoc's `rendered_const` contract](https://doc.rust-lang.org/beta/nightly-rustc/rustc_metadata/fn.rendered_const.html).",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/helpers.rs",
+              "line": 408,
+              "message": "[P1] Match rustdoc's complete simple-const classifier — This helper accepts every `Expr::Path`, including paths with generic arguments that rustdoc classifies as complex, but rejects representable unit and nested simple blocks. For example, `{ Foo::<1> }` passes and is rendered as `Foo`, losing its arguments, while `{ () }` fails. Recursively classify simple blocks and require resolved path segments to have no arguments, matching [rustdoc's documented rules](https://doc.rust-lang.org/beta/nightly-rustc/rustc_metadata/fn.rendered_const.html).",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 249,
+              "message": "[P1] Apply ambiguous bare-argument rejection during catalogue validation too — `validate_lexical_generic_bound` accepts `Marker<N>` because Syn classifies `N` as a type, but the preserving encoder later sets `lexical_error` and returns an error for the same bound. A catalogue can therefore decode and lint successfully yet fail extended-crate encoding. Share the ambiguity gate with the lexical type/bound validators, or avoid rejecting the lexeme during conversion.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_ctx.rs",
+              "line": 548,
+              "message": "[P1] Handle ambiguous associated-const equalities — The new ambiguity check only covers positional `GenericArgument::Type`. Syn also classifies an ambiguous equality such as `Trait<FLAG = N>` as `AssocType`; this branch then emits `Term::Type` without setting `lexical_error`, whereas rustdoc emits `Term::Constant` when `FLAG` is an associated const. Identical alias bounds consequently produce different structural representations. Detect or reject ambiguous associated equalities before conversion.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 626,
+              "message": "[P1] Detect unsupported const-bound modifiers token-wise — The raw prefix test only catches the exact top-level text `[const]`. Equivalent syntax such as `[ const ] Clone`, `for<'a> [const] Trait<'a>`, and nested conditionally-const bounds bypasses it; Syn accepts these forms but discards the marker from its AST, after which the adapter emits `TraitBoundModifier::None` instead of rustdoc's `MaybeConst`. Scan tokens recursively or otherwise reject all such forms before Syn loses the modifier. See [rustdoc's modifier representation](https://doc.rust-lang.org/beta/nightly-rustc/rustdoc_json_types/enum.TraitBoundModifier.html).",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a8fa1621f982822677631f47d14dfa568f149d994e8989ee3ad8f3d3949537a0",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T19:50:58Z",
+          "findings": [
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/helpers.rs",
+              "line": 416,
+              "message": "`is_simple_const_expr` accepts the unit expression `()`, but neither expression renderer handles `Expr::Tuple`. Consequently, `Marker<{ () }>` passes lexical validation and is encoded as `{ <const_expr> }` instead of rustdoc's retained `{ () }`, producing a false mismatch. Render the unit expression or reject it until representable. See the [rustc `rendered_const` contract](https://doc.rust-lang.org/beta/nightly-rustc/rustc_metadata/fn.rendered_const.html).",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/helpers.rs",
+              "line": 254,
+              "message": "Both const-expression path renderers rebuild paths solely from their segments and discard `path.leading_colon`. Because simple const blocks are accepted, a valid global path such as `{ ::constants::N }` is silently changed to `{ constants::N }`, collapsing distinct lexical declarations. Preserve the leading `::` in both renderers.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_ctx.rs",
+              "line": 459,
+              "message": "In preserving-spelling mode, every unresolved bare type argument is guessed to be a const argument. Resolution failure does not establish argument kind: for example, `Into<ImportedType>` is parsed by `syn` as a type but becomes `GenericArg::Const` whenever the imported name is absent from the local resolver. This makes identical type bounds structurally mismatch rustdoc output. The syntactic ambiguity must remain lexical/fail closed rather than be inferred from catalogue resolution.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_ctx.rs",
+              "line": 541,
+              "message": "Associated-type equalities are reclassified as associated-const equalities using the same name heuristic, without even restricting it to preserving-spelling mode. For example, `Trait<Item = Self>` discards the converted `Type` and emits `Term::Constant(\"Self\")`, changing existing ordinary parser behavior and producing the wrong rustdoc shape. Preserve `AssocType` as `Term::Type`; handle ambiguous spelling without guessing its semantic kind.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_ctx.rs",
+              "line": 128,
+              "message": "Single-segment absolute type paths lose their leading `::`: only the multi-segment branch reinserts it, while all branches starting here return the bare `name`. Thus lexical input such as `Into<::Local>` is encoded identically to `Into<Local>`, silently normalizing a declaration that should compare differently. Preserve `leading_colon` for single-segment resolved, prelude, and unresolved paths too.",
+              "severity": "P1"
+            },
+            {
+              "category": "error_handling",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 596,
+              "message": "The unsupported-const-bound scan examines only bracket groups, so it rejects `[const] Clone` but misses the bare `const Clone` form that `syn::TypeParamBound` also accepts. `syn` returns that form as `Verbatim`, after which the fallback at line 339 silently constructs a normal trait bound whose path is `const Clone`. Reject this unrepresentable modifier instead of accepting a fabricated bound.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c9db2b3878fd60e003eb0a6bf4b81dcacaaa3d1e9c236bd9cae62eba1c4b188c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T20:02:38Z",
+          "findings": [
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 670,
+              "message": "The const-modifier scanner treats every `const` identifier as unsupported. Because `validate_lexical_generic_bound` invokes it before stripping the explicitly supported `~const ` prefix, `~const Clone` is rejected and never reaches `validate_maybe_const_bound`, breaking the existing `MaybeConst` alias-bound round trip. Strip or exempt `~const` while continuing to reject bare `const` and `[const]`.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 587,
+              "message": "The ambiguity gate infers argument kind from a name whitelist, which is neither complete nor sound. It rejects valid local type arguments such as `Into<UserId>` before the supplied resolver can identify `UserId`, while accepting prelude spellings even though a value-namespace constant can share that name (for example `const String: usize = 0; Marker<String>`), after which the parser emits `GenericArg::Type` instead of rustdoc's const argument. Preserve the ambiguity lexically or carry authoritative kind information rather than classifying by spelling.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:bd89ae6efcbc3d1c28836b5a8a42717e1df5528aa13e473e7da293c41189007c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T20:09:29Z",
+          "findings": [
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_ctx.rs",
+              "line": 464,
+              "message": "Bare identifier arguments are always emitted as `GenericArg::Type` because `syn` parses the lexically ambiguous `Marker<N>` that way. When `N` is a const parameter or named const, rustdoc emits `GenericArg::Const`, so identical source spelling fails structural equality. Preserve/normalize this ambiguity lexically or resolve the target parameter kind instead of retaining syn's syntactic guess.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_ctx.rs",
+              "line": 517,
+              "message": "An equality such as `Trait<FLAG = N>` is parsed by syn as `AssocType` when the RHS is an identifier, and this branch unconditionally emits `Term::Type`. If `FLAG` is an associated const, rustdoc emits `Term::Constant`; therefore named associated-const equalities cannot compare equal, although literal RHS values work. The encoder must preserve/resolve this ambiguity rather than treating every identifier RHS as a type.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:cc21c09e2e40c5fe92e029aca6ce336b726916ba093f9c81c519185feee4614d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T20:18:34Z",
+          "findings": [
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 110,
+              "message": "The anonymous-const rejection is now conditional on `preserve_prelude_spelling`, so ordinary type/bound parsing accepts inputs such as `Marker<{ 1 + 2 }>` and converts them to the information-free `<const_expr>` placeholder. Distinct declarations can therefore become structurally identical instead of returning an error. Keep this fail-closed guard on every production parsing path that uses the lossy renderer.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 246,
+              "message": "The lexical validation entry points do not run the new unresolved-ambiguity check that their corresponding preserving parsers run. For example, `validate_lexical_generic_bound(\"Marker<N>\", &[])` succeeds at the document boundary, but `parse_generic_bound_with_generics_preserving_spelling` later rejects the same value. This breaks the promised decode/encode validation symmetry; the representability gate must be shared with the required resolution context.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 606,
+              "message": "The ambiguity detector does not recognize the existing standard-prelude allowlist. Consequently a valid lexical type or bound such as `Into<String>` is rejected as ambiguous when `resolve_local` returns `None`, even though `ParseCtx` can deterministically resolve `String` through `STD_PRELUDE_TYPES`. Exclude known prelude names from this rejection.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 717,
+              "message": "The production portion of this module now extends through line 716 before the test-only block, exceeding the repository's 700-line maximum for production modules. Split the validation visitors or related parser helpers into a separate production module.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:2590410904c7df40076fb02db7256da15412d74506e20ead6c83c9022b476123",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T20:28:58Z",
+          "findings": [
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 171,
+              "message": "Both document-boundary lexical validators invoke the resolver-aware ambiguity check with a resolver that always returns `None`. Consequently valid declarations containing catalogue-local types, such as `Into<UserId>` or `Result<UserId, T>`, are rejected during decoding even though the preserving parser accepts them when supplied the real catalogue resolver. Pass the same resolution context into validation or defer this contextual check so decode and encode remain symmetric.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/lexical_ambiguity.rs",
+              "line": 59,
+              "message": "A prelude or locally resolved name is treated as proof that a syntactically ambiguous argument is a type, but the target generic parameter or associated item determines its kind. For example, a module-level const named `String` used as `Marker<String>` for a const-generic `Marker` passes this check because `String` is allowlisted, then gets encoded as `GenericArg::Type` while rustdoc emits `GenericArg::Const`. Fail closed unless target metadata actually disambiguates the argument, or preserve the ambiguity for lexical comparison.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7a5171e84c18f4da4c0663d4cc967f76a6efeba893e2977f7fcbcaa1b975f55e",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T20:41:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f5c38538e887f459a47bd94251c8c9f2e9028f2839be251784d442bc05d76d19",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },

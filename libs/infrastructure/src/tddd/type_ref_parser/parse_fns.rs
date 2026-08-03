@@ -2,11 +2,13 @@
 
 use std::collections::HashMap;
 
+use proc_macro2::{Delimiter, TokenStream, TokenTree};
 use rustdoc_types::{GenericBound, Id, Path, TraitBoundModifier, Type};
 use syn::visit::Visit;
 
 use super::constants::{PRIMITIVE_TYPES, UNRESOLVED_CRATE_ID};
 use super::generic_tokens;
+use super::helpers::{is_simple_const_expr, simple_const_block_expr};
 use super::parse_ctx::{ParseCtx, bound_lifetimes_to_generic_params};
 use super::precise_capture::convert_precise_capture;
 
@@ -105,8 +107,9 @@ where
     validate_generic_identifier_ambiguities(type_ref_str, generic_params)?;
     let syn_type: syn::Type = syn::parse_str(type_ref_str)
         .map_err(|e| format!("syn parse error for `{type_ref_str}`: {e}"))?;
-    reject_anonymous_const_blocks_in_type(&syn_type)?;
     if preserve_prelude_spelling {
+        reject_anonymous_const_blocks_in_type(&syn_type)?;
+        reject_raw_identifiers_in_type(&syn_type)?;
         reject_unsupported_type_macros_in_type(&syn_type)?;
         reject_unsupported_array_lengths_in_type(&syn_type)?;
         reject_unsupported_const_arguments_in_type(&syn_type)?;
@@ -130,17 +133,15 @@ pub(crate) fn parse_syn_type_param_bound(type_ref_str: &str) -> syn::Result<syn:
     syn::parse_str(type_ref_str)
 }
 
-/// Validates the legacy type-position contract: ordinary `syn::Type` syntax
-/// remains accepted, while anonymous const blocks are rejected because the
-/// encoder cannot retain their expression identity.
+/// Validates the legacy type-position contract using ordinary `syn::Type` syntax.
 pub(crate) fn validate_legacy_type_ref(
     type_ref_str: &str,
     generic_params: &[&str],
 ) -> Result<(), String> {
     validate_generic_identifier_ambiguities(type_ref_str, generic_params)?;
-    let syntax: syn::Type = syn::parse_str(type_ref_str)
+    let _syntax: syn::Type = syn::parse_str(type_ref_str)
         .map_err(|e| format!("invalid type syntax '{type_ref_str}': {e}"))?;
-    reject_anonymous_const_blocks_in_type(&syntax)
+    Ok(())
 }
 
 /// Validates a type reference for lexical comparison. Unlike the general type
@@ -154,6 +155,7 @@ pub(crate) fn validate_lexical_type_ref(
     let syntax: syn::Type = syn::parse_str(type_ref_str)
         .map_err(|e| format!("invalid type syntax '{type_ref_str}': {e}"))?;
     reject_anonymous_const_blocks_in_type(&syntax)?;
+    reject_raw_identifiers_in_type(&syntax)?;
     reject_unsupported_type_macros_in_type(&syntax)?;
     reject_unsupported_array_lengths_in_type(&syntax)?;
     reject_unsupported_const_arguments_in_type(&syntax)
@@ -174,7 +176,6 @@ pub(crate) fn validate_maybe_const_bound(
         .trim_start();
     let syn_bound: syn::TypeParamBound = syn::parse_str(syntax_str)
         .map_err(|e| format!("invalid bound syntax '{bound_str}': {e}"))?;
-    reject_anonymous_const_blocks_in_bound(&syn_bound)?;
     let is_plain_trait = matches!(
         syn_bound,
         syn::TypeParamBound::Trait(trait_bound)
@@ -226,6 +227,7 @@ pub(crate) fn validate_lexical_generic_bound(
     generic_params: &[&str],
 ) -> Result<(), String> {
     validate_generic_identifier_ambiguities(bound_str, generic_params)?;
+    reject_unsupported_const_bound_modifier(bound_str)?;
     let syntax_str = bound_str.strip_prefix("~const ").map_or(bound_str, str::trim_start);
     let syn_bound: syn::TypeParamBound = syn::parse_str(syntax_str)
         .map_err(|e| format!("invalid bound syntax '{bound_str}': {e}"))?;
@@ -233,6 +235,7 @@ pub(crate) fn validate_lexical_generic_bound(
         validate_maybe_const_bound(bound_str, generic_params)?;
     }
     reject_anonymous_const_blocks_in_bound(&syn_bound)?;
+    reject_raw_identifiers_in_bound(&syn_bound)?;
     reject_unsupported_type_macros_in_bound(&syn_bound)?;
     reject_unsupported_array_lengths_in_bound(&syn_bound)?;
     reject_unsupported_const_arguments_in_bound(&syn_bound)
@@ -304,8 +307,10 @@ where
     validate_generic_identifier_ambiguities(bound_str, generic_params)?;
     let syn_bound: syn::TypeParamBound =
         syn::parse_str(bound_str).map_err(|e| format!("syn parse error for `{bound_str}`: {e}"))?;
-    reject_anonymous_const_blocks_in_bound(&syn_bound)?;
     if preserve_prelude_spelling {
+        reject_anonymous_const_blocks_in_bound(&syn_bound)?;
+        reject_unsupported_const_bound_modifier(bound_str)?;
+        reject_raw_identifiers_in_bound(&syn_bound)?;
         reject_unsupported_type_macros_in_bound(&syn_bound)?;
         reject_unsupported_array_lengths_in_bound(&syn_bound)?;
         reject_unsupported_const_arguments_in_bound(&syn_bound)?;
@@ -352,7 +357,7 @@ struct AnonymousConstBlockVisitor {
 
 impl<'ast> Visit<'ast> for AnonymousConstBlockVisitor {
     fn visit_expr_block(&mut self, node: &'ast syn::ExprBlock) {
-        self.found = true;
+        self.found |= simple_const_block_expr(node).is_none();
         syn::visit::visit_expr_block(self, node);
     }
 }
@@ -367,6 +372,33 @@ fn reject_anonymous_const_blocks_in_bound(syntax: &syn::TypeParamBound) -> Resul
     let mut visitor = AnonymousConstBlockVisitor::default();
     visitor.visit_type_param_bound(syntax);
     reject_if_anonymous_const_block_found(visitor.found)
+}
+
+/// Raw identifiers are normalized by `syn::Ident::to_string`, while rustdoc
+/// also exposes the normalized spelling.  The lexical path therefore rejects
+/// them at the boundary instead of silently comparing a lossy rendering.
+#[derive(Default)]
+struct RawIdentifierVisitor {
+    found: bool,
+}
+
+impl<'ast> Visit<'ast> for RawIdentifierVisitor {
+    fn visit_ident(&mut self, node: &'ast syn::Ident) {
+        self.found |= node.to_string().starts_with("r#");
+        syn::visit::visit_ident(self, node);
+    }
+}
+
+fn reject_raw_identifiers_in_type(syntax: &syn::Type) -> Result<(), String> {
+    let mut visitor = RawIdentifierVisitor::default();
+    visitor.visit_type(syntax);
+    reject_if_raw_identifier_found(visitor.found)
+}
+
+fn reject_raw_identifiers_in_bound(syntax: &syn::TypeParamBound) -> Result<(), String> {
+    let mut visitor = RawIdentifierVisitor::default();
+    visitor.visit_type_param_bound(syntax);
+    reject_if_raw_identifier_found(visitor.found)
 }
 
 /// Rejects type macros in lexical comparison paths. `syn` can identify the
@@ -497,32 +529,7 @@ impl<'ast> Visit<'ast> for UnsupportedConstArgumentVisitor {
 }
 
 fn is_supported_const_argument_expr(expr: &syn::Expr) -> bool {
-    match expr {
-        syn::Expr::Lit(lit) => {
-            matches!(
-                lit.lit,
-                syn::Lit::Int(_)
-                    | syn::Lit::Str(_)
-                    | syn::Lit::Bool(_)
-                    | syn::Lit::Char(_)
-                    | syn::Lit::Byte(_)
-            )
-        }
-        syn::Expr::Path(path) => {
-            path.qself.is_none()
-                && path.path.leading_colon.is_none()
-                && path
-                    .path
-                    .segments
-                    .iter()
-                    .all(|segment| matches!(segment.arguments, syn::PathArguments::None))
-        }
-        syn::Expr::Unary(unary) => {
-            matches!(unary.op, syn::UnOp::Neg(_))
-                && matches!(&*unary.expr, syn::Expr::Lit(lit) if matches!(lit.lit, syn::Lit::Int(_)))
-        }
-        _ => false,
-    }
+    is_simple_const_expr(expr)
 }
 
 fn reject_unsupported_const_arguments_in_type(syntax: &syn::Type) -> Result<(), String> {
@@ -566,6 +573,44 @@ fn reject_if_anonymous_const_block_found(found: bool) -> Result<(), String> {
     } else {
         Ok(())
     }
+}
+
+fn reject_if_raw_identifier_found(found: bool) -> Result<(), String> {
+    if found {
+        Err("raw identifiers are not supported by lexical type comparison".to_owned())
+    } else {
+        Ok(())
+    }
+}
+
+fn reject_unsupported_const_bound_modifier(bound_str: &str) -> Result<(), String> {
+    let scan_str = bound_str.strip_prefix("~const").map_or(bound_str, str::trim_start);
+    let tokens: TokenStream =
+        scan_str.parse().map_err(|e| format!("invalid bound token stream '{bound_str}': {e}"))?;
+    if contains_const_bound_modifier(tokens) {
+        Err("`[const]` bound modifiers are not supported by lexical type comparison".to_owned())
+    } else {
+        Ok(())
+    }
+}
+
+fn contains_const_bound_modifier(tokens: TokenStream) -> bool {
+    tokens.into_iter().any(|token| match token {
+        TokenTree::Ident(ident) if ident == "const" => true,
+        TokenTree::Group(group) => {
+            (group.delimiter() == Delimiter::Bracket && is_const_modifier_tokens(group.stream()))
+                || contains_const_bound_modifier(group.stream())
+        }
+        _ => false,
+    })
+}
+
+fn is_const_modifier_tokens(tokens: TokenStream) -> bool {
+    let mut iter = tokens.into_iter();
+    matches!(
+        (iter.next(), iter.next()),
+        (Some(TokenTree::Ident(ident)), None) if ident == "const"
+    )
 }
 
 #[cfg(test)]
@@ -620,5 +665,13 @@ mod tests {
             &["Bool"],
         );
         assert_eq!(parsed, Ok(Type::Primitive("bool".to_owned())));
+    }
+
+    #[test]
+    fn test_const_bound_modifier_detection_is_token_wise() {
+        for input in ["[const] Clone", "[ const ] Clone", "for<'a> [const] Clone"] {
+            assert!(super::reject_unsupported_const_bound_modifier(input).is_err());
+        }
+        assert!(super::reject_unsupported_const_bound_modifier("[constant] Clone").is_ok());
     }
 }

@@ -13,24 +13,15 @@ use super::helpers::{
     syn_expr_to_string, unresolved_type,
 };
 
-// ---------------------------------------------------------------------------
-// ParseCtx definition
-// ---------------------------------------------------------------------------
-
 pub(super) struct ParseCtx<'a, F, G> {
     pub(super) resolve_local: &'a F,
     pub(super) external_crate_ids: &'a HashMap<String, u32>,
     pub(super) emit_external_crate: &'a mut G,
     pub(super) std_crate_id: u32,
-    /// Generic type parameter names resolved as `Type::Generic`.
     pub(super) generic_params: &'a [&'a str],
     pub(super) preserve_prelude_spelling: bool,
 }
-/// Returns the catalogue/rustdoc spelling for a parsed identifier.
-///
-/// `syn` retains the `r#` marker on raw identifiers (`r#type`), while rustdoc
-/// exposes the normalized spelling (`type`).  The catalogue stores the latter,
-/// so every identifier that crosses this parser boundary is canonicalized.
+/// Returns the normalized catalogue/rustdoc spelling for a parsed identifier.
 pub(super) fn normalized_ident_name(ident: &syn::Ident) -> String {
     let name = ident.to_string();
     name.strip_prefix("r#").unwrap_or(&name).to_owned()
@@ -55,13 +46,9 @@ where
             syn::Type::Ptr(type_ptr) => self.convert_ptr(type_ptr),
             syn::Type::Never(_) => Type::Primitive("never".to_string()),
             syn::Type::Infer(_) => Type::Infer,
-            // `dyn Trait + Trait2` — encode each bound as a `PolyTrait` entry.
             syn::Type::TraitObject(trait_obj) => self.convert_dyn_trait(trait_obj),
-            // `impl Trait + Trait2` — encode each bound as a `GenericBound`.
             syn::Type::ImplTrait(impl_trait) => self.convert_impl_trait(impl_trait),
-            // `(T)` — parenthesized type; unwrap to the inner type.
             syn::Type::Paren(paren) => self.convert_type(&paren.elem),
-            // `fn(A, B) -> C` — function pointer; encode with minimal signature.
             syn::Type::BareFn(bare_fn) => self.convert_bare_fn(bare_fn),
             _ => unresolved_type("<unknown_type>"),
         }
@@ -74,21 +61,9 @@ where
             return unresolved_type("<empty_path>");
         }
 
-        // Qualified path (`<T as Trait>::Assoc`) — build a full `Type::QualifiedPath`.
-        //
-        // ADR 2026-06-18-0822 D1 needs this faithful `QualifiedPath` shape so
-        // GAT projections compare against rustdoc instead of collapsing to an
-        // unresolved marker. `syn::QSelf.position` is the index into
-        // `type_path.path.segments` that marks the boundary between the trait
-        // prefix and the associated-item name:
-        //   - `segments[..position]` → trait path (may be empty when position == 0)
-        //   - `segments[position]`   → associated item name + its generic args
         if let Some(qself) = type_path.qself.as_ref() {
-            // 1. Recursively convert the self type.
             let self_type = Box::new(self.convert_type(&qself.ty));
 
-            // 2. Build the trait path from the prefix segments (before `position`).
-            //    When position == 0 there is no trait prefix, so trait_ is None.
             let trait_ = if qself.position == 0 {
                 None
             } else {
@@ -99,7 +74,6 @@ where
                 Some(self.resolve_trait_bound_path(&trait_syn_path))
             };
 
-            // 3. The associated-item segment (at `position`): name + generic args.
             let Some(assoc_seg) = segments.get(qself.position).copied() else {
                 return unresolved_type("<qualified_path_missing_assoc>");
             };
@@ -112,10 +86,6 @@ where
             return Type::QualifiedPath { name, self_type, trait_, args: args.map(Box::new) };
         }
 
-        // A projection rooted at a declared generic (`T::Item`) is not a
-        // crate-prefixed path.  Rustdoc represents it as a QualifiedPath with
-        // a Generic self type and no explicit trait; handle it before the
-        // external-crate path branch so `T` is never registered as a crate.
         if type_path.path.leading_colon.is_none() && segments.len() > 1 {
             let Some(first_seg) = segments.first() else {
                 return unresolved_type("<empty_generic_projection>");
@@ -140,18 +110,16 @@ where
             }
         }
 
-        // Multi-segment: first segment is a crate name prefix.
         if segments.len() > 1 {
             return self.convert_crate_prefixed_path(type_path);
         }
 
-        // Single-segment. We already checked `segments.is_empty()` above.
         let Some(first_seg) = segments.first() else {
             return unresolved_type("<empty_path>");
         };
         let name = normalized_ident_name(&first_seg.ident);
-        // A declaration's generic parameters shadow same-spelled catalogue types,
-        // matching Rust name resolution and rustdoc's `Type::Generic` output.
+        let path_name =
+            if type_path.path.leading_colon.is_some() { format!("::{name}") } else { name.clone() };
         if self.generic_params.iter().any(|generic| *generic == name) {
             if !matches!(&first_seg.arguments, syn::PathArguments::None) {
                 return unresolved_type("<generic_with_arguments>");
@@ -162,39 +130,35 @@ where
         if let Some(local_id) = (self.resolve_local)(&name) {
             let generic_args = self.convert_generic_args(&first_seg.arguments);
             return Type::ResolvedPath(Path {
-                path: name,
+                path: path_name,
                 id: local_id,
                 args: generic_args.map(Box::new),
             });
         }
 
-        // 1. Rust primitive?
         if PRIMITIVE_TYPES.contains(&name.as_str()) {
             return Type::Primitive(name);
         }
 
-        // 2. Unit type `()`?  (expressed as empty-path in some syn versions)
         if name == "()" {
             return Type::Tuple(vec![]);
         }
 
-        // 4. `Self` keyword — represents the implementing type. Encoded as a
-        //    sentinel `ResolvedPath` with `Id(0)` (root module placeholder).
-        //    Callers that need to remap `Self` to a concrete type do so after
-        //    codec time.
         if name == "Self" {
-            return Type::ResolvedPath(Path { path: "Self".to_string(), id: Id(0), args: None });
+            return Type::ResolvedPath(Path { path: path_name, id: Id(0), args: None });
         }
 
-        // 5. std prelude allowlist?
-        //
-        // Use the canonical `std::module::TypeName` path for ordinary parsing.
         if STD_PRELUDE_TYPES.contains(&name.as_str()) {
             let generic_args = self.convert_generic_args(&first_seg.arguments);
             let canonical = if self.preserve_prelude_spelling {
                 name.clone()
             } else {
                 std_canonical_path(&name)
+            };
+            let canonical = if type_path.path.leading_colon.is_some() {
+                format!("::{canonical}")
+            } else {
+                canonical
             };
             return Type::ResolvedPath(Path {
                 path: canonical,
@@ -203,10 +167,9 @@ where
             });
         }
 
-        // 6. Unresolved marker.
         let generic_args = self.convert_generic_args(&first_seg.arguments);
         Type::ResolvedPath(Path {
-            path: name,
+            path: path_name,
             id: Id(UNRESOLVED_CRATE_ID),
             args: generic_args.map(Box::new),
         })
@@ -566,8 +529,8 @@ where
                     binding: AssocItemConstraintKind::Equality(rustdoc_types::Term::Constant(
                         rustdoc_types::Constant {
                             expr: expr_str.clone(),
-                            value: Some(expr_str),
-                            is_literal: is_literal_const_expr(&assoc_const.value),
+                            value: None,
+                            is_literal: false,
                         },
                     )),
                 });
@@ -637,8 +600,7 @@ where
 /// `None` (no `extern` keyword) → `Abi::Rust`.
 /// `extern` without a name string → `Abi::C { unwind: false }` (C is the
 /// implicit ABI for bare `extern fn`).
-/// Known ABI name strings are mapped to their specific variants; any other
-/// string falls through to `Abi::Other(name)`.
+/// Known ABI name strings map to specific variants; other strings use `Abi::Other`.
 pub(super) fn syn_abi_to_rustdoc_abi(abi: Option<&syn::Abi>) -> rustdoc_types::Abi {
     let Some(abi) = abi else {
         return rustdoc_types::Abi::Rust;
@@ -649,6 +611,7 @@ pub(super) fn syn_abi_to_rustdoc_abi(abi: Option<&syn::Abi>) -> rustdoc_types::A
         None => return rustdoc_types::Abi::C { unwind: false },
     };
     match name.as_str() {
+        "Rust" => rustdoc_types::Abi::Rust,
         "C" => rustdoc_types::Abi::C { unwind: false },
         "C-unwind" => rustdoc_types::Abi::C { unwind: true },
         "cdecl" => rustdoc_types::Abi::Cdecl { unwind: false },
