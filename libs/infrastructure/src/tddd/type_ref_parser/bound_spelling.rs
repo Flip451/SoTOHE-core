@@ -187,6 +187,56 @@ fn reject_if_redundant_paren_found(found: bool) -> Result<(), String> {
     }
 }
 
+/// A trait object collapses into a trait list plus a separate lifetime field
+/// in both the converted and rustdoc representations, so `dyn 'static + Tr`
+/// and `dyn Tr + 'static` would compare equal despite differing bound order.
+/// Only the representable spelling — every lifetime bound written after the
+/// trait bounds — is accepted; a lifetime bound preceding a trait bound is
+/// rejected. `impl Trait` keeps its ordered bound list and is unaffected.
+#[derive(Default)]
+struct NonFinalDynLifetimeVisitor {
+    found: bool,
+}
+
+impl<'ast> Visit<'ast> for NonFinalDynLifetimeVisitor {
+    fn visit_type_trait_object(&mut self, node: &'ast syn::TypeTraitObject) {
+        let mut seen_lifetime = false;
+        for bound in &node.bounds {
+            if matches!(bound, syn::TypeParamBound::Lifetime(_)) {
+                seen_lifetime = true;
+            } else if seen_lifetime {
+                self.found = true;
+            }
+        }
+        syn::visit::visit_type_trait_object(self, node);
+    }
+}
+
+pub(super) fn reject_non_final_dyn_lifetimes_in_bound(
+    syntax: &syn::TypeParamBound,
+) -> Result<(), String> {
+    let mut visitor = NonFinalDynLifetimeVisitor::default();
+    visitor.visit_type_param_bound(syntax);
+    reject_if_non_final_dyn_lifetime_found(visitor.found)
+}
+
+pub(super) fn reject_non_final_dyn_lifetimes_in_type(syntax: &syn::Type) -> Result<(), String> {
+    let mut visitor = NonFinalDynLifetimeVisitor::default();
+    visitor.visit_type(syntax);
+    reject_if_non_final_dyn_lifetime_found(visitor.found)
+}
+
+fn reject_if_non_final_dyn_lifetime_found(found: bool) -> Result<(), String> {
+    if found {
+        Err(
+            "trait-object lifetime bounds written before a trait bound are not supported by lexical type comparison"
+                .to_owned(),
+        )
+    } else {
+        Ok(())
+    }
+}
+
 /// Precise-capture syntax (`use<'a, T>`) is only valid on `impl Trait`
 /// opaque types; Rust rejects it as a generic-parameter or where-predicate
 /// bound, so admitting it would record an alias contract no implementation

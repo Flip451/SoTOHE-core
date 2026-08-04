@@ -6,7 +6,8 @@ use rustdoc_types::{GenericBound, Id, Path, TraitBoundModifier, Type};
 use syn::visit::Visit;
 
 use super::bound_spelling::{
-    reject_deterministically_non_trait_bound, reject_parenthesized_bounds_in_bound,
+    reject_deterministically_non_trait_bound, reject_non_final_dyn_lifetimes_in_bound,
+    reject_non_final_dyn_lifetimes_in_type, reject_parenthesized_bounds_in_bound,
     reject_precise_capture_bound, reject_redundant_parenthesized_types_in_bound,
     reject_redundant_parenthesized_types_in_type, reject_turbofish_generic_arguments_in_bound,
     reject_unsupported_const_bound_modifier,
@@ -114,6 +115,7 @@ where
         .map_err(|e| format!("syn parse error for `{type_ref_str}`: {e}"))?;
     if preserve_prelude_spelling {
         reject_redundant_parenthesized_types_in_type(&syn_type)?;
+        reject_non_final_dyn_lifetimes_in_type(&syn_type)?;
         reject_anonymous_const_blocks_in_type(&syn_type)?;
         reject_raw_identifiers_in_type(&syn_type)?;
         reject_unsupported_type_macros_in_type(&syn_type)?;
@@ -161,6 +163,7 @@ pub(crate) fn validate_lexical_type_ref(
     let syntax: syn::Type = syn::parse_str(type_ref_str)
         .map_err(|e| format!("invalid type syntax '{type_ref_str}': {e}"))?;
     reject_redundant_parenthesized_types_in_type(&syntax)?;
+    reject_non_final_dyn_lifetimes_in_type(&syntax)?;
     reject_anonymous_const_blocks_in_type(&syntax)?;
     reject_raw_identifiers_in_type(&syntax)?;
     reject_unsupported_type_macros_in_type(&syntax)?;
@@ -246,6 +249,7 @@ pub(crate) fn validate_lexical_generic_bound(
     reject_turbofish_generic_arguments_in_bound(&syn_bound)?;
     reject_parenthesized_bounds_in_bound(&syn_bound)?;
     reject_redundant_parenthesized_types_in_bound(&syn_bound)?;
+    reject_non_final_dyn_lifetimes_in_bound(&syn_bound)?;
     reject_anonymous_const_blocks_in_bound(&syn_bound)?;
     reject_raw_identifiers_in_bound(&syn_bound)?;
     reject_unsupported_type_macros_in_bound(&syn_bound)?;
@@ -325,6 +329,7 @@ where
         reject_turbofish_generic_arguments_in_bound(&syn_bound)?;
         reject_parenthesized_bounds_in_bound(&syn_bound)?;
         reject_redundant_parenthesized_types_in_bound(&syn_bound)?;
+        reject_non_final_dyn_lifetimes_in_bound(&syn_bound)?;
         reject_anonymous_const_blocks_in_bound(&syn_bound)?;
         reject_unsupported_const_bound_modifier(bound_str)?;
         reject_raw_identifiers_in_bound(&syn_bound)?;

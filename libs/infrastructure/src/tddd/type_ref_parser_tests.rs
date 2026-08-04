@@ -648,6 +648,35 @@ fn test_validate_generic_bound_rejects_precise_capture() {
 }
 
 #[test]
+fn test_validate_generic_bound_rejects_non_final_dyn_lifetimes() {
+    for bound in ["Outer<dyn 'static + Tr>", "Outer<Box<dyn 'static + Tr>>"] {
+        assert!(
+            validate_lexical_generic_bound(bound, &[]).is_err(),
+            "a dyn lifetime written before a trait bound must be rejected: {bound}"
+        );
+    }
+    // The representable spelling — lifetime after the trait bounds — stays accepted.
+    for bound in ["Outer<dyn Tr + 'static>", "Outer<dyn Tr>"] {
+        assert!(
+            validate_lexical_generic_bound(bound, &[]).is_ok(),
+            "the canonical dyn spelling must stay accepted: {bound}"
+        );
+    }
+    assert!(validate_lexical_type_ref("Outer<dyn 'static + Tr>", &["T"]).is_err());
+    assert!(validate_lexical_type_ref("Outer<dyn Tr + 'static>", &["T"]).is_ok());
+
+    let result = parse_generic_bound_with_generics_preserving_spelling(
+        "Outer<dyn 'static + Tr>",
+        &no_local,
+        100,
+        &HashMap::new(),
+        &mut |_| 101,
+        &[],
+    );
+    assert!(result.is_err(), "a non-final dyn lifetime must fail closed in the preserving encoder");
+}
+
+#[test]
 fn test_parse_generic_bound_generic_argument_shadows_catalogue_type() {
     let bound = parse_generic_bound_with_generics_preserving_spelling(
         "Into<T>",
