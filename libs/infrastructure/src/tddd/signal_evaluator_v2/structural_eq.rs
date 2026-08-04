@@ -4,13 +4,15 @@
 //! parameter binding names.  Used in Phase 2 to decide whether S-side and C-side
 //! items are identical (determining the `Match` / `Mismatch` sub-region).
 //!
-//! Generics, function, and trait helpers live in the sibling `generics_eq` module.
+//! Generics, function, and trait helpers live in the sibling `generics_eq`
+//! module; the alias lexical-signature serialization lives in the sibling
+//! `alias_lexical` module.
 
 use std::collections::{BTreeMap, BTreeSet, HashMap};
 
 use rustdoc_types::{Id, Item, ItemEnum};
-use serde::Serialize;
 
+use super::alias_lexical::type_alias_lexical_signature;
 use super::format::{format_type, format_type_strip_type_params};
 use super::generics_eq::{
     fn_sigs_structurally_equal, generics_structurally_equal, traits_structurally_equal,
@@ -276,150 +278,6 @@ fn type_alias_non_parameter_predicates(
         })
         .map(type_alias_lexical_signature)
         .collect()
-}
-
-/// Encodes a rustdoc declaration while excluding graph-local `Id` values.
-///
-/// Alias generics are a lexical document contract: paths and nested generic
-/// arguments must remain verbatim.  Rustdoc identifiers describe the graph
-/// instance, not the declaration, so they are removed before comparison.
-fn type_alias_lexical_signature<T: Serialize>(value: &T) -> Result<String, serde_json::Error> {
-    let mut json = serde_json::to_value(value)?;
-    remove_rustdoc_ids(&mut json);
-    normalize_ambiguous_generic_arguments(&mut json);
-    serde_json::to_string(&json)
-}
-
-fn normalize_ambiguous_generic_arguments(value: &mut serde_json::Value) {
-    match value {
-        serde_json::Value::Array(values) => {
-            for value in values {
-                normalize_ambiguous_generic_arguments(value);
-            }
-        }
-        serde_json::Value::Object(values) => {
-            if let Some(serde_json::Value::Array(args)) = values.get_mut("args") {
-                for arg in args {
-                    normalize_generic_argument_lexeme(arg);
-                }
-            }
-            if let Some(serde_json::Value::Array(constraints)) = values.get_mut("constraints") {
-                for constraint in constraints {
-                    if let Some(binding) =
-                        constraint.as_object_mut().and_then(|object| object.get_mut("binding"))
-                    {
-                        normalize_term_lexeme(binding);
-                    }
-                }
-            }
-            for value in values.values_mut() {
-                normalize_ambiguous_generic_arguments(value);
-            }
-        }
-        serde_json::Value::Null
-        | serde_json::Value::Bool(_)
-        | serde_json::Value::Number(_)
-        | serde_json::Value::String(_) => {}
-    }
-}
-
-fn normalize_generic_argument_lexeme(value: &mut serde_json::Value) {
-    let Some(object) = value.as_object_mut() else {
-        return;
-    };
-    if object.len() != 1 {
-        return;
-    }
-    if let Some(type_value) = object.remove("type") {
-        if let Some(lexeme) = bare_type_lexeme(&type_value) {
-            *value = serde_json::json!({ "lexical": lexeme });
-        } else {
-            object.insert("type".to_owned(), type_value);
-        }
-    } else if let Some(const_value) = object.remove("const") {
-        if let Some(lexeme) = bare_const_lexeme(&const_value) {
-            *value = serde_json::json!({ "lexical": lexeme });
-        } else {
-            object.insert("const".to_owned(), const_value);
-        }
-    }
-}
-
-fn normalize_term_lexeme(value: &mut serde_json::Value) {
-    let Some(object) = value.as_object_mut() else {
-        return;
-    };
-    if let Some(term) = object.get_mut("equality") {
-        normalize_term_lexeme(term);
-        return;
-    }
-    if object.len() != 1 {
-        return;
-    }
-    if let Some(type_value) = object.remove("type") {
-        if let Some(lexeme) = bare_type_lexeme(&type_value) {
-            *value = serde_json::json!({ "lexical": lexeme });
-        } else {
-            object.insert("type".to_owned(), type_value);
-        }
-    } else if let Some(const_value) = object.remove("constant") {
-        if let Some(lexeme) = bare_const_lexeme(&const_value) {
-            *value = serde_json::json!({ "lexical": lexeme });
-        } else {
-            object.insert("constant".to_owned(), const_value);
-        }
-    }
-}
-
-fn bare_type_lexeme(value: &serde_json::Value) -> Option<String> {
-    let object = value.as_object()?;
-    if let Some(name) = object.get("generic").and_then(serde_json::Value::as_str) {
-        return Some(name.to_owned());
-    }
-    if let Some(name) = object.get("primitive").and_then(serde_json::Value::as_str) {
-        return Some(name.to_owned());
-    }
-    let path = object.get("resolved_path")?.as_object()?;
-    let args = path.get("args");
-    if args.is_some_and(|args| !args.is_null()) {
-        return None;
-    }
-    path.get("path").and_then(serde_json::Value::as_str).map(ToOwned::to_owned)
-}
-
-fn bare_const_lexeme(value: &serde_json::Value) -> Option<String> {
-    let expr = value.as_object()?.get("expr")?.as_str()?;
-    let mut segments = expr.strip_prefix("::").unwrap_or(expr).split("::");
-    if segments.next().is_none()
-        || !segments.all(|segment| {
-            let mut chars = segment.chars();
-            matches!(chars.next(), Some(first) if first == '_' || first.is_ascii_alphabetic())
-                && chars.all(|ch| ch == '_' || ch.is_ascii_alphanumeric())
-        })
-    {
-        return None;
-    }
-    Some(expr.to_owned())
-}
-
-fn remove_rustdoc_ids(value: &mut serde_json::Value) {
-    match value {
-        serde_json::Value::Array(values) => {
-            for value in values {
-                remove_rustdoc_ids(value);
-            }
-        }
-        serde_json::Value::Object(values) => {
-            values.remove("id");
-            for value in values.values_mut() {
-                remove_rustdoc_ids(value);
-            }
-        }
-        serde_json::Value::Null
-        | serde_json::Value::Bool(_)
-        | serde_json::Value::Number(_)
-        | serde_json::Value::String(_) => {}
-    }
 }
 
 /// Builds a merged `method_name → sig_str` map for all inherent impl blocks
@@ -695,15 +553,12 @@ mod tests {
     use std::collections::HashMap;
 
     use rustdoc_types::{
-        AssocItemConstraint, AssocItemConstraintKind, Constant, FunctionHeader, FunctionSignature,
-        GenericArg, GenericArgs, GenericBound, GenericParamDef, GenericParamDefKind, Generics, Id,
-        Impl, Item, ItemEnum, Path, Struct, StructKind, Term, TraitBoundModifier, Type, TypeAlias,
-        Visibility,
+        FunctionHeader, FunctionSignature, GenericArg, GenericArgs, GenericBound, GenericParamDef,
+        GenericParamDefKind, Generics, Id, Impl, Item, ItemEnum, Path, Struct, StructKind,
+        TraitBoundModifier, Type, TypeAlias, Visibility,
     };
 
-    use super::{
-        items_structurally_equal, structs_structurally_equal, type_alias_lexical_signature,
-    };
+    use super::{items_structurally_equal, structs_structurally_equal};
     use crate::tddd::signal_evaluator_v2::generics_eq::make_simple_trait_bound as make_trait_bound;
 
     fn make_struct_field_item(id: Id, ty_str: &str) -> Item {
@@ -719,58 +574,6 @@ mod tests {
             deprecation: None,
             inner: ItemEnum::StructField(Type::Primitive(ty_str.to_owned())),
         }
-    }
-
-    #[test]
-    fn test_type_alias_lexical_signature_normalizes_bare_type_const_arguments() {
-        let type_args = GenericArgs::AngleBracketed {
-            args: vec![GenericArg::Type(Type::ResolvedPath(Path {
-                path: "N".to_owned(),
-                id: Id(1),
-                args: None,
-            }))],
-            constraints: vec![],
-        };
-        let const_args = GenericArgs::AngleBracketed {
-            args: vec![GenericArg::Const(Constant {
-                expr: "N".to_owned(),
-                value: None,
-                is_literal: false,
-            })],
-            constraints: vec![],
-        };
-        assert_eq!(
-            type_alias_lexical_signature(&type_args).unwrap(),
-            type_alias_lexical_signature(&const_args).unwrap()
-        );
-
-        let type_constraint =
-            GenericArgs::AngleBracketed {
-                args: vec![],
-                constraints: vec![AssocItemConstraint {
-                    name: "FLAG".to_owned(),
-                    args: None,
-                    binding: AssocItemConstraintKind::Equality(Term::Type(Type::ResolvedPath(
-                        Path { path: "N".to_owned(), id: Id(1), args: None },
-                    ))),
-                }],
-            };
-        let const_constraint = GenericArgs::AngleBracketed {
-            args: vec![],
-            constraints: vec![AssocItemConstraint {
-                name: "FLAG".to_owned(),
-                args: None,
-                binding: AssocItemConstraintKind::Equality(Term::Constant(Constant {
-                    expr: "N".to_owned(),
-                    value: None,
-                    is_literal: false,
-                })),
-            }],
-        };
-        assert_eq!(
-            type_alias_lexical_signature(&type_constraint).unwrap(),
-            type_alias_lexical_signature(&const_constraint).unwrap()
-        );
     }
 
     fn empty_generics() -> Generics {
@@ -1432,6 +1235,83 @@ mod tests {
                 "my_crate",
             ),
             "equivalent non-parameter predicates must ignore graph-local rustdoc IDs"
+        );
+    }
+
+    /// Builds a `Fn(&<lifetime> str)` trait bound whose reference input carries the
+    /// given lifetime spelling (`None` models rustdoc's elided representation).
+    fn make_fn_bound_with_input_lifetime(lifetime: Option<&str>) -> GenericBound {
+        GenericBound::TraitBound {
+            trait_: Path {
+                path: "Fn".to_string(),
+                id: Id(0),
+                args: Some(Box::new(GenericArgs::Parenthesized {
+                    inputs: vec![Type::BorrowedRef {
+                        lifetime: lifetime.map(ToOwned::to_owned),
+                        is_mutable: false,
+                        type_: Box::new(Type::Primitive("str".to_string())),
+                    }],
+                    output: None,
+                })),
+            },
+            generic_params: vec![],
+            modifier: TraitBoundModifier::None,
+        }
+    }
+
+    /// A catalogue-side `Fn(&'_ str)` bound must compare equal to rustdoc's
+    /// representation of the same declaration: rustdoc treats the placeholder
+    /// reference lifetime as elided and emits `lifetime: null`.
+    #[test]
+    fn test_type_alias_placeholder_reference_lifetime_bound_compares_equal() {
+        let a_alias = make_type_alias_item(
+            Id(10),
+            Type::Primitive("String".to_string()),
+            vec![make_type_param("T", vec![make_fn_bound_with_input_lifetime(Some("'_"))])],
+        );
+        let b_alias = make_type_alias_item(
+            Id(20),
+            Type::Primitive("String".to_string()),
+            vec![make_type_param("T", vec![make_fn_bound_with_input_lifetime(None)])],
+        );
+
+        assert!(
+            items_structurally_equal(
+                &a_alias,
+                &b_alias,
+                &HashMap::new(),
+                &HashMap::new(),
+                "my_crate",
+            ),
+            "a placeholder `'_` reference lifetime must normalize to rustdoc's elided \
+             representation"
+        );
+    }
+
+    /// Named reference lifetimes stay lexical: only the `'_` placeholder is
+    /// equivalent to rustdoc's elision.
+    #[test]
+    fn test_type_alias_named_reference_lifetime_bound_difference_is_mismatch() {
+        let a_alias = make_type_alias_item(
+            Id(10),
+            Type::Primitive("String".to_string()),
+            vec![make_type_param("T", vec![make_fn_bound_with_input_lifetime(Some("'a"))])],
+        );
+        let b_alias = make_type_alias_item(
+            Id(20),
+            Type::Primitive("String".to_string()),
+            vec![make_type_param("T", vec![make_fn_bound_with_input_lifetime(None)])],
+        );
+
+        assert!(
+            !items_structurally_equal(
+                &a_alias,
+                &b_alias,
+                &HashMap::new(),
+                &HashMap::new(),
+                "my_crate",
+            ),
+            "a named reference lifetime must not be treated as rustdoc's elided spelling"
         );
     }
 

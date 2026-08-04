@@ -60,6 +60,7 @@ use crate::schema_export::{RustdocTargetResolution, resolve_rustdoc_root_name};
 // Sub-modules
 // ---------------------------------------------------------------------------
 
+pub(super) mod alias_lexical;
 pub(super) mod collect_refs;
 pub(super) mod external_crates;
 pub(crate) mod format;
