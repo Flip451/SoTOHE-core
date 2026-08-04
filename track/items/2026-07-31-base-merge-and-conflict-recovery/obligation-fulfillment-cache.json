@@ -8711,7 +8711,7 @@
       },
       "key": {
         "anchor_text_hash": "04ee06225d2dde855bd2ce4384bd448922a1ef5d7cb6550b5f702ec87f32e137",
-        "bound_tests_set_hash": "d134dc79e6731dee3b1a90da2bdfd2ad97a5bf7064ccd045d65c7ddd71830e3e",
+        "bound_tests_set_hash": "212ec9cb72f5383dd7d8c973b7f50b369d9a5b0ea27294f875bf6c16ee898ec0",
         "declaration_hash": "a141e5064fc2d4ea1ab6b859fe37df1ea49e94bd34639ae1cf6ab5b2817321be"
       },
       "obligation_id": {
@@ -8720,7 +8720,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(workflow.contains(\"Step 1: Confirm the recovery context\")); assert!(workflow.contains(\"Step 2: Resolve the conflict\")); assert!(workflow.contains(\"Step 3: Verify and review\")); assert!(workflow.contains(\"Step 4: Guarded commit\")); assert!(claude_adapter.contains(\"Operational SSoT: `.harness/workflows/track/recover.md`\")); assert!(claude_adapter.contains(\"free of recovery sequence\")); assert!(codex_adapter.contains(\"canonical recover workflow is `.harness/workflows/track/recover.md`\")); assert!(codex_adapter.contains(\"must not duplicate its state machine\"));",
+        "citation": "assert!(claude_adapter.contains(\"Operational SSoT: `.harness/workflows/track/recover.md`\")); assert!(claude_adapter.contains(\"free of recovery sequence\")); assert!(codex_adapter.contains(\"canonical recover workflow is `.harness/workflows/track/recover.md`\")); assert!(codex_adapter.contains(\"must not duplicate its state machine\"));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -8835,7 +8835,7 @@
       },
       "key": {
         "anchor_text_hash": "ae93f16b8b5af6d307d274a5c694b4ac052045cff1123092ed79af420e71bad1",
-        "bound_tests_set_hash": "d134dc79e6731dee3b1a90da2bdfd2ad97a5bf7064ccd045d65c7ddd71830e3e",
+        "bound_tests_set_hash": "212ec9cb72f5383dd7d8c973b7f50b369d9a5b0ea27294f875bf6c16ee898ec0",
         "declaration_hash": "a141e5064fc2d4ea1ab6b859fe37df1ea49e94bd34639ae1cf6ab5b2817321be"
       },
       "obligation_id": {
@@ -8844,7 +8844,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(workflow.contains(\"Step 2: Resolve the conflict\"));\n        assert!(workflow.contains(\"Step 3: Verify and review\"));\n        assert!(workflow.contains(\"Step 4: Guarded commit\"));",
+        "citation": "assert_eq!(\n            outcome.stderr.as_deref(),\n            Some(\n                \"base merge conflicted; continue with the recover workflow (/track:recover on Claude Code, $track-recover on Codex)\"\n            )\n        );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"

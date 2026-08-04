@@ -90,6 +90,9 @@ track/items/**/.commit_hash.tmp
 
 # --- Base-merge sync stamp (local operational state written by clean-merge cleanup) ---
 track/items/**/.sync-base.json
+# The atomic writer's temporary record can survive a crash mid-write; it must never be
+# staged by guarded add-all.
+track/items/**/.tmp-.sync-base.json-*
 # Detached cleanup worktrees are removed by the cleanup run; a leftover from a failed
 # removal must never be staged as an embedded-repository gitlink by guarded add-all.
 /.sotp-base-merge-worktree-*/

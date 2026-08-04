@@ -208,7 +208,7 @@ fn render_base_merge_result(
             CommandOutcome::success(Some("base merge completed".to_owned()))
         }
         Ok(BaseMergeOutcome::Conflicted) => CommandOutcome::failure(Some(
-            "base merge conflicted; continue with /track:recover".to_owned(),
+            "base merge conflicted; continue with the recover workflow (/track:recover on Claude Code, $track-recover on Codex)".to_owned(),
         )),
         Err(error) => CommandOutcome::failure(Some(format!("base merge failed: {error}"))),
     }
@@ -675,7 +675,9 @@ mod tests {
         assert_eq!(outcome.exit_code, 1);
         assert_eq!(
             outcome.stderr.as_deref(),
-            Some("base merge conflicted; continue with /track:recover")
+            Some(
+                "base merge conflicted; continue with the recover workflow (/track:recover on Claude Code, $track-recover on Codex)"
+            )
         );
     }
 
@@ -835,7 +837,9 @@ mod tests {
         assert_eq!(outcome.exit_code, 1);
         assert_eq!(
             outcome.stderr.as_deref(),
-            Some("base merge conflicted; continue with /track:recover")
+            Some(
+                "base merge conflicted; continue with the recover workflow (/track:recover on Claude Code, $track-recover on Codex)"
+            )
         );
         assert_ne!(outcome.stdout.as_deref(), Some("base merge completed"));
 
