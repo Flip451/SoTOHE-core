@@ -4,12 +4,15 @@
 //! parameter binding names.  Used in Phase 2 to decide whether S-side and C-side
 //! items are identical (determining the `Match` / `Mismatch` sub-region).
 //!
-//! Generics, function, and trait helpers live in the sibling `generics_eq` module.
+//! Generics, function, and trait helpers live in the sibling `generics_eq`
+//! module; the alias lexical-signature serialization lives in the sibling
+//! `alias_lexical` module.
 
 use std::collections::{BTreeMap, BTreeSet, HashMap};
 
 use rustdoc_types::{Id, Item, ItemEnum};
 
+use super::alias_lexical::type_alias_lexical_signature;
 use super::format::{format_type, format_type_strip_type_params};
 use super::generics_eq::{
     fn_sigs_structurally_equal, generics_structurally_equal, traits_structurally_equal,
@@ -45,7 +48,7 @@ pub(super) fn items_structurally_equal(
         }
         (ItemEnum::TypeAlias(ta), ItemEnum::TypeAlias(tb)) => {
             format_type(&ta.type_) == format_type(&tb.type_)
-                && generics_structurally_equal(&ta.generics, &tb.generics)
+                && type_alias_generics_lexically_equal(&ta.generics, &tb.generics)
         }
         (ItemEnum::Trait(ta), ItemEnum::Trait(tb)) => {
             traits_structurally_equal(ta, tb, a_index, b_index)
@@ -152,6 +155,129 @@ pub(super) fn items_structurally_equal(
         }
         _ => false,
     }
+}
+
+/// Compares type-alias generics as the catalogue declares them.
+///
+/// Function, trait, and impl generics use the name-independent where-form
+/// comparison because their bindings are structural. Alias declarations are a
+/// document-level contract instead: parameter names, parameter order, and
+/// bound order are all observable. The catalogue encoder places inline bounds
+/// into `where_predicates`, while rustdoc may retain them on the parameter, so
+/// this helper preserves their order while accepting those equivalent storage
+/// locations.
+fn type_alias_generics_lexically_equal(
+    a: &rustdoc_types::Generics,
+    b: &rustdoc_types::Generics,
+) -> bool {
+    if a.params.len() != b.params.len()
+        || !a
+            .params
+            .iter()
+            .zip(&b.params)
+            .all(|(left, right)| type_alias_param_lexically_equal(left, right))
+    {
+        return false;
+    }
+
+    let parameter_names: BTreeSet<&str> =
+        a.params.iter().map(|param| param.name.as_str()).collect();
+    for (left, right) in a.params.iter().zip(&b.params) {
+        let (Ok(left_bounds), Ok(right_bounds)) = (
+            type_alias_bounds_for_parameter(a, &left.name),
+            type_alias_bounds_for_parameter(b, &right.name),
+        ) else {
+            return false;
+        };
+        if left_bounds != right_bounds {
+            return false;
+        }
+    }
+
+    matches!(
+        (
+            type_alias_non_parameter_predicates(a, &parameter_names),
+            type_alias_non_parameter_predicates(b, &parameter_names),
+        ),
+        (Ok(left), Ok(right)) if left == right
+    )
+}
+
+fn type_alias_param_lexically_equal(
+    a: &rustdoc_types::GenericParamDef,
+    b: &rustdoc_types::GenericParamDef,
+) -> bool {
+    use rustdoc_types::GenericParamDefKind;
+
+    if a.name != b.name {
+        return false;
+    }
+    match (&a.kind, &b.kind) {
+        (
+            GenericParamDefKind::Type { default: a_default, is_synthetic: a_synthetic, .. },
+            GenericParamDefKind::Type { default: b_default, is_synthetic: b_synthetic, .. },
+        ) => {
+            a_synthetic == b_synthetic
+                && a_default.as_ref().map(format_type) == b_default.as_ref().map(format_type)
+        }
+        (
+            GenericParamDefKind::Const { type_: a_type, default: a_default },
+            GenericParamDefKind::Const { type_: b_type, default: b_default },
+        ) => format_type(a_type) == format_type(b_type) && a_default == b_default,
+        (
+            GenericParamDefKind::Lifetime { outlives: a_outlives },
+            GenericParamDefKind::Lifetime { outlives: b_outlives },
+        ) => a_outlives == b_outlives,
+        _ => false,
+    }
+}
+
+fn type_alias_bounds_for_parameter(
+    generics: &rustdoc_types::Generics,
+    name: &str,
+) -> Result<Vec<String>, serde_json::Error> {
+    use rustdoc_types::{GenericParamDefKind, Type, WherePredicate};
+
+    let inline_bounds = generics
+        .params
+        .iter()
+        .find(|param| param.name == name)
+        .and_then(|param| match &param.kind {
+            GenericParamDefKind::Type { bounds, .. } => Some(bounds),
+            GenericParamDefKind::Lifetime { .. } | GenericParamDefKind::Const { .. } => None,
+        })
+        .into_iter()
+        .flatten()
+        .map(type_alias_lexical_signature);
+    let where_bounds =
+        generics.where_predicates.iter().filter_map(|predicate| match predicate {
+            WherePredicate::BoundPredicate {
+                type_: Type::Generic(predicate_name), bounds, ..
+            } if predicate_name == name => Some(bounds.iter().map(type_alias_lexical_signature)),
+            _ => None,
+        });
+
+    inline_bounds.chain(where_bounds.flatten()).collect()
+}
+
+fn type_alias_non_parameter_predicates(
+    generics: &rustdoc_types::Generics,
+    parameter_names: &BTreeSet<&str>,
+) -> Result<Vec<String>, serde_json::Error> {
+    use rustdoc_types::{Type, WherePredicate};
+
+    generics
+        .where_predicates
+        .iter()
+        .filter(|predicate| {
+            !matches!(
+                predicate,
+                WherePredicate::BoundPredicate { type_: Type::Generic(name), .. }
+                    if parameter_names.contains(name.as_str())
+            )
+        })
+        .map(type_alias_lexical_signature)
+        .collect()
 }
 
 /// Builds a merged `method_name → sig_str` map for all inherent impl blocks
@@ -427,9 +553,9 @@ mod tests {
     use std::collections::HashMap;
 
     use rustdoc_types::{
-        FunctionHeader, FunctionSignature, GenericArg, GenericArgs, GenericParamDef,
-        GenericParamDefKind, Generics, Id, Impl, Item, ItemEnum, Path, Struct, StructKind, Type,
-        Visibility,
+        FunctionHeader, FunctionSignature, GenericArg, GenericArgs, GenericBound, GenericParamDef,
+        GenericParamDefKind, Generics, Id, Impl, Item, ItemEnum, Path, Struct, StructKind,
+        TraitBoundModifier, Type, TypeAlias, Visibility,
     };
 
     use super::{items_structurally_equal, structs_structurally_equal};
@@ -868,6 +994,325 @@ mod tests {
             name: name.to_string(),
             kind: GenericParamDefKind::Type { bounds, default: None, is_synthetic: false },
         }
+    }
+
+    fn make_qualified_trait_bound(path: &str) -> GenericBound {
+        GenericBound::TraitBound {
+            trait_: Path { path: path.to_string(), id: Id(0), args: None },
+            generic_params: vec![],
+            modifier: TraitBoundModifier::None,
+        }
+    }
+
+    /// Builds a TypeAlias item with the target and ordered generic declaration supplied by
+    /// the caller.  Keeping the rustdoc item shape here makes the tests exercise the same
+    /// `items_structurally_equal` dispatch used by the evaluator rather than comparing
+    /// `Generics` in isolation.
+    fn make_type_alias_item(id: Id, target: Type, params: Vec<GenericParamDef>) -> Item {
+        make_type_alias_item_with_generics(
+            id,
+            target,
+            Generics { params, where_predicates: vec![] },
+        )
+    }
+
+    fn make_type_alias_item_with_generics(id: Id, target: Type, generics: Generics) -> Item {
+        make_item(id, ItemEnum::TypeAlias(TypeAlias { type_: target, generics }))
+    }
+
+    /// A TypeAlias carrying the same ordered parameter names and bound notation on both
+    /// sides must compare structurally equal.
+    #[test]
+    fn test_type_alias_same_ordered_generic_name_and_bound_notation_compares_equal() {
+        let params = vec![
+            make_type_param("T", vec![make_trait_bound("Clone")]),
+            make_type_param("E", vec![make_trait_bound("Send")]),
+        ];
+        let a_alias =
+            make_type_alias_item(Id(10), Type::Primitive("String".to_string()), params.clone());
+        let b_alias = make_type_alias_item(Id(20), Type::Primitive("String".to_string()), params);
+
+        assert!(
+            items_structurally_equal(
+                &a_alias,
+                &b_alias,
+                &HashMap::new(),
+                &HashMap::new(),
+                "my_crate",
+            ),
+            "matching TypeAlias target and ordered generic declarations must compare equal"
+        );
+    }
+
+    /// Reordering TypeAlias generic declarations changes the lexical contract and must be
+    /// reported as a structural mismatch even when the same declarations are present.
+    #[test]
+    fn test_type_alias_generic_parameter_order_difference_is_mismatch() {
+        let a_alias = make_type_alias_item(
+            Id(10),
+            Type::Primitive("String".to_string()),
+            vec![
+                make_type_param("T", vec![make_trait_bound("Clone")]),
+                make_type_param("E", vec![make_trait_bound("Clone")]),
+            ],
+        );
+        let b_alias = make_type_alias_item(
+            Id(20),
+            Type::Primitive("String".to_string()),
+            vec![
+                make_type_param("E", vec![make_trait_bound("Clone")]),
+                make_type_param("T", vec![make_trait_bound("Clone")]),
+            ],
+        );
+
+        assert!(
+            !items_structurally_equal(
+                &a_alias,
+                &b_alias,
+                &HashMap::new(),
+                &HashMap::new(),
+                "my_crate",
+            ),
+            "reordered TypeAlias generic declarations must compare unequal"
+        );
+    }
+
+    /// Parameter names are part of an alias declaration even when the target itself does not
+    /// reference the parameter.
+    #[test]
+    fn test_type_alias_generic_parameter_name_difference_is_mismatch() {
+        let a_alias = make_type_alias_item(
+            Id(10),
+            Type::Primitive("String".to_string()),
+            vec![make_type_param("T", vec![make_trait_bound("Clone")])],
+        );
+        let b_alias = make_type_alias_item(
+            Id(20),
+            Type::Primitive("String".to_string()),
+            vec![make_type_param("U", vec![make_trait_bound("Clone")])],
+        );
+
+        assert!(
+            !items_structurally_equal(
+                &a_alias,
+                &b_alias,
+                &HashMap::new(),
+                &HashMap::new(),
+                "my_crate",
+            ),
+            "TypeAlias parameter-name changes must compare unequal"
+        );
+    }
+
+    /// Bound order is part of the alias declaration's lexical contract.
+    #[test]
+    fn test_type_alias_generic_parameter_bound_spelling_difference_is_mismatch() {
+        let a_alias = make_type_alias_item(
+            Id(10),
+            Type::Primitive("String".to_string()),
+            vec![make_type_param("T", vec![make_trait_bound("Clone"), make_trait_bound("Send")])],
+        );
+        let b_alias = make_type_alias_item(
+            Id(20),
+            Type::Primitive("String".to_string()),
+            vec![make_type_param("T", vec![make_trait_bound("Send"), make_trait_bound("Clone")])],
+        );
+
+        assert!(
+            !items_structurally_equal(
+                &a_alias,
+                &b_alias,
+                &HashMap::new(),
+                &HashMap::new(),
+                "my_crate",
+            ),
+            "TypeAlias bound spelling changes must compare unequal"
+        );
+    }
+
+    /// Qualified trait paths are part of an alias bound's lexical declaration.
+    #[test]
+    fn test_type_alias_qualified_bound_path_difference_is_mismatch() {
+        let a_alias = make_type_alias_item(
+            Id(10),
+            Type::Primitive("String".to_string()),
+            vec![make_type_param("T", vec![make_qualified_trait_bound("foo::Trait")])],
+        );
+        let b_alias = make_type_alias_item(
+            Id(20),
+            Type::Primitive("String".to_string()),
+            vec![make_type_param("T", vec![make_qualified_trait_bound("bar::Trait")])],
+        );
+
+        assert!(
+            !items_structurally_equal(
+                &a_alias,
+                &b_alias,
+                &HashMap::new(),
+                &HashMap::new(),
+                "my_crate",
+            ),
+            "TypeAlias qualified bound-path changes must compare unequal"
+        );
+    }
+
+    /// Nested paths inside a bound's generic arguments are also lexical.
+    #[test]
+    fn test_type_alias_nested_bound_argument_path_difference_is_mismatch() {
+        let bound_with_argument = |argument_path: &str| GenericBound::TraitBound {
+            trait_: Path {
+                path: "Trait".to_string(),
+                id: Id(0),
+                args: Some(Box::new(GenericArgs::AngleBracketed {
+                    args: vec![GenericArg::Type(Type::ResolvedPath(Path {
+                        path: argument_path.to_string(),
+                        id: Id(1),
+                        args: None,
+                    }))],
+                    constraints: vec![],
+                })),
+            },
+            generic_params: vec![],
+            modifier: TraitBoundModifier::None,
+        };
+        let a_alias = make_type_alias_item(
+            Id(10),
+            Type::Primitive("String".to_string()),
+            vec![make_type_param("T", vec![bound_with_argument("foo::Arg")])],
+        );
+        let b_alias = make_type_alias_item(
+            Id(20),
+            Type::Primitive("String".to_string()),
+            vec![make_type_param("T", vec![bound_with_argument("bar::Arg")])],
+        );
+
+        assert!(
+            !items_structurally_equal(
+                &a_alias,
+                &b_alias,
+                &HashMap::new(),
+                &HashMap::new(),
+                "my_crate",
+            ),
+            "TypeAlias nested bound argument-path changes must compare unequal"
+        );
+    }
+
+    /// Equivalent non-parameter predicates may carry different rustdoc graph IDs.
+    #[test]
+    fn test_type_alias_non_parameter_where_predicate_different_ids_compares_equal() {
+        let predicate_with_ids =
+            |subject_id: Id, trait_id: Id| rustdoc_types::WherePredicate::BoundPredicate {
+                type_: Type::ResolvedPath(Path {
+                    path: "external::Subject".to_string(),
+                    id: subject_id,
+                    args: None,
+                }),
+                bounds: vec![GenericBound::TraitBound {
+                    trait_: Path { path: "external::Trait".to_string(), id: trait_id, args: None },
+                    generic_params: vec![],
+                    modifier: TraitBoundModifier::None,
+                }],
+                generic_params: vec![],
+            };
+        let a_alias = make_type_alias_item_with_generics(
+            Id(10),
+            Type::Primitive("String".to_string()),
+            Generics { params: vec![], where_predicates: vec![predicate_with_ids(Id(1), Id(2))] },
+        );
+        let b_alias = make_type_alias_item_with_generics(
+            Id(20),
+            Type::Primitive("String".to_string()),
+            Generics { params: vec![], where_predicates: vec![predicate_with_ids(Id(3), Id(4))] },
+        );
+
+        assert!(
+            items_structurally_equal(
+                &a_alias,
+                &b_alias,
+                &HashMap::new(),
+                &HashMap::new(),
+                "my_crate",
+            ),
+            "equivalent non-parameter predicates must ignore graph-local rustdoc IDs"
+        );
+    }
+
+    /// Builds a `Fn(&<lifetime> str)` trait bound whose reference input carries the
+    /// given lifetime spelling (`None` models rustdoc's elided representation).
+    fn make_fn_bound_with_input_lifetime(lifetime: Option<&str>) -> GenericBound {
+        GenericBound::TraitBound {
+            trait_: Path {
+                path: "Fn".to_string(),
+                id: Id(0),
+                args: Some(Box::new(GenericArgs::Parenthesized {
+                    inputs: vec![Type::BorrowedRef {
+                        lifetime: lifetime.map(ToOwned::to_owned),
+                        is_mutable: false,
+                        type_: Box::new(Type::Primitive("str".to_string())),
+                    }],
+                    output: None,
+                })),
+            },
+            generic_params: vec![],
+            modifier: TraitBoundModifier::None,
+        }
+    }
+
+    /// A catalogue-side `Fn(&'_ str)` bound must compare equal to rustdoc's
+    /// representation of the same declaration: rustdoc treats the placeholder
+    /// reference lifetime as elided and emits `lifetime: null`.
+    #[test]
+    fn test_type_alias_placeholder_reference_lifetime_bound_compares_equal() {
+        let a_alias = make_type_alias_item(
+            Id(10),
+            Type::Primitive("String".to_string()),
+            vec![make_type_param("T", vec![make_fn_bound_with_input_lifetime(Some("'_"))])],
+        );
+        let b_alias = make_type_alias_item(
+            Id(20),
+            Type::Primitive("String".to_string()),
+            vec![make_type_param("T", vec![make_fn_bound_with_input_lifetime(None)])],
+        );
+
+        assert!(
+            items_structurally_equal(
+                &a_alias,
+                &b_alias,
+                &HashMap::new(),
+                &HashMap::new(),
+                "my_crate",
+            ),
+            "a placeholder `'_` reference lifetime must normalize to rustdoc's elided \
+             representation"
+        );
+    }
+
+    /// Named reference lifetimes stay lexical: only the `'_` placeholder is
+    /// equivalent to rustdoc's elision.
+    #[test]
+    fn test_type_alias_named_reference_lifetime_bound_difference_is_mismatch() {
+        let a_alias = make_type_alias_item(
+            Id(10),
+            Type::Primitive("String".to_string()),
+            vec![make_type_param("T", vec![make_fn_bound_with_input_lifetime(Some("'a"))])],
+        );
+        let b_alias = make_type_alias_item(
+            Id(20),
+            Type::Primitive("String".to_string()),
+            vec![make_type_param("T", vec![make_fn_bound_with_input_lifetime(None)])],
+        );
+
+        assert!(
+            !items_structurally_equal(
+                &a_alias,
+                &b_alias,
+                &HashMap::new(),
+                &HashMap::new(),
+                "my_crate",
+            ),
+            "a named reference lifetime must not be treated as rustdoc's elided spelling"
+        );
     }
 
     /// Builds a `GenericBound::Outlives` for a lifetime (e.g. `'static`).

@@ -1,0 +1,43 @@
+{
+  "declaration_hash": "7924d2f6d3b69910701f93076077f8819cbf12f4f1a9e48db74de96928fb0895",
+  "generated_at": "2026-08-03T14:23:32Z",
+  "implementation_input_hash": "e6c63040b3322c4941d77e1bb1a967dada936ad3e2c75ca63d51b6b6f9b8e546",
+  "schema_version": 3,
+  "signals": [
+    {
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "CatalogueLinterError"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "enum",
+      "signal": "blue",
+      "type_name": "TypeKindV2"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "type_name": "domain::tddd::catalogue_linter::evaluate_catalogue_lint"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "type_name": "domain::tddd::catalogue_linter::eval::evaluate_catalogue_lint"
+    }
+  ]
+}
