@@ -304,6 +304,12 @@ fn run_cli_with(
 /// the command tree while ignoring positional payloads and option values, so
 /// prompts, track ids, and other user data never become part of the event
 /// identity.
+///
+/// Boolean mode flags that switch a command between a query-only plan and a
+/// mutating apply path are part of the command identity: `maintenance cleanup`
+/// without `--apply` is classified as `maintenance cleanup plan` so the
+/// eligibility policy can exclude the query-only mode while the apply mode
+/// keeps the established label.
 fn command_identity_from_args(args: &[std::ffi::OsString]) -> String {
     let Ok(matches) = Cli::command().try_get_matches_from(args.to_owned()) else {
         return "sotp demo".to_owned();
@@ -313,6 +319,9 @@ fn command_identity_from_args(args: &[std::ffi::OsString]) -> String {
     while let Some((name, subcommand)) = current.subcommand() {
         names.push(name);
         current = subcommand;
+    }
+    if names == ["maintenance", "cleanup"] && !current.get_flag("apply") {
+        names.push("plan");
     }
     if names.is_empty() { "sotp demo".to_owned() } else { format!("sotp {}", names.join(" ")) }
 }
@@ -859,6 +868,24 @@ mod tests {
         assert!(!telemetry_completion_eligible("telemetry report"));
         assert!(!telemetry_completion_eligible("review results"));
         assert!(!telemetry_completion_eligible("verify results"));
+        assert!(!telemetry_completion_eligible("pr status"));
+        assert!(!telemetry_completion_eligible("pr poll-review"));
+        assert!(!telemetry_completion_eligible("maintenance cleanup plan"));
+        assert!(telemetry_completion_eligible("maintenance cleanup"));
+        assert!(telemetry_completion_eligible("pr push"));
+    }
+
+    /// The identity distinguishes the query-only cleanup plan mode from the
+    /// mutating apply mode so eligibility can exclude only the former.
+    #[test]
+    fn test_command_identity_classifies_maintenance_cleanup_mode_flag() {
+        let plan_args: Vec<std::ffi::OsString> =
+            ["sotp", "maintenance", "cleanup"].iter().map(Into::into).collect();
+        assert_eq!(command_identity_from_args(&plan_args), "sotp maintenance cleanup plan");
+
+        let apply_args: Vec<std::ffi::OsString> =
+            ["sotp", "maintenance", "cleanup", "--apply"].iter().map(Into::into).collect();
+        assert_eq!(command_identity_from_args(&apply_args), "sotp maintenance cleanup");
     }
 
     // ── CliCommand::Dry entrypoint dispatch routing ───────────────────────────

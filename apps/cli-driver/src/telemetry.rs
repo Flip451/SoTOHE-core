@@ -377,6 +377,9 @@ pub fn completion_eligible(subcommand: &str) -> bool {
             | "test-obligation results"
             | "test-obligation bindings-skeleton"
             | "dup-index measure-quality"
+            | "pr status"
+            | "pr poll-review"
+            | "maintenance cleanup plan"
     )
 }
 

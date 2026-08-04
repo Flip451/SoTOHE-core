@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-04T00:50:55Z",
+  "generated_at": "2026-08-04T01:29:58Z",
   "declaration_hash": "340bb3e5bc5f0982871ff461cb7c97d7641c5c1e83f623aee69b55e979aff8d0",
-  "implementation_input_hash": "e8520a8eefc63c7c646a02d8cf917cc285c6b4be1a98450a558b66d5d320f605",
+  "implementation_input_hash": "be44811f73f97dd2b81fa0976609174ffb5ff538119238ff22ef766559a2db95",
   "signals": [
     {
       "type_name": "TrackCommand",

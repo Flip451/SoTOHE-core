@@ -3005,13 +3005,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "8c960ee21b419d98edd12ab3e4b22675bde1068c64d46e23e6565d9e37d8fba4",
+        "bound_tests_set_hash": "84313d7efbcca5c8127898276fa07c7cba2fae8fbc5cfcfeba2c3f2112562d6e",
         "declaration_hash": "d4ae98adb9b84cfc112695df0925a11e31ede3bc5097fcce5e194b55c04012f1",
         "anchor_text_hash": "c2c7f968ad201efcf6c2b0e52aa82c94b1eb77f3361dde7b9293d7a063785050"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(telemetry_completion_eligible(\"track spec-design\"));\n        assert!(telemetry_completion_eligible(\"dry write\"));\n        assert!(telemetry_completion_eligible(\"verify layers\"));\n\n        assert!(!telemetry_completion_eligible(\"track resolve\"));\n        assert!(!telemetry_completion_eligible(\"telemetry report\"));\n        assert!(!telemetry_completion_eligible(\"review results\"));\n        assert!(!telemetry_completion_eligible(\"verify results\"));"
+        "citation": "assert!(telemetry_completion_eligible(\"track spec-design\"));\n        assert!(telemetry_completion_eligible(\"dry write\"));\n        assert!(telemetry_completion_eligible(\"verify layers\"));\n\n        assert!(!telemetry_completion_eligible(\"track resolve\"));\n        assert!(!telemetry_completion_eligible(\"telemetry report\"));\n        assert!(!telemetry_completion_eligible(\"review results\"));\n        assert!(!telemetry_completion_eligible(\"verify results\"));\n        assert!(!telemetry_completion_eligible(\"pr status\"));\n        assert!(!telemetry_completion_eligible(\"pr poll-review\"));\n        assert!(!telemetry_completion_eligible(\"maintenance cleanup plan\"));\n        assert!(telemetry_completion_eligible(\"maintenance cleanup\"));\n        assert!(telemetry_completion_eligible(\"pr push\"));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -3041,13 +3041,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "8c960ee21b419d98edd12ab3e4b22675bde1068c64d46e23e6565d9e37d8fba4",
+        "bound_tests_set_hash": "84313d7efbcca5c8127898276fa07c7cba2fae8fbc5cfcfeba2c3f2112562d6e",
         "declaration_hash": "d4ae98adb9b84cfc112695df0925a11e31ede3bc5097fcce5e194b55c04012f1",
         "anchor_text_hash": "a82002a20538715fb2af0c1c3db399e871fceefcd8962ed2a36028e50a15329f"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(telemetry_completion_eligible(\"track spec-design\"));\n        assert!(telemetry_completion_eligible(\"dry write\"));\n        assert!(telemetry_completion_eligible(\"verify layers\"));\n\n        assert!(!telemetry_completion_eligible(\"track resolve\"));\n        assert!(!telemetry_completion_eligible(\"telemetry report\"));\n        assert!(!telemetry_completion_eligible(\"review results\"));\n        assert!(!telemetry_completion_eligible(\"verify results\"));"
+        "citation": "assert!(!telemetry_completion_eligible(\"track resolve\"));\nassert!(telemetry_completion_eligible(\"track spec-design\"));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
