@@ -1082,6 +1082,42 @@
           "hash": "rvw1:sha256:18e10f72db414ceb35cd929a90ab502012083535b5defaac5e4784ff986d76c0",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-04T05:03:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:874d6ccc51da85ab72742607a5f0fb909dc0405e7ca1bb81bf7211232da43b13",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-04T05:11:22Z",
+          "findings": [
+            {
+              "category": "command wiring breakage",
+              "file": ".harness/policies/review-protocol.md",
+              "line": 68,
+              "message": "`stash push` は作業ツリーを退避するだけで base branch へ切り替えないため、この記述だけでは baseline 測定の往復手順が成立しません。直接の `git switch` を禁止しつつ、`bin/sotp track switch-base` と `bin/sotp track branch switch <track-id>` を案内しておらず、track branch を誤って測定したり、base branch 上で `stash pop` して変更を混入させたりできます。元の track branch に戻ってから pop する完全な guarded sequence を明記してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "permission posture drift",
+              "file": ".codex/rules/default.rules",
+              "line": 11,
+              "message": "新たに推奨・allowlist された stash 操作は、安全な対として保証されていません。`push` は変更がない場合も成功しますが stash を作成せず、`pop` は常に repository-wide な最新 stash を復元するため、既存または途中で追加された無関係な stash を適用・削除できます。また実装の `git stash pop` は `--index` を使わず、staged 状態も復元しません。この状態で無条件の push/pop round-trip として案内・許可せず、今回作成した stash との対応付けと index 復元を保証してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:874d6ccc51da85ab72742607a5f0fb909dc0405e7ca1bb81bf7211232da43b13",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-04T05:19:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bd570e6581a435ac84eeffea9154c59b84c9c7ca764a88ab0784ef2fb18fa9b0",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
