@@ -136,3 +136,22 @@ descriptor-retention hardlink 機構の別々の穴であり、艦隊処方箋
   User 裁定として提起する。
 - 蓄積 findings（世代重複・並行 writer・file↔dir 変化等）は hash/除外設計では構造的に
   発生しないクラスであり、回帰観点チェックリストとしてこの記録に保持する。
+
+### round-9 の残 2 findings の裁定（継続方式: merge 裁定時の User 確認）
+
+D2 裁定文書の常設方針（「具体的な文面案を用意した上で作業を継続し、merge 裁定で確認を受ける」）
+に基づき、`tmp/handoff/2026-08-04-lane-d-round9-adjudication-request.md` の両推奨案（A/A）で
+継続する。いずれも新規機構を実装しない可逆な選択であり、strict merge gate と User の手動
+merge が最終確認点になる。
+
+- **telemetry 保存要求（finding 2）→ A: トレードオフ受理。** capture 窓内に並行追記された
+  gitignored 診断ログ行のみが exchange で失われ得る。SoT・成果物・レビュー状態は無傷。
+  保存/マージ機構の追加は retention 螺旋の再入口であり採らない。Known Accepted Deviation
+  として briefing / PR に明記する。
+- **branch switch 直列化要求（finding 1）→ A: 本 track では受理しない。** race は実在するが、
+  修正は全 guarded branch 変更操作が共有する repository-level lock の新設で本 track の
+  scope 外。**ADR 候補: repository-level guarded-operation lock**（switch / merge-base /
+  cleanup を跨ぐ直列化）として記録し、別 track で扱う。単一オーケストレーター運用では
+  switch と merge-base が並走する経路はない。
+
+User が merge 裁定でこの 2 選択を却下する場合、本 track へ差し戻して該当設計を実装する。
