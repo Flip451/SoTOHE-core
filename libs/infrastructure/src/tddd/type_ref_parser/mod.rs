@@ -25,6 +25,7 @@
 //! (CN-08 / spec.json IN-09 / ADR 2 D9 / D10 / D11)
 
 mod bound_spelling;
+mod const_modifier;
 mod constants;
 mod generic_tokens;
 mod helpers;

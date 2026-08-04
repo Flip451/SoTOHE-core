@@ -1149,6 +1149,14 @@ fn test_alias_lexical_gates_reject_additional_lossy_spellings() {
 }
 
 #[test]
+fn test_alias_lexical_gates_reject_multiple_dyn_lifetimes() {
+    // Rust permits only one explicit trait-object lifetime bound (E0226), and
+    // the converter keeps only the first, so a second lifetime must fail closed.
+    assert_alias_lexical_spelling_rejected_at_all_gates("Outer<dyn Tr + 'static + 'static>");
+    assert_alias_lexical_spelling_accepted_at_all_gates("Outer<dyn Tr + 'static>");
+}
+
+#[test]
 fn test_legacy_parsers_accept_lexically_lossy_alias_spellings() {
     for spelling in [
         "Outer<Item: Send +>",

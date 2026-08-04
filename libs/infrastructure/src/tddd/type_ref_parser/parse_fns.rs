@@ -11,14 +11,16 @@ use super::bound_spelling::{
     reject_attributed_binder_params_in_bound, reject_attributed_binder_params_in_type,
     reject_bare_fn_variant_spellings_in_bound, reject_bare_fn_variant_spellings_in_type,
     reject_deterministically_non_trait_bound, reject_infer_placeholders_in_bound,
-    reject_infer_placeholders_in_type, reject_non_final_dyn_lifetimes_in_bound,
+    reject_infer_placeholders_in_type, reject_multiple_dyn_lifetimes_in_bound,
+    reject_multiple_dyn_lifetimes_in_type, reject_non_final_dyn_lifetimes_in_bound,
     reject_non_final_dyn_lifetimes_in_type, reject_parenthesized_bounds_in_bound,
     reject_precise_capture_bound, reject_redundant_parenthesized_types_in_bound,
     reject_redundant_parenthesized_types_in_type, reject_trailing_commas_in_bound,
     reject_trailing_commas_in_type, reject_trailing_pluses_in_bound,
     reject_trailing_pluses_in_type, reject_turbofish_generic_arguments_in_bound,
-    reject_undeclared_lifetime_bound, reject_unsupported_const_bound_modifier,
+    reject_undeclared_lifetime_bound,
 };
+use super::const_modifier::reject_unsupported_const_bound_modifier;
 use super::constants::{PRIMITIVE_TYPES, UNRESOLVED_CRATE_ID};
 use super::generic_tokens;
 use super::helpers::{is_simple_const_expr, simple_const_block_expr};
@@ -123,6 +125,7 @@ where
     if preserve_prelude_spelling {
         reject_redundant_parenthesized_types_in_type(&syn_type)?;
         reject_non_final_dyn_lifetimes_in_type(&syn_type)?;
+        reject_multiple_dyn_lifetimes_in_type(&syn_type)?;
         reject_attributed_bare_fn_args_in_type(&syn_type)?;
         reject_attributed_binder_params_in_type(&syn_type)?;
         reject_infer_placeholders_in_type(&syn_type)?;
@@ -178,6 +181,7 @@ pub(crate) fn validate_lexical_type_ref(
         .map_err(|e| format!("invalid type syntax '{type_ref_str}': {e}"))?;
     reject_redundant_parenthesized_types_in_type(&syntax)?;
     reject_non_final_dyn_lifetimes_in_type(&syntax)?;
+    reject_multiple_dyn_lifetimes_in_type(&syntax)?;
     reject_attributed_bare_fn_args_in_type(&syntax)?;
     reject_attributed_binder_params_in_type(&syntax)?;
     reject_infer_placeholders_in_type(&syntax)?;
@@ -271,6 +275,7 @@ pub(crate) fn validate_lexical_generic_bound(
     reject_parenthesized_bounds_in_bound(&syn_bound)?;
     reject_redundant_parenthesized_types_in_bound(&syn_bound)?;
     reject_non_final_dyn_lifetimes_in_bound(&syn_bound)?;
+    reject_multiple_dyn_lifetimes_in_bound(&syn_bound)?;
     reject_attributed_bare_fn_args_in_bound(&syn_bound)?;
     reject_attributed_binder_params_in_bound(&syn_bound)?;
     reject_infer_placeholders_in_bound(&syn_bound)?;
@@ -359,6 +364,7 @@ where
         reject_parenthesized_bounds_in_bound(&syn_bound)?;
         reject_redundant_parenthesized_types_in_bound(&syn_bound)?;
         reject_non_final_dyn_lifetimes_in_bound(&syn_bound)?;
+        reject_multiple_dyn_lifetimes_in_bound(&syn_bound)?;
         reject_attributed_bare_fn_args_in_bound(&syn_bound)?;
         reject_attributed_binder_params_in_bound(&syn_bound)?;
         reject_infer_placeholders_in_bound(&syn_bound)?;
