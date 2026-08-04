@@ -677,6 +677,32 @@ fn test_validate_generic_bound_rejects_non_final_dyn_lifetimes() {
 }
 
 #[test]
+fn test_validate_generic_bound_rejects_attributed_bare_fn_args() {
+    for bound in ["Outer<fn(#[cfg(any())] u8)>", "Fn(fn(#[cfg(any())] u8))"] {
+        assert!(
+            validate_lexical_generic_bound(bound, &[]).is_err(),
+            "attribute-bearing bare-fn arguments must be rejected: {bound}"
+        );
+    }
+    assert!(validate_lexical_generic_bound("Outer<fn(u8)>", &[]).is_ok());
+    assert!(validate_lexical_type_ref("Outer<fn(#[cfg(any())] u8)>", &["T"]).is_err());
+    assert!(validate_lexical_type_ref("Outer<fn(u8)>", &["T"]).is_ok());
+
+    let result = parse_generic_bound_with_generics_preserving_spelling(
+        "Outer<fn(#[cfg(any())] u8)>",
+        &no_local,
+        100,
+        &HashMap::new(),
+        &mut |_| 101,
+        &[],
+    );
+    assert!(
+        result.is_err(),
+        "attribute-bearing bare-fn arguments must fail closed in the preserving encoder"
+    );
+}
+
+#[test]
 fn test_parse_generic_bound_generic_argument_shadows_catalogue_type() {
     let bound = parse_generic_bound_with_generics_preserving_spelling(
         "Into<T>",
