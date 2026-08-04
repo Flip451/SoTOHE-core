@@ -113,6 +113,80 @@ pub(super) fn reject_parenthesized_bounds_in_bound(
     }
 }
 
+/// Rustdoc and `ParseCtx::convert_type` both erase redundant parentheses
+/// around a nested type, so `Outer<(u8)>` and `Outer<u8>` would compare
+/// equal despite differing canonical notation. Parentheses Rust's grammar
+/// requires — around a multi-bound trait object directly behind `&` / `*`
+/// (`&(dyn A + B)`) — carry no spelling variance (both sides must write
+/// them) and stay accepted.
+#[derive(Default)]
+struct RedundantTypeParenVisitor {
+    found: bool,
+}
+
+impl RedundantTypeParenVisitor {
+    /// Recurses past a grammatically required paren (multi-bound trait object
+    /// directly behind a reference or raw pointer) and reports whether it did.
+    fn skip_required_paren(&mut self, elem: &syn::Type) -> bool {
+        if let syn::Type::Paren(paren) = elem {
+            if matches!(
+                &*paren.elem,
+                syn::Type::TraitObject(trait_object) if trait_object.bounds.len() > 1
+            ) {
+                self.visit_type(&paren.elem);
+                return true;
+            }
+        }
+        false
+    }
+}
+
+impl<'ast> Visit<'ast> for RedundantTypeParenVisitor {
+    fn visit_type_reference(&mut self, node: &'ast syn::TypeReference) {
+        if self.skip_required_paren(&node.elem) {
+            return;
+        }
+        syn::visit::visit_type_reference(self, node);
+    }
+
+    fn visit_type_ptr(&mut self, node: &'ast syn::TypePtr) {
+        if self.skip_required_paren(&node.elem) {
+            return;
+        }
+        syn::visit::visit_type_ptr(self, node);
+    }
+
+    fn visit_type_paren(&mut self, node: &'ast syn::TypeParen) {
+        self.found = true;
+        syn::visit::visit_type_paren(self, node);
+    }
+}
+
+pub(super) fn reject_redundant_parenthesized_types_in_bound(
+    syntax: &syn::TypeParamBound,
+) -> Result<(), String> {
+    let mut visitor = RedundantTypeParenVisitor::default();
+    visitor.visit_type_param_bound(syntax);
+    reject_if_redundant_paren_found(visitor.found)
+}
+
+pub(super) fn reject_redundant_parenthesized_types_in_type(
+    syntax: &syn::Type,
+) -> Result<(), String> {
+    let mut visitor = RedundantTypeParenVisitor::default();
+    visitor.visit_type(syntax);
+    reject_if_redundant_paren_found(visitor.found)
+}
+
+fn reject_if_redundant_paren_found(found: bool) -> Result<(), String> {
+    if found {
+        Err("redundant parenthesized type spellings are not supported by lexical type comparison"
+            .to_owned())
+    } else {
+        Ok(())
+    }
+}
+
 pub(super) fn reject_unsupported_const_bound_modifier(bound_str: &str) -> Result<(), String> {
     let scan_str = bound_str.strip_prefix("~const").map_or(bound_str, str::trim_start);
     let tokens: TokenStream =

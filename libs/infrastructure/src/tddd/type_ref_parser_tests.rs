@@ -590,6 +590,39 @@ fn test_validate_generic_bound_rejects_parenthesized_bounds() {
 }
 
 #[test]
+fn test_validate_generic_bound_rejects_redundant_parenthesized_types() {
+    for bound in ["Outer<(u8)>", "Tr<&(dyn Fn())>", "Tr<(dyn Fn() + Send)>"] {
+        assert!(
+            validate_lexical_generic_bound(bound, &[]).is_err(),
+            "redundant parenthesized type spelling must be rejected: {bound}"
+        );
+    }
+    // Grammatically required parentheses — a multi-bound trait object directly
+    // behind a reference or raw pointer — carry no spelling variance.
+    for bound in ["Tr<&(dyn Fn() + Send)>", "Outer<*const (dyn Fn() + Send)>"] {
+        assert!(
+            validate_lexical_generic_bound(bound, &[]).is_ok(),
+            "grammatically required parentheses must stay accepted: {bound}"
+        );
+    }
+    assert!(validate_lexical_type_ref("Outer<(u8)>", &["T"]).is_err());
+    assert!(validate_lexical_type_ref("&(dyn Fn() + Send)", &["T"]).is_ok());
+
+    let result = parse_generic_bound_with_generics_preserving_spelling(
+        "Outer<(u8)>",
+        &no_local,
+        100,
+        &HashMap::new(),
+        &mut |_| 101,
+        &[],
+    );
+    assert!(
+        result.is_err(),
+        "redundant parenthesized type must fail closed in the preserving encoder"
+    );
+}
+
+#[test]
 fn test_parse_generic_bound_generic_argument_shadows_catalogue_type() {
     let bound = parse_generic_bound_with_generics_preserving_spelling(
         "Into<T>",
