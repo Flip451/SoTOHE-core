@@ -627,9 +627,23 @@ fn test_scan_convention_requirements_does_not_read_a_node_that_is_not_a_regular_
     // by node type before the read is what keeps a walk of a consumer's tree
     // from stopping on one.
     let project = project_with(&[("knowledge/conventions/fixture-alpha.md", ADR_DOCUMENT)]);
-    let listener =
-        std::os::unix::net::UnixListener::bind(project.path().join("knowledge/conventions/odd.md"))
-            .unwrap();
+    let listener = match std::os::unix::net::UnixListener::bind(
+        project.path().join("knowledge/conventions/odd.md"),
+    ) {
+        Ok(listener) => listener,
+        Err(error)
+            if matches!(
+                error.kind(),
+                std::io::ErrorKind::PermissionDenied | std::io::ErrorKind::Unsupported
+            ) =>
+        {
+            // Some hermetic runners deny AF_UNIX even for a private temp
+            // directory. The production scan behavior is unchanged; skip
+            // only this socket-shaped fixture when the kernel cannot create it.
+            return;
+        }
+        Err(error) => panic!("socket fixture must be creatable: {error}"),
+    };
 
     let scanned = scan_convention_requirements(project.path()).unwrap();
 

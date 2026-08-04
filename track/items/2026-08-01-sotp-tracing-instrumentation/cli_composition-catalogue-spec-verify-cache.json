@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "layer": "cli_composition",
+  "entries": [
+    {
+      "claim_hash": "8a11567c04085ffc94370ec64b5a2ed640cc72c958712c79e57739a12c7aeaa8",
+      "evidence_hash": "9cbde1c8c1b48cacc5d0d024f910428fca90be5b2b70829f6b6062574add4d66",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track ブランチ上で完了した、track が解決できる純表示系ではない `sotp` コマンドを共通の entry point で計装し、完了時にコマンド identity、所要時間、および exit 結果を観測する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "TelemetryCompositionRoot"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "track ブランチ上で完了した、track が解決できる純表示系ではない `sotp` コマンドを共通の entry point で計装し、完了時にコマンド identity、所要時間、および exit 結果を観測する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8a11567c04085ffc94370ec64b5a2ed640cc72c958712c79e57739a12c7aeaa8",
+      "evidence_hash": "34dba8d9b16331a0bcdb9d8d3ba20ba4c919233af0e5a3f16e1e69b04f290639",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track ブランチ上で、track が解決できる純表示系ではない任意の `sotp` コマンドが完了すると、同じ track の `telemetry.jsonl` にコマンド identity、所要時間、および exit 結果を含むイベントが追記される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "TelemetryCompositionRoot"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "track ブランチ上で、track が解決できる純表示系ではない任意の `sotp` コマンドが完了すると、同じ track の `telemetry.jsonl` にコマンド identity、所要時間、および exit 結果を含むイベントが追記される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8a11567c04085ffc94370ec64b5a2ed640cc72c958712c79e57739a12c7aeaa8",
+      "evidence_hash": "c9bedd27b787dcd258948cd62ba35a3c61bdd27bdb71b082799853ac29c3c995",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track ブランチ以外でコマンドを実行しても、track の telemetry 記録は生成または更新されない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "TelemetryCompositionRoot"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "track ブランチ以外でコマンドを実行しても、track の telemetry 記録は生成または更新されない。"
+        }
+      }
+    }
+  ]
+}

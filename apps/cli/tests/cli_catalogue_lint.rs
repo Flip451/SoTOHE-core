@@ -27,12 +27,7 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 
 fn sotp_bin() -> Command {
-    let mut cmd = Command::new(env!("CARGO_BIN_EXE_sotp"));
-    // Disable telemetry in spawned binary so integration tests never write to
-    // the real track/items/ tree (CN-06 / AC-07).  The #[cfg(test)] guard only
-    // applies to in-process code; spawned binaries are full production processes.
-    cmd.env("SOTP_TELEMETRY", "0");
-    cmd
+    Command::new(env!("CARGO_BIN_EXE_sotp"))
 }
 
 // ---------------------------------------------------------------------------
@@ -449,6 +444,7 @@ fn write_value_object_catalogue(root: &Path, layer: &str) {
 /// appends `--rules-file <path>` when `rules_file` is `Some`.
 fn run_catalogue_lint_impl(root: &Path, rules_file: Option<&Path>) -> std::process::Output {
     let mut cmd = sotp_bin();
+    cmd.current_dir(root);
     cmd.args([
         "catalogue-lint",
         "check-active-track",
@@ -474,6 +470,7 @@ fn run_catalogue_lint(root: &Path) -> std::process::Output {
 /// helpers use) and no `--rules-file` override.
 fn run_catalogue_lint_with_track_id(root: &Path, track_id: &str) -> std::process::Output {
     let mut cmd = sotp_bin();
+    cmd.current_dir(root);
     cmd.args([
         "catalogue-lint",
         "check-active-track",

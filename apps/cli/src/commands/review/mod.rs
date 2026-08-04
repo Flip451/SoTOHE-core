@@ -115,7 +115,7 @@ pub struct CodexLocalArgs {
 
     /// Path to track items directory.
     #[arg(long, default_value = "track/items")]
-    pub(super) items_dir: PathBuf,
+    pub(crate) items_dir: PathBuf,
 }
 
 /// CLI args for `sotp review claude-local`.
@@ -157,7 +157,7 @@ pub struct ClaudeLocalArgs {
 
     /// Path to track items directory.
     #[arg(long, default_value = "track/items")]
-    pub(super) items_dir: PathBuf,
+    pub(crate) items_dir: PathBuf,
 }
 
 /// Validated auto-record arguments ready for use after the reviewer completes.
@@ -174,7 +174,7 @@ pub(super) struct ValidatedAutoRecordArgs {
     pub(super) round_type_str: String, // "fast" | "final"
     pub(super) group_name: String,
     pub(super) expected_groups: Vec<String>,
-    pub(super) items_dir: PathBuf,
+    pub(crate) items_dir: PathBuf,
     pub(super) diff_base: String,
 }
 
@@ -257,7 +257,7 @@ pub(super) fn validate_claude_auto_record_args(
 pub struct CheckApprovedArgs {
     /// Path to the track items directory.
     #[arg(long, default_value = "track/items")]
-    items_dir: PathBuf,
+    pub(crate) items_dir: PathBuf,
 
     /// Track ID.
     /// When omitted, resolved from the current git branch (`track/<id>`).
@@ -313,7 +313,7 @@ impl std::str::FromStr for ResultsLimit {
 pub struct ResultsArgs {
     /// Path to the track items directory.
     #[arg(long, default_value = "track/items")]
-    pub(super) items_dir: PathBuf,
+    pub(crate) items_dir: PathBuf,
 
     /// Track ID.
     /// When omitted, resolved from the current git branch (`track/<id>`).

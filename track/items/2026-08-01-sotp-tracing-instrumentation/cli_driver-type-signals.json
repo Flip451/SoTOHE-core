@@ -1,0 +1,50 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-08-04T01:29:54Z",
+  "declaration_hash": "66bb638f8347a43cf3ecbd8accd2f2774408ee7da2c111e86c42231a2c991fc0",
+  "implementation_input_hash": "5fbeb07b674480dbf8f47619211e8870932594479b64c78e539cf2a1e4ae1ca6",
+  "signals": [
+    {
+      "type_name": "TelemetryCompletion",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TelemetryDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TelemetryInput",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli_driver::telemetry::completion_eligible",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli_driver::telemetry::duration_millis",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli_driver::telemetry::exit_code_value",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli_driver::telemetry::items_dir_from_args",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}
