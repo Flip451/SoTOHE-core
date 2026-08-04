@@ -4343,6 +4343,35 @@
           "hash": "rvw1:sha256:9e277fbc0ed5cff970c61079afff490e13a4bc297c649ba7ecf4d8f27ed9497c",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-04T04:52:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4154badd7217a10055dac7d53384282b0f84c7d22b6c2d0b78c0a89bce6898aa",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-04T04:57:22Z",
+          "findings": [
+            {
+              "category": "test_coverage",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser_tests.rs",
+              "line": 859,
+              "message": "The new regressions are not exercised through all four modified gates. Both tests stop at `validate_lexical_type_ref` for type-position inputs and never call `parse_type_ref_with_generics_preserving_spelling`; they also do not assert that the non-preserving type and bound parsers remain permissive. Consequently, a wiring regression in the preserving type parser—or accidental tightening of a legacy parser—would pass this suite despite violating the stated contract. Add reject/accept coverage through the preserving type parser and permissive coverage through both legacy parsers for infer placeholders and attributed binders.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4154badd7217a10055dac7d53384282b0f84c7d22b6c2d0b78c0a89bce6898aa",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-04T05:06:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:44e560af7218d2d90d8623f98d5b9e96db77338672edcb8981a51a5e1a56696c",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },

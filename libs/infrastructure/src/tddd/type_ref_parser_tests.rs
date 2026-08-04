@@ -848,6 +848,183 @@ fn test_validate_generic_bound_rejects_undeclared_lifetime_bounds() {
 }
 
 #[test]
+fn test_validate_generic_bound_rejects_infer_placeholders() {
+    for bound in ["Outer<_>", "Fn(_)", "Outer<Vec<_>>"] {
+        assert!(
+            validate_lexical_generic_bound(bound, &[]).is_err(),
+            "an infer placeholder must be rejected: {bound}"
+        );
+        assert!(
+            parse_generic_bound_with_generics_preserving_spelling(
+                bound,
+                &no_local,
+                100,
+                &HashMap::new(),
+                &mut |_| 101,
+                &[],
+            )
+            .is_err(),
+            "an infer placeholder must fail closed in the preserving bound parser: {bound}"
+        );
+    }
+    assert!(validate_lexical_generic_bound("Outer<u8>", &[]).is_ok());
+    assert!(validate_lexical_type_ref("Outer<_>", &["T"]).is_err());
+
+    let result = parse_generic_bound_with_generics_preserving_spelling(
+        "Outer<_>",
+        &no_local,
+        100,
+        &HashMap::new(),
+        &mut |_| 101,
+        &[],
+    );
+    assert!(result.is_err(), "an infer placeholder must fail closed in the preserving encoder");
+}
+
+#[test]
+fn test_validate_generic_bound_rejects_attributed_binder_params() {
+    for bound in
+        ["for<#[allow(unused)] 'a> Tr<&'a u8>", "Outer<for<#[allow(unused)] 'a> fn(&'a u8)>"]
+    {
+        assert!(
+            validate_lexical_generic_bound(bound, &[]).is_err(),
+            "an attributed binder parameter must be rejected: {bound}"
+        );
+        assert!(
+            parse_generic_bound_with_generics_preserving_spelling(
+                bound,
+                &no_local,
+                100,
+                &HashMap::new(),
+                &mut |_| 101,
+                &[],
+            )
+            .is_err(),
+            "an attributed binder parameter must fail closed in the preserving bound parser: {bound}"
+        );
+    }
+    for bound in ["for<'a> Tr<&'a u8>", "Outer<for<'a> fn(&'a u8)>"] {
+        assert!(
+            validate_lexical_generic_bound(bound, &[]).is_ok(),
+            "plain binder spellings must stay accepted: {bound}"
+        );
+    }
+    assert!(
+        validate_lexical_type_ref("Outer<for<#[allow(unused)] 'a> fn(&'a u8)>", &["T"]).is_err()
+    );
+
+    let result = parse_generic_bound_with_generics_preserving_spelling(
+        "for<#[allow(unused)] 'a> Tr<&'a u8>",
+        &no_local,
+        100,
+        &HashMap::new(),
+        &mut |_| 101,
+        &[],
+    );
+    assert!(
+        result.is_err(),
+        "an attributed binder parameter must fail closed in the preserving encoder"
+    );
+}
+
+#[test]
+fn test_parse_type_ref_preserving_spelling_rejects_infer_and_attributed_binder_params() {
+    for source in ["Outer<_>", "Outer<Vec<_>>"] {
+        assert!(
+            validate_lexical_type_ref(source, &[]).is_err(),
+            "an infer placeholder must be rejected in a type: {source}"
+        );
+        assert!(
+            parse_type_ref_with_generics_preserving_spelling(
+                source,
+                &no_local,
+                100,
+                &HashMap::new(),
+                &mut |_| 101,
+                &[],
+            )
+            .is_err(),
+            "an infer placeholder must fail closed in the preserving type parser: {source}"
+        );
+        assert!(
+            parse_type_ref_with_generics(
+                source,
+                &no_local,
+                100,
+                &HashMap::new(),
+                &mut |_| 101,
+                &[],
+            )
+            .is_ok(),
+            "the legacy type parser must retain its permissive behavior: {source}"
+        );
+        assert!(
+            parse_generic_bound_with_generics(
+                source,
+                &no_local,
+                100,
+                &HashMap::new(),
+                &mut |_| 101,
+                &[],
+            )
+            .is_ok(),
+            "the legacy bound parser must retain its permissive behavior: {source}"
+        );
+    }
+
+    let attributed_type = "Outer<for<#[allow(unused)] 'a> fn(&'a u8)>";
+    assert!(validate_lexical_type_ref(attributed_type, &[]).is_err());
+    assert!(
+        parse_type_ref_with_generics_preserving_spelling(
+            attributed_type,
+            &no_local,
+            100,
+            &HashMap::new(),
+            &mut |_| 101,
+            &[],
+        )
+        .is_err(),
+        "an attributed binder parameter must fail closed in the preserving type parser"
+    );
+    assert!(
+        parse_type_ref_with_generics(
+            attributed_type,
+            &no_local,
+            100,
+            &HashMap::new(),
+            &mut |_| 101,
+            &[],
+        )
+        .is_ok(),
+        "the legacy type parser must retain its permissive behavior"
+    );
+    assert!(
+        parse_generic_bound_with_generics(
+            "for<#[allow(unused)] 'a> Tr<&'a u8>",
+            &no_local,
+            100,
+            &HashMap::new(),
+            &mut |_| 101,
+            &[],
+        )
+        .is_ok(),
+        "the legacy bound parser must retain its permissive behavior"
+    );
+    assert!(
+        parse_type_ref_with_generics_preserving_spelling(
+            "Outer<for<'a> fn(&'a u8)>",
+            &no_local,
+            100,
+            &HashMap::new(),
+            &mut |_| 101,
+            &[],
+        )
+        .is_ok(),
+        "plain binder spelling must stay accepted in the preserving type parser"
+    );
+}
+
+#[test]
 fn test_parse_generic_bound_generic_argument_shadows_catalogue_type() {
     let bound = parse_generic_bound_with_generics_preserving_spelling(
         "Into<T>",

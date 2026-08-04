@@ -321,6 +321,89 @@ pub(super) fn reject_undeclared_lifetime_bound(syntax: &syn::TypeParamBound) -> 
     Ok(())
 }
 
+/// Rust rejects the infer placeholder `_` in type-alias item signatures
+/// (E0121), so a bound such as `T: Outer<_>` would record an alias contract
+/// no implementation can compile. Nested `Type::Infer` nodes are rejected at
+/// the boundary.
+#[derive(Default)]
+struct InferPlaceholderVisitor {
+    found: bool,
+}
+
+impl<'ast> Visit<'ast> for InferPlaceholderVisitor {
+    fn visit_type_infer(&mut self, node: &'ast syn::TypeInfer) {
+        self.found = true;
+        syn::visit::visit_type_infer(self, node);
+    }
+}
+
+pub(super) fn reject_infer_placeholders_in_bound(
+    syntax: &syn::TypeParamBound,
+) -> Result<(), String> {
+    let mut visitor = InferPlaceholderVisitor::default();
+    visitor.visit_type_param_bound(syntax);
+    reject_if_infer_placeholder_found(visitor.found)
+}
+
+pub(super) fn reject_infer_placeholders_in_type(syntax: &syn::Type) -> Result<(), String> {
+    let mut visitor = InferPlaceholderVisitor::default();
+    visitor.visit_type(syntax);
+    reject_if_infer_placeholder_found(visitor.found)
+}
+
+fn reject_if_infer_placeholder_found(found: bool) -> Result<(), String> {
+    if found {
+        Err("infer placeholders (`_`) are not valid in type-alias signatures".to_owned())
+    } else {
+        Ok(())
+    }
+}
+
+/// Both the binder conversion and rustdoc omit attributes on higher-ranked
+/// lifetime parameters (`for<#[allow(unused)] 'a> Tr<&'a u8>`), so the
+/// attributed spelling would compare equal to the plain `for<'a>` form.
+/// Attribute-bearing binder parameters are rejected at the boundary.
+#[derive(Default)]
+struct AttributedBinderParamVisitor {
+    found: bool,
+}
+
+impl<'ast> Visit<'ast> for AttributedBinderParamVisitor {
+    fn visit_bound_lifetimes(&mut self, node: &'ast syn::BoundLifetimes) {
+        self.found |= node.lifetimes.iter().any(|param| match param {
+            syn::GenericParam::Lifetime(lifetime_param) => !lifetime_param.attrs.is_empty(),
+            syn::GenericParam::Type(type_param) => !type_param.attrs.is_empty(),
+            syn::GenericParam::Const(const_param) => !const_param.attrs.is_empty(),
+        });
+        syn::visit::visit_bound_lifetimes(self, node);
+    }
+}
+
+pub(super) fn reject_attributed_binder_params_in_bound(
+    syntax: &syn::TypeParamBound,
+) -> Result<(), String> {
+    let mut visitor = AttributedBinderParamVisitor::default();
+    visitor.visit_type_param_bound(syntax);
+    reject_if_attributed_binder_param_found(visitor.found)
+}
+
+pub(super) fn reject_attributed_binder_params_in_type(syntax: &syn::Type) -> Result<(), String> {
+    let mut visitor = AttributedBinderParamVisitor::default();
+    visitor.visit_type(syntax);
+    reject_if_attributed_binder_param_found(visitor.found)
+}
+
+fn reject_if_attributed_binder_param_found(found: bool) -> Result<(), String> {
+    if found {
+        Err(
+            "attributes on higher-ranked binder parameters are not supported by lexical type comparison"
+                .to_owned(),
+        )
+    } else {
+        Ok(())
+    }
+}
+
 /// Rustdoc evaluates attributes on bare-function parameters (a
 /// `#[cfg(any())]` argument disappears from the emitted signature), while the
 /// lexical converter has no attribute evaluator — reproducing one would
