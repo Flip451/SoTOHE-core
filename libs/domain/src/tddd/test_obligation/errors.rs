@@ -12,11 +12,11 @@
 
 use thiserror::Error;
 
-use crate::SpecDocumentLoadError;
 use crate::tddd::catalogue_v2::catalogue_impl_signals_ports::CatalogueDocumentLoaderError;
 use crate::tddd::test_obligation::drift::{NonEmptyDrifts, NonEmptyEdgeVerdictRecords};
 use crate::tddd::test_obligation::ids::{DiagnosticMessage, NonEmptyEdgeIds, RoleName};
 use crate::tddd::test_obligation::verdict::FulfillmentCacheLookupError;
+use crate::{FrozenTrackStatus, SpecDocumentLoadError};
 
 /// Error raised while loading and validating the test-obligation rules config.
 ///
@@ -97,6 +97,15 @@ pub enum SemanticVerifierError {
     VerifierPort(DiagnosticMessage),
 }
 
+/// Stable public category for a track-status read failure.
+///
+/// Raw adapter diagnostics can include filesystem details and are deliberately
+/// excluded from the derive error returned to CLI callers.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TrackStatusReadFailureKind {
+    Unavailable,
+}
+
 /// Failure of `test-obligation derive` (IN-05 / IN-07 / AC-03).
 #[derive(Debug)]
 pub enum ObligationDeriveError {
@@ -107,14 +116,19 @@ pub enum ObligationDeriveError {
         /// The branch the command was invoked on.
         branch: DiagnosticMessage,
     },
+    /// The active-branch track is frozen and its generated artifacts must not change.
+    TrackFrozen {
+        /// The derived track status that disallows writes.
+        status: FrozenTrackStatus,
+    },
+    /// Reading the track status needed to authorize the write failed.
+    TrackStatusRead(TrackStatusReadFailureKind),
     /// Loading a per-layer catalogue document failed.
     CatalogueLoad(CatalogueDocumentLoaderError),
     /// Loading and parsing the spec document failed.
     SpecLoad(SpecDocumentLoadError),
     /// The catalogue was in a state derivation cannot proceed from.
     InvalidCatalogueState(DiagnosticMessage),
-    /// Encoding the derived obligations artifact failed.
-    ArtifactCodec(ArtifactCodecError),
     /// Writing the derived obligations artifact failed.
     ArtifactWrite(DiagnosticMessage),
 }
@@ -377,21 +391,27 @@ mod tests {
     }
 
     #[test]
+    fn test_track_status_read_failure_kind_has_redacted_debug_output() {
+        assert_eq!(format!("{:?}", TrackStatusReadFailureKind::Unavailable), "Unavailable");
+    }
+
+    #[test]
     fn test_obligation_derive_error_all_variants_debuggable() {
         let variants: Vec<ObligationDeriveError> = vec![
             ObligationDeriveError::RulesLoad(TestObligationRulesLoadError::RoleNotCovered {
                 role_name: RoleName::try_new("ValueObject".to_owned()).unwrap(),
             }),
             ObligationDeriveError::TrackNotActive { branch: diag("main") },
+            ObligationDeriveError::TrackFrozen { status: FrozenTrackStatus::Done },
+            ObligationDeriveError::TrackStatusRead(TrackStatusReadFailureKind::Unavailable),
             ObligationDeriveError::CatalogueLoad(catalogue_load_error()),
             ObligationDeriveError::SpecLoad(SpecDocumentLoadError::NotFound {
                 path: PathBuf::from("spec.json"),
             }),
             ObligationDeriveError::InvalidCatalogueState(diag("baseline pending")),
-            ObligationDeriveError::ArtifactCodec(ArtifactCodecError::Io(diag("io"))),
             ObligationDeriveError::ArtifactWrite(diag("write failed")),
         ];
-        assert_eq!(variants.len(), 7);
+        assert_eq!(variants.len(), 8);
         assert!(variants.iter().all(|v| !format!("{v:?}").is_empty()));
     }
 

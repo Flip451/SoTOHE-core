@@ -1,0 +1,126 @@
+{
+  "entries": [
+    {
+      "claim_hash": "9994ee6d1e40afa5be16d71596ffd071dee46dd139364a1a901f3cff19a8a60a",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReasoningEffort",
+          "file_path": "track/items/2026-08-02-codex-reasoning-effort-max/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "217aa358feb9c0158bcfa48fb2d5b58a856dac2b12f52411c58708bdafacc60a",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "reasoning effort の選択肢に max を追加し、max を指定した実行が provider に max として発行されるようにする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "reasoning effort の選択肢に max を追加し、max を指定した実行が provider に max として発行されるようにする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "9994ee6d1e40afa5be16d71596ffd071dee46dd139364a1a901f3cff19a8a60a",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReasoningEffort",
+          "file_path": "track/items/2026-08-02-codex-reasoning-effort-max/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "eddefdc2e6a7720c569b922e87621c51ff0f113c5935b2e85f94f73e757910f8",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "capability 実行、agent profile 検証、review 系実行経路は max を含む reasoning effort を一貫して扱い、プロバイダーが受理しない effort 指定を拒否する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "capability 実行、agent profile 検証、review 系実行経路は max を含む reasoning effort を一貫して扱い、プロバイダーが受理しない effort 指定を拒否する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "9994ee6d1e40afa5be16d71596ffd071dee46dd139364a1a901f3cff19a8a60a",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReasoningEffort",
+          "file_path": "track/items/2026-08-02-codex-reasoning-effort-max/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "fd6927c368baa3dbf0524af13c712704d6ab9f76e1e8ff208388cb4cf087b650",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "max を指定した有効な provider 構成は検証を通過して provider に max として渡され、当該 provider が受理しない effort 構成は UnsupportedEffort として拒否される。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "max を指定した有効な provider 構成は検証を通過して provider に max として渡され",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "9994ee6d1e40afa5be16d71596ffd071dee46dd139364a1a901f3cff19a8a60a",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReasoningEffort",
+          "file_path": "track/items/2026-08-02-codex-reasoning-effort-max/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "786f16a323b6367fed1644a76a7e15e5ab470124b4bb2ec46d4bbd18d0476711",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "(1) capability 実行では、max を設定した対応 provider の割り当てが provider 呼出しに max を含めて開始される。(2) agent profile 検証では、max を設定した profile は provider が max を受理する場合に受理され、受理しない場合は provider 呼出し前に拒否される。(3) review 系実行経路では、max を設定した review 割り当てが provider 呼出しに max を含めて開始され、通常の完了時には当該 review の verdict が記録される。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "capability 実行では、max を設定した対応 provider の割り当てが provider 呼出しに max を含めて開始される。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "9994ee6d1e40afa5be16d71596ffd071dee46dd139364a1a901f3cff19a8a60a",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReasoningEffort",
+          "file_path": "track/items/2026-08-02-codex-reasoning-effort-max/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "c740fce1f43ee02997f2544767452cbd7a481a3593c4a580773edbc335e4608e",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "provider × effort の妥当性は provider 側の宣言に基づき fail-closed で検証し、max の enum 追加は特定 provider に依存してはならない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "provider × effort の妥当性は provider 側の宣言に基づき fail-closed で検証し、max の enum 追加は特定 provider に依存してはならない。",
+        "kind": "pass"
+      }
+    }
+  ],
+  "layer": "usecase",
+  "schema_version": 1
+}

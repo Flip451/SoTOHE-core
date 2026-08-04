@@ -163,7 +163,12 @@ mod tests {
             &format!(
                 r#"{{
                 "schema_version": 1,
-                "providers": {{}},
+                "providers": {{
+                    "{provider}": {{
+                        "label": "Test provider",
+                        "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"]
+                    }}
+                }},
                 "capabilities": {{
                     "{capability}": {{
                         "provider": "{provider}",

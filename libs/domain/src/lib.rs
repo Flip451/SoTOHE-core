@@ -126,8 +126,8 @@ pub use template_export::{
 };
 pub use timestamp::Timestamp;
 pub use track::{
-    StatusOverride, StatusOverrideKind, TaskStatus, TaskStatusKind, TaskTransition, TrackMetadata,
-    TrackStatus, TrackTask, derive_track_status,
+    FrozenTrackStatus, StatusOverride, StatusOverrideKind, TaskStatus, TaskStatusKind,
+    TaskTransition, TrackMetadata, TrackStatus, TrackTask, derive_track_status,
 };
 
 #[cfg(test)]

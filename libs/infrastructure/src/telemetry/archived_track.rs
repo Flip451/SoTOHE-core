@@ -78,9 +78,7 @@ impl ArchivedTrackTelemetryPort for FsArchivedTrackTelemetryAdapter {
             "timestamp": timestamp,
         });
 
-        let mut bytes = serde_json::to_vec(&event)
-            .map_err(|e| ArchivedTrackTelemetryError::EmitUnavailable(e.to_string()))?;
-        bytes.push(b'\n');
+        let bytes = serialize_event_line(&event)?;
 
         let path = self.telemetry_dir.join("telemetry.jsonl");
         reject_symlinks_from_root(&self.telemetry_dir)
@@ -174,6 +172,18 @@ fn open_append_no_follow(path: &Path) -> std::io::Result<File> {
         options.custom_flags(libc::O_NOFOLLOW | libc::O_CLOEXEC);
     }
     options.open(path)
+}
+
+/// Serializes one archived telemetry event to a newline-terminated canonical JSONL line.
+fn serialize_event_line(event: &serde_json::Value) -> Result<Vec<u8>, ArchivedTrackTelemetryError> {
+    // Re-enter the Value boundary so this writer preserves canonical key order
+    // before adding the JSONL delimiter.
+    let value = serde_json::to_value(event)
+        .map_err(|e| ArchivedTrackTelemetryError::EmitUnavailable(e.to_string()))?;
+    let mut bytes = serde_json::to_vec(&value)
+        .map_err(|e| ArchivedTrackTelemetryError::EmitUnavailable(e.to_string()))?;
+    bytes.push(b'\n');
+    Ok(bytes)
 }
 
 // ── Unit tests ────────────────────────────────────────────────────────────────
@@ -276,6 +286,29 @@ mod tests {
             cmds,
             &["track init", "track review", "track commit"],
             "command field must match the emitted subcommand in order"
+        );
+    }
+
+    #[test]
+    fn test_emit_serialization_with_populated_event_produces_canonical_stable_jsonl() {
+        let event = serde_json::json!({
+            "event_type": "TrackSubcommand",
+            "schema_version": 1,
+            "track_id": "archived-2026-06-22",
+            "command": "track full-cycle",
+            "exit_code": 7,
+            "duration_ms": 1_234,
+            "timestamp": "2026-08-02T03:04:05Z",
+        });
+
+        let first = super::serialize_event_line(&event).unwrap();
+        let second = super::serialize_event_line(&event).unwrap();
+
+        assert_eq!(first, second, "identical archived events must produce identical bytes");
+        assert_eq!(first.last(), Some(&b'\n'), "JSONL output must retain its newline delimiter");
+        assert_eq!(
+            first,
+            b"{\"command\":\"track full-cycle\",\"duration_ms\":1234,\"event_type\":\"TrackSubcommand\",\"exit_code\":7,\"schema_version\":1,\"timestamp\":\"2026-08-02T03:04:05Z\",\"track_id\":\"archived-2026-06-22\"}\n"
         );
     }
 

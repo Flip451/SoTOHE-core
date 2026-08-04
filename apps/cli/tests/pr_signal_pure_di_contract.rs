@@ -283,7 +283,7 @@ fn test_pr_review_cycle_off_track_branch_preserves_fail_closed_cli_contract() {
         profiles_dir.join("agent-profiles.json"),
         r#"{
   "schema_version": 1,
-  "providers": { "codex": { "label": "Codex" } },
+  "providers": { "codex": { "label": "Codex", "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"] } },
   "capabilities": {
     "pr-reviewer": {
       "provider": "codex",

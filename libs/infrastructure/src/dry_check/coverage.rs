@@ -245,7 +245,11 @@ impl DryCheckCoveragePort for FsDryCheckCoverageAdapter {
                 .collect(),
         };
 
-        let json = serde_json::to_vec_pretty(&manifest)
+        // Materialize through Value so every nested manifest object uses the
+        // canonical JSON key order before the atomic write.
+        let value = serde_json::to_value(&manifest)
+            .map_err(|e| DryCheckCycleError::CoveragePort(format!("serialize {path_str}: {e}")))?;
+        let json = serde_json::to_vec_pretty(&value)
             .map_err(|e| DryCheckCycleError::CoveragePort(format!("serialize {path_str}: {e}")))?;
 
         if let Some(parent) = self.store_path.parent() {
@@ -370,6 +374,59 @@ mod tests {
         assert!(read.contains_pair(&pair));
         assert_eq!(read.config_fingerprint(), &test_fingerprint());
         assert_eq!(read.corpus_fingerprint(), &test_corpus_fingerprint());
+    }
+
+    #[test]
+    fn test_write_coverage_with_populated_record_produces_canonical_stable_json() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("coverage.json");
+        let adapter = FsDryCheckCoverageAdapter::new(path.clone(), dir.path().to_owned());
+        let mut refs = BTreeSet::new();
+        refs.insert(make_fragment_ref("src/z.rs", 'e'));
+        refs.insert(make_fragment_ref("src/a.rs", 'a'));
+        let mut pairs = BTreeSet::new();
+        pairs.insert(make_pair_key("src/z.rs", 'e', "src/a.rs", 'a'));
+        let record =
+            DryCheckCoverageRecord::new(refs, pairs, test_fingerprint(), test_corpus_fingerprint());
+
+        adapter.write_coverage(&make_track_id(), record.clone()).unwrap();
+        let first = std::fs::read(&path).unwrap();
+        adapter.write_coverage(&make_track_id(), record).unwrap();
+        let second = std::fs::read(&path).unwrap();
+
+        assert_eq!(first, second, "identical coverage records must write identical bytes");
+        assert_eq!(
+            std::str::from_utf8(&first).unwrap(),
+            concat!(
+                "{\n",
+                "  \"config_fingerprint\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\n",
+                "  \"corpus_fingerprint\": \"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\n",
+                "  \"fragment_refs\": [\n",
+                "    {\n",
+                "      \"content_hash\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\n",
+                "      \"path\": \"src/a.rs\"\n",
+                "    },\n",
+                "    {\n",
+                "      \"content_hash\": \"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee\",\n",
+                "      \"path\": \"src/z.rs\"\n",
+                "    }\n",
+                "  ],\n",
+                "  \"processed_pair_keys\": [\n",
+                "    {\n",
+                "      \"high\": {\n",
+                "        \"content_hash\": \"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee\",\n",
+                "        \"path\": \"src/z.rs\"\n",
+                "      },\n",
+                "      \"low\": {\n",
+                "        \"content_hash\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\n",
+                "        \"path\": \"src/a.rs\"\n",
+                "      }\n",
+                "    }\n",
+                "  ],\n",
+                "  \"schema_version\": 4\n",
+                "}"
+            )
+        );
     }
 
     #[test]

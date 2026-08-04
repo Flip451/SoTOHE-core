@@ -1,0 +1,11 @@
+{
+  "catalogue_declaration_hash": "030157e83809a91548f2c3bb6b4b2d9f44e83e1b7f965013ba8c3d4369e84860",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "9994ee6d1e40afa5be16d71596ffd071dee46dd139364a1a901f3cff19a8a60a",
+      "signal": "blue",
+      "type_name": "ReasoningEffort"
+    }
+  ]
+}

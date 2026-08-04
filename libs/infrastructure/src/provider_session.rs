@@ -140,7 +140,11 @@ impl ProviderSessionCachePort for FsProviderSessionCacheAdapter {
         let root = self.canonical_repo_root()?;
         self.prepare_parent(&path, &root)?;
         reject_symlinks_below(&path, &root).map_err(map_symlink_or_io)?;
-        let content = serde_json::to_vec(&PersistedEntry::from_entry(identity, entry))
+        // Materialize through Value so the persisted cache envelope has
+        // canonical JSON key order before its size is checked and written.
+        let value = serde_json::to_value(PersistedEntry::from_entry(identity, entry))
+            .map_err(|error| entry_invalid(format!("cache entry JSON encode failed: {error}")))?;
+        let content = serde_json::to_vec(&value)
             .map_err(|error| entry_invalid(format!("cache entry JSON encode failed: {error}")))?;
         // Mirror the load-side bound so the adapter never persists an entry it
         // would refuse to read back.
@@ -407,6 +411,31 @@ mod tests {
         assert_eq!(cache.load(&key).unwrap(), Some(expected));
         cache.remove(&key).unwrap();
         assert_eq!(cache.load(&key).unwrap(), None);
+    }
+
+    #[test]
+    fn test_provider_session_cache_save_with_populated_entry_writes_canonical_stable_json() {
+        let directory = tempfile::tempdir().unwrap();
+        let cache = FsProviderSessionCacheAdapter::new(
+            directory.path().to_path_buf(),
+            PathBuf::from("tmp/runtime"),
+        );
+        let key = workspace_key();
+        let entry = entry_with_session_id("session-with-populated-cache-entry");
+
+        cache.save(&key, &entry).unwrap();
+        let (path, identity) = cache.cache_path(&key).unwrap();
+        let first = std::fs::read(&path).unwrap();
+        cache.save(&key, &entry).unwrap();
+        let second = std::fs::read(&path).unwrap();
+
+        assert_eq!(first, second, "identical cache entries must write identical bytes");
+        assert_eq!(
+            std::str::from_utf8(&first).unwrap(),
+            format!(
+                r#"{{"effort":"high","key":"{identity}","model":"gpt-5","provider":"codex","session_id":"session-with-populated-cache-entry"}}"#
+            )
+        );
     }
 
     #[test]

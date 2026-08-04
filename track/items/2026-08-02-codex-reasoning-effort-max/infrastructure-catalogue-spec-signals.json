@@ -1,0 +1,31 @@
+{
+  "catalogue_declaration_hash": "a99e435b1786984600be600978fba8c2004731b4f235ceaf180b3fd9e581ba62",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "75884c2e950e7071b6a25b5e24aca89f74e1c63b1fb79bc328c3cfd9a66cd8d7",
+      "signal": "blue",
+      "type_name": "AgentProfiles"
+    },
+    {
+      "entry_hash": "b4df479552682294d66d7efcbaa59639e2d143775f0871269b9338d5bec6490f",
+      "signal": "blue",
+      "type_name": "AgentProfilesError"
+    },
+    {
+      "entry_hash": "863efcda0c9fba85aa3332167eebc88e998a703fa063c7c61f47895bdc592115",
+      "signal": "blue",
+      "type_name": "CapabilityConfigDto"
+    },
+    {
+      "entry_hash": "4221ef4ee7c7627654b22f2b8c55b7446502692a6b11ad9cc2fb124ed1563bde",
+      "signal": "blue",
+      "type_name": "ReasoningEffortDto"
+    },
+    {
+      "entry_hash": "5b923a1d6133ab7aa67e6846f5a35acacd5075b91374e819c41d3cb5e4bd435a",
+      "signal": "blue",
+      "type_name": "ResolvedExecution"
+    }
+  ]
+}
