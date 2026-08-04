@@ -567,6 +567,29 @@ fn test_validate_generic_bound_rejects_turbofish_arguments() {
 }
 
 #[test]
+fn test_validate_generic_bound_rejects_parenthesized_bounds() {
+    for bound in ["(Clone)", "( Clone )"] {
+        assert!(
+            validate_lexical_generic_bound(bound, &[]).is_err(),
+            "parenthesized bound spelling must be rejected: {bound}"
+        );
+    }
+    // Grammatically required parentheses are a type-level node, not a
+    // parenthesized bound, and must stay accepted.
+    assert!(validate_lexical_generic_bound("Tr<&(dyn Fn() + Send)>", &[]).is_ok());
+
+    let result = parse_generic_bound_with_generics_preserving_spelling(
+        "(Clone)",
+        &no_local,
+        100,
+        &HashMap::new(),
+        &mut |_| 101,
+        &[],
+    );
+    assert!(result.is_err(), "parenthesized bound must fail closed in the preserving encoder");
+}
+
+#[test]
 fn test_parse_generic_bound_generic_argument_shadows_catalogue_type() {
     let bound = parse_generic_bound_with_generics_preserving_spelling(
         "Into<T>",
