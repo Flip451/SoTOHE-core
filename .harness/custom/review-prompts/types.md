@@ -229,3 +229,19 @@ baseline captured at track start), per the catalogue action ADRs. A type that fi
 within the current track — even if already committed by an earlier task of the same track —
 is `add`, not `modify`; only identities present in the frozen baseline take `modify`. Do
 not classify actions against the current rustdoc or committed HEAD.
+
+## Declaration-ahead entries (do not treat as SoT integrity violations)
+
+Per the task-contract conformance ADR (2026-06-27-0852 D7), a catalogue entry attributed
+to a todo task may carry an impl-catalog Yellow (`found_type: false`) as normal
+declaration-ahead work-in-progress, and per ADR 2026-07-30-1036 D1 the types review must
+not demand downstream implementation liveness: types convergence is judged against the
+catalogue-spec chain, not against whether source has caught up with the declared final
+shape (including planned renames whose old-named source type transitionally persists).
+
+- Only for track `scope-conditional-pre-review-gates-2026-07-31`:
+  `ReviewCheckApprovedArgs` is the declaration-ahead FINAL identity implemented by task
+  T042 (todo, task-contract attributed; the rename from `commands::review::
+  CheckApprovedArgs` with payload/caller/test updates is recorded in T042's description).
+  Its catalogue-spec signal is Blue; its impl-catalog Yellow is permitted by D7. The
+  old-named transitional source type is not a catalogue subject.

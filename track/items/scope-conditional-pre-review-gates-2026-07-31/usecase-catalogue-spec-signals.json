@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "e8bd71f2d0a2301dd41f17f79f96ac5497e83824682e259f124bc7edbe43977a",
+  "catalogue_declaration_hash": "a3ab5c2693cc44402a67692cd144de6647e6e5c0efc008df0690dab35d4d88e6",
   "signals": [
     {
       "type_name": "CapabilityExecInteractor",
@@ -228,6 +228,36 @@
       "entry_hash": "86a2a1f7d56610b8fb4ab377d35e8ae4f239cdd53570a77dd7a91fe9efcfb15a"
     },
     {
+      "type_name": "RefVerifyChainFilter",
+      "signal": "blue",
+      "entry_hash": "78fbb2e7be4b94db0f8593af3f09823fc38b20e7687d3d43ee5b2b6febdf820b"
+    },
+    {
+      "type_name": "ReviewCheckZeroFindingsError",
+      "signal": "blue",
+      "entry_hash": "e2353f293f64abd7c6a7531370917eb858c84639456d2ec1f6ccd49947601f4c"
+    },
+    {
+      "type_name": "ReviewCheckZeroFindingsInteractor",
+      "signal": "blue",
+      "entry_hash": "110c7363db3945cf2fc369515f413719f4c12ab4d41d2f980512e93970dc0450"
+    },
+    {
+      "type_name": "ReviewCheckZeroFindingsOutcome",
+      "signal": "blue",
+      "entry_hash": "7f2cb2459c0f6ba0620ba2bc1a99d413f7d8ea9d2a82578781e234dffc800c3c"
+    },
+    {
+      "type_name": "ReviewCheckZeroFindingsQuery",
+      "signal": "blue",
+      "entry_hash": "23eb9e1ea61be62726661580bb376b1c696ed130d3c7425432bec9b6ca7abb5b"
+    },
+    {
+      "type_name": "ReviewScopeSelection",
+      "signal": "blue",
+      "entry_hash": "8339c73b2c758968797776d2b157f2e7cc5a87a5a56380ad90a25e424a6c9d3f"
+    },
+    {
       "type_name": "ReviewScopeSelector",
       "signal": "blue",
       "entry_hash": "9867b51315ba84d48b11e322cc8844020fa5ec21ee3362711c9c2a4155d91e8e"
@@ -281,6 +311,26 @@
       "type_name": "ProgramRunnerPort",
       "signal": "blue",
       "entry_hash": "d49b5165ce5926cac4cc005cdff3ae323187a58af0cd34bed74b5586d427dd3f"
+    },
+    {
+      "type_name": "RefVerifyAggregateService",
+      "signal": "blue",
+      "entry_hash": "ead4ecb43b1c25827f08a49969f652b3b9f16ac8a034eeb349842d682f3f90ea"
+    },
+    {
+      "type_name": "RefVerifyCheckApprovedDriverService",
+      "signal": "blue",
+      "entry_hash": "945ab4a1dde7228e33d3e16ddb627212de3179b20cc67731d92945e91e82a528"
+    },
+    {
+      "type_name": "ReviewCheckZeroFindingsService",
+      "signal": "blue",
+      "entry_hash": "69f2330ffbbef7e04de508be33f66b62d4b71fbc97ad00a961d7e93a0699ec2a"
+    },
+    {
+      "type_name": "ReviewService",
+      "signal": "blue",
+      "entry_hash": "d4cff7dc87ee7c38f3ec9fe889d0c2e4e1276916078e76a9e63af1bd035dc2bd"
     }
   ]
 }

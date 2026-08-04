@@ -1437,6 +1437,82 @@
     {
       "for_type": "ClassifiedProgramExecutionRecord",
       "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewCheckZeroFindingsInteractor",
+      "trait_ref": "ReviewCheckZeroFindingsService"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewCheckZeroFindingsQuery",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewCheckZeroFindingsQuery",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewCheckZeroFindingsQuery",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewCheckZeroFindingsQuery",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewCheckZeroFindingsOutcome",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewCheckZeroFindingsOutcome",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewCheckZeroFindingsOutcome",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewCheckZeroFindingsOutcome",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewCheckZeroFindingsError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewCheckZeroFindingsError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewCheckZeroFindingsError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "ReviewScopeSelection",
+      "trait_ref": "Debug"
+    },
+    {
+      "for_type": "ReviewScopeSelection",
+      "trait_ref": "Clone"
+    },
+    {
+      "for_type": "ReviewScopeSelection",
+      "trait_ref": "PartialEq"
+    },
+    {
+      "for_type": "ReviewScopeSelection",
+      "trait_ref": "Eq"
     }
   ],
   "traits": {
@@ -1780,6 +1856,406 @@
         }
       ],
       "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "RefVerifyAggregateService": {
+      "action": "modify",
+      "docs": "Aggregate ref-verify application service extending the focused check-approved service while retaining its run and results contracts (CN-06, AC-16).",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "run",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&str"
+            },
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<RefVerifyRunOutcome, RefVerifyDriverError>"
+        },
+        {
+          "has_default_impl": true,
+          "is_async": false,
+          "name": "results",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&str"
+            },
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "chain",
+              "ty": "RefVerifyChainFilter"
+            },
+            {
+              "name": "layer",
+              "ty": "RefVerifyLayerFilter"
+            },
+            {
+              "name": "verdict",
+              "ty": "RefVerifyVerdictFilter"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<RefVerifyResultsOutput, RefVerifyDriverError>"
+        }
+      ],
+      "module_path": "ref_verify::driver_service",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "RefVerifyCheckApprovedDriverService",
+        "Send",
+        "Sync"
+      ]
+    },
+    "RefVerifyCheckApprovedDriverService": {
+      "action": "modify",
+      "docs": "Ref-verify check-approved — synchronous (bounded I/O) (CN-06, AC-16).",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "check_approved",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&str"
+            },
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "chain",
+              "ty": "RefVerifyChainFilter"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<RefVerifyCheckApprovedOutcome, RefVerifyDriverError>"
+        }
+      ],
+      "module_path": "ref_verify::driver_service",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "ReviewCheckZeroFindingsService": {
+      "action": "add",
+      "docs": "Review check-zero-findings — synchronous (bounded I/O) (CN-06, AC-16).",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "check_zero_findings",
+          "params": [
+            {
+              "name": "query",
+              "ty": "&ReviewCheckZeroFindingsQuery"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<ReviewCheckZeroFindingsOutcome, ReviewCheckZeroFindingsError>"
+        }
+      ],
+      "module_path": "review_v2::check_zero_findings",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "ReviewService": {
+      "action": "modify",
+      "docs": "Aggregate review application service extending the focused check-zero-findings service while retaining its pre-existing command-family methods (CN-06, AC-16).",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "run_codex",
+          "params": [
+            {
+              "name": "input",
+              "ty": "ReviewRunInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<RunReviewOutput, RunReviewError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "run_claude",
+          "params": [
+            {
+              "name": "input",
+              "ty": "ReviewRunInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<RunReviewOutput, RunReviewError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "run_local",
+          "params": [
+            {
+              "name": "model",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "timeout_seconds",
+              "ty": "u64"
+            },
+            {
+              "name": "briefing_file",
+              "ty": "Option<std::path::PathBuf>"
+            },
+            {
+              "name": "prompt",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "track_id",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "round_type",
+              "ty": "String"
+            },
+            {
+              "name": "group",
+              "ty": "String"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "ReviewRunLocalOutput"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "check_approved",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "String"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<ReviewApprovalOutput, ReviewCheckApprovedError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "results",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "selection",
+              "ty": "ReviewScopeSelection"
+            },
+            {
+              "name": "limit",
+              "ty": "u32"
+            },
+            {
+              "name": "round_type",
+              "ty": "String"
+            },
+            {
+              "name": "no_hint",
+              "ty": "bool"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<String, ReviewAuxError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "classify",
+          "params": [
+            {
+              "name": "paths",
+              "ty": "Vec<String>"
+            },
+            {
+              "name": "track_id",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<Vec<(String, String)>, ReviewAuxError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "files",
+          "params": [
+            {
+              "name": "scope",
+              "ty": "String"
+            },
+            {
+              "name": "track_id",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<Vec<String>, ReviewAuxError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "validate_scope",
+          "params": [
+            {
+              "name": "scope",
+              "ty": "String"
+            },
+            {
+              "name": "track_id",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(), ReviewAuxError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "get_briefing",
+          "params": [
+            {
+              "name": "scope",
+              "ty": "String"
+            },
+            {
+              "name": "track_id",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<Option<String>, ReviewAuxError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "persist_commit_hash",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "String"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<String, CommitHashPersistenceError>"
+        }
+      ],
+      "module_path": "review_v2::aggregate_service",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "ReviewCheckZeroFindingsService",
         "Send",
         "Sync"
       ]
@@ -3916,6 +4392,290 @@
         },
         {
           "anchor": "AC-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "RefVerifyChainFilter": {
+      "action": "reference",
+      "docs": "Pre-existing usecase boundary DTO reused to select Chain 1 or Chain 2 for check-approved; All remains available to existing non-CLI consumers and results queries.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Chain1",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Chain2",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "All",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "ref_verify::driver_service",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewCheckZeroFindingsError": {
+      "action": "add",
+      "docs": "Validation and state-evaluation failures for the per-scope final zero_findings query (CN-06, AC-16).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "InvalidTrack",
+            "payload": {
+              "fields": [
+                "domain::FreeText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidScope",
+            "payload": {
+              "fields": [
+                "domain::FreeText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "EvaluationFailed",
+            "payload": {
+              "fields": [
+                "domain::FreeText"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "review_v2::check_zero_findings",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewCheckZeroFindingsInteractor": {
+      "action": "add",
+      "docs": "Dependency-injected interactor for fail-closed evaluation of one scope's current final review verdict (CN-06, AC-16).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "generics": [
+            {
+              "bounds": [],
+              "name": "F"
+            }
+          ],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "build_fn",
+              "ty": "F"
+            }
+          ],
+          "returns": "Self",
+          "where_predicates": [
+            {
+              "lhs": "F",
+              "operator": "Bound",
+              "rhs": [
+                "Fn(&ReviewCheckZeroFindingsQuery) -> Result<ReviewCheckZeroFindingsOutcome, ReviewCheckZeroFindingsError>",
+                "Send",
+                "Sync",
+                "'static"
+              ]
+            }
+          ]
+        }
+      ],
+      "module_path": "review_v2::check_zero_findings",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewCheckZeroFindingsOutcome": {
+      "action": "add",
+      "docs": "Usecase-boundary outcome DTO for the review check-zero-findings operation (CN-06, AC-16).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "CurrentFinalZeroFindings",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "MissingFinalVerdict",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "StaleFinalVerdict",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "FindingsRemain",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "review_v2::check_zero_findings",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewCheckZeroFindingsQuery": {
+      "action": "add",
+      "docs": "Typed read query for the review check-zero-findings operation (CN-06, AC-16).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "track",
+              "ty": "ReviewTrackSelector"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "scope",
+              "ty": "domain::review_v2::ScopeName"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "review_v2::check_zero_findings",
+      "role": {
+        "Query": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewScopeSelection": {
+      "action": "add",
+      "docs": "Application-boundary value selecting one validated review scope or all scopes; the enum makes mutually exclusive selections unrepresentable (CN-06, AC-16).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Named",
+            "payload": {
+              "fields": [
+                "domain::review_v2::ScopeName"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "All",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "review_v2::review_aux",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]

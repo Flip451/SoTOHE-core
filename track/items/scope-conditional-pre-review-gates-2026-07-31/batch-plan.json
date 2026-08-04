@@ -21,13 +21,22 @@
     {"task_id": "T033", "scope_estimates": [{"scope": "infrastructure", "production_lines": 70, "test_lines": 90}], "oversize_justification": null},
     {"task_id": "T034", "scope_estimates": [{"scope": "usecase", "production_lines": 35, "test_lines": 10}], "oversize_justification": null},
     {"task_id": "T035", "scope_estimates": [{"scope": "usecase", "production_lines": 90, "test_lines": 70}], "oversize_justification": null},
-    {"task_id": "T036", "scope_estimates": [{"scope": "cli_composition", "production_lines": 100, "test_lines": 70}], "oversize_justification": null}
+    {"task_id": "T036", "scope_estimates": [{"scope": "cli_composition", "production_lines": 100, "test_lines": 70}], "oversize_justification": null},
+    {"task_id": "T037", "scope_estimates": [{"scope": "cli", "production_lines": 230, "test_lines": 120}], "oversize_justification": null},
+    {"task_id": "T038", "scope_estimates": [{"scope": "usecase", "production_lines": 170, "test_lines": 100}, {"scope": "cli_driver", "production_lines": 85, "test_lines": 50}, {"scope": "cli", "production_lines": 115, "test_lines": 85}], "oversize_justification": null},
+    {"task_id": "T042", "scope_estimates": [{"scope": "cli", "production_lines": 50, "test_lines": 40}], "oversize_justification": null},
+    {"task_id": "T043", "scope_estimates": [{"scope": "usecase", "production_lines": 75, "test_lines": 45}, {"scope": "cli_driver", "production_lines": 40, "test_lines": 25}, {"scope": "cli", "production_lines": 40, "test_lines": 20}], "oversize_justification": null},
+    {"task_id": "T039", "scope_estimates": [{"scope": "usecase", "production_lines": 100, "test_lines": 60}, {"scope": "cli_driver", "production_lines": 50, "test_lines": 35}, {"scope": "cli", "production_lines": 90, "test_lines": 60}], "oversize_justification": null},
+    {"task_id": "T040", "scope_estimates": [{"scope": "harness-policy", "production_lines": 180, "test_lines": 60}], "oversize_justification": null},
+    {"task_id": "T041", "scope_estimates": [{"scope": "harness-policy", "production_lines": 220, "test_lines": 0}], "oversize_justification": null}
   ],
   "batches": [
     {"id": "B1", "task_ids": ["T017", "T018", "T019", "T020", "T021", "T022", "T023"]},
     {"id": "B2", "task_ids": ["T024", "T025", "T028"]},
     {"id": "B3", "task_ids": ["T026", "T027", "T029"]},
     {"id": "B4", "task_ids": ["T032", "T034", "T033"]},
-    {"id": "B5", "task_ids": ["T035", "T030", "T036", "T031"]}
+    {"id": "B5", "task_ids": ["T035", "T030", "T036", "T031"]},
+    {"id": "B6", "task_ids": ["T037", "T039"]},
+    {"id": "B7", "task_ids": ["T038", "T042", "T040", "T041", "T043"]}
   ]
 }

@@ -140,6 +140,36 @@
       "action": "add",
       "for_type": "PhaseCommandDriver",
       "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "RefVerifyCheckApprovedInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "RefVerifyCheckApprovedInput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "RefVerifyChainSelect",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "RefVerifyChainSelect",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "RefVerifyChainSelect",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "RefVerifyChainSelect",
+      "trait_ref": "core::cmp::Eq"
     }
   ],
   "traits": {},
@@ -466,6 +496,250 @@
       "spec_refs": [
         {
           "anchor": "IN-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "RefVerifyChainSelect": {
+      "action": "reference",
+      "docs": "Driver-layer chain selector mapped from the ref-verify check-approved CLI argument (CN-06, AC-16).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Chain1",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Chain2",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "All",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "RefVerifyCheckApprovedInput": {
+      "action": "modify",
+      "docs": "Driver input mapping the `ref-verify check-approved` arguments into the usecase boundary (CN-06, AC-16).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "track_id",
+              "ty": "String"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "chain",
+              "ty": "RefVerifyChainSelect"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewInput": {
+      "action": "modify",
+      "docs": "Review command-family driver input using typed check-zero-findings and mutually exclusive results-scope selection boundaries (CN-06, AC-16).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "RunCodex",
+            "payload": {
+              "fields": [
+                "String",
+                "u64",
+                "Option<std::path::PathBuf>",
+                "Option<String>",
+                "Option<String>",
+                "String",
+                "String",
+                "std::path::PathBuf"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "RunClaude",
+            "payload": {
+              "fields": [
+                "String",
+                "u64",
+                "Option<std::path::PathBuf>",
+                "Option<String>",
+                "Option<String>",
+                "String",
+                "String",
+                "std::path::PathBuf"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "RunLocal",
+            "payload": {
+              "fields": [
+                "Option<String>",
+                "u64",
+                "Option<std::path::PathBuf>",
+                "Option<String>",
+                "Option<String>",
+                "String",
+                "String",
+                "std::path::PathBuf"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "CheckApproved",
+            "payload": {
+              "fields": [
+                "String",
+                "std::path::PathBuf"
+              ],
+              "kind": "tuple"
+            }
+          },
+        {
+          "name": "CheckZeroFindings",
+          "payload": {
+            "fields": [
+              "usecase::review_v2::check_zero_findings::ReviewCheckZeroFindingsQuery"
+            ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Results",
+            "payload": {
+            "fields": [
+              "Option<String>",
+              "std::path::PathBuf",
+              "usecase::review_v2::review_aux::ReviewScopeSelection",
+              "u32",
+                "String",
+                "bool"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Classify",
+            "payload": {
+              "fields": [
+                "Vec<String>",
+                "Option<String>",
+                "std::path::PathBuf"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Files",
+            "payload": {
+              "fields": [
+                "String",
+                "Option<String>",
+                "std::path::PathBuf"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "ValidateScope",
+            "payload": {
+              "fields": [
+                "String",
+                "Option<String>",
+                "std::path::PathBuf"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "GetBriefing",
+            "payload": {
+              "fields": [
+                "String",
+                "Option<String>",
+                "std::path::PathBuf"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "PersistCommitHash",
+            "payload": {
+              "fields": [
+                "String",
+                "std::path::PathBuf"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "review",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]

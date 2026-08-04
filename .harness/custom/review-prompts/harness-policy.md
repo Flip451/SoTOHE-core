@@ -139,3 +139,19 @@ Violations of the role statement above are always reportable. The following prio
   the user adjudicated on 2026-08-03 to accept the cross-populated binding shape in this
   track and to resolve the granularity (method-level spec_refs + derive changes) in a
   separate track. It is not an accepted deviation for any other track or consumer.
+
+- **Conditional allowance — apply only when the review run's resolved Track ID is
+  exactly `scope-conditional-pre-review-gates-2026-07-31`; otherwise, do not apply
+  this allowance.**
+  **Staged completion of the phase convergence matrix and workflow adoption**: the
+  shipped `.harness/config/phase-commands.json` does not yet declare the per-phase
+  direct-upstream convergence pre-entry sequences, and canonical workflows do not yet
+  invoke `bin/sotp phase enter`. Factual background: the admitted delta ADR
+  phase-enter adoption and check-commands ADR and spec elements
+  IN-12/IN-13/CN-06/AC-14/AC-15/AC-16 decide both obligations, and the in-track tasks
+  T038 (check-zero-findings command), T039 (ref-verify chain selector), T040 (config
+  convergence matrix), and T041 (workflow/adapter migration) are planned in batches
+  B6/B7 to implement them. The user adjudicated on 2026-08-04 to accept intermediate
+  commits while those planned tasks land within this track; this allowance expires when
+  T040 and T041 are complete and is not an accepted deviation for any other track or
+  consumer.

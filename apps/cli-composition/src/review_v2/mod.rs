@@ -1647,7 +1647,7 @@ exit 0
                 "schema_version": 1,
                 "scopes": [{
                     "scope": "cli_composition",
-                    "commands": [{"argv": ["false"], "timeout_seconds": null}]
+                    "commands": [{"argv": ["false", "pre-review-gate-evidence"], "timeout_seconds": null}]
                 }]
             }"#,
         )
@@ -1678,6 +1678,10 @@ exit 0
         assert!(
             stderr.contains("pre-review command failed"),
             "expected the pre-review gate block, got: {stderr}"
+        );
+        assert!(
+            stderr.contains("pre-review-gate-evidence"),
+            "expected the pre-review gate block to identify the failed argv, got: {stderr}"
         );
     }
 

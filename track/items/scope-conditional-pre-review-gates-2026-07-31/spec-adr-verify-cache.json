@@ -646,6 +646,52 @@
       }
     },
     {
+      "claim_hash": "7b4c3f4734549516874260aadc28ec779f4da1cff3af16248bd52eca0c9521e0",
+      "evidence_hash": "755b3e4e35b814561a80773314cad213ca4a9dceb84923a09099e6d8a80a0b4f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "shipped `.harness/config/phase-commands.json` は、各 declared phase の pre-entry commands を direct-upstream signal gate、適用される chain-scoped semantic verification、upstream scope の current final `zero_findings` review check の順で宣言する。意味論検証が適用されない phase ではその要素だけを省く。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-12",
+          "text_label": "phase command config は各 declared phase に direct-upstream convergence の ordered literal pre-entry argv matrix を持つ。現在の `spec-design` は `signal check-adr-user --gate commit` と ADR scope の current final `zero_findings` review check を、`type-design` は `signal check-spec-adr --gate commit`、Chain ① semantic verification check、spec scope の current final `zero_findings` review check を、`impl-plan` は `signal check-catalog-spec --gate commit`、Chain ② semantic verification check、types scope の current final `zero_findings` review check を順に通過する。ADR-user chain に semantic verification は追加しない。将来 config に追加される phase も、その direct upstream chain の signal gate、適用される semantic verification、current final `zero_findings` review check を同じ順で宣言する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-08-04-0001-phase-enter-adoption-and-check-commands.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "b9705a31f7c0d6d796d41b0f16651e18fe9eb97a5af9351e05a5e089d15a5ee8",
+      "evidence_hash": "755b3e4e35b814561a80773314cad213ca4a9dceb84923a09099e6d8a80a0b4f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "config に宣言された `spec-design`、`type-design`、`impl-plan` の canonical `/track:*` workflow は、対応する writer を起動するとき `bin/sotp phase enter <phase-id>` を唯一の入口として使う。複合 workflow がこれらの phase へ入る場合も同じ入口を使い、workflow SSoT または provider adapter から `bin/sotp capability exec` で writer を直接起動しない。\n\nphase engine は pre-entry command がすべて zero の場合だけ configured writer を一度起動する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-13",
+          "text_label": "canonical `/track:*` workflow が phase writer を起動するときは、writer の `capability exec` argv を直接 dispatch せず、`bin/sotp phase enter <phase-id>` を起動する。phase engine は config に宣言された convergence pre-entry sequence を first non-zero で fail-closed にし、全て zero の場合だけ canonical writer を一度起動する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-08-04-0001-phase-enter-adoption-and-check-commands.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
       "claim_hash": "07a396adf15accfc8f609dae5115bf3b6b38a3129c93664c94f2742080865d26",
       "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
       "verdict": {
@@ -1010,6 +1056,29 @@
         "data": {
           "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md",
           "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "8fa587f6b3cb186fc083494e54ed3db92fa82015011b1fec6c54d72cfb0b3e46",
+      "evidence_hash": "755b3e4e35b814561a80773314cad213ca4a9dceb84923a09099e6d8a80a0b4f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "final review 収束には、対象 scope の current final verdict を検査する公開 `bin/sotp` check command を設ける。対象 scope の current final verdict が `zero_findings` の場合だけ exit zero とし、verdict の欠如、final 未完了、`findings_remain`、current artifact と対応しない verdict、入力不正は non-zero とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-06",
+          "text_label": "pre-entry matrix で使う public check command は exit code で判定可能でなければならない。`bin/sotp review check-zero-findings --scope <scope> --round final` は指定 scope の current artifact に対応する final review verdict が `zero_findings` の場合だけ zero を返す。`bin/sotp ref-verify check-approved --chain <1|2>` は指定 Chain の current production reference pair が全て verified pass の場合だけ zero を返す。display-only result command を convergence 判定に使わず、未解決、stale、または対象外 chain の状態で false success を返さない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-08-04-0001-phase-enter-adoption-and-check-commands.md",
+          "decision_id": "D2"
         }
       }
     },
@@ -1539,6 +1608,75 @@
         "data": {
           "file_path": "knowledge/adr/2026-08-03-1010-capability-exec-omitted-host-dispatch.md",
           "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "78ce9c6a3c9eae40fed82c06eed1f9658d13d3326589ea804dbb7a34bd4155ed",
+      "evidence_hash": "755b3e4e35b814561a80773314cad213ca4a9dceb84923a09099e6d8a80a0b4f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "shipped `.harness/config/phase-commands.json` は、各 declared phase の pre-entry commands を direct-upstream signal gate、適用される chain-scoped semantic verification、upstream scope の current final `zero_findings` review check の順で宣言する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-14",
+          "text_label": "phase enter は `spec-design` で ADR signal gate と ADR final-review check を、`type-design` で spec signal gate、Chain ① semantic verification check、spec final-review check を、`impl-plan` で catalogue signal gate、Chain ② semantic verification check、types final-review check を config declaration order で実行する。各 required check が zero の場合だけ次の command に進み、最初の non-zero で remaining command と writer を起動しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-08-04-0001-phase-enter-adoption-and-check-commands.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "d3c306763b47bf58494c816b4fba15046782f9b0f1ef03c6ad4ef5c10d321eda",
+      "evidence_hash": "755b3e4e35b814561a80773314cad213ca4a9dceb84923a09099e6d8a80a0b4f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "config に宣言された `spec-design`、`type-design`、`impl-plan` の canonical `/track:*` workflow は、対応する writer を起動するとき `bin/sotp phase enter <phase-id>` を唯一の入口として使う。複合 workflow がこれらの phase へ入る場合も同じ入口を使い、workflow SSoT または provider adapter から `bin/sotp capability exec` で writer を直接起動しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-15",
+          "text_label": "canonical `/track:*` workflow の writer-launch path は `bin/sotp phase enter <phase-id>` だけを呼び、direct `bin/sotp capability exec <writer>` invocation を含まない。phase enter が validation または pre-entry failure を返した場合、その workflow は writer を起動せず non-zero で終了する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-08-04-0001-phase-enter-adoption-and-check-commands.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "94934398148874b5290b24f7a6cf5b694fb5081a27244d13290a946a74a4abea",
+      "evidence_hash": "755b3e4e35b814561a80773314cad213ca4a9dceb84923a09099e6d8a80a0b4f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "final review 収束には、対象 scope の current final verdict を検査する公開 `bin/sotp` check command を設ける。対象 scope の current final verdict が `zero_findings` の場合だけ exit zero とし、verdict の欠如、final 未完了、`findings_remain`、current artifact と対応しない verdict、入力不正は non-zero とする。\n\nsemantic verification 収束には、選択した chain の状態だけを検査する公開 `bin/sotp` check command を設ける。当該 chain の意味論検証要素が current effective convergence rule を満たす場合だけ exit zero とし、未解消、pending、必要な判定根拠の欠如、入力不正は non-zero とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-16",
+          "text_label": "`bin/sotp review check-zero-findings --scope <scope> --round final` returns zero only for a current final `zero_findings` verdict for that scope, and non-zero for absent, stale, non-final, or findings-present review state. `bin/sotp ref-verify check-approved --chain <1|2>` returns zero only when the selected Chain's current production reference pairs are all verified pass, and non-zero when any selected pair is absent, stale, pending, or failed. Both commands are usable as literal pre-entry argv without parsing display output."
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-08-04-0001-phase-enter-adoption-and-check-commands.md",
+          "decision_id": "D2"
         }
       }
     }

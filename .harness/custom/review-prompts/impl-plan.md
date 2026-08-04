@@ -54,8 +54,14 @@ specific `task_id` or `section.id`, or quote the offending text.
   goals. Goal-to-task traceability lives in `impl-plan.json` `plan.summary`;
   review that SSoT field, not a generated `plan.md` view.
 - **task-contract attribution mismatch**: a `task-contract.json` entry that
-  attributes a task to catalogue entries the task description does not actually
-  touch, or omits entries the task description claims to add / modify.
+  attributes a task to a catalogue entry although the implementation, at that
+  task's completion, is not expected to conform to the entry's declared shape,
+  or omits an entry for which the task description claims final / converging
+  ownership. Convergence means conformance at task completion, NOT change: an
+  attributed owner that makes no change to an already-conforming entry (e.g. an
+  `action: reference` baseline entry) is valid, and merely touching or changing
+  an entry mid-track neither requires nor forbids an attribution by itself (see
+  "Task-contract attribution semantics" below).
   Distinguish from Phase 2 zero-entry tracks where `task-contract.json` is
   intentionally an empty entries map. Every catalogue entry — including
   `action: reference` baseline entries — must carry a task attribution:
@@ -152,3 +158,16 @@ specific `task_id` or `section.id`, or quote the offending text.
 - Type-design objections — those belong to the `types` scope reviewer
 - Per-task implementation strategy critique unless it is structurally
   infeasible — the implementer owns the local approach
+
+## Task-contract attribution semantics
+
+Finding-selection guidance only — attribution mechanics themselves are owned by the
+framework (`task-contract.json` schema, `bin/sotp task-contract coverage` / `check`),
+not by this prompt. When selecting attribution findings, apply this reading: an entry's
+attribution designates a task at which the implementation and the catalogue declaration
+converge — it does NOT mean "a task that touches or changes the entry". The relation is
+many-to-many; multiple owners are legitimate, and the gate evaluates the entry against
+its owners' statuses as implemented. Therefore do not report a missing attribution
+solely because a task modifies an entry mid-track without owning its final shape, and
+do not report a present attribution as spurious solely because the owning task makes
+no change to the entry.

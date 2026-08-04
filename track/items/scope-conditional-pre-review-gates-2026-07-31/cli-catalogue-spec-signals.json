@@ -1,11 +1,21 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "3f4181d557a89b8a20bce583c0931b094307e62a667f91bd99a265dd871b6498",
+  "catalogue_declaration_hash": "c50c7b2ab9b2a08d5edebdd8462fc614f4c8a4cb67830875f45609a80b147417",
   "signals": [
     {
       "type_name": "CapabilityExecArgs",
       "signal": "blue",
       "entry_hash": "c97a55aa3b9371e100730d21342d271fef746a67bc41f39f22f0b3a7524d5303"
+    },
+    {
+      "type_name": "CheckApprovedArgs",
+      "signal": "blue",
+      "entry_hash": "60cae9703dff75e73955546e6363fb789787823509af8a7f3d04fa4ed314e9a1"
+    },
+    {
+      "type_name": "CheckZeroFindingsArgs",
+      "signal": "blue",
+      "entry_hash": "bc5b3b42414703b8efc789d3096f35cc37fa15ead549a0935a38b39f86ce9d42"
     },
     {
       "type_name": "CliCommand",
@@ -33,6 +43,26 @@
       "entry_hash": "079521ac57ccf0ce57502eaa781898372387fa8f3645071f87b49241f935caf0"
     },
     {
+      "type_name": "RefVerifyCheckChainArg",
+      "signal": "blue",
+      "entry_hash": "0134a2d8975d9e738f75bd2cfbd9485dd8119793fa0db9ee90ea023cbf568d49"
+    },
+    {
+      "type_name": "ReviewCheckApprovedArgs",
+      "signal": "blue",
+      "entry_hash": "cf8d5c5fcda83edbb5ea4c3c86a00d1945f25101b53bf50e1c0bb5c9966d7706"
+    },
+    {
+      "type_name": "ReviewCheckRoundArg",
+      "signal": "blue",
+      "entry_hash": "a195b8e0e06834053f24140ca42fa7ea01c1fa9a9de26907128173cd2e695d84"
+    },
+    {
+      "type_name": "ReviewCommand",
+      "signal": "blue",
+      "entry_hash": "55c675db14bbbba4d64a8210986311c7a5b9b677d0e1772030b00b7a727a49ec"
+    },
+    {
       "type_name": "cli::commands::capability::into_driver_input",
       "signal": "blue",
       "entry_hash": "7e4563097a686c8d4b4b95abe03c6976e816d036169ec3c3cb1a5df4867257c5"
@@ -51,6 +81,71 @@
       "type_name": "cli::commands::phase::input_from_command",
       "signal": "blue",
       "entry_hash": "df2c7dfdcc69beaa64cac01abb71ec0bb02b5a192ca1189bf4c419d7f3c1f87a"
+    },
+    {
+      "type_name": "ClaudeLocalArgs",
+      "signal": "blue",
+      "entry_hash": "e0360e823d38e83c8a398315e3d90423bb2c93980d1fa9bf02ff7290a461b69c"
+    },
+    {
+      "type_name": "CodexLocalArgs",
+      "signal": "blue",
+      "entry_hash": "e0360e823d38e83c8a398315e3d90423bb2c93980d1fa9bf02ff7290a461b69c"
+    },
+    {
+      "type_name": "ValidatedAutoRecordArgs",
+      "signal": "blue",
+      "entry_hash": "70733e5f2ccac3b7dfcc8c2eead3d592005334b0ac7387471f7cb430e8b601cd"
+    },
+    {
+      "type_name": "cli::commands::review::claude_local::execute_claude_local",
+      "signal": "blue",
+      "entry_hash": "80f92e70395bc37f2059197ae0a19452cf820d7474501c5e041f5d3a4bd9af51"
+    },
+    {
+      "type_name": "cli::commands::review::claude_local::run_execute_claude_local",
+      "signal": "blue",
+      "entry_hash": "80f92e70395bc37f2059197ae0a19452cf820d7474501c5e041f5d3a4bd9af51"
+    },
+    {
+      "type_name": "cli::commands::review::codex_local::emit_outcome_output",
+      "signal": "blue",
+      "entry_hash": "80f92e70395bc37f2059197ae0a19452cf820d7474501c5e041f5d3a4bd9af51"
+    },
+    {
+      "type_name": "cli::commands::review::codex_local::emit_outcome_output_to",
+      "signal": "blue",
+      "entry_hash": "80f92e70395bc37f2059197ae0a19452cf820d7474501c5e041f5d3a4bd9af51"
+    },
+    {
+      "type_name": "cli::commands::review::codex_local::execute_codex_local",
+      "signal": "blue",
+      "entry_hash": "80f92e70395bc37f2059197ae0a19452cf820d7474501c5e041f5d3a4bd9af51"
+    },
+    {
+      "type_name": "cli::commands::review::codex_local::review_input_from_args",
+      "signal": "blue",
+      "entry_hash": "80f92e70395bc37f2059197ae0a19452cf820d7474501c5e041f5d3a4bd9af51"
+    },
+    {
+      "type_name": "cli::commands::review::codex_local::run_execute_codex_local",
+      "signal": "blue",
+      "entry_hash": "80f92e70395bc37f2059197ae0a19452cf820d7474501c5e041f5d3a4bd9af51"
+    },
+    {
+      "type_name": "cli::commands::review::validate_auto_record_args",
+      "signal": "blue",
+      "entry_hash": "80f92e70395bc37f2059197ae0a19452cf820d7474501c5e041f5d3a4bd9af51"
+    },
+    {
+      "type_name": "cli::commands::review::validate_auto_record_args_raw",
+      "signal": "blue",
+      "entry_hash": "80f92e70395bc37f2059197ae0a19452cf820d7474501c5e041f5d3a4bd9af51"
+    },
+    {
+      "type_name": "cli::commands::review::validate_claude_auto_record_args",
+      "signal": "blue",
+      "entry_hash": "80f92e70395bc37f2059197ae0a19452cf820d7474501c5e041f5d3a4bd9af51"
     }
   ]
 }

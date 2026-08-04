@@ -424,6 +424,79 @@ subgraph usecase["usecase"]
     R33_usecase_usecase_ProgramRunnerPort_run([run])
   end
   end
+  subgraph usecase_usecase_module_ref_verify["usecase::ref_verify"]
+    direction TB
+  subgraph T36_usecase_usecase_RefVerifyChainFilter["ref_verify::driver_service::RefVerifyChainFilter"]
+    direction TB
+    T36_usecase_usecase_RefVerifyChainFilter__self[RefVerifyChainFilter]
+    T36_usecase_usecase_RefVerifyChainFilter_Chain1[Chain1]
+    T36_usecase_usecase_RefVerifyChainFilter_Chain2[Chain2]
+    T36_usecase_usecase_RefVerifyChainFilter_All[All]
+  end
+  subgraph R41_usecase_usecase_RefVerifyAggregateService["ref_verify::driver_service::RefVerifyAggregateService"]
+    direction TB
+    R41_usecase_usecase_RefVerifyAggregateService__self[RefVerifyAggregateService]
+    R41_usecase_usecase_RefVerifyAggregateService_run([run])
+    R41_usecase_usecase_RefVerifyAggregateService_results([results])
+  end
+  subgraph R51_usecase_usecase_RefVerifyCheckApprovedDriverService["ref_verify::driver_service::RefVerifyCheckApprovedDriverService"]
+    direction TB
+    R51_usecase_usecase_RefVerifyCheckApprovedDriverService__self[RefVerifyCheckApprovedDriverService]
+    R51_usecase_usecase_RefVerifyCheckApprovedDriverService_check_approved([check_approved])
+  end
+  end
+  subgraph usecase_usecase_module_review_v2["usecase::review_v2"]
+    direction TB
+  subgraph T44_usecase_usecase_ReviewCheckZeroFindingsError["review_v2::check_zero_findings::ReviewCheckZeroFindingsError"]
+    direction TB
+    T44_usecase_usecase_ReviewCheckZeroFindingsError__self[ReviewCheckZeroFindingsError]
+    T44_usecase_usecase_ReviewCheckZeroFindingsError_InvalidTrack[InvalidTrack]
+    T44_usecase_usecase_ReviewCheckZeroFindingsError_InvalidScope[InvalidScope]
+    T44_usecase_usecase_ReviewCheckZeroFindingsError_EvaluationFailed[EvaluationFailed]
+  end
+  subgraph T49_usecase_usecase_ReviewCheckZeroFindingsInteractor["review_v2::check_zero_findings::ReviewCheckZeroFindingsInteractor"]
+    direction TB
+    T49_usecase_usecase_ReviewCheckZeroFindingsInteractor__self[ReviewCheckZeroFindingsInteractor]
+    T49_usecase_usecase_ReviewCheckZeroFindingsInteractor_new([new])
+  end
+  subgraph T46_usecase_usecase_ReviewCheckZeroFindingsOutcome["review_v2::check_zero_findings::ReviewCheckZeroFindingsOutcome"]
+    direction TB
+    T46_usecase_usecase_ReviewCheckZeroFindingsOutcome__self[ReviewCheckZeroFindingsOutcome]
+    T46_usecase_usecase_ReviewCheckZeroFindingsOutcome_CurrentFinalZeroFindings[CurrentFinalZeroFindings]
+    T46_usecase_usecase_ReviewCheckZeroFindingsOutcome_MissingFinalVerdict[MissingFinalVerdict]
+    T46_usecase_usecase_ReviewCheckZeroFindingsOutcome_StaleFinalVerdict[StaleFinalVerdict]
+    T46_usecase_usecase_ReviewCheckZeroFindingsOutcome_FindingsRemain[FindingsRemain]
+  end
+  subgraph T44_usecase_usecase_ReviewCheckZeroFindingsQuery["review_v2::check_zero_findings::ReviewCheckZeroFindingsQuery"]
+    direction TB
+    T44_usecase_usecase_ReviewCheckZeroFindingsQuery__self[ReviewCheckZeroFindingsQuery]
+  end
+  subgraph T36_usecase_usecase_ReviewScopeSelection["review_v2::review_aux::ReviewScopeSelection"]
+    direction TB
+    T36_usecase_usecase_ReviewScopeSelection__self[ReviewScopeSelection]
+    T36_usecase_usecase_ReviewScopeSelection_Named[Named]
+    T36_usecase_usecase_ReviewScopeSelection_All[All]
+  end
+  subgraph R46_usecase_usecase_ReviewCheckZeroFindingsService["review_v2::check_zero_findings::ReviewCheckZeroFindingsService"]
+    direction TB
+    R46_usecase_usecase_ReviewCheckZeroFindingsService__self[ReviewCheckZeroFindingsService]
+    R46_usecase_usecase_ReviewCheckZeroFindingsService_check_zero_findings([check_zero_findings])
+  end
+  subgraph R29_usecase_usecase_ReviewService["review_v2::aggregate_service::ReviewService"]
+    direction TB
+    R29_usecase_usecase_ReviewService__self[ReviewService]
+    R29_usecase_usecase_ReviewService_run_codex([run_codex])
+    R29_usecase_usecase_ReviewService_run_claude([run_claude])
+    R29_usecase_usecase_ReviewService_run_local([run_local])
+    R29_usecase_usecase_ReviewService_check_approved([check_approved])
+    R29_usecase_usecase_ReviewService_results([results])
+    R29_usecase_usecase_ReviewService_classify([classify])
+    R29_usecase_usecase_ReviewService_files([files])
+    R29_usecase_usecase_ReviewService_validate_scope([validate_scope])
+    R29_usecase_usecase_ReviewService_get_briefing([get_briefing])
+    R29_usecase_usecase_ReviewService_persist_commit_hash([persist_commit_hash])
+  end
+  end
 end
 subgraph infrastructure["infrastructure"]
   direction TB
@@ -568,6 +641,20 @@ subgraph cli_driver["cli_driver"]
     T32_cli_driver_cli_driver_PhaseIdArg_as_declaration_id([as_declaration_id])
   end
   end
+  subgraph cli_driver_cli_driver_module_ref_verify["cli_driver::ref_verify"]
+    direction TB
+  subgraph T42_cli_driver_cli_driver_RefVerifyChainSelect["ref_verify::RefVerifyChainSelect"]
+    direction TB
+    T42_cli_driver_cli_driver_RefVerifyChainSelect__self[RefVerifyChainSelect]
+    T42_cli_driver_cli_driver_RefVerifyChainSelect_Chain1[Chain1]
+    T42_cli_driver_cli_driver_RefVerifyChainSelect_Chain2[Chain2]
+    T42_cli_driver_cli_driver_RefVerifyChainSelect_All[All]
+  end
+  subgraph T49_cli_driver_cli_driver_RefVerifyCheckApprovedInput["ref_verify::RefVerifyCheckApprovedInput"]
+    direction TB
+    T49_cli_driver_cli_driver_RefVerifyCheckApprovedInput__self[RefVerifyCheckApprovedInput]
+  end
+  end
   subgraph cli_driver_cli_driver_module_render["cli_driver::render"]
     direction TB
   subgraph T36_cli_driver_cli_driver_CommandOutcome["render::CommandOutcome"]
@@ -575,6 +662,24 @@ subgraph cli_driver["cli_driver"]
     T36_cli_driver_cli_driver_CommandOutcome__self[CommandOutcome]
     T36_cli_driver_cli_driver_CommandOutcome_success([success])
     T36_cli_driver_cli_driver_CommandOutcome_failure([failure])
+  end
+  end
+  subgraph cli_driver_cli_driver_module_review["cli_driver::review"]
+    direction TB
+  subgraph T33_cli_driver_cli_driver_ReviewInput["review::ReviewInput"]
+    direction TB
+    T33_cli_driver_cli_driver_ReviewInput__self[ReviewInput]
+    T33_cli_driver_cli_driver_ReviewInput_RunCodex[RunCodex]
+    T33_cli_driver_cli_driver_ReviewInput_RunClaude[RunClaude]
+    T33_cli_driver_cli_driver_ReviewInput_RunLocal[RunLocal]
+    T33_cli_driver_cli_driver_ReviewInput_CheckApproved[CheckApproved]
+    T33_cli_driver_cli_driver_ReviewInput_CheckZeroFindings[CheckZeroFindings]
+    T33_cli_driver_cli_driver_ReviewInput_Results[Results]
+    T33_cli_driver_cli_driver_ReviewInput_Classify[Classify]
+    T33_cli_driver_cli_driver_ReviewInput_Files[Files]
+    T33_cli_driver_cli_driver_ReviewInput_ValidateScope[ValidateScope]
+    T33_cli_driver_cli_driver_ReviewInput_GetBriefing[GetBriefing]
+    T33_cli_driver_cli_driver_ReviewInput_PersistCommitHash[PersistCommitHash]
   end
   end
 end
@@ -641,6 +746,14 @@ subgraph cli["cli"]
     direction TB
     T26_cli_cli_CapabilityExecArgs__self[CapabilityExecArgs]
   end
+  subgraph T25_cli_cli_CheckApprovedArgs["commands::ref_verify::CheckApprovedArgs"]
+    direction TB
+    T25_cli_cli_CheckApprovedArgs__self[CheckApprovedArgs]
+  end
+  subgraph T29_cli_cli_CheckZeroFindingsArgs["commands::review::CheckZeroFindingsArgs"]
+    direction TB
+    T29_cli_cli_CheckZeroFindingsArgs__self[CheckZeroFindingsArgs]
+  end
   subgraph T20_cli_cli_PhaseCommand["commands::phase::PhaseCommand"]
     direction TB
     T20_cli_cli_PhaseCommand__self[PhaseCommand]
@@ -659,6 +772,32 @@ subgraph cli["cli"]
   subgraph T25_cli_cli_PhaseValidateArgs["commands::phase::PhaseValidateArgs"]
     direction TB
     T25_cli_cli_PhaseValidateArgs__self[PhaseValidateArgs]
+  end
+  subgraph T30_cli_cli_RefVerifyCheckChainArg["commands::ref_verify::RefVerifyCheckChainArg"]
+    direction TB
+    T30_cli_cli_RefVerifyCheckChainArg__self[RefVerifyCheckChainArg]
+    T30_cli_cli_RefVerifyCheckChainArg_Chain1[Chain1]
+    T30_cli_cli_RefVerifyCheckChainArg_Chain2[Chain2]
+  end
+  subgraph T31_cli_cli_ReviewCheckApprovedArgs["commands::review::ReviewCheckApprovedArgs"]
+    direction TB
+    T31_cli_cli_ReviewCheckApprovedArgs__self[ReviewCheckApprovedArgs]
+  end
+  subgraph T27_cli_cli_ReviewCheckRoundArg["commands::review::ReviewCheckRoundArg"]
+    direction TB
+    T27_cli_cli_ReviewCheckRoundArg__self[ReviewCheckRoundArg]
+    T27_cli_cli_ReviewCheckRoundArg_Final[Final]
+  end
+  subgraph T21_cli_cli_ReviewCommand["commands::review::ReviewCommand"]
+    direction TB
+    T21_cli_cli_ReviewCommand__self[ReviewCommand]
+    T21_cli_cli_ReviewCommand_Local[Local]
+    T21_cli_cli_ReviewCommand_FixLocal[FixLocal]
+    T21_cli_cli_ReviewCommand_CheckApproved[CheckApproved]
+    T21_cli_cli_ReviewCommand_CheckZeroFindings[CheckZeroFindings]
+    T21_cli_cli_ReviewCommand_Results[Results]
+    T21_cli_cli_ReviewCommand_Classify[Classify]
+    T21_cli_cli_ReviewCommand_Files[Files]
   end
   F52_cli_cli_cli__commands__capability__into_driver_input[[into_driver_input]]
   F37_cli_cli_cli__commands__phase__execute[[execute]]
@@ -806,9 +945,18 @@ T33_usecase_usecase_ProgramRunOutcome_OutputLimitExceeded --o|output| T37_usecas
 R33_usecase_usecase_ProgramRunnerPort_run --o T33_usecase_usecase_ProgramInvocation__self
 R33_usecase_usecase_ProgramRunnerPort_run --> T33_usecase_usecase_ProgramRunOutcome__self
 R33_usecase_usecase_ProgramRunnerPort_run --> T34_usecase_usecase_ProgramRunnerError__self
+R41_usecase_usecase_RefVerifyAggregateService_results --o T36_usecase_usecase_RefVerifyChainFilter__self
+R51_usecase_usecase_RefVerifyCheckApprovedDriverService_check_approved --o T36_usecase_usecase_RefVerifyChainFilter__self
+T49_usecase_usecase_ReviewCheckZeroFindingsInteractor_new --> T49_usecase_usecase_ReviewCheckZeroFindingsInteractor__self
+T44_usecase_usecase_ReviewCheckZeroFindingsQuery__self --o|track| T35_usecase_usecase_ReviewTrackSelector__self
+R46_usecase_usecase_ReviewCheckZeroFindingsService_check_zero_findings --o T44_usecase_usecase_ReviewCheckZeroFindingsQuery__self
+R46_usecase_usecase_ReviewCheckZeroFindingsService_check_zero_findings --> T44_usecase_usecase_ReviewCheckZeroFindingsError__self
+R46_usecase_usecase_ReviewCheckZeroFindingsService_check_zero_findings --> T46_usecase_usecase_ReviewCheckZeroFindingsOutcome__self
+R29_usecase_usecase_ReviewService_results --o T36_usecase_usecase_ReviewScopeSelection__self
 T40_usecase_usecase_CapabilityExecInteractor__self -.impl.-> R37_usecase_usecase_CapabilityExecService__self
 T38_usecase_usecase_PhaseCommandInteractor__self -.impl.-> R35_usecase_usecase_PhaseCommandService__self
 T50_usecase_usecase_PreReviewCommandDispatchInteractor__self -.impl.-> R47_usecase_usecase_PreReviewCommandDispatchService__self
+T49_usecase_usecase_ReviewCheckZeroFindingsInteractor__self -.impl.-> R46_usecase_usecase_ReviewCheckZeroFindingsService__self
 T44_infrastructure_infrastructure_CommandArgvDto__self --o|arguments| T48_infrastructure_infrastructure_CommandArgumentDto__self
 T50_infrastructure_infrastructure_ConfiguredCommandDto__self --o|argv| T44_infrastructure_infrastructure_CommandArgvDto__self
 T50_infrastructure_infrastructure_ConfiguredCommandDto__self --o|timeout_seconds| T54_infrastructure_infrastructure_CommandTimeoutSecondsDto__self
@@ -854,18 +1002,25 @@ T39_cli_driver_cli_driver_PhaseCommandInput_Enter --o|phase_id| T32_cli_driver_c
 T32_cli_driver_cli_driver_PhaseIdArg_new --o T36_usecase_usecase_CommandDeclarationId__self
 T32_cli_driver_cli_driver_PhaseIdArg_new --> T32_cli_driver_cli_driver_PhaseIdArg__self
 T32_cli_driver_cli_driver_PhaseIdArg_as_declaration_id --> T36_usecase_usecase_CommandDeclarationId__self
+T49_cli_driver_cli_driver_RefVerifyCheckApprovedInput__self --o|chain| T42_cli_driver_cli_driver_RefVerifyChainSelect__self
 T36_cli_driver_cli_driver_CommandOutcome_success --> T36_cli_driver_cli_driver_CommandOutcome__self
 T36_cli_driver_cli_driver_CommandOutcome_failure --> T36_cli_driver_cli_driver_CommandOutcome__self
+T33_cli_driver_cli_driver_ReviewInput_CheckZeroFindings --o T44_usecase_usecase_ReviewCheckZeroFindingsQuery__self
+T33_cli_driver_cli_driver_ReviewInput_Results --o T36_usecase_usecase_ReviewScopeSelection__self
 T57_cli_composition_cli_composition_CapabilityCompositionRoot_new --> T57_cli_composition_cli_composition_CapabilityCompositionRoot__self
 T57_cli_composition_cli_composition_CapabilityCompositionRoot_discover --> T57_cli_composition_cli_composition_CapabilityCompositionRoot__self
 T57_cli_composition_cli_composition_CapabilityCompositionRoot_capability_driver --> T38_cli_driver_cli_driver_CapabilityDriver__self
 T52_cli_composition_cli_composition_PhaseCompositionRoot_build --> T40_cli_driver_cli_driver_PhaseCommandDriver__self
 T18_cli_cli_CliCommand_Phase --o|cmd| T20_cli_cli_PhaseCommand__self
+T18_cli_cli_CliCommand_Review --o|cmd| T21_cli_cli_ReviewCommand__self
+T25_cli_cli_CheckApprovedArgs__self --o|chain| T30_cli_cli_RefVerifyCheckChainArg__self
 T20_cli_cli_PhaseCommand_Validate --o T25_cli_cli_PhaseValidateArgs__self
 T20_cli_cli_PhaseCommand_Explain --o T19_cli_cli_PhaseIdArgs__self
 T20_cli_cli_PhaseCommand_Enter --o T22_cli_cli_PhaseEnterArgs__self
 T22_cli_cli_PhaseEnterArgs__self --o|phase_id| T32_cli_driver_cli_driver_PhaseIdArg__self
 T19_cli_cli_PhaseIdArgs__self --o|phase_id| T32_cli_driver_cli_driver_PhaseIdArg__self
+T21_cli_cli_ReviewCommand_CheckApproved --o T31_cli_cli_ReviewCheckApprovedArgs__self
+T21_cli_cli_ReviewCommand_CheckZeroFindings --o T29_cli_cli_CheckZeroFindingsArgs__self
 F52_cli_cli_cli__commands__capability__into_driver_input --o T26_cli_cli_CapabilityExecArgs__self
 F52_cli_cli_cli__commands__capability__into_driver_input --> T47_cli_driver_cli_driver_CapabilityExecDriverInput__self
 F37_cli_cli_cli__commands__phase__execute --o T20_cli_cli_PhaseCommand__self
@@ -1056,6 +1211,43 @@ class T34_usecase_usecase_ProgramRunnerError__self error_type
 class T48_usecase_usecase_SuccessfulProgramExecutionRecord__self dto
 class R33_usecase_usecase_ProgramRunnerPort_run method_node
 class R33_usecase_usecase_ProgramRunnerPort__self secondary_port
+class T36_usecase_usecase_RefVerifyChainFilter_Chain1 variant_node
+class T36_usecase_usecase_RefVerifyChainFilter_Chain2 variant_node
+class T36_usecase_usecase_RefVerifyChainFilter_All variant_node
+class T36_usecase_usecase_RefVerifyChainFilter__self dto
+class R41_usecase_usecase_RefVerifyAggregateService_run method_node
+class R41_usecase_usecase_RefVerifyAggregateService_results method_node
+class R41_usecase_usecase_RefVerifyAggregateService__self app_service
+class R51_usecase_usecase_RefVerifyCheckApprovedDriverService_check_approved method_node
+class R51_usecase_usecase_RefVerifyCheckApprovedDriverService__self app_service
+class T44_usecase_usecase_ReviewCheckZeroFindingsError_InvalidTrack variant_node
+class T44_usecase_usecase_ReviewCheckZeroFindingsError_InvalidScope variant_node
+class T44_usecase_usecase_ReviewCheckZeroFindingsError_EvaluationFailed variant_node
+class T44_usecase_usecase_ReviewCheckZeroFindingsError__self error_type
+class T49_usecase_usecase_ReviewCheckZeroFindingsInteractor_new method_node
+class T49_usecase_usecase_ReviewCheckZeroFindingsInteractor__self interactor
+class T46_usecase_usecase_ReviewCheckZeroFindingsOutcome_CurrentFinalZeroFindings variant_node
+class T46_usecase_usecase_ReviewCheckZeroFindingsOutcome_MissingFinalVerdict variant_node
+class T46_usecase_usecase_ReviewCheckZeroFindingsOutcome_StaleFinalVerdict variant_node
+class T46_usecase_usecase_ReviewCheckZeroFindingsOutcome_FindingsRemain variant_node
+class T46_usecase_usecase_ReviewCheckZeroFindingsOutcome__self dto
+class T44_usecase_usecase_ReviewCheckZeroFindingsQuery__self query
+class T36_usecase_usecase_ReviewScopeSelection_Named variant_node
+class T36_usecase_usecase_ReviewScopeSelection_All variant_node
+class T36_usecase_usecase_ReviewScopeSelection__self value_object
+class R46_usecase_usecase_ReviewCheckZeroFindingsService_check_zero_findings method_node
+class R46_usecase_usecase_ReviewCheckZeroFindingsService__self app_service
+class R29_usecase_usecase_ReviewService_run_codex method_node
+class R29_usecase_usecase_ReviewService_run_claude method_node
+class R29_usecase_usecase_ReviewService_run_local method_node
+class R29_usecase_usecase_ReviewService_check_approved method_node
+class R29_usecase_usecase_ReviewService_results method_node
+class R29_usecase_usecase_ReviewService_classify method_node
+class R29_usecase_usecase_ReviewService_files method_node
+class R29_usecase_usecase_ReviewService_validate_scope method_node
+class R29_usecase_usecase_ReviewService_get_briefing method_node
+class R29_usecase_usecase_ReviewService_persist_commit_hash method_node
+class R29_usecase_usecase_ReviewService__self app_service
 class T48_infrastructure_infrastructure_CommandArgumentDto__self dto
 class T44_infrastructure_infrastructure_CommandArgvDto__self dto
 class T59_infrastructure_infrastructure_CommandConfigSchemaVersionDto__self dto
@@ -1100,9 +1292,26 @@ class T39_cli_driver_cli_driver_PhaseCommandInput__self dto
 class T32_cli_driver_cli_driver_PhaseIdArg_new method_node
 class T32_cli_driver_cli_driver_PhaseIdArg_as_declaration_id method_node
 class T32_cli_driver_cli_driver_PhaseIdArg__self dto
+class T42_cli_driver_cli_driver_RefVerifyChainSelect_Chain1 variant_node
+class T42_cli_driver_cli_driver_RefVerifyChainSelect_Chain2 variant_node
+class T42_cli_driver_cli_driver_RefVerifyChainSelect_All variant_node
+class T42_cli_driver_cli_driver_RefVerifyChainSelect__self dto
+class T49_cli_driver_cli_driver_RefVerifyCheckApprovedInput__self dto
 class T36_cli_driver_cli_driver_CommandOutcome_success method_node
 class T36_cli_driver_cli_driver_CommandOutcome_failure method_node
 class T36_cli_driver_cli_driver_CommandOutcome__self dto
+class T33_cli_driver_cli_driver_ReviewInput_RunCodex variant_node
+class T33_cli_driver_cli_driver_ReviewInput_RunClaude variant_node
+class T33_cli_driver_cli_driver_ReviewInput_RunLocal variant_node
+class T33_cli_driver_cli_driver_ReviewInput_CheckApproved variant_node
+class T33_cli_driver_cli_driver_ReviewInput_CheckZeroFindings variant_node
+class T33_cli_driver_cli_driver_ReviewInput_Results variant_node
+class T33_cli_driver_cli_driver_ReviewInput_Classify variant_node
+class T33_cli_driver_cli_driver_ReviewInput_Files variant_node
+class T33_cli_driver_cli_driver_ReviewInput_ValidateScope variant_node
+class T33_cli_driver_cli_driver_ReviewInput_GetBriefing variant_node
+class T33_cli_driver_cli_driver_ReviewInput_PersistCommitHash variant_node
+class T33_cli_driver_cli_driver_ReviewInput__self dto
 class T57_cli_composition_cli_composition_CapabilityCompositionRoot_new method_node
 class T57_cli_composition_cli_composition_CapabilityCompositionRoot_discover method_node
 class T57_cli_composition_cli_composition_CapabilityCompositionRoot_capability_driver method_node
@@ -1141,6 +1350,8 @@ class T18_cli_cli_CliCommand_BatchPlan variant_node
 class T18_cli_cli_CliCommand_Demo variant_node
 class T18_cli_cli_CliCommand__self dto
 class T26_cli_cli_CapabilityExecArgs__self dto
+class T25_cli_cli_CheckApprovedArgs__self dto
+class T29_cli_cli_CheckZeroFindingsArgs__self dto
 class T20_cli_cli_PhaseCommand_Validate variant_node
 class T20_cli_cli_PhaseCommand_Explain variant_node
 class T20_cli_cli_PhaseCommand_Enter variant_node
@@ -1148,6 +1359,20 @@ class T20_cli_cli_PhaseCommand__self dto
 class T22_cli_cli_PhaseEnterArgs__self dto
 class T19_cli_cli_PhaseIdArgs__self dto
 class T25_cli_cli_PhaseValidateArgs__self dto
+class T30_cli_cli_RefVerifyCheckChainArg_Chain1 variant_node
+class T30_cli_cli_RefVerifyCheckChainArg_Chain2 variant_node
+class T30_cli_cli_RefVerifyCheckChainArg__self dto
+class T31_cli_cli_ReviewCheckApprovedArgs__self dto
+class T27_cli_cli_ReviewCheckRoundArg_Final variant_node
+class T27_cli_cli_ReviewCheckRoundArg__self dto
+class T21_cli_cli_ReviewCommand_Local variant_node
+class T21_cli_cli_ReviewCommand_FixLocal variant_node
+class T21_cli_cli_ReviewCommand_CheckApproved variant_node
+class T21_cli_cli_ReviewCommand_CheckZeroFindings variant_node
+class T21_cli_cli_ReviewCommand_Results variant_node
+class T21_cli_cli_ReviewCommand_Classify variant_node
+class T21_cli_cli_ReviewCommand_Files variant_node
+class T21_cli_cli_ReviewCommand__self dto
 class F52_cli_cli_cli__commands__capability__into_driver_input free_function
 class F52_cli_cli_cli__commands__capability__into_driver_input function_node
 class F37_cli_cli_cli__commands__phase__execute free_function

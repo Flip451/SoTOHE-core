@@ -591,8 +591,7 @@ mod tests {
                 ));
                 let failed_argv: Vec<&str> = failed
                     .as_ref()
-                    .command
-                    .argv()
+                    .invoked_argv
                     .arguments()
                     .iter()
                     .map(CommandArgument::as_str)

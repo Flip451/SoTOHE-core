@@ -29,6 +29,7 @@
     { "pattern": ".harness/config/contract-map-style.toml", "classification": "include" },
     { "pattern": ".harness/config/disk-maintenance.toml", "classification": "include" },
     { "pattern": ".harness/config/dry-check.json", "classification": "include" },
+    { "pattern": ".harness/config/phase-commands.json", "classification": "include" },
     { "pattern": ".harness/config/pre-review-gates.json", "classification": "include" },
     { "pattern": ".harness/config/review-scope.json", "classification": "include" },
     { "pattern": ".harness/config/samples", "classification": "include" },

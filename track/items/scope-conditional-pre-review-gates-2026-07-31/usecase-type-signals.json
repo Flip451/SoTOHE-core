@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-03T12:28:47Z",
-  "declaration_hash": "e8bd71f2d0a2301dd41f17f79f96ac5497e83824682e259f124bc7edbe43977a",
-  "implementation_input_hash": "7db490248f0ae7cbbeacdafaee4dc19f032cc89342f7e7dea35228ff42c6c184",
+  "generated_at": "2026-08-04T01:57:47Z",
+  "declaration_hash": "a3ab5c2693cc44402a67692cd144de6647e6e5c0efc008df0690dab35d4d88e6",
+  "implementation_input_hash": "e32ac96ab4c12c4dd1b5b9335ea488dc544b7979a8a806afc2e0ec4355f22293",
   "signals": [
     {
       "type_name": "CapabilityExecRequest",
@@ -558,6 +558,80 @@
       "found_type": true
     },
     {
+      "type_name": "RefVerifyAggregateService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "RefVerifyCheckApprovedDriverService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "ReviewCheckZeroFindingsError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "ReviewCheckZeroFindingsInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "ReviewCheckZeroFindingsService"
+      ]
+    },
+    {
+      "type_name": "ReviewCheckZeroFindingsOutcome",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "ReviewCheckZeroFindingsQuery",
+      "kind_tag": "query",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "ReviewCheckZeroFindingsService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ReviewScopeSelection",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
       "type_name": "ReviewScopeSelector",
       "kind_tag": "enum",
       "signal": "blue",
@@ -568,6 +642,12 @@
         "Eq",
         "PartialEq"
       ]
+    },
+    {
+      "type_name": "ReviewService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": true
     },
     {
       "type_name": "ReviewTrackSelector",
@@ -615,6 +695,12 @@
     {
       "type_name": "CapabilityExecService",
       "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "RefVerifyChainFilter",
+      "kind_tag": "enum",
       "signal": "blue",
       "found_type": true
     }

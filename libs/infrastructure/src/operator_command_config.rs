@@ -1195,6 +1195,42 @@ mod tests {
     }
 
     #[test]
+    fn test_shipped_pre_review_config_resolves_implementation_commands_in_order() {
+        let workspace_root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .and_then(std::path::Path::parent)
+            .expect("infrastructure crate is nested under the workspace root");
+        let config = FsPreReviewCommandConfigLoader::new()
+            .load(workspace_root, &TrackId::try_new("example-track").unwrap())
+            .unwrap();
+        let expected = vec![
+            vec!["bin/sotp", "signal", "calc-impl-catalog"],
+            vec!["bin/sotp", "signal", "check-impl-catalog", "--gate", "commit"],
+            vec!["bin/sotp", "task-contract", "coverage"],
+            vec!["bin/sotp", "task-contract", "check"],
+        ];
+
+        for scope_name in
+            ["domain", "usecase", "infrastructure", "cli_driver", "cli", "cli_composition"]
+        {
+            let scope = decode_scope(ReviewScopeNameDto { value: scope_name.to_owned() }).unwrap();
+            let resolved: Vec<Vec<&str>> = config
+                .commands_for(&scope)
+                .unwrap()
+                .iter()
+                .map(|command| {
+                    command.argv().arguments().iter().map(CommandArgument::as_str).collect()
+                })
+                .collect();
+
+            assert_eq!(
+                resolved, expected,
+                "unexpected implementation command sequence for {scope_name}"
+            );
+        }
+    }
+
+    #[test]
     fn test_current_track_resolver_accepts_track_branch_and_rejects_other_branch() {
         let repo = tempfile::tempdir().unwrap();
         for args in [

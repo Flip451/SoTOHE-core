@@ -1655,13 +1655,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "f4074bc2f97a3f11a2ad59daededf65107d7fa45e7de8e6a0d3e1741a46a7a4d",
+        "bound_tests_set_hash": "f4f98f4b2ab7edc1b639c943c11698737336f258a509e5ddc024f5a983e6518d",
         "declaration_hash": "288f9d0ffef0d37b48fb7f0da8aceeafd1dfcdb1a0441a4833df10915e585b75",
         "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(\n            *runner.0.lock().unwrap(),\n            vec![\n                vec![\"bin/sotp\", \"signal\", \"calc-impl-catalog\"],\n                vec![\"bin/sotp\", \"signal\", \"check-impl-catalog\", \"--gate\", \"commit\"],\n                vec![\"bin/sotp\", \"task-contract\", \"coverage\"],\n                vec![\"bin/sotp\", \"task-contract\", \"check\"],\n            ]\n        );"
+        "citation": "assert_eq!(*runner.0.lock().unwrap(), vec![vec![\"bin/sotp\", \"signal\", \"calc-impl-catalog\"], vec![\"bin/sotp\", \"signal\", \"check-impl-catalog\", \"--gate\", \"commit\"], vec![\"bin/sotp\", \"task-contract\", \"coverage\"], vec![\"bin/sotp\", \"task-contract\", \"check\"], ]);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -1691,13 +1691,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "f4074bc2f97a3f11a2ad59daededf65107d7fa45e7de8e6a0d3e1741a46a7a4d",
+        "bound_tests_set_hash": "f4f98f4b2ab7edc1b639c943c11698737336f258a509e5ddc024f5a983e6518d",
         "declaration_hash": "288f9d0ffef0d37b48fb7f0da8aceeafd1dfcdb1a0441a4833df10915e585b75",
         "anchor_text_hash": "6166df4e5cb8aa348e839dc9faf6fdda9446f5782ff3880dec49513621a1e600"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(\n                    failed.as_ref().outcome,\n                    ProgramRunOutcome::Exited { ref exit_code, .. } if exit_code.as_i32() != 0\n                ));\n                let failed_argv: Vec<&str> = failed\n                    .as_ref()\n                    .command\n                    .argv()\n                    .arguments()\n                    .iter()\n                    .map(CommandArgument::as_str)\n                    .collect();\n                assert_eq!(failed_argv, [\"fail\"]); ... assert_eq!(*runner.0.lock().unwrap(), vec![vec![\"first\"], vec![\"fail\"],]);"
+        "citation": "assert!(matches!(\n                    failed.as_ref().outcome,\n                    ProgramRunOutcome::Exited { ref exit_code, .. } if exit_code.as_i32() != 0\n                ));\n                let failed_argv: Vec<&str> = failed\n                    .as_ref()\n                    .invoked_argv\n                    .arguments()\n                    .iter()\n                    .map(CommandArgument::as_str)\n                    .collect();\n                assert_eq!(failed_argv, [\"fail\"]); ... assert_eq!(*runner.0.lock().unwrap(), vec![vec![\"first\"], vec![\"fail\"],]);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -1727,7 +1727,7 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "f4074bc2f97a3f11a2ad59daededf65107d7fa45e7de8e6a0d3e1741a46a7a4d",
+        "bound_tests_set_hash": "f4f98f4b2ab7edc1b639c943c11698737336f258a509e5ddc024f5a983e6518d",
         "declaration_hash": "288f9d0ffef0d37b48fb7f0da8aceeafd1dfcdb1a0441a4833df10915e585b75",
         "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
       },
@@ -1763,13 +1763,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "f4074bc2f97a3f11a2ad59daededf65107d7fa45e7de8e6a0d3e1741a46a7a4d",
+        "bound_tests_set_hash": "f4f98f4b2ab7edc1b639c943c11698737336f258a509e5ddc024f5a983e6518d",
         "declaration_hash": "288f9d0ffef0d37b48fb7f0da8aceeafd1dfcdb1a0441a4833df10915e585b75",
         "anchor_text_hash": "3503592124957ba7751cc28fe43d9a296d963b754b236386592298f341297962"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(\\n            *runner.0.lock().unwrap(),\\n            vec![\\n                vec![\"bin/sotp\", \"signal\", \"calc-impl-catalog\"],\\n                vec![\"bin/sotp\", \"signal\", \"check-impl-catalog\", \"--gate\", \"commit\"],\\n                vec![\"bin/sotp\", \"task-contract\", \"coverage\"],\\n                vec![\"bin/sotp\", \"task-contract\", \"check\"],\\n            ]\\n        ); ... assert_eq!(*runner.0.lock().unwrap(), vec![vec![\"first\"], vec![\"fail\"],]);"
+        "citation": "assert_eq!(*runner.0.lock().unwrap(), vec![vec![\"bin/sotp\", \"signal\", \"calc-impl-catalog\"], vec![\"bin/sotp\", \"signal\", \"check-impl-catalog\", \"--gate\", \"commit\"], vec![\"bin/sotp\", \"task-contract\", \"coverage\"], vec![\"bin/sotp\", \"task-contract\", \"check\"],]);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -2075,13 +2075,13 @@
         "item_identifier": "trait_method:resolve"
       },
       "key": {
-        "bound_tests_set_hash": "65ddbab808b1bc56bfd02c299ce01380e41b8335dcbb1b36f174c56106f42823",
+        "bound_tests_set_hash": "7f7fb7bc6b6ae93484b87c678b0dca7677e8e6185fcce6ddc24135cd18609d00",
         "declaration_hash": "2e52694d40b2a28a91bb58fb6610a91d659f03ec1f99537e71bc53fb39bcec72",
         "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(resolver.resolve(repo.path()).unwrap().as_ref(), \"example-track\");\n        assert!(matches!(\n            resolver.resolve(repo.path()),\n            Err(CurrentReviewTrackResolveError::ResolveFailed { .. })\n        ));"
+        "citation": "assert_eq!(resolver.resolve(repo.path()).unwrap().as_ref(), \"example-track\");\n...\nassert!(matches!(\n    resolver.resolve(repo.path()),\n    Err(CurrentReviewTrackResolveError::ResolveFailed { .. })\n));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -2116,13 +2116,13 @@
         "item_identifier": "trait_method:resolve"
       },
       "key": {
-        "bound_tests_set_hash": "65ddbab808b1bc56bfd02c299ce01380e41b8335dcbb1b36f174c56106f42823",
+        "bound_tests_set_hash": "7f7fb7bc6b6ae93484b87c678b0dca7677e8e6185fcce6ddc24135cd18609d00",
         "declaration_hash": "2e52694d40b2a28a91bb58fb6610a91d659f03ec1f99537e71bc53fb39bcec72",
         "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(resolver.resolve(repo.path()).unwrap().as_ref(), \"example-track\");\nassert!(matches!(\n    resolver.resolve(repo.path()),\n    Err(CurrentReviewTrackResolveError::ResolveFailed { .. })\n));"
+        "citation": "assert_eq!(resolver.resolve(repo.path()).unwrap().as_ref(), \"example-track\");\n...\nassert!(matches!(\n            resolver.resolve(repo.path()),\n            Err(CurrentReviewTrackResolveError::ResolveFailed { .. })\n        ));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -2157,13 +2157,13 @@
         "item_identifier": "trait_method:load"
       },
       "key": {
-        "bound_tests_set_hash": "a499154d17515c3515ee7286fa99e5cc3594ea751cc2ad01fafa14d6ff7d02ed",
+        "bound_tests_set_hash": "9a3578f350e8b9646587cb2441804140c369dce21941ac460ad12071e48646f8",
         "declaration_hash": "014db4f1dd7685eb038c5c291813217fd433819adf2d9d0c53a06c88712d022d",
         "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(argv, [\"bin/sotp\"]); ... assert_eq!(*runner.0.lock().unwrap(), vec![vec![\"first\"], vec![\"fail\"],]);"
+        "citation": "let pre_review =\n            FsPreReviewCommandConfigLoader::new().load(repo.path(), &track_id).unwrap();\n        let commands = pre_review\n            .commands_for(\n                &decode_scope(ReviewScopeNameDto { value: \"implementation\".to_owned() }).unwrap(),\n            )\n            .unwrap();\n        let argv: Vec<&str> =\n            commands[0].argv().arguments().iter().map(|argument| argument.as_str()).collect();\n        assert_eq!(argv, [\"bin/sotp\"]);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -2213,13 +2213,13 @@
         "item_identifier": "trait_method:load"
       },
       "key": {
-        "bound_tests_set_hash": "a499154d17515c3515ee7286fa99e5cc3594ea751cc2ad01fafa14d6ff7d02ed",
+        "bound_tests_set_hash": "9a3578f350e8b9646587cb2441804140c369dce21941ac460ad12071e48646f8",
         "declaration_hash": "014db4f1dd7685eb038c5c291813217fd433819adf2d9d0c53a06c88712d022d",
         "anchor_text_hash": "e44a2b38a1ce3bf278e618e41415dbd26068d287e4173facb0f0c39698f67474"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(decode_pre_review_command_config(duplicate), Err(CommandConfigValidationError::DuplicateScope(_)))); ... command(&[], None), ... command(&[\"bin/sotp\", \"phase\", \"enter\"], None), ... command(&[\"bin/sotp\", \"review\", \"local\"], None), ... command(&[\"bin/sotp\", \"review\", \"fix-local\"], None), ... command(&[\"bin/sotp\", \"signal\"], Some(0)), ... command(&[\"bin/sotp\", \"signal\"], Some(3_601))"
+        "citation": "assert!(matches!(result, Err(CommandConfigLoadError::Invalid(CommandConfigValidationError::RecursiveInvocation { .. }))));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -2269,13 +2269,13 @@
         "item_identifier": "trait_method:load"
       },
       "key": {
-        "bound_tests_set_hash": "a499154d17515c3515ee7286fa99e5cc3594ea751cc2ad01fafa14d6ff7d02ed",
+        "bound_tests_set_hash": "9a3578f350e8b9646587cb2441804140c369dce21941ac460ad12071e48646f8",
         "declaration_hash": "014db4f1dd7685eb038c5c291813217fd433819adf2d9d0c53a06c88712d022d",
         "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(result, Err(CommandConfigLoadError::Invalid(CommandConfigValidationError::InvalidSchemaVersion { .. })))); ... assert!(decode_pre_review_command_config(config).is_err());"
+        "citation": "let pre_review =\n            FsPreReviewCommandConfigLoader::new().load(repo.path(), &track_id).unwrap();\n\nassert!(matches!(\n            result,\n            Err(CommandConfigLoadError::Invalid(\n                CommandConfigValidationError::InvalidSchemaVersion { .. }\n            ))\n        ));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -2325,13 +2325,13 @@
         "item_identifier": "trait_method:dispatch"
       },
       "key": {
-        "bound_tests_set_hash": "f4074bc2f97a3f11a2ad59daededf65107d7fa45e7de8e6a0d3e1741a46a7a4d",
+        "bound_tests_set_hash": "f4f98f4b2ab7edc1b639c943c11698737336f258a509e5ddc024f5a983e6518d",
         "declaration_hash": "fbaab28ef7bc1c0ce72d037ebac828d8289d06c90ab2ffe5f1cccacf55500c71",
         "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(*runner.0.lock().unwrap(), vec![vec![\"bin/sotp\", \"signal\", \"calc-impl-catalog\"], vec![\"bin/sotp\", \"signal\", \"check-impl-catalog\", \"--gate\", \"commit\"], vec![\"bin/sotp\", \"task-contract\", \"coverage\"], vec![\"bin/sotp\", \"task-contract\", \"check\"],]);"
+        "citation": "assert_eq!(\n            *runner.0.lock().unwrap(),\n            vec![\n                vec![\"bin/sotp\", \"signal\", \"calc-impl-catalog\"],\n                vec![\"bin/sotp\", \"signal\", \"check-impl-catalog\", \"--gate\", \"commit\"],\n                vec![\"bin/sotp\", \"task-contract\", \"coverage\"],\n                vec![\"bin/sotp\", \"task-contract\", \"check\"],\n            ]\n        );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -2361,13 +2361,13 @@
         "item_identifier": "trait_method:dispatch"
       },
       "key": {
-        "bound_tests_set_hash": "f4074bc2f97a3f11a2ad59daededf65107d7fa45e7de8e6a0d3e1741a46a7a4d",
+        "bound_tests_set_hash": "f4f98f4b2ab7edc1b639c943c11698737336f258a509e5ddc024f5a983e6518d",
         "declaration_hash": "fbaab28ef7bc1c0ce72d037ebac828d8289d06c90ab2ffe5f1cccacf55500c71",
         "anchor_text_hash": "6166df4e5cb8aa348e839dc9faf6fdda9446f5782ff3880dec49513621a1e600"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(failed.as_ref().outcome, ProgramRunOutcome::Exited { ref exit_code, .. } if exit_code.as_i32() != 0)); ... assert_eq!(failed_argv, [\"fail\"]); ... assert_eq!(*runner.0.lock().unwrap(), vec![vec![\"first\"], vec![\"fail\"],]);"
+        "citation": "assert_eq!(failed_argv, [\"fail\"]); ... assert_eq!(*runner.0.lock().unwrap(), vec![vec![\"first\"], vec![\"fail\"],]);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -2397,7 +2397,7 @@
         "item_identifier": "trait_method:dispatch"
       },
       "key": {
-        "bound_tests_set_hash": "f4074bc2f97a3f11a2ad59daededf65107d7fa45e7de8e6a0d3e1741a46a7a4d",
+        "bound_tests_set_hash": "f4f98f4b2ab7edc1b639c943c11698737336f258a509e5ddc024f5a983e6518d",
         "declaration_hash": "fbaab28ef7bc1c0ce72d037ebac828d8289d06c90ab2ffe5f1cccacf55500c71",
         "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
       },
@@ -2433,13 +2433,13 @@
         "item_identifier": "trait_method:dispatch"
       },
       "key": {
-        "bound_tests_set_hash": "f4074bc2f97a3f11a2ad59daededf65107d7fa45e7de8e6a0d3e1741a46a7a4d",
+        "bound_tests_set_hash": "f4f98f4b2ab7edc1b639c943c11698737336f258a509e5ddc024f5a983e6518d",
         "declaration_hash": "fbaab28ef7bc1c0ce72d037ebac828d8289d06c90ab2ffe5f1cccacf55500c71",
         "anchor_text_hash": "3503592124957ba7751cc28fe43d9a296d963b754b236386592298f341297962"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(*runner.0.lock().unwrap(), vec![vec![\"bin/sotp\", \"signal\", \"calc-impl-catalog\"], vec![\"bin/sotp\", \"signal\", \"check-impl-catalog\", \"--gate\", \"commit\"], vec![\"bin/sotp\", \"task-contract\", \"coverage\"], vec![\"bin/sotp\", \"task-contract\", \"check\"]]);"
+        "citation": "assert_eq!(*runner.0.lock().unwrap(), vec![vec![\"bin/sotp\", \"signal\", \"calc-impl-catalog\"], vec![\"bin/sotp\", \"signal\", \"check-impl-catalog\", \"--gate\", \"commit\"], vec![\"bin/sotp\", \"task-contract\", \"coverage\"], vec![\"bin/sotp\", \"task-contract\", \"check\"], ]);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -3252,13 +3252,13 @@
         "item_identifier": "trait_impl:usecase::pre_review_command::CurrentReviewTrackResolverPort"
       },
       "key": {
-        "bound_tests_set_hash": "65ddbab808b1bc56bfd02c299ce01380e41b8335dcbb1b36f174c56106f42823",
+        "bound_tests_set_hash": "7f7fb7bc6b6ae93484b87c678b0dca7677e8e6185fcce6ddc24135cd18609d00",
         "declaration_hash": "afbd986cb6f31fee280f791b6d846a9da58f471d543d31f7cf6e38dd5d15e392",
         "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(resolver.resolve(repo.path()).unwrap().as_ref(), \"example-track\");"
+        "citation": "assert_eq!(resolver.resolve(repo.path()).unwrap().as_ref(), \"example-track\");\n...\nassert!(matches!(\n    resolver.resolve(repo.path()),\n    Err(CurrentReviewTrackResolveError::ResolveFailed { .. })\n));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -3293,13 +3293,13 @@
         "item_identifier": "trait_impl:usecase::pre_review_command::CurrentReviewTrackResolverPort"
       },
       "key": {
-        "bound_tests_set_hash": "65ddbab808b1bc56bfd02c299ce01380e41b8335dcbb1b36f174c56106f42823",
+        "bound_tests_set_hash": "7f7fb7bc6b6ae93484b87c678b0dca7677e8e6185fcce6ddc24135cd18609d00",
         "declaration_hash": "afbd986cb6f31fee280f791b6d846a9da58f471d543d31f7cf6e38dd5d15e392",
         "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(resolver.resolve(repo.path()).unwrap().as_ref(), \"example-track\");\n        assert!(\n            Command::new(\"git\")\n                .args([\"checkout\", \"-qb\", \"ordinary\"])\n                .current_dir(repo.path())\n                .status()\n                .unwrap()\n                .success()\n        );\n        assert!(matches!(\n            resolver.resolve(repo.path()),\n            Err(CurrentReviewTrackResolveError::ResolveFailed { .. })\n        ));"
+        "citation": "assert_eq!(resolver.resolve(repo.path()).unwrap().as_ref(), \"example-track\");\nassert!(matches!(\n    resolver.resolve(repo.path()),\n    Err(CurrentReviewTrackResolveError::ResolveFailed { .. })\n));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -4208,13 +4208,13 @@
         "item_identifier": "voluntary:AC-05"
       },
       "key": {
-        "bound_tests_set_hash": "c32dd861c436e3c2f5f2a47254c5beadeda1f0c537ea4a70308b9379218fc9ae",
+        "bound_tests_set_hash": "90196e3bc1ef7460b51010d8ef90e3de5ef4ca04ebf1bc735349681e28285989",
         "declaration_hash": "b51f682cface9ab77f6646acf9f5453bfb8df6e9acbde83dc18d81b94cfe640e",
         "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let classified = record(ProgramRunOutcome::Exited {\n            exit_code: ProgramExitCode::new(1),\n            output: output(),\n        })\n        .classify();\n\n        match classified {\n            ClassifiedProgramExecutionRecord::Failed(failure) => {\n                assert!(matches!(\n                    failure.as_ref().outcome,\n                    ProgramRunOutcome::Exited { ref exit_code, .. } if exit_code.as_i32() != 0\n                ));\n            }"
+        "citation": "ClassifiedProgramExecutionRecord::Failed(failure) => {\n                assert!(matches!(\n                    failure.as_ref().outcome,\n                    ProgramRunOutcome::Exited { ref exit_code, .. } if exit_code.as_i32() != 0\n                ));\n            }"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -4300,13 +4300,13 @@
         "item_identifier": "voluntary:AC-05"
       },
       "key": {
-        "bound_tests_set_hash": "f4074bc2f97a3f11a2ad59daededf65107d7fa45e7de8e6a0d3e1741a46a7a4d",
+        "bound_tests_set_hash": "f4f98f4b2ab7edc1b639c943c11698737336f258a509e5ddc024f5a983e6518d",
         "declaration_hash": "7b3fe8ecede5c6e1bce6abe977e1b6e27cac35d493afd2fb1e1d7e1b18168dc1",
         "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "`assert!(matches!(outcome, PreReviewCommandDispatchOutcome::ReadyForReview { records } if records.len() == 4))` and `match outcome { PreReviewCommandDispatchOutcome::Blocked { completed, failed } => { assert_eq!(completed.len(), 1); assert!(matches!(failed.as_ref().outcome, ProgramRunOutcome::Exited { ref exit_code, .. } if exit_code.as_i32() != 0));`"
+        "citation": "assert_eq!(*runner.0.lock().unwrap(), vec![vec![\"first\"], vec![\"fail\"],]);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -4336,13 +4336,13 @@
         "item_identifier": "voluntary:AC-07"
       },
       "key": {
-        "bound_tests_set_hash": "f4074bc2f97a3f11a2ad59daededf65107d7fa45e7de8e6a0d3e1741a46a7a4d",
+        "bound_tests_set_hash": "f4f98f4b2ab7edc1b639c943c11698737336f258a509e5ddc024f5a983e6518d",
         "declaration_hash": "7b3fe8ecede5c6e1bce6abe977e1b6e27cac35d493afd2fb1e1d7e1b18168dc1",
         "anchor_text_hash": "3503592124957ba7751cc28fe43d9a296d963b754b236386592298f341297962"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(*runner.0.lock().unwrap(), vec![vec![\"bin/sotp\", \"signal\", \"calc-impl-catalog\"], vec![\"bin/sotp\", \"signal\", \"check-impl-catalog\", \"--gate\", \"commit\"], vec![\"bin/sotp\", \"task-contract\", \"coverage\"], vec![\"bin/sotp\", \"task-contract\", \"check\"]]); ... assert_eq!(*runner.0.lock().unwrap(), vec![vec![\"first\"], vec![\"fail\"],]);"
+        "citation": "assert_eq!(*runner.0.lock().unwrap(), vec![vec![\"bin/sotp\", \"signal\", \"calc-impl-catalog\"], vec![\"bin/sotp\", \"signal\", \"check-impl-catalog\", \"--gate\", \"commit\"], vec![\"bin/sotp\", \"task-contract\", \"coverage\"], vec![\"bin/sotp\", \"task-contract\", \"check\"],]);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -4372,13 +4372,13 @@
         "item_identifier": "voluntary:CN-03"
       },
       "key": {
-        "bound_tests_set_hash": "73253b9e1614eeacbd27a0396239a686e5e291ce7f60ffd83ef8e03e411e8193",
+        "bound_tests_set_hash": "8725516b7d6adc6e9824016efcf7bd8eede2bce7b5a10d4917120ee652f61f0b",
         "declaration_hash": "7b3fe8ecede5c6e1bce6abe977e1b6e27cac35d493afd2fb1e1d7e1b18168dc1",
         "anchor_text_hash": "6166df4e5cb8aa348e839dc9faf6fdda9446f5782ff3880dec49513621a1e600"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(\n                    failed.as_ref().outcome,\n                    ProgramRunOutcome::Exited { ref exit_code, .. } if exit_code.as_i32() != 0\n                ));\n                let failed_argv: Vec<&str> = failed\n                    .as_ref()\n                    .command\n                    .argv()\n                    .arguments()\n                    .iter()\n                    .map(CommandArgument::as_str)\n                    .collect();\n                assert_eq!(failed_argv, [\"fail\"]);"
+        "citation": "assert_eq!(failed_argv, [\"fail\"]); ... assert_eq!(*runner.0.lock().unwrap(), vec![vec![\"first\"], vec![\"fail\"],]);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -4403,13 +4403,13 @@
         "item_identifier": "voluntary:IN-05"
       },
       "key": {
-        "bound_tests_set_hash": "f4074bc2f97a3f11a2ad59daededf65107d7fa45e7de8e6a0d3e1741a46a7a4d",
+        "bound_tests_set_hash": "f4f98f4b2ab7edc1b639c943c11698737336f258a509e5ddc024f5a983e6518d",
         "declaration_hash": "7b3fe8ecede5c6e1bce6abe977e1b6e27cac35d493afd2fb1e1d7e1b18168dc1",
         "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(\n            matches!(outcome, PreReviewCommandDispatchOutcome::ReadyForReview { records } if records.len() == 4)\n        );\n        assert_eq!(\n            *runner.0.lock().unwrap(),\n            vec![\n                vec![\"bin/sotp\", \"signal\", \"calc-impl-catalog\"],\n                vec![\"bin/sotp\", \"signal\", \"check-impl-catalog\", \"--gate\", \"commit\"],\n                vec![\"bin/sotp\", \"task-contract\", \"coverage\"],\n                vec![\"bin/sotp\", \"task-contract\", \"check\"],\n            ]\n        );"
+        "citation": "assert_eq!(*runner.0.lock().unwrap(), vec![vec![\"bin/sotp\", \"signal\", \"calc-impl-catalog\"], vec![\"bin/sotp\", \"signal\", \"check-impl-catalog\", \"--gate\", \"commit\"], vec![\"bin/sotp\", \"task-contract\", \"coverage\"], vec![\"bin/sotp\", \"task-contract\", \"check\"],])"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -4726,13 +4726,13 @@
         "item_identifier": "voluntary:CN-03"
       },
       "key": {
-        "bound_tests_set_hash": "5e3652d37e354f5f09235a65feb2665e285d746a2775a7eb61647c6338c49015",
+        "bound_tests_set_hash": "f5e49dca754b0bd88931a56f55f999dc5d62efd77fb7c482fe7c050a405457a8",
         "declaration_hash": "18645628c7ca4798c96a0205321288ddcd31949c592802a2e10172a3c311b4db",
         "anchor_text_hash": "6166df4e5cb8aa348e839dc9faf6fdda9446f5782ff3880dec49513621a1e600"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(\n                    failed.as_ref().outcome,\n                    ProgramRunOutcome::Exited { ref exit_code, .. } if exit_code.as_i32() != 0\n                ));\n                let failed_argv: Vec<&str> = failed\n                    .as_ref()\n                    .command\n                    .argv()\n                    .arguments()\n                    .iter()\n                    .map(CommandArgument::as_str)\n                    .collect();\n                assert_eq!(failed_argv, [\"fail\"]);"
+        "citation": "assert!(matches!(\n                    failed.as_ref().outcome,\n                    ProgramRunOutcome::Exited { ref exit_code, .. } if exit_code.as_i32() != 0\n                ));\n                let failed_argv: Vec<&str> = failed\n                    .as_ref()\n                    .invoked_argv\n                    .arguments()\n                    .iter()\n                    .map(CommandArgument::as_str)\n                    .collect();\n                assert_eq!(failed_argv, [\"fail\"]);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -8612,6 +8612,240 @@
           "layer": "cli_composition",
           "module_path": "cli_composition::phase_command::tests",
           "test_name": "test_phase_composition_root_stderr_limited_writer_renders_auditable_outcome"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewCommand",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "8531d43e9c0e9c9384b89a035b80835c03c89ec7751440e9e49bb5b9d2b467f8",
+        "declaration_hash": "e20e23b810712c35cb0d0f39da5221d8ae114687120204fe64258881239ab1ea",
+        "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\\n            *runner.invocations.lock().unwrap(),\\n            vec![\\n                vec![\"bin/sotp\", \"signal\", \"calc-impl-catalog\"],\\n                vec![\"bin/sotp\", \"signal\", \"check-impl-catalog\", \"--gate\", \"commit\"],\\n                vec![\"bin/sotp\", \"task-contract\", \"coverage\"],\\n                vec![\"bin/sotp\", \"task-contract\", \"check\"],\\n            ]\\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::review::tests",
+          "test_name": "review_command_parses_all_surviving_variants"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_command::tests",
+          "test_name": "test_pre_review_gated_review_runs_all_implementation_gates_then_reviews_on_success"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_command::tests",
+          "test_name": "test_pre_review_gated_review_runs_implementation_gates_in_order_and_stops_on_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_command::tests",
+          "test_name": "test_pre_review_command_dispatch_returns_successful_records_in_declaration_order"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_command::tests",
+          "test_name": "test_pre_review_command_config_resolves_declared_scope_in_order"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_shipped_pre_review_config_resolves_implementation_commands_in_order"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_command::tests",
+          "test_name": "test_pre_review_command_config_duplicate_scope_is_rejected"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewCommand",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "e492260d09fae5a51f04c754608aaedfdc2845ee06dde6e57d284f3e404c6c35",
+        "declaration_hash": "e20e23b810712c35cb0d0f39da5221d8ae114687120204fe64258881239ab1ea",
+        "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(local.command, super::ReviewCommand::Local(_)));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::review::tests",
+          "test_name": "review_command_parses_all_surviving_variants"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::review::tests",
+          "test_name": "review_rejects_retired_provider_specific_local_commands"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "review_run_local_public_entry_blocks_on_failing_pre_review_gate"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_command::tests",
+          "test_name": "test_pre_review_command_dispatch_returns_first_failure_with_completed_successes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_command::tests",
+          "test_name": "test_pre_review_command_dispatch_returns_successful_records_in_declaration_order"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewCommand",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "d1e3609e0bc42da52d6e36991859247b25e5f2fe77245010e457a7cdbf581689",
+        "declaration_hash": "e20e23b810712c35cb0d0f39da5221d8ae114687120204fe64258881239ab1ea",
+        "anchor_text_hash": "3503592124957ba7751cc28fe43d9a296d963b754b236386592298f341297962"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            *runner.0.lock().unwrap(),\n            vec![\n                vec![\"bin/sotp\", \"signal\", \"calc-impl-catalog\"],\n                vec![\"bin/sotp\", \"signal\", \"check-impl-catalog\", \"--gate\", \"commit\"],\n                vec![\"bin/sotp\", \"task-contract\", \"coverage\"],\n                vec![\"bin/sotp\", \"task-contract\", \"check\"],\n            ]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::review::tests",
+          "test_name": "review_rejects_retired_provider_specific_local_commands"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "review_run_local_public_entry_blocks_on_failing_pre_review_gate"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_command::tests",
+          "test_name": "test_pre_review_command_dispatch_returns_first_failure_with_completed_successes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_command::tests",
+          "test_name": "test_pre_review_gated_review_blocks_inner_review_when_pre_entry_fails"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_shipped_pre_review_config_resolves_implementation_commands_in_order"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_command::tests",
+          "test_name": "test_pre_review_command_dispatch_returns_successful_records_in_declaration_order"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewCommand",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "8ef4aaf1c2ff3565c898c12df1ea1fca18b59dd90de274610f914faaa77feade",
+        "declaration_hash": "e20e23b810712c35cb0d0f39da5221d8ae114687120204fe64258881239ab1ea",
+        "anchor_text_hash": "6166df4e5cb8aa348e839dc9faf6fdda9446f5782ff3880dec49513621a1e600"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(*runner.0.lock().unwrap(), vec![vec![\"first\"], vec![\"fail\"],]); ... assert_eq!(failed_argv, [\"fail\"]); ... assert!(output.stderr.as_deref().unwrap_or(\"\").contains(\"fail\")); assert!(output.stderr.as_deref().unwrap_or(\"\").contains(\"Exited\")); assert_eq!(review.0.load(Ordering::SeqCst), 0);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::review::tests",
+          "test_name": "review_rejects_retired_provider_specific_local_commands"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_command::tests",
+          "test_name": "test_pre_review_command_config_duplicate_scope_is_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_command::tests",
+          "test_name": "test_pre_review_command_config_reports_pre_review_specific_validation_errors"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_command::tests",
+          "test_name": "test_pre_review_command_config_resolves_declared_scope_in_order"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_shipped_pre_review_config_resolves_implementation_commands_in_order"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_command::tests",
+          "test_name": "test_pre_review_command_dispatch_returns_first_failure_with_completed_successes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_command::tests",
+          "test_name": "test_pre_review_command_dispatch_returns_successful_records_in_declaration_order"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pre_review_command::tests",
+          "test_name": "test_pre_review_gated_review_blocks_inner_review_when_pre_entry_fails"
         }
       ]
     }

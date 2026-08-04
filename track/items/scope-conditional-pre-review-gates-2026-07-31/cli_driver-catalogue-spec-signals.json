@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "5b99b0339808abbd935435d869150db25ecadf5a241583c466fd8e7828dd0340",
+  "catalogue_declaration_hash": "8812c1d1868c4b2abcc2a3da17dd46adf917d0bba18448f0c623079b13845ea8",
   "signals": [
     {
       "type_name": "CapabilityDriver",
@@ -31,6 +31,21 @@
       "type_name": "PhaseIdArg",
       "signal": "blue",
       "entry_hash": "3643415a2d5e6b767dab3be49f568e1188560910a41b121656f1571262d76028"
+    },
+    {
+      "type_name": "RefVerifyChainSelect",
+      "signal": "blue",
+      "entry_hash": "c982154cc9f6a52b22fa99dad473f87ae29cdb0d7d7f3d16ef70b795c2a78ca7"
+    },
+    {
+      "type_name": "RefVerifyCheckApprovedInput",
+      "signal": "blue",
+      "entry_hash": "f98c25b89f701a192175107061cfb85b087eab81e836ec5991e48c745e889fcd"
+    },
+    {
+      "type_name": "ReviewInput",
+      "signal": "blue",
+      "entry_hash": "0e61006ac5abfc4887593aaa6618507b3b5ca8efb9808ed831867011836ec907"
     }
   ]
 }

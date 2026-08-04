@@ -6,15 +6,21 @@
 |------|------|--------|---------|--------|----------|
 | CliCommand | enum | modify | Arch, AdrBaseline, Conventions, Domain, Guard, Hook, Maintenance, Track, Git, Pr, Capability, Phase, Review, File, Verify, FindSimilar, DupIndex, DupCheck, Telemetry, Dry, RefVerify, TestObligation, Signal, TaskContract, Catalog, CatalogueLint, Template, CodexRuntime, BatchPlan, Demo | 🔵 | 🔵 |
 | PhaseCommand | enum | add | Validate, Explain, Enter | 🔵 | 🔵 |
+| RefVerifyCheckChainArg | enum | add | Chain1, Chain2 | 🟡 | 🔵 |
+| ReviewCheckRoundArg | enum | add | Final | 🟡 | 🔵 |
+| ReviewCommand | enum | modify | Local, FixLocal, CheckApproved, CheckZeroFindings, Results, Classify, Files | 🟡 | 🔵 |
 
 ## DTOs
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | CapabilityExecArgs | dto | modify | — | 🔵 | 🔵 |
+| CheckApprovedArgs | dto | modify | — | 🟡 | 🔵 |
+| CheckZeroFindingsArgs | dto | add | — | 🟡 | 🔵 |
 | PhaseEnterArgs | dto | add | — | 🔵 | 🔵 |
 | PhaseIdArgs | dto | add | — | 🔵 | 🔵 |
 | PhaseValidateArgs | dto | add | — | 🔵 | 🔵 |
+| ReviewCheckApprovedArgs | dto | add | — | 🟡 | 🔵 |
 
 ## Free Functions
 

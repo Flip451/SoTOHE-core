@@ -5,6 +5,8 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | PhaseCommandInput | enum | add | Validate, Explain, Enter | 🔵 | 🔵 |
+| RefVerifyChainSelect | enum | reference | Chain1, Chain2, All | 🔵 | 🔵 |
+| ReviewInput | enum | modify | RunCodex, RunClaude, RunLocal, CheckApproved, CheckZeroFindings, Results, Classify, Files, ValidateScope, GetBriefing, PersistCommitHash | 🟡 | 🔵 |
 
 ## DTOs
 
@@ -13,6 +15,7 @@
 | CapabilityExecDriverInput | dto | modify | — | 🔵 | 🔵 |
 | CommandOutcome | dto | reference | — | 🔵 | 🔵 |
 | PhaseIdArg | dto | add | — | 🔵 | 🔵 |
+| RefVerifyCheckApprovedInput | dto | modify | — | 🟡 | 🔵 |
 
 ## Primary Adapters
 

@@ -9,8 +9,6 @@ use cli_driver::review::ReviewInput;
 use usecase::review_v2::{ReviewApprovalDecision, ReviewApprovalOutput};
 
 mod classify;
-mod claude_local;
-mod codex_local;
 mod files;
 mod fix_local;
 mod local;
@@ -19,8 +17,6 @@ mod results;
 mod tests;
 
 use classify::{ClassifyArgs, execute_classify};
-use claude_local::execute_claude_local;
-use codex_local::execute_codex_local;
 use files::{FilesArgs, execute_files};
 use fix_local::{FixLocalArgs, execute_fix_local};
 use local::{LocalArgs, execute_local};
@@ -30,10 +26,6 @@ const DEFAULT_TIMEOUT_SECONDS: u64 = 3_600;
 
 #[derive(Debug, Subcommand)]
 pub enum ReviewCommand {
-    /// Run the local Codex-backed reviewer and auto-record verdict to review.json.
-    CodexLocal(CodexLocalArgs),
-    /// Run the local Claude-backed reviewer and auto-record verdict to review.json.
-    ClaudeLocal(ClaudeLocalArgs),
     /// Run the local reviewer with provider auto-resolved from agent-profiles.json.
     Local(LocalArgs),
     /// Run the review-fix-lead fixer with provider auto-resolved from agent-profiles.json.
@@ -70,187 +62,6 @@ pub enum ReviewCommand {
 pub enum CodexRoundTypeArg {
     Fast,
     Final,
-}
-
-#[derive(Debug, Args)]
-#[command(group(
-    ArgGroup::new("review_input")
-        .required(true)
-        .args(["briefing_file", "prompt"])
-))]
-pub struct CodexLocalArgs {
-    /// Model name resolved from `.harness/config/agent-profiles.json`.
-    #[arg(long)]
-    pub(super) model: String,
-
-    /// Timeout for the reviewer subprocess in seconds.
-    #[arg(long, default_value_t = DEFAULT_TIMEOUT_SECONDS)]
-    pub(super) timeout_seconds: u64,
-
-    /// Path to a briefing file that the reviewer should read.
-    #[arg(long)]
-    pub(super) briefing_file: Option<PathBuf>,
-
-    /// Inline prompt for the reviewer.
-    #[arg(long)]
-    pub(super) prompt: Option<String>,
-
-    /// Test-only explicit path where the wrapper should ask Codex to write the final message.
-    #[cfg(test)]
-    #[arg(long, hide = true)]
-    pub(super) output_last_message: Option<PathBuf>,
-
-    /// Track ID (used for auto-recording verdict to review.json).
-    /// When omitted, resolved from the current git branch (`track/<id>`).
-    #[arg(long)]
-    pub(super) track_id: Option<String>,
-
-    /// Round type: fast or final.
-    #[arg(long, value_enum)]
-    pub(super) round_type: CodexRoundTypeArg,
-
-    /// Review scope name (e.g., "domain", "infrastructure", "other").
-    #[arg(long)]
-    pub(super) group: String,
-
-    /// Path to track items directory.
-    #[arg(long, default_value = "track/items")]
-    pub(super) items_dir: PathBuf,
-}
-
-/// CLI args for `sotp review claude-local`.
-#[derive(Debug, Args)]
-#[command(group(
-    ArgGroup::new("claude_review_input")
-        .required(true)
-        .args(["briefing_file", "prompt"])
-))]
-pub struct ClaudeLocalArgs {
-    /// Model name for the Claude reviewer.
-    #[arg(long)]
-    pub(super) model: String,
-
-    /// Timeout for the reviewer subprocess in seconds.
-    #[arg(long, default_value_t = DEFAULT_TIMEOUT_SECONDS)]
-    pub(super) timeout_seconds: u64,
-
-    /// Path to a briefing file that the reviewer should read.
-    #[arg(long)]
-    pub(super) briefing_file: Option<PathBuf>,
-
-    /// Inline prompt for the reviewer.
-    #[arg(long)]
-    pub(super) prompt: Option<String>,
-
-    /// Track ID (used for auto-recording verdict to review.json).
-    /// When omitted, resolved from the current git branch (`track/<id>`).
-    #[arg(long)]
-    pub(super) track_id: Option<String>,
-
-    /// Round type: fast or final.
-    #[arg(long, value_enum)]
-    pub(super) round_type: CodexRoundTypeArg,
-
-    /// Review scope name (e.g., "domain", "infrastructure", "other").
-    #[arg(long)]
-    pub(super) group: String,
-
-    /// Path to track items directory.
-    #[arg(long, default_value = "track/items")]
-    pub(super) items_dir: PathBuf,
-}
-
-/// Validated auto-record arguments ready for use after the reviewer completes.
-///
-/// Stores all fields as plain strings / standard types so the CLI module
-/// never needs to import domain types (CN-01 / AC-03). The conversion to
-/// `domain::TrackId`, `domain::RoundType`, and `domain::ReviewGroupName`
-/// happens inside `infrastructure::review_v2::run_*_review_str` when
-/// the review cycle is actually executed.
-#[derive(Debug)]
-#[allow(dead_code)] // expected_groups preserved for API compatibility
-pub(super) struct ValidatedAutoRecordArgs {
-    pub(super) track_id: String,
-    pub(super) round_type_str: String, // "fast" | "final"
-    pub(super) group_name: String,
-    pub(super) expected_groups: Vec<String>,
-    pub(super) items_dir: PathBuf,
-    pub(super) diff_base: String,
-}
-
-/// Shared validation logic for auto-record arguments (raw strings).
-///
-/// Used by both `validate_auto_record_args` (CodexLocalArgs) and
-/// `validate_claude_auto_record_args` (ClaudeLocalArgs).
-///
-/// # Errors
-/// Returns `CliError` if args are invalid.
-pub(super) fn validate_auto_record_args_raw(
-    track_id: &str,
-    group: &str,
-    round_type: CodexRoundTypeArg,
-    items_dir: PathBuf,
-) -> Result<ValidatedAutoRecordArgs, crate::CliError> {
-    // Validate track ID format via cli_composition helper (no domain import needed).
-    cli_composition::review_v2::validate_track_id_str(track_id)
-        .map_err(|e| crate::CliError::Message(format!("invalid --track-id: {e}")))?;
-    // Validate group name format via cli_composition helper.
-    cli_composition::review_v2::validate_review_group_name_str(group)
-        .map_err(|e| crate::CliError::Message(format!("invalid --group: {e}")))?;
-
-    let round_type_str = match round_type {
-        CodexRoundTypeArg::Fast => "fast",
-        CodexRoundTypeArg::Final => "final",
-    };
-
-    // `validate_review_group_name_str` accepts inputs with leading/trailing
-    // whitespace because `domain::ReviewGroupName::try_new` trims before
-    // validation. Propagate the trimmed value so downstream scope lookup uses
-    // the canonical form (otherwise " domain " would pass validation but then
-    // fail unknown-scope on lookup).
-    let group_name = group.trim().to_owned();
-
-    Ok(ValidatedAutoRecordArgs {
-        track_id: track_id.to_owned(),
-        round_type_str: round_type_str.to_owned(),
-        group_name,
-        expected_groups: Vec::new(),
-        items_dir,
-        diff_base: String::new(),
-    })
-}
-
-/// Validates and parses auto-record arguments from `CodexLocalArgs`.
-///
-/// All record fields are now required (auto-record is always on). Validation
-/// is performed using the infrastructure crate's string-based parsing helpers
-/// so that no domain types appear in the CLI module (CN-01 / AC-03).
-/// When `track_id` is `None`, the active track is resolved from the current
-/// git branch (CN-01, AC-01).
-///
-/// # Errors
-/// Returns `CliError` if args are invalid.
-pub(super) fn validate_auto_record_args(
-    args: &CodexLocalArgs,
-) -> Result<ValidatedAutoRecordArgs, crate::CliError> {
-    let track_id = crate::commands::track::resolve_track_id(args.track_id.clone(), &args.items_dir)
-        .map_err(|e| crate::CliError::Message(e.to_string()))?;
-    validate_auto_record_args_raw(&track_id, &args.group, args.round_type, args.items_dir.clone())
-}
-
-/// Validates and parses auto-record arguments from `ClaudeLocalArgs`.
-///
-/// When `track_id` is `None`, the active track is resolved from the current
-/// git branch (CN-01, AC-01).
-///
-/// # Errors
-/// Returns `CliError` if args are invalid.
-pub(super) fn validate_claude_auto_record_args(
-    args: &ClaudeLocalArgs,
-) -> Result<ValidatedAutoRecordArgs, crate::CliError> {
-    let track_id = crate::commands::track::resolve_track_id(args.track_id.clone(), &args.items_dir)
-        .map_err(|e| crate::CliError::Message(e.to_string()))?;
-    validate_auto_record_args_raw(&track_id, &args.group, args.round_type, args.items_dir.clone())
 }
 
 #[derive(Debug, Args)]
@@ -343,8 +154,6 @@ pub struct ResultsArgs {
 
 pub fn execute(cmd: ReviewCommand) -> ExitCode {
     match cmd {
-        ReviewCommand::CodexLocal(args) => execute_codex_local(&args),
-        ReviewCommand::ClaudeLocal(args) => execute_claude_local(&args),
         ReviewCommand::Local(args) => execute_local(&args),
         ReviewCommand::FixLocal(args) => execute_fix_local(&args),
         ReviewCommand::CheckApproved(args) => execute_check_approved(&args),
