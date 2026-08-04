@@ -663,13 +663,13 @@
         "item_identifier": "voluntary:IN-01"
       },
       "key": {
-        "bound_tests_set_hash": "6f667f9bd54c01f790eeeaecf12e87fd84207093ee96bed60aebb0e0ba408923",
-        "declaration_hash": "01e2b176d6020a7d8fb9227d869bd8ede87a231b1f10bf773330e89469dcbe55",
+        "bound_tests_set_hash": "81c37c34c6039b4630ee40365bd47c4673f7ba11161a3f20aa4dea86b4394bc8",
+        "declaration_hash": "105d6be8a59a25a7b3bbe8b57bfcabd88c03aa556176201d25c90825a9aceb57",
         "anchor_text_hash": "c2c7f968ad201efcf6c2b0e52aa82c94b1eb77f3361dde7b9293d7a063785050"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(\n            call.starts_with(\"sotp dry|17|\"),\n            \"identity and exit code must be preserved: {call}\"\n        );\n        let duration_ms = call\n            .split('|')\n            .nth(2)\n            .and_then(|value| value.parse::<u64>().ok())\n            .expect(\"completion telemetry must carry duration milliseconds\");\n        assert!(duration_ms >= 200, \"elapsed duration must be forwarded: {call}\");"
+        "citation": "assert!(\n            call.starts_with(\"sotp dry|17|\"),\n            \"identity and exit code must be preserved: {call}\"\n        );\n        let duration_ms = call\n            .split('|')\n            .nth(2)\n            .and_then(|value| value.parse::<u64>().ok())\n            .expect(\"completion telemetry must carry duration milliseconds\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -687,6 +687,16 @@
           "layer": "cli_driver",
           "module_path": "cli_driver::telemetry::tests",
           "test_name": "test_telemetry_report_command_metrics_render_frequency_duration_and_failure_rate"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::tests",
+          "test_name": "test_completed_command_success_appends_existing_telemetry_event"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::tests",
+          "test_name": "test_archive_completion_telemetry_moves_to_archived_track_logs"
         }
       ]
     },
@@ -704,13 +714,13 @@
         "item_identifier": "voluntary:IN-02"
       },
       "key": {
-        "bound_tests_set_hash": "6f667f9bd54c01f790eeeaecf12e87fd84207093ee96bed60aebb0e0ba408923",
-        "declaration_hash": "01e2b176d6020a7d8fb9227d869bd8ede87a231b1f10bf773330e89469dcbe55",
+        "bound_tests_set_hash": "81c37c34c6039b4630ee40365bd47c4673f7ba11161a3f20aa4dea86b4394bc8",
+        "declaration_hash": "105d6be8a59a25a7b3bbe8b57bfcabd88c03aa556176201d25c90825a9aceb57",
         "anchor_text_hash": "7c54b1065f0715eca63ef37b6909f20b93abf04a62b2fa7e396598f46916355d"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(\n            service.calls.lock().unwrap().len(),\n            1,\n            \"the completion event must be emitted once\"\n        );"
+        "citation": "assert_eq!(lines.lines().count(), 2, \"completion must append to existing telemetry\"); ... assert!(archived_log.exists(), \"successful archive completion must append to the archived track log: {archived_log:?}\"); ... assert!(!active_log.exists(), \"successful archive completion must not recreate the active track sink: {active_log:?}\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -728,6 +738,16 @@
           "layer": "cli_driver",
           "module_path": "cli_driver::telemetry::tests",
           "test_name": "test_telemetry_report_command_metrics_render_frequency_duration_and_failure_rate"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::tests",
+          "test_name": "test_completed_command_success_appends_existing_telemetry_event"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::tests",
+          "test_name": "test_archive_completion_telemetry_moves_to_archived_track_logs"
         }
       ]
     },
@@ -746,12 +766,12 @@
       },
       "key": {
         "bound_tests_set_hash": "6f667f9bd54c01f790eeeaecf12e87fd84207093ee96bed60aebb0e0ba408923",
-        "declaration_hash": "01e2b176d6020a7d8fb9227d869bd8ede87a231b1f10bf773330e89469dcbe55",
+        "declaration_hash": "105d6be8a59a25a7b3bbe8b57bfcabd88c03aa556176201d25c90825a9aceb57",
         "anchor_text_hash": "c6df563b04a97af62f3ffd6b5611d9f27c65d91d68cc71d5c033703c2757d41f"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(report.contains(\"3 execution(s)\")); assert!(report.contains(\"540 ms\")); assert!(report.contains(\"1 failure(s), 33.33% failure rate\"));"
+        "citation": "assert!(report.contains(\"3 execution(s)\"));\n        assert!(report.contains(\"540 ms\"));\n        assert!(report.contains(\"1 failure(s), 33.33% failure rate\"));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -787,12 +807,12 @@
       },
       "key": {
         "bound_tests_set_hash": "6f667f9bd54c01f790eeeaecf12e87fd84207093ee96bed60aebb0e0ba408923",
-        "declaration_hash": "01e2b176d6020a7d8fb9227d869bd8ede87a231b1f10bf773330e89469dcbe55",
+        "declaration_hash": "105d6be8a59a25a7b3bbe8b57bfcabd88c03aa556176201d25c90825a9aceb57",
         "anchor_text_hash": "cd8029544eb3944ffaf1e7a917b60c9347300ce2fd97b99d108a3ef0e610d86d"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(outcome.exit_code, 0, \"append failure must not replace command outcome\");"
+        "citation": "assert_eq!(outcome.exit_code, 0, \"append failure must not replace command outcome\");\n        assert_eq!(service.calls.lock().unwrap().len(), 1);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -828,12 +848,12 @@
       },
       "key": {
         "bound_tests_set_hash": "6f667f9bd54c01f790eeeaecf12e87fd84207093ee96bed60aebb0e0ba408923",
-        "declaration_hash": "01e2b176d6020a7d8fb9227d869bd8ede87a231b1f10bf773330e89469dcbe55",
+        "declaration_hash": "105d6be8a59a25a7b3bbe8b57bfcabd88c03aa556176201d25c90825a9aceb57",
         "anchor_text_hash": "a82002a20538715fb2af0c1c3db399e871fceefcd8962ed2a36028e50a15329f"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(\n            call.starts_with(\"sotp dry|17|\"),\n            \"identity and exit code must be preserved: {call}\"\n        );\n        let duration_ms = call\n            .split('|')\n            .nth(2)\n            .and_then(|value| value.parse::<u64>().ok())\n            .expect(\"completion telemetry must carry duration milliseconds\");\n        assert!(duration_ms >= 200, \"elapsed duration must be forwarded: {call}\");\n        assert!(\n            call.contains(\"|command failed|track-id\"),\n            \"error chain and source track must be preserved: {call}\"\n        );"
+        "citation": "assert!(call.starts_with(\"sotp dry|17|\"), \"identity and exit code must be preserved: {call}\");\nassert!(duration_ms >= 200, \"elapsed duration must be forwarded: {call}\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -869,12 +889,12 @@
       },
       "key": {
         "bound_tests_set_hash": "6f667f9bd54c01f790eeeaecf12e87fd84207093ee96bed60aebb0e0ba408923",
-        "declaration_hash": "01e2b176d6020a7d8fb9227d869bd8ede87a231b1f10bf773330e89469dcbe55",
+        "declaration_hash": "105d6be8a59a25a7b3bbe8b57bfcabd88c03aa556176201d25c90825a9aceb57",
         "anchor_text_hash": "2281d423f88ab65f04dd389564bb99b37fa8d85ccc47cc6f7cf89090396c0c85"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(report.contains(\"3 execution(s)\"));\n        assert!(report.contains(\"540 ms\"));\n        assert!(report.contains(\"1 failure(s), 33.33% failure rate\"));"
+        "citation": "assert!(report.contains(\"Command metrics:\"));\n        assert!(report.contains(\"track status\"));\n        assert!(report.contains(\"3 execution(s)\"));\n        assert!(report.contains(\"540 ms\"));\n        assert!(report.contains(\"1 failure(s), 33.33% failure rate\"));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -910,7 +930,7 @@
       },
       "key": {
         "bound_tests_set_hash": "6f667f9bd54c01f790eeeaecf12e87fd84207093ee96bed60aebb0e0ba408923",
-        "declaration_hash": "01e2b176d6020a7d8fb9227d869bd8ede87a231b1f10bf773330e89469dcbe55",
+        "declaration_hash": "105d6be8a59a25a7b3bbe8b57bfcabd88c03aa556176201d25c90825a9aceb57",
         "anchor_text_hash": "e04921a19b9343fdf516148b5cf4dd990446eac27ab385bf64690c3aaa9dd40d"
       },
       "verdict": {
@@ -951,12 +971,12 @@
       },
       "key": {
         "bound_tests_set_hash": "6f667f9bd54c01f790eeeaecf12e87fd84207093ee96bed60aebb0e0ba408923",
-        "declaration_hash": "7e024cb5422999d44afaafbbfb53befa3fbfbfbabffca0c327cb002af16b11b3",
+        "declaration_hash": "a2c089ee2bca6011a437bbf18d9e0804437c8c5fbead4f69c3b14b78f06c793f",
         "anchor_text_hash": "c2c7f968ad201efcf6c2b0e52aa82c94b1eb77f3361dde7b9293d7a063785050"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(\n            call.starts_with(\"sotp dry|17|\"),\n            \"identity and exit code must be preserved: {call}\"\n        );\n        let duration_ms = call\n            .split('|')\n            .nth(2)\n            .and_then(|value| value.parse::<u64>().ok())\n            .expect(\"completion telemetry must carry duration milliseconds\");\n        assert!(duration_ms >= 200, \"elapsed duration must be forwarded: {call}\");"
+        "citation": "\"identity and exit code must be preserved: {call}\""
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -991,13 +1011,13 @@
         "item_identifier": "voluntary:IN-02"
       },
       "key": {
-        "bound_tests_set_hash": "7ab8e387514f6828129f907fad809af69a65afbfc4aa6c84c929006d9724e543",
-        "declaration_hash": "7e024cb5422999d44afaafbbfb53befa3fbfbfbabffca0c327cb002af16b11b3",
+        "bound_tests_set_hash": "81c37c34c6039b4630ee40365bd47c4673f7ba11161a3f20aa4dea86b4394bc8",
+        "declaration_hash": "a2c089ee2bca6011a437bbf18d9e0804437c8c5fbead4f69c3b14b78f06c793f",
         "anchor_text_hash": "7c54b1065f0715eca63ef37b6909f20b93abf04a62b2fa7e396598f46916355d"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(lines.lines().count(), 2, \"completion must append to existing telemetry\");"
+        "citation": "assert_eq!(lines.lines().count(), 2, \"completion must append to existing telemetry\");\n        assert!(lines.lines().next().unwrap().contains(\"\\\"hook_name\\\":\\\"existing\\\"\"));\n        let record: serde_json::Value =\n            serde_json::from_str(lines.lines().last().unwrap()).unwrap();\n        assert_eq!(record[\"event_type\"], \"TrackSubcommand\");\n        assert_eq!(record[\"command\"], \"sotp dry\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -1020,6 +1040,11 @@
           "layer": "cli",
           "module_path": "cli::tests",
           "test_name": "test_completed_command_success_appends_existing_telemetry_event"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::tests",
+          "test_name": "test_archive_completion_telemetry_moves_to_archived_track_logs"
         }
       ]
     },
@@ -1038,12 +1063,12 @@
       },
       "key": {
         "bound_tests_set_hash": "b9c44fd93bfc1c38038a3bb7757e13ae422db1963e20b69565e9e8ecaf6d5326",
-        "declaration_hash": "7e024cb5422999d44afaafbbfb53befa3fbfbfbabffca0c327cb002af16b11b3",
+        "declaration_hash": "a2c089ee2bca6011a437bbf18d9e0804437c8c5fbead4f69c3b14b78f06c793f",
         "anchor_text_hash": "cd8029544eb3944ffaf1e7a917b60c9347300ce2fd97b99d108a3ef0e610d86d"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(outcome.exit_code, 0, \"append failure must not replace command outcome\"); ... assert_eq!(exit, ExitCode::from(42)); assert!(logs_path.is_file(), \"append failure must not replace the original path\");"
+        "citation": "assert_eq!(outcome.exit_code, 0, \"append failure must not replace command outcome\"); ... assert_eq!(exit, ExitCode::from(42));\nassert!(logs_path.is_file(), \"append failure must not replace the original path\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -1084,12 +1109,12 @@
       },
       "key": {
         "bound_tests_set_hash": "6f667f9bd54c01f790eeeaecf12e87fd84207093ee96bed60aebb0e0ba408923",
-        "declaration_hash": "7e024cb5422999d44afaafbbfb53befa3fbfbfbabffca0c327cb002af16b11b3",
+        "declaration_hash": "a2c089ee2bca6011a437bbf18d9e0804437c8c5fbead4f69c3b14b78f06c793f",
         "anchor_text_hash": "a82002a20538715fb2af0c1c3db399e871fceefcd8962ed2a36028e50a15329f"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(\n            service.calls.lock().unwrap().len(),\n            1,\n            \"the completion event must be emitted once\"\n        );\n        let call = service.calls.lock().unwrap()[0].clone();\n        assert!(\n            call.starts_with(\"sotp dry|17|\"),\n            \"identity and exit code must be preserved: {call}\"\n        );\n        let duration_ms = call\n            .split('|')\n            .nth(2)\n            .and_then(|value| value.parse::<u64>().ok())\n            .expect(\"completion telemetry must carry duration milliseconds\");\n        assert!(duration_ms >= 200, \"elapsed duration must be forwarded: {call}\");\n        assert!(\n            call.contains(\"|command failed|track-id\"),\n            \"error chain and source track must be preserved: {call}\"\n        );"
+        "citation": "assert!(\n            call.starts_with(\"sotp dry|17|\"),\n            \"identity and exit code must be preserved: {call}\"\n        );\n        let duration_ms = call\n            .split('|')\n            .nth(2)\n            .and_then(|value| value.parse::<u64>().ok())\n            .expect(\"completion telemetry must carry duration milliseconds\");\n        assert!(duration_ms >= 200, \"elapsed duration must be forwarded: {call}\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -1125,7 +1150,7 @@
       },
       "key": {
         "bound_tests_set_hash": "6f667f9bd54c01f790eeeaecf12e87fd84207093ee96bed60aebb0e0ba408923",
-        "declaration_hash": "7e024cb5422999d44afaafbbfb53befa3fbfbfbabffca0c327cb002af16b11b3",
+        "declaration_hash": "a2c089ee2bca6011a437bbf18d9e0804437c8c5fbead4f69c3b14b78f06c793f",
         "anchor_text_hash": "e04921a19b9343fdf516148b5cf4dd990446eac27ab385bf64690c3aaa9dd40d"
       },
       "verdict": {
@@ -2623,12 +2648,12 @@
       },
       "key": {
         "bound_tests_set_hash": "e1e3dc3f51f6179c944603c14d1e1ba8ccfa93297661e88153e85043e87dd573",
-        "declaration_hash": "7db271ae2ace944f1b052d503b3cd7a530afa4215c47390f4a7f1ab15873780b",
+        "declaration_hash": "35571337721598bfbbe7799f19d7ba4bd60dce13f6c119a166a1b8d93a55cb4c",
         "anchor_text_hash": "c2c7f968ad201efcf6c2b0e52aa82c94b1eb77f3361dde7b9293d7a063785050"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "        assert_eq!(record[\"event_type\"], \"TrackSubcommand\");\n        assert_eq!(record[\"command\"], \"sotp dry\");\n        assert_eq!(record[\"exit_code\"], 0);\n        assert!(record[\"duration_ms\"].is_u64());"
+        "citation": "assert_eq!(record[\"event_type\"], \"TrackSubcommand\");\n        assert_eq!(record[\"command\"], \"sotp dry\");\n        assert_eq!(record[\"exit_code\"], 0);\n        assert!(record[\"duration_ms\"].is_u64());"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -2664,7 +2689,7 @@
       },
       "key": {
         "bound_tests_set_hash": "e1e3dc3f51f6179c944603c14d1e1ba8ccfa93297661e88153e85043e87dd573",
-        "declaration_hash": "7db271ae2ace944f1b052d503b3cd7a530afa4215c47390f4a7f1ab15873780b",
+        "declaration_hash": "35571337721598bfbbe7799f19d7ba4bd60dce13f6c119a166a1b8d93a55cb4c",
         "anchor_text_hash": "a82002a20538715fb2af0c1c3db399e871fceefcd8962ed2a36028e50a15329f"
       },
       "verdict": {
@@ -2705,7 +2730,7 @@
       },
       "key": {
         "bound_tests_set_hash": "e1e3dc3f51f6179c944603c14d1e1ba8ccfa93297661e88153e85043e87dd573",
-        "declaration_hash": "b5e474ba51d2e45432f1436bd7dd833af48f735be9438f7a9cc9e6708300ec42",
+        "declaration_hash": "ea7fc49fe92b8171a40311b821687f08c7e5fdc1c659d08ed208fbf7b57e58e9",
         "anchor_text_hash": "c2c7f968ad201efcf6c2b0e52aa82c94b1eb77f3361dde7b9293d7a063785050"
       },
       "verdict": {
@@ -2746,12 +2771,12 @@
       },
       "key": {
         "bound_tests_set_hash": "e1e3dc3f51f6179c944603c14d1e1ba8ccfa93297661e88153e85043e87dd573",
-        "declaration_hash": "b5e474ba51d2e45432f1436bd7dd833af48f735be9438f7a9cc9e6708300ec42",
+        "declaration_hash": "ea7fc49fe92b8171a40311b821687f08c7e5fdc1c659d08ed208fbf7b57e58e9",
         "anchor_text_hash": "a82002a20538715fb2af0c1c3db399e871fceefcd8962ed2a36028e50a15329f"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(lines.lines().count(), 2, \"completion must append to existing telemetry\");\nassert_eq!(record[\"event_type\"], \"TrackSubcommand\");\nassert_eq!(record[\"command\"], \"sotp dry\");\nassert_eq!(record[\"exit_code\"], 0);\nassert!(record[\"duration_ms\"].is_u64());"
+        "citation": "assert_eq!(record[\"event_type\"], \"TrackSubcommand\");\n        assert_eq!(record[\"command\"], \"sotp dry\");\n        assert_eq!(record[\"exit_code\"], 0);\n        assert!(record[\"duration_ms\"].is_u64());"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -2866,20 +2891,122 @@
     },
     {
       "edge_id": {
-        "entry_key": "cli::telemetry_completion_eligible",
+        "entry_key": "infrastructure::telemetry::context::resolve_telemetry_track_id",
         "anchor_id": {
           "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
           "element_id": "IN-01"
         }
       },
       "obligation_id": {
-        "entry_key": "cli::telemetry_completion_eligible",
+        "entry_key": "infrastructure::telemetry::context::resolve_telemetry_track_id",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "836457a49b5c98ab6a6ab67e2108a59b483e9d32e39a63954d166b9f50d645df",
+        "declaration_hash": "f463c751989639e65a4904337380798f4ed086431bcaf965d87bbf3d51cd76d0",
+        "anchor_text_hash": "c2c7f968ad201efcf6c2b0e52aa82c94b1eb77f3361dde7b9293d7a063785050"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(result.as_deref(), Some(\"context-test\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::context::tests",
+          "test_name": "test_resolve_telemetry_track_id_returns_current_track_branch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::context::tests",
+          "test_name": "test_resolve_telemetry_track_id_rejects_malformed_and_non_track_contexts"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::context::tests",
+          "test_name": "test_resolve_telemetry_track_id_honors_kill_switch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::context::tests",
+          "test_name": "test_resolve_telemetry_track_id_anchors_nonempty_relative_repository_path"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::context::tests",
+          "test_name": "test_resolve_telemetry_track_id_rejects_symlinked_items_path"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "infrastructure::telemetry::context::resolve_telemetry_track_id",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::telemetry::context::resolve_telemetry_track_id",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "836457a49b5c98ab6a6ab67e2108a59b483e9d32e39a63954d166b9f50d645df",
+        "declaration_hash": "f463c751989639e65a4904337380798f4ed086431bcaf965d87bbf3d51cd76d0",
+        "anchor_text_hash": "a82002a20538715fb2af0c1c3db399e871fceefcd8962ed2a36028e50a15329f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(result.as_deref(), Some(\"context-test\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::context::tests",
+          "test_name": "test_resolve_telemetry_track_id_returns_current_track_branch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::context::tests",
+          "test_name": "test_resolve_telemetry_track_id_rejects_malformed_and_non_track_contexts"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::context::tests",
+          "test_name": "test_resolve_telemetry_track_id_honors_kill_switch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::context::tests",
+          "test_name": "test_resolve_telemetry_track_id_anchors_nonempty_relative_repository_path"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::context::tests",
+          "test_name": "test_resolve_telemetry_track_id_rejects_symlinked_items_path"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli_driver::telemetry::completion_eligible",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli_driver::telemetry::completion_eligible",
         "obligation_kind": "logic",
         "item_identifier": "entry"
       },
       "key": {
         "bound_tests_set_hash": "8c960ee21b419d98edd12ab3e4b22675bde1068c64d46e23e6565d9e37d8fba4",
-        "declaration_hash": "6e6f56e1903fea05a384bb153af0c07bbbe9197473cfe4d4837c83d3aabd5d35",
+        "declaration_hash": "d4ae98adb9b84cfc112695df0925a11e31ede3bc5097fcce5e194b55c04012f1",
         "anchor_text_hash": "c2c7f968ad201efcf6c2b0e52aa82c94b1eb77f3361dde7b9293d7a063785050"
       },
       "verdict": {
@@ -2902,25 +3029,25 @@
     },
     {
       "edge_id": {
-        "entry_key": "cli::telemetry_completion_eligible",
+        "entry_key": "cli_driver::telemetry::completion_eligible",
         "anchor_id": {
           "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
           "element_id": "AC-01"
         }
       },
       "obligation_id": {
-        "entry_key": "cli::telemetry_completion_eligible",
+        "entry_key": "cli_driver::telemetry::completion_eligible",
         "obligation_kind": "logic",
         "item_identifier": "entry"
       },
       "key": {
         "bound_tests_set_hash": "8c960ee21b419d98edd12ab3e4b22675bde1068c64d46e23e6565d9e37d8fba4",
-        "declaration_hash": "6e6f56e1903fea05a384bb153af0c07bbbe9197473cfe4d4837c83d3aabd5d35",
+        "declaration_hash": "d4ae98adb9b84cfc112695df0925a11e31ede3bc5097fcce5e194b55c04012f1",
         "anchor_text_hash": "a82002a20538715fb2af0c1c3db399e871fceefcd8962ed2a36028e50a15329f"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(telemetry_completion_eligible(\"track spec-design\"));\n        assert!(telemetry_completion_eligible(\"dry write\"));\n        assert!(telemetry_completion_eligible(\"verify layers\"));\n        assert!(!telemetry_completion_eligible(\"track resolve\"));\n        assert!(!telemetry_completion_eligible(\"telemetry report\"));\n        assert!(!telemetry_completion_eligible(\"review results\"));\n        assert!(!telemetry_completion_eligible(\"verify results\"));"
+        "citation": "assert!(telemetry_completion_eligible(\"track spec-design\"));\n        assert!(telemetry_completion_eligible(\"dry write\"));\n        assert!(telemetry_completion_eligible(\"verify layers\"));\n\n        assert!(!telemetry_completion_eligible(\"track resolve\"));\n        assert!(!telemetry_completion_eligible(\"telemetry report\"));\n        assert!(!telemetry_completion_eligible(\"review results\"));\n        assert!(!telemetry_completion_eligible(\"verify results\"));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -2938,73 +3065,140 @@
     },
     {
       "edge_id": {
-        "entry_key": "cli::telemetry_track_display_only",
+        "entry_key": "TelemetryCompletion",
         "anchor_id": {
           "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
           "element_id": "IN-01"
         }
       },
       "obligation_id": {
-        "entry_key": "cli::telemetry_track_display_only",
+        "entry_key": "TelemetryCompletion",
         "obligation_kind": "logic",
-        "item_identifier": "entry"
+        "item_identifier": "voluntary:IN-01"
       },
       "key": {
-        "bound_tests_set_hash": "8c960ee21b419d98edd12ab3e4b22675bde1068c64d46e23e6565d9e37d8fba4",
-        "declaration_hash": "d841ef78bcfed69904ca7dc7d73e8abe42d3f4cdf1a757e77471ab6812155523",
+        "bound_tests_set_hash": "e39d723368b45863b64935e4fd1ccb7d8fffb3baf5b21b066fa7a47cd5f6dca7",
+        "declaration_hash": "9804b72361a249c5fbf26bc49e7a81b668a363edc5ff7ebf4e81fa37c123ea17",
         "anchor_text_hash": "c2c7f968ad201efcf6c2b0e52aa82c94b1eb77f3361dde7b9293d7a063785050"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(telemetry_completion_eligible(\"track spec-design\"));\n        assert!(telemetry_completion_eligible(\"dry write\"));\n        assert!(telemetry_completion_eligible(\"verify layers\"));\n\n        assert!(!telemetry_completion_eligible(\"track resolve\"));\n        assert!(!telemetry_completion_eligible(\"telemetry report\"));\n        assert!(!telemetry_completion_eligible(\"review results\"));\n        assert!(!telemetry_completion_eligible(\"verify results\"));"
+        "citation": "assert_eq!(record[\"event_type\"], \"TrackSubcommand\");\n        assert_eq!(record[\"command\"], \"sotp dry\");\n        assert_eq!(record[\"exit_code\"], 0);\n        assert!(record[\"duration_ms\"].is_u64());"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
         {
           "layer": "cli",
           "module_path": "cli::tests",
-          "test_name": "test_telemetry_completion_eligible_accepts_track_workflow_commands"
-        },
-        {
-          "layer": "cli",
-          "module_path": "cli::tests",
-          "test_name": "test_telemetry_completion_eligible_excludes_display_only_and_report_commands"
+          "test_name": "test_completed_command_success_appends_existing_telemetry_event"
         }
       ]
     },
     {
       "edge_id": {
-        "entry_key": "cli::telemetry_track_display_only",
+        "entry_key": "TelemetryCompletion",
         "anchor_id": {
           "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
           "element_id": "AC-01"
         }
       },
       "obligation_id": {
-        "entry_key": "cli::telemetry_track_display_only",
+        "entry_key": "TelemetryCompletion",
         "obligation_kind": "logic",
-        "item_identifier": "entry"
+        "item_identifier": "voluntary:AC-01"
       },
       "key": {
-        "bound_tests_set_hash": "8c960ee21b419d98edd12ab3e4b22675bde1068c64d46e23e6565d9e37d8fba4",
-        "declaration_hash": "d841ef78bcfed69904ca7dc7d73e8abe42d3f4cdf1a757e77471ab6812155523",
+        "bound_tests_set_hash": "e39d723368b45863b64935e4fd1ccb7d8fffb3baf5b21b066fa7a47cd5f6dca7",
+        "declaration_hash": "9804b72361a249c5fbf26bc49e7a81b668a363edc5ff7ebf4e81fa37c123ea17",
         "anchor_text_hash": "a82002a20538715fb2af0c1c3db399e871fceefcd8962ed2a36028e50a15329f"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(telemetry_completion_eligible(\"track spec-design\"));\n        assert!(telemetry_completion_eligible(\"dry write\"));\n        assert!(telemetry_completion_eligible(\"verify layers\"));\n\n        assert!(!telemetry_completion_eligible(\"track resolve\"));\n        assert!(!telemetry_completion_eligible(\"telemetry report\"));\n        assert!(!telemetry_completion_eligible(\"review results\"));\n        assert!(!telemetry_completion_eligible(\"verify results\"));"
+        "citation": "assert_eq!(record[\"command\"], \"sotp dry\");\nassert_eq!(record[\"exit_code\"], 0);\nassert!(record[\"duration_ms\"].is_u64());"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
         {
           "layer": "cli",
           "module_path": "cli::tests",
-          "test_name": "test_telemetry_completion_eligible_accepts_track_workflow_commands"
+          "test_name": "test_completed_command_success_appends_existing_telemetry_event"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TelemetryConfig",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TelemetryConfig",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "1df304af2900e4ae1b26c22affdcd31344a763cf39a430f0a2aad755b9674a7f",
+        "declaration_hash": "82788015296939f3f394152134ecdc2264b9c929ccf47e91c63aeea546ad67ff",
+        "anchor_text_hash": "7c54b1065f0715eca63ef37b6909f20b93abf04a62b2fa7e396598f46916355d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(cfg.archive_completion_uses_archive_sink());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::config::tests",
+          "test_name": "test_archive_completion_uses_archive_sink_for_enabled_default_config"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::config::tests",
+          "test_name": "test_archive_completion_uses_archive_sink_rejects_disabled_or_overridden_config"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TelemetryConfig",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TelemetryConfig",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "4412d483a16787b766439a6f4c56d0270d6414f0a91a933f3aa5dab6b16e7f20",
+        "declaration_hash": "82788015296939f3f394152134ecdc2264b9c929ccf47e91c63aeea546ad67ff",
+        "anchor_text_hash": "a82002a20538715fb2af0c1c3db399e871fceefcd8962ed2a36028e50a15329f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(lines.lines().count(), 2, \"completion must append to existing telemetry\");\n        assert_eq!(record[\"event_type\"], \"TrackSubcommand\");\n        assert_eq!(record[\"command\"], \"sotp dry\");\n        assert_eq!(record[\"exit_code\"], 0);\n        assert!(record[\"duration_ms\"].is_u64());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::config::tests",
+          "test_name": "test_archive_completion_uses_archive_sink_for_enabled_default_config"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::config::tests",
+          "test_name": "test_archive_completion_uses_archive_sink_rejects_disabled_or_overridden_config"
         },
         {
           "layer": "cli",
           "module_path": "cli::tests",
-          "test_name": "test_telemetry_completion_eligible_excludes_display_only_and_report_commands"
+          "test_name": "test_completed_command_success_appends_existing_telemetry_event"
         }
       ]
     }

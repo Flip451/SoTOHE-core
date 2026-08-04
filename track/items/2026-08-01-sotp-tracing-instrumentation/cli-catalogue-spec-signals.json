@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "f864b7346b4cc4e6f9aca508f64bd45054eb4844829e6ef30e528f05d68332a0",
+  "catalogue_declaration_hash": "340bb3e5bc5f0982871ff461cb7c97d7641c5c1e83f623aee69b55e979aff8d0",
   "signals": [
     {
       "type_name": "CatalogCommand",
@@ -25,22 +25,12 @@
     {
       "type_name": "cli::run_cli",
       "signal": "blue",
-      "entry_hash": "0af7ae729b3692a933600e1b511806e65ad4ef046307d83a45cd3613a78ee899"
+      "entry_hash": "c0045c1e5d76b37e12628915289145cf566530e7defae9ba0c1d2f0a20dd5db0"
     },
     {
       "type_name": "cli::run_cli_with",
       "signal": "blue",
-      "entry_hash": "b2c77aea9347ded09c2407fadbd58cda6324fcf1cf00cd3692b6aa2e6fbe8b0d"
-    },
-    {
-      "type_name": "cli::telemetry_completion_eligible",
-      "signal": "blue",
-      "entry_hash": "06fb9f6c31f943e6a0924d040f486ec33a03d0deacb46ef88b3256f4eb3d3658"
-    },
-    {
-      "type_name": "cli::telemetry_track_display_only",
-      "signal": "blue",
-      "entry_hash": "a81ea89aee57708ee6158af3b8d2b037bf91dc5b834152306ef36667d0632ee2"
+      "entry_hash": "76e2cde61161314fe2573ca4d98ed73a3d9d42196e00f8fee83984b0664f98e8"
     },
     {
       "type_name": "cli::emit_archived_track_subcommand",

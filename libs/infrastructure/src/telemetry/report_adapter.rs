@@ -210,42 +210,59 @@ fn resolve_project_root_from_items_dir(items_dir: &Path) -> Result<PathBuf, Tele
 
     match (items_name, track_name, project_root) {
         (Some("items"), Some("track"), Some(root)) => {
+            let default_items_dir =
+                !items_dir.is_absolute() && items_dir == Path::new("track/items");
             let root = normalize_project_root(root);
             ensure_trusted_root(&root)?;
-            crate::track::symlink_guard::reject_symlinks_below(items_dir, &root)
-                .map(|_| ())
-                .map_err(|e| {
+            let absolute_root = if root.is_absolute() {
+                root.clone()
+            } else {
+                std::env::current_dir()
+                    .map_err(|e| {
+                        TelemetryAdapterError(format!(
+                            "cannot resolve current directory for relative items_dir: {e}"
+                        ))
+                    })?
+                    .join(&root)
+            };
+            crate::track::symlink_guard::reject_symlinks_up_to_root(&absolute_root).map_err(
+                |e| {
                     TelemetryAdapterError(format!(
                         "items_dir path rejected before use at '{}': {e}",
                         items_dir.display()
                     ))
-                })?;
-            let absolute_root = if root.is_absolute() {
-                root.clone()
+                },
+            )?;
+            let supplied_absolute_items_dir = if items_dir.is_absolute() {
+                items_dir.to_path_buf()
             } else {
-                crate::git_cli::SystemGitRepo::discover()
-                    .map_err(|e| {
-                        TelemetryAdapterError(format!(
-                            "cannot discover git repository for relative items_dir: {e}"
-                        ))
-                    })?
-                    .root()
-                    .join(&root)
+                absolute_root.join("track").join("items")
             };
-            let canonical_root = absolute_root.canonicalize().map_err(|e| {
+            crate::track::symlink_guard::reject_symlinks_below(
+                &supplied_absolute_items_dir,
+                &absolute_root,
+            )
+            .map(|_| ())
+            .map_err(|e| {
+                TelemetryAdapterError(format!(
+                    "items_dir path rejected before use at '{}': {e}",
+                    items_dir.display()
+                ))
+            })?;
+            let canonical_project_root = absolute_root.canonicalize().map_err(|e| {
                 TelemetryAdapterError(format!(
                     "failed to canonicalize project root {}: {e}",
                     absolute_root.display()
                 ))
             })?;
-            ensure_trusted_root(&canonical_root)?;
             let repo =
-                crate::git_cli::SystemGitRepo::discover_from(&canonical_root).map_err(|e| {
-                    TelemetryAdapterError(format!(
-                        "cannot discover git repository from supplied project root {}: {e}",
-                        canonical_root.display()
-                    ))
-                })?;
+                crate::git_cli::SystemGitRepo::discover_from_isolated(&canonical_project_root)
+                    .map_err(|e| {
+                        TelemetryAdapterError(format!(
+                            "cannot discover git repository from supplied project root {}: {e}",
+                            canonical_project_root.display()
+                        ))
+                    })?;
             let repo_root = repo.root().canonicalize().map_err(|e| {
                 TelemetryAdapterError(format!(
                     "failed to canonicalize discovered repository root {}: {e}",
@@ -253,11 +270,13 @@ fn resolve_project_root_from_items_dir(items_dir: &Path) -> Result<PathBuf, Tele
                 ))
             })?;
             ensure_trusted_root(&repo_root)?;
-            if canonical_root != repo_root {
+            if (default_items_dir && !canonical_project_root.starts_with(&repo_root))
+                || (!default_items_dir && canonical_project_root != repo_root)
+            {
                 return Err(TelemetryAdapterError(format!(
                     "--items-dir must resolve to the discovered repository root {}; got {}",
                     repo_root.display(),
-                    canonical_root.display()
+                    canonical_project_root.display()
                 )));
             }
             crate::track::symlink_guard::reject_symlinks_up_to_root(&repo_root).map_err(|e| {
@@ -268,8 +287,18 @@ fn resolve_project_root_from_items_dir(items_dir: &Path) -> Result<PathBuf, Tele
             })?;
             let absolute_items_dir = if items_dir.is_absolute() {
                 items_dir.to_path_buf()
+            } else if default_items_dir {
+                // The CLI's default `track/items` path is repository-relative,
+                // even when the process starts in a nested working directory.
+                repo_root.join("track").join("items")
             } else {
-                repo_root.join(items_dir)
+                std::env::current_dir()
+                    .map_err(|e| {
+                        TelemetryAdapterError(format!(
+                            "cannot resolve current directory for relative items_dir: {e}"
+                        ))
+                    })?
+                    .join(items_dir)
             };
             crate::track::symlink_guard::reject_symlinks_below(&absolute_items_dir, &repo_root)
                 .map(|_| ())
@@ -312,6 +341,7 @@ fn resolve_items_dir_under_current_repo(
 
     let absolute_items_dir =
         if items_dir.is_absolute() { items_dir.to_path_buf() } else { repo_root.join(items_dir) };
+    #[cfg(not(windows))]
     if !absolute_items_dir.starts_with(&repo_root) {
         return Err(TelemetryAdapterError(format!(
             "--items-dir must resolve inside the current repository root {}; got {}",
@@ -320,6 +350,11 @@ fn resolve_items_dir_under_current_repo(
         )));
     }
 
+    // Inspect the supplied path before canonicalization so symlink leaves and
+    // ancestors are rejected before any filesystem read follows them. Windows
+    // may represent the canonical repository root with an extended-length
+    // prefix (`\\?\\C:`), so lexical prefix checks on the raw path are not
+    // reliable across drive-letter and UNC spellings.
     crate::track::symlink_guard::reject_symlinks_below(&absolute_items_dir, &repo_root)
         .map(|_| ())
         .map_err(|e| {
@@ -337,7 +372,7 @@ fn resolve_items_dir_under_current_repo(
     })?;
     if !canonical_items_dir.starts_with(&repo_root) {
         return Err(TelemetryAdapterError(format!(
-            "--items-dir resolves outside the current repository root {}; got {}",
+            "--items-dir must resolve inside the current repository root {}; got {}",
             repo_root.display(),
             canonical_items_dir.display()
         )));
@@ -356,10 +391,7 @@ fn reject_items_dir_escape(items_dir: &Path) -> Result<(), TelemetryAdapterError
     if items_dir.as_os_str().is_empty() {
         return Err(TelemetryAdapterError("--items-dir must not be empty".to_owned()));
     }
-    if items_dir
-        .components()
-        .any(|component| matches!(component, Component::ParentDir | Component::Prefix(_)))
-    {
+    if items_dir.components().any(|component| matches!(component, Component::ParentDir)) {
         return Err(TelemetryAdapterError(format!(
             "--items-dir cannot escape the current repository root: {}",
             items_dir.display()
@@ -386,6 +418,7 @@ fn ensure_trusted_root(root: &Path) -> Result<(), TelemetryAdapterError> {
 #[allow(clippy::unwrap_used)]
 mod tests {
     use std::path::Path;
+    use std::process::Command;
 
     use super::{
         FsTelemetryEmitDynamicAdapter, FsTelemetryReportAdapter, ensure_trusted_root,
@@ -401,6 +434,93 @@ mod tests {
         let target_dir = repo.root().join("target").join("telemetry-report-adapter-tests");
         std::fs::create_dir_all(&target_dir).unwrap();
         tempfile::Builder::new().prefix("items-").tempdir_in(target_dir).unwrap()
+    }
+
+    fn init_repository(path: &Path) {
+        let run_git = |args: &[&str]| {
+            let output = Command::new("git").args(args).current_dir(path).output().unwrap();
+            assert!(
+                output.status.success(),
+                "git {args:?}: {}",
+                String::from_utf8_lossy(&output.stderr)
+            );
+        };
+        run_git(&["init", "--quiet", "--initial-branch=main"]);
+        run_git(&["config", "user.email", "test@example.invalid"]);
+        run_git(&["config", "user.name", "Telemetry Adapter Test"]);
+        std::fs::create_dir_all(path.join("track/items")).unwrap();
+        std::fs::write(path.join("README.md"), "fixture\n").unwrap();
+        run_git(&["add", "."]);
+        run_git(&["commit", "--quiet", "-m", "fixture"]);
+    }
+
+    #[test]
+    fn test_resolve_project_root_from_items_dir_anchors_relative_root_to_current_directory() {
+        if std::env::var_os("SOTP_REPORT_RELATIVE_CHILD").is_some() {
+            let repo_name = std::env::var_os("SOTP_REPORT_RELATIVE_ROOT")
+                .and_then(|path| Path::new(&path).file_name().map(ToOwned::to_owned))
+                .unwrap();
+            let root = resolve_project_root_from_items_dir(
+                &std::path::PathBuf::from(repo_name).join("track/items"),
+            )
+            .unwrap();
+            let expected =
+                std::path::PathBuf::from(std::env::var_os("SOTP_REPORT_RELATIVE_ROOT").unwrap())
+                    .canonicalize()
+                    .unwrap();
+            assert_eq!(root, expected);
+            return;
+        }
+
+        let stable_parent = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
+        let repo = tempfile::tempdir_in(stable_parent).unwrap();
+        init_repository(repo.path());
+        let status = Command::new(std::env::current_exe().unwrap())
+            .args([
+                "--exact",
+                "telemetry::report_adapter::tests::test_resolve_project_root_from_items_dir_anchors_relative_root_to_current_directory",
+                "--nocapture",
+            ])
+            .current_dir(stable_parent)
+            .env("SOTP_REPORT_RELATIVE_CHILD", "1")
+            .env("SOTP_REPORT_RELATIVE_ROOT", repo.path())
+            .status()
+            .unwrap();
+        assert!(status.success(), "relative report subprocess failed: {status}");
+    }
+
+    #[test]
+    fn test_resolve_project_root_from_items_dir_anchors_default_path_to_enclosing_repository() {
+        if std::env::var_os("SOTP_REPORT_DEFAULT_CHILD").is_some() {
+            let root = resolve_project_root_from_items_dir(Path::new("track/items")).unwrap();
+            let expected =
+                std::path::PathBuf::from(std::env::var_os("SOTP_REPORT_DEFAULT_ROOT").unwrap())
+                    .canonicalize()
+                    .unwrap();
+            assert_eq!(root, expected);
+            return;
+        }
+
+        let stable_parent = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
+        let repo = tempfile::tempdir_in(stable_parent).unwrap();
+        init_repository(repo.path());
+        let ambient_repo = tempfile::tempdir_in(stable_parent).unwrap();
+        init_repository(ambient_repo.path());
+        let nested_dir = repo.path().join("nested");
+        std::fs::create_dir_all(&nested_dir).unwrap();
+        let status = Command::new(std::env::current_exe().unwrap())
+            .args([
+                "--exact",
+                "telemetry::report_adapter::tests::test_resolve_project_root_from_items_dir_anchors_default_path_to_enclosing_repository",
+                "--nocapture",
+            ])
+            .current_dir(nested_dir)
+            .env("SOTP_REPORT_DEFAULT_CHILD", "1")
+            .env("SOTP_REPORT_DEFAULT_ROOT", repo.path())
+            .env("GIT_DIR", ambient_repo.path().join(".git"))
+            .status()
+            .unwrap();
+        assert!(status.success(), "default report subprocess failed: {status}");
     }
 
     #[cfg(unix)]

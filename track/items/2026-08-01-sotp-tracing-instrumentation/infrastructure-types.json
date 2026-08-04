@@ -1,10 +1,45 @@
 {
   "crate_name": "infrastructure",
-  "functions": {},
+  "functions": {
+    "infrastructure::telemetry::context::resolve_telemetry_track_id": {
+      "action": "add",
+      "docs": "Resolve a branch-bound track identifier from a validated items directory without performing telemetry file I/O.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "items_dir",
+          "ty": "&std::path::Path"
+        }
+      ],
+      "returns": "Option<String>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ]
+    }
+  },
   "inherent_impls": [],
   "layer": "infrastructure",
   "schema_version": 5,
   "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "TelemetryConfig",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "TelemetryConfig",
+      "trait_ref": "core::clone::Clone"
+    },
     {
       "action": "reference",
       "for_type": "FsTelemetryEmitDynamicAdapter",
@@ -31,6 +66,58 @@
   ],
   "traits": {},
   "types": {
+    "TelemetryConfig": {
+      "action": "modify",
+      "docs": "Resolved telemetry configuration loaded from environment variables at composition-root startup.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "from_env",
+          "params": [],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "is_enabled",
+          "params": [],
+          "receiver": "&self",
+          "returns": "bool"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "archive_completion_uses_archive_sink",
+          "params": [],
+          "receiver": "&self",
+          "returns": "bool"
+        }
+      ],
+      "module_path": "telemetry::config",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ]
+    },
     "FsTelemetryEmitDynamicAdapter": {
       "action": "modify",
       "docs": "Filesystem secondary adapter implementing active-track telemetry emission through TelemetryEmitDynamicPort.",
@@ -59,12 +146,12 @@
           "anchor": "IN-01",
           "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
         },
-    {
-      "anchor": "IN-02",
-      "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
-    },
-    {
-      "anchor": "AC-01",
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-01",
           "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
         },
         {

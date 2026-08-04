@@ -51,6 +51,18 @@ impl TelemetryConfig {
         self.enabled
     }
 
+    /// Returns whether a successful `track archive` completion should use the
+    /// archive-local telemetry sink.
+    ///
+    /// The archive route is available only when telemetry is enabled and no
+    /// explicit output directory override selects the active writer sink.
+    /// Callers capture this resolved policy before dispatch instead of
+    /// re-reading environment variables in a primary adapter.
+    #[must_use]
+    pub fn archive_completion_uses_archive_sink(&self) -> bool {
+        self.enabled && self.output_dir_override.is_none()
+    }
+
     /// Returns the output directory override if `SOTP_TELEMETRY_DIR` was set.
     #[must_use]
     pub(crate) fn output_dir_override(&self) -> Option<&std::path::Path> {
@@ -115,6 +127,32 @@ mod tests {
                 "absent SOTP_TELEMETRY_DIR must leave output_dir_override as None"
             );
         });
+    }
+
+    #[test]
+    fn test_archive_completion_uses_archive_sink_for_enabled_default_config() {
+        temp_env::with_vars(
+            [("SOTP_TELEMETRY", Some("1")), ("SOTP_TELEMETRY_DIR", None::<&str>)],
+            || {
+                let cfg = TelemetryConfig::from_env();
+                assert!(cfg.archive_completion_uses_archive_sink());
+            },
+        );
+    }
+
+    #[test]
+    fn test_archive_completion_uses_archive_sink_rejects_disabled_or_overridden_config() {
+        temp_env::with_var("SOTP_TELEMETRY", Some("0"), || {
+            let cfg = TelemetryConfig::from_env();
+            assert!(!cfg.archive_completion_uses_archive_sink());
+        });
+        temp_env::with_vars(
+            [("SOTP_TELEMETRY", Some("1")), ("SOTP_TELEMETRY_DIR", Some("/tmp/telemetry"))],
+            || {
+                let cfg = TelemetryConfig::from_env();
+                assert!(!cfg.archive_completion_uses_archive_sink());
+            },
+        );
     }
 
     #[test]

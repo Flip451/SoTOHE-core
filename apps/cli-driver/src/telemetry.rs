@@ -4,7 +4,7 @@
 //! data-bearing telemetry inputs at the primary-adapter boundary.
 
 use std::ffi::OsString;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 use std::sync::Arc;
 use std::time::Instant;
@@ -102,6 +102,20 @@ pub fn duration_millis(start: Instant) -> u64 {
     start.elapsed().as_millis().try_into().unwrap_or(u64::MAX)
 }
 
+/// Captured command context held across dispatch and completion emission.
+///
+/// The source track is captured before dispatch so a command that changes
+/// branches cannot retarget its completion record. Ineligible commands carry
+/// no source context and complete as a diagnostic no-op.
+pub struct TelemetryCompletion {
+    items_dir: PathBuf,
+    source_track_id: Option<String>,
+    subcommand: String,
+    started: Instant,
+    eligible: bool,
+    archive_completion_uses_archive_sink: bool,
+}
+
 // ---------------------------------------------------------------------------
 // Input types
 // ---------------------------------------------------------------------------
@@ -119,6 +133,15 @@ pub struct TelemetryReportInput {
 pub enum TelemetryInput {
     /// Aggregate and format telemetry for a track.
     Report(TelemetryReportInput),
+    /// Complete a command whose context was captured before dispatch.
+    CompleteCommand {
+        /// Branch-bound context and command identity captured before dispatch.
+        completion: TelemetryCompletion,
+        /// Process exit code returned by the dispatched command.
+        exit_code: i32,
+        /// Optional error-chain text for a non-zero completion.
+        error_chain: Option<String>,
+    },
     /// Emit an active-track command completion through the existing telemetry
     /// writer path. Dispatch and timing are captured by the CLI boundary and
     /// arrive here as plain data.
@@ -160,18 +183,46 @@ pub enum TelemetryInput {
 /// Holds the report/emission aggregate and exposes data-only handling.
 pub struct TelemetryDriver {
     service: Arc<dyn TelemetryAggregateService>,
+    #[allow(clippy::type_complexity)]
+    context_resolver: Arc<dyn Fn(&Path) -> Option<String> + Send + Sync>,
+    archive_completion_uses_archive_sink: bool,
 }
 
 impl TelemetryDriver {
-    /// Create a new driver over the aggregate telemetry service.
-    pub fn new(service: Arc<dyn TelemetryAggregateService>) -> Self {
-        Self { service }
+    /// Create a driver with branch context resolution and a pre-resolved
+    /// archive-routing policy supplied by infrastructure configuration.
+    #[allow(clippy::type_complexity)]
+    pub fn new(
+        service: Arc<dyn TelemetryAggregateService>,
+        context_resolver: Arc<dyn Fn(&Path) -> Option<String> + Send + Sync>,
+        archive_completion_uses_archive_sink: bool,
+    ) -> Self {
+        Self { service, context_resolver, archive_completion_uses_archive_sink }
+    }
+
+    /// Capture command completion context before dispatch.
+    #[must_use]
+    pub fn begin_completion(&self, items_dir: PathBuf, subcommand: String) -> TelemetryCompletion {
+        let normalized = subcommand.strip_prefix("sotp ").unwrap_or(&subcommand);
+        let eligible = completion_eligible(normalized);
+        let source_track_id = eligible.then(|| (self.context_resolver)(&items_dir)).flatten();
+        TelemetryCompletion {
+            items_dir,
+            source_track_id,
+            subcommand,
+            started: Instant::now(),
+            eligible,
+            archive_completion_uses_archive_sink: self.archive_completion_uses_archive_sink,
+        }
     }
 
     /// Handle a data-only telemetry command.
     pub fn handle(&self, input: TelemetryInput) -> CommandOutcome {
         match input {
             TelemetryInput::Report(input) => self.telemetry_report(input),
+            TelemetryInput::CompleteCommand { completion, exit_code, error_chain } => {
+                self.telemetry_complete(completion, exit_code, error_chain)
+            }
             TelemetryInput::EmitCompletedCommand {
                 items_dir,
                 source_track_id,
@@ -201,6 +252,50 @@ impl TelemetryDriver {
                 duration_ms,
             ),
         }
+    }
+
+    fn telemetry_complete(
+        &self,
+        completion: TelemetryCompletion,
+        exit_code: i32,
+        error_chain: Option<String>,
+    ) -> CommandOutcome {
+        if !completion.eligible {
+            return CommandOutcome::success(None);
+        }
+        let TelemetryCompletion {
+            items_dir,
+            source_track_id,
+            subcommand,
+            started,
+            archive_completion_uses_archive_sink,
+            ..
+        } = completion;
+        let duration_ms = duration_millis(started);
+        let normalized = subcommand.strip_prefix("sotp ").unwrap_or(&subcommand);
+        let archived_track_id = (normalized == "track archive" && exit_code == 0)
+            .then_some(source_track_id.as_deref())
+            .flatten()
+            .filter(|_| archive_completion_uses_archive_sink);
+        if let Some(track_id) = archived_track_id {
+            let _ = self.service.emit_archived(
+                &items_dir,
+                track_id,
+                subcommand,
+                exit_code,
+                duration_ms,
+            );
+        } else {
+            let _ = self.service.emit_completed(
+                &items_dir,
+                source_track_id,
+                subcommand,
+                exit_code,
+                duration_ms,
+                error_chain,
+            );
+        }
+        CommandOutcome::success(None)
     }
 
     fn telemetry_report(&self, input: TelemetryReportInput) -> CommandOutcome {
@@ -253,6 +348,51 @@ impl TelemetryDriver {
             Err(_) => CommandOutcome::success(None),
         }
     }
+}
+
+/// Resolve the completion-telemetry admission decision for a normalized
+/// command identity (IN-01 / AC-01).
+#[must_use]
+pub fn completion_eligible(subcommand: &str) -> bool {
+    let normalized = subcommand.strip_prefix("sotp ").unwrap_or(subcommand);
+    let top_level = normalized.split_whitespace().next().unwrap_or_default();
+    if top_level == "track" {
+        return !telemetry_track_display_only(normalized);
+    }
+    if top_level == "verify" {
+        return normalized != "verify results";
+    }
+    if matches!(top_level, "arch" | "hook" | "find-similar" | "telemetry") {
+        return false;
+    }
+    !matches!(
+        normalized,
+        "conventions resolve"
+            | "review results"
+            | "review classify"
+            | "review files"
+            | "dry results"
+            | "ref-verify results"
+            | "signal report"
+            | "test-obligation results"
+            | "test-obligation bindings-skeleton"
+            | "dup-index measure-quality"
+    )
+}
+
+fn telemetry_track_display_only(subcommand: &str) -> bool {
+    matches!(
+        subcommand,
+        "track resolve"
+            | "track next-task"
+            | "track task-counts"
+            | "track views validate"
+            | "track spec-element-hash"
+            | "track fixpoint-resolve"
+            | "track catalogue-impl-signals"
+            | "track type-graph"
+            | "track contract-map"
+    )
 }
 
 // ---------------------------------------------------------------------------
@@ -705,7 +845,121 @@ mod tests {
     where
         T: TelemetryAggregateService + 'static,
     {
-        TelemetryDriver::new(service)
+        TelemetryDriver::new(service, Arc::new(|_| None), false)
+    }
+
+    #[test]
+    fn test_telemetry_driver_begin_completion_captures_context_and_emits_once() {
+        let service_impl = Arc::new(CompletedCommandService {
+            calls: std::sync::Mutex::new(Vec::new()),
+            fail: false,
+        });
+        let service: Arc<dyn TelemetryAggregateService> = service_impl.clone();
+        let driver = TelemetryDriver::new(
+            service,
+            Arc::new(|items_dir| {
+                assert_eq!(items_dir, Path::new("track/items"));
+                Some("active-track".to_owned())
+            }),
+            false,
+        );
+        let completion =
+            driver.begin_completion(PathBuf::from("track/items"), "sotp dry write".to_owned());
+
+        assert!(completion.eligible);
+        assert_eq!(completion.source_track_id.as_deref(), Some("active-track"));
+        let outcome = driver.handle(TelemetryInput::CompleteCommand {
+            completion,
+            exit_code: 17,
+            error_chain: Some("command failed".to_owned()),
+        });
+
+        assert_eq!(outcome.exit_code, 0, "diagnostic telemetry must preserve command outcome");
+        let calls = service_impl.calls.lock().unwrap();
+        assert_eq!(calls.len(), 1, "eligible completion must emit exactly once");
+        assert!(calls[0].starts_with("sotp dry write|17|"));
+        assert!(calls[0].contains("|command failed|active-track"));
+    }
+
+    #[test]
+    fn test_telemetry_driver_begin_completion_skips_ineligible_context_resolution() {
+        let service_impl = Arc::new(CompletedCommandService {
+            calls: std::sync::Mutex::new(Vec::new()),
+            fail: false,
+        });
+        let service: Arc<dyn TelemetryAggregateService> = service_impl.clone();
+        let resolver_calls = Arc::new(std::sync::atomic::AtomicUsize::new(0));
+        let resolver_calls_for_callback = Arc::clone(&resolver_calls);
+        let driver = TelemetryDriver::new(
+            service,
+            Arc::new(move |_| {
+                resolver_calls_for_callback.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+                Some("must-not-be-captured".to_owned())
+            }),
+            false,
+        );
+        let completion =
+            driver.begin_completion(PathBuf::from("track/items"), "sotp track resolve".to_owned());
+
+        assert!(!completion.eligible);
+        assert!(completion.source_track_id.is_none());
+        let outcome = driver.handle(TelemetryInput::CompleteCommand {
+            completion,
+            exit_code: 9,
+            error_chain: Some("display-only failure".to_owned()),
+        });
+
+        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(resolver_calls.load(std::sync::atomic::Ordering::SeqCst), 0);
+        assert!(service_impl.calls.lock().unwrap().is_empty());
+    }
+
+    #[test]
+    fn test_telemetry_driver_begin_completion_routes_archive_to_archived_service() {
+        let service_impl = Arc::new(ArchiveCommandService {
+            calls: std::sync::Mutex::new(Vec::new()),
+            fail: false,
+        });
+        let service: Arc<dyn TelemetryAggregateService> = service_impl.clone();
+        let driver =
+            TelemetryDriver::new(service, Arc::new(|_| Some("archived-track".to_owned())), true);
+        let completion =
+            driver.begin_completion(PathBuf::from("track/items"), "sotp track archive".to_owned());
+        let outcome = driver.handle(TelemetryInput::CompleteCommand {
+            completion,
+            exit_code: 0,
+            error_chain: None,
+        });
+
+        assert_eq!(outcome.exit_code, 0);
+        let calls = service_impl.calls.lock().unwrap();
+        assert_eq!(calls.len(), 1, "successful archive must use archived telemetry emission");
+        assert!(calls[0].starts_with("archived-track|sotp track archive|0|"));
+    }
+
+    #[test]
+    fn test_telemetry_driver_complete_command_archive_failure_preserves_outcome() {
+        let service_impl = Arc::new(ArchiveCommandService {
+            calls: std::sync::Mutex::new(Vec::new()),
+            fail: true,
+        });
+        let service: Arc<dyn TelemetryAggregateService> = service_impl.clone();
+        let driver =
+            TelemetryDriver::new(service, Arc::new(|_| Some("archived-track".to_owned())), true);
+        let completion =
+            driver.begin_completion(PathBuf::from("track/items"), "sotp track archive".to_owned());
+        let outcome = driver.handle(TelemetryInput::CompleteCommand {
+            completion,
+            exit_code: 0,
+            error_chain: None,
+        });
+
+        assert_eq!(outcome.exit_code, 0, "archive write failures are diagnostic-only");
+        assert_eq!(
+            service_impl.calls.lock().unwrap().len(),
+            1,
+            "the completion archive route must attempt exactly one emission"
+        );
     }
 
     #[test]

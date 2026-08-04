@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-03T14:26:34Z",
+  "generated_at": "2026-08-03T22:40:33Z",
   "declaration_hash": "2272aaeefd0f6671edb60c0a4388eeee2a67fdd17b499be1f75d14e656d96ac4",
-  "implementation_input_hash": "cd857046ace1952def0e4816999b59acdc421dcff01f533cb5c009d6952c36c8",
+  "implementation_input_hash": "d57232a39092e01e77e357e4e07f96e6ff7e5ac33ee38d96ca745a981a5ca13c",
   "signals": [
     {
       "type_name": "TelemetryCompositionRoot",

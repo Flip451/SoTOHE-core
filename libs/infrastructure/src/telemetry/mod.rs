@@ -13,11 +13,13 @@
 
 pub mod archived_track;
 pub mod config;
+pub mod context;
 pub mod report;
 pub mod report_adapter;
 pub mod writer;
 
 pub use config::TelemetryConfig;
+pub use context::resolve_telemetry_track_id;
 pub use report::{
     PhaseDurationSummary, TelemetryErrorEntry, TelemetryHookBlockEntry, TelemetryReport,
     TelemetryReportError, TelemetryReportSnapshot,

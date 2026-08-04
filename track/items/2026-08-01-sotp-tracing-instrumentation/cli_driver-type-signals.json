@@ -1,9 +1,15 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-03T19:27:42Z",
-  "declaration_hash": "093d6b35702f39db8708db3d320494ac4e67808fcc9f3af69c846f85df146880",
-  "implementation_input_hash": "b9dc9c9767ec122c95d591ca2953a9eb70cbe4b18b31dc8c99876b461406beef",
+  "generated_at": "2026-08-03T23:19:07Z",
+  "declaration_hash": "66bb638f8347a43cf3ecbd8accd2f2774408ee7da2c111e86c42231a2c991fc0",
+  "implementation_input_hash": "72604605993803e3f5b1457260e127e9665c4048d684152d6cb956e516a2423e",
   "signals": [
+    {
+      "type_name": "TelemetryCompletion",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
     {
       "type_name": "TelemetryDriver",
       "kind_tag": "primary_adapter",
@@ -13,6 +19,12 @@
     {
       "type_name": "TelemetryInput",
       "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli_driver::telemetry::completion_eligible",
+      "kind_tag": "free_function",
       "signal": "blue",
       "found_type": true
     },

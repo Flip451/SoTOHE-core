@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-03T18:28:53Z",
-  "declaration_hash": "f864b7346b4cc4e6f9aca508f64bd45054eb4844829e6ef30e528f05d68332a0",
-  "implementation_input_hash": "ae554f08f65539796af2c4fb01a2ac86c6013010ed64f180bc8f909a7adad621",
+  "generated_at": "2026-08-03T23:19:38Z",
+  "declaration_hash": "340bb3e5bc5f0982871ff461cb7c97d7641c5c1e83f623aee69b55e979aff8d0",
+  "implementation_input_hash": "230d998d685f47477987b1c9288b425ffebf33992103f0414907258b3a15d71b",
   "signals": [
     {
       "type_name": "TrackCommand",
@@ -24,18 +24,6 @@
     },
     {
       "type_name": "cli::run_cli_with",
-      "kind_tag": "free_function",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "cli::telemetry_completion_eligible",
-      "kind_tag": "free_function",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "cli::telemetry_track_display_only",
       "kind_tag": "free_function",
       "signal": "blue",
       "found_type": true

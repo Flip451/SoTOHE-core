@@ -25,6 +25,7 @@ pub(crate) use validate::{
 };
 
 #[derive(Debug, Subcommand)]
+#[non_exhaustive]
 pub enum TrackCommand {
     /// Archive a completed track: move it from `track/items/<id>/` to
     /// `track/archive/<id>/` via `git mv`, and additionally move any gitignored

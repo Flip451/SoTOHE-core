@@ -443,6 +443,16 @@
           "layer": "cli_driver",
           "module_path": "cli_driver::telemetry::tests",
           "test_name": "test_telemetry_report_command_metrics_render_frequency_duration_and_failure_rate"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::tests",
+          "test_name": "test_completed_command_success_appends_existing_telemetry_event"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::tests",
+          "test_name": "test_archive_completion_telemetry_moves_to_archived_track_logs"
         }
       ]
     },
@@ -470,6 +480,16 @@
           "layer": "cli_driver",
           "module_path": "cli_driver::telemetry::tests",
           "test_name": "test_telemetry_report_command_metrics_render_frequency_duration_and_failure_rate"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::tests",
+          "test_name": "test_completed_command_success_appends_existing_telemetry_event"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::tests",
+          "test_name": "test_archive_completion_telemetry_moves_to_archived_track_logs"
         }
       ]
     },
@@ -664,6 +684,11 @@
           "layer": "cli",
           "module_path": "cli::tests",
           "test_name": "test_completed_command_success_appends_existing_telemetry_event"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::tests",
+          "test_name": "test_archive_completion_telemetry_moves_to_archived_track_logs"
         }
       ]
     },
@@ -1200,7 +1225,42 @@
     {
       "kind": "fulfillment",
       "obligation_id": {
-        "entry_key": "cli::telemetry_completion_eligible",
+        "entry_key": "infrastructure::telemetry::context::resolve_telemetry_track_id",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::context::tests",
+          "test_name": "test_resolve_telemetry_track_id_returns_current_track_branch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::context::tests",
+          "test_name": "test_resolve_telemetry_track_id_rejects_malformed_and_non_track_contexts"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::context::tests",
+          "test_name": "test_resolve_telemetry_track_id_honors_kill_switch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::context::tests",
+          "test_name": "test_resolve_telemetry_track_id_anchors_nonempty_relative_repository_path"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::context::tests",
+          "test_name": "test_resolve_telemetry_track_id_rejects_symlinked_items_path"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "cli_driver::telemetry::completion_eligible",
         "obligation_kind": "logic",
         "item_identifier": "entry"
       },
@@ -1218,22 +1278,85 @@
       ]
     },
     {
-      "kind": "fulfillment",
-      "obligation_id": {
-        "entry_key": "cli::telemetry_track_display_only",
-        "obligation_kind": "logic",
-        "item_identifier": "entry"
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TelemetryCompletion",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-01"
+        }
       },
       "tests": [
         {
           "layer": "cli",
           "module_path": "cli::tests",
-          "test_name": "test_telemetry_completion_eligible_accepts_track_workflow_commands"
+          "test_name": "test_completed_command_success_appends_existing_telemetry_event"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TelemetryCompletion",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::tests",
+          "test_name": "test_completed_command_success_appends_existing_telemetry_event"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TelemetryConfig",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::config::tests",
+          "test_name": "test_archive_completion_uses_archive_sink_for_enabled_default_config"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::config::tests",
+          "test_name": "test_archive_completion_uses_archive_sink_rejects_disabled_or_overridden_config"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TelemetryConfig",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::config::tests",
+          "test_name": "test_archive_completion_uses_archive_sink_for_enabled_default_config"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::config::tests",
+          "test_name": "test_archive_completion_uses_archive_sink_rejects_disabled_or_overridden_config"
         },
         {
           "layer": "cli",
           "module_path": "cli::tests",
-          "test_name": "test_telemetry_completion_eligible_excludes_display_only_and_report_commands"
+          "test_name": "test_completed_command_success_appends_existing_telemetry_event"
         }
       ]
     }

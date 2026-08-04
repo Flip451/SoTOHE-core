@@ -1,11 +1,16 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "562c26513d729dd93cfdc5dacd82f8ff12ac6ee7562424e610f50896d0af723c",
+  "catalogue_declaration_hash": "b6b61fd315dc23101e88f733a564076c5764ff25712868f6d07f5125d1352e46",
   "signals": [
     {
       "type_name": "FsTelemetryEmitDynamicAdapter",
       "signal": "blue",
       "entry_hash": "67e9a801a8af8e8e78a58c572f82db0a6eea4cd3793f92e23524b0dc6841f36e"
+    },
+    {
+      "type_name": "TelemetryConfig",
+      "signal": "blue",
+      "entry_hash": "220d49250b053f58c2b16f01a4003c18163de93ccccb0f8ce4d5e47bf4b4f580"
     },
     {
       "type_name": "TelemetryReport",
@@ -16,6 +21,11 @@
       "type_name": "TelemetryReportSnapshot",
       "signal": "blue",
       "entry_hash": "2d92d898031ef3d8bdb61e762c6e7ca0b99788bf3c408337181e60693d6514fe"
+    },
+    {
+      "type_name": "infrastructure::telemetry::context::resolve_telemetry_track_id",
+      "signal": "blue",
+      "entry_hash": "48c838b9b6f0641ceb6732599162193c7180b49ff7fb5c27f7422f3ccc835151"
     },
     {
       "type_name": "TelemetryReportOutput",

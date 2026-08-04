@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-03T19:28:56Z",
-  "declaration_hash": "562c26513d729dd93cfdc5dacd82f8ff12ac6ee7562424e610f50896d0af723c",
-  "implementation_input_hash": "6028fc4c76041091bec1dba93b7f3ecbd69de26b8f6df69164e054d9222eb7a4",
+  "generated_at": "2026-08-04T00:21:57Z",
+  "declaration_hash": "b6b61fd315dc23101e88f733a564076c5764ff25712868f6d07f5125d1352e46",
+  "implementation_input_hash": "8700ce5b7ed700a0bceafe681a13faa4315933aa17c8d7f7738ba585b33dd032",
   "signals": [
     {
       "type_name": "FsTelemetryEmitDynamicAdapter",
@@ -12,6 +12,12 @@
       "found_items": [
         "usecase::telemetry::TelemetryEmitDynamicPort"
       ]
+    },
+    {
+      "type_name": "TelemetryConfig",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "TelemetryReport",
@@ -31,6 +37,12 @@
         "Clone",
         "Debug"
       ]
+    },
+    {
+      "type_name": "infrastructure::telemetry::context::resolve_telemetry_track_id",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "TelemetryReportOutput",

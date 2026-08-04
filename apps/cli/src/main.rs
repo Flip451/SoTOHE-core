@@ -171,7 +171,7 @@ macro_rules! run_cli_with_context {
     ) => {{
         use cli_composition::{DemoCompositionRoot, TelemetryCompositionRoot};
         use cli_driver::demo::DemoInput;
-        use cli_driver::telemetry::{TelemetryInput, duration_millis, exit_code_value};
+        use cli_driver::telemetry::{TelemetryInput, exit_code_value};
         use $crate::commands;
         use $crate::{CliCommand, execute_hook_with_telemetry, execute_verify_with_telemetry};
 
@@ -181,12 +181,9 @@ macro_rules! run_cli_with_context {
         let command_identity = $command_identity;
         let telemetry_items_dir = $telemetry_items_dir;
         let telemetry_driver = TelemetryCompositionRoot::new().telemetry_driver();
-        // Capture the branch-bound track context before dispatch so a command
-        // that changes branches cannot retarget its completion event.
-        let source_track_id =
-            cli_composition::telemetry_wiring::resolve_telemetry_writer(&telemetry_items_dir)
-                .map(|(_, track_id)| track_id);
-        let started = std::time::Instant::now();
+        // The wired driver captures branch-bound context only when the command
+        // is eligible, preserving lazy paths for hooks and display-only calls.
+        let completion = telemetry_driver.begin_completion(telemetry_items_dir, command_identity);
         let (exit_code, error_chain) = match cli.command {
             Some(CliCommand::Arch { cmd }) => (commands::arch::execute(cmd), None),
             Some(CliCommand::AdrBaseline { cmd }) => (commands::adr_baseline::execute(cmd), None),
@@ -252,46 +249,11 @@ macro_rules! run_cli_with_context {
                 (ExitCode::from(outcome.exit_code), None)
             }
         };
-        let exit_code_i32 = exit_code_value(exit_code);
-        let normalized = command_identity.strip_prefix("sotp ").unwrap_or(&command_identity);
-        if telemetry_completion_eligible(normalized) {
-            let duration_ms = duration_millis(started);
-            let archived_track_id = (normalized == "track archive"
-                && exit_code == ExitCode::SUCCESS)
-                .then(|| source_track_id.as_ref().cloned())
-                .flatten()
-                .filter(|_| {
-                    // The archive factory intentionally writes to the existing
-                    // archive-local path. When the active telemetry config is
-                    // redirected or disabled, use the active writer instead
-                    // so its override/kill-switch semantics still apply.
-                    let override_set = std::env::var("SOTP_TELEMETRY_DIR")
-                        .map(|value| !value.is_empty())
-                        .unwrap_or(false);
-                    let disabled = std::env::var("SOTP_TELEMETRY")
-                        .map(|value| value.trim() == "0")
-                        .unwrap_or(false);
-                    !override_set && !disabled
-                });
-            if let Some(track_id) = archived_track_id {
-                let _ = telemetry_driver.handle(TelemetryInput::EmitArchivedTrackSubcommand {
-                    items_dir: telemetry_items_dir,
-                    track_id,
-                    subcommand: command_identity,
-                    exit_code: exit_code_i32,
-                    duration_ms,
-                });
-            } else {
-                let _ = telemetry_driver.handle(TelemetryInput::EmitCompletedCommand {
-                    items_dir: telemetry_items_dir,
-                    source_track_id,
-                    subcommand: command_identity,
-                    exit_code: exit_code_i32,
-                    duration_ms,
-                    error_chain,
-                });
-            }
-        }
+        let _ = telemetry_driver.handle(TelemetryInput::CompleteCommand {
+            completion,
+            exit_code: exit_code_value(exit_code),
+            error_chain,
+        });
         exit_code
     }};
 }
@@ -301,7 +263,7 @@ fn main() -> ExitCode {
     // (IN-01 / CN-04 / AC-01: subscriber init lives here, not in domain or usecase).
     cli_composition::telemetry_wiring::init_tracing_subscriber();
 
-    run_cli(Cli::parse(), commands::dry::execute)
+    run_cli(Cli::parse(), commands::dry::execute, commands::ref_verify::execute)
 }
 
 /// Thin entrypoint retained for the existing CLI boundary.
@@ -309,8 +271,13 @@ fn main() -> ExitCode {
 /// The common completion lifecycle remains owned by `TelemetryDriver`; this
 /// wrapper only supplies the parsed command and the raw-argv context needed by
 /// the driver-facing macro.
-fn run_cli(cli: Cli, dry_execute: fn(commands::dry::DryCommand) -> ExitCode) -> ExitCode {
-    run_cli_with(cli, dry_execute, commands::ref_verify::execute)
+fn run_cli(
+    cli: Cli,
+    dry_execute: fn(commands::dry::DryCommand) -> ExitCode,
+    ref_verify_execute: fn(commands::ref_verify::RefVerifyCommand) -> ExitCode,
+) -> ExitCode {
+    let argv = std::env::args_os().collect::<Vec<_>>();
+    run_cli_with(cli, dry_execute, ref_verify_execute, &argv)
 }
 
 /// Common CLI entrypoint that captures command context before dispatch, then
@@ -319,10 +286,10 @@ fn run_cli_with(
     cli: Cli,
     dry_execute: fn(commands::dry::DryCommand) -> ExitCode,
     ref_verify_execute: fn(commands::ref_verify::RefVerifyCommand) -> ExitCode,
+    argv: &[std::ffi::OsString],
 ) -> ExitCode {
-    let argv = std::env::args_os().collect::<Vec<_>>();
-    let command_identity = command_identity_from_args(&argv);
-    let items_dir = cli_driver::telemetry::items_dir_from_args(&argv);
+    let command_identity = command_identity_from_args(argv);
+    let items_dir = cli_driver::telemetry::items_dir_from_args(argv);
     run_cli_with_context!(cli, dry_execute, ref_verify_execute, command_identity, items_dir,)
 }
 
@@ -341,52 +308,6 @@ fn command_identity_from_args(args: &[std::ffi::OsString]) -> String {
         current = subcommand;
     }
     if names.is_empty() { "sotp demo".to_owned() } else { format!("sotp {}", names.join(" ")) }
-}
-
-/// Composition policy for the common command-completion telemetry boundary.
-///
-/// The CLI owns command-family routing because it is the only layer that sees
-/// the parsed clap command tree. The driver receives only the resulting data
-/// payload through `TelemetryInput::EmitCompletedCommand`.
-fn telemetry_completion_eligible(subcommand: &str) -> bool {
-    let top_level = subcommand.split_whitespace().next().unwrap_or_default();
-    if top_level == "track" {
-        return !telemetry_track_display_only(subcommand);
-    }
-    if top_level == "verify" {
-        return subcommand != "verify results";
-    }
-    if matches!(top_level, "arch" | "hook" | "find-similar" | "telemetry") {
-        return false;
-    }
-    !matches!(
-        subcommand,
-        "conventions resolve"
-            | "review results"
-            | "review classify"
-            | "review files"
-            | "dry results"
-            | "ref-verify results"
-            | "signal report"
-            | "test-obligation results"
-            | "test-obligation bindings-skeleton"
-            | "dup-index measure-quality"
-    )
-}
-
-fn telemetry_track_display_only(subcommand: &str) -> bool {
-    matches!(
-        subcommand,
-        "track resolve"
-            | "track next-task"
-            | "track task-counts"
-            | "track views validate"
-            | "track spec-element-hash"
-            | "track fixpoint-resolve"
-            | "track catalogue-impl-signals"
-            | "track type-graph"
-            | "track contract-map"
-    )
 }
 
 // ---------------------------------------------------------------------------
@@ -568,10 +489,11 @@ mod tests {
     use cli_driver::demo::DemoInput as DriverDemoInput;
     use tempfile::TempDir;
 
-    use super::{Cli, CliCommand, command_identity_from_args, telemetry_completion_eligible};
+    use super::{Cli, CliCommand, command_identity_from_args};
     use crate::commands::dry::DryCommand;
     use crate::commands::ref_verify::RefVerifyCommand;
     use crate::commands::track::test_support::{process_env_lock, run_git, run_in_dir, seed_repo};
+    use cli_driver::telemetry::completion_eligible as telemetry_completion_eligible;
 
     const MINIMAL_RULES: &str = r#"{
   "layers": [

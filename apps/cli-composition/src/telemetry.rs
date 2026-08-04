@@ -79,7 +79,12 @@ impl TelemetryCompositionRoot {
             emit,
             archived,
         )) as Arc<dyn usecase::TelemetryAggregateService>;
-        cli_driver::telemetry::TelemetryDriver::new(service)
+        let telemetry_config = infrastructure::telemetry::TelemetryConfig::from_env();
+        cli_driver::telemetry::TelemetryDriver::new(
+            service,
+            Arc::new(infrastructure::telemetry::resolve_telemetry_track_id),
+            telemetry_config.archive_completion_uses_archive_sink(),
+        )
     }
 }
 

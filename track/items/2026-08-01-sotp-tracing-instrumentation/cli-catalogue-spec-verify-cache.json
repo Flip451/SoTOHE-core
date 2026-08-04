@@ -243,7 +243,7 @@
       }
     },
     {
-      "claim_hash": "0af7ae729b3692a933600e1b511806e65ad4ef046307d83a45cd3613a78ee899",
+      "claim_hash": "c0045c1e5d76b37e12628915289145cf566530e7defae9ba0c1d2f0a20dd5db0",
       "evidence_hash": "9cbde1c8c1b48cacc5d0d024f910428fca90be5b2b70829f6b6062574add4d66",
       "verdict": {
         "kind": "pass",
@@ -267,7 +267,7 @@
       }
     },
     {
-      "claim_hash": "0af7ae729b3692a933600e1b511806e65ad4ef046307d83a45cd3613a78ee899",
+      "claim_hash": "c0045c1e5d76b37e12628915289145cf566530e7defae9ba0c1d2f0a20dd5db0",
       "evidence_hash": "34dba8d9b16331a0bcdb9d8d3ba20ba4c919233af0e5a3f16e1e69b04f290639",
       "verdict": {
         "kind": "pass",
@@ -291,7 +291,7 @@
       }
     },
     {
-      "claim_hash": "b2c77aea9347ded09c2407fadbd58cda6324fcf1cf00cd3692b6aa2e6fbe8b0d",
+      "claim_hash": "76e2cde61161314fe2573ca4d98ed73a3d9d42196e00f8fee83984b0664f98e8",
       "evidence_hash": "9cbde1c8c1b48cacc5d0d024f910428fca90be5b2b70829f6b6062574add4d66",
       "verdict": {
         "kind": "pass",
@@ -315,7 +315,7 @@
       }
     },
     {
-      "claim_hash": "b2c77aea9347ded09c2407fadbd58cda6324fcf1cf00cd3692b6aa2e6fbe8b0d",
+      "claim_hash": "76e2cde61161314fe2573ca4d98ed73a3d9d42196e00f8fee83984b0664f98e8",
       "evidence_hash": "34dba8d9b16331a0bcdb9d8d3ba20ba4c919233af0e5a3f16e1e69b04f290639",
       "verdict": {
         "kind": "pass",
@@ -327,102 +327,6 @@
           "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/cli-types.json",
           "section_key": "functions",
           "entry_key": "cli::run_cli_with"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "acceptance_criteria",
-          "element_id": "AC-01",
-          "text_label": "track ブランチ上で、track が解決できる純表示系ではない任意の `sotp` コマンドが完了すると、同じ track の `telemetry.jsonl` にコマンド identity、所要時間、および exit 結果を含むイベントが追記される。"
-        }
-      }
-    },
-    {
-      "claim_hash": "06fb9f6c31f943e6a0924d040f486ec33a03d0deacb46ef88b3256f4eb3d3658",
-      "evidence_hash": "9cbde1c8c1b48cacc5d0d024f910428fca90be5b2b70829f6b6062574add4d66",
-      "verdict": {
-        "kind": "pass",
-        "citation": "track が解決できる純表示系ではない `sotp` コマンドを共通の entry point で計装し"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/cli-types.json",
-          "section_key": "functions",
-          "entry_key": "cli::telemetry_completion_eligible"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "in_scope",
-          "element_id": "IN-01",
-          "text_label": "track ブランチ上で完了した、track が解決できる純表示系ではない `sotp` コマンドを共通の entry point で計装し、完了時にコマンド identity、所要時間、および exit 結果を観測する。"
-        }
-      }
-    },
-    {
-      "claim_hash": "06fb9f6c31f943e6a0924d040f486ec33a03d0deacb46ef88b3256f4eb3d3658",
-      "evidence_hash": "34dba8d9b16331a0bcdb9d8d3ba20ba4c919233af0e5a3f16e1e69b04f290639",
-      "verdict": {
-        "kind": "pass",
-        "citation": "track ブランチ上で、track が解決できる純表示系ではない任意の `sotp` コマンドが完了すると"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/cli-types.json",
-          "section_key": "functions",
-          "entry_key": "cli::telemetry_completion_eligible"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "acceptance_criteria",
-          "element_id": "AC-01",
-          "text_label": "track ブランチ上で、track が解決できる純表示系ではない任意の `sotp` コマンドが完了すると、同じ track の `telemetry.jsonl` にコマンド identity、所要時間、および exit 結果を含むイベントが追記される。"
-        }
-      }
-    },
-    {
-      "claim_hash": "a81ea89aee57708ee6158af3b8d2b037bf91dc5b834152306ef36667d0632ee2",
-      "evidence_hash": "9cbde1c8c1b48cacc5d0d024f910428fca90be5b2b70829f6b6062574add4d66",
-      "verdict": {
-        "kind": "pass",
-        "citation": "track が解決できる純表示系ではない `sotp` コマンドを共通の entry point で計装し"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/cli-types.json",
-          "section_key": "functions",
-          "entry_key": "cli::telemetry_track_display_only"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "in_scope",
-          "element_id": "IN-01",
-          "text_label": "track ブランチ上で完了した、track が解決できる純表示系ではない `sotp` コマンドを共通の entry point で計装し、完了時にコマンド identity、所要時間、および exit 結果を観測する。"
-        }
-      }
-    },
-    {
-      "claim_hash": "a81ea89aee57708ee6158af3b8d2b037bf91dc5b834152306ef36667d0632ee2",
-      "evidence_hash": "34dba8d9b16331a0bcdb9d8d3ba20ba4c919233af0e5a3f16e1e69b04f290639",
-      "verdict": {
-        "kind": "pass",
-        "citation": "track が解決できる純表示系ではない任意の `sotp` コマンドが完了すると"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/cli-types.json",
-          "section_key": "functions",
-          "entry_key": "cli::telemetry_track_display_only"
         }
       },
       "evidence_origin": {

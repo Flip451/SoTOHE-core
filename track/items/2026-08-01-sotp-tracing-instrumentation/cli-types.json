@@ -25,6 +25,72 @@
         }
       ]
     },
+    "cli::emit_archived_track_subcommand": {
+      "action": "delete",
+      "informal_grounds": [],
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ]
+    },
+    "cli::execute_track_with_telemetry": {
+      "action": "delete",
+      "informal_grounds": [],
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ]
+    },
+    "cli::is_display_only_track_command": {
+      "action": "delete",
+      "informal_grounds": [],
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ]
+    },
+    "cli::telemetry_dir_override_is_set": {
+      "action": "delete",
+      "informal_grounds": [],
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ]
+    },
+    "cli::track_command_label": {
+      "action": "delete",
+      "informal_grounds": [],
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ]
+    },
     "cli::run_cli": {
       "action": "modify",
       "docs": "Thin wrapper around the macro-based CLI entrypoint.",
@@ -38,6 +104,10 @@
         {
           "name": "dry_execute",
           "ty": "fn(commands::dry::DryCommand) -> std::process::ExitCode"
+        },
+        {
+          "name": "ref_verify_execute",
+          "ty": "fn(commands::ref_verify::RefVerifyCommand) -> std::process::ExitCode"
         }
       ],
       "returns": "std::process::ExitCode",
@@ -70,6 +140,10 @@
         {
           "name": "ref_verify_execute",
           "ty": "fn(commands::ref_verify::RefVerifyCommand) -> std::process::ExitCode"
+        },
+        {
+          "name": "argv",
+          "ty": "&[std::ffi::OsString]"
         }
       ],
       "returns": "std::process::ExitCode",
@@ -81,120 +155,6 @@
         },
         {
           "anchor": "AC-01",
-          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
-        }
-      ]
-    },
-    "cli::telemetry_completion_eligible": {
-      "action": "add",
-      "docs": "Classifies a parsed command label for completion routing.",
-      "informal_grounds": [],
-      "is_async": false,
-      "params": [
-        {
-          "name": "subcommand",
-          "ty": "&str"
-        }
-      ],
-      "returns": "bool",
-      "role": "FreeFunction",
-      "spec_refs": [
-        {
-          "anchor": "IN-01",
-          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
-        },
-        {
-          "anchor": "AC-01",
-          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
-        }
-      ]
-    },
-    "cli::telemetry_track_display_only": {
-      "action": "add",
-      "docs": "Classifies a parsed track command label for completion routing.",
-      "informal_grounds": [],
-      "is_async": false,
-      "params": [
-        {
-          "name": "subcommand",
-          "ty": "&str"
-        }
-      ],
-      "returns": "bool",
-      "role": "FreeFunction",
-      "spec_refs": [
-        {
-          "anchor": "IN-01",
-          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
-        },
-        {
-          "anchor": "AC-01",
-          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
-        }
-      ]
-    },
-    "cli::execute_track_with_telemetry": {
-      "action": "delete",
-      "informal_grounds": [],
-      "spec_refs": [
-        {
-          "anchor": "IN-01",
-          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
-        },
-        {
-          "anchor": "AC-01",
-          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
-        }
-      ]
-    },
-    "cli::emit_archived_track_subcommand": {
-      "action": "delete",
-      "informal_grounds": [],
-      "spec_refs": [
-        {
-          "anchor": "IN-01",
-          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
-        },
-        {
-          "anchor": "IN-02",
-          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
-        }
-      ]
-    },
-    "cli::is_display_only_track_command": {
-      "action": "delete",
-      "informal_grounds": [],
-      "spec_refs": [
-        {
-          "anchor": "IN-01",
-          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
-        },
-        {
-          "anchor": "AC-01",
-          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
-        }
-      ]
-    },
-    "cli::track_command_label": {
-      "action": "delete",
-      "informal_grounds": [],
-      "spec_refs": [
-        {
-          "anchor": "IN-01",
-          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
-        },
-        {
-          "anchor": "AC-01",
-          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
-        }
-      ]
-    },
-    "cli::telemetry_dir_override_is_set": {
-      "action": "delete",
-      "informal_grounds": [],
-      "spec_refs": [
-        {
-          "anchor": "IN-01",
           "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
         }
       ]
@@ -237,8 +197,8 @@
       "action": "reference",
       "for_type": "CatalogueLintCommand",
       "trait_ref": "clap::Subcommand"
-    }
-    ,{
+    },
+    {
       "action": "reference",
       "for_type": "TrackCommand",
       "trait_ref": "core::fmt::Debug"
@@ -379,8 +339,14 @@
             "name": "Archive",
             "payload": {
               "fields": [
-                { "name": "items_dir", "ty": "std::path::PathBuf" },
-                { "name": "track_id", "ty": "Option<String>" }
+                {
+                  "name": "items_dir",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                }
               ],
               "kind": "struct"
             }
@@ -389,11 +355,26 @@
             "name": "Transition",
             "payload": {
               "fields": [
-                { "name": "items_dir", "ty": "std::path::PathBuf" },
-                { "name": "track_id", "ty": "Option<String>" },
-                { "name": "task_id", "ty": "String" },
-                { "name": "target_status", "ty": "String" },
-                { "name": "commit_hash", "ty": "Option<String>" }
+                {
+                  "name": "items_dir",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "task_id",
+                  "ty": "String"
+                },
+                {
+                  "name": "target_status",
+                  "ty": "String"
+                },
+                {
+                  "name": "commit_hash",
+                  "ty": "Option<String>"
+                }
               ],
               "kind": "struct"
             }
@@ -402,7 +383,10 @@
             "name": "Branch",
             "payload": {
               "fields": [
-                { "name": "action", "ty": "BranchAction" }
+                {
+                  "name": "action",
+                  "ty": "BranchAction"
+                }
               ],
               "kind": "struct"
             }
@@ -420,7 +404,10 @@
             "name": "Views",
             "payload": {
               "fields": [
-                { "name": "action", "ty": "ViewAction" }
+                {
+                  "name": "action",
+                  "ty": "ViewAction"
+                }
               ],
               "kind": "struct"
             }
@@ -429,11 +416,26 @@
             "name": "AddTask",
             "payload": {
               "fields": [
-                { "name": "items_dir", "ty": "std::path::PathBuf" },
-                { "name": "track_id", "ty": "Option<String>" },
-                { "name": "description", "ty": "String" },
-                { "name": "section", "ty": "Option<String>" },
-                { "name": "after", "ty": "Option<String>" }
+                {
+                  "name": "items_dir",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "description",
+                  "ty": "String"
+                },
+                {
+                  "name": "section",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "after",
+                  "ty": "Option<String>"
+                }
               ],
               "kind": "struct"
             }
@@ -442,10 +444,22 @@
             "name": "SetOverride",
             "payload": {
               "fields": [
-                { "name": "items_dir", "ty": "std::path::PathBuf" },
-                { "name": "track_id", "ty": "Option<String>" },
-                { "name": "status", "ty": "String" },
-                { "name": "reason", "ty": "String" }
+                {
+                  "name": "items_dir",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "status",
+                  "ty": "String"
+                },
+                {
+                  "name": "reason",
+                  "ty": "String"
+                }
               ],
               "kind": "struct"
             }
@@ -454,8 +468,14 @@
             "name": "ClearOverride",
             "payload": {
               "fields": [
-                { "name": "items_dir", "ty": "std::path::PathBuf" },
-                { "name": "track_id", "ty": "Option<String>" }
+                {
+                  "name": "items_dir",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                }
               ],
               "kind": "struct"
             }
@@ -464,8 +484,14 @@
             "name": "NextTask",
             "payload": {
               "fields": [
-                { "name": "items_dir", "ty": "std::path::PathBuf" },
-                { "name": "track_id", "ty": "Option<String>" }
+                {
+                  "name": "items_dir",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                }
               ],
               "kind": "struct"
             }
@@ -474,8 +500,14 @@
             "name": "TaskCounts",
             "payload": {
               "fields": [
-                { "name": "items_dir", "ty": "std::path::PathBuf" },
-                { "name": "track_id", "ty": "Option<String>" }
+                {
+                  "name": "items_dir",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                }
               ],
               "kind": "struct"
             }
@@ -484,12 +516,30 @@
             "name": "TypeGraph",
             "payload": {
               "fields": [
-                { "name": "items_dir", "ty": "std::path::PathBuf" },
-                { "name": "track_id", "ty": "Option<String>" },
-                { "name": "workspace_root", "ty": "std::path::PathBuf" },
-                { "name": "layer", "ty": "Option<String>" },
-                { "name": "cluster_depth", "ty": "usize" },
-                { "name": "edges", "ty": "String" }
+                {
+                  "name": "items_dir",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "workspace_root",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "layer",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "cluster_depth",
+                  "ty": "usize"
+                },
+                {
+                  "name": "edges",
+                  "ty": "String"
+                }
               ],
               "kind": "struct"
             }
@@ -498,10 +548,22 @@
             "name": "BaselineGraph",
             "payload": {
               "fields": [
-                { "name": "items_dir", "ty": "std::path::PathBuf" },
-                { "name": "track_id", "ty": "Option<String>" },
-                { "name": "workspace_root", "ty": "std::path::PathBuf" },
-                { "name": "layers", "ty": "Option<String>" }
+                {
+                  "name": "items_dir",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "workspace_root",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "layers",
+                  "ty": "Option<String>"
+                }
               ],
               "kind": "struct"
             }
@@ -510,10 +572,22 @@
             "name": "ContractMap",
             "payload": {
               "fields": [
-                { "name": "items_dir", "ty": "std::path::PathBuf" },
-                { "name": "track_id", "ty": "Option<String>" },
-                { "name": "workspace_root", "ty": "std::path::PathBuf" },
-                { "name": "layers", "ty": "Option<String>" }
+                {
+                  "name": "items_dir",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "workspace_root",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "layers",
+                  "ty": "Option<String>"
+                }
               ],
               "kind": "struct"
             }
@@ -522,9 +596,18 @@
             "name": "SpecElementHash",
             "payload": {
               "fields": [
-                { "name": "items_dir", "ty": "std::path::PathBuf" },
-                { "name": "track_id", "ty": "Option<String>" },
-                { "name": "anchor", "ty": "Option<String>" }
+                {
+                  "name": "items_dir",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "anchor",
+                  "ty": "Option<String>"
+                }
               ],
               "kind": "struct"
             }
@@ -533,10 +616,22 @@
             "name": "BaselineCapture",
             "payload": {
               "fields": [
-                { "name": "track_id", "ty": "Option<String>" },
-                { "name": "workspace_root", "ty": "std::path::PathBuf" },
-                { "name": "source_workspace", "ty": "Option<std::path::PathBuf>" },
-                { "name": "layer", "ty": "Option<String>" }
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "workspace_root",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "source_workspace",
+                  "ty": "Option<std::path::PathBuf>"
+                },
+                {
+                  "name": "layer",
+                  "ty": "Option<String>"
+                }
               ],
               "kind": "struct"
             }
@@ -563,10 +658,22 @@
             "name": "Lint",
             "payload": {
               "fields": [
-                { "name": "track_id", "ty": "Option<String>" },
-                { "name": "layer_id", "ty": "String" },
-                { "name": "workspace_root", "ty": "std::path::PathBuf" },
-                { "name": "rules_file", "ty": "Option<std::path::PathBuf>" }
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "layer_id",
+                  "ty": "String"
+                },
+                {
+                  "name": "workspace_root",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "rules_file",
+                  "ty": "Option<std::path::PathBuf>"
+                }
               ],
               "kind": "struct"
             }
@@ -575,9 +682,18 @@
             "name": "CatalogueImplSignals",
             "payload": {
               "fields": [
-                { "name": "track_id", "ty": "Option<String>" },
-                { "name": "workspace_root", "ty": "std::path::PathBuf" },
-                { "name": "layer", "ty": "Option<String>" }
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "workspace_root",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "layer",
+                  "ty": "Option<String>"
+                }
               ],
               "kind": "struct"
             }
@@ -586,7 +702,10 @@
             "name": "SwitchBase",
             "payload": {
               "fields": [
-                { "name": "project_root", "ty": "std::path::PathBuf" }
+                {
+                  "name": "project_root",
+                  "ty": "std::path::PathBuf"
+                }
               ],
               "kind": "struct"
             }

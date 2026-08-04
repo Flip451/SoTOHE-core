@@ -3,51 +3,177 @@
   "track_id": "2026-08-01-sotp-tracing-instrumentation",
   "entries": {
     "T001": [
-      {"layer": "usecase", "entry_key": "SotpCommandIdentity"},
-      {"layer": "usecase", "entry_key": "CommandDurationMillis"},
-      {"layer": "usecase", "entry_key": "CommandTraceValueError"}
+      {
+        "layer": "usecase",
+        "entry_key": "SotpCommandIdentity"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "CommandDurationMillis"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "CommandTraceValueError"
+      }
     ],
     "T003": [
-      {"layer": "usecase", "entry_key": "CommandExecutionCount"},
-      {"layer": "usecase", "entry_key": "CommandFailureRateBasisPoints"},
-      {"layer": "usecase", "entry_key": "CommandExecutionMetric"},
-      {"layer": "usecase", "entry_key": "TelemetrySkippedLineCount"},
-      {"layer": "usecase", "entry_key": "TelemetryReportOutput"}
+      {
+        "layer": "usecase",
+        "entry_key": "CommandExecutionCount"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "CommandFailureRateBasisPoints"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "CommandExecutionMetric"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "TelemetrySkippedLineCount"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "TelemetryReportOutput"
+      }
     ],
     "T006": [
-      {"layer": "infrastructure", "entry_key": "TelemetryReport"},
-      {"layer": "infrastructure", "entry_key": "TelemetryReportSnapshot"},
-      {"layer": "infrastructure", "entry_key": "TelemetryReportOutput"}
+      {
+        "layer": "infrastructure",
+        "entry_key": "TelemetryReport"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "TelemetryReportSnapshot"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "TelemetryReportOutput"
+      }
     ],
     "T010": [
-      {"layer": "usecase", "entry_key": "TelemetryEmitDynamicPort"},
-      {"layer": "usecase", "entry_key": "TelemetryAggregateService"},
-      {"layer": "usecase", "entry_key": "TelemetryReportService"},
-      {"layer": "usecase", "entry_key": "TelemetryEmitService"},
-      {"layer": "usecase", "entry_key": "TelemetryArchivedService"},
-      {"layer": "usecase", "entry_key": "TelemetryEmitInteractor"},
-      {"layer": "usecase", "entry_key": "TelemetryArchiveInteractor"},
-      {"layer": "usecase", "entry_key": "TelemetryAggregateInteractor"},
-      {"layer": "cli_driver", "entry_key": "TelemetryInput"},
-      {"layer": "cli_driver", "entry_key": "TelemetryDriver"},
-      {"layer": "cli_driver", "entry_key": "cli_driver::telemetry::duration_millis"},
-      {"layer": "cli_driver", "entry_key": "cli_driver::telemetry::exit_code_value"},
-      {"layer": "cli_driver", "entry_key": "cli_driver::telemetry::items_dir_from_args"},
-      {"layer": "cli", "entry_key": "cli::command_identity_from_args"},
-      {"layer": "cli", "entry_key": "TrackCommand"},
-      {"layer": "cli", "entry_key": "CatalogCommand"},
-      {"layer": "cli", "entry_key": "CatalogueLintCommand"},
-      {"layer": "cli", "entry_key": "cli::run_cli"},
-      {"layer": "cli", "entry_key": "cli::run_cli_with"},
-      {"layer": "cli", "entry_key": "cli::telemetry_completion_eligible"},
-      {"layer": "cli", "entry_key": "cli::telemetry_track_display_only"},
-      {"layer": "cli", "entry_key": "cli::track_command_label"},
-      {"layer": "cli", "entry_key": "cli::execute_track_with_telemetry"},
-      {"layer": "cli", "entry_key": "cli::is_display_only_track_command"},
-      {"layer": "cli", "entry_key": "cli::emit_archived_track_subcommand"},
-      {"layer": "cli", "entry_key": "cli::telemetry_dir_override_is_set"},
-      {"layer": "cli_composition", "entry_key": "TelemetryCompositionRoot"},
-      {"layer": "infrastructure", "entry_key": "FsTelemetryEmitDynamicAdapter"}
+      {
+        "layer": "usecase",
+        "entry_key": "TelemetryEmitDynamicPort"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "TelemetryAggregateService"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "TelemetryReportService"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "TelemetryEmitService"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "TelemetryArchivedService"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "TelemetryEmitInteractor"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "TelemetryArchiveInteractor"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "TelemetryAggregateInteractor"
+      },
+      {
+        "layer": "cli_driver",
+        "entry_key": "TelemetryInput"
+      },
+      {
+        "layer": "cli_driver",
+        "entry_key": "TelemetryCompletion"
+      },
+      {
+        "layer": "cli_driver",
+        "entry_key": "TelemetryDriver"
+      },
+      {
+        "layer": "cli_driver",
+        "entry_key": "cli_driver::telemetry::completion_eligible"
+      },
+      {
+        "layer": "cli_driver",
+        "entry_key": "cli_driver::telemetry::duration_millis"
+      },
+      {
+        "layer": "cli_driver",
+        "entry_key": "cli_driver::telemetry::exit_code_value"
+      },
+      {
+        "layer": "cli_driver",
+        "entry_key": "cli_driver::telemetry::items_dir_from_args"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "cli::command_identity_from_args"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "CatalogCommand"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "CatalogueLintCommand"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "cli::track_command_label"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "cli::execute_track_with_telemetry"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "cli::is_display_only_track_command"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "cli::emit_archived_track_subcommand"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "cli::telemetry_dir_override_is_set"
+      },
+      {
+        "layer": "cli_composition",
+        "entry_key": "TelemetryCompositionRoot"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "FsTelemetryEmitDynamicAdapter"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "TelemetryConfig"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::telemetry::context::resolve_telemetry_track_id"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "TrackCommand"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "cli::run_cli"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "cli::run_cli_with"
+      }
     ]
   }
 }
+
