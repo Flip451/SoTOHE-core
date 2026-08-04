@@ -4228,6 +4228,35 @@
           "hash": "rvw1:sha256:2449b4715cadc5b4baca105e779bda77b4c6cf0bccef8a015c5ca450b3d444d2",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-04T03:03:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:981801f454137dc8b3ba604639652d9e102b6b75987a062404b73b268708c2cf",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-04T03:07:06Z",
+          "findings": [
+            {
+              "category": "test coverage",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser_tests.rs",
+              "line": 634,
+              "message": "The regression covers both `use<T>` and `use<'a, T>` at the decode validator, but exercises the preserving-spelling encoder only with `use<T>`. Loop over both spellings for `parse_generic_bound_with_generics_preserving_spelling` so lifetime-capture rejection is pinned at both required entry points.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:981801f454137dc8b3ba604639652d9e102b6b75987a062404b73b268708c2cf",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-04T03:11:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:21d9869d106397cccf7074c2ee481e43c56e33696f2b9982f1ffced3b5aa8e32",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },

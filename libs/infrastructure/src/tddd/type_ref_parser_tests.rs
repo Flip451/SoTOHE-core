@@ -623,6 +623,31 @@ fn test_validate_generic_bound_rejects_redundant_parenthesized_types() {
 }
 
 #[test]
+fn test_validate_generic_bound_rejects_precise_capture() {
+    for bound in ["use<T>", "use<'a, T>"] {
+        assert!(
+            validate_lexical_generic_bound(bound, &["T"]).is_err(),
+            "precise-capture bound must be rejected: {bound}"
+        );
+    }
+
+    for bound in ["use<T>", "use<'a, T>"] {
+        let result = parse_generic_bound_with_generics_preserving_spelling(
+            bound,
+            &no_local,
+            100,
+            &HashMap::new(),
+            &mut |_| 101,
+            &["T"],
+        );
+        assert!(
+            result.is_err(),
+            "precise-capture bound must fail closed in the preserving encoder: {bound}"
+        );
+    }
+}
+
+#[test]
 fn test_parse_generic_bound_generic_argument_shadows_catalogue_type() {
     let bound = parse_generic_bound_with_generics_preserving_spelling(
         "Into<T>",

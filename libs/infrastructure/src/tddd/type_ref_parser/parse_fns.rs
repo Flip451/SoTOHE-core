@@ -7,8 +7,9 @@ use syn::visit::Visit;
 
 use super::bound_spelling::{
     reject_deterministically_non_trait_bound, reject_parenthesized_bounds_in_bound,
-    reject_redundant_parenthesized_types_in_bound, reject_redundant_parenthesized_types_in_type,
-    reject_turbofish_generic_arguments_in_bound, reject_unsupported_const_bound_modifier,
+    reject_precise_capture_bound, reject_redundant_parenthesized_types_in_bound,
+    reject_redundant_parenthesized_types_in_type, reject_turbofish_generic_arguments_in_bound,
+    reject_unsupported_const_bound_modifier,
 };
 use super::constants::{PRIMITIVE_TYPES, UNRESOLVED_CRATE_ID};
 use super::generic_tokens;
@@ -241,6 +242,7 @@ pub(crate) fn validate_lexical_generic_bound(
         validate_maybe_const_bound(bound_str, generic_params)?;
     }
     reject_deterministically_non_trait_bound(&syn_bound, generic_params)?;
+    reject_precise_capture_bound(&syn_bound)?;
     reject_turbofish_generic_arguments_in_bound(&syn_bound)?;
     reject_parenthesized_bounds_in_bound(&syn_bound)?;
     reject_redundant_parenthesized_types_in_bound(&syn_bound)?;
@@ -319,6 +321,7 @@ where
         syn::parse_str(bound_str).map_err(|e| format!("syn parse error for `{bound_str}`: {e}"))?;
     if preserve_prelude_spelling {
         reject_deterministically_non_trait_bound(&syn_bound, generic_params)?;
+        reject_precise_capture_bound(&syn_bound)?;
         reject_turbofish_generic_arguments_in_bound(&syn_bound)?;
         reject_parenthesized_bounds_in_bound(&syn_bound)?;
         reject_redundant_parenthesized_types_in_bound(&syn_bound)?;

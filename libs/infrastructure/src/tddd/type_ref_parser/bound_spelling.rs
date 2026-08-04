@@ -187,6 +187,18 @@ fn reject_if_redundant_paren_found(found: bool) -> Result<(), String> {
     }
 }
 
+/// Precise-capture syntax (`use<'a, T>`) is only valid on `impl Trait`
+/// opaque types; Rust rejects it as a generic-parameter or where-predicate
+/// bound, so admitting it would record an alias contract no implementation
+/// can compile. Reject the top-level form at the alias validation boundary.
+pub(super) fn reject_precise_capture_bound(syntax: &syn::TypeParamBound) -> Result<(), String> {
+    if matches!(syntax, syn::TypeParamBound::PreciseCapture(_)) {
+        Err("`use<..>` precise-capture lists are not valid generic-parameter bounds".to_owned())
+    } else {
+        Ok(())
+    }
+}
+
 pub(super) fn reject_unsupported_const_bound_modifier(bound_str: &str) -> Result<(), String> {
     let scan_str = bound_str.strip_prefix("~const").map_or(bound_str, str::trim_start);
     let tokens: TokenStream =
