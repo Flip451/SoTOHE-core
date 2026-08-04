@@ -306,6 +306,163 @@ fn reject_if_trailing_comma_found(found: bool) -> Result<(), String> {
     }
 }
 
+/// The converter and rustdoc discard trailing `+` punctuation from trait
+/// objects, `impl Trait`, associated-type constraints, and higher-ranked
+/// lifetime bounds. They also discard an empty colon on an HRTB lifetime
+/// parameter. Each notation difference would otherwise silently compare equal,
+/// so it is rejected at the boundary.
+#[derive(Default)]
+struct TrailingPlusVisitor {
+    found: bool,
+}
+
+impl<'ast> Visit<'ast> for TrailingPlusVisitor {
+    fn visit_type_trait_object(&mut self, node: &'ast syn::TypeTraitObject) {
+        self.found |= node.bounds.trailing_punct();
+        syn::visit::visit_type_trait_object(self, node);
+    }
+
+    fn visit_type_impl_trait(&mut self, node: &'ast syn::TypeImplTrait) {
+        self.found |= node.bounds.trailing_punct();
+        syn::visit::visit_type_impl_trait(self, node);
+    }
+
+    fn visit_constraint(&mut self, node: &'ast syn::Constraint) {
+        self.found |= node.bounds.trailing_punct();
+        syn::visit::visit_constraint(self, node);
+    }
+
+    fn visit_lifetime_param(&mut self, node: &'ast syn::LifetimeParam) {
+        self.found |=
+            node.bounds.trailing_punct() || (node.colon_token.is_some() && node.bounds.is_empty());
+        syn::visit::visit_lifetime_param(self, node);
+    }
+}
+
+pub(super) fn reject_trailing_pluses_in_bound(syntax: &syn::TypeParamBound) -> Result<(), String> {
+    let mut visitor = TrailingPlusVisitor::default();
+    visitor.visit_type_param_bound(syntax);
+    reject_if_trailing_plus_found(visitor.found)
+}
+
+pub(super) fn reject_trailing_pluses_in_type(syntax: &syn::Type) -> Result<(), String> {
+    let mut visitor = TrailingPlusVisitor::default();
+    visitor.visit_type(syntax);
+    reject_if_trailing_plus_found(visitor.found)
+}
+
+fn reject_if_trailing_plus_found(found: bool) -> Result<(), String> {
+    if found {
+        Err("trailing `+` bound punctuation is not supported by lexical type comparison".to_owned())
+    } else {
+        Ok(())
+    }
+}
+
+/// Bare-function spellings the representation cannot retain: an explicitly
+/// written `_` parameter name (`fn(_: u8)`) collapses to the same form as an
+/// omitted name (`fn(u8)`), a named variadic (`args: ...`) is discarded, and
+/// several ABI spellings normalize to the same representation. In particular,
+/// `extern fn()` becomes explicit C, `extern "Rust" fn()` becomes plain Rust,
+/// and raw or escaped ABI literals lose their source spelling. Those variants
+/// are rejected; canonical omitted-name, unnamed-variadic, and explicit ABI
+/// forms stay accepted.
+#[derive(Default)]
+struct BareFnVariantSpellingVisitor {
+    found: bool,
+}
+
+impl<'ast> Visit<'ast> for BareFnVariantSpellingVisitor {
+    fn visit_bare_fn_arg(&mut self, node: &'ast syn::BareFnArg) {
+        self.found |= node.name.as_ref().is_some_and(|(ident, _)| ident == "_");
+        syn::visit::visit_bare_fn_arg(self, node);
+    }
+
+    fn visit_bare_variadic(&mut self, node: &'ast syn::BareVariadic) {
+        self.found |= node.name.is_some();
+        syn::visit::visit_bare_variadic(self, node);
+    }
+
+    fn visit_type_bare_fn(&mut self, node: &'ast syn::TypeBareFn) {
+        self.found |= node.abi.as_ref().is_some_and(|abi| {
+            let Some(name) = &abi.name else {
+                return true;
+            };
+            let value = name.value();
+            value == "Rust" || name.token().to_string() != format!("{value:?}")
+        });
+        syn::visit::visit_type_bare_fn(self, node);
+    }
+}
+
+pub(super) fn reject_bare_fn_variant_spellings_in_bound(
+    syntax: &syn::TypeParamBound,
+) -> Result<(), String> {
+    let mut visitor = BareFnVariantSpellingVisitor::default();
+    visitor.visit_type_param_bound(syntax);
+    reject_if_bare_fn_variant_spelling_found(visitor.found)
+}
+
+pub(super) fn reject_bare_fn_variant_spellings_in_type(syntax: &syn::Type) -> Result<(), String> {
+    let mut visitor = BareFnVariantSpellingVisitor::default();
+    visitor.visit_type(syntax);
+    reject_if_bare_fn_variant_spelling_found(visitor.found)
+}
+
+fn reject_if_bare_fn_variant_spelling_found(found: bool) -> Result<(), String> {
+    if found {
+        Err(
+            "non-canonical bare-function parameter, variadic, and ABI spellings are not supported by lexical type comparison"
+                .to_owned(),
+        )
+    } else {
+        Ok(())
+    }
+}
+
+/// Rustc rejects `impl Trait` in generic arguments (E0562) and `Self` in
+/// top-level type-alias declarations (E0411), so either node would record an
+/// alias contract no implementation can compile. Both are rejected at the
+/// boundary.
+#[derive(Default)]
+struct AliasInvalidNodeVisitor {
+    found: bool,
+}
+
+impl<'ast> Visit<'ast> for AliasInvalidNodeVisitor {
+    fn visit_type_impl_trait(&mut self, node: &'ast syn::TypeImplTrait) {
+        self.found = true;
+        syn::visit::visit_type_impl_trait(self, node);
+    }
+
+    fn visit_path(&mut self, node: &'ast syn::Path) {
+        self.found |= node.segments.iter().any(|segment| segment.ident == "Self");
+        syn::visit::visit_path(self, node);
+    }
+}
+
+pub(super) fn reject_alias_invalid_nodes_in_bound(
+    syntax: &syn::TypeParamBound,
+) -> Result<(), String> {
+    let mut visitor = AliasInvalidNodeVisitor::default();
+    visitor.visit_type_param_bound(syntax);
+    reject_if_alias_invalid_node_found(visitor.found)
+}
+
+pub(super) fn reject_alias_invalid_nodes_in_type(syntax: &syn::Type) -> Result<(), String> {
+    let mut visitor = AliasInvalidNodeVisitor::default();
+    visitor.visit_type(syntax);
+    reject_if_alias_invalid_node_found(visitor.found)
+}
+
+fn reject_if_alias_invalid_node_found(found: bool) -> Result<(), String> {
+    if found {
+        Err("`impl Trait` and `Self` are not valid in type-alias declarations".to_owned())
+    } else {
+        Ok(())
+    }
+}
+
 /// The alias model declares only type parameters, so a lifetime bound can
 /// reference no declared lifetime: rustc rejects `type A<T: 'a> = T` for the
 /// undeclared `'a`. Only `'static` is always in scope and stays accepted.

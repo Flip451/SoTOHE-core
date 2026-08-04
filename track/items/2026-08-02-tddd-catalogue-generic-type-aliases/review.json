@@ -4372,6 +4372,64 @@
           "hash": "rvw1:sha256:44e560af7218d2d90d8623f98d5b9e96db77338672edcb8981a51a5e1a56696c",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-04T05:30:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f85ca35090548d4a39395e5bc8dd9bf0a186cc5ae91ac90b1dea882a1ca422c6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-04T05:40:43Z",
+          "findings": [
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/bound_spelling.rs",
+              "line": 317,
+              "message": "`TrailingPlusVisitor` checks only trait-object and `impl Trait` bound lists. A valid spelling such as `Outer<Item: Send +>` stores the trailing punctuation in `syn::Constraint::bounds`, so it passes all four lexical gates and encodes identically to `Outer<Item: Send>`. Check `Constraint::bounds.trailing_punct()` and add four-gate regression coverage.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/bound_spelling.rs",
+              "line": 366,
+              "message": "The ABI guard rejects only shorthand `extern fn()`. It still accepts `extern \"Rust\" fn()`, which maps to the same `Abi::Rust` as `fn()`, and raw/escaped ABI literals whose spelling is normalized through `LitStr::value()`. These catalogue spellings can therefore compare equal despite lexical differences; reject every non-round-trippable ABI spelling.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/bound_spelling.rs",
+              "line": 360,
+              "message": "Named C-variadic parameters are not inspected. For example, `unsafe extern \"C\" fn(u8, args: ...)` is valid Rust, but the converter retains only `is_c_variadic` and discards `args`, making it identical to `unsafe extern \"C\" fn(u8, ...)`. Reject `BareVariadic` nodes whose `name` is present.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f85ca35090548d4a39395e5bc8dd9bf0a186cc5ae91ac90b1dea882a1ca422c6",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-04T05:53:07Z",
+          "findings": [
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/bound_spelling.rs",
+              "line": 317,
+              "message": "`TrailingPlusVisitor` still does not inspect higher-ranked lifetime-parameter bounds. Valid spellings such as `Outer<for<'a: 'static +> fn(&'a ())>` store the trailing `+` in `LifetimeParam.bounds`, so all four lexical gates accept them while the converter and rustdoc both emit the same outlives list as the spelling without `+`. The similarly valid empty-colon form `for<'a:>` also collapses to `for<'a>`. Reject trailing punctuation and empty bound colons on HRTB lifetime parameters and add four-gate regressions.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ea9b552ce34a8f10f57d53a924a677220216be0e9285e114c25528680419c90b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-04T06:03:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c636f7530b29aaa425e3c38408fa5fd9361726b076caf2baf671914844c6de1a",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },

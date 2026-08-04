@@ -247,8 +247,11 @@ fn test_parse_type_ref_assoc_const_matches_rustdoc_metadata() {
 
 #[test]
 fn test_parse_type_ref_assoc_type_equality_remains_a_type() {
+    // The equality term must stay a Type rather than being guessed as a
+    // constant. (`Self` is no longer usable as the subject here: it is
+    // rejected in alias declarations per rustc E0411.)
     let ty = parse_type_ref_with_generics_preserving_spelling(
-        "Trait<Item = Self>",
+        "Trait<Item = Foo>",
         &no_local,
         100,
         &HashMap::new(),
@@ -268,7 +271,7 @@ fn test_parse_type_ref_assoc_type_equality_remains_a_type() {
     assert!(matches!(
         &constraint.binding,
         AssocItemConstraintKind::Equality(rustdoc_types::Term::Type(Type::ResolvedPath(path)))
-            if path.path == "Self"
+            if path.path == "Foo"
     ));
 }
 
@@ -1022,6 +1025,162 @@ fn test_parse_type_ref_preserving_spelling_rejects_infer_and_attributed_binder_p
         .is_ok(),
         "plain binder spelling must stay accepted in the preserving type parser"
     );
+}
+
+fn assert_alias_lexical_spelling_rejected_at_all_gates(spelling: &str) {
+    assert!(
+        validate_lexical_generic_bound(spelling, &[]).is_err(),
+        "the lexical generic-bound validator must reject: {spelling}"
+    );
+    assert!(
+        validate_lexical_type_ref(spelling, &["T"]).is_err(),
+        "the lexical type validator must reject: {spelling}"
+    );
+    assert!(
+        parse_generic_bound_with_generics_preserving_spelling(
+            spelling,
+            &no_local,
+            100,
+            &HashMap::new(),
+            &mut |_| 101,
+            &[],
+        )
+        .is_err(),
+        "the preserving generic-bound encoder must reject: {spelling}"
+    );
+    assert!(
+        parse_type_ref_with_generics_preserving_spelling(
+            spelling,
+            &no_local,
+            100,
+            &HashMap::new(),
+            &mut |_| 101,
+            &["T"],
+        )
+        .is_err(),
+        "the preserving type encoder must reject: {spelling}"
+    );
+}
+
+fn assert_alias_lexical_spelling_accepted_at_all_gates(spelling: &str) {
+    assert!(
+        validate_lexical_generic_bound(spelling, &[]).is_ok(),
+        "the lexical generic-bound validator must accept: {spelling}"
+    );
+    assert!(
+        validate_lexical_type_ref(spelling, &["T"]).is_ok(),
+        "the lexical type validator must accept: {spelling}"
+    );
+    assert!(
+        parse_generic_bound_with_generics_preserving_spelling(
+            spelling,
+            &no_local,
+            100,
+            &HashMap::new(),
+            &mut |_| 101,
+            &[],
+        )
+        .is_ok(),
+        "the preserving generic-bound encoder must accept: {spelling}"
+    );
+    assert!(
+        parse_type_ref_with_generics_preserving_spelling(
+            spelling,
+            &no_local,
+            100,
+            &HashMap::new(),
+            &mut |_| 101,
+            &["T"],
+        )
+        .is_ok(),
+        "the preserving type encoder must accept: {spelling}"
+    );
+}
+
+#[test]
+fn test_alias_lexical_gates_reject_original_lossy_spellings() {
+    for spelling in [
+        "Outer<dyn Send +>",
+        "Outer<fn(_: u8)>",
+        "Outer<extern fn()>",
+        "Outer<impl Clone>",
+        "Outer<Self>",
+        "Outer<Self::Assoc>",
+    ] {
+        assert_alias_lexical_spelling_rejected_at_all_gates(spelling);
+    }
+
+    for spelling in [
+        "Outer<dyn Send>",
+        "Outer<fn(u8)>",
+        "Outer<fn(x: u8)>",
+        "Outer<extern \"C\" fn()>",
+        "Outer<u8>",
+    ] {
+        assert_alias_lexical_spelling_accepted_at_all_gates(spelling);
+    }
+}
+
+#[test]
+fn test_alias_lexical_gates_reject_additional_lossy_spellings() {
+    for spelling in [
+        "Outer<Item: Send +>",
+        "Outer<for<'a: 'static +> fn(&'a ())>",
+        "Outer<for<'a:> fn(&'a ())>",
+        "Outer<extern \"Rust\" fn()>",
+        r##"Outer<extern r#"C"# fn()>"##,
+        "Outer<extern \"\\x43\" fn()>",
+        "Outer<unsafe extern \"C\" fn(u8, args: ...)>",
+    ] {
+        assert_alias_lexical_spelling_rejected_at_all_gates(spelling);
+    }
+
+    for spelling in [
+        "Outer<Item: Send>",
+        "Outer<for<'a: 'static> fn(&'a ())>",
+        "Outer<for<'a> fn(&'a ())>",
+        "Outer<fn()>",
+        "Outer<extern \"C\" fn()>",
+        "Outer<extern \"efiapi\" fn()>",
+        "Outer<unsafe extern \"C\" fn(u8, ...)>",
+    ] {
+        assert_alias_lexical_spelling_accepted_at_all_gates(spelling);
+    }
+}
+
+#[test]
+fn test_legacy_parsers_accept_lexically_lossy_alias_spellings() {
+    for spelling in [
+        "Outer<Item: Send +>",
+        "Outer<for<'a: 'static +> fn(&'a ())>",
+        "Outer<extern \"Rust\" fn()>",
+        "Outer<unsafe extern \"C\" fn(u8, args: ...)>",
+    ] {
+        assert!(
+            parse_generic_bound_with_generics(
+                spelling,
+                &no_local,
+                100,
+                &HashMap::new(),
+                &mut |_| 101,
+                &[],
+            )
+            .is_ok(),
+            "the legacy generic-bound parser must retain permissive behavior: {spelling}"
+        );
+        assert!(
+            parse_type_ref_with_generics(
+                spelling,
+                &no_local,
+                100,
+                &HashMap::new(),
+                &mut |_| 101,
+                &["T"],
+            )
+            .is_ok(),
+            "the legacy type parser must retain permissive behavior: {spelling}"
+        );
+    }
 }
 
 #[test]
