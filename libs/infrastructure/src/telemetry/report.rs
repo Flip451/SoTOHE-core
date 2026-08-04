@@ -126,6 +126,13 @@ const KNOWN_SCHEMA_VERSIONS: &[u32] = &[1];
 /// Largest JSONL record accepted by the report reader; bounds corrupted or attacker input.
 const MAX_TELEMETRY_RECORD_BYTES: usize = 64 * 1024;
 
+/// Maximum immutable telemetry-file snapshot consumed by one report request.
+///
+/// The reader captures the file length before streaming so concurrent appends
+/// are excluded from the report. Reject snapshots above this limit before
+/// reading to bound report I/O and parsing work.
+const MAX_TELEMETRY_SNAPSHOT_BYTES: u64 = 8 * 1024 * 1024;
+
 /// Maximum number of distinct report rows retained per projection. Aggregation
 /// continues streaming after the cap, counting omitted rows instead of
 /// rejecting an otherwise valid append-only log.
@@ -278,6 +285,14 @@ impl TelemetryReport {
                         message: e.to_string(),
                     })?
                     .len();
+                if remaining_snapshot_bytes > MAX_TELEMETRY_SNAPSHOT_BYTES {
+                    return Err(TelemetryReportError::Io {
+                        path: log_path.display().to_string(),
+                        message: format!(
+                            "telemetry snapshot exceeds size limit of {MAX_TELEMETRY_SNAPSHOT_BYTES} bytes"
+                        ),
+                    });
+                }
                 let mut reader = io::BufReader::new(file);
                 let mut line = Vec::new();
 
@@ -332,10 +347,12 @@ impl TelemetryReport {
                                 };
                                 let mut projection_truncated = false;
 
-                                if phase_map.contains_key(&command)
+                                if phase_map.contains_key(metric_command)
                                     || phase_map.len() < MAX_TELEMETRY_RETAINED_ENTRIES
                                 {
-                                    let entry = phase_map.entry(command.clone()).or_insert((0, 0));
+                                    let entry = phase_map
+                                        .entry(metric_command.to_owned())
+                                        .or_insert((0, 0));
                                     entry.0 = entry.0.saturating_add(duration_ms);
                                     entry.1 = entry.1.saturating_add(1);
                                 } else {
@@ -598,6 +615,24 @@ mod tests {
         assert_eq!(output.phase_durations.len(), 1);
         let pd = output.phase_durations.first().unwrap();
         assert_eq!(pd.total_ms, 2000); // 1200 + 800
+        assert_eq!(pd.event_count, 2);
+    }
+
+    /// Legacy `track plan` and common-entry `sotp track plan` labels aggregate
+    /// into one phase-duration row, matching the command-metrics normalization.
+    #[test]
+    fn test_aggregate_normalizes_legacy_labels_in_phase_durations() {
+        let prefixed_line = r#"{"event_type":"TrackSubcommand","schema_version":1,"track_id":"t","command":"sotp track plan","exit_code":0,"duration_ms":30,"timestamp":"2026-06-10T00:02:00Z"}"#;
+        let tmp = TempDir::new().unwrap();
+        write_jsonl(tmp.path(), "t", &[COMMAND_SUCCESS_LINE, prefixed_line]);
+
+        let report = TelemetryReport::new(tmp.path().to_path_buf());
+        let output = report.aggregate(&track_id("t")).unwrap();
+
+        assert_eq!(output.phase_durations.len(), 1);
+        let pd = output.phase_durations.first().unwrap();
+        assert_eq!(pd.phase_name, "track plan");
+        assert_eq!(pd.total_ms, 150); // 120 + 30
         assert_eq!(pd.event_count, 2);
     }
 
@@ -925,6 +960,25 @@ mod tests {
         assert_eq!(*output.skipped_lines.as_ref(), 1);
         assert!(output.command_metrics.is_empty());
         assert!(output.phase_durations.is_empty());
+    }
+
+    #[test]
+    fn test_aggregate_snapshot_exceeds_budget_returns_io_error() {
+        let tmp = TempDir::new().unwrap();
+        let logs_dir = tmp.path().join("t").join("logs");
+        std::fs::create_dir_all(&logs_dir).unwrap();
+        let log_path = logs_dir.join("telemetry.jsonl");
+        std::fs::File::create(&log_path)
+            .unwrap()
+            .set_len(MAX_TELEMETRY_SNAPSHOT_BYTES.saturating_add(1))
+            .unwrap();
+
+        let result = TelemetryReport::new(tmp.path().to_path_buf()).aggregate(&track_id("t"));
+
+        assert!(
+            matches!(result, Err(TelemetryReportError::Io { ref path, ref message }) if path == &log_path.display().to_string() && message.contains("snapshot exceeds size limit")),
+            "expected snapshot budget I/O error; got: {result:?}"
+        );
     }
 
     /// Missing telemetry.jsonl for an existing track returns empty output.

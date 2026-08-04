@@ -151,7 +151,7 @@ impl TelemetryEmitDynamicPort for FsTelemetryEmitDynamicAdapter {
         // the process CWD. Invalid paths and unavailable repository state are
         // typed adapter failures; the driver deliberately swallows those
         // diagnostic failures so the original command outcome remains unchanged.
-        let repo_root = resolve_project_root_from_items_dir(items_dir)
+        let anchor_root = resolve_project_root_from_items_dir(items_dir)
             .map_err(|e| TelemetryEmitDynamicPortError::EmitUnavailable(e.to_string()))?;
         let resolved_track_id = source_track_id.to_owned();
         let track_id = TrackId::try_new(resolved_track_id).map_err(|error| {
@@ -159,7 +159,7 @@ impl TelemetryEmitDynamicPort for FsTelemetryEmitDynamicAdapter {
                 "invalid captured track id: {error}"
             ))
         })?;
-        let anchored_items_dir = repo_root.join("track").join("items");
+        let anchored_items_dir = anchor_root.join("track").join("items");
         let writer = TelemetryWriter::new(
             TelemetryConfig::from_env(),
             track_id.as_ref().to_owned(),
@@ -270,11 +270,13 @@ fn resolve_project_root_from_items_dir(items_dir: &Path) -> Result<PathBuf, Tele
                 ))
             })?;
             ensure_trusted_root(&repo_root)?;
-            if (default_items_dir && !canonical_project_root.starts_with(&repo_root))
-                || (!default_items_dir && canonical_project_root != repo_root)
-            {
+            // Explicit non-default items roots pass through unchanged,
+            // including nested in-repository layouts such as
+            // `<repo>/custom/track/items`, matching the pre-dispatch context
+            // resolver. Only roots outside the repository stay fail-closed.
+            if !canonical_project_root.starts_with(&repo_root) {
                 return Err(TelemetryAdapterError(format!(
-                    "--items-dir must resolve to the discovered repository root {}; got {}",
+                    "--items-dir must resolve inside the discovered repository root {}; got {}",
                     repo_root.display(),
                     canonical_project_root.display()
                 )));
@@ -308,7 +310,11 @@ fn resolve_project_root_from_items_dir(items_dir: &Path) -> Result<PathBuf, Tele
                         items_dir.display()
                     ))
                 })?;
-            Ok(repo_root)
+            // Return the anchor the writer must join `track/items` onto: the
+            // repository root for the repository-relative default, and the
+            // validated supplied project root (possibly nested) otherwise, so
+            // emission preserves the caller's items directory.
+            if default_items_dir { Ok(repo_root) } else { Ok(canonical_project_root) }
         }
         _ => Err(TelemetryAdapterError(format!(
             "--items-dir must point to '<project-root>/track/items'; got {}",
@@ -606,14 +612,18 @@ mod tests {
     }
 
     #[test]
-    fn test_resolve_project_root_from_items_dir_rejects_nested_repository_path() {
+    fn test_resolve_project_root_from_items_dir_preserves_nested_in_repository_root() {
         let tmp = tempdir_in_current_repo();
         let items_dir = tmp.path().join("track").join("items");
         std::fs::create_dir_all(&items_dir).unwrap();
 
-        let err = resolve_project_root_from_items_dir(&items_dir).unwrap_err();
+        let anchor = resolve_project_root_from_items_dir(&items_dir).unwrap();
 
-        assert!(err.to_string().contains("discovered repository root"), "{err}");
+        assert_eq!(
+            anchor,
+            tmp.path().canonicalize().unwrap(),
+            "a nested in-repository items root must keep its supplied project root"
+        );
     }
 
     #[test]

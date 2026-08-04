@@ -289,7 +289,14 @@ fn run_cli_with(
     argv: &[std::ffi::OsString],
 ) -> ExitCode {
     let command_identity = command_identity_from_args(argv);
-    let items_dir = cli_driver::telemetry::items_dir_from_args(argv);
+    // Verify subcommands derive their effective items root from positional
+    // spec paths or `--track-dir`, which the raw-argv extractor cannot see.
+    // Reuse the parsed DTO's derivation so the common completion targets the
+    // same repository as the command's own telemetry (GateEval) sink.
+    let items_dir = match &cli.command {
+        Some(CliCommand::Verify { cmd }) => cmd.items_dir(),
+        _ => cli_driver::telemetry::items_dir_from_args(argv),
+    };
     run_cli_with_context!(cli, dry_execute, ref_verify_execute, command_identity, items_dir,)
 }
 
@@ -710,6 +717,54 @@ mod tests {
 
         assert_eq!(exit, ExitCode::from(42));
         assert!(logs_path.is_file(), "append failure must not replace the original path");
+    }
+
+    /// A positional-spec verify invocation targeting a track outside the CWD
+    /// repository must route its common completion to that track's repository,
+    /// matching the command's own telemetry sink derivation.
+    #[test]
+    fn test_completed_command_verify_positional_spec_routes_to_target_repository() {
+        let _guard = process_env_lock().lock().unwrap();
+        let cwd_repo = TempDir::new().unwrap();
+        seed_repo(cwd_repo.path(), "main");
+        let target_repo = TempDir::new().unwrap();
+        seed_repo(target_repo.path(), "track/verify-remote");
+        let spec_path = target_repo.path().join("track/items/verify-remote/spec.json");
+        fs::create_dir_all(spec_path.parent().unwrap()).unwrap();
+        fs::write(&spec_path, "{}").unwrap();
+
+        let argv: Vec<std::ffi::OsString> =
+            ["sotp".as_ref(), "verify".as_ref(), "spec-signals".as_ref(), spec_path.as_os_str()]
+                .into_iter()
+                .map(std::ffi::OsString::from)
+                .collect();
+        let cli = Cli::try_parse_from(argv.clone()).unwrap();
+
+        temp_env::with_vars([("SOTP_TELEMETRY", Some("1")), ("SOTP_TELEMETRY_DIR", None)], || {
+            run_in_dir(cwd_repo.path(), || {
+                super::run_cli_with(
+                    cli,
+                    |_command| ExitCode::FAILURE,
+                    |_command| ExitCode::FAILURE,
+                    &argv,
+                )
+            })
+        });
+
+        let log = target_repo.path().join("track/items/verify-remote/logs/telemetry.jsonl");
+        let lines = fs::read_to_string(&log)
+            .expect("completion must be recorded in the target track repository");
+        let completion = lines
+            .lines()
+            .map(|line| serde_json::from_str::<serde_json::Value>(line).unwrap())
+            .find(|record| record["event_type"] == "TrackSubcommand")
+            .expect("the common completion event must be appended to the target log");
+        assert_eq!(completion["command"], "sotp verify spec-signals");
+        assert!(
+            !cwd_repo.path().join("track/items").exists()
+                || !cwd_repo.path().join("track/items/verify-remote").exists(),
+            "the CWD repository must not receive the completion"
+        );
     }
 
     #[test]

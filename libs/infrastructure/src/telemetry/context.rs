@@ -39,7 +39,10 @@ pub fn resolve_telemetry_track_id(items_dir: &Path) -> Option<String> {
         // rather than treating that subdirectory as a project root.
         discovered_root
     } else {
-        if discovered_root != canonical_project_root {
+        // Explicit non-default items roots pass through unchanged, including
+        // nested in-repository layouts such as `<repo>/custom/track/items`.
+        // Only roots outside the enclosing repository stay fail-closed.
+        if !canonical_project_root.starts_with(&discovered_root) {
             return None;
         }
         canonical_project_root
@@ -190,6 +193,20 @@ mod tests {
             resolve_telemetry_track_id(&repo.path().join("track/items"))
         });
         assert_eq!(result.as_deref(), Some("context-missing-items"));
+    }
+
+    #[test]
+    fn test_resolve_telemetry_track_id_preserves_nested_in_repository_items_dir() {
+        let _lock = test_lock();
+        let repo = seed_repo("track/context-nested");
+        let nested_items = repo.path().join("custom").join("track").join("items");
+        std::fs::create_dir_all(&nested_items).unwrap();
+
+        let result = temp_env::with_var("SOTP_TELEMETRY", Some("1"), || {
+            resolve_telemetry_track_id(&nested_items)
+        });
+
+        assert_eq!(result.as_deref(), Some("context-nested"));
     }
 
     #[test]
