@@ -4285,6 +4285,64 @@
           "hash": "rvw1:sha256:2c17d02b1cbef22d6f624e412c26d77753e87f60e68665f49350ada091b357ef",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-04T04:10:24Z",
+          "findings": [
+            {
+              "category": "test coverage",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser_tests.rs",
+              "line": 706,
+              "message": "The new trailing-comma guard is not regression-tested through `parse_type_ref_with_generics_preserving_spelling` (including the required accepted `fn(u8, ...)` exemption). A future change could remove the preserving type gate while the current tests still pass.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:136c3d7ca21577ff925fe46fdee15dd672dbe70c3f2d4532d3b3f97dd939ae9b",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-04T04:15:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c822e3fea3e1cb4df463753a6fdd4aa7c8ed1e5797d26c3d54c90d49ecba602d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-04T04:25:20Z",
+          "findings": [
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/bound_spelling.rs",
+              "line": 250,
+              "message": "`TrailingCommaVisitor` does not inspect `BoundLifetimes.lifetimes.trailing_punct()` or `PreciseCapture.params.trailing_punct()`, although both are converted to punctuation-free vectors. Consequently spellings such as `for<'a,> Fn(&'a u8)` pass both bound gates, `for<'a,> fn(&'a u8)` passes both type gates, and each compares identically to its comma-free form. `impl Clone + use<T,>` has the same loss in type paths. Add visitor checks and four-gate regressions for these comma-bearing AST nodes.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/bound_spelling.rs",
+              "line": 268,
+              "message": "The variadic exemption is too broad. In syn, the semantic comma before `...` is represented by `inputs.trailing_punct()`, but a redundant comma after `...` is stored separately in `BareVariadic::comma`. Because any `variadic.is_some()` disables this check and `BareVariadic::comma` is never examined, `unsafe extern \"C\" fn(u8, ..., )` passes all lexical gates and is encoded identically to the comma-free spelling. Reject `variadic.comma.is_some()` while retaining the separator exemption.",
+              "severity": "P1"
+            },
+            {
+              "category": "test-coverage",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser_tests.rs",
+              "line": 793,
+              "message": "The lifetime regression covers `'_` rejection and `'static` acceptance only through `validate_lexical_generic_bound`; the preserving-spelling encoder is exercised only with `'a`. This leaves the required accept path at the second bound entry point unpinned. Add preserving-encoder assertions that `'_` is rejected and `'static` is accepted.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c822e3fea3e1cb4df463753a6fdd4aa7c8ed1e5797d26c3d54c90d49ecba602d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-04T04:34:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9e277fbc0ed5cff970c61079afff490e13a4bc297c649ba7ecf4d8f27ed9497c",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },

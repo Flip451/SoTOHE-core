@@ -237,6 +237,90 @@ fn reject_if_non_final_dyn_lifetime_found(found: bool) -> Result<(), String> {
     }
 }
 
+/// The converter and rustdoc both drop trailing punctuation, so `Tr<u8,>`
+/// and `Tr<u8>` would compare equal despite differing canonical notation.
+/// Trailing commas are rejected wherever they are redundant; the semantic
+/// positions — a one-element tuple (`(u8,)`) and the comma before a variadic
+/// (`fn(u8, ...)`) — stay accepted.
+#[derive(Default)]
+struct TrailingCommaVisitor {
+    found: bool,
+}
+
+impl<'ast> Visit<'ast> for TrailingCommaVisitor {
+    fn visit_bound_lifetimes(&mut self, node: &'ast syn::BoundLifetimes) {
+        self.found |= node.lifetimes.trailing_punct();
+        syn::visit::visit_bound_lifetimes(self, node);
+    }
+
+    fn visit_angle_bracketed_generic_arguments(
+        &mut self,
+        node: &'ast syn::AngleBracketedGenericArguments,
+    ) {
+        self.found |= node.args.trailing_punct();
+        syn::visit::visit_angle_bracketed_generic_arguments(self, node);
+    }
+
+    fn visit_parenthesized_generic_arguments(
+        &mut self,
+        node: &'ast syn::ParenthesizedGenericArguments,
+    ) {
+        self.found |= node.inputs.trailing_punct();
+        syn::visit::visit_parenthesized_generic_arguments(self, node);
+    }
+
+    fn visit_precise_capture(&mut self, node: &'ast syn::PreciseCapture) {
+        self.found |= node.params.trailing_punct();
+        syn::visit::visit_precise_capture(self, node);
+    }
+
+    fn visit_type_bare_fn(&mut self, node: &'ast syn::TypeBareFn) {
+        self.found |= (node.variadic.is_none() && node.inputs.trailing_punct())
+            || node.variadic.as_ref().is_some_and(|variadic| variadic.comma.is_some());
+        syn::visit::visit_type_bare_fn(self, node);
+    }
+
+    fn visit_type_tuple(&mut self, node: &'ast syn::TypeTuple) {
+        self.found |= node.elems.len() > 1 && node.elems.trailing_punct();
+        syn::visit::visit_type_tuple(self, node);
+    }
+}
+
+pub(super) fn reject_trailing_commas_in_bound(syntax: &syn::TypeParamBound) -> Result<(), String> {
+    let mut visitor = TrailingCommaVisitor::default();
+    visitor.visit_type_param_bound(syntax);
+    reject_if_trailing_comma_found(visitor.found)
+}
+
+pub(super) fn reject_trailing_commas_in_type(syntax: &syn::Type) -> Result<(), String> {
+    let mut visitor = TrailingCommaVisitor::default();
+    visitor.visit_type(syntax);
+    reject_if_trailing_comma_found(visitor.found)
+}
+
+fn reject_if_trailing_comma_found(found: bool) -> Result<(), String> {
+    if found {
+        Err("redundant trailing commas are not supported by lexical type comparison".to_owned())
+    } else {
+        Ok(())
+    }
+}
+
+/// The alias model declares only type parameters, so a lifetime bound can
+/// reference no declared lifetime: rustc rejects `type A<T: 'a> = T` for the
+/// undeclared `'a`. Only `'static` is always in scope and stays accepted.
+pub(super) fn reject_undeclared_lifetime_bound(syntax: &syn::TypeParamBound) -> Result<(), String> {
+    if let syn::TypeParamBound::Lifetime(lifetime) = syntax {
+        if lifetime.ident != "static" {
+            return Err(format!(
+                "lifetime bound `'{}` references no declarable lifetime parameter; only `'static` is supported",
+                lifetime.ident
+            ));
+        }
+    }
+    Ok(())
+}
+
 /// Rustdoc evaluates attributes on bare-function parameters (a
 /// `#[cfg(any())]` argument disappears from the emitted signature), while the
 /// lexical converter has no attribute evaluator — reproducing one would

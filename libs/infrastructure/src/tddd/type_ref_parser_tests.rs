@@ -703,6 +703,151 @@ fn test_validate_generic_bound_rejects_attributed_bare_fn_args() {
 }
 
 #[test]
+fn test_validate_generic_bound_rejects_redundant_trailing_commas() {
+    let redundant_spellings = [
+        "Tr<u8,>",
+        "Fn(u8,)",
+        "Outer<fn(u8,)>",
+        "Outer<(u8, u16,)>",
+        "for<'a,> Fn(&'a u8)",
+        "Outer<for<'a,> fn(&'a u8)>",
+        "Outer<fn(u8, ...,)>",
+    ];
+    for spelling in redundant_spellings {
+        assert!(
+            validate_lexical_generic_bound(spelling, &[]).is_err(),
+            "a redundant trailing comma must be rejected in a bound: {spelling}"
+        );
+        assert!(
+            validate_lexical_type_ref(spelling, &["T"]).is_err(),
+            "a redundant trailing comma must be rejected in a type: {spelling}"
+        );
+        assert!(
+            parse_generic_bound_with_generics_preserving_spelling(
+                spelling,
+                &no_local,
+                100,
+                &HashMap::new(),
+                &mut |_| 101,
+                &[],
+            )
+            .is_err(),
+            "a redundant trailing comma must fail closed in the preserving bound encoder: {spelling}"
+        );
+        assert!(
+            parse_type_ref_with_generics_preserving_spelling(
+                spelling,
+                &no_local,
+                100,
+                &HashMap::new(),
+                &mut |_| 101,
+                &["T"],
+            )
+            .is_err(),
+            "a redundant trailing comma must fail closed in the preserving type encoder: {spelling}"
+        );
+    }
+
+    // Semantic trailing commas — a one-element tuple and a variadic marker — stay accepted.
+    for spelling in ["Tr<u8>", "Outer<(u8,)>", "Outer<fn(u8, ...)>"] {
+        assert!(
+            validate_lexical_generic_bound(spelling, &[]).is_ok(),
+            "semantic or canonical bound spellings must stay accepted: {spelling}"
+        );
+        assert!(
+            validate_lexical_type_ref(spelling, &["T"]).is_ok(),
+            "semantic or canonical type spellings must stay accepted: {spelling}"
+        );
+        assert!(
+            parse_generic_bound_with_generics_preserving_spelling(
+                spelling,
+                &no_local,
+                100,
+                &HashMap::new(),
+                &mut |_| 101,
+                &[],
+            )
+            .is_ok(),
+            "semantic or canonical bound spelling must stay encodable: {spelling}"
+        );
+        assert!(
+            parse_type_ref_with_generics_preserving_spelling(
+                spelling,
+                &no_local,
+                100,
+                &HashMap::new(),
+                &mut |_| 101,
+                &["T"],
+            )
+            .is_ok(),
+            "semantic or canonical type spelling must stay encodable: {spelling}"
+        );
+    }
+}
+
+#[test]
+fn test_preserving_type_parser_rejects_precise_capture_trailing_comma() {
+    let spelling = "impl Clone + use<T,>";
+    assert!(
+        validate_lexical_type_ref(spelling, &["T"]).is_err(),
+        "a precise-capture trailing comma must be rejected in a type"
+    );
+    assert!(
+        parse_type_ref_with_generics_preserving_spelling(
+            spelling,
+            &no_local,
+            100,
+            &HashMap::new(),
+            &mut |_| 101,
+            &["T"],
+        )
+        .is_err(),
+        "a precise-capture trailing comma must fail closed in the preserving type encoder"
+    );
+}
+
+#[test]
+fn test_validate_generic_bound_rejects_undeclared_lifetime_bounds() {
+    for bound in ["'a", "'_"] {
+        assert!(
+            validate_lexical_generic_bound(bound, &["T"]).is_err(),
+            "an undeclared lifetime bound must be rejected: {bound}"
+        );
+    }
+    assert!(
+        validate_lexical_generic_bound("'static", &["T"]).is_ok(),
+        "`'static` is always in scope and must stay accepted"
+    );
+
+    for bound in ["'a", "'_"] {
+        assert!(
+            parse_generic_bound_with_generics_preserving_spelling(
+                bound,
+                &no_local,
+                100,
+                &HashMap::new(),
+                &mut |_| 101,
+                &["T"],
+            )
+            .is_err(),
+            "an undeclared lifetime bound must fail closed in the preserving encoder: {bound}"
+        );
+    }
+    assert!(
+        parse_generic_bound_with_generics_preserving_spelling(
+            "'static",
+            &no_local,
+            100,
+            &HashMap::new(),
+            &mut |_| 101,
+            &["T"],
+        )
+        .is_ok(),
+        "`'static` must stay accepted in the preserving encoder"
+    );
+}
+
+#[test]
 fn test_parse_generic_bound_generic_argument_shadows_catalogue_type() {
     let bound = parse_generic_bound_with_generics_preserving_spelling(
         "Into<T>",
