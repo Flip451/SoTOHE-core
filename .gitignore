@@ -93,6 +93,9 @@ track/items/**/.sync-base.json
 # The atomic writer's temporary record can survive a crash mid-write; it must never be
 # staged by guarded add-all.
 track/items/**/.tmp-.sync-base.json-*
+# The baseline replacement phase marker survives a crash between exchange and marker
+# removal; it is machine-owned recovery state and must never be staged.
+track/items/**/.sotp-baseline-replacement-phase
 # Detached cleanup worktrees are removed by the cleanup run; a leftover from a failed
 # removal must never be staged as an embedded-repository gitlink by guarded add-all.
 /.sotp-base-merge-worktree-*/
