@@ -160,6 +160,29 @@ pub(crate) fn resolve_type_ref_node_ids(
     current_crate: &str,
     self_node_id: Option<&str>,
 ) -> Vec<String> {
+    resolve_type_ref_node_ids_with_generics(
+        type_ref_str,
+        node_index,
+        trait_index,
+        current_crate,
+        self_node_id,
+        &[],
+    )
+}
+
+/// Same as [`resolve_type_ref_node_ids`], but treats `generic_params` as the
+/// generic parameter names declared by the surrounding declaration: a bare
+/// candidate matching one of them is a generic use that shadows any identically
+/// named catalogue type, so it never resolves to a node (no bogus edge to an
+/// unrelated declared type of the same name).
+pub(crate) fn resolve_type_ref_node_ids_with_generics(
+    type_ref_str: &str,
+    node_index: &NodeIndex,
+    trait_index: &BTreeMap<(String, String), String>,
+    current_crate: &str,
+    self_node_id: Option<&str>,
+    generic_params: &[&str],
+) -> Vec<String> {
     // Parse with syn; fall back silently on malformed input.
     let syn_type = match syn::parse_str::<syn::Type>(type_ref_str) {
         Ok(t) => t,
@@ -185,6 +208,9 @@ pub(crate) fn resolve_type_ref_node_ids(
                 push_unique_node_id(&mut resolved, id);
             }
             // If self_node_id is None, "Self" has no resolution — silent skip.
+            continue;
+        }
+        if generic_params.contains(&candidate.as_str()) {
             continue;
         }
         if let Some(node_id) = node_index.resolve(candidate, current_crate) {

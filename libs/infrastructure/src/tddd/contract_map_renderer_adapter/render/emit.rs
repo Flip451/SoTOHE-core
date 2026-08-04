@@ -10,8 +10,8 @@ use domain::tddd::ContractMapRendererError;
 
 use super::{
     NodeIndex, StyleConfig, apply_shape, edge_arrow_label, edge_line, function_node_id,
-    resolve_type_ref_node_ids, sanitize, trait_node_id, trait_rep_node_id, type_node_id,
-    type_rep_node_id,
+    resolve_type_ref_node_ids, resolve_type_ref_node_ids_with_generics, sanitize, trait_node_id,
+    trait_rep_node_id, type_node_id, type_rep_node_id,
 };
 
 // ---------------------------------------------------------------------------
@@ -207,13 +207,22 @@ pub(super) fn emit_entry<'a>(
             // (ADR 2026-04-17-1528 §D1 — silent skip for primitives / external types).
             // Uses resolve_type_ref_node_ids so that reference-wrapped alias targets
             // (e.g. `&DeclaredType`) are also resolved correctly.
-            if let TypeKindV2::TypeAlias { target, .. } = type_entry.kind() {
-                let target_ids = resolve_type_ref_node_ids(
+            if let TypeKindV2::TypeAlias { target, generics } = type_entry.kind() {
+                // Effective alias parameters mirror the codec's precedence rule:
+                // the kind-level declaration wins, with the legacy entry-level
+                // field as fallback. A declared parameter shadows any identically
+                // named catalogue type, so it must not resolve to an edge target.
+                let alias_generics =
+                    if generics.is_empty() { type_entry.generics() } else { generics.as_slice() };
+                let generic_names: Vec<&str> =
+                    alias_generics.iter().map(|g| g.name.as_str()).collect();
+                let target_ids = resolve_type_ref_node_ids_with_generics(
                     target.as_str(),
                     node_index,
                     trait_index,
                     crate_name,
                     None, // type alias targets have no Self context
+                    &generic_names,
                 );
                 for target_id in &target_ids {
                     let (arrow, label) = edge_arrow_label(&style.edge, "alias")?;

@@ -1185,6 +1185,159 @@ include_function_roles = []
         assert!(output.contains("alias_of"), "alias_of label must appear: {output}");
     }
 
+    #[test]
+    fn test_render_generic_alias_parameter_shadows_declared_type() {
+        // A kind-level alias parameter (`Alias<T> = Result<T, RawId>`) shadows an
+        // identically named declared catalogue type `T`: the generic use must not
+        // resolve to that unrelated type, while the declared `RawId` still gets
+        // its alias_of edge.
+        use domain::tddd::catalogue_v2::identifiers::ParamName;
+        use domain::tddd::catalogue_v2::methods::MethodGenericParam;
+
+        let tmp = tempfile::tempdir().unwrap();
+        let path = write_style_config(tmp.path(), FULL_VALID_CONFIG);
+        let adapter = ContractMapRendererAdapter::new(path);
+        let opts = ContractMapRenderOptions::default();
+
+        let crate_name = CrateName::new("domain").unwrap();
+        let layer = LayerId::try_new("domain").unwrap();
+        let mut doc = CatalogueDocument::new(3, crate_name, layer.clone());
+
+        for name in ["T", "RawId"] {
+            doc.insert_type(
+                TypeName::new(name).unwrap(),
+                TypeEntry::new(
+                    ItemAction::Add,
+                    DataRole::value_object(),
+                    TypeKindV2::Struct(StructKind::new(
+                        StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                        None,
+                    )),
+                    vec![],
+                    vec![],
+                    vec![],
+                    ModulePath::root(),
+                    None,
+                    vec![],
+                    vec![],
+                ),
+            );
+        }
+
+        doc.insert_type(
+            TypeName::new("UserId").unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::TypeAlias {
+                    target: TypeRef::new("Result<T, RawId>").unwrap(),
+                    generics: vec![MethodGenericParam {
+                        name: ParamName::new("T").unwrap(),
+                        bounds: vec![],
+                    }],
+                },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let result = adapter.render(&[doc], &[layer], &opts).unwrap();
+        let output = result.content().as_ref();
+        let source = render::type_rep_node_id("domain", "domain", "UserId");
+        let raw_id = render::type_rep_node_id("domain", "domain", "RawId");
+        let shadowed_id = render::type_rep_node_id("domain", "domain", "T");
+        let raw_edge = format!("{source} ---|alias_of| {raw_id}");
+        let shadowed_edge = format!("{source} ---|alias_of| {shadowed_id}");
+        assert_eq!(
+            output.matches(&raw_edge).count(),
+            1,
+            "the declared RawId target must produce exactly one alias_of edge: {output}"
+        );
+        assert!(
+            !output.contains(&shadowed_edge),
+            "the alias parameter T must not resolve to the declared type T: {output}"
+        );
+    }
+
+    #[test]
+    fn test_render_legacy_alias_parameter_shadows_declared_type() {
+        // The same shadowing must apply when the alias parameter is declared in
+        // the legacy entry-level generics field instead of the TypeAlias kind.
+        use domain::tddd::catalogue_v2::identifiers::ParamName;
+        use domain::tddd::catalogue_v2::methods::MethodGenericParam;
+
+        let tmp = tempfile::tempdir().unwrap();
+        let path = write_style_config(tmp.path(), FULL_VALID_CONFIG);
+        let adapter = ContractMapRendererAdapter::new(path);
+        let opts = ContractMapRenderOptions::default();
+
+        let crate_name = CrateName::new("domain").unwrap();
+        let layer = LayerId::try_new("domain").unwrap();
+        let mut doc = CatalogueDocument::new(3, crate_name, layer.clone());
+
+        for name in ["T", "RawId"] {
+            doc.insert_type(
+                TypeName::new(name).unwrap(),
+                TypeEntry::new(
+                    ItemAction::Add,
+                    DataRole::value_object(),
+                    TypeKindV2::Struct(StructKind::new(
+                        StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                        None,
+                    )),
+                    vec![],
+                    vec![],
+                    vec![],
+                    ModulePath::root(),
+                    None,
+                    vec![],
+                    vec![],
+                ),
+            );
+        }
+
+        doc.insert_type(
+            TypeName::new("UserId").unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::TypeAlias {
+                    target: TypeRef::new("Result<T, RawId>").unwrap(),
+                    generics: vec![],
+                },
+                vec![],
+                vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let result = adapter.render(&[doc], &[layer], &opts).unwrap();
+        let output = result.content().as_ref();
+        let source = render::type_rep_node_id("domain", "domain", "UserId");
+        let raw_id = render::type_rep_node_id("domain", "domain", "RawId");
+        let shadowed_id = render::type_rep_node_id("domain", "domain", "T");
+        let raw_edge = format!("{source} ---|alias_of| {raw_id}");
+        let shadowed_edge = format!("{source} ---|alias_of| {shadowed_id}");
+        assert_eq!(
+            output.matches(&raw_edge).count(),
+            1,
+            "the declared RawId target must produce exactly one alias_of edge: {output}"
+        );
+        assert!(
+            !output.contains(&shadowed_edge),
+            "the legacy alias parameter T must not resolve to the declared type T: {output}"
+        );
+    }
+
     // -----------------------------------------------------------------------
     // T008 / AC-06: trait impl edges + workspace-external silent skip
     // -----------------------------------------------------------------------

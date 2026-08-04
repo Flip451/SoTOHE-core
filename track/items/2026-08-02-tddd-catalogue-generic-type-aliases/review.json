@@ -4099,6 +4099,35 @@
           "hash": "rvw1:sha256:140e0e6f86eb2625577e4bbbc9c145ed4faeae8f248fd100f5be46aa12d9299e",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-04T00:16:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2d9d9609b7a83e48c2737e387fa4a236b19ffbe9973cf2732a64a2d2ee8c776c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-04T00:21:52Z",
+          "findings": [
+            {
+              "category": "test_coverage",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/mod.rs",
+              "line": 1251,
+              "message": "Both new regression tests only count `alias_of` labels. A broken implementation that filters `RawId` but still emits the bogus edge to declared type `T` would also produce exactly one edge and pass. Assert the exact `UserId -> RawId` edge and absence of `UserId -> T` for both generic-declaration locations.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:2d9d9609b7a83e48c2737e387fa4a236b19ffbe9973cf2732a64a2d2ee8c776c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-04T00:29:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:de634a6226b4c293129458f08bf248827d93a667d6d7b15feb49116e1c9773f0",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
