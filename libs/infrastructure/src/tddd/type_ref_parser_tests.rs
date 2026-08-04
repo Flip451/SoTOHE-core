@@ -485,6 +485,88 @@ fn test_parse_generic_bound_raw_pointer_const_argument_is_supported() {
 }
 
 #[test]
+fn test_validate_generic_bound_rejects_deterministically_non_trait_paths() {
+    for bound in ["u8", "bool", "str"] {
+        assert!(
+            validate_lexical_generic_bound(bound, &[]).is_err(),
+            "primitive path must be rejected as a bound: {bound}"
+        );
+    }
+    assert!(
+        validate_lexical_generic_bound("U", &["U"]).is_err(),
+        "generic-parameter-rooted bound must be rejected"
+    );
+    assert!(validate_lexical_generic_bound("str::pattern::Pattern", &[]).is_ok());
+    assert!(validate_lexical_generic_bound("Clone", &[]).is_ok());
+
+    for (bound, generic_params) in
+        [("Outer<Item: u8>", &[] as &[&str]), ("Outer<Item: U>", &["U"] as &[&str])]
+    {
+        assert!(
+            validate_lexical_generic_bound(bound, generic_params).is_err(),
+            "nested non-trait bound must be rejected: {bound}"
+        );
+        let result = parse_generic_bound_with_generics_preserving_spelling(
+            bound,
+            &no_local,
+            100,
+            &HashMap::new(),
+            &mut |_| 101,
+            generic_params,
+        );
+        assert!(
+            result.is_err(),
+            "nested non-trait bound must fail closed in the preserving encoder: {bound}"
+        );
+    }
+
+    let result = parse_generic_bound_with_generics_preserving_spelling(
+        "u8",
+        &no_local,
+        100,
+        &HashMap::new(),
+        &mut |_| 101,
+        &[],
+    );
+    assert!(result.is_err(), "primitive bound must fail closed in the preserving encoder");
+
+    for (bound, generic_params) in
+        [("Outer<Item: u8>", &[] as &[&str]), ("Outer<Item: U>", &["U"] as &[&str])]
+    {
+        let result = parse_generic_bound_with_generics(
+            bound,
+            &no_local,
+            100,
+            &HashMap::new(),
+            &mut |_| 101,
+            generic_params,
+        );
+        assert!(result.is_ok(), "legacy bound parser must retain its permissive behavior: {bound}");
+    }
+}
+
+#[test]
+fn test_validate_generic_bound_rejects_turbofish_arguments() {
+    for bound in ["Tr::<u8>", "Tr<Vec::<u8>>"] {
+        assert!(
+            validate_lexical_generic_bound(bound, &[]).is_err(),
+            "turbofish spelling must be rejected: {bound}"
+        );
+    }
+    assert!(validate_lexical_generic_bound("Tr<Vec<u8>>", &[]).is_ok());
+
+    let result = parse_generic_bound_with_generics_preserving_spelling(
+        "Tr::<u8>",
+        &no_local,
+        100,
+        &HashMap::new(),
+        &mut |_| 101,
+        &[],
+    );
+    assert!(result.is_err(), "turbofish bound must fail closed in the preserving encoder");
+}
+
+#[test]
 fn test_parse_generic_bound_generic_argument_shadows_catalogue_type() {
     let bound = parse_generic_bound_with_generics_preserving_spelling(
         "Into<T>",

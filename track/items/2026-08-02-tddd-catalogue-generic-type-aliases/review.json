@@ -4156,6 +4156,50 @@
           "hash": "rvw1:sha256:6c78fd1205701907fa9829c42ad65f9e0ca5ab64e3c1606620f4436e3544c76f",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-04T01:33:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ce5dc5cb1e2f131b7b5d8a9dec09e0b6d0477f8c71c6a115d4e5a1be08be8ce0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-04T01:41:23Z",
+          "findings": [
+            {
+              "category": "boundary validation",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 360,
+              "message": "`reject_deterministically_non_trait_bound` checks only the outer trait path, so nested associated-type bounds such as `Outer<Item: u8>` and `Outer<Item: U>` (with generic parameter `U`) still pass both lexical validation and preserving encoding even though Rust rejects them as non-trait bounds. Recursively validate nested `TypeParamBound` nodes and add decode/encode regression tests.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ce5dc5cb1e2f131b7b5d8a9dec09e0b6d0477f8c71c6a115d4e5a1be08be8ce0",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-04T01:51:13Z",
+          "findings": [
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/parse_fns.rs",
+              "line": 351,
+              "message": "The added rejection visitors grow this module to 713 production lines before the `#[cfg(test)]` block, exceeding the repository's 700-line maximum for production modules. Move the bound-validation visitors/helpers into a focused submodule.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:410f8ab25337097afc7317acefe534f8ba6036f25faa97df75c69631bc8f1999",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-04T01:59:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:76c653098c7cf2668fd0629ff6b3e321618f52ddd11f0b123fd72cfa49a0887f",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },

@@ -234,6 +234,8 @@ pub(crate) fn validate_lexical_generic_bound(
     if bound_str.starts_with("~const ") {
         validate_maybe_const_bound(bound_str, generic_params)?;
     }
+    reject_deterministically_non_trait_bound(&syn_bound, generic_params)?;
+    reject_turbofish_generic_arguments_in_bound(&syn_bound)?;
     reject_anonymous_const_blocks_in_bound(&syn_bound)?;
     reject_raw_identifiers_in_bound(&syn_bound)?;
     reject_unsupported_type_macros_in_bound(&syn_bound)?;
@@ -308,6 +310,8 @@ where
     let syn_bound: syn::TypeParamBound =
         syn::parse_str(bound_str).map_err(|e| format!("syn parse error for `{bound_str}`: {e}"))?;
     if preserve_prelude_spelling {
+        reject_deterministically_non_trait_bound(&syn_bound, generic_params)?;
+        reject_turbofish_generic_arguments_in_bound(&syn_bound)?;
         reject_anonymous_const_blocks_in_bound(&syn_bound)?;
         reject_unsupported_const_bound_modifier(bound_str)?;
         reject_raw_identifiers_in_bound(&syn_bound)?;
@@ -341,6 +345,74 @@ where
             generic_params: vec![],
             modifier: TraitBoundModifier::None,
         }),
+    }
+}
+
+/// Rejects trait-shaped paths Rust itself rejects: bare primitives (`T: u8`) or paths rooted at
+/// declared generic parameters (`T: U`). Multi-segment paths such as `str::pattern::Pattern` can
+/// resolve to real traits and stay accepted.
+fn reject_deterministically_non_trait_bound(
+    syntax: &syn::TypeParamBound,
+    generic_params: &[&str],
+) -> Result<(), String> {
+    let mut visitor = DeterministicallyNonTraitBoundVisitor { generic_params, found: false };
+    visitor.visit_type_param_bound(syntax);
+    if visitor.found {
+        Err("bounds must name a trait, not a primitive type or declared generic parameter"
+            .to_owned())
+    } else {
+        Ok(())
+    }
+}
+
+struct DeterministicallyNonTraitBoundVisitor<'params, 'names> {
+    generic_params: &'params [&'names str],
+    found: bool,
+}
+
+impl<'ast, 'params, 'names> Visit<'ast> for DeterministicallyNonTraitBoundVisitor<'params, 'names> {
+    fn visit_type_param_bound(&mut self, node: &'ast syn::TypeParamBound) {
+        if let syn::TypeParamBound::Trait(trait_bound) = node {
+            let path = &trait_bound.path;
+            if let Some(first) = path.segments.first() {
+                let first_name = first.ident.to_string();
+                self.found |= path.segments.len() == 1
+                    && PRIMITIVE_TYPES.contains(&first_name.as_str())
+                    || (path.leading_colon.is_none() || path.segments.len() == 1)
+                        && self.generic_params.iter().any(|generic| *generic == first_name);
+            }
+        }
+        syn::visit::visit_type_param_bound(self, node);
+    }
+}
+
+/// Rustdoc's structural representation omits `syn`'s turbofish marker, so
+/// `Tr<u8>` and `Tr::<u8>` would serialize identically and a notation
+/// difference the alias lexical contract must surface would silently vanish.
+/// The lexical path rejects the turbofish spelling instead of comparing it
+/// lossily.
+#[derive(Default)]
+struct TurbofishArgumentVisitor {
+    found: bool,
+}
+
+impl<'ast> Visit<'ast> for TurbofishArgumentVisitor {
+    fn visit_angle_bracketed_generic_arguments(
+        &mut self,
+        node: &'ast syn::AngleBracketedGenericArguments,
+    ) {
+        self.found |= node.colon2_token.is_some();
+        syn::visit::visit_angle_bracketed_generic_arguments(self, node);
+    }
+}
+
+fn reject_turbofish_generic_arguments_in_bound(syntax: &syn::TypeParamBound) -> Result<(), String> {
+    let mut visitor = TurbofishArgumentVisitor::default();
+    visitor.visit_type_param_bound(syntax);
+    if visitor.found {
+        Err("turbofish generic arguments are not supported by lexical type comparison".to_owned())
+    } else {
+        Ok(())
     }
 }
 
