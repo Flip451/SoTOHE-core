@@ -112,19 +112,24 @@ fn branch_ref_snapshot(repo: &SystemGitRepo) -> Result<BranchRefSnapshot, GitSta
     }
 
     // A symbolic branch ref can point to a different branch without changing
-    // its resolved object id. Keep the symbolic target and raw Git bytes so a
-    // retarget cannot evade this guard through lossy Unicode conversion.
+    // its resolved object id. Hash the symbolic target and raw Git bytes so a
+    // retarget cannot evade this guard through lossy Unicode conversion, and
+    // stream them into a fixed-size digest so the snapshot stays bounded no
+    // matter how many local heads the repository carries.
     let refs_args =
         ["for-each-ref", "--format=%(refname)%00%(objectname)%00%(symref)%00", "refs/heads"];
-    let branches = run_git(repo, &refs_args)?;
-    if !branches.status.success() {
-        return Err(command_failure(&refs_args, &branches));
+    let (refs_status, refs_digest, refs_stderr) = stream_git_output(repo, &refs_args)?;
+    if !refs_status.success() {
+        return Err(command_failure(
+            &refs_args,
+            &Output { status: refs_status, stdout: Vec::new(), stderr: refs_stderr },
+        ));
     }
 
     Ok(BranchRefSnapshot {
         branch: non_empty_output(&branch, "rev-parse --abbrev-ref HEAD")?,
         head: non_empty_output(&head, "rev-parse --verify HEAD")?,
-        branches: branches.stdout,
+        branches: refs_digest,
     })
 }
 
@@ -568,6 +573,36 @@ mod tests {
         adapter.execute(GitStashCommand::Pop).expect("large stash pop must succeed");
         assert_eq!(
             fs::read_to_string(first_artifact).expect("large untracked file must be restored"),
+            "saved\n"
+        );
+    }
+
+    #[test]
+    fn test_fs_git_stash_adapter_push_handles_large_branch_ref_snapshot() {
+        let _lock = cwd_lock().lock().expect("CWD lock must not be poisoned");
+        let repo = init_repo();
+        let suffix = "x".repeat(48);
+        for index in 0..320 {
+            run_git(repo.path(), &["branch", &format!("fixture-head-{index:04}-{suffix}")]);
+        }
+        let refs = output(
+            repo.path(),
+            &["for-each-ref", "--format=%(refname)%00%(objectname)%00%(symref)%00", "refs/heads"],
+        );
+        assert!(
+            refs.len() > MAX_STASH_OUTPUT_BYTES,
+            "fixture must exceed the former retained branch-ref bound"
+        );
+        fs::write(repo.path().join("untracked.txt"), "saved\n")
+            .expect("untracked file must be written");
+
+        let _cwd = CurrentDirGuard::enter(repo.path());
+        let adapter = FsGitStashAdapter::new();
+        adapter.execute(GitStashCommand::Push).expect("push must succeed with many local heads");
+        adapter.execute(GitStashCommand::Pop).expect("pop must succeed with many local heads");
+        assert_eq!(
+            fs::read_to_string(repo.path().join("untracked.txt"))
+                .expect("untracked file must be restored"),
             "saved\n"
         );
     }
