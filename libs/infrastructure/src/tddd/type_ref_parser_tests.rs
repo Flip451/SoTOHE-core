@@ -1149,6 +1149,16 @@ fn test_alias_lexical_gates_reject_additional_lossy_spellings() {
 }
 
 #[test]
+fn test_alias_lexical_gates_reject_empty_generic_argument_lists() {
+    // Rustdoc emits `args: null` for both `Tr<>` and `Tr`, so the explicit
+    // empty-list spelling must fail closed.
+    for spelling in ["Tr<>", "Outer<Inner<>>"] {
+        assert_alias_lexical_spelling_rejected_at_all_gates(spelling);
+    }
+    assert_alias_lexical_spelling_accepted_at_all_gates("Outer<Inner>");
+}
+
+#[test]
 fn test_alias_lexical_gates_reject_multiple_dyn_lifetimes() {
     // Rust permits only one explicit trait-object lifetime bound (E0226), and
     // the converter keeps only the first, so a second lifetime must fail closed.
