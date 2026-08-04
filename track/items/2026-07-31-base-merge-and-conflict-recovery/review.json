@@ -1499,6 +1499,20 @@
           "hash": "rvw1:sha256:35d90a70607f6f675bde85eefe973d585eb12db33bb40cf9d432cf0d65875de8",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-04T03:57:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:45f4996385e807c53f81918fb777448c539c6928bf6a8e51c4c814636c245177",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-04T04:00:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:45f4996385e807c53f81918fb777448c539c6928bf6a8e51c4c814636c245177",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -3028,6 +3042,393 @@
           "at": "2026-08-03T20:43:24Z",
           "findings": [],
           "hash": "rvw1:sha256:527e1c2830d921ea646c25f7d4c6090e2896c205d6b0c473fe70fcca481aa6d8",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T21:27:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e1809bc85fe911e60aaad6269d5b638a851cadcad417f01f6206554b95e4aee4",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-03T21:34:56Z",
+          "findings": [
+            {
+              "category": "data_corruption",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 483,
+              "message": "A markerless replacement proves only that the atomic exchange completed; it does not prove the retained trees are equivalent. If the post-exchange comparison detects a write through a pre-exchange descriptor into `replacement`, `retain_after_baseline_exchange` deliberately preserves both trees. On retry, this unconditional promotion skips that comparison, rebuilds from `active_track`, and eventually deletes the recovery slot after SyncBase, silently losing the retained write. Reconcile only expected telemetry differences and continue failing closed on other active/replacement divergence.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:e1809bc85fe911e60aaad6269d5b638a851cadcad417f01f6206554b95e4aee4",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T22:01:42Z",
+          "findings": [
+            {
+              "category": "concurrency/data_integrity",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 522,
+              "message": "`atomic_write_file` replaces the retained telemetry file after both logs were snapshotted. `retain_after_baseline_exchange` explicitly allows a writer with a pre-exchange descriptor to keep appending to this retained tree, but such writers do not share the metadata lock. An append after the read at line 504—or through the old descriptor after this rename—is written to an inode that this replacement unlinks; the subsequent comparison can then pass while the appended event is silently lost. Synchronize with telemetry writers or reconcile without replacing the live append-only file.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:de2736d2084ea6122bbb04a16831bece725496e8836778b9acd309885a058686",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T22:31:02Z",
+          "findings": [
+            {
+              "category": "concurrency/data_integrity",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 568,
+              "message": "The retained descriptor remains live after reconciliation, but the same retry later stages and deletes its recovery slot. An append through that descriptor after `reconcile_interrupted_replacement` returns exists only in `recovery_slot`; the new replacement is built from `active_track` without it, and this cleanup removes the sole copy (with later descriptor writes going to an unlinked inode). Reconcile or freeze the slot immediately before superseding it, or use synchronization shared by telemetry writers.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:b508f967cdfe33f9dfcf2df8b74cbbe352fae0a2872017dd21f699388563f048",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T23:05:38Z",
+          "findings": [
+            {
+              "category": "concurrency/data_integrity",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 670,
+              "message": "Renaming the hard link over `target` unlinks the target inode without synchronizing telemetry writers. A writer that opened the post-exchange active telemetry file before reconciliation can append after the snapshots or rename through that old descriptor; the append then exists only on the unlinked inode while subsequent checks read the source-linked path and pass. Establish the shared telemetry inode before the directory exchange or synchronize reconciliation with telemetry writers.",
+              "severity": "P0"
+            },
+            {
+              "category": "crash_recovery",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 670,
+              "message": "On Unix, if `source` and `target` already reference the same inode, renaming the newly created hard link over `target` succeeds as a no-op and leaves `.sotp-telemetry-link` behind. The new promotion flow reaches this state when active telemetry is already linked to retained recovery; the staging file is then copied into a later replacement, whose next reconciliation fails permanently at the existing-path check. Detect identical inodes and remove/skip the staging link, and reconcile orphaned staging entries on retries.",
+              "severity": "P1"
+            },
+            {
+              "category": "concurrency/data_integrity",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 568,
+              "message": "Non-telemetry equality is checked before the retained tree is promoted, but a writer holding a pre-exchange descriptor can modify that tree after the check. The next replacement is built from `active_track`, and this cleanup deletes the recovery slot containing the only copy of that late write. Synchronize all track writers or preserve the recovery slot until old-tree descriptors cannot introduce unmerged content.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:7636b0e7ba0c2fc1b28ab2ac3b3b765b79e45909af45795cd3c09b11ada84f6c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-03T23:39:24Z",
+          "findings": [
+            {
+              "category": "trusted-root violation",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 667,
+              "message": "The source and target paths are checked for symlinks only before the mutation, then `hard_link` and `rename` resolve them again by pathname. A concurrent replacement of either `logs` directory with a symlink can therefore create a hard link or overwrite `telemetry.jsonl` outside the trusted root. Perform these operations relative to no-follow directory descriptors (`linkat`/`renameat`) instead of re-resolving validated paths.",
+              "severity": "P0"
+            },
+            {
+              "category": "trusted-root violation",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 688,
+              "message": "`append_file_in_place` validates the parent and file by pathname, but subsequently opens the path after another process can replace an intermediate directory with a symlink. `O_NOFOLLOW` protects only the final component, so the append can corrupt a file outside `trusted_root`. Open each component relative to a trusted no-follow directory descriptor and append through that descriptor.",
+              "severity": "P0"
+            },
+            {
+              "category": "concurrency/data_integrity",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 563,
+              "message": "When `had_recovery` is true, non-telemetry verification compares only `active_track` with the current `replacement`; it never compares `recovery_slot`. A write through a descriptor to the earlier retained tree after `reconcile_interrupted_replacement`'s comparison follows that tree into `recovery_slot`, and this staging/cleanup path then deletes its only copy. Verify the recovery slot's non-baseline content before staging it or synchronize every writer that can retain an old-tree descriptor.",
+              "severity": "P0"
+            },
+            {
+              "category": "concurrency/liveness",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 236,
+              "message": "Telemetry reconciliation runs after `verify_non_baseline_content_matches`, even though that comparison includes `logs/telemetry.jsonl`. An ordinary append made after the replacement snapshot was copied therefore aborts publication before the code can establish the shared inode; because telemetry writers do not share this lock, recurring telemetry can continually block cleanup. Reconcile telemetry before the comparison, then fail closed on remaining non-telemetry drift.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:97505151bc472b7e25078a2f77552026d325ec14f6c32ed319ba1997f5632d39",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-04T00:34:45Z",
+          "findings": [
+            {
+              "category": "retry-correctness",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 521,
+              "message": "The retry path unconditionally deletes the retained recovery tree's `.sync-base.json` before comparing it with the new replacement. If a previous valid stamp exists in both trees and a later SyncBase-stage operation fails, the next retry removes only the recovery copy, so the comparison at line 558 necessarily fails and the retry cannot converge. This also mutates the recovery tree before subsequent validation can fail.",
+              "severity": "P1"
+            },
+            {
+              "category": "fail-closed-validation",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 521,
+              "message": "Production code treats the test-only root file `failure-telemetry.json` as append-only telemetry, although the actual telemetry contract uses `logs/telemetry.jsonl`. Any legitimate non-baseline artifact with this name is rewritten and hard-linked before drift verification, allowing prefix-related changes to bypass the fail-closed comparison. Remove this special case and make the regression test use the real telemetry path.",
+              "severity": "P1"
+            },
+            {
+              "category": "data-integrity",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 654,
+              "message": "Replacing the secondary telemetry entry with a hard link unlinks its previous inode. A `TelemetryWriter` already holding that secondary file open continues appending to the now-unlinked inode, so records written after reconciliation disappear when the descriptor closes. This occurs during retained-recovery promotion when the active track is reconciled as the secondary; reconciliation must coordinate writers or avoid replacing a potentially live inode.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:91965a4ffe5d40da624fd3474f09befd1b8553a71216470e524140cc01cfbd66",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-04T00:54:55Z",
+          "findings": [
+            {
+              "category": "data-integrity",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 649,
+              "message": "`telemetry_path_is_open` only scans `/proc/self/fd`, although the telemetry writer explicitly supports multi-process appends, and the scan is also racy with the later target rename. An external writer—or a writer that appends/closes between the snapshot and scan—can therefore be missed; replacing the secondary path then leaves subsequent writes on an unlinked inode and loses telemetry. Reconciliation must coordinate with all writers or avoid replacing a potentially writable target inode.",
+              "severity": "P1"
+            },
+            {
+              "category": "retry-correctness",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 525,
+              "message": "Adding `.sync-base.json` to the ignored-file set does not handle the supported failure case where that path is a directory: snapshot comparison applies ignored names only after the directory branch has already recursed. After a SyncBase failure preserves such a directory in recovery and the operator removes the active obstruction, every retry compares the retained directory against a replacement without it and fails permanently. The retry comparison must ignore or reconcile the top-level path regardless of node type.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:100e02cbedb69a84c611c249642f7360f28def0dfb8388b583cee9c7139a705a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-04T01:18:55Z",
+          "findings": [
+            {
+              "category": "concurrency/data_integrity",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 515,
+              "message": "Interrupted reconciliation still calls `reconcile_telemetry_inode` with `preserve_secondary = false`. If telemetry did not exist before the directory exchange but a long-lived `TelemetryWriter` creates the active file before a post-exchange failure, retry sees `(primary=None, secondary=Some)`, copies its bytes, and replaces the active entry with the primary inode. The writer retains the unlinked old inode, so subsequent events disappear. Preserve the active secondary inode or synchronize with telemetry writers.",
+              "severity": "P1"
+            },
+            {
+              "category": "crash_recovery",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 518,
+              "message": "The retained `.sync-base.json` is copied directly into the markerless `replacement` before recovery staging and promotion. If the process crashes or a later staging/rename operation fails, that modified replacement remains; on restart, `reconcile_interrupted_replacement` compares it against an active tree without the marker and fails before this normalization is reached again. This leaves the retry permanently blocked. Normalize through recoverable staging or record a phase that restart can reconcile.",
+              "severity": "P1"
+            },
+            {
+              "category": "concurrency/data_integrity",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 572,
+              "message": "The new recovery comparison remains a point-in-time check. A writer holding a descriptor to any non-telemetry file in the pre-exchange tree can append after verification; the following staging and cleanup delete that tree's sole link while active and replacement contain only the earlier snapshot. The append and all later descriptor writes are silently lost. Synchronize these writers or retain/merge the old recovery tree instead of deleting it after an unlocked comparison.",
+              "severity": "P0"
+            },
+            {
+              "category": "data_integrity",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 650,
+              "message": "`link_telemetry_inode` unconditionally unlinks the fixed name `logs/.sotp-telemetry-link`. During interrupted reconciliation the target parent is the live active track, so a pre-existing non-baseline artifact with that name is deleted before drift verification; a later error does not restore it. Use collision-safe staging or remove an existing entry only after verifying it is an orphan created by this operation.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0897edf4230ce7dedd632cf476cd9288dcb4568e5164260b91dfc7569889ee7e",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-04T01:41:26Z",
+          "findings": [
+            {
+              "category": "data_loss",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 624,
+              "message": "The previous recovery tree is deliberately retained at promotion so open descriptors remain reachable, but the immediately following SyncBase call invokes this helper again with both the pending tree and canonical slot present. This branch unconditionally deletes the pending tree, so descriptor-backed writes after promotion are unlinked and lost; the new regression test stops before SyncBase and misses this path. Reconcile or preserve the retained tree through SyncBase instead of deleting it.",
+              "severity": "P0"
+            },
+            {
+              "category": "recovery_correctness",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 646,
+              "message": "`link_telemetry_inode` relies on `renameat` to consume its staging hard link, but interrupted-publication retries normally have source and target telemetry already pointing to the same inode. POSIX rename then succeeds as a no-op, leaving `.sotp-telemetry-link-0` in the active tree; the subsequent non-baseline comparison sees the extra file and permanently blocks recovery. Detect identical inodes or explicitly remove the owned staging name after the rename.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:79a8e501d09a9a0c745bf9f407f74bbba8c8c82ae0aff5a291748333019d0e69",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-04T01:56:04Z",
+          "findings": [
+            {
+              "category": "data_loss",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 492,
+              "message": "When a markerless replacement is reconciled while a canonical recovery slot exists and the base staging directory is absent, the old slot is staged with `preserve == false` and deleted here immediately after installing the replacement. A process holding a descriptor to that prior recovery tree is then left writing to an unlinked inode, silently losing later writes—the same descriptor case `promote_baseline_recovery_slot` now explicitly preserves. Reconciliation must retain or safely merge that staged tree too.",
+              "severity": "P0"
+            },
+            {
+              "category": "resource_management",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 600,
+              "message": "After one failed SyncBase leaves the base pending directory, every later successful SyncBase selects a fresh `.sotp-baseline-recovery-current-<id>-N` path with `preserve == true`, and this early return prevents any generation from being removed. Each subsequent base merge therefore retains another complete recovery tree until disk exhaustion or the 10,000-name limit permanently blocks SyncBase. Add bounded reclamation/reconciliation that still protects live descriptors.",
+              "severity": "P1"
+            },
+            {
+              "category": "crash_recovery",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 646,
+              "message": "The post-rename unlink handles the successful same-inode case, but a crash or error after `linkat` and before that unlink leaves `.sotp-telemetry-link-N` behind. During interrupted-publication reconciliation this staging file is created inside the active track; the next retry skips it, creates another candidate, and then fails the non-baseline comparison on the original extra file indefinitely. Existing owned staging links must be recognized and reconciled on restart.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e7effc82d76bc9f062f46619ad18edb0132f0f372413c492e65b99ceb52119cc",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-04T02:06:49Z",
+          "findings": [
+            {
+              "category": "recovery_liveness",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 611,
+              "message": "A single failed SyncBase leaves the base retained directory; the next two baseline publications permanently retain `current-0` and `current-1`, and no path ever reclaims them. Every later publication with a canonical recovery slot therefore hits this limit and fails before SyncBase—even when the stamp value is an idempotent no-op—and retries cannot self-heal without manual deletion. The bounded policy needs a safe reconciliation/reclamation path rather than a permanent two-generation dead end.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:2f6d06857798be96fef6237f8151c476b00bdda1b9e3634fda74fe8d428c2133",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-04T02:26:14Z",
+          "findings": [
+            {
+              "category": "recovery_liveness",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 615,
+              "message": "`retain_open_file_inodes` always allocates a new `inode-N` hardlink for every regular file in every reclaimed generation, even when that inode is already retained, and nothing removes these links. Successful cleanup therefore consumes the fixed 10,000-name namespace cumulatively (later merges can retain two whole track trees); once it fills, all subsequent base-merge cleanups fail permanently with `retained descriptor link limit reached`. Deduplicate retained device/inode pairs or provide a bounded lifecycle that cannot exhaust across normal retries.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0d94bf885b576bdfa4c8e2f3238708c6fa67859e223ee08f5dd564ea8f266f6f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-04T02:35:29Z",
+          "findings": [
+            {
+              "category": "recovery_liveness",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 615,
+              "message": "The new device/inode check only deduplicates retries of the same staged inode. Each successful baseline generation normally creates fresh file inodes, and this function still adds permanent hardlinks for all of them while nothing removes `.sotp-retained-recovery-descriptors-*`. Once the cumulative 10,000-link namespace fills, cleanup returns `retained descriptor link limit reached`; the staged tree remains, so every later merge retries the same failing reclamation and cannot complete. Provide a bounded lifecycle for obsolete generations instead of retaining every distinct inode forever.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:384efd52d4350e4ecf6e9ebfd12a6e2dd3d8e28c0026f5761699f809524332f7",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-04T02:42:39Z",
+          "findings": [
+            {
+              "category": "data_loss",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 615,
+              "message": "When a descriptor-retention directory already exists, this function deletes it before linking the current generation. A writer can keep an older staged file descriptor open across another cleanup; deleting its last hardlink makes subsequent writes unreachable and permanently lost when that descriptor closes. The current test drops the writer before the next generation, so it misses this case. Preserve prior retained inodes while adding the new generation, or use a lifecycle that proves no older descriptors remain before unlinking them.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:91c0f46c450604b21c486ff0405e27e39dba032b283e3b75a5db8106ed5e246a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-04T02:57:45Z",
+          "findings": [
+            {
+              "category": "data_loss",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 616,
+              "message": "The stable per-relative-path link retains only the first inode. If a later recovery generation has the same path and an open writer, the existing target makes this function skip linking the newer inode; cleanup then removes its staging tree, so subsequent writes through that descriptor become unreachable and are lost. Each current/live inode must remain recoverable, not only the oldest inode at that path.",
+              "severity": "P0"
+            },
+            {
+              "category": "bounded_io",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 616,
+              "message": "The per-call entry and byte limits do not bound the persistent retained-descriptor tree: every newly encountered relative path adds a permanent hardlink, and existing retained content is never counted or reclaimed. Repeated merges with path churn can therefore grow disk and inode usage without bound.",
+              "severity": "P1"
+            },
+            {
+              "category": "recovery_liveness",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 616,
+              "message": "Keeping a permanent target entry for each relative path makes ordinary file-to-directory or directory-to-file changes fail cleanup. A later generation encounters the previous entry type, returns an error, and subsequent cleanup retries hit the same persistent conflict, preventing base-merge recovery from progressing.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:63b45a10b718f45b71012850bf63119e28bbb86410dcf13fc65057421c1b6bc6",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-04T03:28:12Z",
+          "findings": [
+            {
+              "category": "data_loss",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 623,
+              "message": "`reclaim_current_staging_paths` unconditionally deletes every retained `current-*` generation before allocating the next one. A failed SyncBase can deliberately leave one of these paths as the only link to that generation; if an open descriptor remains after the corresponding active file was replaced or removed, the next retry unlinks its inode and subsequent writes become irretrievable. A fixed generation count cannot safely bound descriptor lifetime this way.",
+              "severity": "P0"
+            },
+            {
+              "category": "recovery_liveness",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 646,
+              "message": "The hard-link replacement protocol is not crash-idempotent. When source and target already reference the same inode, POSIX rename is a no-op, leaving `.sotp-telemetry-link-*` present until the following unlink. A crash in that window can leave the extra entry inside a markerless replacement; restart verifies tree equality before re-entering this helper, so the unexpected entry makes every reconciliation retry fail.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e3f75065b7dab8eaca459a304f8b7aa691fd8f692e8d50450edd43948fb8065a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-04T03:40:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:aa6501d5617ebbb00aec8b73807da6ab562ab5f30dad2b663783ef42fa0dffc9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-04T03:51:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7d8074375549f139080ee6be42fd96c2d74c30cf38a27c1f60cbe1ccb1ce4f5a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-04T03:55:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7d8074375549f139080ee6be42fd96c2d74c30cf38a27c1f60cbe1ccb1ce4f5a",
           "type": "final",
           "verdict": "zero_findings"
         }

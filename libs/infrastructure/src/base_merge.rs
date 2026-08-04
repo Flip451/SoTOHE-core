@@ -55,8 +55,6 @@ use cleanup_tree::{
     copy_tree_with_baselines, remove_tree_bounded,
 };
 #[cfg(test)]
-use cleanup_tree::{copy_cleanup_inputs, replace_tree};
-#[cfg(test)]
 use publication::acquire_track_writer_lock;
 use publication::{
     PendingWriterLock, generated_baseline_file_names, path_exists, promote_baseline_recovery_slot,
@@ -702,6 +700,37 @@ mod tests {
     use std::sync::Arc;
 
     use domain::{BranchStrategySnapshot, MergeMethod, NonEmptyString, TrackMetadata};
+
+    fn copy_cleanup_inputs(
+        source_workspace: &Path,
+        target_workspace: &Path,
+        track_id: &str,
+    ) -> Result<(), String> {
+        let generated_baseline_files =
+            super::publication::generated_baseline_file_names(source_workspace)?;
+        super::copy_cleanup_inputs_with_baselines(
+            source_workspace,
+            target_workspace,
+            track_id,
+            &generated_baseline_files,
+        )
+    }
+
+    fn replace_tree(
+        source: &Path,
+        target: &Path,
+        include_baselines: bool,
+        trusted_target_root: &Path,
+    ) -> Result<(), String> {
+        super::remove_tree_bounded(target, trusted_target_root)?;
+        super::copy_tree_with_baselines(
+            source,
+            target,
+            include_baselines,
+            trusted_target_root,
+            &BTreeSet::new(),
+        )
+    }
 
     fn git(root: &Path, args: &[&str]) {
         crate::verify::test_support::git_with_identity(root, args);
@@ -1396,6 +1425,59 @@ mod tests {
         assert!(!replacement.exists(), "successful SyncBase must remove the recovery slot");
         remove_commit_pinned_worktree(root, &worktree).unwrap();
         let _ = std::fs::remove_dir_all(&worktree);
+    }
+
+    struct TelemetryAppendBaselineCapture {
+        live_track: std::path::PathBuf,
+    }
+
+    impl domain::tddd::catalogue_v2::RustdocBaselineCapturePort for TelemetryAppendBaselineCapture {
+        fn capture(
+            &self,
+            items_dir: &Path,
+            track_id: &TrackId,
+            rustdoc_workspace: &Path,
+            binding: &domain::tddd::catalogue_v2::TdddLayerBinding,
+            features: &[domain::tddd::CargoFeatureName],
+        ) -> Result<(), domain::tddd::catalogue_v2::BaselineCaptureIoError> {
+            let logs = self.live_track.join("logs");
+            std::fs::create_dir_all(&logs)
+                .and_then(|()| {
+                    std::fs::write(logs.join("telemetry.jsonl"), "{\"event\":\"appended\"}\n")
+                })
+                .map_err(|error| {
+                    domain::tddd::catalogue_v2::BaselineCaptureIoError(error.to_string())
+                })?;
+            FixtureBaselineCapture.capture(
+                items_dir,
+                track_id,
+                rustdoc_workspace,
+                binding,
+                features,
+            )
+        }
+    }
+
+    #[test]
+    fn test_fs_base_merge_cleanup_tolerates_operational_log_appends_during_capture()
+    -> Result<(), BaselineReplacementError> {
+        let fixture = setup_cleanup_repository();
+        let root = fixture.path();
+        let track_dir = root.join("track/items/cleanup-test");
+        std::fs::write(track_dir.join("domain-types-baseline.json"), "prior-valid-baseline")
+            .unwrap();
+        let request = usecase::base_merge::BaseMergeCleanupRequest {
+            workspace_root: root.to_path_buf(),
+            track_id: TrackId::try_new("cleanup-test").unwrap(),
+            base_branch: BaseBranchName::try_new("develop".to_owned()).unwrap(),
+            base_commit: CommitHash::try_new(current_commit(root, "develop^{commit}")).unwrap(),
+        };
+        let adapter = FsBaseMergeCleanupAdapter::with_baseline_capture(Arc::new(
+            TelemetryAppendBaselineCapture { live_track: track_dir.clone() },
+        ));
+
+        adapter.replace_baselines(&request)?;
+        Ok(())
     }
 
     #[test]

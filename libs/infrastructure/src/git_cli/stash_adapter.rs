@@ -1,7 +1,12 @@
 //! Filesystem/Git adapter for the guarded stash boundary.
 
-use std::process::{Output, Stdio};
+use std::io::Read;
+use std::process::{Child, ExitStatus, Output, Stdio};
+use std::sync::mpsc::{self, Receiver, RecvTimeoutError};
+use std::thread::{self, JoinHandle};
+use std::time::{Duration, Instant};
 
+use sha2::{Digest as _, Sha256};
 use usecase::git_stash::{GitStashCommand, GitStashError, GitStashPort};
 use usecase::git_workflow::DiagnosticText;
 
@@ -10,6 +15,9 @@ use super::{
 };
 
 const MAX_STASH_OUTPUT_BYTES: usize = 16 * 1024;
+const STASH_COMMAND_TIMEOUT: Duration = Duration::from_secs(10);
+const STASH_POLL_INTERVAL: Duration = Duration::from_millis(10);
+const STASH_PIPE_BUFFER_BYTES: usize = 8 * 1024;
 
 /// Concrete Git adapter for [`GitStashPort`].
 pub struct FsGitStashAdapter;
@@ -40,6 +48,11 @@ struct GuardedStashSnapshot {
     branch_refs: BranchRefSnapshot,
     stash: Vec<u8>,
     worktree: Vec<u8>,
+}
+
+struct StashPipeReader<T> {
+    receiver: Receiver<std::io::Result<T>>,
+    handle: JoinHandle<()>,
 }
 
 fn unavailable(detail: impl Into<String>) -> GitStashError {
@@ -127,13 +140,238 @@ fn stash_ref_snapshot(repo: &SystemGitRepo) -> Result<Vec<u8>, GitStashError> {
     Err(command_failure(&args, &output))
 }
 
+fn spawn_digest_reader(
+    mut pipe: impl Read + Send + 'static,
+) -> std::io::Result<StashPipeReader<Vec<u8>>> {
+    let (sender, receiver) = mpsc::sync_channel(1);
+    let handle =
+        thread::Builder::new().name("streaming-git-status-reader".to_owned()).spawn(move || {
+            let mut hasher = Sha256::new();
+            let mut buffer = [0_u8; STASH_PIPE_BUFFER_BYTES];
+            let result = loop {
+                match pipe.read(&mut buffer) {
+                    Ok(0) => break Ok(hasher.finalize().to_vec()),
+                    Ok(read) => {
+                        let Some(chunk) = buffer.get(..read) else {
+                            break Err(std::io::Error::other(
+                                "git status reader returned an invalid byte count",
+                            ));
+                        };
+                        hasher.update(chunk);
+                    }
+                    Err(error) => break Err(error),
+                }
+            };
+            drop(pipe);
+            let _ = sender.send(result);
+        })?;
+    Ok(StashPipeReader { receiver, handle })
+}
+
+fn spawn_bounded_stderr_reader(
+    mut pipe: impl Read + Send + 'static,
+) -> std::io::Result<StashPipeReader<Vec<u8>>> {
+    let (sender, receiver) = mpsc::sync_channel(1);
+    let handle = thread::Builder::new().name("bounded-git-status-stderr-reader".to_owned()).spawn(
+        move || {
+            let mut retained = Vec::new();
+            let mut buffer = [0_u8; STASH_PIPE_BUFFER_BYTES];
+            let result = loop {
+                match pipe.read(&mut buffer) {
+                    Ok(0) => break Ok(retained),
+                    Ok(read) => {
+                        let remaining = MAX_STASH_OUTPUT_BYTES.saturating_sub(retained.len());
+                        let taken = read.min(remaining);
+                        let Some(prefix) = buffer.get(..taken) else {
+                            break Err(std::io::Error::other(
+                                "git status stderr reader returned an invalid byte count",
+                            ));
+                        };
+                        retained.extend_from_slice(prefix);
+                        if taken < read {
+                            break Err(std::io::Error::other(
+                                "git status stderr exceeded its limit",
+                            ));
+                        }
+                    }
+                    Err(error) => break Err(error),
+                }
+            };
+            drop(pipe);
+            let _ = sender.send(result);
+        },
+    )?;
+    Ok(StashPipeReader { receiver, handle })
+}
+
+fn wait_for_stash_child(child: &mut Child, started: Instant) -> std::io::Result<ExitStatus> {
+    loop {
+        match child.try_wait()? {
+            Some(status) => return Ok(status),
+            None if started.elapsed() >= STASH_COMMAND_TIMEOUT => {
+                return Err(std::io::Error::new(
+                    std::io::ErrorKind::TimedOut,
+                    "git status timed out",
+                ));
+            }
+            None => thread::sleep(STASH_POLL_INTERVAL),
+        }
+    }
+}
+
+fn receive_stash_reader<T>(reader: &StashPipeReader<T>, started: Instant) -> std::io::Result<T> {
+    let remaining = STASH_COMMAND_TIMEOUT
+        .checked_sub(started.elapsed())
+        .ok_or_else(|| std::io::Error::new(std::io::ErrorKind::TimedOut, "git status timed out"))?;
+    match reader.receiver.recv_timeout(remaining) {
+        Ok(result) => result,
+        Err(RecvTimeoutError::Timeout) => {
+            Err(std::io::Error::new(std::io::ErrorKind::TimedOut, "git status timed out"))
+        }
+        Err(RecvTimeoutError::Disconnected) => {
+            Err(std::io::Error::other("git status reader disconnected"))
+        }
+    }
+}
+
+fn join_stash_readers(readers: Vec<StashPipeReader<Vec<u8>>>) -> std::io::Result<()> {
+    let mut first_error = None;
+    for reader in readers {
+        if reader.handle.join().is_err() && first_error.is_none() {
+            first_error = Some(std::io::Error::other("git status reader panicked"));
+        }
+    }
+    first_error.map_or(Ok(()), Err)
+}
+
+fn cleanup_stash_child(
+    child: &mut Child,
+    readers: Vec<StashPipeReader<Vec<u8>>>,
+) -> std::io::Result<()> {
+    let termination = super::terminate_bounded_git_child(child);
+    let readers = join_stash_readers(readers);
+    match (termination, readers) {
+        (Ok(()), Ok(())) => Ok(()),
+        (Err(error), Ok(())) | (Ok(()), Err(error)) => Err(error),
+        (Err(termination), Err(readers)) => Err(std::io::Error::other(format!(
+            "git status cleanup failed ({termination}); reader cleanup failed ({readers})"
+        ))),
+    }
+}
+
+fn stream_git_output(
+    repo: &SystemGitRepo,
+    args: &[&str],
+) -> Result<(ExitStatus, Vec<u8>, Vec<u8>), GitStashError> {
+    let command_label = args.join(" ");
+    let mut command = guarded_git_command();
+    command
+        .args(args)
+        .current_dir(repo.root())
+        .stdin(Stdio::null())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped());
+    let mut child = spawn_bounded_git_child(&mut command)
+        .map_err(|error| unavailable(format!("failed to spawn git {command_label}: {error}")))?;
+    let stdout = match child.stdout.take() {
+        Some(stdout) => stdout,
+        None => {
+            let cleanup = cleanup_stash_child(&mut child, Vec::new());
+            return Err(unavailable(format!(
+                "failed to stream git {command_label} stdout: missing pipe; cleanup: {cleanup:?}"
+            )));
+        }
+    };
+    let stderr = match child.stderr.take() {
+        Some(stderr) => stderr,
+        None => {
+            let cleanup = cleanup_stash_child(&mut child, Vec::new());
+            return Err(unavailable(format!(
+                "failed to stream git {command_label} stderr: missing pipe; cleanup: {cleanup:?}"
+            )));
+        }
+    };
+    let stdout_reader = match spawn_digest_reader(stdout) {
+        Ok(reader) => reader,
+        Err(error) => {
+            let cleanup = cleanup_stash_child(&mut child, Vec::new());
+            return Err(unavailable(format!(
+                "failed to start git {command_label} stdout reader: {error}; cleanup: {cleanup:?}"
+            )));
+        }
+    };
+    let stderr_reader = match spawn_bounded_stderr_reader(stderr) {
+        Ok(reader) => reader,
+        Err(error) => {
+            let cleanup = cleanup_stash_child(&mut child, vec![stdout_reader]);
+            return Err(unavailable(format!(
+                "failed to start git {command_label} stderr reader: {error}; cleanup: {cleanup:?}"
+            )));
+        }
+    };
+    let readers = vec![stdout_reader, stderr_reader];
+    let started = Instant::now();
+    let status = match wait_for_stash_child(&mut child, started) {
+        Ok(status) => status,
+        Err(error) => {
+            let cleanup = cleanup_stash_child(&mut child, readers);
+            return Err(unavailable(format!(
+                "failed to collect git {command_label}: {error}; cleanup: {cleanup:?}"
+            )));
+        }
+    };
+    let digest = match readers.first() {
+        Some(reader) => match receive_stash_reader(reader, started) {
+            Ok(digest) => digest,
+            Err(error) => {
+                let cleanup = cleanup_stash_child(&mut child, readers);
+                return Err(unavailable(format!(
+                    "failed to read git {command_label} stdout: {error}; cleanup: {cleanup:?}"
+                )));
+            }
+        },
+        None => {
+            let cleanup = cleanup_stash_child(&mut child, readers);
+            return Err(unavailable(format!(
+                "git {command_label} stdout reader was missing; cleanup: {cleanup:?}"
+            )));
+        }
+    };
+    let stderr = match readers.get(1) {
+        Some(reader) => match receive_stash_reader(reader, started) {
+            Ok(stderr) => stderr,
+            Err(error) => {
+                let cleanup = cleanup_stash_child(&mut child, readers);
+                return Err(unavailable(format!(
+                    "failed to read git {command_label} stderr: {error}; cleanup: {cleanup:?}"
+                )));
+            }
+        },
+        None => {
+            let cleanup = cleanup_stash_child(&mut child, readers);
+            return Err(unavailable(format!(
+                "git {command_label} stderr reader was missing; cleanup: {cleanup:?}"
+            )));
+        }
+    };
+    if let Err(error) = join_stash_readers(readers) {
+        return Err(unavailable(format!("failed to join git {command_label} readers: {error}")));
+    }
+    Ok((status, digest, stderr))
+}
+
 fn worktree_snapshot(repo: &SystemGitRepo) -> Result<Vec<u8>, GitStashError> {
     let args = ["status", "--porcelain=v1", "-z", "--untracked-files=all"];
-    let output = run_git(repo, &args)?;
-    if !output.status.success() {
-        return Err(command_failure(&args, &output));
+    let (status, digest, stderr) = stream_git_output(repo, &args)?;
+    if !status.success() {
+        return Err(command_failure(&args, &Output { status, stdout: Vec::new(), stderr }));
     }
-    Ok(output.stdout)
+    Ok(digest)
+}
+
+fn run_git_operation(repo: &SystemGitRepo, args: &[&str]) -> Result<Output, GitStashError> {
+    let (status, _stdout_digest, stderr) = stream_git_output(repo, args)?;
+    Ok(Output { status, stdout: Vec::new(), stderr })
 }
 
 fn guarded_stash_snapshot(repo: &SystemGitRepo) -> Result<GuardedStashSnapshot, GitStashError> {
@@ -182,7 +420,7 @@ impl GitStashPort for FsGitStashAdapter {
             GitStashCommand::Push => &["stash", "push", "--include-untracked"],
             GitStashCommand::Pop => &["stash", "pop"],
         };
-        let output = match run_git(&repo, args) {
+        let output = match run_git_operation(&repo, args) {
             Ok(output) => output,
             Err(error) => {
                 return Err(re_adjudicate_after_uncertain_operation(&repo, &before, args, &error));
@@ -214,7 +452,8 @@ mod tests {
     use std::sync::{Mutex, OnceLock};
 
     use super::{
-        FsGitStashAdapter, guarded_stash_snapshot, re_adjudicate_after_uncertain_operation,
+        FsGitStashAdapter, MAX_STASH_OUTPUT_BYTES, guarded_stash_snapshot,
+        re_adjudicate_after_uncertain_operation,
     };
     use crate::git_cli::SystemGitRepo;
     use usecase::git_stash::{GitStashCommand, GitStashError, GitStashPort};
@@ -296,6 +535,39 @@ mod tests {
         assert_eq!(
             fs::read_to_string(repo.path().join("untracked.txt"))
                 .expect("untracked file must be restored"),
+            "saved\n"
+        );
+    }
+
+    #[test]
+    fn test_fs_git_stash_adapter_push_handles_large_worktree_snapshot() {
+        let _lock = cwd_lock().lock().expect("CWD lock must not be poisoned");
+        let repo = init_repo();
+        fs::write(repo.path().join("tracked.txt"), "changed\n").expect("tracked file must change");
+        let suffix = "x".repeat(48);
+        for index in 0..400 {
+            fs::write(
+                repo.path().join(format!("untracked-artifact-{index:04}-{suffix}")),
+                "saved\n",
+            )
+            .expect("large untracked fixture file must be written");
+        }
+        let status =
+            output(repo.path(), &["status", "--porcelain=v1", "-z", "--untracked-files=all"]);
+        assert!(
+            status.len() > MAX_STASH_OUTPUT_BYTES,
+            "fixture must exceed the former retained status bound"
+        );
+        let first_artifact = repo.path().join(format!("untracked-artifact-0000-{suffix}"));
+
+        let _cwd = CurrentDirGuard::enter(repo.path());
+        let adapter = FsGitStashAdapter::new();
+        adapter.execute(GitStashCommand::Push).expect("large stash push must succeed");
+        assert!(!first_artifact.exists());
+
+        adapter.execute(GitStashCommand::Pop).expect("large stash pop must succeed");
+        assert_eq!(
+            fs::read_to_string(first_artifact).expect("large untracked file must be restored"),
             "saved\n"
         );
     }

@@ -113,3 +113,26 @@ baseline の陳腐化であり、conflict hunk のない base 由来ドリフト
   guarded 経路を一切迂回しない読み取り専用の rustdoc export 用である。
 - 再捕捉後、`signal calc-impl-catalog` / `task-contract coverage` / `task-contract check` は
   すべて通過。catalogue・task-contract・impl-plan への編集は一切行っていない。
+
+## 2026-08-04 — PR レビュー P1 対応の非収束とアプローチ転換（艦隊処方箋）
+
+PR #236 の review cycle round 8 の 2 P1（publication の retry ブロック窓 / stash snapshot の
+16KiB 上限）への fix ループが、infrastructure scope 累計 115 レビューラウンド・findings 1〜4 の
+振動状態に陥った。直近の findings はすべて fix 中に発明された `retain_open_file_inodes` /
+descriptor-retention hardlink 機構の別々の穴であり、艦隊処方箋
+（`tmp/handoff/2026-08-04-stash-retention-prescription.md`）に基づき以下を実施した。
+
+- fix ループを即時停止し、未コミットの retention 精巧化（`publication.rs` 441→1141 行、
+  `base_merge.rs` の付随変更）を破棄して HEAD（`fef26ec6`）へ復元した。破棄 diff は
+  scratchpad に退避済み。
+- stash 側の未コミット変更は P1 の原方針（porcelain 出力の保持をやめ SHA-256 streaming
+  digest 化、400-file 回帰テスト付き）どおりのため維持した。
+- publication 側は「保持をやめる」設計で最小に再設計した: track dir 直下の `logs/`
+  （機械追記の telemetry、gitignored 運用状態）を publication drift 比較から構造的に除外
+  （`cleanup_tree.rs` の snapshot 収集で skip）。これにより「telemetry 追記が retained tree
+  との等価比較を恒久的に破る」問題クラス全体が stateless に消滅し、retention 機構は不要。
+- 既知のトレードオフ: capture 中の並行 telemetry 追記は exchange で失われ得る（診断ログ
+  のみ・gitignored）。実体保持が本当に要る要件が示されるなら、それは実装判断ではなく
+  User 裁定として提起する。
+- 蓄積 findings（世代重複・並行 writer・file↔dir 変化等）は hash/除外設計では構造的に
+  発生しないクラスであり、回帰観点チェックリストとしてこの記録に保持する。

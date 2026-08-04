@@ -27,22 +27,6 @@ use crate::conventions_resolve::directory_walk::{
     ListingError, bounded_entries, open_directory_at,
 };
 
-#[cfg(test)]
-pub(super) fn copy_cleanup_inputs(
-    source_workspace: &Path,
-    target_workspace: &Path,
-    track_id: &str,
-) -> Result<(), String> {
-    let generated_baseline_files =
-        super::publication::generated_baseline_file_names(source_workspace)?;
-    copy_cleanup_inputs_with_baselines(
-        source_workspace,
-        target_workspace,
-        track_id,
-        &generated_baseline_files,
-    )
-}
-
 pub(super) fn copy_cleanup_inputs_with_baselines(
     source_workspace: &Path,
     target_workspace: &Path,
@@ -76,23 +60,6 @@ pub(super) fn copy_cleanup_inputs_with_baselines(
         generated_baseline_files,
     )?;
     remove_baseline_files(&target_track, generated_baseline_files)
-}
-
-#[cfg(test)]
-pub(super) fn replace_tree(
-    source: &Path,
-    target: &Path,
-    include_baselines: bool,
-    trusted_target_root: &Path,
-) -> Result<(), String> {
-    remove_tree_bounded(target, trusted_target_root)?;
-    copy_tree_with_baselines(
-        source,
-        target,
-        include_baselines,
-        trusted_target_root,
-        &BTreeSet::new(),
-    )
 }
 
 pub(super) fn remove_tree_bounded(path: &Path, trusted_root: &Path) -> Result<(), String> {
@@ -136,10 +103,8 @@ fn collect_removal_snapshot(
     let kind = if metadata.file_type().is_symlink() {
         RemovalEntryKind::Symlink
     } else if metadata.is_file() {
-        if metadata.is_file() {
-            budget.file_limit(path, metadata.len())?;
-            budget.consume_file(path, metadata.len())?;
-        }
+        budget.file_limit(path, metadata.len())?;
+        budget.consume_file(path, metadata.len())?;
         RemovalEntryKind::File
     } else if metadata.is_dir() {
         RemovalEntryKind::Directory
@@ -338,6 +303,12 @@ fn collect_non_baseline_snapshot_at(
             ));
         }
         if entry.is_dir {
+            if is_operational_log_directory(&child_relative) {
+                // Gitignored telemetry grows between retained-snapshot retries;
+                // it has no publication-drift meaning.
+                budget.inspect_entry(&child_path, depth + 1)?;
+                continue;
+            }
             let nested_directory = open_directory_at(&directory, &entry.name).map_err(|error| {
                 format!("cannot open track snapshot directory {}: {error}", child_path.display())
             })?;
@@ -401,6 +372,12 @@ fn open_snapshot_leaf_at_nofollow(parent: &fs::File, name: &Path) -> std::io::Re
     )
     .map(fs::File::from)
     .map_err(std::io::Error::from)
+}
+
+/// Gitignored machine telemetry under the track-root `logs/` directory is
+/// excluded from publication drift comparison.
+fn is_operational_log_directory(relative: &Path) -> bool {
+    relative == Path::new("logs")
 }
 
 fn is_ignored_publication_file(
