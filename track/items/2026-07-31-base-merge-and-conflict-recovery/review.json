@@ -3509,6 +3509,35 @@
           "hash": "rvw1:sha256:ab31902527c03dd5f067cfa288167b6cee39ae932baa7ed2438422762e85a56b",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-04T05:49:33Z",
+          "findings": [
+            {
+              "category": "unbounded I/O",
+              "file": "libs/infrastructure/src/verify/spec_states.rs",
+              "line": 339,
+              "message": "The new baseline validation uses unbounded `std::fs::read`, allowing an oversized baseline file to exhaust verifier memory and bypassing the repository's bounded-I/O policy. Read the baseline through the existing limited reader with the established rustdoc-baseline size cap.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:670b070d49115e6ac9c32e61b37a01ea5c262fa51909ab944305e3c9a7c29daa",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-04T05:56:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7c44f4e08ea2028f961dcb7e349b982192acb5836129ab639de92f268ba2955b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-04T06:05:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7c44f4e08ea2028f961dcb7e349b982192acb5836129ab639de92f268ba2955b",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },

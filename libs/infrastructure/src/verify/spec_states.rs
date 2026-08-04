@@ -4,6 +4,7 @@
 //! reads the sibling `domain-types.json` and verifies its entries.
 //! Otherwise falls back to the markdown table scan (legacy path).
 
+use std::io::Read as _;
 use std::path::{Path, PathBuf};
 
 use domain::spec::{SpecDocument, check_spec_doc_signals};
@@ -16,6 +17,8 @@ use crate::track::symlink_guard;
 use super::frontmatter::parse_yaml_frontmatter;
 use super::path_safety::check_signals_file;
 use super::tddd_layers::{TdddLayerBinding, parse_tddd_layers};
+
+const MAX_RUSTDOC_JSON_BYTES: usize = 64 * 1024 * 1024;
 
 /// Verifies spec.json Stage 1 signals (chain ① `check-spec-adr`).
 ///
@@ -317,6 +320,45 @@ fn evaluate_layer_catalogue(
                     current_hash.as_digest().as_str()
                 ))]);
             }
+            // A baseline recapture (e.g. a clean merge-base) changes reverse
+            // filtering without touching the catalogue, so the cached signals
+            // are only current when the baseline hash also matches.
+            let baseline_path = dir.join(binding.baseline_file());
+            match symlink_guard::reject_symlinks_below(&baseline_path, trusted_root) {
+                Ok(true) => {}
+                Ok(false) => {
+                    return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+                        "{} not found — run `sotp track baseline-capture` before gating cached signals",
+                        baseline_path.display()
+                    ))]);
+                }
+                Err(e) => {
+                    return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+                        "{}: {e}",
+                        baseline_path.display()
+                    ))]);
+                }
+            }
+            let baseline_bytes =
+                match read_bytes_file_limited(&baseline_path, MAX_RUSTDOC_JSON_BYTES) {
+                    Ok(b) => b,
+                    Err(e) => {
+                        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+                            "cannot read {}: {e}",
+                            baseline_path.display()
+                        ))]);
+                    }
+                };
+            let current_baseline_hash = type_signals_codec::baseline_hash(&baseline_bytes);
+            if *doc.cache_key().baseline_hash() != current_baseline_hash {
+                return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+                    "{}: baseline_hash mismatch (recorded={}, current={}) — \
+                     re-run `sotp signal calc-impl-catalog` to refresh the evaluation result",
+                    signal_path.display(),
+                    doc.cache_key().baseline_hash().as_digest().as_str(),
+                    current_baseline_hash.as_digest().as_str()
+                ))]);
+            }
             doc
         }
         Ok(false) => {
@@ -339,6 +381,29 @@ fn evaluate_layer_catalogue(
 
     let strictness = if strict { Strictness::Strict } else { Strictness::Interim };
     check_type_signals(&signals_doc, strictness)
+}
+
+fn read_bytes_file_limited(path: &Path, maximum_bytes: usize) -> Result<Vec<u8>, std::io::Error> {
+    let metadata = std::fs::metadata(path)?;
+    if metadata.len() > maximum_bytes as u64 {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::InvalidData,
+            "file exceeds maximum size",
+        ));
+    }
+
+    let mut file = std::fs::File::open(path)?;
+    let mut bytes = Vec::new();
+    std::io::Read::by_ref(&mut file)
+        .take((maximum_bytes as u64).saturating_add(1))
+        .read_to_end(&mut bytes)?;
+    if bytes.len() > maximum_bytes {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::InvalidData,
+            "file exceeds maximum size",
+        ));
+    }
+    Ok(bytes)
 }
 
 /// Evaluate chain ③ (`check-impl-catalog`) gate for a single layer with explicit paths.
@@ -587,12 +652,22 @@ mod tests {
             .as_digest()
             .as_str()
             .to_owned();
+        let baseline_bytes: &[u8] = b"fixture-baseline";
+        let baseline_name = format!(
+            "{}-baseline.json",
+            catalogue_name.strip_suffix(".json").unwrap_or(catalogue_name)
+        );
+        std::fs::write(track_dir.join(baseline_name), baseline_bytes).unwrap();
+        let baseline_hash = crate::tddd::type_signals_codec::baseline_hash(baseline_bytes)
+            .as_digest()
+            .as_str()
+            .to_owned();
         let signal_file = serde_json::json!({
             "schema_version": 4,
             "generated_at": "2026-04-18T12:00:00Z",
             "declaration_hash": hash,
             "implementation_input_hash": hash,
-            "baseline_hash": hash,
+            "baseline_hash": baseline_hash,
             "signals": signals_array,
         });
         let encoded = serde_json::to_string_pretty(&signal_file).unwrap();
@@ -1556,6 +1631,55 @@ mod tests {
     }
 
     #[test]
+    fn test_signal_file_with_stale_baseline_hash_fails_closed() {
+        // A baseline recapture (e.g. a clean merge-base) changes reverse
+        // filtering without touching the catalogue; the cached signals must
+        // fail closed instead of gating an obsolete result.
+        let dir = tempfile::tempdir().unwrap();
+        write_domain_tddd_rules(dir.path());
+        let spec_json_path = dir.path().join("spec.json");
+        std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
+        std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS)
+            .unwrap();
+        write_matching_signal_file(dir.path(), "domain-types.json", "domain-type-signals.json");
+        std::fs::write(dir.path().join("domain-types-baseline.json"), b"recaptured-baseline")
+            .unwrap();
+
+        let outcome =
+            verify_type_signals_from_spec_json(spec_json_path, false, dir.path().to_path_buf());
+
+        assert!(
+            outcome.has_errors(),
+            "a recaptured baseline must stale the cached signals: {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_signal_file_with_oversized_baseline_fails_closed() {
+        let dir = tempfile::tempdir().unwrap();
+        write_domain_tddd_rules(dir.path());
+        let spec_json_path = dir.path().join("spec.json");
+        std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
+        std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS)
+            .unwrap();
+        write_matching_signal_file(dir.path(), "domain-types.json", "domain-type-signals.json");
+
+        let baseline_path = dir.path().join("domain-types-baseline.json");
+        let baseline = std::fs::File::create(&baseline_path).unwrap();
+        baseline.set_len((MAX_RUSTDOC_JSON_BYTES as u64).saturating_add(1)).unwrap();
+
+        let outcome =
+            verify_type_signals_from_spec_json(spec_json_path, false, dir.path().to_path_buf());
+        let debug = format!("{outcome:?}");
+
+        assert!(outcome.has_errors(), "an oversized baseline must fail closed: {outcome:?}");
+        assert!(
+            debug.contains("file exceeds maximum size"),
+            "the oversized baseline must be rejected by the bounded reader: {debug}"
+        );
+    }
+
+    #[test]
     fn test_signal_file_overrides_inline_declaration_signals() {
         // Stage 2 (chain ③): when the signal file carries Blue signals but the
         // declaration file has stale Red inline signals, the evaluation result
@@ -1573,13 +1697,18 @@ mod tests {
         let decl_bytes = std::fs::read(dir.path().join("domain-types.json")).unwrap();
         let hash = crate::tddd::type_signals_codec::declaration_hash(&decl_bytes);
         let digest = hash.as_digest().as_str().to_owned();
+        std::fs::write(dir.path().join("domain-types-baseline.json"), b"fixture-baseline").unwrap();
+        let baseline_digest = crate::tddd::type_signals_codec::baseline_hash(b"fixture-baseline")
+            .as_digest()
+            .as_str()
+            .to_owned();
         let blue_signal_file = format!(
             r#"{{
               "schema_version": 4,
               "generated_at": "2026-04-18T12:00:00Z",
               "declaration_hash": "{digest}",
               "implementation_input_hash": "{digest}",
-              "baseline_hash": "{digest}",
+              "baseline_hash": "{baseline_digest}",
               "signals": [
                 {{
                   "type_name": "TrackId",
