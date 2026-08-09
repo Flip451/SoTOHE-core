@@ -232,7 +232,8 @@
     {
       "id": "T042",
       "description": "`cli:ReviewCommand` の final shape を排他的に統合し、legacy variant removal、`CheckZeroFindings` の追加、`CheckApproved` payload の `ReviewCheckApprovedArgs` rename を実装する。`apps/cli-driver/src/review.rs` の `ReviewCheckZeroFindingsInput` から usecase query への fallible conversion と CLI caller integration、dispatch / tests を更新する。既存 `review check-approved` 経路の互換性検証 tests を更新する。CN-06、AC-16、AC-17。",
-      "status": "in_progress",
+      "status": "done",
+      "commit_hash": "731a2f250aaa49af9defd0956290f1925d14651d",
       "depends_on": [
         "T038"
       ]
@@ -254,7 +255,7 @@
     {
       "id": "T040",
       "description": "`.harness/config/phase-commands.json` を phase ごとの convergence matrix に更新し、`apps/cli/src/commands/phase.rs` に phase-entry fixture / integration tests を追加する。IN-12、CN-06、AC-14、AC-16。",
-      "status": "todo",
+      "status": "in_progress",
       "depends_on": [
         "T038",
         "T039",

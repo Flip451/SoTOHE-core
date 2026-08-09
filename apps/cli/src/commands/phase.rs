@@ -79,6 +79,7 @@ mod tests {
     use std::fs;
     use std::io::{Read, Seek, SeekFrom, Write};
     use std::os::fd::AsRawFd;
+    use std::os::unix::fs::PermissionsExt;
     use std::path::Path;
     use std::str::FromStr;
     use std::sync::{Arc, Mutex};
@@ -217,6 +218,26 @@ mod tests {
 
     fn write_phase_config(config_path: &std::path::Path, source: &str) {
         fs::write(config_path, source).expect("phase config is written");
+    }
+
+    fn write_phase_entry_fixture(repository_root: &Path) {
+        let bin_dir = repository_root.join("bin");
+        fs::create_dir_all(&bin_dir).expect("fixture bin directory is created");
+        let fixture = bin_dir.join("sotp");
+        fs::write(
+            &fixture,
+            r#"#!/bin/sh
+printf '%s\n' "$*" >> phase-audit.txt
+if [ "$*" = "ref-verify check-approved --chain 1" ] && [ -f fail-chain-1 ]; then
+    exit 1
+fi
+"#,
+        )
+        .expect("phase entry fixture is written");
+        let mut permissions =
+            fs::metadata(&fixture).expect("fixture metadata is read").permissions();
+        permissions.set_mode(0o755);
+        fs::set_permissions(&fixture, permissions).expect("phase entry fixture is executable");
     }
 
     fn capture_cli_output<T>(run: impl FnOnce() -> T) -> (T, String, String) {
@@ -506,6 +527,189 @@ mod tests {
             )
         });
         assert_eq!(exit, std::process::ExitCode::FAILURE);
+    }
+
+    #[test]
+    fn test_phase_enter_type_design_matrix_failure_blocks_remaining_checks_and_writer() {
+        let _process_guard = process_env_lock().lock().expect("test process lock");
+        let repository = tempfile::tempdir().expect("temporary repository is created");
+        let config_dir = repository.path().join(".harness/config");
+        fs::create_dir_all(&config_dir).expect("phase config directory is created");
+        write_phase_entry_fixture(repository.path());
+        write_phase_config(
+            &config_dir.join("phase-commands.json"),
+            r#"{
+                "schema_version": 1,
+                "phases": [{
+                    "id": "type-design",
+                    "writer": {
+                        "argv": ["bin/sotp", "capability", "exec", "type-designer"]
+                    },
+                    "pre_entry_commands": [
+                        {
+                            "argv": ["bin/sotp", "signal", "check-spec-adr", "--gate", "commit"]
+                        },
+                        {
+                            "argv": ["bin/sotp", "ref-verify", "check-approved", "--chain", "1"]
+                        },
+                        {
+                            "argv": [
+                                "bin/sotp", "review", "check-zero-findings", "--scope", "spec",
+                                "--round", "final"
+                            ]
+                        }
+                    ]
+                }]
+            }"#,
+        );
+        fs::write(repository.path().join("fail-chain-1"), "blocked")
+            .expect("failing convergence check is configured");
+
+        let exit = run_in_dir(repository.path(), || {
+            execute_with_driver(
+                PhaseCommand::Enter(PhaseEnterArgs {
+                    phase_id: PhaseIdArg::from_str("type-design").expect("valid phase id"),
+                    host: None,
+                }),
+                &PhaseCompositionRoot.build(),
+            )
+        });
+
+        assert_eq!(exit, std::process::ExitCode::FAILURE);
+        assert_eq!(
+            fs::read_to_string(repository.path().join("phase-audit.txt"))
+                .expect("blocked phase entry is recorded"),
+            "signal check-spec-adr --gate commit\nref-verify check-approved --chain 1\n"
+        );
+    }
+
+    #[test]
+    fn test_phase_enter_type_design_matrix_success_runs_every_check_then_writer() {
+        let _process_guard = process_env_lock().lock().expect("test process lock");
+        let repository = tempfile::tempdir().expect("temporary repository is created");
+        let config_dir = repository.path().join(".harness/config");
+        fs::create_dir_all(&config_dir).expect("phase config directory is created");
+        write_phase_entry_fixture(repository.path());
+        write_phase_config(
+            &config_dir.join("phase-commands.json"),
+            r#"{
+                "schema_version": 1,
+                "phases": [{
+                    "id": "type-design",
+                    "writer": {
+                        "argv": ["bin/sotp", "capability", "exec", "type-designer"]
+                    },
+                    "pre_entry_commands": [
+                        {
+                            "argv": ["bin/sotp", "signal", "check-spec-adr", "--gate", "commit"]
+                        },
+                        {
+                            "argv": ["bin/sotp", "ref-verify", "check-approved", "--chain", "1"]
+                        },
+                        {
+                            "argv": [
+                                "bin/sotp", "review", "check-zero-findings", "--scope", "spec",
+                                "--round", "final"
+                            ]
+                        }
+                    ]
+                }]
+            }"#,
+        );
+
+        let exit = run_in_dir(repository.path(), || {
+            execute_with_driver(
+                PhaseCommand::Enter(PhaseEnterArgs {
+                    phase_id: PhaseIdArg::from_str("type-design").expect("valid phase id"),
+                    host: None,
+                }),
+                &PhaseCompositionRoot.build(),
+            )
+        });
+
+        assert_eq!(exit, std::process::ExitCode::SUCCESS);
+        assert_eq!(
+            fs::read_to_string(repository.path().join("phase-audit.txt"))
+                .expect("completed phase entry is recorded"),
+            concat!(
+                "signal check-spec-adr --gate commit\n",
+                "ref-verify check-approved --chain 1\n",
+                "review check-zero-findings --scope spec --round final\n",
+                "capability exec type-designer\n"
+            )
+        );
+    }
+
+    #[test]
+    fn test_shipped_phase_commands_declare_direct_upstream_convergence_matrix() {
+        let config: serde_json::Value =
+            serde_json::from_str(include_str!("../../../../.harness/config/phase-commands.json"))
+                .expect("shipped phase config is valid JSON");
+        let phases = config
+            .get("phases")
+            .and_then(serde_json::Value::as_array)
+            .expect("phase declarations are an array");
+
+        let commands_for = |phase_id: &str| {
+            phases
+                .iter()
+                .find(|phase| phase.get("id").and_then(serde_json::Value::as_str) == Some(phase_id))
+                .unwrap_or_else(|| panic!("{phase_id} declaration is present"))
+                .get("pre_entry_commands")
+                .and_then(serde_json::Value::as_array)
+                .expect("pre-entry commands are an array")
+                .iter()
+                .map(|command| command.get("argv").expect("command argv is present").clone())
+                .collect::<Vec<_>>()
+        };
+
+        assert_eq!(
+            commands_for("spec-design"),
+            vec![
+                serde_json::json!(["bin/sotp", "signal", "check-adr-user", "--gate", "commit"]),
+                serde_json::json!([
+                    "bin/sotp",
+                    "review",
+                    "check-zero-findings",
+                    "--scope",
+                    "adr",
+                    "--round",
+                    "final"
+                ]),
+            ]
+        );
+        assert_eq!(
+            commands_for("type-design"),
+            vec![
+                serde_json::json!(["bin/sotp", "signal", "check-spec-adr", "--gate", "commit"]),
+                serde_json::json!(["bin/sotp", "ref-verify", "check-approved", "--chain", "1"]),
+                serde_json::json!([
+                    "bin/sotp",
+                    "review",
+                    "check-zero-findings",
+                    "--scope",
+                    "spec",
+                    "--round",
+                    "final"
+                ]),
+            ]
+        );
+        assert_eq!(
+            commands_for("impl-plan"),
+            vec![
+                serde_json::json!(["bin/sotp", "signal", "check-catalog-spec", "--gate", "commit"]),
+                serde_json::json!(["bin/sotp", "ref-verify", "check-approved", "--chain", "2"]),
+                serde_json::json!([
+                    "bin/sotp",
+                    "review",
+                    "check-zero-findings",
+                    "--scope",
+                    "types",
+                    "--round",
+                    "final"
+                ]),
+            ]
+        );
     }
 
     #[test]
