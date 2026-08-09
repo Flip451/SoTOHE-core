@@ -579,7 +579,7 @@ mod tests {
     use super::run_cli_with;
     use super::{Cli, CliCommand, run_cli};
     use crate::commands::dry::DryCommand;
-    use crate::commands::ref_verify::RefVerifyCommand;
+    use crate::commands::ref_verify::{RefVerifyCheckChainArg, RefVerifyCommand};
     use crate::commands::track::test_support::{process_env_lock, run_in_dir, seed_repo};
 
     const MINIMAL_RULES: &str = r#"{
@@ -836,13 +836,20 @@ mod tests {
         }
     }
 
-    /// `sotp ref-verify check-approved --track-id x` must resolve to
+    /// `sotp ref-verify check-approved --chain 1 --track-id x` must resolve to
     /// `CliCommand::RefVerify { cmd: RefVerifyCommand::CheckApproved }`.
     #[test]
     fn test_ref_verify_dispatch_check_approved_routes_to_ref_verify_check_approved_variant() {
-        let cli =
-            Cli::try_parse_from(["sotp", "ref-verify", "check-approved", "--track-id", "my-track"])
-                .unwrap();
+        let cli = Cli::try_parse_from([
+            "sotp",
+            "ref-verify",
+            "check-approved",
+            "--chain",
+            "1",
+            "--track-id",
+            "my-track",
+        ])
+        .unwrap();
         let exit = run_cli_with(
             cli,
             |_cmd| ExitCode::FAILURE,
@@ -850,6 +857,7 @@ mod tests {
                 match cmd {
                     RefVerifyCommand::CheckApproved(args) => {
                         assert_eq!(args.track_id.as_deref(), Some("my-track"));
+                        assert_eq!(args.chain, RefVerifyCheckChainArg::Chain1);
                     }
                     other => panic!("expected CheckApproved, got {other:?}"),
                 }
@@ -859,16 +867,24 @@ mod tests {
         assert_eq!(exit, ExitCode::from(43));
     }
 
-    /// `sotp ref-verify check-approved --track-id x` must parse into
+    /// `sotp ref-verify check-approved --chain 2 --track-id x` must parse into
     /// `CliCommand::RefVerify { cmd: RefVerifyCommand::CheckApproved }`.
     #[test]
     fn test_ref_verify_dispatch_check_approved_parses_to_ref_verify_check_approved_variant() {
-        let cli =
-            Cli::try_parse_from(["sotp", "ref-verify", "check-approved", "--track-id", "my-track"])
-                .unwrap();
+        let cli = Cli::try_parse_from([
+            "sotp",
+            "ref-verify",
+            "check-approved",
+            "--chain",
+            "2",
+            "--track-id",
+            "my-track",
+        ])
+        .unwrap();
         match cli.command {
             Some(CliCommand::RefVerify { cmd: RefVerifyCommand::CheckApproved(args) }) => {
                 assert_eq!(args.track_id.as_deref(), Some("my-track"));
+                assert_eq!(args.chain, RefVerifyCheckChainArg::Chain2);
             }
             _ => panic!("expected RefVerify {{ CheckApproved }}, got a different variant"),
         }

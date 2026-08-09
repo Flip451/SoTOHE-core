@@ -29,6 +29,7 @@
 |------|------|--------|---------|--------|----------|
 | FsPhaseCommandConfigLoader | secondary_adapter | add | impl Debug, impl Default, impl PhaseCommandConfigLoaderPort | 🔵 | 🔵 |
 | FsPreReviewCommandConfigLoader | secondary_adapter | add | impl Debug, impl Default, impl PreReviewCommandConfigLoaderPort | 🔵 | 🔵 |
+| FsRefVerifyAggregateAdapter | secondary_adapter | modify | impl Default, impl RefVerifyAggregateService, impl RefVerifyCheckApprovedDriverService | 🔵 | 🔵 |
 | GitCurrentReviewTrackResolver | secondary_adapter | add | impl Debug, impl Default, impl CurrentReviewTrackResolverPort | 🔵 | 🔵 |
 | ProcessProgramRunner | secondary_adapter | add | impl Debug, impl Default, impl ProgramRunnerPort | 🔵 | 🔵 |
 

@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-04T00:44:37Z",
-  "declaration_hash": "c50c7b2ab9b2a08d5edebdd8462fc614f4c8a4cb67830875f45609a80b147417",
-  "implementation_input_hash": "a140812b54aad9c2b919e8c2d4c83dc73c2d2893152ed9d1e5905a65f9fca8ff",
+  "generated_at": "2026-08-04T05:28:08Z",
+  "declaration_hash": "111b1f97f7b6588268c56d9bac4d9fd5452b2c6698e83e6e58f2f8e115350d6a",
+  "implementation_input_hash": "045f8da4d3b64c5acc9b77715a584325641b5e6155ffe4d6d0f66e30e8dc8229",
   "signals": [
     {
       "type_name": "CapabilityExecArgs",
@@ -13,7 +13,7 @@
     {
       "type_name": "CheckApprovedArgs",
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
@@ -80,9 +80,9 @@
     {
       "type_name": "RefVerifyCheckChainArg",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -141,6 +141,12 @@
     },
     {
       "type_name": "cli::commands::phase::input_from_command",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::ref_verify::execute_check_approved_with_driver",
       "kind_tag": "free_function",
       "signal": "blue",
       "found_type": true

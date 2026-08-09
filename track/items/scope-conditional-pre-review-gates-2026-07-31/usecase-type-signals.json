@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-04T01:57:47Z",
+  "generated_at": "2026-08-04T06:49:43Z",
   "declaration_hash": "a3ab5c2693cc44402a67692cd144de6647e6e5c0efc008df0690dab35d4d88e6",
-  "implementation_input_hash": "e32ac96ab4c12c4dd1b5b9335ea488dc544b7979a8a806afc2e0ec4355f22293",
+  "implementation_input_hash": "4c26ad37dc2705784ee57d5a1010db378298df427619efd7f6dfaeafec6c720f",
   "signals": [
     {
       "type_name": "CapabilityExecRequest",
@@ -560,13 +560,13 @@
     {
       "type_name": "RefVerifyAggregateService",
       "kind_tag": "application_service",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
       "type_name": "RefVerifyCheckApprovedDriverService",
       "kind_tag": "application_service",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {

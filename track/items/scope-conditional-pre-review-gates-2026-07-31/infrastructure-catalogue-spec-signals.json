@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "89b2252ccff399710658f79f5946f27bea1bbdfbe2a1fc4d821348a3267aca7a",
+  "catalogue_declaration_hash": "8e64995ed50572728f4d7adc3a41fa018897ac4ede062195991a2168bc5d60b4",
   "signals": [
     {
       "type_name": "CommandArgumentDto",
@@ -51,6 +51,11 @@
       "type_name": "FsPreReviewCommandConfigLoader",
       "signal": "blue",
       "entry_hash": "a3f99c5ba56df9424e7bd2b59d20ee1f77b9676199670b999146179c9e86e7fe"
+    },
+    {
+      "type_name": "FsRefVerifyAggregateAdapter",
+      "signal": "blue",
+      "entry_hash": "3e01b6b7c54bad971124fe632eda960a5befe86bb2c2927a20e937df3a4d62b2"
     },
     {
       "type_name": "GitCurrentReviewTrackResolver",

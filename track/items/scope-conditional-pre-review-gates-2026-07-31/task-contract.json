@@ -195,9 +195,18 @@
       {"layer": "usecase", "entry_key": "RefVerifyChainFilter"},
       {"layer": "usecase", "entry_key": "RefVerifyAggregateService"},
       {"layer": "usecase", "entry_key": "RefVerifyCheckApprovedDriverService"},
+      {"layer": "infrastructure", "entry_key": "FsRefVerifyAggregateAdapter"},
+      {"layer": "cli_composition", "entry_key": "RefVerifyVerdictFilter"},
+      {"layer": "cli_composition", "entry_key": "RefVerifyRunInput"},
+      {"layer": "cli_composition", "entry_key": "RefVerifyCheckApprovedInput"},
+      {"layer": "cli_composition", "entry_key": "RefVerifyCompositionRoot"},
+      {"layer": "cli_composition", "entry_key": "RefVerifyChainFilter"},
+      {"layer": "cli_composition", "entry_key": "RefVerifyResultsInput"},
       {"layer": "cli_driver", "entry_key": "RefVerifyChainSelect"},
+      {"layer": "cli_driver", "entry_key": "RefVerifyDriver"},
       {"layer": "cli_driver", "entry_key": "RefVerifyCheckApprovedInput"},
       {"layer": "cli", "entry_key": "CheckApprovedArgs"},
+      {"layer": "cli", "entry_key": "cli::commands::ref_verify::execute_check_approved_with_driver"},
       {"layer": "cli", "entry_key": "RefVerifyCheckChainArg"}
     ]
   }

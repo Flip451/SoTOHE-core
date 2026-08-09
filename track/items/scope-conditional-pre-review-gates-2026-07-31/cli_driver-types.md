@@ -15,7 +15,7 @@
 | CapabilityExecDriverInput | dto | modify | — | 🔵 | 🔵 |
 | CommandOutcome | dto | reference | — | 🔵 | 🔵 |
 | PhaseIdArg | dto | add | — | 🔵 | 🔵 |
-| RefVerifyCheckApprovedInput | dto | modify | — | 🟡 | 🔵 |
+| RefVerifyCheckApprovedInput | dto | modify | — | 🔵 | 🔵 |
 
 ## Primary Adapters
 
@@ -23,4 +23,5 @@
 |------|------|--------|---------|--------|----------|
 | CapabilityDriver | primary_adapter | reference | — | 🔵 | 🔵 |
 | PhaseCommandDriver | primary_adapter | add | — | 🔵 | 🔵 |
+| RefVerifyDriver | primary_adapter | reference | — | 🔵 | 🔵 |
 

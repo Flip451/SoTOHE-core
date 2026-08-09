@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "8812c1d1868c4b2abcc2a3da17dd46adf917d0bba18448f0c623079b13845ea8",
+  "catalogue_declaration_hash": "abc8c2af7cc7511f7d7da53ff2aa9edb4de9e2d1eff74dd6195b73db52732fbd",
   "signals": [
     {
       "type_name": "CapabilityDriver",
@@ -41,6 +41,11 @@
       "type_name": "RefVerifyCheckApprovedInput",
       "signal": "blue",
       "entry_hash": "f98c25b89f701a192175107061cfb85b087eab81e836ec5991e48c745e889fcd"
+    },
+    {
+      "type_name": "RefVerifyDriver",
+      "signal": "blue",
+      "entry_hash": "9cb087d80db87733487907e6de76b28705ecf070c2b53e2d6f6ff7c31a69c40d"
     },
     {
       "type_name": "ReviewInput",

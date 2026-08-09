@@ -245,3 +245,10 @@ shape (including planned renames whose old-named source type transitionally pers
   CheckApprovedArgs` with payload/caller/test updates is recorded in T042's description).
   Its catalogue-spec signal is Blue; its impl-catalog Yellow is permitted by D7. The
   old-named transitional source type is not a catalogue subject.
+- Only for track `scope-conditional-pre-review-gates-2026-07-31`:
+  `FsRefVerifyAggregateAdapter` IS present in the frozen rustdoc baseline
+  (`infrastructure-types-baseline.json` index 4721; it exists in the track-init source
+  commit `16f5699d`). Its declaration `action: modify` — with the pre-existing `Default` /
+  `RefVerifyAggregateService` impls as `reference` and only the new
+  `RefVerifyCheckApprovedDriverService` impl as `add` — is the adjudicated correct
+  decomposition (rollback-diagnoser, 2026-08-04). Do not report it as needing `action: add`.

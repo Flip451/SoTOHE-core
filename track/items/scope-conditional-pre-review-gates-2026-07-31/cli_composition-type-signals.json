@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-03T17:35:43Z",
-  "declaration_hash": "696e7052429b656e8ace7a86f16719be9d27c4e27b17fa42fc8e15ac76d6bbea",
-  "implementation_input_hash": "13cc09f588754af79e840a8c6e2c5e99f6d860346ea2965b440eb35d73a30465",
+  "generated_at": "2026-08-09T03:18:00Z",
+  "declaration_hash": "d6208f1b6a976ce3a678fb30533ba5310b353b8b8a3e071717bcae7d596cb30b",
+  "implementation_input_hash": "0ffa0b2f4218628ad5d9129096b0498207c8c181ef6e910b7e0cf79208280472",
   "signals": [
     {
       "type_name": "PhaseCompositionRoot",
@@ -13,6 +13,42 @@
         "Debug",
         "Default"
       ]
+    },
+    {
+      "type_name": "RefVerifyCompositionRoot",
+      "kind_tag": "composition_root",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "RefVerifyChainFilter",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "RefVerifyCheckApprovedInput",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "RefVerifyResultsInput",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "RefVerifyRunInput",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "RefVerifyVerdictFilter",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
     },
     {
       "type_name": "CapabilityCompositionRoot",

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "c50c7b2ab9b2a08d5edebdd8462fc614f4c8a4cb67830875f45609a80b147417",
+  "catalogue_declaration_hash": "111b1f97f7b6588268c56d9bac4d9fd5452b2c6698e83e6e58f2f8e115350d6a",
   "signals": [
     {
       "type_name": "CapabilityExecArgs",
@@ -81,6 +81,11 @@
       "type_name": "cli::commands::phase::input_from_command",
       "signal": "blue",
       "entry_hash": "df2c7dfdcc69beaa64cac01abb71ec0bb02b5a192ca1189bf4c419d7f3c1f87a"
+    },
+    {
+      "type_name": "cli::commands::ref_verify::execute_check_approved_with_driver",
+      "signal": "blue",
+      "entry_hash": "35c069b49ed7778028de02b2edbe02974fc6ccd3f770db083c24af57e6ec6986"
     },
     {
       "type_name": "ClaudeLocalArgs",

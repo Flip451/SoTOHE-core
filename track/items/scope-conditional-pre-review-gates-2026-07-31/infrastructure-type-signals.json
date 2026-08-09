@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-03T17:35:30Z",
-  "declaration_hash": "89b2252ccff399710658f79f5946f27bea1bbdfbe2a1fc4d821348a3267aca7a",
-  "implementation_input_hash": "0eab3430d9544f8766b42e7d33b5565a47b88adcfdb88779bd191f15a0f251cf",
+  "generated_at": "2026-08-09T03:17:57Z",
+  "declaration_hash": "8e64995ed50572728f4d7adc3a41fa018897ac4ede062195991a2168bc5d60b4",
+  "implementation_input_hash": "6c7ff103f944e853b57ea72fd5ea61574518054433fc481c63bf7ebdb508be51",
   "signals": [
     {
       "type_name": "CommandArgumentDto",
@@ -122,6 +122,15 @@
         "Debug",
         "Default",
         "usecase::pre_review_command::PreReviewCommandConfigLoaderPort"
+      ]
+    },
+    {
+      "type_name": "FsRefVerifyAggregateAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "usecase::ref_verify::driver_service::RefVerifyCheckApprovedDriverService"
       ]
     },
     {

@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-04T01:48:06Z",
-  "declaration_hash": "8812c1d1868c4b2abcc2a3da17dd46adf917d0bba18448f0c623079b13845ea8",
-  "implementation_input_hash": "4f94f2cdf7f8c9f0ca22951b8bd2bc093d9729e7c38129f69a0173da36d3d588",
+  "generated_at": "2026-08-04T06:18:40Z",
+  "declaration_hash": "abc8c2af7cc7511f7d7da53ff2aa9edb4de9e2d1eff74dd6195b73db52732fbd",
+  "implementation_input_hash": "c791cc56b47fc0ea62d54e823c77275867da64cd5b460cc3afa1493d9163f0a4",
   "signals": [
     {
       "type_name": "CapabilityExecDriverInput",
@@ -47,7 +47,7 @@
     {
       "type_name": "RefVerifyCheckApprovedInput",
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
@@ -71,6 +71,12 @@
     {
       "type_name": "RefVerifyChainSelect",
       "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "RefVerifyDriver",
+      "kind_tag": "primary_adapter",
       "signal": "blue",
       "found_type": true
     }

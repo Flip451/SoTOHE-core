@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "696e7052429b656e8ace7a86f16719be9d27c4e27b17fa42fc8e15ac76d6bbea",
+  "catalogue_declaration_hash": "d6208f1b6a976ce3a678fb30533ba5310b353b8b8a3e071717bcae7d596cb30b",
   "signals": [
     {
       "type_name": "CapabilityCompositionRoot",
@@ -11,6 +11,36 @@
       "type_name": "PhaseCompositionRoot",
       "signal": "blue",
       "entry_hash": "0ec9dcaa0216ebdc38542a319623057167ffff0183f270d18093a24339c8571f"
+    },
+    {
+      "type_name": "RefVerifyCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "ecaba0e448916267967f52d3c0c4f4e644087b780680da82025cf32231dd87b5"
+    },
+    {
+      "type_name": "RefVerifyChainFilter",
+      "signal": "blue",
+      "entry_hash": "fb69c9a89e37e7c23d453a285ec403a807586e5360055b522ab03e3fa5d388b9"
+    },
+    {
+      "type_name": "RefVerifyCheckApprovedInput",
+      "signal": "blue",
+      "entry_hash": "fb69c9a89e37e7c23d453a285ec403a807586e5360055b522ab03e3fa5d388b9"
+    },
+    {
+      "type_name": "RefVerifyResultsInput",
+      "signal": "blue",
+      "entry_hash": "fb69c9a89e37e7c23d453a285ec403a807586e5360055b522ab03e3fa5d388b9"
+    },
+    {
+      "type_name": "RefVerifyRunInput",
+      "signal": "blue",
+      "entry_hash": "fb69c9a89e37e7c23d453a285ec403a807586e5360055b522ab03e3fa5d388b9"
+    },
+    {
+      "type_name": "RefVerifyVerdictFilter",
+      "signal": "blue",
+      "entry_hash": "fb69c9a89e37e7c23d453a285ec403a807586e5360055b522ab03e3fa5d388b9"
     }
   ]
 }

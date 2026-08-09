@@ -117,6 +117,34 @@
         }
       ]
     },
+    "cli::commands::ref_verify::execute_check_approved_with_driver": {
+      "action": "add",
+      "docs": "Ref-verify check-approved execution through an injected driver (CN-06, AC-16).",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "args",
+          "ty": "&CheckApprovedArgs"
+        },
+        {
+          "name": "driver",
+          "ty": "&cli_driver::ref_verify::RefVerifyDriver"
+        }
+      ],
+      "returns": "std::process::ExitCode",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
     "cli::commands::review::claude_local::execute_claude_local": {
       "action": "delete",
       "informal_grounds": [],

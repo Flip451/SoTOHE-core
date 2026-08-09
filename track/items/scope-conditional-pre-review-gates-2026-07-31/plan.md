@@ -9,7 +9,7 @@ GO-03 → T018、T019、T020、T021、T022、T023。
 GO-04 → T018、T020、T021、T022、T023。
 GO-05 → T017、T018、T019、T020、T021、T022。
 
-## Tasks (24/31 resolved)
+## Tasks (25/31 resolved)
 
 ### S0 — 確定済みの履歴 task
 
@@ -54,15 +54,15 @@ GO-05 → T017、T018、T019、T020、T021、T022。
 
 > `apps/cli/src/commands/review/mod.rs` から `codex-local` / `claude-local` subcommand とそれらだけが使用する CLI wiring / dispatch / dead code を削除する。IN-05。
 
-- [~] **T037**: `apps/cli/src/commands/review/{claude_local.rs,codex_local.rs,mod.rs,tests.rs}` から provider-specific modules、Args、handlers、provider-local execute / render / validation functions、interim wiring を削除し、関連 tests を更新する。review CLI の subcommand enum の最終形と attribution は T042 に委ねる。IN-05。
+- [x] **T037**: `apps/cli/src/commands/review/{claude_local.rs,codex_local.rs,mod.rs,tests.rs}` から provider-specific modules、Args、handlers、provider-local execute / render / validation functions、interim wiring を削除し、関連 tests を更新する。review CLI の subcommand enum の最終形と attribution は T042 に委ねる。IN-05。 (`a9f31561b5604a0af4065a14fb07b2b8ef1c15b1`)
 
 ### S4 — phase-entry convergence matrix
 
-> T038–T041 は exit-code check commands、per-phase convergence matrix、canonical workflow entrypoint を phase-enter contract に収束させる。IN-12、IN-13、CN-06、AC-14、AC-15、AC-16。
+> T038–T041 は exit-code check commands、per-phase matrix configuration、canonical workflow entrypoint を追加・更新する。IN-12、IN-13、CN-06、AC-14、AC-15、AC-16。
 
 - [ ] **T038**: `review check-zero-findings` の usecase / driver work と CLI payload / handler を実装し、関連 tests を更新する。enum variant registration と review CLI の subcommand enum の最終形は T042 に委ねる。CN-06、AC-16。
 - [ ] **T042**: `cli:ReviewCommand` の final shape を排他的に統合し、legacy variant removal、`CheckZeroFindings` の追加、`CheckApproved` payload の `ReviewCheckApprovedArgs` rename、dispatch / callers / tests integration を更新する。CN-06、AC-16。
 - [ ] **T043**: `ReviewScopeSelection` への results-selection enum migration を usecase、CLI driver、CLI callers と tests に実装する。CN-06、AC-16。
-- [ ] **T039**: `ref-verify check-approved` の required Chain 1 / Chain 2 selector を usecase、CLI driver、CLI command に実装し、`apps/cli/src/commands/ref_verify.rs` に AC-16 state の CLI exit-code tests を追加する。CN-06、AC-16。
+- [~] **T039**: `ref-verify check-approved` の Chain 1 / Chain 2 selector を usecase、CLI driver、`apps/cli/src/commands/ref_verify.rs` に実装し、CLI exit-code tests を追加する。`libs/infrastructure/src/ref_verify/driver_adapter.rs` の chain-scoped check-approved fail-closed path を更新し、`apps/cli-composition/src/{ref_verify.rs,lib.rs}` の pure-DI handoff を更新して wrapper / DTO re-export を削除する。CN-06、AC-16。
 - [ ] **T040**: `.harness/config/phase-commands.json` を phase ごとの convergence matrix に更新し、`apps/cli/src/commands/phase.rs` に phase-entry fixture / integration tests を追加する。IN-12、CN-06、AC-14、AC-16。
 - [ ] **T041**: `.harness/workflows/track/{plan,spec-design,type-design,impl-plan,adr2pr}.md`、`.claude/commands/track/{plan,spec-design,type-design,impl-plan,adr2pr}.md`、`.agents/skills/track-{plan,spec-design,type-design,impl-plan,adr2pr}/SKILL.md` の phase-writer launch sites を `bin/sotp phase enter <phase-id>` に更新し、direct writer dispatch を除去する。workflow-level static regression check を追加する。IN-13、AC-15。

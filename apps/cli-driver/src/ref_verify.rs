@@ -36,6 +36,8 @@ pub struct RefVerifyCheckApprovedInput {
     pub track_id: String,
     /// Path to the track items directory (e.g. `track/items`).
     pub items_dir: PathBuf,
+    /// The semantic verification chain whose approval state is required.
+    pub chain: RefVerifyChainSelect,
 }
 
 /// Chain-filter selection for the `ref-verify results` command.
@@ -175,7 +177,8 @@ impl RefVerifyDriver {
     }
 
     fn ref_verify_check_approved(&self, input: RefVerifyCheckApprovedInput) -> CommandOutcome {
-        match self.service.check_approved(&input.track_id, &input.items_dir) {
+        let chain = chain_select_to_filter(input.chain);
+        match self.service.check_approved(&input.track_id, &input.items_dir, chain) {
             Ok(RefVerifyCheckApprovedOutcome::NoPairs) => CommandOutcome::success(Some(
                 "[OK] No production reference pairs found — check-approved gate passes.".to_owned(),
             )),

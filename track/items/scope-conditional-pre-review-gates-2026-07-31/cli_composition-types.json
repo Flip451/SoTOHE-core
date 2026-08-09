@@ -14,6 +14,26 @@
         }
       ],
       "type_name": "PhaseCompositionRoot"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "ref_verify_driver",
+          "params": [],
+          "receiver": "&self",
+          "returns": "cli_driver::ref_verify::RefVerifyDriver"
+        }
+      ],
+      "type_name": "RefVerifyCompositionRoot"
     }
   ],
   "layer": "cli_composition",
@@ -27,6 +47,11 @@
     {
       "action": "add",
       "for_type": "PhaseCompositionRoot",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "reference",
+      "for_type": "RefVerifyCompositionRoot",
       "trait_ref": "core::default::Default"
     }
   ],
@@ -118,6 +143,107 @@
         },
         {
           "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "RefVerifyChainFilter": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "ref_verify",
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "RefVerifyCheckApprovedInput": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "ref_verify",
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "RefVerifyCompositionRoot": {
+      "action": "modify",
+      "docs": "Pure-DI ref-verify composition root exposing only construction and the wired CLI driver handoff (CN-06, AC-16).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "RefVerifyResultsInput": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "ref_verify",
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "RefVerifyRunInput": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "ref_verify",
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "RefVerifyVerdictFilter": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "ref_verify",
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]

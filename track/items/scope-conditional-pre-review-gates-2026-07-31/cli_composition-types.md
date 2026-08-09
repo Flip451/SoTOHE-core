@@ -6,4 +6,5 @@
 |------|------|--------|---------|--------|----------|
 | CapabilityCompositionRoot | composition_root | reference | — | 🔵 | 🔵 |
 | PhaseCompositionRoot | composition_root | add | — | 🔵 | 🔵 |
+| RefVerifyCompositionRoot | composition_root | modify | — | 🔵 | 🔵 |
 

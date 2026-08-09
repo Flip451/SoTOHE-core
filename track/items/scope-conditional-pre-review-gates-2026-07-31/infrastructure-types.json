@@ -98,6 +98,18 @@
         }
       ],
       "type_name": "GitCurrentReviewTrackResolver"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "FsRefVerifyAggregateAdapter"
     }
   ],
   "layer": "infrastructure",
@@ -606,6 +618,21 @@
     {
       "for_type": "EntryKeyDto",
       "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "action": "reference",
+      "for_type": "FsRefVerifyAggregateAdapter",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "reference",
+      "for_type": "FsRefVerifyAggregateAdapter",
+      "trait_ref": "usecase::ref_verify::driver_service::RefVerifyAggregateService"
+    },
+    {
+      "action": "add",
+      "for_type": "FsRefVerifyAggregateAdapter",
+      "trait_ref": "usecase::ref_verify::driver_service::RefVerifyCheckApprovedDriverService"
     }
   ],
   "traits": {},
@@ -848,14 +875,14 @@
         "kind": "struct",
         "shape": {
           "fields": [
-          {
-            "name": "layer",
-            "ty": "LayerIdDto"
-          },
-          {
-            "name": "entry_key",
-            "ty": "EntryKeyDto"
-          }
+            {
+              "name": "layer",
+              "ty": "LayerIdDto"
+            },
+            {
+              "name": "entry_key",
+              "ty": "EntryKeyDto"
+            }
           ],
           "has_stripped_fields": false,
           "kind": "plain"
@@ -955,6 +982,32 @@
         },
         {
           "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "FsRefVerifyAggregateAdapter": {
+      "action": "modify",
+      "docs": "Filesystem secondary adapter aggregating ref-verify run, results, and chain-scoped check-approved services behind the single driver port (CN-06, AC-16).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "ref_verify::driver_adapter",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]
@@ -1266,14 +1319,14 @@
               "name": "schema_version",
               "ty": "TaskContractSchemaVersionDto"
             },
-          {
-            "name": "track_id",
-            "ty": "TrackIdDto"
-          },
-          {
-            "name": "entries",
-            "ty": "BTreeMap<TaskIdDto, Vec<ContractedEntryRefDto>>"
-          }
+            {
+              "name": "track_id",
+              "ty": "TrackIdDto"
+            },
+            {
+              "name": "entries",
+              "ty": "BTreeMap<TaskIdDto, Vec<ContractedEntryRefDto>>"
+            }
           ],
           "has_stripped_fields": false,
           "kind": "plain"

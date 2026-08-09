@@ -56,6 +56,36 @@
         }
       ],
       "type_name": "PhaseCommandDriver"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "service",
+              "ty": "std::sync::Arc<dyn usecase::ref_verify::RefVerifyAggregateService>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [
+            {
+              "name": "input",
+              "ty": "RefVerifyInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "CommandOutcome"
+        }
+      ],
+      "type_name": "RefVerifyDriver"
     }
   ],
   "layer": "cli_driver",
@@ -584,6 +614,34 @@
         }
       ]
     },
+    "RefVerifyDriver": {
+      "action": "reference",
+      "docs": "Primary ref-verify adapter injecting the aggregate application service and rendering typed inputs as command outcomes (CN-06, AC-16).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
     "ReviewInput": {
       "action": "modify",
       "docs": "Review command-family driver input using typed check-zero-findings and mutually exclusive results-scope selection boundaries (CN-06, AC-16).",
@@ -649,23 +707,23 @@
               "kind": "tuple"
             }
           },
-        {
-          "name": "CheckZeroFindings",
-          "payload": {
-            "fields": [
-              "usecase::review_v2::check_zero_findings::ReviewCheckZeroFindingsQuery"
-            ],
+          {
+            "name": "CheckZeroFindings",
+            "payload": {
+              "fields": [
+                "usecase::review_v2::check_zero_findings::ReviewCheckZeroFindingsQuery"
+              ],
               "kind": "tuple"
             }
           },
           {
             "name": "Results",
             "payload": {
-            "fields": [
-              "Option<String>",
-              "std::path::PathBuf",
-              "usecase::review_v2::review_aux::ReviewScopeSelection",
-              "u32",
+              "fields": [
+                "Option<String>",
+                "std::path::PathBuf",
+                "usecase::review_v2::review_aux::ReviewScopeSelection",
+                "u32",
                 "String",
                 "bool"
               ],
