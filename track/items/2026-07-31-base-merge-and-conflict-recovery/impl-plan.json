@@ -69,11 +69,21 @@
           "T015"
         ],
         "title": "Baseline-fresh rendered signals"
+      },
+      {
+        "description": [
+          "Update pre-review type-signal handling in `FsImplCatalogSignalReader::read_signals` and add focused regression coverage. IN-05; CN-03; CN-04; AC-07; AC-09."
+        ],
+        "id": "S7",
+        "task_ids": [
+          "T016"
+        ],
+        "title": "Baseline-fresh pre-review signals"
       }
     ],
     "summary": [
       "GO-01 → T001–T004, T010, T011, T013, and T014.",
-      "GO-02 → T005–T009, T012, and T015."
+      "GO-02 → T005–T009, T012, T015, and T016."
     ]
   },
   "schema_version": 2,
@@ -205,6 +215,15 @@
       "description": "Update type-signals rendering in `libs/infrastructure/src/track/render/sync.rs` and add focused regression coverage. IN-05; CN-03; CN-04; AC-07; AC-09.",
       "id": "T015",
       "status": "done"
+    },
+    {
+      "commit_hash": null,
+      "depends_on": [
+        "T012"
+      ],
+      "description": "In `FsImplCatalogSignalReader::read_signals`, reject stale or unreadable present-baseline type-signals documents before pre-review evaluation, and add focused regression coverage. IN-05; CN-03; CN-04; AC-07; AC-09.",
+      "id": "T016",
+      "status": "in_progress"
     }
   ]
 }

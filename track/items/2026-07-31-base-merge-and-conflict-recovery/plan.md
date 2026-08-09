@@ -4,9 +4,9 @@
 ## Summary
 
 GO-01 → T001–T004, T010, T011, T013, and T014.
-GO-02 → T005–T009, T012, and T015.
+GO-02 → T005–T009, T012, T015, and T016.
 
-## Tasks (15/15 resolved)
+## Tasks (15/16 resolved)
 
 ### S1 — Guarded base merge
 
@@ -52,3 +52,9 @@ GO-02 → T005–T009, T012, and T015.
 > Update type-signals rendering in `libs/infrastructure/src/track/render/sync.rs` and add focused regression coverage. IN-05; CN-03; CN-04; AC-07; AC-09.
 
 - [x] **T015**: Update type-signals rendering in `libs/infrastructure/src/track/render/sync.rs` and add focused regression coverage. IN-05; CN-03; CN-04; AC-07; AC-09. (`fad2c002`)
+
+### S7 — Baseline-fresh pre-review signals
+
+> Update pre-review type-signal handling in `FsImplCatalogSignalReader::read_signals` and add focused regression coverage. IN-05; CN-03; CN-04; AC-07; AC-09.
+
+- [~] **T016**: In `FsImplCatalogSignalReader::read_signals`, reject stale or unreadable present-baseline type-signals documents before pre-review evaluation, and add focused regression coverage. IN-05; CN-03; CN-04; AC-07; AC-09.

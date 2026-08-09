@@ -2160,6 +2160,42 @@
           "hash": "rvw1:sha256:e7c8561094a4b7a09b612a42712b8f9d74915f477d28513d3ead3f35fd8d3100",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T17:09:43Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 75,
+              "message": "S7 description restates upstream behavior (“Reject present-baseline stale type signals… while retaining the structural-absence boundary”) instead of limiting the section to target + operation + anchors. Remove the behavioral prose and cite the anchors only, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 224,
+              "message": "T016 description restates the behavior contract (“preserve structural-absence handling”) in prose. Keep the target, operation, and anchors, but remove the upstream behavior restatement per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d6c8cb5dbb20629cf51f3e5ab044c9fbb05732eaefaace70d658b58ff9fe2f6c",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T17:12:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bc2eb4f33f74d92d81ca24253fcc59e3908ad9f13e73bd554b88760e8962edc3",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T17:16:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bc2eb4f33f74d92d81ca24253fcc59e3908ad9f13e73bd554b88760e8962edc3",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -4379,6 +4415,50 @@
           "at": "2026-08-09T15:58:57Z",
           "findings": [],
           "hash": "rvw1:sha256:ed2c3df1129c23dbb5e94c09af71725da5cd183e6ae0a6f24ef7e8a6a9bdd0bc",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T16:48:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9102cb44396df93a634b65b4fb877a59e1403d5d9852b27975fda1aef3c89941",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T16:53:52Z",
+          "findings": [
+            {
+              "category": "unbounded I/O",
+              "file": "libs/infrastructure/src/impl_catalog_signal_reader.rs",
+              "line": 100,
+              "message": "`read_catalogue_bytes` checks the file size with metadata, then calls `std::fs::read`, which reads to EOF without a bound. If the catalogue grows after the metadata check, it can bypass the 16 MiB limit and cause unbounded allocation in the pre-review gate. Open the file once and read through `take(MAX_TYPE_CATALOGUE_BYTES + 1)`, rejecting the extra byte, as `type_signals_evaluator::inputs::read_bytes_file_limited` does.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9102cb44396df93a634b65b4fb877a59e1403d5d9852b27975fda1aef3c89941",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T16:59:59Z",
+          "findings": [
+            {
+              "category": "unbounded/non-regular I/O",
+              "file": "libs/infrastructure/src/impl_catalog_signal_reader.rs",
+              "line": 193,
+              "message": "`read_signals` checks only a metadata snapshot and then uses `std::fs::read`, so a regular file that grows after the check can bypass `MAX_TYPE_SIGNALS_BYTES`. It also never requires a regular file, allowing a FIFO or device to block or stream without the intended bound. Open the file once, validate its opened metadata, read through `take(MAX_TYPE_SIGNALS_BYTES + 1)`, and reject the extra byte, as the corrected catalogue reader does.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:bc04703acf5721e1af69fe037483413c097daf99e769cfb0bfe1fc3737b0033d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T17:06:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:94b086ed39d70b89b270d9eac5eb7cf94e4a06f5627aff5d84b4122d3cd416f6",
           "type": "final",
           "verdict": "zero_findings"
         }
