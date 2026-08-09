@@ -198,13 +198,13 @@
       "status": "done"
     },
     {
-      "commit_hash": null,
+      "commit_hash": "fad2c002",
       "depends_on": [
         "T012"
       ],
       "description": "Update type-signals rendering in `libs/infrastructure/src/track/render/sync.rs` and add focused regression coverage. IN-05; CN-03; CN-04; AC-07; AC-09.",
       "id": "T015",
-      "status": "in_progress"
+      "status": "done"
     }
   ]
 }
