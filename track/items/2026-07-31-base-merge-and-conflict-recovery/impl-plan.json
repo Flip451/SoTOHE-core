@@ -217,13 +217,13 @@
       "status": "done"
     },
     {
-      "commit_hash": null,
+      "commit_hash": "13f2d1a2",
       "depends_on": [
         "T012"
       ],
       "description": "In `FsImplCatalogSignalReader::read_signals`, reject stale or unreadable present-baseline type-signals documents before pre-review evaluation, and add focused regression coverage. IN-05; CN-03; CN-04; AC-07; AC-09.",
       "id": "T016",
-      "status": "in_progress"
+      "status": "done"
     }
   ]
 }
