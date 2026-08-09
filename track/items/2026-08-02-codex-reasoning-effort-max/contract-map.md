@@ -1,0 +1,171 @@
+<!-- Generated contract-map-renderer — DO NOT EDIT DIRECTLY -->
+```mermaid
+---
+config:
+  layout: elk
+---
+flowchart LR
+classDef aggregate_root fill:#ede9fe,stroke:#4c1d95,stroke-width:2px
+classDef app_service fill:#ecfdf5,stroke:#059669,stroke-width:2px
+classDef command fill:#fff7ed,stroke:#c2410c,stroke-width:1px
+classDef composition_root fill:#e0e7ff,stroke:#3730a3,stroke-width:2px
+classDef domain_event fill:#fce7f3,stroke:#9d174d,stroke-width:1px
+classDef domain_service fill:#fee2e2,stroke:#991b1b,stroke-width:1px
+classDef dto fill:#f8fafc,stroke:#64748b,stroke-width:1px
+classDef entity fill:#dbeafe,stroke:#1e40af,stroke-width:2px
+classDef error_type fill:#fef2f2,stroke:#b91c1c,stroke-width:1px,stroke-dasharray:4 2
+classDef event_policy fill:#fef3c7,stroke:#92400e,stroke-width:1px
+classDef factory fill:#e0f2fe,stroke:#0369a1,stroke-width:1px
+classDef free_function fill:#f5f3ff,stroke:#7c3aed,stroke-width:1px
+classDef function_node fill:#f5f3ff,stroke:#a78bfa,stroke-width:1px
+classDef interactor fill:#f0fdfa,stroke:#0d9488,stroke-width:1px
+classDef method_node fill:#f8fafc,stroke:#cbd5e1,stroke-width:1px
+classDef primary_adapter fill:#ecfccb,stroke:#3f6212,stroke-width:1px
+classDef query fill:#f0f9ff,stroke:#0369a1,stroke-width:1px
+classDef repository fill:#f5f3ff,stroke:#6d28d9,stroke-width:1px
+classDef secondary_adapter fill:#fafaf9,stroke:#57534e,stroke-width:1px
+classDef secondary_port fill:#fafaf9,stroke:#78716c,stroke-width:1px,stroke-dasharray:4 2
+classDef specification fill:#fdf4ff,stroke:#6b21a8,stroke-width:1px
+classDef specification_port fill:#fdf4ff,stroke:#9333ea,stroke-width:1px,stroke-dasharray:4 2
+classDef typestate_overlay stroke:#dc2626,stroke-width:3px
+classDef use_case fill:#ecfeff,stroke:#0e7490,stroke-width:1px
+classDef use_case_function fill:#eef2ff,stroke:#4338ca,stroke-width:1px
+classDef value_object fill:#d1fae5,stroke:#065f46,stroke-width:1px
+classDef variant_node fill:#fafaf9,stroke:#d6d3d1,stroke-width:1px
+subgraph domain["domain"]
+  direction TB
+end
+subgraph usecase["usecase"]
+  direction TB
+  subgraph usecase_usecase_module_capability_exec["usecase::capability_exec"]
+    direction TB
+  subgraph T31_usecase_usecase_ReasoningEffort["capability_exec::values::ReasoningEffort"]
+    direction TB
+    T31_usecase_usecase_ReasoningEffort__self[ReasoningEffort]
+    T31_usecase_usecase_ReasoningEffort_Low[Low]
+    T31_usecase_usecase_ReasoningEffort_Medium[Medium]
+    T31_usecase_usecase_ReasoningEffort_High[High]
+    T31_usecase_usecase_ReasoningEffort_XHigh[XHigh]
+    T31_usecase_usecase_ReasoningEffort_Max[Max]
+  end
+  end
+end
+subgraph infrastructure["infrastructure"]
+  direction TB
+  subgraph infrastructure_infrastructure_module_agent_profiles["infrastructure::agent_profiles"]
+    direction TB
+  subgraph T43_infrastructure_infrastructure_AgentProfiles["agent_profiles::profiles::AgentProfiles"]
+    direction TB
+    T43_infrastructure_infrastructure_AgentProfiles__self[AgentProfiles]
+    T43_infrastructure_infrastructure_AgentProfiles_load([load])
+    T43_infrastructure_infrastructure_AgentProfiles_resolve_capability([resolve_capability])
+    T43_infrastructure_infrastructure_AgentProfiles_resolve_execution([resolve_execution])
+    T43_infrastructure_infrastructure_AgentProfiles_provider_label([provider_label])
+    T43_infrastructure_infrastructure_AgentProfiles_resolve_prompt_template_path([resolve_prompt_template_path])
+  end
+  subgraph T48_infrastructure_infrastructure_AgentProfilesError["agent_profiles::types::AgentProfilesError"]
+    direction TB
+    T48_infrastructure_infrastructure_AgentProfilesError__self[AgentProfilesError]
+    T48_infrastructure_infrastructure_AgentProfilesError_Io[Io]
+    T48_infrastructure_infrastructure_AgentProfilesError_Symlink[Symlink]
+    T48_infrastructure_infrastructure_AgentProfilesError_PathOutsideTrustedRoot[PathOutsideTrustedRoot]
+    T48_infrastructure_infrastructure_AgentProfilesError_Parse[Parse]
+    T48_infrastructure_infrastructure_AgentProfilesError_UnsupportedSchemaVersion[UnsupportedSchemaVersion]
+    T48_infrastructure_infrastructure_AgentProfilesError_InvalidCapability[InvalidCapability]
+    T48_infrastructure_infrastructure_AgentProfilesError_CapabilityNotFound[CapabilityNotFound]
+    T48_infrastructure_infrastructure_AgentProfilesError_ModelMissing[ModelMissing]
+    T48_infrastructure_infrastructure_AgentProfilesError_EffortMissing[EffortMissing]
+    T48_infrastructure_infrastructure_AgentProfilesError_UnsupportedEffort[UnsupportedEffort]
+  end
+  subgraph T49_infrastructure_infrastructure_CapabilityConfigDto["agent_profiles::types::CapabilityConfigDto"]
+    direction TB
+    T49_infrastructure_infrastructure_CapabilityConfigDto__self[CapabilityConfigDto]
+    T49_infrastructure_infrastructure_CapabilityConfigDto_provider([provider])
+    T49_infrastructure_infrastructure_CapabilityConfigDto_model([model])
+    T49_infrastructure_infrastructure_CapabilityConfigDto_fast_provider([fast_provider])
+    T49_infrastructure_infrastructure_CapabilityConfigDto_fast_model([fast_model])
+    T49_infrastructure_infrastructure_CapabilityConfigDto_prompt_template_path([prompt_template_path])
+    T49_infrastructure_infrastructure_CapabilityConfigDto_effort([effort])
+    T49_infrastructure_infrastructure_CapabilityConfigDto_fast_effort([fast_effort])
+    T49_infrastructure_infrastructure_CapabilityConfigDto_execution_mode([execution_mode])
+  end
+  subgraph T48_infrastructure_infrastructure_ReasoningEffortDto["agent_profiles::types::ReasoningEffortDto"]
+    direction TB
+    T48_infrastructure_infrastructure_ReasoningEffortDto__self[ReasoningEffortDto]
+    T48_infrastructure_infrastructure_ReasoningEffortDto_Low[Low]
+    T48_infrastructure_infrastructure_ReasoningEffortDto_Medium[Medium]
+    T48_infrastructure_infrastructure_ReasoningEffortDto_High[High]
+    T48_infrastructure_infrastructure_ReasoningEffortDto_XHigh[XHigh]
+    T48_infrastructure_infrastructure_ReasoningEffortDto_Max[Max]
+    T48_infrastructure_infrastructure_ReasoningEffortDto_into_domain([into_domain])
+  end
+  subgraph T47_infrastructure_infrastructure_ResolvedExecution["agent_profiles::types::ResolvedExecution"]
+    direction TB
+    T47_infrastructure_infrastructure_ResolvedExecution__self[ResolvedExecution]
+    T47_infrastructure_infrastructure_ResolvedExecution_ProviderCli[ProviderCli]
+    T47_infrastructure_infrastructure_ResolvedExecution_HostedService[HostedService]
+  end
+  end
+end
+subgraph cli_driver["cli_driver"]
+  direction TB
+end
+subgraph cli_composition["cli_composition"]
+  direction TB
+end
+subgraph cli["cli"]
+  direction TB
+end
+T43_infrastructure_infrastructure_AgentProfiles_load --> T48_infrastructure_infrastructure_AgentProfilesError__self
+T43_infrastructure_infrastructure_AgentProfiles_load --> T43_infrastructure_infrastructure_AgentProfiles__self
+T43_infrastructure_infrastructure_AgentProfiles_resolve_capability --> T49_infrastructure_infrastructure_CapabilityConfigDto__self
+T43_infrastructure_infrastructure_AgentProfiles_resolve_execution --> T48_infrastructure_infrastructure_AgentProfilesError__self
+T43_infrastructure_infrastructure_AgentProfiles_resolve_execution --> T47_infrastructure_infrastructure_ResolvedExecution__self
+T48_infrastructure_infrastructure_AgentProfilesError_UnsupportedEffort --o T31_usecase_usecase_ReasoningEffort__self
+T49_infrastructure_infrastructure_CapabilityConfigDto_effort --> T48_infrastructure_infrastructure_ReasoningEffortDto__self
+T49_infrastructure_infrastructure_CapabilityConfigDto_fast_effort --> T48_infrastructure_infrastructure_ReasoningEffortDto__self
+T48_infrastructure_infrastructure_ReasoningEffortDto_into_domain --> T31_usecase_usecase_ReasoningEffort__self
+T47_infrastructure_infrastructure_ResolvedExecution_ProviderCli --o|effort| T31_usecase_usecase_ReasoningEffort__self
+class T31_usecase_usecase_ReasoningEffort_Low variant_node
+class T31_usecase_usecase_ReasoningEffort_Medium variant_node
+class T31_usecase_usecase_ReasoningEffort_High variant_node
+class T31_usecase_usecase_ReasoningEffort_XHigh variant_node
+class T31_usecase_usecase_ReasoningEffort_Max variant_node
+class T31_usecase_usecase_ReasoningEffort__self value_object
+class T43_infrastructure_infrastructure_AgentProfiles_load method_node
+class T43_infrastructure_infrastructure_AgentProfiles_resolve_capability method_node
+class T43_infrastructure_infrastructure_AgentProfiles_resolve_execution method_node
+class T43_infrastructure_infrastructure_AgentProfiles_provider_label method_node
+class T43_infrastructure_infrastructure_AgentProfiles_resolve_prompt_template_path method_node
+class T43_infrastructure_infrastructure_AgentProfiles__self secondary_adapter
+class T48_infrastructure_infrastructure_AgentProfilesError_Io variant_node
+class T48_infrastructure_infrastructure_AgentProfilesError_Symlink variant_node
+class T48_infrastructure_infrastructure_AgentProfilesError_PathOutsideTrustedRoot variant_node
+class T48_infrastructure_infrastructure_AgentProfilesError_Parse variant_node
+class T48_infrastructure_infrastructure_AgentProfilesError_UnsupportedSchemaVersion variant_node
+class T48_infrastructure_infrastructure_AgentProfilesError_InvalidCapability variant_node
+class T48_infrastructure_infrastructure_AgentProfilesError_CapabilityNotFound variant_node
+class T48_infrastructure_infrastructure_AgentProfilesError_ModelMissing variant_node
+class T48_infrastructure_infrastructure_AgentProfilesError_EffortMissing variant_node
+class T48_infrastructure_infrastructure_AgentProfilesError_UnsupportedEffort variant_node
+class T48_infrastructure_infrastructure_AgentProfilesError__self error_type
+class T49_infrastructure_infrastructure_CapabilityConfigDto_provider method_node
+class T49_infrastructure_infrastructure_CapabilityConfigDto_model method_node
+class T49_infrastructure_infrastructure_CapabilityConfigDto_fast_provider method_node
+class T49_infrastructure_infrastructure_CapabilityConfigDto_fast_model method_node
+class T49_infrastructure_infrastructure_CapabilityConfigDto_prompt_template_path method_node
+class T49_infrastructure_infrastructure_CapabilityConfigDto_effort method_node
+class T49_infrastructure_infrastructure_CapabilityConfigDto_fast_effort method_node
+class T49_infrastructure_infrastructure_CapabilityConfigDto_execution_mode method_node
+class T49_infrastructure_infrastructure_CapabilityConfigDto__self dto
+class T48_infrastructure_infrastructure_ReasoningEffortDto_Low variant_node
+class T48_infrastructure_infrastructure_ReasoningEffortDto_Medium variant_node
+class T48_infrastructure_infrastructure_ReasoningEffortDto_High variant_node
+class T48_infrastructure_infrastructure_ReasoningEffortDto_XHigh variant_node
+class T48_infrastructure_infrastructure_ReasoningEffortDto_Max variant_node
+class T48_infrastructure_infrastructure_ReasoningEffortDto_into_domain method_node
+class T48_infrastructure_infrastructure_ReasoningEffortDto__self dto
+class T47_infrastructure_infrastructure_ResolvedExecution_ProviderCli variant_node
+class T47_infrastructure_infrastructure_ResolvedExecution_HostedService variant_node
+class T47_infrastructure_infrastructure_ResolvedExecution__self dto
+```

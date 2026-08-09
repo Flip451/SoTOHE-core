@@ -13,16 +13,18 @@
 
 pub mod archived_track;
 pub mod config;
+pub mod context;
 pub mod report;
 pub mod report_adapter;
 pub mod writer;
 
 pub use config::TelemetryConfig;
+pub use context::resolve_telemetry_track_id;
 pub use report::{
     PhaseDurationSummary, TelemetryErrorEntry, TelemetryHookBlockEntry, TelemetryReport,
-    TelemetryReportError, TelemetryReportOutput,
+    TelemetryReportError, TelemetryReportSnapshot,
 };
-pub use report_adapter::FsTelemetryReportAdapter;
+pub use report_adapter::{FsTelemetryEmitDynamicAdapter, FsTelemetryReportAdapter};
 pub use writer::TelemetryWriter;
 
 use serde::{Deserialize, Serialize};
@@ -46,7 +48,7 @@ use thiserror::Error;
 /// avoid coupling to `agent_profiles::RoundType` which lacks serde derives.
 /// `track_id` is recorded as a plain `String` for the same DTO-boundary reason.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(tag = "event_type")]
+#[serde(tag = "event_type", deny_unknown_fields)]
 pub enum TelemetryEvent {
     /// A track operation subcommand completed (IN-03 / AC-02).
     TrackSubcommand {

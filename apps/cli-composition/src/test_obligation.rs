@@ -431,9 +431,18 @@ mod tests {
             r#"{
                 "schema_version": 1,
                 "providers": {
-                    "codex": { "label": "Codex" },
-                    "claude": { "label": "Claude" },
-                    "gemini": { "label": "Gemini" }
+                    "codex": {
+                        "label": "Codex",
+                        "supported_reasoning_efforts": ["high"]
+                    },
+                    "claude": {
+                        "label": "Claude",
+                        "supported_reasoning_efforts": ["low", "high"]
+                    },
+                    "gemini": {
+                        "label": "Gemini",
+                        "supported_reasoning_efforts": ["high"]
+                    }
                 },
                 "capabilities": {
                     "obligation-fulfillment-verifier": {
@@ -968,7 +977,7 @@ mod tests {
             &profiles_path,
             r#"{
                 "schema_version": 1,
-                "providers": { "codex": { "label": "Codex" } },
+                "providers": { "codex": { "label": "Codex", "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"] } },
                 "capabilities": {
                     "unrelated-capability": { "provider": "codex", "model": "unrelated", "execution_mode": "typed-pipeline" }
                 }

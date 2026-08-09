@@ -1,0 +1,846 @@
+{
+  "schema_version": 1,
+  "layer": "usecase",
+  "entries": [
+    {
+      "claim_hash": "543c0bd7cd986767e30424372c4c091a8417666fe84e3e3e5716b1e77a2bd602",
+      "evidence_hash": "7f63c4775a20c1ebcb13ce2fb395e5a2b3aa361f7ca28a0cde89e84bcef2634c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "観測イベント"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CommandDurationMillis"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "track ブランチ上で完了した、track が解決できる純表示系ではないコマンドの観測イベントを、通常は既存の track-local `track/items/<track-id>/logs/telemetry.jsonl` へ追記する。`track archive` の成功時だけは、既存ログが track とともに archive へ移動するため `track/archive/<track-id>/logs/telemetry.jsonl` へ追記し、active 側のログを再作成しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "48dffc8f96fd1aaa54729c3b7a8f57cecac977dac11f96fbfa0680dcbbc0d722",
+      "evidence_hash": "69f53cc3e250ce8590f8b62c6376a05918b4993da260228f02685f5c2da3eead",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存の `sotp telemetry` 集計を、追記されたコマンド観測イベントを含めて利用頻度、所要時間、および失敗率を分析できるように拡張する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CommandExecutionCount"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "既存の `sotp telemetry` 集計を、追記されたコマンド観測イベントを含めて利用頻度、所要時間、および失敗率を分析できるように拡張する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "48dffc8f96fd1aaa54729c3b7a8f57cecac977dac11f96fbfa0680dcbbc0d722",
+      "evidence_hash": "db0cac5221d4ba872e6350cb2de0769c0ffc7c92dbb9adac5e0497d66f197420",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存の telemetry 記録を集計し、コマンド横断の実行頻度、所要時間、および失敗率を確認できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CommandExecutionCount"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "`sotp telemetry` は既存の telemetry 記録を集計し、コマンド横断の実行頻度、所要時間、および失敗率を確認できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cc5465f4ec56114829340b68e35a8b88213d3d1f44d7dbd686196ed518d4f3c3",
+      "evidence_hash": "69f53cc3e250ce8590f8b62c6376a05918b4993da260228f02685f5c2da3eead",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存の `sotp telemetry` 集計を、追記されたコマンド観測イベントを含めて利用頻度、所要時間、および失敗率を分析できるように拡張する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CommandExecutionMetric"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "既存の `sotp telemetry` 集計を、追記されたコマンド観測イベントを含めて利用頻度、所要時間、および失敗率を分析できるように拡張する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cc5465f4ec56114829340b68e35a8b88213d3d1f44d7dbd686196ed518d4f3c3",
+      "evidence_hash": "db0cac5221d4ba872e6350cb2de0769c0ffc7c92dbb9adac5e0497d66f197420",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp telemetry` は既存の telemetry 記録を集計し、コマンド横断の実行頻度、所要時間、および失敗率を確認できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CommandExecutionMetric"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "`sotp telemetry` は既存の telemetry 記録を集計し、コマンド横断の実行頻度、所要時間、および失敗率を確認できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d3f504cc0410f0d3aa9a74be80657735ecaefbb432988400f0563f9ffd0bd259",
+      "evidence_hash": "69f53cc3e250ce8590f8b62c6376a05918b4993da260228f02685f5c2da3eead",
+      "verdict": {
+        "kind": "pass",
+        "citation": "利用頻度、所要時間、および失敗率を分析できるように拡張する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CommandFailureRateBasisPoints"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "既存の `sotp telemetry` 集計を、追記されたコマンド観測イベントを含めて利用頻度、所要時間、および失敗率を分析できるように拡張する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d3f504cc0410f0d3aa9a74be80657735ecaefbb432988400f0563f9ffd0bd259",
+      "evidence_hash": "db0cac5221d4ba872e6350cb2de0769c0ffc7c92dbb9adac5e0497d66f197420",
+      "verdict": {
+        "kind": "pass",
+        "citation": "コマンド横断の実行頻度、所要時間、および失敗率を確認できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CommandFailureRateBasisPoints"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "`sotp telemetry` は既存の telemetry 記録を集計し、コマンド横断の実行頻度、所要時間、および失敗率を確認できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "7629cb9872aa149630afb0c915671a2ddcc2ecad3a4146efeaca3720356f6384",
+      "evidence_hash": "9cbde1c8c1b48cacc5d0d024f910428fca90be5b2b70829f6b6062574add4d66",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track ブランチ上で完了した、track が解決できる純表示系ではない `sotp` コマンドを共通の entry point で計装し、完了時にコマンド identity、所要時間、および exit 結果を観測する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CommandTraceValueError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "track ブランチ上で完了した、track が解決できる純表示系ではない `sotp` コマンドを共通の entry point で計装し、完了時にコマンド identity、所要時間、および exit 結果を観測する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "7629cb9872aa149630afb0c915671a2ddcc2ecad3a4146efeaca3720356f6384",
+      "evidence_hash": "7f63c4775a20c1ebcb13ce2fb395e5a2b3aa361f7ca28a0cde89e84bcef2634c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track ブランチ上で完了した、track が解決できる純表示系ではないコマンドの観測イベントを、通常は既存の track-local `track/items/<track-id>/logs/telemetry.jsonl` へ追記する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CommandTraceValueError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "track ブランチ上で完了した、track が解決できる純表示系ではないコマンドの観測イベントを、通常は既存の track-local `track/items/<track-id>/logs/telemetry.jsonl` へ追記する。`track archive` の成功時だけは、既存ログが track とともに archive へ移動するため `track/archive/<track-id>/logs/telemetry.jsonl` へ追記し、active 側のログを再作成しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "560b6a62fc352cd4981d5337adcb495a9cc3b6c659e3f87cf3561b59c4ba8c41",
+      "evidence_hash": "9cbde1c8c1b48cacc5d0d024f910428fca90be5b2b70829f6b6062574add4d66",
+      "verdict": {
+        "kind": "pass",
+        "citation": "完了時にコマンド identity、所要時間、および exit 結果を観測する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SotpCommandIdentity"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "track ブランチ上で完了した、track が解決できる純表示系ではない `sotp` コマンドを共通の entry point で計装し、完了時にコマンド identity、所要時間、および exit 結果を観測する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "560b6a62fc352cd4981d5337adcb495a9cc3b6c659e3f87cf3561b59c4ba8c41",
+      "evidence_hash": "7f63c4775a20c1ebcb13ce2fb395e5a2b3aa361f7ca28a0cde89e84bcef2634c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track ブランチ上で完了した、track が解決できる純表示系ではないコマンドの観測イベントを、通常は既存の track-local `track/items/<track-id>/logs/telemetry.jsonl` へ追記する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SotpCommandIdentity"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "track ブランチ上で完了した、track が解決できる純表示系ではないコマンドの観測イベントを、通常は既存の track-local `track/items/<track-id>/logs/telemetry.jsonl` へ追記する。`track archive` の成功時だけは、既存ログが track とともに archive へ移動するため `track/archive/<track-id>/logs/telemetry.jsonl` へ追記し、active 側のログを再作成しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6080c3f11d161a347c96829b0dfb425b5704cd3aeff6501a4236619fbf3afa7c",
+      "evidence_hash": "9cbde1c8c1b48cacc5d0d024f910428fca90be5b2b70829f6b6062574add4d66",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track ブランチ上で完了した、track が解決できる純表示系ではない `sotp` コマンドを共通の entry point で計装し、完了時にコマンド identity、所要時間、および exit 結果を観測する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TelemetryAggregateInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "track ブランチ上で完了した、track が解決できる純表示系ではない `sotp` コマンドを共通の entry point で計装し、完了時にコマンド identity、所要時間、および exit 結果を観測する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6080c3f11d161a347c96829b0dfb425b5704cd3aeff6501a4236619fbf3afa7c",
+      "evidence_hash": "7f63c4775a20c1ebcb13ce2fb395e5a2b3aa361f7ca28a0cde89e84bcef2634c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track ブランチ上で完了した、track が解決できる純表示系ではないコマンドの観測イベントを、通常は既存の track-local `track/items/<track-id>/logs/telemetry.jsonl` へ追記する。`track archive` の成功時だけは、既存ログが track とともに archive へ移動するため `track/archive/<track-id>/logs/telemetry.jsonl` へ追記し、active 側のログを再作成しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TelemetryAggregateInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "track ブランチ上で完了した、track が解決できる純表示系ではないコマンドの観測イベントを、通常は既存の track-local `track/items/<track-id>/logs/telemetry.jsonl` へ追記する。`track archive` の成功時だけは、既存ログが track とともに archive へ移動するため `track/archive/<track-id>/logs/telemetry.jsonl` へ追記し、active 側のログを再作成しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6080c3f11d161a347c96829b0dfb425b5704cd3aeff6501a4236619fbf3afa7c",
+      "evidence_hash": "69f53cc3e250ce8590f8b62c6376a05918b4993da260228f02685f5c2da3eead",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存の `sotp telemetry` 集計を、追記されたコマンド観測イベントを含めて利用頻度、所要時間、および失敗率を分析できるように拡張する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TelemetryAggregateInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "既存の `sotp telemetry` 集計を、追記されたコマンド観測イベントを含めて利用頻度、所要時間、および失敗率を分析できるように拡張する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6080c3f11d161a347c96829b0dfb425b5704cd3aeff6501a4236619fbf3afa7c",
+      "evidence_hash": "34dba8d9b16331a0bcdb9d8d3ba20ba4c919233af0e5a3f16e1e69b04f290639",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track ブランチ上で、track が解決できる純表示系ではない任意の `sotp` コマンドが完了すると、同じ track の `telemetry.jsonl` にコマンド identity、所要時間、および exit 結果を含むイベントが追記される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TelemetryAggregateInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "track ブランチ上で、track が解決できる純表示系ではない任意の `sotp` コマンドが完了すると、同じ track の `telemetry.jsonl` にコマンド identity、所要時間、および exit 結果を含むイベントが追記される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6080c3f11d161a347c96829b0dfb425b5704cd3aeff6501a4236619fbf3afa7c",
+      "evidence_hash": "db0cac5221d4ba872e6350cb2de0769c0ffc7c92dbb9adac5e0497d66f197420",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp telemetry` は既存の telemetry 記録を集計し、コマンド横断の実行頻度、所要時間、および失敗率を確認できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TelemetryAggregateInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "`sotp telemetry` は既存の telemetry 記録を集計し、コマンド横断の実行頻度、所要時間、および失敗率を確認できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b52bf525c3192d60ef9b236b736fb1c34bd6ffaaeaf75d602710520ca535b41c",
+      "evidence_hash": "7f63c4775a20c1ebcb13ce2fb395e5a2b3aa361f7ca28a0cde89e84bcef2634c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`track archive` の成功時だけは、既存ログが track とともに archive へ移動するため `track/archive/<track-id>/logs/telemetry.jsonl` へ追記し、active 側のログを再作成しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TelemetryArchiveInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "track ブランチ上で完了した、track が解決できる純表示系ではないコマンドの観測イベントを、通常は既存の track-local `track/items/<track-id>/logs/telemetry.jsonl` へ追記する。`track archive` の成功時だけは、既存ログが track とともに archive へ移動するため `track/archive/<track-id>/logs/telemetry.jsonl` へ追記し、active 側のログを再作成しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b52bf525c3192d60ef9b236b736fb1c34bd6ffaaeaf75d602710520ca535b41c",
+      "evidence_hash": "c68f88aafa877e4c76e69857523a015e562220d83101149c90daffb8616f9058",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実行後に作成または更新されるコマンド観測の記録先は既存の `telemetry.jsonl` のみであり、別の command-trace file やローテーション済み世代は作成されない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TelemetryArchiveInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "実行後に作成または更新されるコマンド観測の記録先は既存の `telemetry.jsonl` のみであり、別の command-trace file やローテーション済み世代は作成されない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b4c0fb711446b15da8795e3b9da3c3ac8f001d998bafa36dae94cb3037bb79a4",
+      "evidence_hash": "9cbde1c8c1b48cacc5d0d024f910428fca90be5b2b70829f6b6062574add4d66",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track ブランチ上で完了した、track が解決できる純表示系ではない `sotp` コマンドを共通の entry point で計装し、完了時にコマンド identity、所要時間、および exit 結果を観測する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TelemetryEmitInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "track ブランチ上で完了した、track が解決できる純表示系ではない `sotp` コマンドを共通の entry point で計装し、完了時にコマンド identity、所要時間、および exit 結果を観測する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b4c0fb711446b15da8795e3b9da3c3ac8f001d998bafa36dae94cb3037bb79a4",
+      "evidence_hash": "7f63c4775a20c1ebcb13ce2fb395e5a2b3aa361f7ca28a0cde89e84bcef2634c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track ブランチ上で完了した、track が解決できる純表示系ではないコマンドの観測イベントを、通常は既存の track-local `track/items/<track-id>/logs/telemetry.jsonl` へ追記する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TelemetryEmitInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "track ブランチ上で完了した、track が解決できる純表示系ではないコマンドの観測イベントを、通常は既存の track-local `track/items/<track-id>/logs/telemetry.jsonl` へ追記する。`track archive` の成功時だけは、既存ログが track とともに archive へ移動するため `track/archive/<track-id>/logs/telemetry.jsonl` へ追記し、active 側のログを再作成しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b4c0fb711446b15da8795e3b9da3c3ac8f001d998bafa36dae94cb3037bb79a4",
+      "evidence_hash": "34dba8d9b16331a0bcdb9d8d3ba20ba4c919233af0e5a3f16e1e69b04f290639",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track ブランチ上で、track が解決できる純表示系ではない任意の `sotp` コマンドが完了すると、同じ track の `telemetry.jsonl` にコマンド identity、所要時間、および exit 結果を含むイベントが追記される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TelemetryEmitInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "track ブランチ上で、track が解決できる純表示系ではない任意の `sotp` コマンドが完了すると、同じ track の `telemetry.jsonl` にコマンド identity、所要時間、および exit 結果を含むイベントが追記される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b4c0fb711446b15da8795e3b9da3c3ac8f001d998bafa36dae94cb3037bb79a4",
+      "evidence_hash": "0a5b8eefaa5d21b78ee550633a947f9904abd51f0f4a7845db989b2a2efa939a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "telemetry の追記に失敗しても、実行済みコマンドの exit 結果は telemetry 失敗によって失敗へ変わらない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TelemetryEmitInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "telemetry の追記に失敗しても、実行済みコマンドの exit 結果は telemetry 失敗によって失敗へ変わらない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "3e225f72b306332000b1197464117be3422fd9fd45975c891dbdd3ee92513781",
+      "evidence_hash": "69f53cc3e250ce8590f8b62c6376a05918b4993da260228f02685f5c2da3eead",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存の `sotp telemetry` 集計を、追記されたコマンド観測イベントを含めて利用頻度、所要時間、および失敗率を分析できるように拡張する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TelemetryReportOutput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "既存の `sotp telemetry` 集計を、追記されたコマンド観測イベントを含めて利用頻度、所要時間、および失敗率を分析できるように拡張する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "3e225f72b306332000b1197464117be3422fd9fd45975c891dbdd3ee92513781",
+      "evidence_hash": "db0cac5221d4ba872e6350cb2de0769c0ffc7c92dbb9adac5e0497d66f197420",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp telemetry` は既存の telemetry 記録を集計し、コマンド横断の実行頻度、所要時間、および失敗率を確認できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TelemetryReportOutput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "`sotp telemetry` は既存の telemetry 記録を集計し、コマンド横断の実行頻度、所要時間、および失敗率を確認できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d2278f793dcf87dc995bda2a44e3c72d5d3c44d9354ab65a7da63786f1b841b4",
+      "evidence_hash": "989d232b0e62d298c71b88e9d6116bf0bd06d2b5eadd3347d107f633cccb24ec",
+      "verdict": {
+        "kind": "pass",
+        "citation": "skip した記録件数を報告する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TelemetrySkippedLineCount"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "`sotp telemetry` は、形式不正な記録および未知の `schema_version` を持つ記録を fail-open で skip し、skip した記録件数を報告する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "58bcbab2da3d1257f988a4dbfa8787858fc1f09f172e3d239e9e49047dbcaf1f",
+      "evidence_hash": "599af9bf8cc9d1f6ff798cf352cd082cc1ad48f83f817c4bb727afd4848795c3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新たな `telemetry.jsonl` 以外の command-trace sink またはローテーション方針を導入しない。既存 report reader の互換読み取りは変更対象外とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TelemetryAggregateService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-02",
+          "text_label": "新たな `telemetry.jsonl` 以外の command-trace sink またはローテーション方針を導入しない。既存 report reader の互換読み取りは変更対象外とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2ca317307dc67e6cf803a0083291424e095847c9f9d7ec3189ae98158eb79f01",
+      "evidence_hash": "599af9bf8cc9d1f6ff798cf352cd082cc1ad48f83f817c4bb727afd4848795c3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新たな `telemetry.jsonl` 以外の command-trace sink またはローテーション方針を導入しない。既存 report reader の互換読み取りは変更対象外とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TelemetryArchivedService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-02",
+          "text_label": "新たな `telemetry.jsonl` 以外の command-trace sink またはローテーション方針を導入しない。既存 report reader の互換読み取りは変更対象外とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cc052561efa18192e67f2e97a06742188ff99215c4d6c922447a3ab020b0acda",
+      "evidence_hash": "9cbde1c8c1b48cacc5d0d024f910428fca90be5b2b70829f6b6062574add4d66",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track ブランチ上で完了した、track が解決できる純表示系ではない `sotp` コマンドを共通の entry point で計装し、完了時にコマンド identity、所要時間、および exit 結果を観測する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TelemetryEmitDynamicPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "track ブランチ上で完了した、track が解決できる純表示系ではない `sotp` コマンドを共通の entry point で計装し、完了時にコマンド identity、所要時間、および exit 結果を観測する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cc052561efa18192e67f2e97a06742188ff99215c4d6c922447a3ab020b0acda",
+      "evidence_hash": "7f63c4775a20c1ebcb13ce2fb395e5a2b3aa361f7ca28a0cde89e84bcef2634c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track ブランチ上で完了した、track が解決できる純表示系ではないコマンドの観測イベントを、通常は既存の track-local `track/items/<track-id>/logs/telemetry.jsonl` へ追記する。`track archive` の成功時だけは、既存ログが track とともに archive へ移動するため `track/archive/<track-id>/logs/telemetry.jsonl` へ追記し、active 側のログを再作成しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TelemetryEmitDynamicPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "track ブランチ上で完了した、track が解決できる純表示系ではないコマンドの観測イベントを、通常は既存の track-local `track/items/<track-id>/logs/telemetry.jsonl` へ追記する。`track archive` の成功時だけは、既存ログが track とともに archive へ移動するため `track/archive/<track-id>/logs/telemetry.jsonl` へ追記し、active 側のログを再作成しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cc052561efa18192e67f2e97a06742188ff99215c4d6c922447a3ab020b0acda",
+      "evidence_hash": "34dba8d9b16331a0bcdb9d8d3ba20ba4c919233af0e5a3f16e1e69b04f290639",
+      "verdict": {
+        "kind": "pass",
+        "citation": "同じ track の `telemetry.jsonl` にコマンド identity、所要時間、および exit 結果を含むイベントが追記される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TelemetryEmitDynamicPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "track ブランチ上で、track が解決できる純表示系ではない任意の `sotp` コマンドが完了すると、同じ track の `telemetry.jsonl` にコマンド identity、所要時間、および exit 結果を含むイベントが追記される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f2e243e836cfdf3abdb96b92eee2ab8b3533eb69c0e66a2334627e092d0ccad5",
+      "evidence_hash": "9cbde1c8c1b48cacc5d0d024f910428fca90be5b2b70829f6b6062574add4d66",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track ブランチ上で完了した、track が解決できる純表示系ではない `sotp` コマンドを共通の entry point で計装し、完了時にコマンド identity、所要時間、および exit 結果を観測する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TelemetryEmitService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "track ブランチ上で完了した、track が解決できる純表示系ではない `sotp` コマンドを共通の entry point で計装し、完了時にコマンド identity、所要時間、および exit 結果を観測する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f2e243e836cfdf3abdb96b92eee2ab8b3533eb69c0e66a2334627e092d0ccad5",
+      "evidence_hash": "7f63c4775a20c1ebcb13ce2fb395e5a2b3aa361f7ca28a0cde89e84bcef2634c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track ブランチ上で完了した、track が解決できる純表示系ではないコマンドの観測イベントを、通常は既存の track-local `track/items/<track-id>/logs/telemetry.jsonl` へ追記する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TelemetryEmitService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "track ブランチ上で完了した、track が解決できる純表示系ではないコマンドの観測イベントを、通常は既存の track-local `track/items/<track-id>/logs/telemetry.jsonl` へ追記する。`track archive` の成功時だけは、既存ログが track とともに archive へ移動するため `track/archive/<track-id>/logs/telemetry.jsonl` へ追記し、active 側のログを再作成しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f2e243e836cfdf3abdb96b92eee2ab8b3533eb69c0e66a2334627e092d0ccad5",
+      "evidence_hash": "34dba8d9b16331a0bcdb9d8d3ba20ba4c919233af0e5a3f16e1e69b04f290639",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track ブランチ上で、track が解決できる純表示系ではない任意の `sotp` コマンドが完了すると、同じ track の `telemetry.jsonl` にコマンド identity、所要時間、および exit 結果を含むイベントが追記される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TelemetryEmitService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "track ブランチ上で、track が解決できる純表示系ではない任意の `sotp` コマンドが完了すると、同じ track の `telemetry.jsonl` にコマンド identity、所要時間、および exit 結果を含むイベントが追記される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0c385e4113bbff8562c1ea55b02b39cd3a7d3ca118264e4efb08d6dd1f29ef60",
+      "evidence_hash": "69f53cc3e250ce8590f8b62c6376a05918b4993da260228f02685f5c2da3eead",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存の `sotp telemetry` 集計を、追記されたコマンド観測イベントを含めて利用頻度、所要時間、および失敗率を分析できるように拡張する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TelemetryReportService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "既存の `sotp telemetry` 集計を、追記されたコマンド観測イベントを含めて利用頻度、所要時間、および失敗率を分析できるように拡張する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0c385e4113bbff8562c1ea55b02b39cd3a7d3ca118264e4efb08d6dd1f29ef60",
+      "evidence_hash": "db0cac5221d4ba872e6350cb2de0769c0ffc7c92dbb9adac5e0497d66f197420",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存の telemetry 記録を集計し、コマンド横断の実行頻度、所要時間、および失敗率を確認できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TelemetryReportService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "`sotp telemetry` は既存の telemetry 記録を集計し、コマンド横断の実行頻度、所要時間、および失敗率を確認できる。"
+        }
+      }
+    }
+  ]
+}

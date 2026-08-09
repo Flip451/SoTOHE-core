@@ -446,7 +446,12 @@ mod tests {
             config_dir.join("agent-profiles.json"),
             r#"{
   "schema_version": 1,
-  "providers": { "claude": { "label": "Claude Code" } },
+  "providers": {
+    "claude": {
+      "label": "Claude Code",
+      "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"]
+    }
+  },
   "capabilities": {
     "ref-verifier-chain1": {
       "provider": "claude",

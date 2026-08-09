@@ -1,0 +1,488 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "f99310ce2e1c37991c87620780959e7bf2513b37e6ee208fea32db6ced27e39b",
+      "evidence_hash": "8a936ca4168276fb339a20f460d1b732fb7e12ad4381c0895ccaa101cb72d5a2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "tracing crate による span / event 計装を全コマンド共通の entry point に入れ、実行コマンド・所要時間・exit 結果をローカル jsonl に記録する。既存の `sotp telemetry` 集計をこの記録の分析に拡張する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "track ブランチ上で、track が解決できる純表示系ではない `sotp` コマンドの完了観測を共通 entry point から既存 telemetry に記録し、利用頻度、所要時間、および失敗率を確認できるようにする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-sotp-tracing-instrumentation.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "9cbde1c8c1b48cacc5d0d024f910428fca90be5b2b70829f6b6062574add4d66",
+      "evidence_hash": "8a936ca4168276fb339a20f460d1b732fb7e12ad4381c0895ccaa101cb72d5a2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "tracing crate による span / event 計装を全コマンド共通の entry point に入れ、実行コマンド・所要時間・exit 結果をローカル jsonl に記録する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "track ブランチ上で完了した、track が解決できる純表示系ではない `sotp` コマンドを共通の entry point で計装し、完了時にコマンド identity、所要時間、および exit 結果を観測する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-sotp-tracing-instrumentation.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "7f63c4775a20c1ebcb13ce2fb395e5a2b3aa361f7ca28a0cde89e84bcef2634c",
+      "evidence_hash": "8a936ca4168276fb339a20f460d1b732fb7e12ad4381c0895ccaa101cb72d5a2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実行コマンド・所要時間・exit 結果をローカル jsonl に記録する。記録はローカル完結とし、外部送信は行わない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "track ブランチ上で完了した、track が解決できる純表示系ではないコマンドの観測イベントを、通常は既存の track-local `track/items/<track-id>/logs/telemetry.jsonl` へ追記する。`track archive` の成功時だけは、既存ログが track とともに archive へ移動するため `track/archive/<track-id>/logs/telemetry.jsonl` へ追記し、active 側のログを再作成しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-sotp-tracing-instrumentation.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "7f63c4775a20c1ebcb13ce2fb395e5a2b3aa361f7ca28a0cde89e84bcef2634c",
+      "evidence_hash": "a83c1ab3493e9e3a8060721ad6a41cdde229b621533c3015fd61c37c6e0a4305",
+      "verdict": {
+        "kind": "pass",
+        "citation": "telemetry は track dir 配下の `logs/` に置く（gitignore: `track/items/**/logs/`）。\nretention は track のライフサイクルに追随する: archive 時は gitignored の `logs/` も\ntrack dir と一緒にファイルシステム上で移動する（archive ツール側の実装要件）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "track ブランチ上で完了した、track が解決できる純表示系ではないコマンドの観測イベントを、通常は既存の track-local `track/items/<track-id>/logs/telemetry.jsonl` へ追記する。`track archive` の成功時だけは、既存ログが track とともに archive へ移動するため `track/archive/<track-id>/logs/telemetry.jsonl` へ追記し、active 側のログを再作成しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "69f53cc3e250ce8590f8b62c6376a05918b4993da260228f02685f5c2da3eead",
+      "evidence_hash": "8a936ca4168276fb339a20f460d1b732fb7e12ad4381c0895ccaa101cb72d5a2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存の `sotp telemetry` 集計をこの記録の分析に拡張する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "既存の `sotp telemetry` 集計を、追記されたコマンド観測イベントを含めて利用頻度、所要時間、および失敗率を分析できるように拡張する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-sotp-tracing-instrumentation.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "69f53cc3e250ce8590f8b62c6376a05918b4993da260228f02685f5c2da3eead",
+      "evidence_hash": "a83c1ab3493e9e3a8060721ad6a41cdde229b621533c3015fd61c37c6e0a4305",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track-id 指定でフェーズ別所要時間・エラー一覧・hook block 一覧を集計する subcommand を初期スコープに含める"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "既存の `sotp telemetry` 集計を、追記されたコマンド観測イベントを含めて利用頻度、所要時間、および失敗率を分析できるように拡張する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "3a4bd9a7e32060f604394331aca3ca1382c55652e057341021fe221cb75c6226",
+      "evidence_hash": "a83c1ab3493e9e3a8060721ad6a41cdde229b621533c3015fd61c37c6e0a4305",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track 帰属は branch-bound に解決する（現在の git ブランチに紐づく track）。track 引数を取らないリポジトリ全域ゲート（layers / orchestra 等）も、track ブランチ上での実行は当該 track に帰属させる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "telemetry の track 帰属は現在の branch に結び付け、track ブランチ上の実行だけを当該 track の時系列観測に含める。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "306913ef10c2d8b0c51008ed956e5030be7065ea020438872f4b361ad52d19d5",
+      "evidence_hash": "8a936ca4168276fb339a20f460d1b732fb7e12ad4381c0895ccaa101cb72d5a2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "記録はローカル完結とし、外部送信は行わない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-01",
+          "text_label": "計装記録または telemetry 分析結果を外部サービスへ送信することは対象外とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-sotp-tracing-instrumentation.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "599af9bf8cc9d1f6ff798cf352cd082cc1ad48f83f817c4bb727afd4848795c3",
+      "evidence_hash": "a83c1ab3493e9e3a8060721ad6a41cdde229b621533c3015fd61c37c6e0a4305",
+      "verdict": {
+        "kind": "pass",
+        "citation": "telemetry は track dir 配下の `logs/` に置く（gitignore: `track/items/**/logs/`）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-02",
+          "text_label": "新たな `telemetry.jsonl` 以外の command-trace sink またはローテーション方針を導入しない。既存 report reader の互換読み取りは変更対象外とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "2de29775325b8aedd86b9187a853ea8b6bfcfe8550477e906cb38a7ac2b87cc4",
+      "evidence_hash": "a83c1ab3493e9e3a8060721ad6a41cdde229b621533c3015fd61c37c6e0a4305",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`track/*` 以外のブランチ（`main` 等）では、`track_resolution.rs` の `updated_at` fallback で最新 track が解決される場合でも telemetry は記録しない"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-03",
+          "text_label": "track ブランチ以外で実行されたコマンドを telemetry に記録することは対象外とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "574105179e56bc8ee83a1de0885b1455e116072d8878b0b5743d9998687db32f",
+      "evidence_hash": "8a936ca4168276fb339a20f460d1b732fb7e12ad4381c0895ccaa101cb72d5a2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存の `sotp telemetry` 集計をこの記録の分析に拡張する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-04",
+          "text_label": "コマンド内部の詳細な span を追加することは対象外とし、必要性が判明した場合に再評価する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-sotp-tracing-instrumentation.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "b22edeb6768f92aa30adcf65c467e5160aa6c7d87a83390ca689d8b41773de0e",
+      "evidence_hash": "8a936ca4168276fb339a20f460d1b732fb7e12ad4381c0895ccaa101cb72d5a2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "記録はローカル完結とし、外部送信は行わない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "計装記録はローカルで完結させ、外部送信を行わない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-sotp-tracing-instrumentation.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "e70f71b8e5fa9626cb231eaea8a311346c805592307b9115ec8439c2d4db65d5",
+      "evidence_hash": "a83c1ab3493e9e3a8060721ad6a41cdde229b621533c3015fd61c37c6e0a4305",
+      "verdict": {
+        "kind": "pass",
+        "citation": "SoT 成果物は telemetry と独立に無傷で残る。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "診断用 telemetry の追記失敗はコマンドの完了結果を変更せず、SoT 成果物を損なわない fire-and-forget の挙動を維持する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "989d232b0e62d298c71b88e9d6116bf0bd06d2b5eadd3347d107f633cccb24ec",
+      "evidence_hash": "a83c1ab3493e9e3a8060721ad6a41cdde229b621533c3015fd61c37c6e0a4305",
+      "verdict": {
+        "kind": "pass",
+        "citation": "読み手は破損行・未知 `schema_version` の行を fail せず skip し、skip 件数を報告する（fail-open — lock なしの並行 append で稀に生じうる破損行を読み手側で吸収する）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "`sotp telemetry` は、形式不正な記録および未知の `schema_version` を持つ記録を fail-open で skip し、skip した記録件数を報告する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "34dba8d9b16331a0bcdb9d8d3ba20ba4c919233af0e5a3f16e1e69b04f290639",
+      "evidence_hash": "8a936ca4168276fb339a20f460d1b732fb7e12ad4381c0895ccaa101cb72d5a2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "tracing crate による span / event 計装を全コマンド共通の entry point に入れ、実行コマンド・所要時間・exit 結果をローカル jsonl に記録する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "track ブランチ上で、track が解決できる純表示系ではない任意の `sotp` コマンドが完了すると、同じ track の `telemetry.jsonl` にコマンド identity、所要時間、および exit 結果を含むイベントが追記される。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-sotp-tracing-instrumentation.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "34dba8d9b16331a0bcdb9d8d3ba20ba4c919233af0e5a3f16e1e69b04f290639",
+      "evidence_hash": "a83c1ab3493e9e3a8060721ad6a41cdde229b621533c3015fd61c37c6e0a4305",
+      "verdict": {
+        "kind": "pass",
+        "citation": "telemetry は track dir 配下の `logs/` に置く（gitignore: `track/items/**/logs/`）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "track ブランチ上で、track が解決できる純表示系ではない任意の `sotp` コマンドが完了すると、同じ track の `telemetry.jsonl` にコマンド identity、所要時間、および exit 結果を含むイベントが追記される。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "db0cac5221d4ba872e6350cb2de0769c0ffc7c92dbb9adac5e0497d66f197420",
+      "evidence_hash": "8a936ca4168276fb339a20f460d1b732fb7e12ad4381c0895ccaa101cb72d5a2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存の `sotp telemetry` 集計をこの記録の分析に拡張する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "`sotp telemetry` は既存の telemetry 記録を集計し、コマンド横断の実行頻度、所要時間、および失敗率を確認できる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-29-0839-sotp-tracing-instrumentation.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "db0cac5221d4ba872e6350cb2de0769c0ffc7c92dbb9adac5e0497d66f197420",
+      "evidence_hash": "a83c1ab3493e9e3a8060721ad6a41cdde229b621533c3015fd61c37c6e0a4305",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track-id 指定でフェーズ別所要時間・エラー一覧・hook block 一覧を集計する subcommand を初期スコープに含める"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "`sotp telemetry` は既存の telemetry 記録を集計し、コマンド横断の実行頻度、所要時間、および失敗率を確認できる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "0a5b8eefaa5d21b78ee550633a947f9904abd51f0f4a7845db989b2a2efa939a",
+      "evidence_hash": "a83c1ab3493e9e3a8060721ad6a41cdde229b621533c3015fd61c37c6e0a4305",
+      "verdict": {
+        "kind": "pass",
+        "citation": "SoT 成果物は telemetry と独立に無傷で残る。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "telemetry の追記に失敗しても、実行済みコマンドの exit 結果は telemetry 失敗によって失敗へ変わらない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "c9bedd27b787dcd258948cd62ba35a3c61bdd27bdb71b082799853ac29c3c995",
+      "evidence_hash": "a83c1ab3493e9e3a8060721ad6a41cdde229b621533c3015fd61c37c6e0a4305",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`track/*` 以外のブランチ（`main` 等）では、`track_resolution.rs` の `updated_at` fallback で最新 track が解決される場合でも telemetry は記録しない"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "track ブランチ以外でコマンドを実行しても、track の telemetry 記録は生成または更新されない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "c68f88aafa877e4c76e69857523a015e562220d83101149c90daffb8616f9058",
+      "evidence_hash": "a83c1ab3493e9e3a8060721ad6a41cdde229b621533c3015fd61c37c6e0a4305",
+      "verdict": {
+        "kind": "pass",
+        "citation": "telemetry は track dir 配下の `logs/` に置く（gitignore: `track/items/**/logs/`）。retention は track のライフサイクルに追随する: archive 時は gitignored の `logs/` も track dir と一緒にファイルシステム上で移動する"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "実行後に作成または更新されるコマンド観測の記録先は既存の `telemetry.jsonl` のみであり、別の command-trace file やローテーション済み世代は作成されない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
+          "decision_id": "D3"
+        }
+      }
+    }
+  ]
+}

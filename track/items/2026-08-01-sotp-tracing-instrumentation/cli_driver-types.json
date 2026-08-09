@@ -1,0 +1,365 @@
+{
+  "crate_name": "cli_driver",
+  "functions": {
+    "cli_driver::telemetry::completion_eligible": {
+      "action": "add",
+      "docs": "Resolve the completion-telemetry admission decision for a normalized command identity.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "subcommand",
+          "ty": "&str"
+        }
+      ],
+      "returns": "bool",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ]
+    },
+    "cli_driver::telemetry::duration_millis": {
+      "action": "add",
+      "docs": "Convert a completed command start instant to an unconstrained full-range technical millisecond measurement for diagnostic telemetry.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "start",
+          "ty": "std::time::Instant"
+        }
+      ],
+      "returns": "u64",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ]
+    },
+    "cli_driver::telemetry::exit_code_value": {
+      "action": "add",
+      "docs": "Convert a process exit result to an unconstrained raw process-status integer for diagnostic telemetry.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "exit_code",
+          "ty": "std::process::ExitCode"
+        }
+      ],
+      "returns": "i32",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ]
+    },
+    "cli_driver::telemetry::items_dir_from_args": {
+      "action": "add",
+      "docs": "Extract only the technical track-items filesystem path from opaque OS arguments; command identity and positional payload interpretation remain outside this cli_driver helper.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "args",
+          "ty": "&[std::ffi::OsString]"
+        }
+      ],
+      "returns": "std::path::PathBuf",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ]
+    }
+  },
+  "inherent_impls": [],
+  "layer": "cli_driver",
+  "schema_version": 5,
+  "trait_impls": [],
+  "traits": {},
+  "types": {
+    "TelemetryCompletion": {
+      "action": "add",
+      "docs": "Captured command context carried from pre-dispatch capture to diagnostic completion emission.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "telemetry",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ]
+    },
+    "TelemetryDriver": {
+      "action": "modify",
+      "docs": "Primary adapter accepting data-only TelemetryInput values and delegating report/emission operations to one aggregate service.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "service",
+              "ty": "std::sync::Arc<dyn usecase::telemetry::TelemetryAggregateService>"
+            },
+            {
+              "name": "context_resolver",
+              "ty": "std::sync::Arc<dyn Fn(&std::path::Path) -> Option<String> + Send + Sync>"
+            },
+            {
+              "name": "archive_completion_uses_archive_sink",
+              "ty": "bool"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "begin_completion",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "subcommand",
+              "ty": "String"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "TelemetryCompletion"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [
+            {
+              "name": "input",
+              "ty": "TelemetryInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "CommandOutcome"
+        }
+      ],
+      "module_path": "telemetry",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ]
+    },
+    "TelemetryInput": {
+      "action": "modify",
+      "docs": "Data-only telemetry driver input for report and direct emission operations; command completion carries pre-dispatch context and is submitted after CLI dispatch.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Report",
+            "payload": {
+              "fields": [
+                "TelemetryReportInput"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "CompleteCommand",
+            "payload": {
+              "fields": [
+                {
+                  "name": "completion",
+                  "ty": "TelemetryCompletion"
+                },
+                {
+                  "name": "exit_code",
+                  "ty": "i32"
+                },
+                {
+                  "name": "error_chain",
+                  "ty": "Option<String>"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "EmitCompletedCommand",
+            "payload": {
+              "fields": [
+                {
+                  "name": "items_dir",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "source_track_id",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "subcommand",
+                  "ty": "String"
+                },
+                {
+                  "name": "exit_code",
+                  "ty": "i32"
+                },
+                {
+                  "name": "duration_ms",
+                  "ty": "u64"
+                },
+                {
+                  "name": "error_chain",
+                  "ty": "Option<String>"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "EmitArchivedTrackSubcommand",
+            "payload": {
+              "fields": [
+                {
+                  "name": "items_dir",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "String"
+                },
+                {
+                  "name": "subcommand",
+                  "ty": "String"
+                },
+                {
+                  "name": "exit_code",
+                  "ty": "i32"
+                },
+                {
+                  "name": "duration_ms",
+                  "ty": "u64"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "telemetry",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ]
+    }
+  }
+}

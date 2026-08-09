@@ -137,6 +137,12 @@ pub(super) struct AgentProfilesDto {
 pub(super) struct ProviderMetadataDto {
     #[allow(dead_code)]
     pub(super) label: Option<String>,
+    /// Reasoning efforts this provider accepts for provider-CLI execution.
+    ///
+    /// The declaration is required so provider × effort validation remains
+    /// fail-closed. Profiles that omit it are invalid; this track does not
+    /// preserve an older schema's implicit provider defaults.
+    pub(super) supported_reasoning_efforts: Vec<ReasoningEffortDto>,
 }
 
 /// Configuration for a single capability entry.

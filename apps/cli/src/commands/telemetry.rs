@@ -25,8 +25,9 @@ use crate::commands::driver_outcome_to_exit;
 /// Subcommands for `sotp telemetry`.
 #[derive(Debug, Subcommand)]
 pub enum TelemetryCommand {
-    /// Aggregate and display telemetry for a track: phase durations, errors,
-    /// hook blocks, and skipped-line count.
+    /// Aggregate and display telemetry for a track: phase durations, command
+    /// frequency, command duration, command failure rate, errors, hook blocks,
+    /// and skipped-line count.
     ///
     /// Reads `track/items/<track-id>/logs/telemetry.jsonl` (or the directory
     /// specified by `--items-dir`) and prints a human-readable summary to

@@ -22,7 +22,7 @@ pub struct ClassifyArgs {
 
     /// Path to the track items directory.
     #[arg(long, default_value = "track/items")]
-    pub(super) items_dir: PathBuf,
+    pub(crate) items_dir: PathBuf,
 
     /// One or more repo-relative paths to classify.
     #[arg(num_args = 1.., required = true)]
