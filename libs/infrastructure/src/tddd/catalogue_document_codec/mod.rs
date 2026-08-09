@@ -765,6 +765,108 @@ mod tests {
     }
 
     #[test]
+    fn test_decode_type_alias_rejects_arguments_on_generic_rooted_target() {
+        // `type A<T> = T<u8>` applies type arguments to the declared
+        // parameter, which rustc rejects with E0109; the generic-alias target
+        // routes through the closed lexical grammar and must fail at decode.
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "BadAlias": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "type_alias",
+        "target": "T<u8>",
+        "generics": [
+          { "name": "T", "bounds": [] }
+        ]
+      }
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+
+        let error = CatalogueDocumentCodec::decode(json, "domain").unwrap_err();
+        assert!(
+            error.to_string().contains("invalid type alias target"),
+            "expected a target validation error, got: {error}"
+        );
+
+        // `'_` is not permitted in a type-alias signature, including a
+        // generic alias target. It must fail through the public decode path.
+        let anonymous_lifetime = json.replace("\"T<u8>\"", "\"&'_ T\"");
+        let error = CatalogueDocumentCodec::decode(&anonymous_lifetime, "domain").unwrap_err();
+        assert!(
+            error.to_string().contains("invalid type alias target"),
+            "expected an anonymous-lifetime target validation error, got: {error}"
+        );
+
+        // Reserved lifetime names are rejected by rustc in alias signatures,
+        // even though `syn` parses them as a lifetime token.
+        for keyword_lifetime in ["&'self T", "&'r#self T", "&'r#static T"] {
+            let target = json.replace("\"T<u8>\"", &format!("\"{keyword_lifetime}\""));
+            let error = CatalogueDocumentCodec::decode(&target, "domain").unwrap_err();
+            assert!(
+                error.to_string().contains("invalid type alias target"),
+                "expected a keyword-lifetime target validation error for {keyword_lifetime}, got: {error}"
+            );
+        }
+
+        // A named lifetime in the target refers to a source-declared lifetime
+        // parameter the schema cannot express, so it stays decodable.
+        let lexical_lifetime = json.replace("\"T<u8>\"", "\"&'a T\"");
+        assert!(
+            CatalogueDocumentCodec::decode(&lexical_lifetime, "domain").is_ok(),
+            "a named target lifetime must stay decodable (lexical lifetime convention)"
+        );
+
+        let unicode_lifetime = json.replace("\"T<u8>\"", "\"&'α T\"");
+        assert!(
+            CatalogueDocumentCodec::decode(&unicode_lifetime, "domain").is_ok(),
+            "a Unicode named target lifetime must stay decodable (lexical lifetime convention)"
+        );
+
+        let raw_keyword_lifetime = json.replace("\"T<u8>\"", "\"&'r#async T\"");
+        assert!(
+            CatalogueDocumentCodec::decode(&raw_keyword_lifetime, "domain").is_ok(),
+            "a raw keyword target lifetime must stay decodable when valid in source"
+        );
+
+        let normalized_keyword_lifetime = json.replace("\"T<u8>\"", "\"&'async T\"");
+        assert!(
+            CatalogueDocumentCodec::decode(&normalized_keyword_lifetime, "domain").is_ok(),
+            "a rustdoc-normalized keyword target lifetime must stay decodable"
+        );
+
+        // A generic projection on the parameter stays a valid target.
+        let json_projection = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "ProjectionAlias": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "type_alias",
+        "target": "T::Item",
+        "generics": [
+          { "name": "T", "bounds": [] }
+        ]
+      }
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+        assert!(CatalogueDocumentCodec::decode(json_projection, "domain").is_ok());
+    }
+
+    #[test]
     fn test_decode_type_alias_accepts_ordered_generic_declaration() {
         let json = r#"{
   "schema_version": 5,

@@ -5,7 +5,9 @@ use std::collections::HashMap;
 use rustdoc_types::{GenericBound, Id, Path, TraitBoundModifier, Type};
 use syn::visit::Visit;
 
-use super::closed_grammar::{enforce_closed_bound_grammar, enforce_closed_type_grammar};
+use super::closed_grammar::{
+    enforce_closed_alias_target_grammar, enforce_closed_bound_grammar, enforce_closed_type_grammar,
+};
 use super::constants::{PRIMITIVE_TYPES, UNRESOLVED_CRATE_ID};
 use super::generic_tokens;
 use super::helpers::{is_simple_const_expr, simple_const_block_expr};
@@ -155,6 +157,24 @@ pub(crate) fn validate_lexical_type_ref(
     let syntax: syn::Type = syn::parse_str(type_ref_str)
         .map_err(|e| format!("invalid type syntax '{type_ref_str}': {e}"))?;
     enforce_closed_type_grammar(type_ref_str, generic_params)?;
+    reject_anonymous_const_blocks_in_type(&syntax)?;
+    reject_unsupported_array_lengths_in_type(&syntax)?;
+    reject_unsupported_const_arguments_in_type(&syntax)
+}
+
+/// Validates a generic type-alias TARGET through the closed grammar with the
+/// target lifetime policy: free NAMED lifetimes stay in scope because the
+/// catalogue schema cannot declare lifetime parameters and targets carry them
+/// lexically (established modeling convention); everything else follows the
+/// same closed rules as [`validate_lexical_type_ref`].
+pub(crate) fn validate_lexical_alias_target(
+    type_ref_str: &str,
+    generic_params: &[&str],
+) -> Result<(), String> {
+    validate_generic_identifier_ambiguities(type_ref_str, generic_params)?;
+    let syntax: syn::Type = syn::parse_str(type_ref_str)
+        .map_err(|e| format!("invalid type syntax '{type_ref_str}': {e}"))?;
+    enforce_closed_alias_target_grammar(type_ref_str, generic_params)?;
     reject_anonymous_const_blocks_in_type(&syntax)?;
     reject_unsupported_array_lengths_in_type(&syntax)?;
     reject_unsupported_const_arguments_in_type(&syntax)

@@ -80,10 +80,36 @@ pub(crate) fn enforce_closed_type_grammar(
     type_ref_str: &str,
     generic_params: &[&str],
 ) -> Result<(), String> {
+    enforce_type_grammar_with_policy(type_ref_str, generic_params, LifetimePolicy::ScopedOnly)
+}
+
+/// Rule A + Rule B for a type-alias TARGET string.
+///
+/// The catalogue schema declares only type parameters, so an alias whose real
+/// declaration carries a lifetime parameter records that lifetime lexically in
+/// the target (an established modeling convention, e.g.
+/// `Pin<Box<dyn Future<…> + Send + 'a>>`). A named lifetime in a target is a
+/// reference to a source-declared lifetime parameter the schema cannot
+/// express — not an undeclared lifetime in the rustc sense (E0261 judges the
+/// real declaration, which does declare it). Free named lifetimes are
+/// therefore in scope for targets; the anonymous `'_` stays rejected because
+/// rustc forbids it in alias signatures.
+pub(crate) fn enforce_closed_alias_target_grammar(
+    type_ref_str: &str,
+    generic_params: &[&str],
+) -> Result<(), String> {
+    enforce_type_grammar_with_policy(type_ref_str, generic_params, LifetimePolicy::AnyNamed)
+}
+
+fn enforce_type_grammar_with_policy(
+    type_ref_str: &str,
+    generic_params: &[&str],
+    lifetime_policy: LifetimePolicy,
+) -> Result<(), String> {
     let syn_type: syn::Type = syn::parse_str(type_ref_str)
         .map_err(|e| format!("invalid type syntax '{type_ref_str}': {e}"))?;
 
-    let mut visitor = AllowlistVisitor::new(generic_params);
+    let mut visitor = AllowlistVisitor::with_lifetime_policy(generic_params, lifetime_policy);
     visitor.visit_type(&syn_type);
     visitor.finish()?;
 
@@ -176,16 +202,50 @@ fn with_dummy_context<R>(
 // Rule B — syntax allowlist visitor
 // ---------------------------------------------------------------------------
 
+/// How lifetime USES outside a binder are judged.
+#[derive(Clone, Copy)]
+enum LifetimePolicy {
+    /// Bound / where positions: only `'static` or binder-introduced names.
+    ScopedOnly,
+    /// Alias targets: source-declarable named lifetimes (the schema cannot
+    /// declare lifetime parameters, so targets carry them lexically); `'_`
+    /// and Rust's reserved lifetime names stay rejected.
+    AnyNamed,
+}
+
+/// The lifetime name used for Rust declaration/scope comparison. Raw
+/// identifiers and their ordinary spelling name the same lifetime.
+fn normalized_lifetime_name(name: &str) -> &str {
+    name.strip_prefix("r#").unwrap_or(name)
+}
+
+/// Whether a lifetime spelling is reserved where a source declaration must
+/// introduce a user-defined lifetime. `syn` validates token syntax; this
+/// closes the remaining rustc-reserved names while leaving keyword and Unicode
+/// lifetime names available.
+fn is_reserved_declared_lifetime_name(name: &str) -> bool {
+    matches!(normalized_lifetime_name(name), "_" | "self" | "Self" | "super" | "crate")
+        || name == "r#static"
+}
+
 struct AllowlistVisitor<'params, 'names> {
     generic_params: &'params [&'names str],
     /// Lifetime names (without `'`) introduced by enclosing `for<>` binders.
     lifetime_scope: Vec<String>,
+    lifetime_policy: LifetimePolicy,
     rejection: Option<String>,
 }
 
 impl<'params, 'names> AllowlistVisitor<'params, 'names> {
     fn new(generic_params: &'params [&'names str]) -> Self {
-        Self { generic_params, lifetime_scope: vec![], rejection: None }
+        Self::with_lifetime_policy(generic_params, LifetimePolicy::ScopedOnly)
+    }
+
+    fn with_lifetime_policy(
+        generic_params: &'params [&'names str],
+        lifetime_policy: LifetimePolicy,
+    ) -> Self {
+        Self { generic_params, lifetime_scope: vec![], lifetime_policy, rejection: None }
     }
 
     fn finish(self) -> Result<(), String> {
@@ -203,10 +263,30 @@ impl<'params, 'names> AllowlistVisitor<'params, 'names> {
 
     fn check_lifetime_use(&mut self, lifetime: &syn::Lifetime) {
         let name = lifetime.ident.to_string();
-        if name != "static" && !self.lifetime_scope.contains(&name) {
-            self.reject(&format!(
-                "lifetime `'{name}` is neither `'static` nor introduced by a visible `for<>` binder"
-            ));
+        let normalized_name = normalized_lifetime_name(&name);
+        match self.lifetime_policy {
+            LifetimePolicy::ScopedOnly => {
+                if name == "r#static"
+                    || (normalized_name != "static"
+                        && !self.lifetime_scope.iter().any(|scoped| scoped == normalized_name))
+                {
+                    self.reject(&format!(
+                        "lifetime `'{name}` is neither `'static` nor introduced by a visible \
+                         `for<>` binder"
+                    ));
+                }
+            }
+            LifetimePolicy::AnyNamed => {
+                // `syn` has already checked lifetime-token syntax.  These
+                // are the remaining reserved forms that rustc does not allow
+                // in lifetime declarations; raw keyword names such as
+                // `'r#async` remain source-declarable and are accepted.
+                if is_reserved_declared_lifetime_name(&name) {
+                    self.reject(&format!(
+                        "lifetime `'{name}` is not valid in a type-alias signature"
+                    ));
+                }
+            }
         }
     }
 
@@ -233,16 +313,17 @@ impl<'params, 'names> AllowlistVisitor<'params, 'names> {
                     // rejected by rustc (E0262), and a name already in scope is
                     // a duplicate or shadowing declaration (E0403 / E0496).
                     let name = lifetime_param.lifetime.ident.to_string();
-                    if name == "static" || name == "_" {
+                    let normalized_name = normalized_lifetime_name(&name);
+                    if normalized_name == "static" || is_reserved_declared_lifetime_name(&name) {
                         self.reject(&format!("`'{name}` cannot be declared by a `for<>` binder"));
                     }
-                    if self.lifetime_scope.contains(&name) {
+                    if self.lifetime_scope.iter().any(|scoped| scoped == normalized_name) {
                         self.reject(&format!(
                             "binder lifetime `'{name}` duplicates or shadows a lifetime already \
                              in scope"
                         ));
                     }
-                    self.lifetime_scope.push(name);
+                    self.lifetime_scope.push(normalized_name.to_owned());
                     added += 1;
                 }
                 syn::GenericParam::Type(_) | syn::GenericParam::Const(_) => {

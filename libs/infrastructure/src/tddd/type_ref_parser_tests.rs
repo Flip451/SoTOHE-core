@@ -1189,6 +1189,72 @@ fn test_alias_lexical_gates_reject_empty_generic_argument_lists() {
 }
 
 #[test]
+fn test_alias_target_grammar_accepts_source_declarable_named_lifetimes_only() {
+    // The schema cannot declare lifetime parameters, so alias TARGETS carry
+    // them lexically (established modeling convention): free named lifetimes
+    // are in scope for the target grammar only.
+    assert!(
+        validate_lexical_alias_target(
+            "std::pin::Pin<std::boxed::Box<dyn core::future::Future<Output = Result<V, E>> + Send + 'a>>",
+            &["V", "E"],
+        )
+        .is_ok(),
+        "a free named lifetime must stay valid in a generic alias target"
+    );
+    assert!(
+        validate_lexical_alias_target("&'α T", &["T"]).is_ok(),
+        "Unicode lifetime names valid in source declarations must stay valid in generic alias targets"
+    );
+    assert!(
+        validate_lexical_alias_target("&'r#async T", &["T"]).is_ok(),
+        "raw keyword lifetime names valid in source declarations must stay valid in generic alias targets"
+    );
+    assert!(
+        validate_lexical_alias_target("&'async T", &["T"]).is_ok(),
+        "rustdoc-normalized keyword lifetime names must stay valid in generic alias targets"
+    );
+    // Anonymous and reserved lifetime names are not valid in a type-alias
+    // signature, while bound / subject positions keep the scoped rule.
+    assert!(validate_lexical_alias_target("&'_ u8", &["T"]).is_err());
+    assert!(validate_lexical_alias_target("&'self u8", &["T"]).is_err());
+    assert!(validate_lexical_alias_target("&'r#self u8", &["T"]).is_err());
+    assert!(validate_lexical_alias_target("&'r#static u8", &["T"]).is_err());
+    assert!(validate_lexical_type_ref("&'a u8", &["T"]).is_err());
+}
+
+#[test]
+fn test_lexical_gates_reject_reserved_lifetime_binder_declarations() {
+    // Reserved binder names must fail at declaration time.  Checking only
+    // lifetime uses would let an unused `for<'self>` through, and ScopedOnly
+    // would otherwise consider a use in that binder in scope.
+    assert!(validate_lexical_alias_target("for<'self> fn(T)", &["T"]).is_err());
+    assert!(validate_lexical_generic_bound("for<'self> Fn(&'self T)", &["T"]).is_err());
+    assert!(validate_lexical_type_ref("for<'self> fn(&'self T)", &["T"]).is_err());
+
+    for reserved in
+        ["self", "Self", "super", "crate", "r#self", "r#Self", "r#super", "r#crate", "r#static"]
+    {
+        let target = format!("for<'{reserved}> fn(T)");
+        assert!(
+            validate_lexical_alias_target(&target, &["T"]).is_err(),
+            "a reserved lifetime binder must be rejected in a target: {target}"
+        );
+    }
+}
+
+#[test]
+fn test_closed_grammar_normalizes_raw_lifetime_names_in_hrtb_scopes() {
+    assert!(
+        validate_lexical_generic_bound("for<'r#a> Fn(&'a ())", &["T"]).is_ok(),
+        "a use of a raw-named binder lifetime must resolve through its ordinary spelling"
+    );
+    assert!(
+        validate_lexical_generic_bound("for<'a, 'r#a> Fn(&'a ())", &["T"]).is_err(),
+        "a raw-named binder lifetime must not bypass duplicate-declaration rejection"
+    );
+}
+
+#[test]
 fn test_alias_lexical_gates_reject_multiple_dyn_lifetimes() {
     // Rust permits only one explicit trait-object lifetime bound (E0226), and
     // the converter keeps only the first, so a second lifetime must fail closed.

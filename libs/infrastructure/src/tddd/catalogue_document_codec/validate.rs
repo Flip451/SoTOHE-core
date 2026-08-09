@@ -8,7 +8,8 @@ use domain::tddd::catalogue_v2::{BoundOp, MethodGenericParam, WherePredicateDecl
 
 use crate::tddd::type_ref_parser::{
     is_plain_generic_param_name, validate_generic_identifier_ambiguities, validate_legacy_type_ref,
-    validate_lexical_generic_bound, validate_lexical_type_ref, validate_maybe_const_bound,
+    validate_lexical_alias_target, validate_lexical_generic_bound, validate_lexical_type_ref,
+    validate_maybe_const_bound,
 };
 
 use super::CatalogueDocumentCodecError;
@@ -120,19 +121,28 @@ pub(super) fn validate_type_alias_where_predicates(
     Ok(())
 }
 
-/// Validates a type-alias target with the general type-reference rules used by
-/// its encoder. Alias bounds and where predicates use a separate lexical gate
-/// because their structural comparison preserves declared spelling.
+/// Validates a type-alias target. A generic alias routes through the closed
+/// lexical grammar — the same generic/legacy fork the where-predicate
+/// subjects use — so a target that applies type arguments to a declared
+/// parameter (`T<u8>`, rustc E0109) or any other unrepresentable form fails
+/// at decode instead of converting to an unresolved marker. Targets use the
+/// dedicated lifetime policy of [`validate_lexical_alias_target`]: the schema
+/// cannot declare lifetime parameters, so targets carry source-declared
+/// lifetimes lexically. A non-generic alias keeps the general type-reference
+/// rules used by its encoder.
 pub(super) fn validate_type_alias_target(
     entry_name: &str,
     target: &str,
     generic_params: &[&str],
 ) -> Result<(), CatalogueDocumentCodecError> {
-    validate_legacy_type_ref(target, generic_params).map_err(|error| {
-        CatalogueDocumentCodecError::InvalidEntry {
-            entry_name: entry_name.to_owned(),
-            reason: format!("invalid type alias target: {error}"),
-        }
+    let validation = if generic_params.is_empty() {
+        validate_legacy_type_ref(target, generic_params)
+    } else {
+        validate_lexical_alias_target(target, generic_params)
+    };
+    validation.map_err(|error| CatalogueDocumentCodecError::InvalidEntry {
+        entry_name: entry_name.to_owned(),
+        reason: format!("invalid type alias target: {error}"),
     })
 }
 

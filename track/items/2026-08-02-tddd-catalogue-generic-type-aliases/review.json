@@ -4601,6 +4601,146 @@
           "hash": "rvw1:sha256:752134089ac7e1dd63ad31738a114c29f26f4fd8a4d551496814c1f69a64946a",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T05:07:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3c7b38499a0e097d35ab9e5df72052dbb6eeae6fbdcc5653530bd1d2563ee4ef",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T05:12:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3c7b38499a0e097d35ab9e5df72052dbb6eeae6fbdcc5653530bd1d2563ee4ef",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T05:23:33Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/closed_grammar.rs",
+              "line": 256,
+              "message": "`AnyNamed` makes every named lifetime pass alias-target validation, so an undeclared lifetime such as `&'a T` with only `T` declared is accepted at decode even though `type A<T> = &'a T` is rejected by rustc (E0261). This also violates the briefing's requirement that generic alias targets use the same closed grammar as where-subjects; only binder-scoped or `'static` lifetimes should pass.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:cbc6d7e8322b25be0de66230ebe21992c80788cdd0dfa1c0ad2d8bf864c1e84d",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T05:41:53Z",
+          "findings": [
+            {
+              "category": "test coverage",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs",
+              "line": 801,
+              "message": "The briefing requires `'_` rejection to be pinned at both the parser and decode levels, but the codec regression test only exercises `T<u8>`, a named lifetime, and `T::Item`. There is no `CatalogueDocumentCodec::decode` case with a generic alias target such as `&'_ T` asserting an `InvalidEntry`, so the public DTO-to-domain validation path could regress without detection.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a49efa078185920753c883714f8b9ec91e5a754f4735934e2708ef11bf524fb6",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T05:45:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:65c28127f078c78e94a54754f07eddb1114af95a8989fb44e0b7ad06a8e2d1b3",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T05:51:34Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/closed_grammar.rs",
+              "line": 260,
+              "message": "`LifetimePolicy::AnyNamed` rejects only `'_`, so keyword lifetimes such as `&'self T` pass the new target gate: `syn` represents the apostrophe plus keyword as a `Lifetime`, Rule A renders it unchanged, but rustc rejects lifetime keyword names. This makes the codec accept targets that cannot correspond to the source-declared lifetime convention. Reject Rust keyword names here (while retaining the valid special `'static`) and add a decode regression.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:65c28127f078c78e94a54754f07eddb1114af95a8989fb44e0b7ad06a8e2d1b3",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T05:57:49Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/closed_grammar.rs",
+              "line": 261,
+              "message": "`AnyNamed` now reuses the catalogue type-parameter validator, whose `is_plain_identifier` check is ASCII-only. Rust permits Unicode lifetime names, so a valid source declaration such as `type A<'α, T> = &'α T` cannot be represented: `validate_lexical_alias_target(\"&'α T\", &[\"T\"])` is rejected despite the target policy accepting source-declared named lifetimes. Check only the lifetime-specific invalid cases (keywords and `'_`) and add parser/decode coverage for a valid Unicode lifetime.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:11b1d0b1eaa54f4a4a6c4b8381456ff52ce7d3cf2e1f23fce9633c8d93dc95dc",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T06:07:59Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/closed_grammar.rs",
+              "line": 265,
+              "message": "`AnyNamed` rejects every ASCII raw lifetime because names such as `r#async` fail `is_plain_generic_param_name`; it also rejects the rustdoc-normalized `async` form. Rust 2021+ permits raw keyword lifetimes such as `type A<'r#async, T> = &'r#async T`, so this valid source-declared target has no accepted catalogue representation. Validate raw-lifetime rules separately while continuing to reject reserved forms such as `r#self`, and add parser/decode coverage.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e2993ac29ef146734d4484eaa3f561f30e6c78ac9821504cb936994f80711cb8",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T06:16:09Z",
+          "findings": [
+            {
+              "category": "test coverage",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs",
+              "line": 821,
+              "message": "The briefing explicitly requires reserved target lifetimes `'self` and `'r#self` to be rejected. The parser test covers both, but the public `CatalogueDocumentCodec::decode` regression only exercises `'self`; there is no decode-level assertion for `'r#self`, leaving the raw-reserved spelling's DTO validation path unpinned.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:86fd2d7ae030c46486c05b1437aa5fc12b5e818d8f8c9cd361e2366d8fc3c6f8",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T06:21:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:91738290d245690803c36b1028502de70e0ccae4d2bb424b8610ccfe55533e6f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T06:24:14Z",
+          "findings": [
+            {
+              "category": "fail-closed validation",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/closed_grammar.rs",
+              "line": 308,
+              "message": "The reserved-name check still applies only to lifetime uses; `enter_binder` continues to reject only `static` and `_`. Consequently `validate_lexical_alias_target(\"for<'self> fn(T)\", &[\"T\"])` has no lifetime use for `check_lifetime_use` to catch and is accepted even though rustc rejects the binder. Under `ScopedOnly`, even a used reserved binder such as `for<'self> fn(&'self T)` passes because `self` was pushed into scope. Reject all reserved bare/raw lifetime declarations in `enter_binder` and cover target plus bound/where-subject gates.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:91738290d245690803c36b1028502de70e0ccae4d2bb424b8610ccfe55533e6f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T06:36:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5d7c3d909d34f2a5a433b1eb8613a2866b04237972471085e98498712a037443",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
