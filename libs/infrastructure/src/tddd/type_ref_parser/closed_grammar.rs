@@ -358,6 +358,40 @@ impl<'ast, 'params, 'names> Visit<'ast> for AllowlistVisitor<'params, 'names> {
     }
 
     fn visit_type_bare_fn(&mut self, node: &'ast syn::TypeBareFn) {
+        // Rustc rejects unrecognized ABI names outright (E0703); only the
+        // stable calling conventions can appear in compiler-validated rustdoc
+        // output. This includes the conventions the converter keeps as
+        // `Abi::Other` (`efiapi`, the `thiscall` family).
+        if let Some(name) = node.abi.as_ref().and_then(|abi| abi.name.as_ref()) {
+            const SUPPORTED_ABI_NAMES: &[&str] = &[
+                "Rust",
+                "C",
+                "C-unwind",
+                "cdecl",
+                "cdecl-unwind",
+                "stdcall",
+                "stdcall-unwind",
+                "fastcall",
+                "fastcall-unwind",
+                "aapcs",
+                "aapcs-unwind",
+                "win64",
+                "win64-unwind",
+                "sysv64",
+                "sysv64-unwind",
+                "system",
+                "system-unwind",
+                "efiapi",
+                "thiscall",
+                "thiscall-unwind",
+            ];
+            if !SUPPORTED_ABI_NAMES.contains(&name.value().as_str()) {
+                self.reject(&format!(
+                    "`extern \"{}\"` is not a calling convention rustc supports (E0703)",
+                    name.value()
+                ));
+            }
+        }
         let added = self.enter_binder(node.lifetimes.as_ref());
         for input in &node.inputs {
             if !input.attrs.is_empty() {

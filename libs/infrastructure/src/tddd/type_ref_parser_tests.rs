@@ -1150,6 +1150,9 @@ fn test_alias_lexical_gates_reject_additional_lossy_spellings() {
         r##"Outer<extern r#"C"# fn()>"##,
         "Outer<extern \"\\x43\" fn()>",
         "Outer<unsafe extern \"C\" fn(u8, args: ...)>",
+        // rustc rejects unrecognized ABI names outright (E0703)
+        "Outer<extern \"garbage\" fn()>",
+        "Outer<extern \"garbage\" fn(u8, ...)>",
     ] {
         assert_alias_lexical_spelling_rejected_at_all_gates(spelling);
     }
