@@ -179,13 +179,13 @@
       "status": "done"
     },
     {
-      "commit_hash": null,
+      "commit_hash": "e44e0e56",
       "depends_on": [
         "T013"
       ],
       "description": "Integrate the second base merge (develop 83c64c2e) by resolving the existing conflict hunks in `apps/cli/src/commands/track/mod.rs` and `apps/cli/src/main.rs`, then run `bin/sotp track baseline-capture --source-workspace <exact-merged-base-disposable-clone>` to refresh the active track's per-layer `<layer>-types-baseline.json` files after recovery review. AC-04.",
       "id": "T014",
-      "status": "in_progress"
+      "status": "done"
     }
   ]
 }
