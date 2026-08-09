@@ -940,7 +940,7 @@ exec gh pr comment --body-file "$1"
 ''']
 
 [tasks.track-commit-message]
-description = "[wrapper] Regenerate signals + views (via track-active-gate; that gate runs no ref-verify call), then run the strict commit gate: stage working tree, full cargo make ci, track-aware cargo make ci-track (including ADR-baseline check-commit), code-review gate (review not approved → BLOCK), semantic review refresh (`sotp ref-verify run` — the scope derives from track artifact existence, so pre-Phase-1 tracks pass with zero pairs; the only writing step, positioned after the code-review gate per CN-02 / IN-02), re-stage to capture verify-cache artifact writes, `sotp ref-verify check-approved` (non-Pass pairs → BLOCK; same existence-derived scope), test-obligation fulfillment gate (`sotp test-obligation check`; missing bindings / unresolved edges / stale verdicts → BLOCK), DRY gate (`sotp dry check-approved`; unresolved DRY violations → BLOCK), commit from tmp/track-commit/commit-message.txt, persist HEAD SHA to .commit_hash. This regeneration is commit-only: review wrappers carry no `track-active-gate` dependency and receive their pre-review gating from the scope-resolved dispatch inside `bin/sotp review local`. The strict checks (ci + ci-track + check-approved + semantic review + test-obligation + DRY gate) are NOT weakened by the bare-chain refactor (CN-12)."
+description = "[wrapper] Regenerate signals + views (via track-active-gate; that gate runs no ref-verify call), then run the strict commit gate: stage working tree, full cargo make ci, track-aware cargo make ci-track (including ADR-baseline check-commit), code-review gate (review not approved → BLOCK), semantic review refresh (`sotp ref-verify run` — the scope derives from track artifact existence, so pre-Phase-1 tracks pass with zero pairs; the only writing step, positioned after the code-review gate per CN-02 / IN-02), re-stage to capture verify-cache artifact writes, `sotp ref-verify check-approved --chain 1` and `--chain 2` (non-Pass pairs on either required chain → BLOCK; same existence-derived scope), test-obligation fulfillment gate (`sotp test-obligation check`; missing bindings / unresolved edges / stale verdicts → BLOCK), DRY gate (`sotp dry check-approved`; unresolved DRY violations → BLOCK), commit from tmp/track-commit/commit-message.txt, persist HEAD SHA to .commit_hash. This regeneration is commit-only: review wrappers carry no `track-active-gate` dependency and receive their pre-review gating from the scope-resolved dispatch inside `bin/sotp review local`. The strict checks (ci + ci-track + check-approved + semantic review + test-obligation + DRY gate) are NOT weakened by the bare-chain refactor (CN-12)."
 dependencies = ["track-active-gate"]
 script_runner = "@shell"
 script = ['''
@@ -950,7 +950,8 @@ cargo make ci-track && \
 bin/sotp review check-approved && \
 bin/sotp ref-verify run && \
 bin/sotp git add-all && \
-bin/sotp ref-verify check-approved && \
+bin/sotp ref-verify check-approved --chain 1 && \
+bin/sotp ref-verify check-approved --chain 2 && \
 bin/sotp test-obligation check && \
 bin/sotp dry check-approved && \
 bin/sotp git commit-from-file tmp/track-commit/commit-message.txt --cleanup && \

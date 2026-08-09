@@ -296,13 +296,14 @@ impl ReviewService for PreReviewCommandGatedReviewInteractor {
             },
             None => ReviewTrackSelector::CurrentBranch,
         };
-        let scope = if group == "other" {
-            ReviewScopeSelector::Other
-        } else {
-            match MainScopeName::new(group.clone()) {
-                Ok(name) => ReviewScopeSelector::Named(name),
-                Err(error) => return blocked_output(&error.to_string()),
-            }
+        let parsed_scope = match ScopeName::parse(&group) {
+            Ok(scope) => scope,
+            Err(error) => return blocked_output(&error.to_string()),
+        };
+        let group = parsed_scope.to_string();
+        let scope = match parsed_scope {
+            ScopeName::Main(name) => ReviewScopeSelector::Named(name),
+            ScopeName::Other => ReviewScopeSelector::Other,
         };
         match self.dispatcher.dispatch(PreReviewCommandDispatchCommand {
             repository_root,
@@ -406,8 +407,9 @@ mod tests {
         ProgramRunOutcome, ProgramRunnerError, ProgramRunnerPort,
     };
     use crate::review_v2::{
-        ReviewCheckZeroFindingsError, ReviewCheckZeroFindingsQuery, ReviewCheckZeroFindingsService,
-        ReviewRunInput, ReviewRunLocalOutput, ReviewService, RunReviewError, RunReviewOutput,
+        ReviewCheckZeroFindingsEvaluationError, ReviewCheckZeroFindingsQuery,
+        ReviewCheckZeroFindingsService, ReviewRunInput, ReviewRunLocalOutput, ReviewService,
+        RunReviewError, RunReviewOutput,
     };
 
     use super::{
@@ -815,8 +817,10 @@ mod tests {
         fn check_zero_findings(
             &self,
             _query: &ReviewCheckZeroFindingsQuery,
-        ) -> Result<crate::review_v2::ReviewCheckZeroFindingsOutcome, ReviewCheckZeroFindingsError>
-        {
+        ) -> Result<
+            crate::review_v2::ReviewCheckZeroFindingsOutcome,
+            ReviewCheckZeroFindingsEvaluationError,
+        > {
             panic!("not used")
         }
     }
@@ -839,6 +843,102 @@ mod tests {
             _items_dir: PathBuf,
         ) -> ReviewRunLocalOutput {
             self.0.fetch_add(1, Ordering::SeqCst);
+            ReviewRunLocalOutput { stdout: Some("reviewed".to_owned()), stderr: None, exit_code: 0 }
+        }
+        fn check_approved(
+            &self,
+            _track_id: String,
+            _items_dir: PathBuf,
+        ) -> Result<
+            crate::review_v2::ReviewApprovalOutput,
+            crate::review_v2::ReviewCheckApprovedError,
+        > {
+            panic!("not used")
+        }
+        fn results(
+            &self,
+            _track_id: Option<String>,
+            _items_dir: PathBuf,
+            _scope: Option<String>,
+            _all: bool,
+            _limit: u32,
+            _round_type: String,
+            _no_hint: bool,
+        ) -> Result<String, crate::review_v2::ReviewAuxError> {
+            panic!("not used")
+        }
+        fn classify(
+            &self,
+            _paths: Vec<String>,
+            _track_id: Option<String>,
+            _items_dir: PathBuf,
+        ) -> Result<Vec<(String, String)>, crate::review_v2::ReviewAuxError> {
+            panic!("not used")
+        }
+        fn files(
+            &self,
+            _scope: String,
+            _track_id: Option<String>,
+            _items_dir: PathBuf,
+        ) -> Result<Vec<String>, crate::review_v2::ReviewAuxError> {
+            panic!("not used")
+        }
+        fn validate_scope(
+            &self,
+            _scope: String,
+            _track_id: Option<String>,
+            _items_dir: PathBuf,
+        ) -> Result<(), crate::review_v2::ReviewAuxError> {
+            panic!("not used")
+        }
+        fn get_briefing(
+            &self,
+            _scope: String,
+            _track_id: Option<String>,
+            _items_dir: PathBuf,
+        ) -> Result<Option<String>, crate::review_v2::ReviewAuxError> {
+            panic!("not used")
+        }
+        fn persist_commit_hash(
+            &self,
+            _track_id: String,
+            _workspace_root: PathBuf,
+        ) -> Result<String, crate::commit_hash_persistence::CommitHashPersistenceError> {
+            panic!("not used")
+        }
+    }
+
+    struct GroupCapturingReview(Mutex<Vec<String>>);
+    impl ReviewCheckZeroFindingsService for GroupCapturingReview {
+        fn check_zero_findings(
+            &self,
+            _query: &ReviewCheckZeroFindingsQuery,
+        ) -> Result<
+            crate::review_v2::ReviewCheckZeroFindingsOutcome,
+            ReviewCheckZeroFindingsEvaluationError,
+        > {
+            panic!("not used")
+        }
+    }
+    impl ReviewService for GroupCapturingReview {
+        fn run_codex(&self, _input: ReviewRunInput) -> Result<RunReviewOutput, RunReviewError> {
+            panic!("not used")
+        }
+        fn run_claude(&self, _input: ReviewRunInput) -> Result<RunReviewOutput, RunReviewError> {
+            panic!("not used")
+        }
+        fn run_local(
+            &self,
+            _model: Option<String>,
+            _timeout_seconds: u64,
+            _briefing_file: Option<PathBuf>,
+            _prompt: Option<String>,
+            _track_id: Option<String>,
+            _round_type: String,
+            group: String,
+            _items_dir: PathBuf,
+        ) -> ReviewRunLocalOutput {
+            self.0.lock().expect("received group lock is healthy").push(group);
             ReviewRunLocalOutput { stdout: Some("reviewed".to_owned()), stderr: None, exit_code: 0 }
         }
         fn check_approved(
@@ -936,6 +1036,31 @@ mod tests {
         assert_eq!(
             captured.first().expect("dispatch command captured").repository_root,
             PathBuf::from(".")
+        );
+    }
+
+    #[test]
+    fn test_pre_review_gated_review_normalizes_case_insensitive_other_group_for_inner_review() {
+        let review = Arc::new(GroupCapturingReview(Mutex::new(Vec::new())));
+        let dispatcher = Arc::new(CapturingDispatcher(Mutex::new(Vec::new())));
+        let gated = PreReviewCommandGatedReviewInteractor::new(review.clone(), dispatcher.clone());
+
+        let output = gated.run_local(
+            None,
+            60,
+            None,
+            None,
+            Some("test-track".to_owned()),
+            "fast".to_owned(),
+            "Other".to_owned(),
+            PathBuf::from("track/items"),
+        );
+
+        assert_eq!(output.exit_code, 0);
+        assert_eq!(*review.0.lock().unwrap(), vec!["other"]);
+        assert_eq!(
+            dispatcher.0.lock().unwrap().first().expect("dispatch command captured").scope,
+            ReviewScopeSelector::Other
         );
     }
 

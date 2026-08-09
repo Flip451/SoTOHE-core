@@ -9,7 +9,7 @@ GO-03 → T018、T019、T020、T021、T022、T023。
 GO-04 → T018、T020、T021、T022、T023。
 GO-05 → T017、T018、T019、T020、T021、T022。
 
-## Tasks (26/31 resolved)
+## Tasks (27/31 resolved)
 
 ### S0 — 確定済みの履歴 task
 
@@ -60,8 +60,8 @@ GO-05 → T017、T018、T019、T020、T021、T022。
 
 > T038–T041 は exit-code check commands、per-phase matrix configuration、canonical workflow entrypoint を追加・更新する。IN-12、IN-13、CN-06、AC-14、AC-15、AC-16。
 
-- [~] **T038**: `libs/usecase/src/review_v2/{check_zero_findings.rs,mod.rs}` に `ReviewCheckZeroFindings{Query,Outcome,Error,Service,Interactor}` を追加し、`libs/infrastructure/src/review_v2/` の usecase state port を実装する `ReviewCheckZeroFindingsStateAdapter` を追加する。`apps/cli-driver/src/review.rs` と `apps/cli-composition/src/review_v2/{check_zero_findings.rs,mod.rs}` の driver / adapter wiring を更新する。`apps/cli/src/commands/review/{mod.rs,tests.rs}` の `CheckZeroFindingsArgs` / `ReviewCheckRoundArg` と handler tests を追加する。enum variant registration と review CLI の subcommand enum の最終形は T042 に委ねる。CN-06、AC-16。
-- [ ] **T042**: `cli:ReviewCommand` の final shape を排他的に統合し、legacy variant removal、`CheckZeroFindings` の追加、`CheckApproved` payload の `ReviewCheckApprovedArgs` rename、dispatch / callers / tests integration を更新する。CN-06、AC-16。
+- [x] **T038**: `libs/usecase/src/review_v2/{check_zero_findings.rs,mod.rs}` に `ReviewCheckZeroFindings{Query,Outcome,Service,Interactor}` を追加し、`libs/infrastructure/src/review_v2/` の usecase state port を実装する `ReviewCheckZeroFindingsStateAdapter` を追加する。`apps/cli-driver/src/review.rs` と `apps/cli-composition/src/review_v2/{check_zero_findings.rs,mod.rs}` の driver / adapter wiring を更新する。`apps/cli/src/commands/review/{mod.rs,tests.rs}` の `CheckZeroFindingsArgs` / `ReviewCheckRoundArg` と handler tests を追加する。error surface の最終形、enum variant registration と review CLI の subcommand enum の最終形は T042 に委ねる。CN-06、AC-16。 (`ce1eba1dabdc6f458f4dc3dfcabf10fed8bf194d`)
+- [~] **T042**: `cli:ReviewCommand` の final shape を排他的に統合し、legacy variant removal、`CheckZeroFindings` の追加、`CheckApproved` payload の `ReviewCheckApprovedArgs` rename を実装する。`apps/cli-driver/src/review.rs` の `ReviewCheckZeroFindingsInput` から usecase query への fallible conversion と CLI caller integration、dispatch / tests を更新する。既存 `review check-approved` 経路の互換性検証 tests を更新する。CN-06、AC-16、AC-17。
 - [ ] **T043**: `ReviewScopeSelection` への results-selection enum migration を usecase、CLI driver、CLI callers と tests に実装する。CN-06、AC-16。
 - [x] **T039**: `ref-verify check-approved` の Chain 1 / Chain 2 selector を usecase、CLI driver、`apps/cli/src/commands/ref_verify.rs` に実装し、CLI exit-code tests を追加する。`libs/infrastructure/src/ref_verify/driver_adapter.rs` の chain-scoped check-approved fail-closed path を更新し、`apps/cli-composition/src/{ref_verify.rs,lib.rs}` の pure-DI handoff を更新して wrapper / DTO re-export を削除する。CN-06、AC-16。 (`d6737bc396ffcd8dfd5e3af9e2cfd10c2605c30d`)
 - [ ] **T040**: `.harness/config/phase-commands.json` を phase ごとの convergence matrix に更新し、`apps/cli/src/commands/phase.rs` に phase-entry fixture / integration tests を追加する。IN-12、CN-06、AC-14、AC-16。

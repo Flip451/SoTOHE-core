@@ -24,9 +24,9 @@ pub use check_approved::{
     ReviewCheckApprovedInteractor, ReviewCheckApprovedService,
 };
 pub use check_zero_findings::{
-    ReviewCheckZeroFindingsError, ReviewCheckZeroFindingsInteractor,
+    ReviewCheckZeroFindingsEvaluationError, ReviewCheckZeroFindingsInteractor,
     ReviewCheckZeroFindingsOutcome, ReviewCheckZeroFindingsQuery, ReviewCheckZeroFindingsService,
-    ReviewCheckZeroFindingsStatePort,
+    ReviewCheckZeroFindingsStatePort, ReviewCheckZeroFindingsValidationError,
 };
 pub use cycle::ReviewCycle;
 pub use error::{DiffGetError, ReviewCycleError, ReviewHasherError, ReviewerError};

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "1293c720775c3bdf168bb2f26d6125ca42f5069fef322130775714aac5848880",
+  "catalogue_declaration_hash": "b5033b244254930c50c631ad7c41c46d3573de3538908f54351c75784996cbf7",
   "signals": [
     {
       "type_name": "CapabilityExecArgs",
@@ -50,12 +50,12 @@
     {
       "type_name": "ReviewCheckApprovedArgs",
       "signal": "blue",
-      "entry_hash": "cf8d5c5fcda83edbb5ea4c3c86a00d1945f25101b53bf50e1c0bb5c9966d7706"
+      "entry_hash": "e5806dc64bade4a2443e5f482b2d4c56a3a33b71545e302927ee8df355fa92a5"
     },
     {
       "type_name": "ReviewCheckRoundArg",
       "signal": "blue",
-      "entry_hash": "a195b8e0e06834053f24140ca42fa7ea01c1fa9a9de26907128173cd2e695d84"
+      "entry_hash": "9846cd032d59ee22f9c513171e9d90eda348c66c8057ff29d418de044a118082"
     },
     {
       "type_name": "ReviewCommand",
@@ -86,6 +86,16 @@
       "type_name": "cli::commands::ref_verify::execute_check_approved_with_driver",
       "signal": "blue",
       "entry_hash": "35c069b49ed7778028de02b2edbe02974fc6ccd3f770db083c24af57e6ec6986"
+    },
+    {
+      "type_name": "cli::commands::review::execute_check_approved",
+      "signal": "blue",
+      "entry_hash": "2ae16597ed7efc7b3bd7acae268f571d12c3ecc33937fb366bf1496eb3b7502b"
+    },
+    {
+      "type_name": "cli::commands::review::execute_check_zero_findings",
+      "signal": "blue",
+      "entry_hash": "d005ddf319ba41665ebce9911df1adbb500ad461e9575c2913a7166c6ee906d7"
     },
     {
       "type_name": "ClaudeLocalArgs",

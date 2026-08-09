@@ -4,7 +4,7 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use clap::{ArgGroup, Args, Subcommand};
-use cli_driver::review::ReviewInput;
+use cli_driver::review::{ReviewCheckRoundSelect, ReviewCheckZeroFindingsInput, ReviewInput};
 #[cfg(test)]
 use usecase::review_v2::{ReviewApprovalDecision, ReviewApprovalOutput};
 
@@ -38,7 +38,9 @@ pub enum ReviewCommand {
     /// self-resolved by the fixer skill (ADR 2026-06-01-2300 D1/D3).
     FixLocal(FixLocalArgs),
     /// Check if review is approved for commit.
-    CheckApproved(CheckApprovedArgs),
+    CheckApproved(ReviewCheckApprovedArgs),
+    /// Check whether a scope has a current final zero-findings verdict.
+    CheckZeroFindings(CheckZeroFindingsArgs),
     /// Show review results: per-scope state summary, optional round history, and a commit hint.
     ///
     /// Read-only canonical API replacing direct `review.json` access. With `--limit 0`
@@ -65,7 +67,7 @@ pub enum CodexRoundTypeArg {
 }
 
 #[derive(Debug, Args)]
-pub struct CheckApprovedArgs {
+pub struct ReviewCheckApprovedArgs {
     /// Path to the track items directory.
     #[arg(long, default_value = "track/items")]
     items_dir: PathBuf,
@@ -186,6 +188,7 @@ pub fn execute(cmd: ReviewCommand) -> ExitCode {
         ReviewCommand::Local(args) => execute_local(&args),
         ReviewCommand::FixLocal(args) => execute_fix_local(&args),
         ReviewCommand::CheckApproved(args) => execute_check_approved(&args),
+        ReviewCommand::CheckZeroFindings(args) => execute_check_zero_findings(&args),
         ReviewCommand::Results(args) => execute_results(&args),
         ReviewCommand::Classify(args) => execute_classify(&args),
         ReviewCommand::Files(args) => execute_files(&args),
@@ -233,7 +236,7 @@ pub(super) fn format_approval_verdict(output: ReviewApprovalOutput) -> (String, 
     }
 }
 
-fn execute_check_approved(args: &CheckApprovedArgs) -> ExitCode {
+fn execute_check_approved(args: &ReviewCheckApprovedArgs) -> ExitCode {
     let track_id =
         match crate::commands::track::resolve_track_id(args.track_id.clone(), &args.items_dir) {
             Ok(id) => id,
@@ -250,6 +253,42 @@ fn execute_check_approved(args: &CheckApprovedArgs) -> ExitCode {
     }
     if let Some(msg) = &outcome.stderr {
         eprintln!("{msg}");
+    }
+    ExitCode::from(outcome.exit_code)
+}
+
+fn execute_check_zero_findings(args: &CheckZeroFindingsArgs) -> ExitCode {
+    let track_id =
+        match crate::commands::track::resolve_track_id(args.track_id.clone(), &args.items_dir) {
+            Ok(track_id) => track_id,
+            Err(message) => {
+                eprintln!("{message}");
+                return ExitCode::FAILURE;
+            }
+        };
+    let round = match args.round {
+        ReviewCheckRoundArg::Final => ReviewCheckRoundSelect::Final,
+    };
+    let input = match ReviewCheckZeroFindingsInput::try_new(
+        args.items_dir.clone(),
+        track_id,
+        args.scope.clone(),
+        round,
+    ) {
+        Ok(input) => input,
+        Err(error) => {
+            eprintln!("{error}");
+            return ExitCode::FAILURE;
+        }
+    };
+    let outcome = cli_composition::ReviewCompositionRoot::new()
+        .review_driver()
+        .handle(ReviewInput::CheckZeroFindings(input));
+    if let Some(message) = &outcome.stdout {
+        println!("{message}");
+    }
+    if let Some(message) = &outcome.stderr {
+        eprintln!("{message}");
     }
     ExitCode::from(outcome.exit_code)
 }

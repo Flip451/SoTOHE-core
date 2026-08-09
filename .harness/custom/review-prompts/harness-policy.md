@@ -141,19 +141,14 @@ Violations of the role statement above are always reportable. The following prio
   separate track. It is not an accepted deviation for any other track or consumer.
 - **Conditional allowance — apply only when the review run's resolved Track ID is
   exactly `scope-conditional-pre-review-gates-2026-07-31`; otherwise ignore.**
-  **Staged `check-zero-findings` registration**: task T038 lands the
-  `review check-zero-findings` usecase / driver / composition work and the CLI payload
-  WITHOUT registering the review subcommand enum variant; the impl-plan (Phase 3 SSoT)
-  assigns the review CLI enum's final shape to T042, and final-shape convergence of the
-  cli_driver review entries (`ReviewInput`, aggregate `ReviewService`) to T043. Factual
-  background: the batch-plan order is B7 = T038 → T042 → T040 → T041 → T043, and
-  rollback-diagnoser verdicts (2026-08-04) upheld the single-converging-owner split for
-  the shared enum. The driver dispatch and aggregate wiring are already implemented; the
-  only remaining suppression is the cli.md note (missing CLI enum registration /
-  execution path, owned by T042), which expires when T042 completes. The cli_driver.md
-  note only restates the attribution semantics (a T043 attribution asserts convergence
-  at completion, not pending change). It is not an accepted deviation for any other
-  track or consumer.
+  **Staged `check-zero-findings` registration (resolved)**: the staged-registration
+  suppression previously recorded here has EXPIRED — the review CLI enum registration
+  and execution path landed with task T042, and the driver dispatch / aggregate wiring
+  landed earlier; the former cli.md suppression note has been removed. What remains is
+  attribution semantics only: a T043 attribution on the cli_driver review entries
+  (`ReviewInput`, aggregate `ReviewService`) asserts convergence at that task's
+  completion, not pending change — the cli_driver.md note restates exactly that. It is
+  not an accepted deviation for any other track or consumer.
 - **Conditional allowance — apply only when the review run's resolved Track ID is
   exactly `scope-conditional-pre-review-gates-2026-07-31`; otherwise ignore.**
   **Pre-existing review_v2 composition surface**: a user adjudication (2026-07-22)

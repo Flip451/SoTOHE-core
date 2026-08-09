@@ -174,7 +174,6 @@
       {"layer": "cli", "entry_key": "cli::commands::review::validate_claude_auto_record_args"}
     ],
     "T038": [
-      {"layer": "usecase", "entry_key": "ReviewCheckZeroFindingsError"},
       {"layer": "usecase", "entry_key": "ReviewCheckZeroFindingsInteractor"},
       {"layer": "usecase", "entry_key": "ReviewCheckZeroFindingsOutcome"},
       {"layer": "usecase", "entry_key": "ReviewCheckZeroFindingsQuery"},
@@ -187,6 +186,19 @@
     ],
     "T042": [
       {"layer": "cli", "entry_key": "ReviewCheckApprovedArgs"},
+      {"layer": "domain", "entry_key": "ScopeName"},
+      {"layer": "domain", "entry_key": "MainScopeName"},
+      {"layer": "domain", "entry_key": "ScopeNameError"},
+      {"layer": "usecase", "entry_key": "ReviewCheckZeroFindingsQuery"},
+      {"layer": "usecase", "entry_key": "ReviewCheckZeroFindingsService"},
+      {"layer": "usecase", "entry_key": "ReviewCheckZeroFindingsInteractor"},
+      {"layer": "usecase", "entry_key": "ReviewCheckZeroFindingsEvaluationError"},
+      {"layer": "usecase", "entry_key": "ReviewCheckZeroFindingsValidationError"},
+      {"layer": "usecase", "entry_key": "DiagnosticText"},
+      {"layer": "cli_driver", "entry_key": "ReviewCheckZeroFindingsInput"},
+      {"layer": "cli_driver", "entry_key": "ReviewCheckRoundSelect"},
+      {"layer": "cli", "entry_key": "cli::commands::review::execute_check_approved"},
+      {"layer": "cli", "entry_key": "cli::commands::review::execute_check_zero_findings"},
       {"layer": "cli", "entry_key": "ReviewCommand"}
     ],
     "T043": [

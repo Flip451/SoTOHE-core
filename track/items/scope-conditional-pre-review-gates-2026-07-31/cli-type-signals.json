@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-09T04:27:42Z",
-  "declaration_hash": "1293c720775c3bdf168bb2f26d6125ca42f5069fef322130775714aac5848880",
-  "implementation_input_hash": "caa094539776759b1ad69eae131c0c336035c5f5eff04d411c6ddce0ed25efab",
+  "generated_at": "2026-08-09T17:54:01Z",
+  "declaration_hash": "b5033b244254930c50c631ad7c41c46d3573de3538908f54351c75784996cbf7",
+  "implementation_input_hash": "d3937ca957f6d96a531078751ecb4f6b5734618100a1dfff7e4962592291fdf9",
   "signals": [
     {
       "type_name": "CapabilityExecArgs",
@@ -93,9 +93,9 @@
     {
       "type_name": "ReviewCheckApprovedArgs",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Args",
         "Debug",
         "FromArgMatches"
@@ -118,7 +118,7 @@
     {
       "type_name": "ReviewCommand",
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
@@ -147,6 +147,18 @@
     },
     {
       "type_name": "cli::commands::ref_verify::execute_check_approved_with_driver",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::review::execute_check_approved",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::review::execute_check_zero_findings",
       "kind_tag": "free_function",
       "signal": "blue",
       "found_type": true

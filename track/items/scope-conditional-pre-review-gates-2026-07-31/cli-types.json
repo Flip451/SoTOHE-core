@@ -299,6 +299,54 @@
         }
       ]
     },
+    "cli::commands::review::execute_check_approved": {
+      "action": "modify",
+      "docs": "CLI handler for the behavior-preserving `review check-approved` operation (CN-07, AC-17).",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "args",
+          "ty": "&ReviewCheckApprovedArgs"
+        }
+      ],
+      "returns": "std::process::ExitCode",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "CN-07",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-17",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "cli::commands::review::execute_check_zero_findings": {
+      "action": "add",
+      "docs": "CLI handler for the `review check-zero-findings` operation (CN-06, AC-16).",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "args",
+          "ty": "&CheckZeroFindingsArgs"
+        }
+      ],
+      "returns": "std::process::ExitCode",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
     "cli::commands::review::validate_auto_record_args": {
       "action": "delete",
       "informal_grounds": [],
@@ -1345,13 +1393,22 @@
     },
     "ReviewCheckApprovedArgs": {
       "action": "add",
-      "docs": "Clap argument DTO for the `review check-approved` operation; the prefixed identity disambiguates it from the ref-verify argument type (CN-06, AC-16).",
+      "docs": "Clap argument DTO for `review check-approved` (CN-07, AC-17).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
         "shape": {
-          "fields": [],
-          "has_stripped_fields": true,
+          "fields": [
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "track_id",
+              "ty": "Option<String>"
+            }
+          ],
+          "has_stripped_fields": false,
           "kind": "plain"
         }
       },
@@ -1362,18 +1419,18 @@
       },
       "spec_refs": [
         {
-          "anchor": "CN-06",
+          "anchor": "CN-07",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         },
         {
-          "anchor": "AC-16",
+          "anchor": "AC-17",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]
     },
     "ReviewCheckRoundArg": {
       "action": "add",
-      "docs": "Clap round selector for the `review check-zero-findings` operation (CN-06, AC-16).",
+      "docs": "Clap-facing transport enum mirrored by `cli_driver::review::ReviewCheckRoundSelect`; `cli::commands::review::execute_check_zero_findings` owns the exhaustive conversion (CN-06, AC-16).",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",

@@ -1,7 +1,7 @@
 <!-- Generated from spec.json — DO NOT EDIT DIRECTLY -->
 ---
 version: "1.3"
-signals: { blue: 44, yellow: 0, red: 0 }
+signals: { blue: 48, yellow: 0, red: 0 }
 ---
 
 # operator-owned argv による phase command と scope 条件付き pre-review gate dispatch
@@ -30,6 +30,7 @@ signals: { blue: 44, yellow: 0, red: 0 }
 - [IN-11] operator-owned command config は provider host または `--host` を保持しない。config を消費する invocation surface は caller-supplied optional host を受け取り、値が present の場合だけ configured writer の `capability exec` invocation の dispatch boundary でその `--host` と値を追加して forward できる。保存・解決された literal argv の他の要素は変更しない。 [adr: knowledge/adr/2026-08-03-1010-capability-exec-omitted-host-dispatch.md#D3] [tasks: T027, T032, T035, T030, T031]
 - [IN-12] phase command config は各 declared phase に direct-upstream convergence の ordered literal pre-entry argv matrix を持つ。現在の `spec-design` は `signal check-adr-user --gate commit` と ADR scope の current final `zero_findings` review check を、`type-design` は `signal check-spec-adr --gate commit`、Chain ① semantic verification check、spec scope の current final `zero_findings` review check を、`impl-plan` は `signal check-catalog-spec --gate commit`、Chain ② semantic verification check、types scope の current final `zero_findings` review check を順に通過する。ADR-user chain に semantic verification は追加しない。将来 config に追加される phase も、その direct upstream chain の signal gate、適用される semantic verification、current final `zero_findings` review check を同じ順で宣言する。 [adr: knowledge/adr/2026-08-04-0001-phase-enter-adoption-and-check-commands.md#D3] [tasks: T040]
 - [IN-13] canonical `/track:*` workflow が phase writer を起動するときは、writer の `capability exec` argv を直接 dispatch せず、`bin/sotp phase enter <phase-id>` を起動する。phase engine は config に宣言された convergence pre-entry sequence を first non-zero で fail-closed にし、全て zero の場合だけ canonical writer を一度起動する。 [adr: knowledge/adr/2026-08-04-0001-phase-enter-adoption-and-check-commands.md#D1] [tasks: T041]
+- [IN-14] catalogue-v5 の name uniqueness 対応として、既存の `bin/sotp review check-approved` の内部 Rust DTO を `ReviewCheckApprovedArgs` へ改名し、既存の command arguments、approved / bypass / blocked の exit-code semantics、および commit guard としての独立責務を維持する。 [adr: knowledge/adr/2026-04-28-1905-review-results-command.md#D1, knowledge/adr/2026-04-28-1905-review-results-command.md#D6] [tasks: T042]
 
 ### Out of Scope
 - [OS-01] phase engine または pre-review dispatcher が arbitrary または full な `bin/sotp` subcommand grammar、gate predicate、config に保存・解決された literal argv の rewrite、または hidden executable mapping を実装・再現することは含まない。ただし、D5 が義務付ける config safety validation としての finite exact-literal-prefix recursion denylist と、D3 による caller-supplied optional host の configured writer `capability exec` invocation への dispatch-boundary での実行時追加はこれに含まれず、command semantic interpretation ではない。 [adr: knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D1, knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D4, knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D5, knowledge/adr/2026-08-03-1010-capability-exec-omitted-host-dispatch.md#D3] [tasks: T018, T020, T021, T022]
@@ -44,6 +45,8 @@ signals: { blue: 44, yellow: 0, red: 0 }
 - [CN-04] scope-aware dispatch の所有権は CLI に置き、Makefile に scope 条件分岐または review policy を実装しない。 [adr: knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md#D2, knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D4] [tasks: T022, T023]
 - [CN-05] implementation review で task-contract check を実行する前に impl-catalog signal を再計算して検査し、task-contract は catalogue-entry attribution の structural contract に限定する。 [adr: knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D6] [tasks: T017, T018, T019, T020, T021, T022, T023]
 - [CN-06] pre-entry matrix で使う public check command は exit code で判定可能でなければならない。`bin/sotp review check-zero-findings --scope <scope> --round final` は指定 scope の current artifact に対応する final review verdict が `zero_findings` の場合だけ zero を返す。`bin/sotp ref-verify check-approved --chain <1|2>` は指定 Chain の current production reference pair が全て verified pass の場合だけ zero を返す。display-only result command を convergence 判定に使わず、未解決、stale、または対象外 chain の状態で false success を返さない。 [adr: knowledge/adr/2026-08-04-0001-phase-enter-adoption-and-check-commands.md#D2] [tasks: T038, T042, T043, T039, T040]
+- [CN-07] 既存の `bin/sotp review check-approved` は引数と approved / bypass / blocked の exit-code semantics を維持する。catalogue-v5 の name uniqueness 対応は、内部 Rust DTO を `ReviewCheckApprovedArgs` へ改名することだけであり、command surface、approval judgment、または commit guard としての独立責務を変更しない。 [adr: knowledge/adr/2026-04-28-1905-review-results-command.md#D1, knowledge/adr/2026-04-28-1905-review-results-command.md#D6] [tasks: T042]
+- [CN-08] zero-findings review check の driver→usecase boundary は domain 型を `pub use` で再公開しない。driver は raw boundary value を usecase-owned boundary DTO または Query constructor に渡し、usecase が domain `ScopeName` を内部で構築する。 [adr: knowledge/adr/2026-04-30-0848-cli-via-usecase-only.md#D1] [tasks: T042]
 
 ## Acceptance Criteria
 - [ ] [AC-01] phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに writer/pre-entry argv の先頭三要素が exactly `["bin/sotp", "phase", "enter"]`、`["bin/sotp", "review", "local"]`、または `["bin/sotp", "review", "fix-local"]` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。 [adr: knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D2, knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md#D5] [tasks: T018, T019, T023, T026, T027, T029, T032]
@@ -62,6 +65,7 @@ signals: { blue: 44, yellow: 0, red: 0 }
 - [ ] [AC-14] phase enter は `spec-design` で ADR signal gate と ADR final-review check を、`type-design` で spec signal gate、Chain ① semantic verification check、spec final-review check を、`impl-plan` で catalogue signal gate、Chain ② semantic verification check、types final-review check を config declaration order で実行する。各 required check が zero の場合だけ次の command に進み、最初の non-zero で remaining command と writer を起動しない。 [adr: knowledge/adr/2026-08-04-0001-phase-enter-adoption-and-check-commands.md#D3] [tasks: T040]
 - [ ] [AC-15] canonical `/track:*` workflow の writer-launch path は `bin/sotp phase enter <phase-id>` だけを呼び、direct `bin/sotp capability exec <writer>` invocation を含まない。phase enter が validation または pre-entry failure を返した場合、その workflow は writer を起動せず non-zero で終了する。 [adr: knowledge/adr/2026-08-04-0001-phase-enter-adoption-and-check-commands.md#D1] [tasks: T041]
 - [ ] [AC-16] `bin/sotp review check-zero-findings --scope <scope> --round final` returns zero only for a current final `zero_findings` verdict for that scope, and non-zero for absent, stale, non-final, or findings-present review state. `bin/sotp ref-verify check-approved --chain <1|2>` returns zero only when the selected Chain's current production reference pairs are all verified pass, and non-zero when any selected pair is absent, stale, pending, or failed. Both commands are usable as literal pre-entry argv without parsing display output. [adr: knowledge/adr/2026-08-04-0001-phase-enter-adoption-and-check-commands.md#D2] [tasks: T038, T042, T043, T039, T040]
+- [ ] [AC-17] catalogue-v5 name-uniqueness 対応後も、`bin/sotp review check-approved` は既存の引数を受理し、approved と approved-by-bypass の場合は zero、blocked の場合は non-zero を返す。Rust DTO の `ReviewCheckApprovedArgs` への rename 以外で command invocation、exit-code contract、または commit guard behavior に観測可能な変更を生じさせない。 [adr: knowledge/adr/2026-04-28-1905-review-results-command.md#D1, knowledge/adr/2026-04-28-1905-review-results-command.md#D6] [tasks: T042]
 
 ## Related Conventions (Required Reading)
 - knowledge/conventions/coding-principles.md#Rules
@@ -70,5 +74,5 @@ signals: { blue: 44, yellow: 0, red: 0 }
 ## Signal Summary
 
 ### Stage 1: Spec Signals
-🔵 44  🟡 0  🔴 0
+🔵 48  🟡 0  🔴 0
 

@@ -693,12 +693,14 @@ mod tests {
     use std::process::Command;
 
     use super::{ReviewCompositionRoot, ReviewRunCodexInput};
+    use cli_driver::review::{ReviewCheckRoundSelect, ReviewCheckZeroFindingsInput, ReviewInput};
     use domain::{
         TrackId,
         review_v2::{MainScopeName, RoundType, ScopeName},
     };
     use infrastructure::provider_session::FsProviderSessionCacheAdapter;
     use infrastructure::review_v2::ReviewCheckZeroFindingsStateAdapter;
+    use usecase::review_v2::ReviewCheckZeroFindingsQuery;
     use usecase::{
         capability_exec::{ModelName, ProviderName, ReasoningEffort},
         provider_session::{
@@ -1019,17 +1021,38 @@ exit 0
         }
     }
 
+    fn check_zero_findings_input(repo: &ReviewEntrypointRepo) -> ReviewCheckZeroFindingsInput {
+        ReviewCheckZeroFindingsInput::try_new(
+            repo.items_dir.clone(),
+            repo.track_id.clone(),
+            "cli_composition".to_owned(),
+            ReviewCheckRoundSelect::Final,
+        )
+        .expect("valid fixture input")
+    }
+
+    fn check_zero_findings_query(
+        repo: &ReviewEntrypointRepo,
+        scope: &str,
+    ) -> ReviewCheckZeroFindingsQuery {
+        ReviewCheckZeroFindingsQuery::try_new(
+            repo.items_dir.clone(),
+            repo.track_id.clone(),
+            scope.to_owned(),
+        )
+        .expect("valid fixture query")
+    }
+
     /// Exercises the actual composition evaluator through a persisted
     /// `review.json`, including current, stale, findings, and fast-only states.
     #[cfg(unix)]
     #[test]
     fn test_check_zero_findings_interactor_evaluates_real_review_json_states() {
-        use cli_driver::review::ReviewInput;
         use domain::review_v2::{FastVerdict, ReviewHash, ReviewWriter, ReviewerFinding, Verdict};
         use infrastructure::review_v2::FsReviewStore;
         use usecase::review_v2::{
             ReviewCheckZeroFindingsInteractor, ReviewCheckZeroFindingsOutcome,
-            ReviewCheckZeroFindingsQuery, ReviewCheckZeroFindingsService as _,
+            ReviewCheckZeroFindingsService as _,
         };
 
         let _lock = cwd_lock().lock().unwrap();
@@ -1041,11 +1064,7 @@ exit 0
         std::env::set_current_dir(repo._dir.path()).unwrap();
 
         let review_scope = ScopeName::Main(MainScopeName::new("cli_composition").unwrap());
-        let query = ReviewCheckZeroFindingsQuery {
-            track: TrackId::try_new(repo.track_id.clone()).unwrap(),
-            items_dir: repo.items_dir.clone(),
-            scope: review_scope.clone(),
-        };
+        let query = check_zero_findings_query(&repo, "cli_composition");
         let interactor = ReviewCheckZeroFindingsInteractor::new(std::sync::Arc::new(
             ReviewCheckZeroFindingsStateAdapter,
         ));
@@ -1057,7 +1076,8 @@ exit 0
         GitRunner::at(foreign_repo.path()).assert_success(&["init", "-b", "main"]);
         std::env::set_current_dir(foreign_repo.path()).unwrap();
         let cwd_before_check = std::env::current_dir().unwrap();
-        let check_outcome = driver.handle(ReviewInput::CheckZeroFindings(query.clone()));
+        let check_outcome =
+            driver.handle(ReviewInput::CheckZeroFindings(check_zero_findings_input(&repo)));
         assert_eq!(check_outcome.exit_code, 0, "{check_outcome:?}");
         assert_eq!(std::env::current_dir().unwrap(), cwd_before_check);
 
@@ -1086,10 +1106,7 @@ exit 0
             ReviewCheckZeroFindingsOutcome::MissingFinalVerdict
         );
 
-        let unknown_scope = ReviewCheckZeroFindingsQuery {
-            scope: ScopeName::Main(MainScopeName::new("not-configured").unwrap()),
-            ..query
-        };
+        let unknown_scope = check_zero_findings_query(&repo, "not-configured");
         assert_eq!(
             interactor.check_zero_findings(&unknown_scope).unwrap(),
             ReviewCheckZeroFindingsOutcome::MissingFinalVerdict
@@ -1099,9 +1116,6 @@ exit 0
     #[cfg(unix)]
     #[test]
     fn test_review_driver_check_zero_findings_current_fast_only_verdict_returns_nonzero_exit() {
-        use cli_driver::review::ReviewInput;
-        use usecase::review_v2::ReviewCheckZeroFindingsQuery;
-
         let _lock = cwd_lock().lock().unwrap();
         let repo = setup_review_entrypoint_repo("check-zero-findings-fast-only-2026");
         let bin_dir = repo.track_dir.join("fake-bin-check-zero-findings-fast-only");
@@ -1110,17 +1124,11 @@ exit 0
         let _cwd_guard = CwdGuard::save_current();
         std::env::set_current_dir(repo._dir.path()).unwrap();
 
-        let query = ReviewCheckZeroFindingsQuery {
-            track: TrackId::try_new(repo.track_id.clone()).unwrap(),
-            items_dir: repo.items_dir.clone(),
-            scope: ScopeName::Main(MainScopeName::new("cli_composition").unwrap()),
-        };
-
         ReviewCompositionRoot::new().review_run_codex(codex_review_input(&repo, "fast")).unwrap();
 
         let outcome = ReviewCompositionRoot::new()
             .review_driver()
-            .handle(ReviewInput::CheckZeroFindings(query));
+            .handle(ReviewInput::CheckZeroFindings(check_zero_findings_input(&repo)));
 
         assert_ne!(outcome.exit_code, 0, "a current fast-only verdict must fail closed");
         assert!(outcome.stderr.as_deref().is_some_and(|message| message.contains("final")));
@@ -1129,9 +1137,6 @@ exit 0
     #[cfg(unix)]
     #[test]
     fn test_review_driver_check_zero_findings_uses_isolated_git_for_base_fallback() {
-        use cli_driver::review::ReviewInput;
-        use usecase::review_v2::ReviewCheckZeroFindingsQuery;
-
         let _lock = cwd_lock().lock().unwrap();
         let repo = setup_review_entrypoint_repo("check-zero-findings-git-dir-2026");
         let bin_dir = repo.track_dir.join("fake-bin-check-zero-findings-git-dir");
@@ -1140,11 +1145,6 @@ exit 0
         let _cwd_guard = CwdGuard::save_current();
         std::env::set_current_dir(repo._dir.path()).unwrap();
 
-        let query = ReviewCheckZeroFindingsQuery {
-            track: TrackId::try_new(repo.track_id.clone()).unwrap(),
-            items_dir: repo.items_dir.clone(),
-            scope: ScopeName::Main(MainScopeName::new("cli_composition").unwrap()),
-        };
         ReviewCompositionRoot::new().review_run_codex(codex_review_input(&repo, "final")).unwrap();
         fs::remove_file(repo.track_dir.join(".commit_hash")).unwrap();
 
@@ -1154,7 +1154,7 @@ exit 0
 
         let outcome = ReviewCompositionRoot::new()
             .review_driver()
-            .handle(ReviewInput::CheckZeroFindings(query));
+            .handle(ReviewInput::CheckZeroFindings(check_zero_findings_input(&repo)));
 
         assert_eq!(
             outcome.exit_code, 0,
@@ -1165,9 +1165,6 @@ exit 0
     #[cfg(unix)]
     #[test]
     fn test_review_driver_check_zero_findings_uses_isolated_git_for_commit_hash_ancestry() {
-        use cli_driver::review::ReviewInput;
-        use usecase::review_v2::ReviewCheckZeroFindingsQuery;
-
         let _lock = cwd_lock().lock().unwrap();
         let repo = setup_review_entrypoint_repo("check-zero-findings-ancestry-git-dir-2026");
         let bin_dir = repo.track_dir.join("fake-bin-check-zero-findings-ancestry-git-dir");
@@ -1176,11 +1173,6 @@ exit 0
         let _cwd_guard = CwdGuard::save_current();
         std::env::set_current_dir(repo._dir.path()).unwrap();
 
-        let query = ReviewCheckZeroFindingsQuery {
-            track: TrackId::try_new(repo.track_id.clone()).unwrap(),
-            items_dir: repo.items_dir.clone(),
-            scope: ScopeName::Main(MainScopeName::new("cli_composition").unwrap()),
-        };
         ReviewCompositionRoot::new().review_run_codex(codex_review_input(&repo, "final")).unwrap();
 
         let metadata_path = repo.track_dir.join("metadata.json");
@@ -1196,7 +1188,7 @@ exit 0
 
         let outcome = ReviewCompositionRoot::new()
             .review_driver()
-            .handle(ReviewInput::CheckZeroFindings(query));
+            .handle(ReviewInput::CheckZeroFindings(check_zero_findings_input(&repo)));
 
         assert_eq!(
             outcome.exit_code, 0,
@@ -1232,8 +1224,8 @@ exit 0
     #[test]
     fn test_check_zero_findings_interactor_corrupt_review_json_returns_evaluation_failed() {
         use usecase::review_v2::{
-            ReviewCheckZeroFindingsError, ReviewCheckZeroFindingsInteractor,
-            ReviewCheckZeroFindingsQuery, ReviewCheckZeroFindingsService as _,
+            ReviewCheckZeroFindingsEvaluationError, ReviewCheckZeroFindingsInteractor,
+            ReviewCheckZeroFindingsService as _,
         };
 
         let _lock = cwd_lock().lock().unwrap();
@@ -1242,18 +1234,14 @@ exit 0
         std::env::set_current_dir(repo._dir.path()).unwrap();
         fs::write(repo.track_dir.join("review.json"), "{not valid json").unwrap();
 
-        let query = ReviewCheckZeroFindingsQuery {
-            track: TrackId::try_new(repo.track_id).unwrap(),
-            items_dir: repo.items_dir,
-            scope: ScopeName::Main(MainScopeName::new("cli_composition").unwrap()),
-        };
+        let query = check_zero_findings_query(&repo, "cli_composition");
         let interactor = ReviewCheckZeroFindingsInteractor::new(std::sync::Arc::new(
             ReviewCheckZeroFindingsStateAdapter,
         ));
 
         assert!(matches!(
             interactor.check_zero_findings(&query),
-            Err(ReviewCheckZeroFindingsError::EvaluationFailed(_))
+            Err(ReviewCheckZeroFindingsEvaluationError::EvaluationFailed(_))
         ));
     }
 
@@ -1261,7 +1249,7 @@ exit 0
     fn test_check_zero_findings_interactor_absent_review_json_returns_missing_final_verdict() {
         use usecase::review_v2::{
             ReviewCheckZeroFindingsInteractor, ReviewCheckZeroFindingsOutcome,
-            ReviewCheckZeroFindingsQuery, ReviewCheckZeroFindingsService as _,
+            ReviewCheckZeroFindingsService as _,
         };
 
         let _lock = cwd_lock().lock().unwrap();
@@ -1270,11 +1258,7 @@ exit 0
         std::env::set_current_dir(repo._dir.path()).unwrap();
         assert!(!repo.track_dir.join("review.json").exists());
 
-        let query = ReviewCheckZeroFindingsQuery {
-            track: TrackId::try_new(repo.track_id).unwrap(),
-            items_dir: repo.items_dir,
-            scope: ScopeName::Main(MainScopeName::new("cli_composition").unwrap()),
-        };
+        let query = check_zero_findings_query(&repo, "cli_composition");
         let interactor = ReviewCheckZeroFindingsInteractor::new(std::sync::Arc::new(
             ReviewCheckZeroFindingsStateAdapter,
         ));
@@ -1289,7 +1273,7 @@ exit 0
     fn test_check_zero_findings_interactor_empty_scope_returns_missing_final_verdict() {
         use usecase::review_v2::{
             ReviewCheckZeroFindingsInteractor, ReviewCheckZeroFindingsOutcome,
-            ReviewCheckZeroFindingsQuery, ReviewCheckZeroFindingsService as _,
+            ReviewCheckZeroFindingsService as _,
         };
 
         let _lock = cwd_lock().lock().unwrap();
@@ -1302,11 +1286,7 @@ exit 0
         )
         .unwrap();
 
-        let query = ReviewCheckZeroFindingsQuery {
-            track: TrackId::try_new(repo.track_id).unwrap(),
-            items_dir: repo.items_dir,
-            scope: ScopeName::Main(MainScopeName::new("empty_scope").unwrap()),
-        };
+        let query = check_zero_findings_query(&repo, "empty_scope");
         let interactor = ReviewCheckZeroFindingsInteractor::new(std::sync::Arc::new(
             ReviewCheckZeroFindingsStateAdapter,
         ));

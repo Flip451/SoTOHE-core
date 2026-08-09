@@ -692,6 +692,52 @@
       }
     },
     {
+      "claim_hash": "7f9ae50549ced0880c35614fc920b8e9fd0d3aef53822e0e5ce81d29cb859856",
+      "evidence_hash": "33cc2dba5ce0c832364f9749b70fb4af1fe77a8c805879c10f7846d6ea220519",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp review check-approved` は無変更（stateless gate として責務が独立）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-14",
+          "text_label": "catalogue-v5 の name uniqueness 対応として、既存の `bin/sotp review check-approved` の内部 Rust DTO を `ReviewCheckApprovedArgs` へ改名し、既存の command arguments、approved / bypass / blocked の exit-code semantics、および commit guard としての独立責務を維持する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "7f9ae50549ced0880c35614fc920b8e9fd0d3aef53822e0e5ce81d29cb859856",
+      "evidence_hash": "33cc2dba5ce0c832364f9749b70fb4af1fe77a8c805879c10f7846d6ea220519",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`review check-approved` | approved/blocked の 2 値（exit code） | commit guard"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-14",
+          "text_label": "catalogue-v5 の name uniqueness 対応として、既存の `bin/sotp review check-approved` の内部 Rust DTO を `ReviewCheckApprovedArgs` へ改名し、既存の command arguments、approved / bypass / blocked の exit-code semantics、および commit guard としての独立責務を維持する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
       "claim_hash": "07a396adf15accfc8f609dae5115bf3b6b38a3129c93664c94f2742080865d26",
       "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
       "verdict": {
@@ -1079,6 +1125,75 @@
         "data": {
           "file_path": "knowledge/adr/2026-08-04-0001-phase-enter-adoption-and-check-commands.md",
           "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "e2fb1beed3372ec7fb5280e157a8149cd832682ccbf7923cea19b79426fa43f0",
+      "evidence_hash": "33cc2dba5ce0c832364f9749b70fb4af1fe77a8c805879c10f7846d6ea220519",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp review check-approved` は無変更（stateless gate として責務が独立）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "既存の `bin/sotp review check-approved` は引数と approved / bypass / blocked の exit-code semantics を維持する。catalogue-v5 の name uniqueness 対応は、内部 Rust DTO を `ReviewCheckApprovedArgs` へ改名することだけであり、command surface、approval judgment、または commit guard としての独立責務を変更しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "e2fb1beed3372ec7fb5280e157a8149cd832682ccbf7923cea19b79426fa43f0",
+      "evidence_hash": "33cc2dba5ce0c832364f9749b70fb4af1fe77a8c805879c10f7846d6ea220519",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`review check-approved` | approved/blocked の 2 値（exit code） | commit guard"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "既存の `bin/sotp review check-approved` は引数と approved / bypass / blocked の exit-code semantics を維持する。catalogue-v5 の name uniqueness 対応は、内部 Rust DTO を `ReviewCheckApprovedArgs` へ改名することだけであり、command surface、approval judgment、または commit guard としての独立責務を変更しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "f91359fed2be615f09bac070ee9e94ed6f7e5435a2008fcb38d7280b5a69e875",
+      "evidence_hash": "96a57dcf0c83070859487ec59897a5db65ed5011969791489ae397d36a25a08e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase は domain 型をそのまま外部に再公開せず（`pub use domain::...` を介した re-export を禁ずる）、cli が消費する形に整えた DTO / Command / Query / Result 型を usecase 自身が定義してそれを公開する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-08",
+          "text_label": "zero-findings review check の driver→usecase boundary は domain 型を `pub use` で再公開しない。driver は raw boundary value を usecase-owned boundary DTO または Query constructor に渡し、usecase が domain `ScopeName` を内部で構築する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-04-30-0848-cli-via-usecase-only.md",
+          "decision_id": "D1"
         }
       }
     },
@@ -1677,6 +1792,52 @@
         "data": {
           "file_path": "knowledge/adr/2026-08-04-0001-phase-enter-adoption-and-check-commands.md",
           "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "a6ea86816599c722ab0f56bb53c99c4514d4fda465d8930cb7b6dd861690d60c",
+      "evidence_hash": "33cc2dba5ce0c832364f9749b70fb4af1fe77a8c805879c10f7846d6ea220519",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp review check-approved` は無変更（stateless gate として責務が独立）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-17",
+          "text_label": "catalogue-v5 name-uniqueness 対応後も、`bin/sotp review check-approved` は既存の引数を受理し、approved と approved-by-bypass の場合は zero、blocked の場合は non-zero を返す。Rust DTO の `ReviewCheckApprovedArgs` への rename 以外で command invocation、exit-code contract、または commit guard behavior に観測可能な変更を生じさせない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "a6ea86816599c722ab0f56bb53c99c4514d4fda465d8930cb7b6dd861690d60c",
+      "evidence_hash": "33cc2dba5ce0c832364f9749b70fb4af1fe77a8c805879c10f7846d6ea220519",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`review check-approved` | approved/blocked の 2 値（exit code） | commit guard"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-17",
+          "text_label": "catalogue-v5 name-uniqueness 対応後も、`bin/sotp review check-approved` は既存の引数を受理し、approved と approved-by-bypass の場合は zero、blocked の場合は non-zero を返す。Rust DTO の `ReviewCheckApprovedArgs` への rename 以外で command invocation、exit-code contract、または commit guard behavior に観測可能な変更を生じさせない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+          "decision_id": "D6"
         }
       }
     }

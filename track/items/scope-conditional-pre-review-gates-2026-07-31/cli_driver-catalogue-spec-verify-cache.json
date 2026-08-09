@@ -603,6 +603,126 @@
       }
     },
     {
+      "claim_hash": "e68f249f43a45ee6358a15eb325af5a153dad4f76b6fc04a38093484aadb4328",
+      "evidence_hash": "8fa587f6b3cb186fc083494e54ed3db92fa82015011b1fec6c54d72cfb0b3e46",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp review check-zero-findings --scope <scope> --round final` は指定 scope の current artifact に対応する final review verdict が `zero_findings` の場合だけ zero を返す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "ReviewCheckRoundSelect"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-06",
+          "text_label": "pre-entry matrix で使う public check command は exit code で判定可能でなければならない。`bin/sotp review check-zero-findings --scope <scope> --round final` は指定 scope の current artifact に対応する final review verdict が `zero_findings` の場合だけ zero を返す。`bin/sotp ref-verify check-approved --chain <1|2>` は指定 Chain の current production reference pair が全て verified pass の場合だけ zero を返す。display-only result command を convergence 判定に使わず、未解決、stale、または対象外 chain の状態で false success を返さない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e68f249f43a45ee6358a15eb325af5a153dad4f76b6fc04a38093484aadb4328",
+      "evidence_hash": "94934398148874b5290b24f7a6cf5b694fb5081a27244d13290a946a74a4abea",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp review check-zero-findings --scope <scope> --round final` returns zero only for a current final `zero_findings` verdict for that scope"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "ReviewCheckRoundSelect"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-16",
+          "text_label": "`bin/sotp review check-zero-findings --scope <scope> --round final` returns zero only for a current final `zero_findings` verdict for that scope, and non-zero for absent, stale, non-final, or findings-present review state. `bin/sotp ref-verify check-approved --chain <1|2>` returns zero only when the selected Chain's current production reference pairs are all verified pass, and non-zero when any selected pair is absent, stale, pending, or failed. Both commands are usable as literal pre-entry argv without parsing display output."
+        }
+      }
+    },
+    {
+      "claim_hash": "8653bd755cdf4c97b915d119bae5ae86280cf2cc26ada44f644c91b33e3e6432",
+      "evidence_hash": "f91359fed2be615f09bac070ee9e94ed6f7e5435a2008fcb38d7280b5a69e875",
+      "verdict": {
+        "kind": "pass",
+        "citation": "driver は raw boundary value を usecase-owned boundary DTO または Query constructor に渡し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "ReviewCheckZeroFindingsInput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-08",
+          "text_label": "zero-findings review check の driver→usecase boundary は domain 型を `pub use` で再公開しない。driver は raw boundary value を usecase-owned boundary DTO または Query constructor に渡し、usecase が domain `ScopeName` を内部で構築する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8653bd755cdf4c97b915d119bae5ae86280cf2cc26ada44f644c91b33e3e6432",
+      "evidence_hash": "8fa587f6b3cb186fc083494e54ed3db92fa82015011b1fec6c54d72cfb0b3e46",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp review check-zero-findings --scope <scope> --round final` は指定 scope の current artifact に対応する final review verdict が `zero_findings` の場合だけ zero を返す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "ReviewCheckZeroFindingsInput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-06",
+          "text_label": "pre-entry matrix で使う public check command は exit code で判定可能でなければならない。`bin/sotp review check-zero-findings --scope <scope> --round final` は指定 scope の current artifact に対応する final review verdict が `zero_findings` の場合だけ zero を返す。`bin/sotp ref-verify check-approved --chain <1|2>` は指定 Chain の current production reference pair が全て verified pass の場合だけ zero を返す。display-only result command を convergence 判定に使わず、未解決、stale、または対象外 chain の状態で false success を返さない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8653bd755cdf4c97b915d119bae5ae86280cf2cc26ada44f644c91b33e3e6432",
+      "evidence_hash": "94934398148874b5290b24f7a6cf5b694fb5081a27244d13290a946a74a4abea",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp review check-zero-findings --scope <scope> --round final` returns zero only for a current final `zero_findings` verdict for that scope, and non-zero for absent, stale, non-final, or findings-present review state."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "ReviewCheckZeroFindingsInput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-16",
+          "text_label": "`bin/sotp review check-zero-findings --scope <scope> --round final` returns zero only for a current final `zero_findings` verdict for that scope, and non-zero for absent, stale, non-final, or findings-present review state. `bin/sotp ref-verify check-approved --chain <1|2>` returns zero only when the selected Chain's current production reference pairs are all verified pass, and non-zero when any selected pair is absent, stale, pending, or failed. Both commands are usable as literal pre-entry argv without parsing display output."
+        }
+      }
+    },
+    {
       "claim_hash": "f70580dcc5043463ebb985b96216cfa2f86ef9a86f8c27db682061a9b6fa9d0e",
       "evidence_hash": "8fa587f6b3cb186fc083494e54ed3db92fa82015011b1fec6c54d72cfb0b3e46",
       "verdict": {
@@ -651,11 +771,11 @@
       }
     },
     {
-      "claim_hash": "0e61006ac5abfc4887593aaa6618507b3b5ca8efb9808ed831867011836ec907",
+      "claim_hash": "ab9b00ef96b6a5e51142c1826319dffb67347f6e8420cd77a97277bc91e3f444",
       "evidence_hash": "8fa587f6b3cb186fc083494e54ed3db92fa82015011b1fec6c54d72cfb0b3e46",
       "verdict": {
         "kind": "pass",
-        "citation": "pre-entry matrix で使う public check command は exit code で判定可能でなければならない。`bin/sotp review check-zero-findings --scope <scope> --round final` は指定 scope の current artifact に対応する final review verdict が `zero_findings` の場合だけ zero を返す。"
+        "citation": "`bin/sotp review check-zero-findings --scope <scope> --round final` は指定 scope の current artifact に対応する final review verdict が `zero_findings` の場合だけ zero を返す。`bin/sotp ref-verify check-approved --chain <1|2>` は指定 Chain の current production reference pair が全て verified pass の場合だけ zero を返す。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -675,7 +795,7 @@
       }
     },
     {
-      "claim_hash": "0e61006ac5abfc4887593aaa6618507b3b5ca8efb9808ed831867011836ec907",
+      "claim_hash": "ab9b00ef96b6a5e51142c1826319dffb67347f6e8420cd77a97277bc91e3f444",
       "evidence_hash": "94934398148874b5290b24f7a6cf5b694fb5081a27244d13290a946a74a4abea",
       "verdict": {
         "kind": "pass",

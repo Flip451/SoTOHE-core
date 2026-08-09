@@ -14,7 +14,8 @@ use usecase::review_v2::run_review_fix::{
     RunReviewFixCommand, RunReviewFixError, RunReviewFixOutput, RunReviewFixService,
 };
 use usecase::review_v2::{
-    ReviewCheckZeroFindingsError, ReviewCheckZeroFindingsOutcome, ReviewCheckZeroFindingsQuery,
+    ReviewCheckZeroFindingsEvaluationError, ReviewCheckZeroFindingsOutcome,
+    ReviewCheckZeroFindingsQuery, ReviewCheckZeroFindingsValidationError,
 };
 use usecase::review_v2::{ReviewCheckZeroFindingsService, ReviewService};
 
@@ -49,7 +50,7 @@ fn check_zero_findings_outcome_to_command_outcome(
 
 /// Maps both a completed check and an evaluation error to the command boundary.
 fn check_zero_findings_result_to_command_outcome(
-    result: Result<ReviewCheckZeroFindingsOutcome, ReviewCheckZeroFindingsError>,
+    result: Result<ReviewCheckZeroFindingsOutcome, ReviewCheckZeroFindingsEvaluationError>,
 ) -> CommandOutcome {
     match result {
         Ok(outcome) => check_zero_findings_outcome_to_command_outcome(outcome),
@@ -60,6 +61,38 @@ fn check_zero_findings_result_to_command_outcome(
 // ---------------------------------------------------------------------------
 // Input type
 // ---------------------------------------------------------------------------
+
+/// Final-only round selector accepted by the check-zero-findings delivery boundary.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ReviewCheckRoundSelect {
+    Final,
+}
+
+/// Delivery input that converts validated CLI values into the focused usecase query.
+#[derive(Debug, Clone)]
+pub struct ReviewCheckZeroFindingsInput(ReviewCheckZeroFindingsQuery);
+
+impl ReviewCheckZeroFindingsInput {
+    /// Forwards raw delivery values to the usecase-owned query constructor.
+    pub fn try_new(
+        items_dir: PathBuf,
+        track_id: String,
+        scope: String,
+        round: ReviewCheckRoundSelect,
+    ) -> Result<Self, ReviewCheckZeroFindingsValidationError> {
+        match round {
+            ReviewCheckRoundSelect::Final => {
+                ReviewCheckZeroFindingsQuery::try_new(items_dir, track_id, scope).map(Self)
+            }
+        }
+    }
+
+    /// Returns the usecase-validated query for dispatch.
+    #[must_use]
+    pub fn into_query(self) -> ReviewCheckZeroFindingsQuery {
+        self.0
+    }
+}
 
 /// Typed input for the `review` command family.
 pub enum ReviewInput {
@@ -129,7 +162,7 @@ pub enum ReviewInput {
     },
     /// Check whether one resolved track and scope have a current final
     /// zero-findings review verdict.
-    CheckZeroFindings(ReviewCheckZeroFindingsQuery),
+    CheckZeroFindings(ReviewCheckZeroFindingsInput),
     /// Show review results: per-scope state summary, optional round history.
     Results {
         /// Track ID (auto-detected from branch if `None`).
@@ -277,7 +310,9 @@ impl ReviewDriver {
             ReviewInput::CheckApproved { track_id, items_dir } => {
                 self.review_check_approved(track_id, items_dir)
             }
-            ReviewInput::CheckZeroFindings(query) => self.review_check_zero_findings(query),
+            ReviewInput::CheckZeroFindings(input) => {
+                self.review_check_zero_findings(input.into_query())
+            }
             ReviewInput::Results {
                 track_id,
                 items_dir,
@@ -657,26 +692,28 @@ fn json_str(s: &str) -> String {
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
+    use std::fs;
     use std::path::PathBuf;
     use std::sync::{Arc, Mutex};
 
-    use domain::review_v2::{MainScopeName, ScopeName};
+    use usecase::TrackId;
     use usecase::capability_exec::{ModelName, ReasoningEffort};
     use usecase::review_v2::run_review_fix::{
         RunReviewFixCommand, RunReviewFixError, RunReviewFixOutput, RunReviewFixService,
     };
     use usecase::review_v2::{
-        ReviewCheckZeroFindingsError, ReviewCheckZeroFindingsOutcome, ReviewCheckZeroFindingsQuery,
-        ReviewCheckZeroFindingsService, ReviewGroupName, ReviewRoundType, ReviewService,
-        SubagentDispatchInstruction, SubagentName, TrackId,
+        ReviewCheckZeroFindingsEvaluationError, ReviewCheckZeroFindingsOutcome,
+        ReviewCheckZeroFindingsQuery, ReviewCheckZeroFindingsService,
+        ReviewCheckZeroFindingsValidationError, ReviewGroupName, ReviewRoundType, ReviewService,
+        SubagentDispatchInstruction, SubagentName,
     };
 
     use super::{
-        ReviewDriver, ReviewFixDriver, ReviewInput, SUBAGENT_DISPATCH_EXIT_CODE,
-        SUBAGENT_DISPATCH_SENTINEL, check_zero_findings_outcome_to_command_outcome,
+        ReviewCheckRoundSelect, ReviewCheckZeroFindingsInput, ReviewDriver, ReviewFixDriver,
+        ReviewInput, SUBAGENT_DISPATCH_EXIT_CODE, SUBAGENT_DISPATCH_SENTINEL,
+        check_zero_findings_outcome_to_command_outcome,
         check_zero_findings_result_to_command_outcome, subagent_dispatch_to_outcome,
     };
-
     struct UnusedReviewService;
 
     impl ReviewService for UnusedReviewService {
@@ -781,12 +818,14 @@ mod tests {
 
     struct CapturingCheckZeroFindingsService {
         received_query: Mutex<Option<ReviewCheckZeroFindingsQuery>>,
-        result: Mutex<Option<Result<ReviewCheckZeroFindingsOutcome, ReviewCheckZeroFindingsError>>>,
+        result: Mutex<
+            Option<Result<ReviewCheckZeroFindingsOutcome, ReviewCheckZeroFindingsEvaluationError>>,
+        >,
     }
 
     impl CapturingCheckZeroFindingsService {
         fn new(
-            result: Result<ReviewCheckZeroFindingsOutcome, ReviewCheckZeroFindingsError>,
+            result: Result<ReviewCheckZeroFindingsOutcome, ReviewCheckZeroFindingsEvaluationError>,
         ) -> Self {
             Self { received_query: Mutex::new(None), result: Mutex::new(Some(result)) }
         }
@@ -800,7 +839,8 @@ mod tests {
         fn check_zero_findings(
             &self,
             query: &ReviewCheckZeroFindingsQuery,
-        ) -> Result<ReviewCheckZeroFindingsOutcome, ReviewCheckZeroFindingsError> {
+        ) -> Result<ReviewCheckZeroFindingsOutcome, ReviewCheckZeroFindingsEvaluationError>
+        {
             let mut received = self.received_query.lock().expect("capture lock is healthy");
             assert!(received.is_none(), "driver must call focused service once");
             *received = Some(query.clone());
@@ -813,15 +853,26 @@ mod tests {
     }
 
     fn check_zero_findings_query() -> ReviewCheckZeroFindingsQuery {
-        ReviewCheckZeroFindingsQuery {
-            track: TrackId::try_new("review-driver-check-2026").expect("valid test track ID"),
-            items_dir: PathBuf::from("track/items"),
-            scope: ScopeName::Main(MainScopeName::new("cli_driver").expect("valid test scope")),
-        }
+        ReviewCheckZeroFindingsQuery::try_new(
+            PathBuf::from("track/items"),
+            "review-driver-check-2026".to_owned(),
+            "cli_driver".to_owned(),
+        )
+        .expect("valid test query")
+    }
+
+    fn check_zero_findings_input() -> ReviewCheckZeroFindingsInput {
+        ReviewCheckZeroFindingsInput::try_new(
+            PathBuf::from("track/items"),
+            "review-driver-check-2026".to_owned(),
+            "cli_driver".to_owned(),
+            ReviewCheckRoundSelect::Final,
+        )
+        .expect("valid driver input")
     }
 
     fn review_driver_for_check(
-        result: Result<ReviewCheckZeroFindingsOutcome, ReviewCheckZeroFindingsError>,
+        result: Result<ReviewCheckZeroFindingsOutcome, ReviewCheckZeroFindingsEvaluationError>,
     ) -> (ReviewDriver, Arc<CapturingCheckZeroFindingsService>) {
         let focused_service = Arc::new(CapturingCheckZeroFindingsService::new(result));
         let driver = ReviewDriver::new(Arc::new(UnusedReviewService), focused_service.clone());
@@ -831,10 +882,11 @@ mod tests {
     #[test]
     fn test_review_driver_check_zero_findings_dispatches_success_to_focused_service() {
         let query = check_zero_findings_query();
+        let input = check_zero_findings_input();
         let (driver, focused_service) =
             review_driver_for_check(Ok(ReviewCheckZeroFindingsOutcome::CurrentFinalZeroFindings));
 
-        let outcome = driver.handle(ReviewInput::CheckZeroFindings(query.clone()));
+        let outcome = driver.handle(ReviewInput::CheckZeroFindings(input));
 
         assert_eq!(focused_service.received_query(), Some(query));
         assert_eq!(outcome.exit_code, 0);
@@ -849,14 +901,125 @@ mod tests {
             Ok(ReviewCheckZeroFindingsOutcome::FindingsRemain),
         ] {
             let query = check_zero_findings_query();
+            let input = check_zero_findings_input();
             let (driver, focused_service) = review_driver_for_check(result);
 
-            let outcome = driver.handle(ReviewInput::CheckZeroFindings(query.clone()));
+            let outcome = driver.handle(ReviewInput::CheckZeroFindings(input));
 
             assert_eq!(focused_service.received_query(), Some(query));
             assert_ne!(outcome.exit_code, 0);
             assert!(outcome.stderr.is_some());
         }
+    }
+
+    #[test]
+    fn test_review_check_zero_findings_input_converts_named_and_other_scopes() {
+        let named = check_zero_findings_input().into_query();
+        assert_eq!(named, check_zero_findings_query());
+
+        let other = ReviewCheckZeroFindingsInput::try_new(
+            PathBuf::from("track/items"),
+            "review-driver-check-2026".to_owned(),
+            "Other".to_owned(),
+            ReviewCheckRoundSelect::Final,
+        )
+        .expect("other input converts")
+        .into_query();
+        let expected_other = ReviewCheckZeroFindingsQuery::try_new(
+            PathBuf::from("track/items"),
+            "review-driver-check-2026".to_owned(),
+            "other".to_owned(),
+        )
+        .expect("other query is valid");
+        assert_eq!(other, expected_other);
+    }
+
+    #[test]
+    fn test_review_check_zero_findings_input_forwards_raw_tokens_to_usecase_query() {
+        let items_dir = PathBuf::from("track/items");
+        let track_id = "review-driver-check-2026".to_owned();
+        let scope = "cli_driver".to_owned();
+        let input = ReviewCheckZeroFindingsInput::try_new(
+            items_dir.clone(),
+            track_id.clone(),
+            scope.clone(),
+            ReviewCheckRoundSelect::Final,
+        )
+        .expect("valid raw input");
+        let expected = ReviewCheckZeroFindingsQuery::try_new(items_dir, track_id, scope)
+            .expect("valid usecase query");
+
+        assert_eq!(input.clone().into_query(), expected);
+        let ReviewCheckZeroFindingsInput(stored_query) = input;
+        assert_eq!(stored_query, expected);
+    }
+
+    #[test]
+    fn test_review_driver_manifest_has_no_production_domain_dependency() {
+        let manifest: toml::Value =
+            toml::from_str(include_str!("../Cargo.toml")).expect("cli-driver manifest must parse");
+        let tables = manifest.as_table().expect("manifest must be a table");
+
+        for table_name in ["dependencies", "build-dependencies"] {
+            let contains_domain = tables
+                .get(table_name)
+                .and_then(toml::Value::as_table)
+                .is_some_and(|dependencies| dependencies.contains_key("domain"));
+            assert!(!contains_domain, "domain must not be a production {table_name} dependency");
+        }
+
+        if let Some(targets) = tables.get("target").and_then(toml::Value::as_table) {
+            for (target_name, target) in targets {
+                let target_tables =
+                    target.as_table().expect("target dependency configuration must be a table");
+                for table_name in ["dependencies", "build-dependencies"] {
+                    let contains_domain = target_tables
+                        .get(table_name)
+                        .and_then(toml::Value::as_table)
+                        .is_some_and(|dependencies| dependencies.contains_key("domain"));
+                    assert!(
+                        !contains_domain,
+                        "domain must not be a production {table_name} dependency for {target_name}"
+                    );
+                }
+            }
+        }
+
+        let dev_dependencies = tables
+            .get("dev-dependencies")
+            .and_then(toml::Value::as_table)
+            .expect("dev-dependencies must be a table");
+        assert!(dev_dependencies.contains_key("domain"));
+    }
+
+    #[test]
+    fn test_review_v2_sources_do_not_reexport_domain_scope_name() {
+        let review_v2_dir =
+            PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../libs/usecase/src/review_v2");
+        let forbidden_reexport = ["pub use domain::review_v2::{", "ScopeName"].concat();
+
+        for entry in fs::read_dir(review_v2_dir).expect("review_v2 source directory must exist") {
+            let path = entry.expect("review_v2 directory entry must be readable").path();
+            if path.extension().is_some_and(|extension| extension == "rs") {
+                let source = fs::read_to_string(&path).expect("review_v2 source must be readable");
+                assert!(
+                    !source.contains(&forbidden_reexport),
+                    "{} must not re-export domain ScopeName",
+                    path.display()
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn test_review_check_zero_findings_input_rejects_invalid_scope_name() {
+        let result = ReviewCheckZeroFindingsInput::try_new(
+            PathBuf::from("track/items"),
+            "review-driver-check-2026".to_owned(),
+            "".to_owned(),
+            ReviewCheckRoundSelect::Final,
+        );
+        assert!(matches!(result, Err(ReviewCheckZeroFindingsValidationError::InvalidScope(_))));
     }
 
     #[test]
@@ -902,13 +1065,30 @@ mod tests {
     #[test]
     fn test_review_check_zero_findings_evaluation_failure_returns_nonzero_exit() {
         let outcome = check_zero_findings_result_to_command_outcome(Err(
-            ReviewCheckZeroFindingsError::EvaluationFailed(domain::FreeText::new(
-                "review.json is malformed",
-            )),
+            ReviewCheckZeroFindingsEvaluationError::EvaluationFailed(
+                usecase::git_workflow::DiagnosticText::new("review.json is malformed"),
+            ),
         ));
 
         assert_ne!(outcome.exit_code, 0);
         assert!(outcome.stderr.as_deref().is_some_and(|message| message.contains("malformed")));
+    }
+
+    #[test]
+    fn test_review_driver_check_zero_findings_service_evaluation_failure_returns_nonzero_exit() {
+        let query = check_zero_findings_query();
+        let (driver, focused_service) =
+            review_driver_for_check(Err(ReviewCheckZeroFindingsEvaluationError::EvaluationFailed(
+                usecase::git_workflow::DiagnosticText::new("review artifact could not be read"),
+            )));
+
+        let outcome = driver.handle(ReviewInput::CheckZeroFindings(check_zero_findings_input()));
+
+        assert_eq!(focused_service.received_query(), Some(query));
+        assert_ne!(outcome.exit_code, 0);
+        assert!(
+            outcome.stderr.as_deref().is_some_and(|message| message.contains("could not be read"))
+        );
     }
 
     #[test]

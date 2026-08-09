@@ -8,11 +8,19 @@
 | CoverageViolation | enum | modify | MissingTaskContract, OrphanEntry, InvalidEntryRef, MissingSignalDocument, InvalidTaskRef | 🔵 | 🔵 |
 | PreReviewGateOutcome | enum | modify | Passed, Blocked | 🔵 | 🔵 |
 | PreReviewGateViolation | enum | modify | MissingTaskContract, NonBlueSignal | 🔵 | 🔵 |
+| ScopeName | enum | modify | Main, Other | 🔵 | 🔵 |
 
 ## Value Objects
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | ContractedEntryRef | value_object | reference | — | 🔵 | 🔵 |
+| MainScopeName | value_object | reference | — | 🔵 | 🔵 |
 | TaskContractDocument | value_object | reference | — | 🔵 | 🔵 |
+
+## Error Types
+
+| Name | Kind | Action | Details | Signal | Cat-Spec |
+|------|------|--------|---------|--------|----------|
+| ScopeNameError | error_type | reference | Empty, NotAscii, Reserved | 🔵 | 🔵 |
 

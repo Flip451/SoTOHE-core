@@ -8,7 +8,7 @@
 | PhaseCommand | enum | add | Validate, Explain, Enter | 🔵 | 🔵 |
 | RefVerifyCheckChainArg | enum | add | Chain1, Chain2 | 🔵 | 🔵 |
 | ReviewCheckRoundArg | enum | add | Final | 🔵 | 🔵 |
-| ReviewCommand | enum | modify | Local, FixLocal, CheckApproved, CheckZeroFindings, Results, Classify, Files | 🟡 | 🔵 |
+| ReviewCommand | enum | modify | Local, FixLocal, CheckApproved, CheckZeroFindings, Results, Classify, Files | 🔵 | 🔵 |
 
 ## DTOs
 
@@ -20,7 +20,7 @@
 | PhaseEnterArgs | dto | add | — | 🔵 | 🔵 |
 | PhaseIdArgs | dto | add | — | 🔵 | 🔵 |
 | PhaseValidateArgs | dto | add | — | 🔵 | 🔵 |
-| ReviewCheckApprovedArgs | dto | add | — | 🟡 | 🔵 |
+| ReviewCheckApprovedArgs | dto | add | — | 🔵 | 🔵 |
 
 ## Free Functions
 
@@ -31,4 +31,6 @@
 | cli::commands::phase::execute_with_driver | free_function | add | fn(command: PhaseCommand, driver: &cli_driver::phase_command::PhaseCommandDriver) -> std::process::ExitCode | 🔵 | 🔵 |
 | cli::commands::phase::input_from_command | free_function | add | fn(command: PhaseCommand) -> cli_driver::phase_command::PhaseCommandInput | 🔵 | 🔵 |
 | cli::commands::ref_verify::execute_check_approved_with_driver | free_function | add | fn(args: &CheckApprovedArgs, driver: &cli_driver::ref_verify::RefVerifyDriver) -> std::process::ExitCode | 🔵 | 🔵 |
+| cli::commands::review::execute_check_approved | free_function | modify | fn(args: &ReviewCheckApprovedArgs) -> std::process::ExitCode | 🔵 | 🔵 |
+| cli::commands::review::execute_check_zero_findings | free_function | add | fn(args: &CheckZeroFindingsArgs) -> std::process::ExitCode | 🔵 | 🔵 |
 

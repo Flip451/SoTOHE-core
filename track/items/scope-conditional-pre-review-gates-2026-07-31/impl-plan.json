@@ -222,16 +222,17 @@
     },
     {
       "id": "T038",
-      "description": "`libs/usecase/src/review_v2/{check_zero_findings.rs,mod.rs}` に `ReviewCheckZeroFindings{Query,Outcome,Error,Service,Interactor}` を追加し、`libs/infrastructure/src/review_v2/` の usecase state port を実装する `ReviewCheckZeroFindingsStateAdapter` を追加する。`apps/cli-driver/src/review.rs` と `apps/cli-composition/src/review_v2/{check_zero_findings.rs,mod.rs}` の driver / adapter wiring を更新する。`apps/cli/src/commands/review/{mod.rs,tests.rs}` の `CheckZeroFindingsArgs` / `ReviewCheckRoundArg` と handler tests を追加する。enum variant registration と review CLI の subcommand enum の最終形は T042 に委ねる。CN-06、AC-16。",
-      "status": "in_progress",
+      "description": "`libs/usecase/src/review_v2/{check_zero_findings.rs,mod.rs}` に `ReviewCheckZeroFindings{Query,Outcome,Service,Interactor}` を追加し、`libs/infrastructure/src/review_v2/` の usecase state port を実装する `ReviewCheckZeroFindingsStateAdapter` を追加する。`apps/cli-driver/src/review.rs` と `apps/cli-composition/src/review_v2/{check_zero_findings.rs,mod.rs}` の driver / adapter wiring を更新する。`apps/cli/src/commands/review/{mod.rs,tests.rs}` の `CheckZeroFindingsArgs` / `ReviewCheckRoundArg` と handler tests を追加する。error surface の最終形、enum variant registration と review CLI の subcommand enum の最終形は T042 に委ねる。CN-06、AC-16。",
+      "status": "done",
+      "commit_hash": "ce1eba1dabdc6f458f4dc3dfcabf10fed8bf194d",
       "depends_on": [
         "T037"
       ]
     },
     {
       "id": "T042",
-      "description": "`cli:ReviewCommand` の final shape を排他的に統合し、legacy variant removal、`CheckZeroFindings` の追加、`CheckApproved` payload の `ReviewCheckApprovedArgs` rename、dispatch / callers / tests integration を更新する。CN-06、AC-16。",
-      "status": "todo",
+      "description": "`cli:ReviewCommand` の final shape を排他的に統合し、legacy variant removal、`CheckZeroFindings` の追加、`CheckApproved` payload の `ReviewCheckApprovedArgs` rename を実装する。`apps/cli-driver/src/review.rs` の `ReviewCheckZeroFindingsInput` から usecase query への fallible conversion と CLI caller integration、dispatch / tests を更新する。既存 `review check-approved` 経路の互換性検証 tests を更新する。CN-06、AC-16、AC-17。",
+      "status": "in_progress",
       "depends_on": [
         "T038"
       ]

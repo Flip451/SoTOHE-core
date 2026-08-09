@@ -545,7 +545,7 @@
         "role": "ApplicationService"
       },
       "brief": "Author a result test covering 'trait_method:check_zero_findings' of ReviewCheckZeroFindingsService",
-      "declaration_hash": "be8b99f98acbcb5ea6d6059f371746a942284cac3519b7eaefdd64b753caa593",
+      "declaration_hash": "aa2cad5143764e2cd7005d40092764a3c7314706a6a32b7022b07e630d8f7b1a",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -1222,6 +1222,62 @@
       },
       "brief": "Author a logic test covering 'entry' of cli::commands::ref_verify::execute_check_approved_with_driver",
       "declaration_hash": "cf46d56925d55369c46a62e0afed4a8d0de5834e18c1da4c00bc5943c4a0034a",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-06"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-16"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::review::execute_check_approved",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::review::execute_check_approved"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::review::execute_check_approved",
+      "declaration_hash": "a33f1acae9c5873204cf9e309d5bb88840f1075380f647d062c6ae2dfd7168f7",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-07"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-17"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::review::execute_check_zero_findings",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::review::execute_check_zero_findings"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::review::execute_check_zero_findings",
+      "declaration_hash": "d9e36fd3f25d12e22b959e641ed57125e48650863a055fdc61998df3b44be8ec",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",

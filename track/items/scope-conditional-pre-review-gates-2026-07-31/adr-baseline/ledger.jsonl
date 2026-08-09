@@ -1,3 +1,5 @@
 {"source":"2026-07-30-1036-scope-conditional-pre-review-gates.md","hash":"23b79cf86c8de5aac8f30d60403d7611cf27722b816492b10d5784af7b63f744","kind":"init","timestamp":"2026-07-31T11:16:19Z"}
 {"source":"2026-07-30-1036-scope-conditional-pre-review-gates.md","hash":"bf80c253a435ce57c60aead69591cea0a98259b3d8c03cacd6b5e14048bc8a5f","kind":"escalation","reason":"review-refinement記録（経過措置）: Phase 0 reviewでD1/D2を含む全文がzero_findingsへ収束し、ユーザーが当該全文を承認したため、decision groundingを境界承認refへ更新した。adr-diagnoserは本文がbyte不変で承認refのみを忠実に適用しており、他の決定内容へ影響しないadoption-conformant編集と判定した。","timestamp":"2026-07-31T11:34:04Z"}
 {"source":"2026-07-12-0510-capability-exec-unified-dispatch.md","hash":"eb76607980929a7ef1e69bc8d0000b2a3a82c3632aeae3b002204b20f1d6b712","kind":"cite","timestamp":"2026-08-03T04:24:26Z"}
+{"source":"2026-04-28-1905-review-results-command.md","hash":"5490271e96e4fa3e4123b43342afd6a98de0acace227656f62c638193165c82b","kind":"cite","timestamp":"2026-08-09T20:01:44Z"}
+{"source":"2026-04-30-0848-cli-via-usecase-only.md","hash":"41c3ec2e45f1ac9d431a3f1e8efdb82e213ea768aedbcd2695d9b0add8bbcd69","kind":"cite","timestamp":"2026-08-09T20:01:44Z"}

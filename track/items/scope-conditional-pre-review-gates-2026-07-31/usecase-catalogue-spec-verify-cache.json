@@ -1731,6 +1731,30 @@
       }
     },
     {
+      "claim_hash": "6707641795f4a7dbb940e0f5b86c2c4a6160c7c4f45d6912ec879c8d324d44ec",
+      "evidence_hash": "f91359fed2be615f09bac070ee9e94ed6f7e5435a2008fcb38d7280b5a69e875",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase diagnostic-text value (CN-08)."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "DiagnosticText"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-08",
+          "text_label": "zero-findings review check の driver→usecase boundary は domain 型を `pub use` で再公開しない。driver は raw boundary value を usecase-owned boundary DTO または Query constructor に渡し、usecase が domain `ScopeName` を内部で構築する。"
+        }
+      }
+    },
+    {
       "claim_hash": "27a57f7100fcf056c17b12b91996493881cb6918bdc44530c8dd7dd9b588eed8",
       "evidence_hash": "3a5e9bfe0d346bd4954b8a1b5e75e3144ca58519d0d0207e5f5861d453dfc660",
       "verdict": {
@@ -3795,18 +3819,18 @@
       }
     },
     {
-      "claim_hash": "ad2dcf75abfb13b227da4d1e243202d91719d84c16f31663c3110ef016a0e30a",
+      "claim_hash": "ec884b963812fddf79ec1da1df364f18afab8b7d7bf2321797f412ee6b55a81b",
       "evidence_hash": "8fa587f6b3cb186fc083494e54ed3db92fa82015011b1fec6c54d72cfb0b3e46",
       "verdict": {
         "kind": "pass",
-        "citation": "pre-entry matrix で使う public check command は exit code で判定可能でなければならない。`bin/sotp review check-zero-findings --scope <scope> --round final` は指定 scope の current artifact に対応する final review verdict が `zero_findings` の場合だけ zero を返す。"
+        "citation": "未解決、stale、または対象外 chain の状態で false success を返さない。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
         "data": {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
           "section_key": "types",
-          "entry_key": "ReviewCheckZeroFindingsError"
+          "entry_key": "ReviewCheckZeroFindingsEvaluationError"
         }
       },
       "evidence_origin": {
@@ -3819,18 +3843,18 @@
       }
     },
     {
-      "claim_hash": "ad2dcf75abfb13b227da4d1e243202d91719d84c16f31663c3110ef016a0e30a",
+      "claim_hash": "ec884b963812fddf79ec1da1df364f18afab8b7d7bf2321797f412ee6b55a81b",
       "evidence_hash": "94934398148874b5290b24f7a6cf5b694fb5081a27244d13290a946a74a4abea",
       "verdict": {
         "kind": "pass",
-        "citation": "`bin/sotp review check-zero-findings --scope <scope> --round final` returns zero only for a current final `zero_findings` verdict for that scope, and non-zero for absent, stale, non-final, or findings-present review state."
+        "citation": "returns zero only for a current final `zero_findings` verdict for that scope, and non-zero for absent, stale, non-final, or findings-present review state."
       },
       "claim_origin": {
         "kind": "catalogue_entry",
         "data": {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
           "section_key": "types",
-          "entry_key": "ReviewCheckZeroFindingsError"
+          "entry_key": "ReviewCheckZeroFindingsEvaluationError"
         }
       },
       "evidence_origin": {
@@ -3939,7 +3963,31 @@
       }
     },
     {
-      "claim_hash": "d17fa8ffdcba255ff7e8ec055f4f1d01c7a75cad5c8c6b0562923165d717d023",
+      "claim_hash": "c4b63610a4cdbcd7bc50882c6e2907a94b4d9cf0b588476ba63972b6b8c78cf9",
+      "evidence_hash": "f91359fed2be615f09bac070ee9e94ed6f7e5435a2008fcb38d7280b5a69e875",
+      "verdict": {
+        "kind": "pass",
+        "citation": "driver は raw boundary value を usecase-owned boundary DTO または Query constructor に渡し、usecase が domain `ScopeName` を内部で構築する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "ReviewCheckZeroFindingsQuery"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-08",
+          "text_label": "zero-findings review check の driver→usecase boundary は domain 型を `pub use` で再公開しない。driver は raw boundary value を usecase-owned boundary DTO または Query constructor に渡し、usecase が domain `ScopeName` を内部で構築する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c4b63610a4cdbcd7bc50882c6e2907a94b4d9cf0b588476ba63972b6b8c78cf9",
       "evidence_hash": "8fa587f6b3cb186fc083494e54ed3db92fa82015011b1fec6c54d72cfb0b3e46",
       "verdict": {
         "kind": "pass",
@@ -3963,7 +4011,7 @@
       }
     },
     {
-      "claim_hash": "d17fa8ffdcba255ff7e8ec055f4f1d01c7a75cad5c8c6b0562923165d717d023",
+      "claim_hash": "c4b63610a4cdbcd7bc50882c6e2907a94b4d9cf0b588476ba63972b6b8c78cf9",
       "evidence_hash": "94934398148874b5290b24f7a6cf5b694fb5081a27244d13290a946a74a4abea",
       "verdict": {
         "kind": "pass",
@@ -3975,6 +4023,78 @@
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
           "section_key": "types",
           "entry_key": "ReviewCheckZeroFindingsQuery"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-16",
+          "text_label": "`bin/sotp review check-zero-findings --scope <scope> --round final` returns zero only for a current final `zero_findings` verdict for that scope, and non-zero for absent, stale, non-final, or findings-present review state. `bin/sotp ref-verify check-approved --chain <1|2>` returns zero only when the selected Chain's current production reference pairs are all verified pass, and non-zero when any selected pair is absent, stale, pending, or failed. Both commands are usable as literal pre-entry argv without parsing display output."
+        }
+      }
+    },
+    {
+      "claim_hash": "4dfffefbf7e0d15c4a002c5486bbf8732c0612d109083be27c352367fc28af96",
+      "evidence_hash": "f91359fed2be615f09bac070ee9e94ed6f7e5435a2008fcb38d7280b5a69e875",
+      "verdict": {
+        "kind": "pass",
+        "citation": "zero-findings review check の driver→usecase boundary は domain 型を `pub use` で再公開しない。driver は raw boundary value を usecase-owned boundary DTO または Query constructor に渡し、usecase が domain `ScopeName` を内部で構築する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "ReviewCheckZeroFindingsValidationError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-08",
+          "text_label": "zero-findings review check の driver→usecase boundary は domain 型を `pub use` で再公開しない。driver は raw boundary value を usecase-owned boundary DTO または Query constructor に渡し、usecase が domain `ScopeName` を内部で構築する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "4dfffefbf7e0d15c4a002c5486bbf8732c0612d109083be27c352367fc28af96",
+      "evidence_hash": "8fa587f6b3cb186fc083494e54ed3db92fa82015011b1fec6c54d72cfb0b3e46",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp review check-zero-findings --scope <scope> --round final` は指定 scope の current artifact に対応する final review verdict が `zero_findings` の場合だけ zero を返す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "ReviewCheckZeroFindingsValidationError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-06",
+          "text_label": "pre-entry matrix で使う public check command は exit code で判定可能でなければならない。`bin/sotp review check-zero-findings --scope <scope> --round final` は指定 scope の current artifact に対応する final review verdict が `zero_findings` の場合だけ zero を返す。`bin/sotp ref-verify check-approved --chain <1|2>` は指定 Chain の current production reference pair が全て verified pass の場合だけ zero を返す。display-only result command を convergence 判定に使わず、未解決、stale、または対象外 chain の状態で false success を返さない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "4dfffefbf7e0d15c4a002c5486bbf8732c0612d109083be27c352367fc28af96",
+      "evidence_hash": "94934398148874b5290b24f7a6cf5b694fb5081a27244d13290a946a74a4abea",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp review check-zero-findings --scope <scope> --round final` returns zero only for a current final `zero_findings` verdict for that scope, and non-zero for absent, stale, non-final, or findings-present review state."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "ReviewCheckZeroFindingsValidationError"
         }
       },
       "evidence_origin": {
@@ -5019,11 +5139,11 @@
       }
     },
     {
-      "claim_hash": "69f2330ffbbef7e04de508be33f66b62d4b71fbc97ad00a961d7e93a0699ec2a",
+      "claim_hash": "57ea7e3e9b046ce0726bb8569fa0ebb408889abf4177db9212e32b330bde7f79",
       "evidence_hash": "8fa587f6b3cb186fc083494e54ed3db92fa82015011b1fec6c54d72cfb0b3e46",
       "verdict": {
         "kind": "pass",
-        "citation": "指定 scope の current artifact に対応する final review verdict が `zero_findings` の場合だけ zero を返す。"
+        "citation": "pre-entry matrix で使う public check command は exit code で判定可能でなければならない。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -5043,7 +5163,7 @@
       }
     },
     {
-      "claim_hash": "69f2330ffbbef7e04de508be33f66b62d4b71fbc97ad00a961d7e93a0699ec2a",
+      "claim_hash": "57ea7e3e9b046ce0726bb8569fa0ebb408889abf4177db9212e32b330bde7f79",
       "evidence_hash": "94934398148874b5290b24f7a6cf5b694fb5081a27244d13290a946a74a4abea",
       "verdict": {
         "kind": "pass",

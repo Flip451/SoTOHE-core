@@ -8629,7 +8629,7 @@
         "item_identifier": "voluntary:IN-05"
       },
       "key": {
-        "bound_tests_set_hash": "8531d43e9c0e9c9384b89a035b80835c03c89ec7751440e9e49bb5b9d2b467f8",
+        "bound_tests_set_hash": "b445956e71f1ddb5fcabd78a0897f89b9467ee845d30ee7da0f6be420f20d991",
         "declaration_hash": "e20e23b810712c35cb0d0f39da5221d8ae114687120204fe64258881239ab1ea",
         "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb"
       },
@@ -8690,7 +8690,7 @@
         "item_identifier": "voluntary:AC-05"
       },
       "key": {
-        "bound_tests_set_hash": "e492260d09fae5a51f04c754608aaedfdc2845ee06dde6e57d284f3e404c6c35",
+        "bound_tests_set_hash": "ff49ec2f280c4165cc95fb4bf8220651da56ec305e84092e7cb0f9208fbcf490",
         "declaration_hash": "e20e23b810712c35cb0d0f39da5221d8ae114687120204fe64258881239ab1ea",
         "anchor_text_hash": "8d48277fc4c897efc673b3a0900124a4d8004b50284e41c8eb83f36ea17d1b80"
       },
@@ -8704,6 +8704,11 @@
           "layer": "cli",
           "module_path": "cli::commands::review::tests",
           "test_name": "review_command_parses_all_surviving_variants"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::review::tests",
+          "test_name": "review_local_enum_route_runs_selected_pre_review_gate_before_reviewer"
         },
         {
           "layer": "cli",
@@ -10341,13 +10346,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "6ca1c04006d503cb9c683e14c6448868d33fb60de3615819e9502e397db7691e",
+        "bound_tests_set_hash": "3da0f7708d839b47f1029cc03a0fc0481aea9d1fbebc8b95526acfae8ffc0ce8",
         "declaration_hash": "e5db7d6018a2c4c0257864c7621518b6e0df50e58bc9e9eb85d71840e5462de9",
         "anchor_text_hash": "8d34e5e09f55a8997a644feb9c062f2d14bb3789b47feb693c070f1c397c40aa"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(check_outcome.exit_code, 0, \"{check_outcome:?}\");\n...\nassert_eq!(interactor.check_zero_findings(&query).unwrap(), ReviewCheckZeroFindingsOutcome::StaleFinalVerdict);\n...\nassert_eq!(interactor.check_zero_findings(&query).unwrap(), ReviewCheckZeroFindingsOutcome::FindingsRemain);\n...\nassert_eq!(interactor.check_zero_findings(&query).unwrap(), ReviewCheckZeroFindingsOutcome::MissingFinalVerdict);"
+        "citation": "let interactor = ReviewCheckZeroFindingsInteractor::new(std::sync::Arc::new(\n            ReviewCheckZeroFindingsStateAdapter,\n        ));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -10382,13 +10387,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "6ca1c04006d503cb9c683e14c6448868d33fb60de3615819e9502e397db7691e",
+        "bound_tests_set_hash": "3da0f7708d839b47f1029cc03a0fc0481aea9d1fbebc8b95526acfae8ffc0ce8",
         "declaration_hash": "e5db7d6018a2c4c0257864c7621518b6e0df50e58bc9e9eb85d71840e5462de9",
         "anchor_text_hash": "10341447fc6871cfb7adaeeb10623b54eb7feaa360bb6ab8e8a7a7f563b9001f"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(\n            interactor.check_zero_findings(&query).unwrap(),\n            ReviewCheckZeroFindingsOutcome::StaleFinalVerdict\n        );\n\nassert_eq!(\n            interactor.check_zero_findings(&query).unwrap(),\n            ReviewCheckZeroFindingsOutcome::FindingsRemain\n        );\n\nassert_eq!(\n            interactor.check_zero_findings(&query).unwrap(),\n            ReviewCheckZeroFindingsOutcome::MissingFinalVerdict\n        );"
+        "citation": "assert_eq!(check_outcome.exit_code, 0, \"{check_outcome:?}\");\n\n        fs::write(repo._dir.path().join(\"src/lib.rs\"), \"pub fn changed_again() {}\\n\").unwrap();\n        assert_eq!(\n            interactor.check_zero_findings(&query).unwrap(),\n            ReviewCheckZeroFindingsOutcome::StaleFinalVerdict\n        );\n\n        assert_eq!(\n            interactor.check_zero_findings(&query).unwrap(),\n            ReviewCheckZeroFindingsOutcome::FindingsRemain\n        );\n\n        assert_eq!(\n            interactor.check_zero_findings(&query).unwrap(),\n            ReviewCheckZeroFindingsOutcome::MissingFinalVerdict\n        );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -10423,13 +10428,13 @@
         "item_identifier": "trait_method:check_zero_findings"
       },
       "key": {
-        "bound_tests_set_hash": "5d19f2ed38a535771a1ad3ea93645b3eae4213c6f0799ecb530fcf55862633b9",
-        "declaration_hash": "be8b99f98acbcb5ea6d6059f371746a942284cac3519b7eaefdd64b753caa593",
+        "bound_tests_set_hash": "90de8f9f1a0c29f7549ef0b4385989350b99d51d6dcc5ba66cecc5f4ddd40be1",
+        "declaration_hash": "aa2cad5143764e2cd7005d40092764a3c7314706a6a32b7022b07e630d8f7b1a",
         "anchor_text_hash": "8d34e5e09f55a8997a644feb9c062f2d14bb3789b47feb693c070f1c397c40aa"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(check_outcome.exit_code, 0, \"{check_outcome:?}\"); ... assert_eq!(interactor.check_zero_findings(&query).unwrap(), ReviewCheckZeroFindingsOutcome::StaleFinalVerdict); ... assert_eq!(interactor.check_zero_findings(&query).unwrap(), ReviewCheckZeroFindingsOutcome::FindingsRemain); ... assert_eq!(outcome.exit_code, 0); ... assert_ne!(outcome.exit_code, 0);"
+        "citation": "assert_eq!(check_outcome.exit_code, 0, \"{check_outcome:?}\");\n        assert_eq!(std::env::current_dir().unwrap(), cwd_before_check);\n\n        fs::write(repo._dir.path().join(\"src/lib.rs\"), \"pub fn changed_again() {}\\n\").unwrap();\n        assert_eq!(\n            interactor.check_zero_findings(&query).unwrap(),\n            ReviewCheckZeroFindingsOutcome::StaleFinalVerdict\n        );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -10484,13 +10489,13 @@
         "item_identifier": "trait_method:check_zero_findings"
       },
       "key": {
-        "bound_tests_set_hash": "5d19f2ed38a535771a1ad3ea93645b3eae4213c6f0799ecb530fcf55862633b9",
-        "declaration_hash": "be8b99f98acbcb5ea6d6059f371746a942284cac3519b7eaefdd64b753caa593",
+        "bound_tests_set_hash": "90de8f9f1a0c29f7549ef0b4385989350b99d51d6dcc5ba66cecc5f4ddd40be1",
+        "declaration_hash": "aa2cad5143764e2cd7005d40092764a3c7314706a6a32b7022b07e630d8f7b1a",
         "anchor_text_hash": "10341447fc6871cfb7adaeeb10623b54eb7feaa360bb6ab8e8a7a7f563b9001f"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(check_outcome.exit_code, 0, \"{check_outcome:?}\");"
+        "citation": "assert_eq!(check_outcome.exit_code, 0, \"{check_outcome:?}\"); ... assert_eq!(interactor.check_zero_findings(&query).unwrap(), ReviewCheckZeroFindingsOutcome::StaleFinalVerdict); ... ReviewCheckZeroFindingsOutcome::FindingsRemain ... ReviewCheckZeroFindingsOutcome::MissingFinalVerdict ... assert_ne!(outcome.exit_code, 0);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -10545,7 +10550,7 @@
         "item_identifier": "voluntary:CN-06"
       },
       "key": {
-        "bound_tests_set_hash": "fb62b89b9da055010d67c92157b01c1fcb2c71c6d825cd9d7205ea0ae3e9c018",
+        "bound_tests_set_hash": "4070f6061006b735708d3dc0676e825a7811d89c941d5862fbbbc74b663d70b2",
         "declaration_hash": "8185a25c7fedae5576c2c380a405a44c05b9c97358bd30ca0b5fb5bbe814c682",
         "anchor_text_hash": "8d34e5e09f55a8997a644feb9c062f2d14bb3789b47feb693c070f1c397c40aa"
       },
@@ -10586,13 +10591,13 @@
         "item_identifier": "voluntary:AC-16"
       },
       "key": {
-        "bound_tests_set_hash": "fb62b89b9da055010d67c92157b01c1fcb2c71c6d825cd9d7205ea0ae3e9c018",
+        "bound_tests_set_hash": "4070f6061006b735708d3dc0676e825a7811d89c941d5862fbbbc74b663d70b2",
         "declaration_hash": "8185a25c7fedae5576c2c380a405a44c05b9c97358bd30ca0b5fb5bbe814c682",
         "anchor_text_hash": "10341447fc6871cfb7adaeeb10623b54eb7feaa360bb6ab8e8a7a7f563b9001f"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(outcome.exit_code, 0);\nassert!(outcome.stderr.is_none());\n\nassert_ne!(outcome.exit_code, 0);\nassert!(outcome.stderr.is_some());\n\nassert_ne!(outcome.exit_code, 0, \"a current fast-only verdict must fail closed\");"
+        "citation": "assert_eq!(outcome.exit_code, 0);\nassert_ne!(outcome.exit_code, 0);\nassert_ne!(outcome.exit_code, 0, \"a current fast-only verdict must fail closed\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -10627,13 +10632,13 @@
         "item_identifier": "trait_method:state_for"
       },
       "key": {
-        "bound_tests_set_hash": "7a777447f01e530513e9eb3b566f46854b8d594a3aaea477934d871b99059b30",
+        "bound_tests_set_hash": "53bbcaf9268dbcf0edd61162e0c2653ce7d499fb7691c9b63c54f5cd9d83663c",
         "declaration_hash": "de56fc0b4c9d3f9aa46f221655e1ce9ca743fa4a4c8f0bc75f164b9187b9faaf",
         "anchor_text_hash": "8d34e5e09f55a8997a644feb9c062f2d14bb3789b47feb693c070f1c397c40aa"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(interactor.check_zero_findings(&query).unwrap(),\n            ReviewCheckZeroFindingsOutcome::StaleFinalVerdict);"
+        "citation": "assert_eq!(check_outcome.exit_code, 0, \"{check_outcome:?}\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -10688,13 +10693,13 @@
         "item_identifier": "trait_method:state_for"
       },
       "key": {
-        "bound_tests_set_hash": "7a777447f01e530513e9eb3b566f46854b8d594a3aaea477934d871b99059b30",
+        "bound_tests_set_hash": "53bbcaf9268dbcf0edd61162e0c2653ce7d499fb7691c9b63c54f5cd9d83663c",
         "declaration_hash": "de56fc0b4c9d3f9aa46f221655e1ce9ca743fa4a4c8f0bc75f164b9187b9faaf",
         "anchor_text_hash": "10341447fc6871cfb7adaeeb10623b54eb7feaa360bb6ab8e8a7a7f563b9001f"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(interactor.check_zero_findings(&query).unwrap(), ReviewCheckZeroFindingsOutcome::StaleFinalVerdict); ... assert_eq!(interactor.check_zero_findings(&query).unwrap(), ReviewCheckZeroFindingsOutcome::FindingsRemain); ... assert_eq!(interactor.check_zero_findings(&query).unwrap(), ReviewCheckZeroFindingsOutcome::MissingFinalVerdict);"
+        "citation": "assert_eq!(check_outcome.exit_code, 0, \"{check_outcome:?}\");\n\nassert_eq!(interactor.check_zero_findings(&query).unwrap(), ReviewCheckZeroFindingsOutcome::StaleFinalVerdict);\n\nassert!(result.is_err(), \"symlinked items_dir must fail closed: {result:?}\");\n\nassert_eq!(state, Some(ReviewState::Required(RequiredReason::NotStarted)));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -10749,13 +10754,13 @@
         "item_identifier": "trait_impl:usecase::review_v2::check_zero_findings::ReviewCheckZeroFindingsStatePort"
       },
       "key": {
-        "bound_tests_set_hash": "0020d9ab8bd7047ebb5c96c74c0c57a355f9cf2b3fc8b9c4abc8c8fb49973d62",
+        "bound_tests_set_hash": "683d7811b518d37df332ae6a57f6b7653efd40714765be5fedde1c00cf345bae",
         "declaration_hash": "b715d441e82dadbeadf8115ec24278a446470a232f532af6b91e14b4c739bec3",
         "anchor_text_hash": "8d34e5e09f55a8997a644feb9c062f2d14bb3789b47feb693c070f1c397c40aa"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(interactor.check_zero_findings(&query).unwrap(),\n            ReviewCheckZeroFindingsOutcome::StaleFinalVerdict);"
+        "citation": "ReviewCompositionRoot::new().review_run_codex(codex_review_input(&repo, \"final\")).unwrap();\n\nlet foreign_repo = tempfile::tempdir().unwrap();\nGitRunner::at(foreign_repo.path()).assert_success(&[\"init\", \"-b\", \"main\"]);\nstd::env::set_current_dir(foreign_repo.path()).unwrap();\nlet cwd_before_check = std::env::current_dir().unwrap();\nlet check_outcome =\n    driver.handle(ReviewInput::CheckZeroFindings(check_zero_findings_input(&repo)));\nassert_eq!(check_outcome.exit_code, 0, \"{check_outcome:?}\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -10805,13 +10810,13 @@
         "item_identifier": "trait_impl:usecase::review_v2::check_zero_findings::ReviewCheckZeroFindingsStatePort"
       },
       "key": {
-        "bound_tests_set_hash": "0020d9ab8bd7047ebb5c96c74c0c57a355f9cf2b3fc8b9c4abc8c8fb49973d62",
+        "bound_tests_set_hash": "683d7811b518d37df332ae6a57f6b7653efd40714765be5fedde1c00cf345bae",
         "declaration_hash": "b715d441e82dadbeadf8115ec24278a446470a232f532af6b91e14b4c739bec3",
         "anchor_text_hash": "10341447fc6871cfb7adaeeb10623b54eb7feaa360bb6ab8e8a7a7f563b9001f"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(check_outcome.exit_code, 0, \"{check_outcome:?}\"); ... assert_eq!(interactor.check_zero_findings(&query).unwrap(), ReviewCheckZeroFindingsOutcome::StaleFinalVerdict); ... assert_eq!(interactor.check_zero_findings(&query).unwrap(), ReviewCheckZeroFindingsOutcome::FindingsRemain); ... assert_eq!(interactor.check_zero_findings(&query).unwrap(), ReviewCheckZeroFindingsOutcome::MissingFinalVerdict);"
+        "citation": "assert_eq!(interactor.check_zero_findings(&query).unwrap(),\n    ReviewCheckZeroFindingsOutcome::StaleFinalVerdict);\n\nassert_eq!(interactor.check_zero_findings(&query).unwrap(),\n    ReviewCheckZeroFindingsOutcome::FindingsRemain);\n\nassert_eq!(interactor.check_zero_findings(&query).unwrap(),\n    ReviewCheckZeroFindingsOutcome::MissingFinalVerdict);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -10849,33 +10854,28 @@
     },
     {
       "edge_id": {
-        "entry_key": "ReviewCheckZeroFindingsError",
+        "entry_key": "ReviewCheckZeroFindingsEvaluationError",
         "anchor_id": {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "CN-06"
         }
       },
       "obligation_id": {
-        "entry_key": "ReviewCheckZeroFindingsError",
+        "entry_key": "ReviewCheckZeroFindingsEvaluationError",
         "obligation_kind": "logic",
         "item_identifier": "voluntary:CN-06"
       },
       "key": {
-        "bound_tests_set_hash": "ab083034588494945ad7bafdc2f0a5e220edf5dc436c8634545338dbb6b2e1a3",
-        "declaration_hash": "0a5f268eeb584919fb5f428b015a9a7d5d69a25c1b10af99827aeae8a70611eb",
+        "bound_tests_set_hash": "9830c4f5dbc10821270db00610e50ea2ef7d444196b9f9ca8ca6c59ef7cd4230",
+        "declaration_hash": "c9bb2ee096fedb9d6d9a0ac3c9d2c9b19d11fd73172608fa8b72eb4b91f3e192",
         "anchor_text_hash": "8d34e5e09f55a8997a644feb9c062f2d14bb3789b47feb693c070f1c397c40aa"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(\n            interactor.check_zero_findings(&query),\n            Err(ReviewCheckZeroFindingsError::EvaluationFailed(_))\n        ));"
+        "citation": "assert_ne!(outcome.exit_code, 0);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
-        {
-          "layer": "cli_composition",
-          "module_path": "cli_composition::review_v2::tests",
-          "test_name": "test_check_zero_findings_interactor_evaluates_real_review_json_states"
-        },
         {
           "layer": "cli_composition",
           "module_path": "cli_composition::review_v2::tests",
@@ -10889,39 +10889,39 @@
         {
           "layer": "cli_driver",
           "module_path": "cli_driver::review::tests",
-          "test_name": "test_review_check_zero_findings_unconfigured_scope_returns_nonzero_exit"
+          "test_name": "test_review_driver_check_zero_findings_service_evaluation_failure_returns_nonzero_exit"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::check_zero_findings::tests",
+          "test_name": "test_check_zero_findings_evaluator_error_is_propagated"
         }
       ]
     },
     {
       "edge_id": {
-        "entry_key": "ReviewCheckZeroFindingsError",
+        "entry_key": "ReviewCheckZeroFindingsEvaluationError",
         "anchor_id": {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "AC-16"
         }
       },
       "obligation_id": {
-        "entry_key": "ReviewCheckZeroFindingsError",
+        "entry_key": "ReviewCheckZeroFindingsEvaluationError",
         "obligation_kind": "logic",
         "item_identifier": "voluntary:AC-16"
       },
       "key": {
-        "bound_tests_set_hash": "ab083034588494945ad7bafdc2f0a5e220edf5dc436c8634545338dbb6b2e1a3",
-        "declaration_hash": "0a5f268eeb584919fb5f428b015a9a7d5d69a25c1b10af99827aeae8a70611eb",
+        "bound_tests_set_hash": "9830c4f5dbc10821270db00610e50ea2ef7d444196b9f9ca8ca6c59ef7cd4230",
+        "declaration_hash": "c9bb2ee096fedb9d6d9a0ac3c9d2c9b19d11fd73172608fa8b72eb4b91f3e192",
         "anchor_text_hash": "10341447fc6871cfb7adaeeb10623b54eb7feaa360bb6ab8e8a7a7f563b9001f"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(\n            interactor.check_zero_findings(&query),\n            Err(ReviewCheckZeroFindingsError::EvaluationFailed(_))\n        ));\n\n        assert_ne!(outcome.exit_code, 0);"
+        "citation": "assert_ne!(outcome.exit_code, 0);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
-        {
-          "layer": "cli_composition",
-          "module_path": "cli_composition::review_v2::tests",
-          "test_name": "test_check_zero_findings_interactor_evaluates_real_review_json_states"
-        },
         {
           "layer": "cli_composition",
           "module_path": "cli_composition::review_v2::tests",
@@ -10935,7 +10935,12 @@
         {
           "layer": "cli_driver",
           "module_path": "cli_driver::review::tests",
-          "test_name": "test_review_check_zero_findings_unconfigured_scope_returns_nonzero_exit"
+          "test_name": "test_review_driver_check_zero_findings_service_evaluation_failure_returns_nonzero_exit"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::check_zero_findings::tests",
+          "test_name": "test_check_zero_findings_evaluator_error_is_propagated"
         }
       ]
     },
@@ -10953,13 +10958,13 @@
         "item_identifier": "voluntary:CN-06"
       },
       "key": {
-        "bound_tests_set_hash": "b80928ba1cf5eb8e703583e4d2dcc30cbaa9957099992f4beeb12864fd7d9a52",
+        "bound_tests_set_hash": "4fd7d75609a3036b5fe1a7e99fc238f92dbe4db2ceee89cfb1c69ee52b55feac",
         "declaration_hash": "03cad1a31dec52aa244afb9b89c623a3391384f3521e19dee8e6ad513120116f",
         "anchor_text_hash": "8d34e5e09f55a8997a644feb9c062f2d14bb3789b47feb693c070f1c397c40aa"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(check_outcome.exit_code, 0, \"{check_outcome:?}\"); ... assert_eq!(interactor.check_zero_findings(&query).unwrap(), ReviewCheckZeroFindingsOutcome::StaleFinalVerdict); ... assert_eq!(interactor.check_zero_findings(&query).unwrap(), ReviewCheckZeroFindingsOutcome::FindingsRemain); ... assert_ne!(outcome.exit_code, 0);"
+        "citation": "assert_eq!(interactor.check_zero_findings(&query).unwrap(), ReviewCheckZeroFindingsOutcome::StaleFinalVerdict); ... assert_eq!(interactor.check_zero_findings(&query).unwrap(), ReviewCheckZeroFindingsOutcome::FindingsRemain); ... assert_eq!(interactor.check_zero_findings(&query).unwrap(), ReviewCheckZeroFindingsOutcome::MissingFinalVerdict); ... let outcome = check_zero_findings_outcome_to_command_outcome(ReviewCheckZeroFindingsOutcome::CurrentFinalZeroFindings,); assert_eq!(outcome.exit_code, 0);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -11009,13 +11014,13 @@
         "item_identifier": "voluntary:AC-16"
       },
       "key": {
-        "bound_tests_set_hash": "5d19f2ed38a535771a1ad3ea93645b3eae4213c6f0799ecb530fcf55862633b9",
+        "bound_tests_set_hash": "90de8f9f1a0c29f7549ef0b4385989350b99d51d6dcc5ba66cecc5f4ddd40be1",
         "declaration_hash": "03cad1a31dec52aa244afb9b89c623a3391384f3521e19dee8e6ad513120116f",
         "anchor_text_hash": "10341447fc6871cfb7adaeeb10623b54eb7feaa360bb6ab8e8a7a7f563b9001f"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(check_outcome.exit_code, 0, \"{check_outcome:?}\");\n\nassert_eq!(outcome.exit_code, 0);\nassert!(outcome.stderr.is_none());"
+        "citation": "assert_eq!(check_outcome.exit_code, 0, \"{check_outcome:?}\");\n...\nassert_eq!(interactor.check_zero_findings(&query).unwrap(), ReviewCheckZeroFindingsOutcome::StaleFinalVerdict);\n...\nassert_eq!(interactor.check_zero_findings(&query).unwrap(), ReviewCheckZeroFindingsOutcome::FindingsRemain);\n...\nassert_eq!(interactor.check_zero_findings(&query).unwrap(), ReviewCheckZeroFindingsOutcome::MissingFinalVerdict);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -11070,13 +11075,13 @@
         "item_identifier": "voluntary:CN-06"
       },
       "key": {
-        "bound_tests_set_hash": "d9542fa28c687427dcfa9dd210dc91dbd3213b460d4543f33c125a50481bb167",
-        "declaration_hash": "040a2d4faed0fdc9670b59106380f363b0f86b45853109d3556be677f4a13e81",
+        "bound_tests_set_hash": "bfdc46c90ecf5689c0f5b60edbe487cd86222a9c9a7995359c9411f604e44ce9",
+        "declaration_hash": "8fafbd2092ac539a00c111bb2a20cb55ae7c718ce1a24cf4a81ef58f0b355df8",
         "anchor_text_hash": "8d34e5e09f55a8997a644feb9c062f2d14bb3789b47feb693c070f1c397c40aa"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(check_outcome.exit_code, 0, \"{check_outcome:?}\");"
+        "citation": "assert_eq!(check_outcome.exit_code, 0, \"{check_outcome:?}\"); ... assert_eq!(interactor.check_zero_findings(&query).unwrap(), ReviewCheckZeroFindingsOutcome::StaleFinalVerdict); ... assert_eq!(interactor.check_zero_findings(&query).unwrap(), ReviewCheckZeroFindingsOutcome::FindingsRemain); ... ReviewCheckZeroFindingsOutcome::MissingFinalVerdict"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -11109,6 +11114,16 @@
           "layer": "cli_driver",
           "module_path": "cli_driver::review::tests",
           "test_name": "test_review_check_zero_findings_unconfigured_scope_returns_nonzero_exit"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::check_zero_findings::tests",
+          "test_name": "test_review_check_zero_findings_query_valid_raw_tokens_construct_domain_values"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::check_zero_findings::tests",
+          "test_name": "test_review_check_zero_findings_query_invalid_raw_tokens_return_validation_error"
         }
       ]
     },
@@ -11126,13 +11141,13 @@
         "item_identifier": "voluntary:AC-16"
       },
       "key": {
-        "bound_tests_set_hash": "6ca1c04006d503cb9c683e14c6448868d33fb60de3615819e9502e397db7691e",
-        "declaration_hash": "040a2d4faed0fdc9670b59106380f363b0f86b45853109d3556be677f4a13e81",
+        "bound_tests_set_hash": "e538b917e6ecef9878cb4ba10e66f81b166ed1cfbd0e12c687e8aca06a3efbac",
+        "declaration_hash": "8fafbd2092ac539a00c111bb2a20cb55ae7c718ce1a24cf4a81ef58f0b355df8",
         "anchor_text_hash": "10341447fc6871cfb7adaeeb10623b54eb7feaa360bb6ab8e8a7a7f563b9001f"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(check_outcome.exit_code, 0, \"{check_outcome:?}\");\n...\nReviewCheckZeroFindingsOutcome::StaleFinalVerdict\n...\nReviewCheckZeroFindingsOutcome::FindingsRemain\n...\nReviewCheckZeroFindingsOutcome::MissingFinalVerdict"
+        "citation": "assert_eq!(named.scope, ScopeName::parse(named_raw_scope).unwrap());\n        assert_eq!(named.items_dir, PathBuf::from(\"track/items\"));\n        assert_eq!(other.scope, ScopeName::parse(other_raw_scope).unwrap());"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -11150,6 +11165,16 @@
           "layer": "cli_composition",
           "module_path": "cli_composition::review_v2::tests",
           "test_name": "test_check_zero_findings_interactor_empty_scope_returns_missing_final_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::check_zero_findings::tests",
+          "test_name": "test_review_check_zero_findings_query_valid_raw_tokens_construct_domain_values"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::check_zero_findings::tests",
+          "test_name": "test_review_check_zero_findings_query_invalid_raw_tokens_return_validation_error"
         }
       ]
     },
@@ -11167,20 +11192,25 @@
         "item_identifier": "voluntary:CN-06"
       },
       "key": {
-        "bound_tests_set_hash": "1d161188dcefce8758cbac351349b21bab21935d7c7a7b2f85fb2857974ab1fc",
+        "bound_tests_set_hash": "81ecaf55cecc66a80b834455d9a454c71080646d92d73796bfed8b286b2c05b9",
         "declaration_hash": "6c6a1ee71546031e9b06865c1f1e6ef6859e6d78286ed5ab41641f56935fefed",
         "anchor_text_hash": "8d34e5e09f55a8997a644feb9c062f2d14bb3789b47feb693c070f1c397c40aa"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(args.scope, \"usecase\");\n    assert_eq!(args.round, ReviewCheckRoundArg::Final);"
+        "citation": "assert_eq!(super::execute(parse_review_command(&args)), std::process::ExitCode::SUCCESS);\n\n        fs::write(repo.root.join(\"src/lib.rs\"), \"pub fn changed_after_review() {}\\n\").unwrap();\n        assert_eq!(super::execute(parse_review_command(&args)), std::process::ExitCode::FAILURE);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
         {
           "layer": "cli",
           "module_path": "cli::commands::review::tests",
-          "test_name": "test_check_zero_findings_args_direct_payload_parser_accepts_literal_final_round"
+          "test_name": "review_command_parses_all_surviving_variants"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::review::tests",
+          "test_name": "review_check_zero_findings_enum_route_selects_final_scope_state_for_exit_code"
         },
         {
           "layer": "cli_driver",
@@ -11218,20 +11248,20 @@
         "item_identifier": "voluntary:AC-16"
       },
       "key": {
-        "bound_tests_set_hash": "1d161188dcefce8758cbac351349b21bab21935d7c7a7b2f85fb2857974ab1fc",
+        "bound_tests_set_hash": "cde26c35ad9aa3203bcf5fc8f6f22b3d5e4f2cbbc5ea1a2fed71fdaa174af42c",
         "declaration_hash": "6c6a1ee71546031e9b06865c1f1e6ef6859e6d78286ed5ab41641f56935fefed",
         "anchor_text_hash": "10341447fc6871cfb7adaeeb10623b54eb7feaa360bb6ab8e8a7a7f563b9001f"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let matches = command\n        .try_get_matches_from([\"check-zero-findings\", \"--scope\", \"usecase\", \"--round\", \"final\"])\n        .unwrap();\n    let args = <CheckZeroFindingsArgs as clap::FromArgMatches>::from_arg_matches(&matches).unwrap();\n\n    assert_eq!(args.scope, \"usecase\");\n    assert_eq!(args.round, ReviewCheckRoundArg::Final);"
+        "citation": "TestCli::try_parse_from([\n        \"sotp\",\n        \"check-zero-findings\",\n        \"--scope\",\n        \"usecase\",\n        \"--round\",\n        \"final\",\n        \"--track-id\",\n        \"check-track\",\n    ])\n    .expect(\"check-zero-findings must parse through the review command tree\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
         {
           "layer": "cli",
           "module_path": "cli::commands::review::tests",
-          "test_name": "test_check_zero_findings_args_direct_payload_parser_accepts_literal_final_round"
+          "test_name": "review_command_parses_all_surviving_variants"
         },
         {
           "layer": "cli_driver",
@@ -11269,20 +11299,20 @@
         "item_identifier": "voluntary:CN-06"
       },
       "key": {
-        "bound_tests_set_hash": "97206a3e2df60a82bbd55d9a136f4db9d62fbada0fc8e98be01968cddd636131",
-        "declaration_hash": "1500c4af0767d3b945afa7badfaad9e19561d3a7b6d2af4ea75090441584ce66",
+        "bound_tests_set_hash": "e593cccb085fb6ca0bd6bae0d8be14b7bf96d23d23e41d6e586ccbb4c595f17d",
+        "declaration_hash": "8c9c4c3cc20f6da2fc98b5764b3dd6de87c54d1f0bbd13932ec849e87ad52be1",
         "anchor_text_hash": "8d34e5e09f55a8997a644feb9c062f2d14bb3789b47feb693c070f1c397c40aa"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(args.round, ReviewCheckRoundArg::Final);"
+        "citation": "assert_eq!(args.round, super::ReviewCheckRoundArg::Final);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
         {
           "layer": "cli",
           "module_path": "cli::commands::review::tests",
-          "test_name": "test_check_zero_findings_args_direct_payload_parser_accepts_literal_final_round"
+          "test_name": "review_command_parses_all_surviving_variants"
         }
       ]
     },
@@ -11300,25 +11330,1565 @@
         "item_identifier": "voluntary:AC-16"
       },
       "key": {
-        "bound_tests_set_hash": "1b963791da1ca6e87f6b88315f2623b5b08f42dc83ad0bdad2eed5a65ae4671c",
-        "declaration_hash": "1500c4af0767d3b945afa7badfaad9e19561d3a7b6d2af4ea75090441584ce66",
+        "bound_tests_set_hash": "d713f7ae8d1531886605a93947ceeda829ab8b15f11ce136a4e8f81dec2e08e8",
+        "declaration_hash": "8c9c4c3cc20f6da2fc98b5764b3dd6de87c54d1f0bbd13932ec849e87ad52be1",
         "anchor_text_hash": "10341447fc6871cfb7adaeeb10623b54eb7feaa360bb6ab8e8a7a7f563b9001f"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let matches = command\n        .try_get_matches_from([\"check-zero-findings\", \"--scope\", \"usecase\", \"--round\", \"final\"])\n        .unwrap();\n    let args = <CheckZeroFindingsArgs as clap::FromArgMatches>::from_arg_matches(&matches).unwrap();\n\n    assert_eq!(args.scope, \"usecase\");\n    assert_eq!(args.round, ReviewCheckRoundArg::Final);"
+        "citation": "assert_eq!(args.round, super::ReviewCheckRoundArg::Final);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
         {
           "layer": "cli",
           "module_path": "cli::commands::review::tests",
-          "test_name": "test_check_zero_findings_args_direct_payload_parser_accepts_literal_final_round"
+          "test_name": "review_command_parses_all_surviving_variants"
         },
         {
           "layer": "cli",
           "module_path": "cli::commands::review::tests",
-          "test_name": "test_check_zero_findings_args_reject_non_final_or_missing_round"
+          "test_name": "test_review_command_rejects_non_final_or_missing_check_zero_findings_round"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewCommand",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "ed5ca64acd94f2907ba4e9ed086f90c81f5d1157522b9ee0fa4dbdf01b187723",
+        "declaration_hash": "e20e23b810712c35cb0d0f39da5221d8ae114687120204fe64258881239ab1ea",
+        "anchor_text_hash": "8d34e5e09f55a8997a644feb9c062f2d14bb3789b47feb693c070f1c397c40aa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome.exit_code, 0); ... assert_ne!(outcome.exit_code, 0); ... assert_eq!(exit, ExitCode::SUCCESS); ... assert_eq!(exit, ExitCode::FAILURE);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::review::tests",
+          "test_name": "review_command_parses_all_surviving_variants"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_driver_check_zero_findings_dispatches_success_to_focused_service"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_driver_check_zero_findings_dispatches_non_success_to_focused_service"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_evaluates_real_review_json_states"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_review_driver_check_zero_findings_current_fast_only_verdict_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_parses_required_chain1"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_parses_required_chain2"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_chain1_all_approved_returns_success_exit_code"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_chain2_not_approved_returns_failure_exit_code"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain1_pass_ignores_pending_chain2"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain2_pass_ignores_pending_chain1"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain1_absent_cache_exits_one"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain1_stale_cache_exits_one"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain1_pending_cache_exits_one"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain1_failed_cache_exits_one"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain2_absent_cache_exits_one"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain2_stale_cache_exits_one"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain2_pending_cache_exits_one"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain2_failed_cache_exits_one"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewCommand",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-16"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-16"
+      },
+      "key": {
+        "bound_tests_set_hash": "a0253db7eb5e2ebb6c32e20c98a417a77517c2f27d6f50dab9b808e862a949e0",
+        "declaration_hash": "e20e23b810712c35cb0d0f39da5221d8ae114687120204fe64258881239ab1ea",
+        "anchor_text_hash": "10341447fc6871cfb7adaeeb10623b54eb7feaa360bb6ab8e8a7a7f563b9001f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome.exit_code, 0, \"selected Chain-1 must be approved: {outcome:?}\"); ... assert_eq!(outcome.exit_code, 1, \"absent Chain-1 cache must block: {outcome:?}\"); ... assert_eq!(outcome.exit_code, 1, \"stale Chain-1 cache must block: {outcome:?}\"); ... assert_eq!(outcome.exit_code, 1, \"pending Chain-1 cache must block: {outcome:?}\"); ... assert_eq!(outcome.exit_code, 1, \"failed Chain-1 cache must block: {outcome:?}\"); ... assert_eq!(outcome.exit_code, 0, \"selected Chain-2 must be approved: {outcome:?}\"); ... assert_eq!(outcome.exit_code, 1, \"absent Chain-2 cache must block: {outcome:?}\"); ... assert_eq!(outcome.exit_code, 1, \"stale Chain-2 cache must block: {outcome:?}\"); ... assert_eq!(outcome.exit_code, 1, \"pending Chain-2 cache must block: {outcome:?}\"); ... assert_eq!(outcome.exit_code, 1, \"failed Chain-2 cache must block: {outcome:?}\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::review::tests",
+          "test_name": "review_command_parses_all_surviving_variants"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_current_final_zero_findings_returns_success"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_missing_final_verdict_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_stale_final_verdict_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_findings_remain_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_evaluates_real_review_json_states"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_review_driver_check_zero_findings_current_fast_only_verdict_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_parses_required_chain1"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_parses_required_chain2"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_chain1_all_approved_returns_success_exit_code"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_chain2_not_approved_returns_failure_exit_code"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain1_pass_ignores_pending_chain2"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain2_pass_ignores_pending_chain1"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain1_absent_cache_exits_one"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain1_stale_cache_exits_one"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain1_pending_cache_exits_one"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain1_failed_cache_exits_one"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain2_absent_cache_exits_one"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain2_stale_cache_exits_one"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain2_pending_cache_exits_one"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain2_failed_cache_exits_one"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewCheckApprovedArgs",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCheckApprovedArgs",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "8dc6f2b8c3f17b0787a28c8f8e56335eeeab1f8fce612f5a8951e91464ecba03",
+        "declaration_hash": "83617bdc1ac89317364040d1fc3b243c4b8ec9c6cae0a4c08cc7dc65fca4533a",
+        "anchor_text_hash": "3b55c8e54e21cb4c7fef5d4ce81a45963369a73a35e5ea7604817837f9728993"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let args = ReviewCheckApprovedArgs { items_dir, track_id: Some(\"test-track\".to_string()) }; ... assert_eq!(exit, std::process::ExitCode::SUCCESS); ... assert_eq!(exit, std::process::ExitCode::FAILURE);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::review::tests",
+          "test_name": "check_approved_approved_path_exits_success_with_ok_message"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::review::tests",
+          "test_name": "check_approved_bypass_path_exits_success_with_warn_message"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::review::tests",
+          "test_name": "check_approved_blocked_path_exits_failure_with_blocked_message"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_current_final_zero_findings_returns_success"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_missing_final_verdict_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_stale_final_verdict_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_findings_remain_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_review_driver_check_zero_findings_current_fast_only_verdict_returns_nonzero_exit"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewCheckApprovedArgs",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-17"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCheckApprovedArgs",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-17"
+      },
+      "key": {
+        "bound_tests_set_hash": "8dc6f2b8c3f17b0787a28c8f8e56335eeeab1f8fce612f5a8951e91464ecba03",
+        "declaration_hash": "83617bdc1ac89317364040d1fc3b243c4b8ec9c6cae0a4c08cc7dc65fca4533a",
+        "anchor_text_hash": "e6aacfb8f455c1821b32165af066e46f417e456ec790af84bfe16dac190fcf8c"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let args = ReviewCheckApprovedArgs { items_dir, track_id: Some(\"test-track\".to_string()) };\n    let exit = execute(ReviewCommand::CheckApproved(args));\n    assert_eq!(exit, std::process::ExitCode::SUCCESS);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::review::tests",
+          "test_name": "check_approved_approved_path_exits_success_with_ok_message"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::review::tests",
+          "test_name": "check_approved_bypass_path_exits_success_with_warn_message"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::review::tests",
+          "test_name": "check_approved_blocked_path_exits_failure_with_blocked_message"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_current_final_zero_findings_returns_success"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_missing_final_verdict_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_stale_final_verdict_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_findings_remain_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_review_driver_check_zero_findings_current_fast_only_verdict_returns_nonzero_exit"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewCheckRoundSelect",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCheckRoundSelect",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "470cb7665b176404ff4d063b9c06dce32083b4ed014a6c725b80fc51b63146da",
+        "declaration_hash": "73eda02d5894cb4bf7a01a863da952e3c7b9480edd51da8d62ef4f18a19a744c",
+        "anchor_text_hash": "8d34e5e09f55a8997a644feb9c062f2d14bb3789b47feb693c070f1c397c40aa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(super::execute(parse_review_command(&args)), std::process::ExitCode::SUCCESS);\n\nfs::write(repo.root.join(\"src/lib.rs\"), \"pub fn changed_after_review() {}\\n\").unwrap();\nassert_eq!(super::execute(parse_review_command(&args)), std::process::ExitCode::FAILURE);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_input_converts_named_and_other_scopes"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::review::tests",
+          "test_name": "review_check_zero_findings_enum_route_selects_final_scope_state_for_exit_code"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_current_final_zero_findings_returns_success"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_missing_final_verdict_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_stale_final_verdict_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_findings_remain_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_evaluates_real_review_json_states"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_review_driver_check_zero_findings_current_fast_only_verdict_returns_nonzero_exit"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewCheckRoundSelect",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-16"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCheckRoundSelect",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-16"
+      },
+      "key": {
+        "bound_tests_set_hash": "470cb7665b176404ff4d063b9c06dce32083b4ed014a6c725b80fc51b63146da",
+        "declaration_hash": "73eda02d5894cb4bf7a01a863da952e3c7b9480edd51da8d62ef4f18a19a744c",
+        "anchor_text_hash": "10341447fc6871cfb7adaeeb10623b54eb7feaa360bb6ab8e8a7a7f563b9001f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(super::execute(parse_review_command(&args)), std::process::ExitCode::SUCCESS); ... assert_eq!(super::execute(parse_review_command(&args)), std::process::ExitCode::FAILURE); ... assert_ne!(outcome.exit_code, 0); ... ReviewCheckZeroFindingsOutcome::MissingFinalVerdict ... ReviewCheckZeroFindingsOutcome::StaleFinalVerdict ... ReviewCheckZeroFindingsOutcome::FindingsRemain ... assert_ne!(outcome.exit_code, 0, \"a current fast-only verdict must fail closed\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_input_converts_named_and_other_scopes"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::review::tests",
+          "test_name": "review_check_zero_findings_enum_route_selects_final_scope_state_for_exit_code"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_current_final_zero_findings_returns_success"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_missing_final_verdict_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_stale_final_verdict_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_findings_remain_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_evaluates_real_review_json_states"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_review_driver_check_zero_findings_current_fast_only_verdict_returns_nonzero_exit"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewCheckZeroFindingsInput",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCheckZeroFindingsInput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "501846a558bd71fa72f9232c1762ff029dffa50e706555c8646fecd6ef3bc069",
+        "declaration_hash": "d04978b82cc1ec42462460009c310f0722cd969dd8ec79a35dcd326b2028b629",
+        "anchor_text_hash": "8d34e5e09f55a8997a644feb9c062f2d14bb3789b47feb693c070f1c397c40aa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome.exit_code, 0);\n        assert!(outcome.stderr.is_none());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_input_converts_named_and_other_scopes"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_driver_check_zero_findings_dispatches_success_to_focused_service"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_driver_check_zero_findings_dispatches_non_success_to_focused_service"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::review::tests",
+          "test_name": "review_check_zero_findings_enum_route_selects_final_scope_state_for_exit_code"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_current_final_zero_findings_returns_success"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_missing_final_verdict_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_stale_final_verdict_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_findings_remain_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_evaluates_real_review_json_states"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_review_driver_check_zero_findings_current_fast_only_verdict_returns_nonzero_exit"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewCheckZeroFindingsInput",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-16"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCheckZeroFindingsInput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-16"
+      },
+      "key": {
+        "bound_tests_set_hash": "501846a558bd71fa72f9232c1762ff029dffa50e706555c8646fecd6ef3bc069",
+        "declaration_hash": "d04978b82cc1ec42462460009c310f0722cd969dd8ec79a35dcd326b2028b629",
+        "anchor_text_hash": "10341447fc6871cfb7adaeeb10623b54eb7feaa360bb6ab8e8a7a7f563b9001f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome.exit_code, 0); ... assert_ne!(outcome.exit_code, 0);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_input_converts_named_and_other_scopes"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_driver_check_zero_findings_dispatches_success_to_focused_service"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_driver_check_zero_findings_dispatches_non_success_to_focused_service"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::review::tests",
+          "test_name": "review_check_zero_findings_enum_route_selects_final_scope_state_for_exit_code"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_current_final_zero_findings_returns_success"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_missing_final_verdict_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_stale_final_verdict_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_findings_remain_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_evaluates_real_review_json_states"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_review_driver_check_zero_findings_current_fast_only_verdict_returns_nonzero_exit"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::review::execute_check_approved",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::review::execute_check_approved",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "5f93a93bf268e60ae5688e72e84684867bf6d134937114368ba5774ccf7f25c5",
+        "declaration_hash": "a33f1acae9c5873204cf9e309d5bb88840f1075380f647d062c6ae2dfd7168f7",
+        "anchor_text_hash": "3b55c8e54e21cb4c7fef5d4ce81a45963369a73a35e5ea7604817837f9728993"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(exit, std::process::ExitCode::SUCCESS); ... assert_eq!(exit, std::process::ExitCode::SUCCESS); ... assert_eq!(exit, std::process::ExitCode::FAILURE);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::review::tests",
+          "test_name": "check_approved_approved_path_exits_success_with_ok_message"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::review::tests",
+          "test_name": "check_approved_bypass_path_exits_success_with_warn_message"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::review::tests",
+          "test_name": "check_approved_blocked_path_exits_failure_with_blocked_message"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::review::execute_check_approved",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-17"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::review::execute_check_approved",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "5f93a93bf268e60ae5688e72e84684867bf6d134937114368ba5774ccf7f25c5",
+        "declaration_hash": "a33f1acae9c5873204cf9e309d5bb88840f1075380f647d062c6ae2dfd7168f7",
+        "anchor_text_hash": "e6aacfb8f455c1821b32165af066e46f417e456ec790af84bfe16dac190fcf8c"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(exit, std::process::ExitCode::SUCCESS); ... assert_eq!(exit, std::process::ExitCode::SUCCESS); ... assert_eq!(exit, std::process::ExitCode::FAILURE);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::review::tests",
+          "test_name": "check_approved_approved_path_exits_success_with_ok_message"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::review::tests",
+          "test_name": "check_approved_bypass_path_exits_success_with_warn_message"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::review::tests",
+          "test_name": "check_approved_blocked_path_exits_failure_with_blocked_message"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::review::execute_check_zero_findings",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::review::execute_check_zero_findings",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "8a169483c8ce0dd0406118483c63a2183a5e489c396eec212c07fd9ebaf31fa7",
+        "declaration_hash": "d9e36fd3f25d12e22b959e641ed57125e48650863a055fdc61998df3b44be8ec",
+        "anchor_text_hash": "8d34e5e09f55a8997a644feb9c062f2d14bb3789b47feb693c070f1c397c40aa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(super::execute(parse_review_command(&args)), std::process::ExitCode::SUCCESS);\n\n        fs::write(repo.root.join(\"src/lib.rs\"), \"pub fn changed_after_review() {}\\n\").unwrap();\n        assert_eq!(super::execute(parse_review_command(&args)), std::process::ExitCode::FAILURE);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::review::tests",
+          "test_name": "review_check_zero_findings_enum_route_selects_final_scope_state_for_exit_code"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_current_final_zero_findings_returns_success"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_missing_final_verdict_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_stale_final_verdict_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_findings_remain_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_review_driver_check_zero_findings_current_fast_only_verdict_returns_nonzero_exit"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::review::execute_check_zero_findings",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-16"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::review::execute_check_zero_findings",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "8a169483c8ce0dd0406118483c63a2183a5e489c396eec212c07fd9ebaf31fa7",
+        "declaration_hash": "d9e36fd3f25d12e22b959e641ed57125e48650863a055fdc61998df3b44be8ec",
+        "anchor_text_hash": "10341447fc6871cfb7adaeeb10623b54eb7feaa360bb6ab8e8a7a7f563b9001f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(super::execute(parse_review_command(&args)), std::process::ExitCode::SUCCESS); ... fs::write(repo.root.join(\"src/lib.rs\"), \"pub fn changed_after_review() {}\\n\").unwrap(); assert_eq!(super::execute(parse_review_command(&args)), std::process::ExitCode::FAILURE); ... assert_ne!(outcome.exit_code, 0, \"a current fast-only verdict must fail closed\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::review::tests",
+          "test_name": "review_check_zero_findings_enum_route_selects_final_scope_state_for_exit_code"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_current_final_zero_findings_returns_success"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_missing_final_verdict_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_stale_final_verdict_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_findings_remain_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_review_driver_check_zero_findings_current_fast_only_verdict_returns_nonzero_exit"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewCheckZeroFindingsQuery",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCheckZeroFindingsQuery",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-08"
+      },
+      "key": {
+        "bound_tests_set_hash": "69871729c563fdd48281b196d5afc342c99c466e1daf7983d2210d662727d17e",
+        "declaration_hash": "8fafbd2092ac539a00c111bb2a20cb55ae7c718ce1a24cf4a81ef58f0b355df8",
+        "anchor_text_hash": "668f20d9ca0aad39435487bde3bca3b2726bc7470e97c2b06a0aaa9ecf793b9e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(named.scope, ScopeName::parse(named_raw_scope).unwrap());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::check_zero_findings::tests",
+          "test_name": "test_review_check_zero_findings_query_valid_raw_tokens_construct_domain_values"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::check_zero_findings::tests",
+          "test_name": "test_review_check_zero_findings_query_invalid_raw_tokens_return_validation_error"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_driver_manifest_has_no_production_domain_dependency"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_v2_sources_do_not_reexport_domain_scope_name"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_input_forwards_raw_tokens_to_usecase_query"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewCheckZeroFindingsInput",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCheckZeroFindingsInput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-08"
+      },
+      "key": {
+        "bound_tests_set_hash": "450f9b3f28637d27df66ea2dc826f1fa32ef97cd56f780370cb32180d5e4d397",
+        "declaration_hash": "d04978b82cc1ec42462460009c310f0722cd969dd8ec79a35dcd326b2028b629",
+        "anchor_text_hash": "668f20d9ca0aad39435487bde3bca3b2726bc7470e97c2b06a0aaa9ecf793b9e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let named = check_zero_findings_input().into_query();\n        assert_eq!(named, check_zero_findings_query());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_input_converts_named_and_other_scopes"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_input_rejects_invalid_scope_name"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_driver_manifest_has_no_production_domain_dependency"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_v2_sources_do_not_reexport_domain_scope_name"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_input_forwards_raw_tokens_to_usecase_query"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ScopeName",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ScopeName",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-08"
+      },
+      "key": {
+        "bound_tests_set_hash": "2df48bf35eceddc6043fd9f8d51135309595076584f48de9dd5655bda90050fc",
+        "declaration_hash": "5dfab474c515362343c45b1e1f6fc081dd69a68a8f526049ee4d8f963712e767",
+        "anchor_text_hash": "668f20d9ca0aad39435487bde3bca3b2726bc7470e97c2b06a0aaa9ecf793b9e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(\n                    !source.contains(&forbidden_reexport),\n                    \"{} must not re-export domain ScopeName\",\n                    path.display()\n                );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::review_v2::tests",
+          "test_name": "test_scope_name_parse_classifies_named_and_other_scopes"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::review_v2::tests",
+          "test_name": "test_scope_name_parse_reuses_named_scope_validation"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::review::tests",
+          "test_name": "review_check_zero_findings_enum_route_selects_final_scope_state_for_exit_code"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_evaluates_real_review_json_states"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_driver_manifest_has_no_production_domain_dependency"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_v2_sources_do_not_reexport_domain_scope_name"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_input_forwards_raw_tokens_to_usecase_query"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::check_zero_findings::tests",
+          "test_name": "test_review_check_zero_findings_query_valid_raw_tokens_construct_domain_values"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ScopeName",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ScopeName",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "b7204a5f03f2b9b75d5e410e73372e07d52f6b46a838971a32549eace45c0737",
+        "declaration_hash": "5dfab474c515362343c45b1e1f6fc081dd69a68a8f526049ee4d8f963712e767",
+        "anchor_text_hash": "8d34e5e09f55a8997a644feb9c062f2d14bb3789b47feb693c070f1c397c40aa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(super::execute(parse_review_command(&args)), std::process::ExitCode::SUCCESS); ... assert_eq!(super::execute(parse_review_command(&args)), std::process::ExitCode::FAILURE); ... assert_eq!(outcome.exit_code, 0, \"selected Chain-1 must be approved: {outcome:?}\"); ... assert_eq!(outcome.exit_code, 1, \"stale Chain-1 cache must block: {outcome:?}\"); ... assert_eq!(outcome.exit_code, 1, \"pending Chain-2 cache must block: {outcome:?}\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::review_v2::tests",
+          "test_name": "test_scope_name_parse_classifies_named_and_other_scopes"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::review_v2::tests",
+          "test_name": "test_scope_name_parse_reuses_named_scope_validation"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::review::tests",
+          "test_name": "review_check_zero_findings_enum_route_selects_final_scope_state_for_exit_code"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_evaluates_real_review_json_states"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_driver_manifest_has_no_production_domain_dependency"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_v2_sources_do_not_reexport_domain_scope_name"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_input_forwards_raw_tokens_to_usecase_query"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain1_pass_ignores_pending_chain2"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain2_pass_ignores_pending_chain1"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain1_absent_cache_exits_one"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain1_stale_cache_exits_one"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain1_pending_cache_exits_one"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain1_failed_cache_exits_one"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain2_absent_cache_exits_one"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain2_stale_cache_exits_one"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain2_pending_cache_exits_one"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain2_failed_cache_exits_one"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::review::tests",
+          "test_name": "review_check_zero_findings_enum_route_selects_other_scope_state_for_exit_code"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ScopeName",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-16"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ScopeName",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-16"
+      },
+      "key": {
+        "bound_tests_set_hash": "b6133150dbcd0b1751a6fd7f6ea29544810fd1a552c0c2ceab6413e75d5dd737",
+        "declaration_hash": "5dfab474c515362343c45b1e1f6fc081dd69a68a8f526049ee4d8f963712e767",
+        "anchor_text_hash": "10341447fc6871cfb7adaeeb10623b54eb7feaa360bb6ab8e8a7a7f563b9001f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"let args = [\\n            \\\"sotp\\\",\\n            \\\"check-zero-findings\\\",\\n            \\\"--scope\\\",\\n            \\\"cli\\\",\\n            \\\"--round\\\",\\n            \\\"final\\\",\\n            \\\"--track-id\\\",\\n            repo.track_id.as_str(),\\n            \\\"--items-dir\\\",\\n            items_dir,\\n        ];\\n        assert_eq!(super::execute(parse_review_command(&args)), std::process::ExitCode::SUCCESS);\"; \"assert_eq!(super::execute(parse_review_command(&args)), std::process::ExitCode::FAILURE);\"; \"assert_eq!(\\n            interactor.check_zero_findings(&query).unwrap(),\\n            ReviewCheckZeroFindingsOutcome::StaleFinalVerdict\\n        );\"; \"ReviewCheckZeroFindingsOutcome::FindingsRemain\"; \"ReviewCheckZeroFindingsOutcome::MissingFinalVerdict\"; \"assert_eq!(outcome.exit_code, 0, \\\"selected Chain-1 must be approved: {outcome:?}\\\");\"; \"assert_eq!(outcome.exit_code, 0, \\\"selected Chain-2 must be approved: {outcome:?}\\\");\"; \"assert_eq!(outcome.exit_code, 1, \\\"absent Chain-1 cache must block: {outcome:?}\\\");\"; \"assert_eq!(outcome.exit_code, 1, \\\"stale Chain-1 cache must block: {outcome:?}\\\");\"; \"assert_eq!(outcome.exit_code, 1, \\\"pending Chain-1 cache must block: {outcome:?}\\\");\"; \"assert_eq!(outcome.exit_code, 1, \\\"failed Chain-1 cache must block: {outcome:?}\\\");\"; \"assert_eq!(outcome.exit_code, 1, \\\"absent Chain-2 cache must block: {outcome:?}\\\");\"; \"assert_eq!(outcome.exit_code, 1, \\\"stale Chain-2 cache must block: {outcome:?}\\\");\"; \"assert_eq!(outcome.exit_code, 1, \\\"pending Chain-2 cache must block: {outcome:?}\\\");\"; \"assert_eq!(outcome.exit_code, 1, \\\"failed Chain-2 cache must block: {outcome:?}\\\");\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::review_v2::tests",
+          "test_name": "test_scope_name_parse_classifies_named_and_other_scopes"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::review_v2::tests",
+          "test_name": "test_scope_name_parse_reuses_named_scope_validation"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::review::tests",
+          "test_name": "review_check_zero_findings_enum_route_selects_final_scope_state_for_exit_code"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_evaluates_real_review_json_states"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_driver_manifest_has_no_production_domain_dependency"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_v2_sources_do_not_reexport_domain_scope_name"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_input_forwards_raw_tokens_to_usecase_query"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain1_pass_ignores_pending_chain2"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain2_pass_ignores_pending_chain1"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain1_absent_cache_exits_one"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain1_stale_cache_exits_one"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain1_pending_cache_exits_one"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain1_failed_cache_exits_one"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain2_absent_cache_exits_one"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain2_stale_cache_exits_one"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain2_pending_cache_exits_one"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain2_failed_cache_exits_one"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewCheckZeroFindingsValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCheckZeroFindingsValidationError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-08"
+      },
+      "key": {
+        "bound_tests_set_hash": "0ae6159e5ec4a7fb621014d666741a523053779b59bb077ff82f1b8e9ef776ad",
+        "declaration_hash": "543202026b3c78f92e64f188f6f4a58393b080e24e5009d57629ecf4f914c093",
+        "anchor_text_hash": "668f20d9ca0aad39435487bde3bca3b2726bc7470e97c2b06a0aaa9ecf793b9e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            invalid_track,\n            Err(ReviewCheckZeroFindingsValidationError::InvalidTrackId(_))\n        ));\n        assert!(matches!(\n            invalid_scope,\n            Err(ReviewCheckZeroFindingsValidationError::InvalidScope(_))\n        ));\n        assert!(matches!(\n            non_ascii_scope,\n            Err(ReviewCheckZeroFindingsValidationError::InvalidScope(_))\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::check_zero_findings::tests",
+          "test_name": "test_review_check_zero_findings_query_invalid_raw_tokens_return_validation_error"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_input_rejects_invalid_scope_name"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::review::tests",
+          "test_name": "review_check_zero_findings_enum_route_selects_final_scope_state_for_exit_code"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_evaluates_real_review_json_states"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_driver_manifest_has_no_production_domain_dependency"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_v2_sources_do_not_reexport_domain_scope_name"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_input_forwards_raw_tokens_to_usecase_query"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewCheckZeroFindingsValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCheckZeroFindingsValidationError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "3e291b04338fa996ca54bbc24d9b99a83e196e3fd55631c6a2b477408502b12c",
+        "declaration_hash": "543202026b3c78f92e64f188f6f4a58393b080e24e5009d57629ecf4f914c093",
+        "anchor_text_hash": "8d34e5e09f55a8997a644feb9c062f2d14bb3789b47feb693c070f1c397c40aa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            invalid_track,\n            Err(ReviewCheckZeroFindingsValidationError::InvalidTrackId(_))\n        ));\n        assert!(matches!(\n            invalid_scope,\n            Err(ReviewCheckZeroFindingsValidationError::InvalidScope(_))\n        ));\n        assert!(matches!(\n            non_ascii_scope,\n            Err(ReviewCheckZeroFindingsValidationError::InvalidScope(_))\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::check_zero_findings::tests",
+          "test_name": "test_review_check_zero_findings_query_invalid_raw_tokens_return_validation_error"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_input_rejects_invalid_scope_name"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::review::tests",
+          "test_name": "review_check_zero_findings_enum_route_selects_final_scope_state_for_exit_code"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_evaluates_real_review_json_states"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_driver_manifest_has_no_production_domain_dependency"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_v2_sources_do_not_reexport_domain_scope_name"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_input_forwards_raw_tokens_to_usecase_query"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain1_pass_ignores_pending_chain2"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain2_pass_ignores_pending_chain1"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain1_absent_cache_exits_one"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain1_stale_cache_exits_one"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain1_pending_cache_exits_one"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain1_failed_cache_exits_one"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain2_absent_cache_exits_one"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain2_stale_cache_exits_one"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain2_pending_cache_exits_one"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain2_failed_cache_exits_one"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewCheckZeroFindingsValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-16"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCheckZeroFindingsValidationError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-16"
+      },
+      "key": {
+        "bound_tests_set_hash": "3e291b04338fa996ca54bbc24d9b99a83e196e3fd55631c6a2b477408502b12c",
+        "declaration_hash": "543202026b3c78f92e64f188f6f4a58393b080e24e5009d57629ecf4f914c093",
+        "anchor_text_hash": "10341447fc6871cfb7adaeeb10623b54eb7feaa360bb6ab8e8a7a7f563b9001f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            invalid_track,\n            Err(ReviewCheckZeroFindingsValidationError::InvalidTrackId(_))\n        ));\n        assert!(matches!(\n            invalid_scope,\n            Err(ReviewCheckZeroFindingsValidationError::InvalidScope(_))\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::check_zero_findings::tests",
+          "test_name": "test_review_check_zero_findings_query_invalid_raw_tokens_return_validation_error"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_input_rejects_invalid_scope_name"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::review::tests",
+          "test_name": "review_check_zero_findings_enum_route_selects_final_scope_state_for_exit_code"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_evaluates_real_review_json_states"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_driver_manifest_has_no_production_domain_dependency"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_v2_sources_do_not_reexport_domain_scope_name"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_input_forwards_raw_tokens_to_usecase_query"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain1_pass_ignores_pending_chain2"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain2_pass_ignores_pending_chain1"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain1_absent_cache_exits_one"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain1_stale_cache_exits_one"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain1_pending_cache_exits_one"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain1_failed_cache_exits_one"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain2_absent_cache_exits_one"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain2_stale_cache_exits_one"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain2_pending_cache_exits_one"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::ref_verify::tests",
+          "test_name": "test_ref_verify_check_approved_selected_chain2_failed_cache_exits_one"
         }
       ]
     }

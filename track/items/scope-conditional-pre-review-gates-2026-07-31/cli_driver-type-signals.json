@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-09T08:03:56Z",
-  "declaration_hash": "8ca97acb64b7f33cd52eadef6b73c7566b3b639e075f590941399817f7615428",
-  "implementation_input_hash": "8846afa6531002e544c26d22a70afe8264ae794f1281e48f9cc355213b9764ff",
+  "generated_at": "2026-08-09T19:26:08Z",
+  "declaration_hash": "b05cc4b1e7fff4b8d11e7fe4a3254bf9a8ea7b8412e74c2e9e5f7b344414fe68",
+  "implementation_input_hash": "59ea3142ddb2b3a486ec7269a360a4b785b704801c5fa164721e879c56ee68f8",
   "signals": [
     {
       "type_name": "CapabilityExecDriverInput",
@@ -49,6 +49,28 @@
       "kind_tag": "dto",
       "signal": "blue",
       "found_type": true
+    },
+    {
+      "type_name": "ReviewCheckRoundSelect",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "ReviewCheckZeroFindingsInput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug"
+      ]
     },
     {
       "type_name": "ReviewDriver",

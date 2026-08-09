@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "f4ca2410935650910432cf33e29441657dbadf169b345a6b8fb3a7142b2946c0",
+  "catalogue_declaration_hash": "f27633871081f642a8dd9d58312f16baf44ab4df29f2bd03ec7163b0bcbaf3ff",
   "signals": [
     {
       "type_name": "CapabilityExecInteractor",
@@ -91,6 +91,11 @@
       "type_name": "CurrentReviewTrackResolveError",
       "signal": "blue",
       "entry_hash": "1b19f40dec3598c3c701093fcd5e046e8146b0e7661fc66c0ef5198a31bd4b33"
+    },
+    {
+      "type_name": "DiagnosticText",
+      "signal": "blue",
+      "entry_hash": "6707641795f4a7dbb940e0f5b86c2c4a6160c7c4f45d6912ec879c8d324d44ec"
     },
     {
       "type_name": "FailedProgramExecutionRecord",
@@ -233,9 +238,9 @@
       "entry_hash": "78fbb2e7be4b94db0f8593af3f09823fc38b20e7687d3d43ee5b2b6febdf820b"
     },
     {
-      "type_name": "ReviewCheckZeroFindingsError",
+      "type_name": "ReviewCheckZeroFindingsEvaluationError",
       "signal": "blue",
-      "entry_hash": "ad2dcf75abfb13b227da4d1e243202d91719d84c16f31663c3110ef016a0e30a"
+      "entry_hash": "ec884b963812fddf79ec1da1df364f18afab8b7d7bf2321797f412ee6b55a81b"
     },
     {
       "type_name": "ReviewCheckZeroFindingsInteractor",
@@ -250,7 +255,12 @@
     {
       "type_name": "ReviewCheckZeroFindingsQuery",
       "signal": "blue",
-      "entry_hash": "d17fa8ffdcba255ff7e8ec055f4f1d01c7a75cad5c8c6b0562923165d717d023"
+      "entry_hash": "c4b63610a4cdbcd7bc50882c6e2907a94b4d9cf0b588476ba63972b6b8c78cf9"
+    },
+    {
+      "type_name": "ReviewCheckZeroFindingsValidationError",
+      "signal": "blue",
+      "entry_hash": "4dfffefbf7e0d15c4a002c5486bbf8732c0612d109083be27c352367fc28af96"
     },
     {
       "type_name": "ReviewScopeSelection",
@@ -325,7 +335,7 @@
     {
       "type_name": "ReviewCheckZeroFindingsService",
       "signal": "blue",
-      "entry_hash": "69f2330ffbbef7e04de508be33f66b62d4b71fbc97ad00a961d7e93a0699ec2a"
+      "entry_hash": "57ea7e3e9b046ce0726bb8569fa0ebb408889abf4177db9212e32b330bde7f79"
     },
     {
       "type_name": "ReviewCheckZeroFindingsStatePort",

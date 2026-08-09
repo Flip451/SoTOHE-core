@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-09T08:03:56Z",
-  "declaration_hash": "f4ca2410935650910432cf33e29441657dbadf169b345a6b8fb3a7142b2946c0",
-  "implementation_input_hash": "ac6867389aea00d6cc742d80380ee59c498d6cee7a898891d911297befe79126",
+  "generated_at": "2026-08-09T19:48:45Z",
+  "declaration_hash": "f27633871081f642a8dd9d58312f16baf44ab4df29f2bd03ec7163b0bcbaf3ff",
+  "implementation_input_hash": "ff8f81856a453635c2511f1d6f03cea59d9643afa60aaff11eeffd0bf2211c28",
   "signals": [
     {
       "type_name": "CapabilityExecRequest",
@@ -570,7 +570,7 @@
       "found_type": true
     },
     {
-      "type_name": "ReviewCheckZeroFindingsError",
+      "type_name": "ReviewCheckZeroFindingsEvaluationError",
       "kind_tag": "error_type",
       "signal": "blue",
       "found_type": true,
@@ -624,6 +624,17 @@
       "kind_tag": "secondary_port",
       "signal": "blue",
       "found_type": true
+    },
+    {
+      "type_name": "ReviewCheckZeroFindingsValidationError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
     },
     {
       "type_name": "ReviewScopeSelection",
@@ -701,6 +712,12 @@
     {
       "type_name": "CapabilityExecService",
       "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "DiagnosticText",
+      "kind_tag": "value_object",
       "signal": "blue",
       "found_type": true
     },

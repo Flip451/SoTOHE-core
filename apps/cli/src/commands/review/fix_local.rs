@@ -326,17 +326,12 @@ mod tests {
     /// return a failure exit code (branch auto-resolve fails on non-track branches).
     #[test]
     fn test_execute_fix_local_returns_failure_on_non_track_branch() {
+        use crate::commands::track::test_support::process_env_lock;
         use std::env;
         use std::fs;
         use std::process::Command;
-        use std::sync::{Mutex, OnceLock};
 
-        fn cwd_lock() -> &'static Mutex<()> {
-            static LOCK: OnceLock<Mutex<()>> = OnceLock::new();
-            LOCK.get_or_init(|| Mutex::new(()))
-        }
-
-        let _guard = cwd_lock().lock().unwrap();
+        let _guard = process_env_lock().lock().unwrap();
         let original_dir = env::current_dir().unwrap();
 
         let dir = tempfile::tempdir().unwrap();

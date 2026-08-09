@@ -58,6 +58,21 @@ fn test_main_scope_name_with_reserved_other_returns_error() {
 // ── ScopeName ─────────────────────────────────────────────────────────
 
 #[test]
+fn test_scope_name_parse_classifies_named_and_other_scopes() {
+    let named = ScopeName::parse("domain").unwrap();
+    let other = ScopeName::parse("Other").unwrap();
+
+    assert!(matches!(named, ScopeName::Main(name) if name.as_str() == "domain"));
+    assert_eq!(other, ScopeName::Other);
+}
+
+#[test]
+fn test_scope_name_parse_reuses_named_scope_validation() {
+    assert!(matches!(ScopeName::parse(""), Err(ScopeNameError::Empty)));
+    assert!(matches!(ScopeName::parse("非ASCII"), Err(ScopeNameError::NotAscii)));
+}
+
+#[test]
 fn test_scope_name_main_displays_inner_name() {
     let scope = ScopeName::Main(MainScopeName::new("domain").unwrap());
     assert_eq!(scope.to_string(), "domain");

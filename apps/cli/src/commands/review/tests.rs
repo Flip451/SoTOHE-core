@@ -1,14 +1,9 @@
 #![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 
+use crate::commands::track::test_support::process_env_lock;
 use std::env;
 use std::fs;
 use std::path::{Path, PathBuf};
-use std::sync::{Mutex, OnceLock};
-
-fn env_lock() -> &'static Mutex<()> {
-    static LOCK: OnceLock<Mutex<()>> = OnceLock::new();
-    LOCK.get_or_init(|| Mutex::new(()))
-}
 
 #[test]
 fn review_local_defaults_to_one_hour_timeout() {
@@ -77,6 +72,22 @@ fn review_command_parses_all_surviving_variants() {
     let check_approved =
         TestCli::try_parse_from(["sotp", "check-approved"]).expect("check-approved must parse");
     assert!(matches!(check_approved.command, super::ReviewCommand::CheckApproved(_)));
+
+    let check_zero_findings = TestCli::try_parse_from([
+        "sotp",
+        "check-zero-findings",
+        "--scope",
+        "usecase",
+        "--round",
+        "final",
+        "--track-id",
+        "check-track",
+    ])
+    .expect("check-zero-findings must parse through the review command tree");
+    let super::ReviewCommand::CheckZeroFindings(args) = check_zero_findings.command else {
+        panic!("expected check-zero-findings command");
+    };
+    assert_eq!(args.round, super::ReviewCheckRoundArg::Final);
 
     let results = TestCli::try_parse_from(["sotp", "results"]).expect("results must parse");
     assert!(matches!(results.command, super::ReviewCommand::Results(_)));
@@ -213,24 +224,24 @@ fn setup_check_approved_repo(root: &Path) -> (PathBuf, PathBuf) {
 /// Case: all scopes NotRequired (empty diff) → Approved verdict → exit 0 + [OK].
 #[test]
 fn check_approved_approved_path_exits_success_with_ok_message() {
-    let _lock = env_lock().lock().unwrap();
-    use super::{CheckApprovedArgs, execute_check_approved};
+    let _lock = process_env_lock().lock().unwrap();
+    use super::{ReviewCheckApprovedArgs, ReviewCommand, execute};
 
     let dir = tempfile::tempdir().unwrap();
     let (items_dir, _track_dir) = setup_check_approved_repo(dir.path());
     let _cwd = CurrentDirGuard::change_to(dir.path());
 
     // Empty diff → "Other" scope is NotRequired(Empty) → Approved.
-    let args = CheckApprovedArgs { items_dir, track_id: Some("test-track".to_string()) };
-    let exit = execute_check_approved(&args);
+    let args = ReviewCheckApprovedArgs { items_dir, track_id: Some("test-track".to_string()) };
+    let exit = execute(ReviewCommand::CheckApproved(args));
     assert_eq!(exit, std::process::ExitCode::SUCCESS);
 }
 
 /// Case: all Required(NotStarted) and review.json absent → ApprovedWithBypass → exit 0 + [WARN].
 #[test]
 fn check_approved_bypass_path_exits_success_with_warn_message() {
-    let _lock = env_lock().lock().unwrap();
-    use super::{CheckApprovedArgs, execute_check_approved};
+    let _lock = process_env_lock().lock().unwrap();
+    use super::{ReviewCheckApprovedArgs, ReviewCommand, execute};
 
     let dir = tempfile::tempdir().unwrap();
     let (items_dir, _track_dir) = setup_check_approved_repo(dir.path());
@@ -243,8 +254,8 @@ fn check_approved_bypass_path_exits_success_with_warn_message() {
     fs::create_dir_all(&domain_src).unwrap();
     fs::write(domain_src.join("lib.rs"), "// untracked").unwrap();
 
-    let args = CheckApprovedArgs { items_dir, track_id: Some("test-track".to_string()) };
-    let exit = execute_check_approved(&args);
+    let args = ReviewCheckApprovedArgs { items_dir, track_id: Some("test-track".to_string()) };
+    let exit = execute(ReviewCommand::CheckApproved(args));
     assert_eq!(exit, std::process::ExitCode::SUCCESS);
 }
 
@@ -255,8 +266,8 @@ fn check_approved_bypass_path_exits_success_with_warn_message() {
 /// create a spurious `Other` required scope that could make this test pass for the wrong reason.
 #[test]
 fn check_approved_blocked_path_exits_failure_with_blocked_message() {
-    let _lock = env_lock().lock().unwrap();
-    use super::{CheckApprovedArgs, execute_check_approved};
+    let _lock = process_env_lock().lock().unwrap();
+    use super::{ReviewCheckApprovedArgs, ReviewCommand, execute};
 
     let dir = tempfile::tempdir().unwrap();
     let (items_dir, track_dir) = setup_check_approved_repo(dir.path());
@@ -271,9 +282,266 @@ fn check_approved_blocked_path_exits_failure_with_blocked_message() {
     // review_operational in the scope config excludes this file from scope classification.
     fs::write(track_dir.join("review.json"), r#"{"schema_version":2,"scopes":{}}"#).unwrap();
 
-    let args = CheckApprovedArgs { items_dir, track_id: Some("test-track".to_string()) };
-    let exit = execute_check_approved(&args);
+    let args = ReviewCheckApprovedArgs { items_dir, track_id: Some("test-track".to_string()) };
+    let exit = execute(ReviewCommand::CheckApproved(args));
     assert_eq!(exit, std::process::ExitCode::FAILURE);
+}
+
+#[cfg(unix)]
+struct ReviewCommandRouteRepo {
+    _dir: tempfile::TempDir,
+    root: PathBuf,
+    items_dir: PathBuf,
+    track_id: String,
+    fake_bin_dir: PathBuf,
+}
+
+#[cfg(unix)]
+fn run_git(root: &Path, args: &[&str]) -> String {
+    use std::process::Command;
+
+    let output = Command::new("git").args(args).current_dir(root).output().unwrap();
+    assert!(
+        output.status.success(),
+        "git {} failed: {}",
+        args.join(" "),
+        String::from_utf8_lossy(&output.stderr)
+    );
+    String::from_utf8_lossy(&output.stdout).trim().to_owned()
+}
+
+/// Creates a real track repository whose final review verdict can be queried
+/// through the CLI command enum.
+#[cfg(unix)]
+fn setup_review_command_route_repo(track_id: &str) -> ReviewCommandRouteRepo {
+    let dir = tempfile::tempdir().unwrap();
+    let root = dir.path().to_path_buf();
+    run_git(&root, &["init", "-b", "main"]);
+    run_git(&root, &["config", "user.email", "test@example.invalid"]);
+    run_git(&root, &["config", "user.name", "Test"]);
+
+    let config_dir = root.join(".harness/config");
+    fs::create_dir_all(&config_dir).unwrap();
+    fs::write(
+        config_dir.join("review-scope.json"),
+        r#"{"version":2,"groups":{"cli":{"patterns":["src/**"]}},"review_operational":["track/items/<track-id>/**","tmp/reviewer-runtime/**"]}"#,
+    )
+    .unwrap();
+    fs::write(root.join("README.md"), "base\n").unwrap();
+    run_git(&root, &["add", "."]);
+    run_git(&root, &["commit", "-m", "base"]);
+    let base_commit = run_git(&root, &["rev-parse", "HEAD"]);
+
+    let track_branch = format!("track/{track_id}");
+    run_git(&root, &["checkout", "-b", &track_branch]);
+    fs::create_dir_all(root.join("src")).unwrap();
+    fs::write(root.join("src/lib.rs"), "pub fn reviewed() {}\n").unwrap();
+    fs::create_dir_all(root.join("other")).unwrap();
+    fs::write(root.join("other/review_target.rs"), "pub fn reviewed_other() {}\n").unwrap();
+    run_git(&root, &["add", "src/lib.rs", "other/review_target.rs"]);
+    run_git(&root, &["commit", "-m", "review target"]);
+
+    let items_dir = root.join("track/items");
+    let track_dir = items_dir.join(track_id);
+    fs::create_dir_all(&track_dir).unwrap();
+    fs::write(track_dir.join(".commit_hash"), base_commit).unwrap();
+    fs::write(
+        track_dir.join("metadata.json"),
+        format!(
+            r#"{{"schema_version":6,"id":"{track_id}","title":"Test Track","created_at":"2026-01-01T00:00:00Z","updated_at":"2026-01-01T00:00:00Z","branch_strategy_snapshot":{{"base_branch":"main","merge_target":"main","merge_method":"squash"}}}}"#
+        ),
+    )
+    .unwrap();
+
+    let fake_bin_dir = root.join("fake-bin");
+    fs::create_dir_all(&fake_bin_dir).unwrap();
+    let codex = fake_bin_dir.join("codex");
+    fs::write(
+        &codex,
+        r#"#!/bin/sh
+case "$1" in
+  --version) echo "codex 0.125.0"; exit 0 ;;
+esac
+out=""
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --output-last-message) out="$2"; shift 2 ;;
+    *) shift ;;
+  esac
+done
+printf '{"verdict":"zero_findings","findings":[]}\n' > "$out"
+"#,
+    )
+    .unwrap();
+    use std::os::unix::fs::PermissionsExt;
+    fs::set_permissions(&codex, fs::Permissions::from_mode(0o755)).unwrap();
+
+    ReviewCommandRouteRepo {
+        _dir: dir,
+        root,
+        items_dir,
+        track_id: track_id.to_owned(),
+        fake_bin_dir,
+    }
+}
+
+#[cfg(unix)]
+fn with_fake_codex_on_path<T>(bin_dir: &Path, action: impl FnOnce() -> T) -> T {
+    let mut path = bin_dir.as_os_str().to_os_string();
+    path.push(":");
+    path.push(env::var_os("PATH").unwrap_or_default());
+    temp_env::with_var("PATH", Some(path), action)
+}
+
+fn parse_review_command(args: &[&str]) -> super::ReviewCommand {
+    use clap::Parser;
+
+    #[derive(Parser)]
+    struct TestCli {
+        #[command(subcommand)]
+        command: super::ReviewCommand,
+    }
+
+    TestCli::try_parse_from(args).expect("review command must parse").command
+}
+
+/// The `Local` enum route must select the configured pre-review workflow
+/// before the provider-resolved reviewer can be launched.
+#[cfg(unix)]
+#[test]
+fn review_local_enum_route_runs_selected_pre_review_gate_before_reviewer() {
+    let _lock = process_env_lock().lock().unwrap();
+    let repo = setup_review_command_route_repo("review-local-enum-route");
+    fs::write(
+        repo.root.join(".harness/config/pre-review-gates.json"),
+        r#"{
+  "schema_version": 1,
+  "scopes": [{
+    "scope": "cli",
+    "commands": [{"argv": ["sh", "-c", "touch .pre-review-command-ran; exit 1"], "timeout_seconds": null}]
+  }]
+}"#,
+    )
+    .unwrap();
+    let _cwd = CurrentDirGuard::change_to(&repo.root);
+    let items_dir = repo.items_dir.to_str().unwrap();
+    let command = parse_review_command(&[
+        "sotp",
+        "local",
+        "--prompt",
+        "review",
+        "--round-type",
+        "fast",
+        "--group",
+        "cli",
+        "--track-id",
+        &repo.track_id,
+        "--items-dir",
+        items_dir,
+    ]);
+
+    let exit = super::execute(command);
+
+    assert_eq!(exit, std::process::ExitCode::FAILURE);
+    assert!(
+        repo.root.join(".pre-review-command-ran").exists(),
+        "the Local enum route must enter the selected pre-review command workflow"
+    );
+}
+
+/// A parsed `check-zero-findings --scope cli --round final` command must
+/// select the persisted final verdict for that scope at the CLI enum route.
+#[cfg(unix)]
+#[test]
+fn review_check_zero_findings_enum_route_selects_final_scope_state_for_exit_code() {
+    let _lock = process_env_lock().lock().unwrap();
+    let repo = setup_review_command_route_repo("review-check-zero-enum-route");
+    let _cwd = CurrentDirGuard::change_to(&repo.root);
+
+    with_fake_codex_on_path(&repo.fake_bin_dir, || {
+        let review = cli_composition::ReviewCompositionRoot::new()
+            .review_run_codex(cli_composition::review_v2::ReviewRunCodexInput {
+                model: "test-codex".to_owned(),
+                timeout_seconds: 10,
+                briefing_file: None,
+                prompt: Some("review".to_owned()),
+                track_id: Some(repo.track_id.clone()),
+                round_type: "final".to_owned(),
+                group: "cli".to_owned(),
+                items_dir: repo.items_dir.clone(),
+            })
+            .unwrap();
+        assert_eq!(review.exit_code, 0, "fixture must persist a final zero-findings verdict");
+
+        let items_dir = repo.items_dir.to_str().unwrap();
+        let args = [
+            "sotp",
+            "check-zero-findings",
+            "--scope",
+            "cli",
+            "--round",
+            "final",
+            "--track-id",
+            repo.track_id.as_str(),
+            "--items-dir",
+            items_dir,
+        ];
+        assert_eq!(super::execute(parse_review_command(&args)), std::process::ExitCode::SUCCESS);
+
+        fs::write(repo.root.join("src/lib.rs"), "pub fn changed_after_review() {}\n").unwrap();
+        assert_eq!(super::execute(parse_review_command(&args)), std::process::ExitCode::FAILURE);
+    });
+}
+
+/// A parsed `check-zero-findings --scope other --round final` command must
+/// select the persisted `Other` verdict rather than a named scope's verdict.
+#[cfg(unix)]
+#[test]
+fn review_check_zero_findings_enum_route_selects_other_scope_state_for_exit_code() {
+    let _lock = process_env_lock().lock().unwrap();
+    let repo = setup_review_command_route_repo("review-check-zero-other-enum-route");
+    let _cwd = CurrentDirGuard::change_to(&repo.root);
+
+    with_fake_codex_on_path(&repo.fake_bin_dir, || {
+        let review = cli_composition::ReviewCompositionRoot::new()
+            .review_run_codex(cli_composition::review_v2::ReviewRunCodexInput {
+                model: "test-codex".to_owned(),
+                timeout_seconds: 10,
+                briefing_file: None,
+                prompt: Some("review".to_owned()),
+                track_id: Some(repo.track_id.clone()),
+                round_type: "final".to_owned(),
+                group: "other".to_owned(),
+                items_dir: repo.items_dir.clone(),
+            })
+            .unwrap();
+        assert_eq!(
+            review.exit_code, 0,
+            "fixture must persist an Other final zero-findings verdict"
+        );
+
+        let items_dir = repo.items_dir.to_str().unwrap();
+        let args = [
+            "sotp",
+            "check-zero-findings",
+            "--scope",
+            "other",
+            "--round",
+            "final",
+            "--track-id",
+            repo.track_id.as_str(),
+            "--items-dir",
+            items_dir,
+        ];
+        assert_eq!(super::execute(parse_review_command(&args)), std::process::ExitCode::SUCCESS);
+
+        fs::write(
+            repo.root.join("other/review_target.rs"),
+            "pub fn changed_after_other_review() {}\n",
+        )
+        .unwrap();
+        assert_eq!(super::execute(parse_review_command(&args)), std::process::ExitCode::FAILURE);
+    });
 }
 
 // ---------------------------------------------------------------------------
@@ -354,7 +622,7 @@ fn format_approval_verdict_blocked_has_blocked_prefix_and_lists_scopes() {
 fn build_review_v2_rejects_items_dir_outside_repo_root() {
     // Serialize with env_lock because build_review_v2_str uses SystemGitRepo::discover()
     // (via infrastructure::review_v2::build_review_v2_str) which depends on cwd — other tests may change cwd concurrently.
-    let _lock = env_lock().lock().unwrap();
+    let _lock = process_env_lock().lock().unwrap();
     // Use /tmp as items_dir — this should always be outside the repo root.
     let result =
         cli_composition::review_v2::build_review_v2_str("test-track", std::path::Path::new("/tmp"));
@@ -370,7 +638,7 @@ fn build_review_v2_rejects_items_dir_outside_repo_root() {
 fn build_review_v2_rejects_traversal_items_dir_outside_repo_root() {
     // A relative path with ".." that resolves outside the repo root should be
     // rejected by the canonicalize + starts_with containment check.
-    let _lock = env_lock().lock().unwrap();
+    let _lock = process_env_lock().lock().unwrap();
     let dir = tempfile::tempdir().unwrap();
     setup_test_git_repo(dir.path());
     let _cwd = CurrentDirGuard::change_to(dir.path());
@@ -576,79 +844,27 @@ fn resolve_reviewer_fast_round_mixed_provider_selects_fast_provider() {
     assert_eq!(resolved.model.as_deref(), Some("gpt-5.4-mini"));
 }
 #[test]
-fn test_check_zero_findings_args_accept_final_round_and_scope() {
-    use super::{CheckZeroFindingsArgs, ReviewCheckRoundArg};
+fn test_review_command_rejects_non_final_or_missing_check_zero_findings_round() {
+    use clap::Parser;
 
-    // This local payload parser deliberately models the literal subcommand
-    // without registering it in `ReviewCommand`; T042 owns that enum change.
-    let payload = <CheckZeroFindingsArgs as clap::Args>::augment_args(clap::Command::new(
-        "check-zero-findings",
-    ));
-    let command = clap::Command::new("review").subcommand(payload);
-    let matches = command
-        .try_get_matches_from([
-            "review",
+    #[derive(Parser)]
+    struct TestCli {
+        #[command(subcommand)]
+        command: super::ReviewCommand,
+    }
+
+    assert!(
+        TestCli::try_parse_from([
+            "sotp",
             "check-zero-findings",
             "--scope",
             "usecase",
             "--round",
-            "final",
-            "--track-id",
-            "check-track",
+            "fast",
         ])
-        .unwrap();
-    let (_, payload_matches) = matches.subcommand().unwrap();
-    let args =
-        <CheckZeroFindingsArgs as clap::FromArgMatches>::from_arg_matches(payload_matches).unwrap();
-
-    assert_eq!(args.scope, "usecase");
-    assert_eq!(args.round, ReviewCheckRoundArg::Final);
-    assert_eq!(args.track_id.as_deref(), Some("check-track"));
-    assert_eq!(args.items_dir, std::path::PathBuf::from("track/items"));
-}
-
-#[test]
-fn test_check_zero_findings_args_direct_payload_parser_accepts_literal_final_round() {
-    use super::{CheckZeroFindingsArgs, ReviewCheckRoundArg};
-
-    let command = <CheckZeroFindingsArgs as clap::Args>::augment_args(clap::Command::new(
-        "check-zero-findings",
-    ));
-    let matches = command
-        .try_get_matches_from(["check-zero-findings", "--scope", "usecase", "--round", "final"])
-        .unwrap();
-    let args = <CheckZeroFindingsArgs as clap::FromArgMatches>::from_arg_matches(&matches).unwrap();
-
-    assert_eq!(args.scope, "usecase");
-    assert_eq!(args.round, ReviewCheckRoundArg::Final);
-}
-
-#[test]
-fn test_check_zero_findings_args_reject_non_final_or_missing_round() {
-    use super::CheckZeroFindingsArgs;
-
-    let command = || {
-        let payload = <CheckZeroFindingsArgs as clap::Args>::augment_args(clap::Command::new(
-            "check-zero-findings",
-        ));
-        clap::Command::new("review").subcommand(payload)
-    };
-
-    assert!(
-        command()
-            .try_get_matches_from([
-                "review",
-                "check-zero-findings",
-                "--scope",
-                "usecase",
-                "--round",
-                "fast",
-            ])
-            .is_err()
+        .is_err()
     );
     assert!(
-        command()
-            .try_get_matches_from(["review", "check-zero-findings", "--scope", "usecase"])
-            .is_err()
+        TestCli::try_parse_from(["sotp", "check-zero-findings", "--scope", "usecase"]).is_err()
     );
 }

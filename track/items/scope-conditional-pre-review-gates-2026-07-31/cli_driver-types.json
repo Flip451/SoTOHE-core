@@ -86,6 +86,43 @@
         }
       ],
       "type_name": "RefVerifyDriver"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "track_id",
+              "ty": "String"
+            },
+            {
+              "name": "scope",
+              "ty": "String"
+            },
+            {
+              "name": "round",
+              "ty": "ReviewCheckRoundSelect"
+            }
+          ],
+          "returns": "Result<Self, usecase::review_v2::ReviewCheckZeroFindingsValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "into_query",
+          "params": [],
+          "receiver": "self",
+          "returns": "usecase::review_v2::ReviewCheckZeroFindingsQuery"
+        }
+      ],
+      "type_name": "ReviewCheckZeroFindingsInput"
     }
   ],
   "layer": "cli_driver",
@@ -200,6 +237,32 @@
       "action": "reference",
       "for_type": "RefVerifyChainSelect",
       "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ReviewCheckRoundSelect",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ReviewCheckRoundSelect",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ReviewCheckRoundSelect",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ReviewCheckRoundSelect",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewCheckZeroFindingsInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewCheckZeroFindingsInput",
+      "trait_ref": "core::clone::Clone"
     }
   ],
   "traits": {},
@@ -213,7 +276,7 @@
         "shape": {
           "fields": [],
           "has_stripped_fields": true,
-          "kind": "plain"
+        "kind": "plain"
         }
       },
       "methods": [
@@ -642,6 +705,69 @@
         }
       ]
     },
+    "ReviewCheckRoundSelect": {
+      "action": "add",
+      "docs": "Clap-free driver-boundary mirror of `cli::commands::review::ReviewCheckRoundArg`; `cli::commands::review::execute_check_zero_findings` owns the exhaustive conversion (CN-06, AC-16).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Final",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "review",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewCheckZeroFindingsInput": {
+      "action": "add",
+      "docs": "Check-zero-findings driver input (CN-08, CN-06, AC-16).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+        "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "review",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-08",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
     "ReviewDriver": {
       "action": "modify",
       "docs": "Primary review adapter (CN-06, AC-16).",
@@ -769,7 +895,7 @@
             "name": "CheckZeroFindings",
             "payload": {
               "fields": [
-                "usecase::review_v2::check_zero_findings::ReviewCheckZeroFindingsQuery"
+                "ReviewCheckZeroFindingsInput"
               ],
               "kind": "tuple"
             }

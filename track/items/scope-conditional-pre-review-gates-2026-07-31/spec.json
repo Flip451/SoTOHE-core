@@ -233,6 +233,20 @@
             "anchor": "D1"
           }
         ]
+      },
+      {
+        "id": "IN-14",
+        "text": "catalogue-v5 の name uniqueness 対応として、既存の `bin/sotp review check-approved` の内部 Rust DTO を `ReviewCheckApprovedArgs` へ改名し、既存の command arguments、approved / bypass / blocked の exit-code semantics、および commit guard としての独立責務を維持する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+            "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+            "anchor": "D6"
+          }
+        ]
       }
     ],
     "out_of_scope": [
@@ -364,6 +378,30 @@
         {
           "file": "knowledge/adr/2026-08-04-0001-phase-enter-adoption-and-check-commands.md",
           "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "CN-07",
+      "text": "既存の `bin/sotp review check-approved` は引数と approved / bypass / blocked の exit-code semantics を維持する。catalogue-v5 の name uniqueness 対応は、内部 Rust DTO を `ReviewCheckApprovedArgs` へ改名することだけであり、command surface、approval judgment、または commit guard としての独立責務を変更しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+          "anchor": "D6"
+        }
+      ]
+    },
+    {
+      "id": "CN-08",
+      "text": "zero-findings review check の driver→usecase boundary は domain 型を `pub use` で再公開しない。driver は raw boundary value を usecase-owned boundary DTO または Query constructor に渡し、usecase が domain `ScopeName` を内部で構築する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-30-0848-cli-via-usecase-only.md",
+          "anchor": "D1"
         }
       ]
     }
@@ -568,6 +606,20 @@
           "anchor": "D2"
         }
       ]
+    },
+    {
+      "id": "AC-17",
+      "text": "catalogue-v5 name-uniqueness 対応後も、`bin/sotp review check-approved` は既存の引数を受理し、approved と approved-by-bypass の場合は zero、blocked の場合は non-zero を返す。Rust DTO の `ReviewCheckApprovedArgs` への rename 以外で command invocation、exit-code contract、または commit guard behavior に観測可能な変更を生じさせない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+          "anchor": "D6"
+        }
+      ]
     }
   ],
   "related_conventions": [
@@ -581,7 +633,7 @@
     }
   ],
   "signals": {
-    "blue": 44,
+    "blue": 48,
     "yellow": 0,
     "red": 0
   }

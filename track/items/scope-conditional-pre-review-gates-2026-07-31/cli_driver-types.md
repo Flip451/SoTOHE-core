@@ -6,6 +6,7 @@
 |------|------|--------|---------|--------|----------|
 | PhaseCommandInput | enum | add | Validate, Explain, Enter | 🔵 | 🔵 |
 | RefVerifyChainSelect | enum | reference | Chain1, Chain2, All | 🔵 | 🔵 |
+| ReviewCheckRoundSelect | enum | add | Final | 🔵 | 🔵 |
 | ReviewInput | enum | modify | RunCodex, RunClaude, RunLocal, CheckApproved, CheckZeroFindings, Results, Classify, Files, ValidateScope, GetBriefing, PersistCommitHash | 🟡 | 🔵 |
 
 ## DTOs
@@ -16,6 +17,7 @@
 | CommandOutcome | dto | reference | — | 🔵 | 🔵 |
 | PhaseIdArg | dto | add | — | 🔵 | 🔵 |
 | RefVerifyCheckApprovedInput | dto | modify | — | 🔵 | 🔵 |
+| ReviewCheckZeroFindingsInput | dto | add | — | 🔵 | 🔵 |
 
 ## Primary Adapters
 

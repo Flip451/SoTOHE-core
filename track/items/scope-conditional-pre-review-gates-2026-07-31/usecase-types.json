@@ -386,10 +386,10 @@
           "is_async": false,
           "name": "new",
           "params": [
-        {
-          "name": "inner",
-          "ty": "Arc<dyn ReviewService>"
-        },
+            {
+              "name": "inner",
+              "ty": "Arc<dyn ReviewService>"
+            },
             {
               "name": "dispatcher",
               "ty": "Arc<dyn PreReviewCommandDispatchService>"
@@ -525,11 +525,61 @@
         }
       ],
       "type_name": "ProgramExecutionRecord"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "track_id",
+              "ty": "String"
+            },
+            {
+              "name": "scope",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<Self, ReviewCheckZeroFindingsValidationError>"
+        }
+      ],
+      "type_name": "ReviewCheckZeroFindingsQuery"
     }
   ],
   "layer": "usecase",
   "schema_version": 5,
   "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "DiagnosticText",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "DiagnosticText",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "DiagnosticText",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "DiagnosticText",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "DiagnosticText",
+      "trait_ref": "core::fmt::Display"
+    },
     {
       "action": "reference",
       "for_type": "CapabilityExecRequest",
@@ -1484,21 +1534,6 @@
       "trait_ref": "core::cmp::Eq"
     },
     {
-      "action": "add",
-      "for_type": "ReviewCheckZeroFindingsError",
-      "trait_ref": "core::fmt::Debug"
-    },
-    {
-      "action": "add",
-      "for_type": "ReviewCheckZeroFindingsError",
-      "trait_ref": "core::fmt::Display"
-    },
-    {
-      "action": "add",
-      "for_type": "ReviewCheckZeroFindingsError",
-      "trait_ref": "core::error::Error"
-    },
-    {
       "for_type": "ReviewScopeSelection",
       "trait_ref": "Debug"
     },
@@ -1513,6 +1548,33 @@
     {
       "for_type": "ReviewScopeSelection",
       "trait_ref": "Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewCheckZeroFindingsValidationError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewCheckZeroFindingsValidationError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewCheckZeroFindingsValidationError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "ReviewCheckZeroFindingsEvaluationError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ReviewCheckZeroFindingsEvaluationError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "ReviewCheckZeroFindingsEvaluationError",
+      "trait_ref": "core::error::Error"
     }
   ],
   "traits": {
@@ -1994,7 +2056,7 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<ReviewCheckZeroFindingsOutcome, ReviewCheckZeroFindingsError>"
+          "returns": "Result<ReviewCheckZeroFindingsOutcome, ReviewCheckZeroFindingsEvaluationError>"
         }
       ],
       "module_path": "review_v2::check_zero_findings",
@@ -3205,6 +3267,51 @@
         },
         {
           "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "DiagnosticText": {
+      "action": "reference",
+      "docs": "Usecase diagnostic-text value (CN-08).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "s",
+              "ty": "impl Into"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "module_path": "git_workflow",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-08",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]
@@ -4484,9 +4591,9 @@
         }
       ]
     },
-    "ReviewCheckZeroFindingsError": {
+    "ReviewCheckZeroFindingsEvaluationError": {
       "action": "add",
-      "docs": "State-evaluation failures for the per-scope final zero_findings query (CN-06, AC-16).",
+      "docs": "Evaluation failure returned by the check-zero-findings service after query validation (CN-06, AC-16).",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -4495,7 +4602,7 @@
             "name": "EvaluationFailed",
             "payload": {
               "fields": [
-                "domain::FreeText"
+                "DiagnosticText"
               ],
               "kind": "tuple"
             }
@@ -4610,26 +4717,13 @@
     },
     "ReviewCheckZeroFindingsQuery": {
       "action": "add",
-      "docs": "Typed read query for the review check-zero-findings operation (CN-06, AC-16).",
+      "docs": "Check-zero-findings query input (CN-08, CN-06, AC-16).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
         "shape": {
-          "fields": [
-            {
-              "name": "track",
-              "ty": "domain::TrackId"
-            },
-            {
-              "name": "items_dir",
-              "ty": "std::path::PathBuf"
-            },
-            {
-              "name": "scope",
-              "ty": "domain::review_v2::ScopeName"
-            }
-          ],
-          "has_stripped_fields": false,
+          "fields": [],
+          "has_stripped_fields": true,
           "kind": "plain"
         }
       },
@@ -4639,6 +4733,57 @@
         "Query": {}
       },
       "spec_refs": [
+        {
+          "anchor": "CN-08",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewCheckZeroFindingsValidationError": {
+      "action": "add",
+      "docs": "Constructor validation error for ReviewCheckZeroFindingsQuery (CN-08, CN-06, AC-16).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "InvalidTrackId",
+            "payload": {
+              "fields": [
+                "DiagnosticText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidScope",
+            "payload": {
+              "fields": [
+                "DiagnosticText"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "review_v2::check_zero_findings",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-08",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
         {
           "anchor": "CN-06",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"

@@ -26,6 +26,7 @@
 | CommandSequenceIndex | value_object | add | — | 🔵 | 🔵 |
 | CommandTimeoutSeconds | value_object | add | — | 🔵 | 🔵 |
 | ConfiguredCommand | value_object | add | — | 🔵 | 🔵 |
+| DiagnosticText | value_object | reference | — | 🔵 | 🔵 |
 | OutputCaptureLimitBytes | value_object | add | — | 🔵 | 🔵 |
 | PhaseCommandConfig | value_object | add | — | 🔵 | 🔵 |
 | PhaseCommandDeclaration | value_object | add | — | 🔵 | 🔵 |
@@ -51,7 +52,8 @@
 | PreReviewCommandConfigValidationError | error_type | add | InvalidSchemaVersion, DuplicateScope | 🔵 | 🔵 |
 | PreReviewCommandDispatchError | error_type | add | Config, UnknownScope, TrackResolution, TrackMismatch, Runner | 🔵 | 🔵 |
 | ProgramRunnerError | error_type | add | SpawnFailed, WaitFailed, TerminateFailed | 🔵 | 🔵 |
-| ReviewCheckZeroFindingsError | error_type | add | EvaluationFailed | 🔵 | 🔵 |
+| ReviewCheckZeroFindingsEvaluationError | error_type | add | EvaluationFailed | 🔵 | 🔵 |
+| ReviewCheckZeroFindingsValidationError | error_type | add | InvalidTrackId, InvalidScope | 🔵 | 🔵 |
 
 ## Secondary Ports
 
@@ -72,7 +74,7 @@
 | PreReviewCommandDispatchService | application_service | add | fn dispatch(&self, command: PreReviewCommandDispatchCommand) -> Result<PreReviewCommandDispatchOutcome, PreReviewCommandDispatchError> | 🔵 | 🔵 |
 | RefVerifyAggregateService | application_service | modify | fn run(&self, track_id: &str, items_dir: &std::path::Path) -> Result<RefVerifyRunOutcome, RefVerifyDriverError>, fn results(&self, track_id: &str, items_dir: &std::path::Path, chain: RefVerifyChainFilter, layer: RefVerifyLayerFilter, verdict: RefVerifyVerdictFilter) -> Result<RefVerifyResultsOutput, RefVerifyDriverError> | 🔵 | 🔵 |
 | RefVerifyCheckApprovedDriverService | application_service | modify | fn check_approved(&self, track_id: &str, items_dir: &std::path::Path, chain: RefVerifyChainFilter) -> Result<RefVerifyCheckApprovedOutcome, RefVerifyDriverError> | 🔵 | 🔵 |
-| ReviewCheckZeroFindingsService | application_service | add | fn check_zero_findings(&self, query: &ReviewCheckZeroFindingsQuery) -> Result<ReviewCheckZeroFindingsOutcome, ReviewCheckZeroFindingsError> | 🔵 | 🔵 |
+| ReviewCheckZeroFindingsService | application_service | add | fn check_zero_findings(&self, query: &ReviewCheckZeroFindingsQuery) -> Result<ReviewCheckZeroFindingsOutcome, ReviewCheckZeroFindingsEvaluationError> | 🔵 | 🔵 |
 | ReviewService | application_service | modify | fn run_codex(&self, input: ReviewRunInput) -> Result<RunReviewOutput, RunReviewError>, fn run_claude(&self, input: ReviewRunInput) -> Result<RunReviewOutput, RunReviewError>, fn run_local(&self, model: Option<String>, timeout_seconds: u64, briefing_file: Option<std::path::PathBuf>, prompt: Option<String>, track_id: Option<String>, round_type: String, group: String, items_dir: std::path::PathBuf) -> ReviewRunLocalOutput, fn check_approved(&self, track_id: String, items_dir: std::path::PathBuf) -> Result<ReviewApprovalOutput, ReviewCheckApprovedError>, fn results(&self, track_id: Option<String>, items_dir: std::path::PathBuf, selection: ReviewScopeSelection, limit: u32, round_type: String, no_hint: bool) -> Result<String, ReviewAuxError>, fn classify(&self, paths: Vec<String>, track_id: Option<String>, items_dir: std::path::PathBuf) -> Result<Vec<(String, String)>, ReviewAuxError>, fn files(&self, scope: String, track_id: Option<String>, items_dir: std::path::PathBuf) -> Result<Vec<String>, ReviewAuxError>, fn validate_scope(&self, scope: String, track_id: Option<String>, items_dir: std::path::PathBuf) -> Result<(), ReviewAuxError>, fn get_briefing(&self, scope: String, track_id: Option<String>, items_dir: std::path::PathBuf) -> Result<Option<String>, ReviewAuxError>, fn persist_commit_hash(&self, track_id: String, workspace_root: std::path::PathBuf) -> Result<String, CommitHashPersistenceError> | 🟡 | 🔵 |
 
 ## Interactors

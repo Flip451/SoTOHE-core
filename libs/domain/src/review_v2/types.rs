@@ -104,6 +104,22 @@ pub enum ScopeName {
     Other,
 }
 
+impl ScopeName {
+    /// Classifies a raw scope name into a named scope or the `other` sentinel.
+    ///
+    /// # Errors
+    ///
+    /// Returns the validation error from [`MainScopeName::new`] for invalid
+    /// named scopes.
+    pub fn parse(value: &str) -> Result<Self, ScopeNameError> {
+        if value.eq_ignore_ascii_case("other") {
+            Ok(Self::Other)
+        } else {
+            MainScopeName::new(value).map(Self::Main)
+        }
+    }
+}
+
 impl fmt::Display for ScopeName {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {

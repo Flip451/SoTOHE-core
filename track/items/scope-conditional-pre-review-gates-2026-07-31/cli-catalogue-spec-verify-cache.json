@@ -651,11 +651,11 @@
       }
     },
     {
-      "claim_hash": "cf8d5c5fcda83edbb5ea4c3c86a00d1945f25101b53bf50e1c0bb5c9966d7706",
-      "evidence_hash": "8fa587f6b3cb186fc083494e54ed3db92fa82015011b1fec6c54d72cfb0b3e46",
+      "claim_hash": "e5806dc64bade4a2443e5f482b2d4c56a3a33b71545e302927ee8df355fa92a5",
+      "evidence_hash": "e2fb1beed3372ec7fb5280e157a8149cd832682ccbf7923cea19b79426fa43f0",
       "verdict": {
         "kind": "pass",
-        "citation": "`bin/sotp ref-verify check-approved --chain <1|2>` は指定 Chain の current production reference pair が全て verified pass の場合だけ zero を返す。"
+        "citation": "既存の `bin/sotp review check-approved` は引数と approved / bypass / blocked の exit-code semantics を維持する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -669,17 +669,17 @@
         "kind": "spec_element",
         "data": {
           "section": "constraint",
-          "element_id": "CN-06",
-          "text_label": "pre-entry matrix で使う public check command は exit code で判定可能でなければならない。`bin/sotp review check-zero-findings --scope <scope> --round final` は指定 scope の current artifact に対応する final review verdict が `zero_findings` の場合だけ zero を返す。`bin/sotp ref-verify check-approved --chain <1|2>` は指定 Chain の current production reference pair が全て verified pass の場合だけ zero を返す。display-only result command を convergence 判定に使わず、未解決、stale、または対象外 chain の状態で false success を返さない。"
+          "element_id": "CN-07",
+          "text_label": "既存の `bin/sotp review check-approved` は引数と approved / bypass / blocked の exit-code semantics を維持する。catalogue-v5 の name uniqueness 対応は、内部 Rust DTO を `ReviewCheckApprovedArgs` へ改名することだけであり、command surface、approval judgment、または commit guard としての独立責務を変更しない。"
         }
       }
     },
     {
-      "claim_hash": "cf8d5c5fcda83edbb5ea4c3c86a00d1945f25101b53bf50e1c0bb5c9966d7706",
-      "evidence_hash": "94934398148874b5290b24f7a6cf5b694fb5081a27244d13290a946a74a4abea",
+      "claim_hash": "e5806dc64bade4a2443e5f482b2d4c56a3a33b71545e302927ee8df355fa92a5",
+      "evidence_hash": "a6ea86816599c722ab0f56bb53c99c4514d4fda465d8930cb7b6dd861690d60c",
       "verdict": {
         "kind": "pass",
-        "citation": "`bin/sotp ref-verify check-approved --chain <1|2>` returns zero only when the selected Chain's current production reference pairs are all verified pass, and non-zero when any selected pair is absent, stale, pending, or failed."
+        "citation": "`Rust DTO の `ReviewCheckApprovedArgs` への rename 以外で command invocation、exit-code contract、または commit guard behavior に観測可能な変更を生じさせない。`"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -693,13 +693,13 @@
         "kind": "spec_element",
         "data": {
           "section": "acceptance_criteria",
-          "element_id": "AC-16",
-          "text_label": "`bin/sotp review check-zero-findings --scope <scope> --round final` returns zero only for a current final `zero_findings` verdict for that scope, and non-zero for absent, stale, non-final, or findings-present review state. `bin/sotp ref-verify check-approved --chain <1|2>` returns zero only when the selected Chain's current production reference pairs are all verified pass, and non-zero when any selected pair is absent, stale, pending, or failed. Both commands are usable as literal pre-entry argv without parsing display output."
+          "element_id": "AC-17",
+          "text_label": "catalogue-v5 name-uniqueness 対応後も、`bin/sotp review check-approved` は既存の引数を受理し、approved と approved-by-bypass の場合は zero、blocked の場合は non-zero を返す。Rust DTO の `ReviewCheckApprovedArgs` への rename 以外で command invocation、exit-code contract、または commit guard behavior に観測可能な変更を生じさせない。"
         }
       }
     },
     {
-      "claim_hash": "a195b8e0e06834053f24140ca42fa7ea01c1fa9a9de26907128173cd2e695d84",
+      "claim_hash": "9846cd032d59ee22f9c513171e9d90eda348c66c8057ff29d418de044a118082",
       "evidence_hash": "8fa587f6b3cb186fc083494e54ed3db92fa82015011b1fec6c54d72cfb0b3e46",
       "verdict": {
         "kind": "pass",
@@ -723,11 +723,11 @@
       }
     },
     {
-      "claim_hash": "a195b8e0e06834053f24140ca42fa7ea01c1fa9a9de26907128173cd2e695d84",
+      "claim_hash": "9846cd032d59ee22f9c513171e9d90eda348c66c8057ff29d418de044a118082",
       "evidence_hash": "94934398148874b5290b24f7a6cf5b694fb5081a27244d13290a946a74a4abea",
       "verdict": {
         "kind": "pass",
-        "citation": "`bin/sotp review check-zero-findings --scope <scope> --round final` returns zero only for a current final `zero_findings` verdict for that scope"
+        "citation": "`bin/sotp review check-zero-findings --scope <scope> --round final` returns zero only for a current final `zero_findings` verdict for that scope, and non-zero for absent, stale, non-final, or findings-present review state."
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1215,6 +1215,102 @@
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
           "section_key": "functions",
           "entry_key": "cli::commands::ref_verify::execute_check_approved_with_driver"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-16",
+          "text_label": "`bin/sotp review check-zero-findings --scope <scope> --round final` returns zero only for a current final `zero_findings` verdict for that scope, and non-zero for absent, stale, non-final, or findings-present review state. `bin/sotp ref-verify check-approved --chain <1|2>` returns zero only when the selected Chain's current production reference pairs are all verified pass, and non-zero when any selected pair is absent, stale, pending, or failed. Both commands are usable as literal pre-entry argv without parsing display output."
+        }
+      }
+    },
+    {
+      "claim_hash": "2ae16597ed7efc7b3bd7acae268f571d12c3ecc33937fb366bf1496eb3b7502b",
+      "evidence_hash": "e2fb1beed3372ec7fb5280e157a8149cd832682ccbf7923cea19b79426fa43f0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存の `bin/sotp review check-approved` は引数と approved / bypass / blocked の exit-code semantics を維持する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::review::execute_check_approved"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "既存の `bin/sotp review check-approved` は引数と approved / bypass / blocked の exit-code semantics を維持する。catalogue-v5 の name uniqueness 対応は、内部 Rust DTO を `ReviewCheckApprovedArgs` へ改名することだけであり、command surface、approval judgment、または commit guard としての独立責務を変更しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2ae16597ed7efc7b3bd7acae268f571d12c3ecc33937fb366bf1496eb3b7502b",
+      "evidence_hash": "a6ea86816599c722ab0f56bb53c99c4514d4fda465d8930cb7b6dd861690d60c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp review check-approved` は既存の引数を受理し、approved と approved-by-bypass の場合は zero、blocked の場合は non-zero を返す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::review::execute_check_approved"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-17",
+          "text_label": "catalogue-v5 name-uniqueness 対応後も、`bin/sotp review check-approved` は既存の引数を受理し、approved と approved-by-bypass の場合は zero、blocked の場合は non-zero を返す。Rust DTO の `ReviewCheckApprovedArgs` への rename 以外で command invocation、exit-code contract、または commit guard behavior に観測可能な変更を生じさせない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d005ddf319ba41665ebce9911df1adbb500ad461e9575c2913a7166c6ee906d7",
+      "evidence_hash": "8fa587f6b3cb186fc083494e54ed3db92fa82015011b1fec6c54d72cfb0b3e46",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp review check-zero-findings --scope <scope> --round final` は指定 scope の current artifact に対応する final review verdict が `zero_findings` の場合だけ zero を返す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::review::execute_check_zero_findings"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-06",
+          "text_label": "pre-entry matrix で使う public check command は exit code で判定可能でなければならない。`bin/sotp review check-zero-findings --scope <scope> --round final` は指定 scope の current artifact に対応する final review verdict が `zero_findings` の場合だけ zero を返す。`bin/sotp ref-verify check-approved --chain <1|2>` は指定 Chain の current production reference pair が全て verified pass の場合だけ zero を返す。display-only result command を convergence 判定に使わず、未解決、stale、または対象外 chain の状態で false success を返さない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d005ddf319ba41665ebce9911df1adbb500ad461e9575c2913a7166c6ee906d7",
+      "evidence_hash": "94934398148874b5290b24f7a6cf5b694fb5081a27244d13290a946a74a4abea",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp review check-zero-findings --scope <scope> --round final` returns zero only for a current final `zero_findings` verdict for that scope, and non-zero for absent, stale, non-final, or findings-present review state."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::review::execute_check_zero_findings"
         }
       },
       "evidence_origin": {

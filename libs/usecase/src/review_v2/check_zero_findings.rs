@@ -12,12 +12,36 @@ use domain::review_v2::{NotRequiredReason, RequiredReason, ReviewState, ScopeNam
 use domain::{FreeText, TrackId};
 use thiserror::Error;
 
+use crate::git_workflow::DiagnosticText;
+
 /// Typed query for one scope's final review verdict.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ReviewCheckZeroFindingsQuery {
-    pub track: TrackId,
-    pub items_dir: PathBuf,
-    pub scope: domain::review_v2::ScopeName,
+    track: TrackId,
+    items_dir: PathBuf,
+    scope: ScopeName,
+}
+
+impl ReviewCheckZeroFindingsQuery {
+    /// Validates raw delivery-boundary values and constructs the domain query state.
+    pub fn try_new(
+        items_dir: PathBuf,
+        track_id: String,
+        scope: String,
+    ) -> Result<Self, ReviewCheckZeroFindingsValidationError> {
+        let track = TrackId::try_new(track_id).map_err(|error| {
+            ReviewCheckZeroFindingsValidationError::InvalidTrackId(DiagnosticText::new(
+                error.to_string(),
+            ))
+        })?;
+        let scope = ScopeName::parse(&scope).map_err(|error| {
+            ReviewCheckZeroFindingsValidationError::InvalidScope(DiagnosticText::new(
+                error.to_string(),
+            ))
+        })?;
+
+        Ok(Self { track, items_dir, scope })
+    }
 }
 
 /// Result of evaluating one scope's final review verdict.
@@ -29,11 +53,20 @@ pub enum ReviewCheckZeroFindingsOutcome {
     FindingsRemain,
 }
 
-/// Validation or evaluation failure for a check-zero-findings query.
+/// Evaluation failure returned while checking a validated query.
 #[derive(Debug, Error)]
-pub enum ReviewCheckZeroFindingsError {
+pub enum ReviewCheckZeroFindingsEvaluationError {
     #[error("review verdict evaluation failed: {0}")]
-    EvaluationFailed(domain::FreeText),
+    EvaluationFailed(DiagnosticText),
+}
+
+/// Validation error returned while constructing a check-zero-findings query.
+#[derive(Debug, Error)]
+pub enum ReviewCheckZeroFindingsValidationError {
+    #[error("invalid check-zero-findings track id: {0}")]
+    InvalidTrackId(DiagnosticText),
+    #[error("invalid check-zero-findings scope: {0}")]
+    InvalidScope(DiagnosticText),
 }
 
 /// Application service for the check-zero-findings operation.
@@ -46,7 +79,7 @@ pub trait ReviewCheckZeroFindingsService: Send + Sync {
     fn check_zero_findings(
         &self,
         query: &ReviewCheckZeroFindingsQuery,
-    ) -> Result<ReviewCheckZeroFindingsOutcome, ReviewCheckZeroFindingsError>;
+    ) -> Result<ReviewCheckZeroFindingsOutcome, ReviewCheckZeroFindingsEvaluationError>;
 }
 
 /// Secondary port for reading the current review state of one scope.
@@ -86,11 +119,15 @@ impl ReviewCheckZeroFindingsService for ReviewCheckZeroFindingsInteractor {
     fn check_zero_findings(
         &self,
         query: &ReviewCheckZeroFindingsQuery,
-    ) -> Result<ReviewCheckZeroFindingsOutcome, ReviewCheckZeroFindingsError> {
+    ) -> Result<ReviewCheckZeroFindingsOutcome, ReviewCheckZeroFindingsEvaluationError> {
         let state = self
             .state_port
             .state_for(&query.track, &query.items_dir, &query.scope)
-            .map_err(ReviewCheckZeroFindingsError::EvaluationFailed)?;
+            .map_err(|error| {
+                ReviewCheckZeroFindingsEvaluationError::EvaluationFailed(DiagnosticText::new(
+                    error.to_string(),
+                ))
+            })?;
 
         match state {
             Some(ReviewState::NotRequired(NotRequiredReason::ZeroFindings)) => {
@@ -114,7 +151,7 @@ impl ReviewCheckZeroFindingsService for ReviewCheckZeroFindingsInteractor {
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
-    use domain::review_v2::{MainScopeName, NotRequiredReason, RequiredReason, ScopeName};
+    use domain::review_v2::{NotRequiredReason, RequiredReason, ScopeName};
 
     use super::*;
 
@@ -138,11 +175,12 @@ mod tests {
     }
 
     fn query() -> ReviewCheckZeroFindingsQuery {
-        ReviewCheckZeroFindingsQuery {
-            track: TrackId::try_new("usecase-track").unwrap(),
-            items_dir: PathBuf::from("track/items"),
-            scope: ScopeName::Main(MainScopeName::new("usecase").unwrap()),
-        }
+        ReviewCheckZeroFindingsQuery::try_new(
+            PathBuf::from("track/items"),
+            "usecase-track".to_owned(),
+            "usecase".to_owned(),
+        )
+        .unwrap()
     }
 
     #[test]
@@ -185,14 +223,65 @@ mod tests {
 
         let error = interactor.check_zero_findings(&query()).unwrap_err();
 
-        assert!(matches!(error, ReviewCheckZeroFindingsError::EvaluationFailed(_)));
+        assert!(matches!(
+            error,
+            ReviewCheckZeroFindingsEvaluationError::EvaluationFailed(diagnostic)
+                if diagnostic.as_str() == "review artifact could not be read"
+        ));
     }
 
     #[test]
-    fn test_review_check_zero_findings_error_variants_exist() {
+    fn test_review_check_zero_findings_query_valid_raw_tokens_construct_domain_values() {
+        let named_raw_scope = "usecase";
+        let named = ReviewCheckZeroFindingsQuery::try_new(
+            PathBuf::from("track/items"),
+            "usecase-track".to_owned(),
+            named_raw_scope.to_owned(),
+        )
+        .unwrap();
+        let other_raw_scope = "other";
+        let other = ReviewCheckZeroFindingsQuery::try_new(
+            PathBuf::from("track/items"),
+            "usecase-track".to_owned(),
+            other_raw_scope.to_owned(),
+        )
+        .unwrap();
+
+        assert_eq!(named.track.as_ref(), "usecase-track");
+        assert_eq!(named.scope, ScopeName::parse(named_raw_scope).unwrap());
+        assert_eq!(named.items_dir, PathBuf::from("track/items"));
+        assert_eq!(other.scope, ScopeName::parse(other_raw_scope).unwrap());
+    }
+
+    #[test]
+    fn test_review_check_zero_findings_query_invalid_raw_tokens_return_validation_error() {
+        let invalid_track = ReviewCheckZeroFindingsQuery::try_new(
+            PathBuf::from("track/items"),
+            "INVALID_TRACK".to_owned(),
+            "usecase".to_owned(),
+        );
+        let invalid_scope = ReviewCheckZeroFindingsQuery::try_new(
+            PathBuf::from("track/items"),
+            "usecase-track".to_owned(),
+            "".to_owned(),
+        );
+        let non_ascii_scope = ReviewCheckZeroFindingsQuery::try_new(
+            PathBuf::from("track/items"),
+            "usecase-track".to_owned(),
+            "非ASCII".to_owned(),
+        );
+
         assert!(matches!(
-            ReviewCheckZeroFindingsError::EvaluationFailed(domain::FreeText::new("read failed")),
-            ReviewCheckZeroFindingsError::EvaluationFailed(_)
+            invalid_track,
+            Err(ReviewCheckZeroFindingsValidationError::InvalidTrackId(_))
+        ));
+        assert!(matches!(
+            invalid_scope,
+            Err(ReviewCheckZeroFindingsValidationError::InvalidScope(_))
+        ));
+        assert!(matches!(
+            non_ascii_scope,
+            Err(ReviewCheckZeroFindingsValidationError::InvalidScope(_))
         ));
     }
 }
