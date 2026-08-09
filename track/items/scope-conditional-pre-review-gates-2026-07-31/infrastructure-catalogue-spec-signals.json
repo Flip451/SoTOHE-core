@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "8e64995ed50572728f4d7adc3a41fa018897ac4ede062195991a2168bc5d60b4",
+  "catalogue_declaration_hash": "0f24ff04358cfa9f11af3ca01b2505f3d97981499aa414ea3516bd0bd447239d",
   "signals": [
     {
       "type_name": "CommandArgumentDto",
@@ -91,6 +91,11 @@
       "type_name": "ProcessProgramRunner",
       "signal": "blue",
       "entry_hash": "5c49961aa67d03c8ec521e30c0867442ea951b7aa31ee3bb87a7c88b5bce8a88"
+    },
+    {
+      "type_name": "ReviewCheckZeroFindingsStateAdapter",
+      "signal": "blue",
+      "entry_hash": "73b64dafc079d17c0178083660c7cf23dc19a1d4dd88af376c62c7179f685c44"
     },
     {
       "type_name": "ReviewScopeNameDto",

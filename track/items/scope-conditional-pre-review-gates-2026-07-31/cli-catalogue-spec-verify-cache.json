@@ -147,7 +147,7 @@
       }
     },
     {
-      "claim_hash": "bc5b3b42414703b8efc789d3096f35cc37fa15ead549a0935a38b39f86ce9d42",
+      "claim_hash": "3112e8d13c8d031ef8669f08a3becfcb6a8f7918a4498f6c23da6bd27898d872",
       "evidence_hash": "8fa587f6b3cb186fc083494e54ed3db92fa82015011b1fec6c54d72cfb0b3e46",
       "verdict": {
         "kind": "pass",
@@ -171,7 +171,7 @@
       }
     },
     {
-      "claim_hash": "bc5b3b42414703b8efc789d3096f35cc37fa15ead549a0935a38b39f86ce9d42",
+      "claim_hash": "3112e8d13c8d031ef8669f08a3becfcb6a8f7918a4498f6c23da6bd27898d872",
       "evidence_hash": "94934398148874b5290b24f7a6cf5b694fb5081a27244d13290a946a74a4abea",
       "verdict": {
         "kind": "pass",

@@ -222,8 +222,8 @@
     },
     {
       "id": "T038",
-      "description": "`review check-zero-findings` の usecase / driver work と CLI payload / handler を実装し、関連 tests を更新する。enum variant registration と review CLI の subcommand enum の最終形は T042 に委ねる。CN-06、AC-16。",
-      "status": "todo",
+      "description": "`libs/usecase/src/review_v2/{check_zero_findings.rs,mod.rs}` に `ReviewCheckZeroFindings{Query,Outcome,Error,Service,Interactor}` を追加し、`libs/infrastructure/src/review_v2/` の usecase state port を実装する `ReviewCheckZeroFindingsStateAdapter` を追加する。`apps/cli-driver/src/review.rs` と `apps/cli-composition/src/review_v2/{check_zero_findings.rs,mod.rs}` の driver / adapter wiring を更新する。`apps/cli/src/commands/review/{mod.rs,tests.rs}` の `CheckZeroFindingsArgs` / `ReviewCheckRoundArg` と handler tests を追加する。enum variant registration と review CLI の subcommand enum の最終形は T042 に委ねる。CN-06、AC-16。",
+      "status": "in_progress",
       "depends_on": [
         "T037"
       ]
@@ -247,7 +247,8 @@
     {
       "id": "T039",
       "description": "`ref-verify check-approved` の Chain 1 / Chain 2 selector を usecase、CLI driver、`apps/cli/src/commands/ref_verify.rs` に実装し、CLI exit-code tests を追加する。`libs/infrastructure/src/ref_verify/driver_adapter.rs` の chain-scoped check-approved fail-closed path を更新し、`apps/cli-composition/src/{ref_verify.rs,lib.rs}` の pure-DI handoff を更新して wrapper / DTO re-export を削除する。CN-06、AC-16。",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "d6737bc396ffcd8dfd5e3af9e2cfd10c2605c30d"
     },
     {
       "id": "T040",
@@ -342,7 +343,7 @@
         "id": "S4",
         "title": "phase-entry convergence matrix",
         "description": [
-        "T038–T041 は exit-code check commands、per-phase matrix configuration、canonical workflow entrypoint を追加・更新する。IN-12、IN-13、CN-06、AC-14、AC-15、AC-16。"
+          "T038–T041 は exit-code check commands、per-phase matrix configuration、canonical workflow entrypoint を追加・更新する。IN-12、IN-13、CN-06、AC-14、AC-15、AC-16。"
         ],
         "task_ids": [
           "T038",

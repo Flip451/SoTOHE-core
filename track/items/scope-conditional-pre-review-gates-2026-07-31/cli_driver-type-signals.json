@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-04T06:18:40Z",
-  "declaration_hash": "abc8c2af7cc7511f7d7da53ff2aa9edb4de9e2d1eff74dd6195b73db52732fbd",
-  "implementation_input_hash": "c791cc56b47fc0ea62d54e823c77275867da64cd5b460cc3afa1493d9163f0a4",
+  "generated_at": "2026-08-09T08:03:56Z",
+  "declaration_hash": "8ca97acb64b7f33cd52eadef6b73c7566b3b639e075f590941399817f7615428",
+  "implementation_input_hash": "8846afa6531002e544c26d22a70afe8264ae794f1281e48f9cc355213b9764ff",
   "signals": [
     {
       "type_name": "CapabilityExecDriverInput",
@@ -47,6 +47,12 @@
     {
       "type_name": "RefVerifyCheckApprovedInput",
       "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ReviewDriver",
+      "kind_tag": "primary_adapter",
       "signal": "blue",
       "found_type": true
     },

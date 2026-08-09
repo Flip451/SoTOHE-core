@@ -89,9 +89,10 @@ pub trait CommitHashReader: Send + Sync {
     /// Returns `Err` if the file content is not a valid commit hash.
     ///
     /// Note: infrastructure implementations may additionally perform ancestry
-    /// validation (`git merge-base --is-ancestor`), returning `None` on failure
-    /// (fail-closed for scope expansion). This is an infra implementation detail
-    /// and not part of the trait contract.
+    /// validation (`git merge-base --is-ancestor`). A clean non-ancestor answer
+    /// may return `None`; an unreadable or indeterminate Git probe returns an
+    /// error rather than silently selecting another diff base. This is an infra
+    /// implementation detail and not part of the trait contract.
     ///
     /// # Errors
     /// Returns `CommitHashError` on I/O or format failure.

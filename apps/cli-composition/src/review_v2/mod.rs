@@ -698,6 +698,7 @@ mod tests {
         review_v2::{MainScopeName, RoundType, ScopeName},
     };
     use infrastructure::provider_session::FsProviderSessionCacheAdapter;
+    use infrastructure::review_v2::ReviewCheckZeroFindingsStateAdapter;
     use usecase::{
         capability_exec::{ModelName, ProviderName, ReasoningEffort},
         provider_session::{
@@ -1016,6 +1017,362 @@ exit 0
             group: "cli_composition".to_owned(),
             items_dir: repo.items_dir.clone(),
         }
+    }
+
+    /// Exercises the actual composition evaluator through a persisted
+    /// `review.json`, including current, stale, findings, and fast-only states.
+    #[cfg(unix)]
+    #[test]
+    fn test_check_zero_findings_interactor_evaluates_real_review_json_states() {
+        use cli_driver::review::ReviewInput;
+        use domain::review_v2::{FastVerdict, ReviewHash, ReviewWriter, ReviewerFinding, Verdict};
+        use infrastructure::review_v2::FsReviewStore;
+        use usecase::review_v2::{
+            ReviewCheckZeroFindingsInteractor, ReviewCheckZeroFindingsOutcome,
+            ReviewCheckZeroFindingsQuery, ReviewCheckZeroFindingsService as _,
+        };
+
+        let _lock = cwd_lock().lock().unwrap();
+        let repo = setup_review_entrypoint_repo("check-zero-findings-2026");
+        let bin_dir = repo.track_dir.join("fake-bin-check-zero-findings");
+        write_fake_codex_reviewer_bin(&bin_dir);
+        let _path_guard = prepend_path(&bin_dir);
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo._dir.path()).unwrap();
+
+        let review_scope = ScopeName::Main(MainScopeName::new("cli_composition").unwrap());
+        let query = ReviewCheckZeroFindingsQuery {
+            track: TrackId::try_new(repo.track_id.clone()).unwrap(),
+            items_dir: repo.items_dir.clone(),
+            scope: review_scope.clone(),
+        };
+        let interactor = ReviewCheckZeroFindingsInteractor::new(std::sync::Arc::new(
+            ReviewCheckZeroFindingsStateAdapter,
+        ));
+        let driver = ReviewCompositionRoot::new().review_driver();
+
+        ReviewCompositionRoot::new().review_run_codex(codex_review_input(&repo, "final")).unwrap();
+
+        let foreign_repo = tempfile::tempdir().unwrap();
+        GitRunner::at(foreign_repo.path()).assert_success(&["init", "-b", "main"]);
+        std::env::set_current_dir(foreign_repo.path()).unwrap();
+        let cwd_before_check = std::env::current_dir().unwrap();
+        let check_outcome = driver.handle(ReviewInput::CheckZeroFindings(query.clone()));
+        assert_eq!(check_outcome.exit_code, 0, "{check_outcome:?}");
+        assert_eq!(std::env::current_dir().unwrap(), cwd_before_check);
+
+        fs::write(repo._dir.path().join("src/lib.rs"), "pub fn changed_again() {}\n").unwrap();
+        assert_eq!(
+            interactor.check_zero_findings(&query).unwrap(),
+            ReviewCheckZeroFindingsOutcome::StaleFinalVerdict
+        );
+
+        let store = FsReviewStore::new(repo.track_dir.join("review.json"), repo.track_dir.clone());
+        let finding = ReviewerFinding::new("remaining finding", None, None, None, None).unwrap();
+        let findings = Verdict::findings_remain(vec![finding]).unwrap();
+        let persisted_hash = ReviewHash::computed("rvw1:sha256:abcdef0123456789").unwrap();
+        store.write_verdict(&review_scope, &findings, &persisted_hash).unwrap();
+        assert_eq!(
+            interactor.check_zero_findings(&query).unwrap(),
+            ReviewCheckZeroFindingsOutcome::FindingsRemain
+        );
+
+        store.reset().unwrap();
+        store
+            .write_fast_verdict(&review_scope, &FastVerdict::ZeroFindings, &persisted_hash)
+            .unwrap();
+        assert_eq!(
+            interactor.check_zero_findings(&query).unwrap(),
+            ReviewCheckZeroFindingsOutcome::MissingFinalVerdict
+        );
+
+        let unknown_scope = ReviewCheckZeroFindingsQuery {
+            scope: ScopeName::Main(MainScopeName::new("not-configured").unwrap()),
+            ..query
+        };
+        assert_eq!(
+            interactor.check_zero_findings(&unknown_scope).unwrap(),
+            ReviewCheckZeroFindingsOutcome::MissingFinalVerdict
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_review_driver_check_zero_findings_current_fast_only_verdict_returns_nonzero_exit() {
+        use cli_driver::review::ReviewInput;
+        use usecase::review_v2::ReviewCheckZeroFindingsQuery;
+
+        let _lock = cwd_lock().lock().unwrap();
+        let repo = setup_review_entrypoint_repo("check-zero-findings-fast-only-2026");
+        let bin_dir = repo.track_dir.join("fake-bin-check-zero-findings-fast-only");
+        write_fake_codex_reviewer_bin(&bin_dir);
+        let _path_guard = prepend_path(&bin_dir);
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo._dir.path()).unwrap();
+
+        let query = ReviewCheckZeroFindingsQuery {
+            track: TrackId::try_new(repo.track_id.clone()).unwrap(),
+            items_dir: repo.items_dir.clone(),
+            scope: ScopeName::Main(MainScopeName::new("cli_composition").unwrap()),
+        };
+
+        ReviewCompositionRoot::new().review_run_codex(codex_review_input(&repo, "fast")).unwrap();
+
+        let outcome = ReviewCompositionRoot::new()
+            .review_driver()
+            .handle(ReviewInput::CheckZeroFindings(query));
+
+        assert_ne!(outcome.exit_code, 0, "a current fast-only verdict must fail closed");
+        assert!(outcome.stderr.as_deref().is_some_and(|message| message.contains("final")));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_review_driver_check_zero_findings_uses_isolated_git_for_base_fallback() {
+        use cli_driver::review::ReviewInput;
+        use usecase::review_v2::ReviewCheckZeroFindingsQuery;
+
+        let _lock = cwd_lock().lock().unwrap();
+        let repo = setup_review_entrypoint_repo("check-zero-findings-git-dir-2026");
+        let bin_dir = repo.track_dir.join("fake-bin-check-zero-findings-git-dir");
+        write_fake_codex_reviewer_bin(&bin_dir);
+        let _path_guard = prepend_path(&bin_dir);
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo._dir.path()).unwrap();
+
+        let query = ReviewCheckZeroFindingsQuery {
+            track: TrackId::try_new(repo.track_id.clone()).unwrap(),
+            items_dir: repo.items_dir.clone(),
+            scope: ScopeName::Main(MainScopeName::new("cli_composition").unwrap()),
+        };
+        ReviewCompositionRoot::new().review_run_codex(codex_review_input(&repo, "final")).unwrap();
+        fs::remove_file(repo.track_dir.join(".commit_hash")).unwrap();
+
+        let foreign_repo = tempfile::tempdir().unwrap();
+        GitRunner::at(foreign_repo.path()).assert_success(&["init", "-b", "main"]);
+        let _git_dir_guard = EnvGuard::set("GIT_DIR", foreign_repo.path().join(".git"));
+
+        let outcome = ReviewCompositionRoot::new()
+            .review_driver()
+            .handle(ReviewInput::CheckZeroFindings(query));
+
+        assert_eq!(
+            outcome.exit_code, 0,
+            "GIT_DIR must not redirect branch-fallback base resolution"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_review_driver_check_zero_findings_uses_isolated_git_for_commit_hash_ancestry() {
+        use cli_driver::review::ReviewInput;
+        use usecase::review_v2::ReviewCheckZeroFindingsQuery;
+
+        let _lock = cwd_lock().lock().unwrap();
+        let repo = setup_review_entrypoint_repo("check-zero-findings-ancestry-git-dir-2026");
+        let bin_dir = repo.track_dir.join("fake-bin-check-zero-findings-ancestry-git-dir");
+        write_fake_codex_reviewer_bin(&bin_dir);
+        let _path_guard = prepend_path(&bin_dir);
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo._dir.path()).unwrap();
+
+        let query = ReviewCheckZeroFindingsQuery {
+            track: TrackId::try_new(repo.track_id.clone()).unwrap(),
+            items_dir: repo.items_dir.clone(),
+            scope: ScopeName::Main(MainScopeName::new("cli_composition").unwrap()),
+        };
+        ReviewCompositionRoot::new().review_run_codex(codex_review_input(&repo, "final")).unwrap();
+
+        let metadata_path = repo.track_dir.join("metadata.json");
+        let metadata = fs::read_to_string(&metadata_path).unwrap();
+        let invalid_fallback_metadata =
+            metadata.replace("\"base_branch\":\"main\"", "\"base_branch\":\"missing-base\"");
+        assert_ne!(invalid_fallback_metadata, metadata, "fixture must invalidate base fallback");
+        fs::write(&metadata_path, invalid_fallback_metadata).unwrap();
+
+        let foreign_repo = tempfile::tempdir().unwrap();
+        GitRunner::at(foreign_repo.path()).assert_success(&["init", "-b", "main"]);
+        let _git_dir_guard = EnvGuard::set("GIT_DIR", foreign_repo.path().join(".git"));
+
+        let outcome = ReviewCompositionRoot::new()
+            .review_driver()
+            .handle(ReviewInput::CheckZeroFindings(query));
+
+        assert_eq!(
+            outcome.exit_code, 0,
+            "GIT_DIR must not redirect persisted commit-hash ancestry validation"
+        );
+    }
+
+    #[test]
+    fn test_check_zero_findings_state_adapter_rejects_revision_expression_base_branch() {
+        use usecase::review_v2::ReviewCheckZeroFindingsStatePort as _;
+
+        let _lock = cwd_lock().lock().unwrap();
+        let repo = setup_review_entrypoint_repo("check-zero-findings-invalid-base-2026");
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo._dir.path()).unwrap();
+        fs::remove_file(repo.track_dir.join(".commit_hash")).unwrap();
+        let metadata_path = repo.track_dir.join("metadata.json");
+        let metadata = fs::read_to_string(&metadata_path).unwrap();
+        let invalid_metadata =
+            metadata.replace("\"base_branch\":\"main\"", "\"base_branch\":\"HEAD~1\"");
+        assert_ne!(invalid_metadata, metadata, "fixture must set a revision expression");
+        fs::write(&metadata_path, invalid_metadata).unwrap();
+
+        let result = ReviewCheckZeroFindingsStateAdapter.state_for(
+            &TrackId::try_new(repo.track_id).unwrap(),
+            &repo.items_dir,
+            &ScopeName::Main(MainScopeName::new("cli_composition").unwrap()),
+        );
+
+        assert!(result.is_err(), "revision expressions must not resolve as base branches");
+    }
+
+    #[test]
+    fn test_check_zero_findings_interactor_corrupt_review_json_returns_evaluation_failed() {
+        use usecase::review_v2::{
+            ReviewCheckZeroFindingsError, ReviewCheckZeroFindingsInteractor,
+            ReviewCheckZeroFindingsQuery, ReviewCheckZeroFindingsService as _,
+        };
+
+        let _lock = cwd_lock().lock().unwrap();
+        let repo = setup_review_entrypoint_repo("check-zero-findings-corrupt-2026");
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo._dir.path()).unwrap();
+        fs::write(repo.track_dir.join("review.json"), "{not valid json").unwrap();
+
+        let query = ReviewCheckZeroFindingsQuery {
+            track: TrackId::try_new(repo.track_id).unwrap(),
+            items_dir: repo.items_dir,
+            scope: ScopeName::Main(MainScopeName::new("cli_composition").unwrap()),
+        };
+        let interactor = ReviewCheckZeroFindingsInteractor::new(std::sync::Arc::new(
+            ReviewCheckZeroFindingsStateAdapter,
+        ));
+
+        assert!(matches!(
+            interactor.check_zero_findings(&query),
+            Err(ReviewCheckZeroFindingsError::EvaluationFailed(_))
+        ));
+    }
+
+    #[test]
+    fn test_check_zero_findings_interactor_absent_review_json_returns_missing_final_verdict() {
+        use usecase::review_v2::{
+            ReviewCheckZeroFindingsInteractor, ReviewCheckZeroFindingsOutcome,
+            ReviewCheckZeroFindingsQuery, ReviewCheckZeroFindingsService as _,
+        };
+
+        let _lock = cwd_lock().lock().unwrap();
+        let repo = setup_review_entrypoint_repo("check-zero-findings-absent-2026");
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo._dir.path()).unwrap();
+        assert!(!repo.track_dir.join("review.json").exists());
+
+        let query = ReviewCheckZeroFindingsQuery {
+            track: TrackId::try_new(repo.track_id).unwrap(),
+            items_dir: repo.items_dir,
+            scope: ScopeName::Main(MainScopeName::new("cli_composition").unwrap()),
+        };
+        let interactor = ReviewCheckZeroFindingsInteractor::new(std::sync::Arc::new(
+            ReviewCheckZeroFindingsStateAdapter,
+        ));
+
+        assert_eq!(
+            interactor.check_zero_findings(&query).unwrap(),
+            ReviewCheckZeroFindingsOutcome::MissingFinalVerdict
+        );
+    }
+
+    #[test]
+    fn test_check_zero_findings_interactor_empty_scope_returns_missing_final_verdict() {
+        use usecase::review_v2::{
+            ReviewCheckZeroFindingsInteractor, ReviewCheckZeroFindingsOutcome,
+            ReviewCheckZeroFindingsQuery, ReviewCheckZeroFindingsService as _,
+        };
+
+        let _lock = cwd_lock().lock().unwrap();
+        let repo = setup_review_entrypoint_repo("check-zero-findings-empty-scope-2026");
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo._dir.path()).unwrap();
+        fs::write(
+            repo._dir.path().join(".harness/config/review-scope.json"),
+            r#"{"version":2,"groups":{"cli_composition":{"patterns":["src/**"]},"empty_scope":{"patterns":["empty/**"]}}}"#,
+        )
+        .unwrap();
+
+        let query = ReviewCheckZeroFindingsQuery {
+            track: TrackId::try_new(repo.track_id).unwrap(),
+            items_dir: repo.items_dir,
+            scope: ScopeName::Main(MainScopeName::new("empty_scope").unwrap()),
+        };
+        let interactor = ReviewCheckZeroFindingsInteractor::new(std::sync::Arc::new(
+            ReviewCheckZeroFindingsStateAdapter,
+        ));
+
+        assert_eq!(
+            interactor.check_zero_findings(&query).unwrap(),
+            ReviewCheckZeroFindingsOutcome::MissingFinalVerdict
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_check_zero_findings_state_adapter_rejects_symlinked_items_dir() {
+        use usecase::review_v2::ReviewCheckZeroFindingsStatePort as _;
+
+        let _lock = cwd_lock().lock().unwrap();
+        let repo = setup_review_entrypoint_repo("check-zero-findings-symlink-items-2026");
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo._dir.path()).unwrap();
+        let symlinked_items_dir = repo._dir.path().join("symlinked-items");
+        std::os::unix::fs::symlink(&repo.items_dir, &symlinked_items_dir).unwrap();
+        let track_id = TrackId::try_new(repo.track_id).unwrap();
+        let scope = ScopeName::Main(MainScopeName::new("cli_composition").unwrap());
+
+        let result =
+            ReviewCheckZeroFindingsStateAdapter.state_for(&track_id, &symlinked_items_dir, &scope);
+
+        assert!(result.is_err(), "symlinked items_dir must fail closed: {result:?}");
+    }
+
+    #[test]
+    fn test_check_zero_findings_state_adapter_rejects_malformed_commit_hash() {
+        use usecase::review_v2::ReviewCheckZeroFindingsStatePort as _;
+
+        let _lock = cwd_lock().lock().unwrap();
+        let repo = setup_review_entrypoint_repo("check-zero-findings-malformed-hash-2026");
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo._dir.path()).unwrap();
+        fs::write(repo.track_dir.join(".commit_hash"), "not-a-commit-hash\n").unwrap();
+        let track_id = TrackId::try_new(repo.track_id).unwrap();
+        let scope = ScopeName::Main(MainScopeName::new("cli_composition").unwrap());
+
+        let result =
+            ReviewCheckZeroFindingsStateAdapter.state_for(&track_id, &repo.items_dir, &scope);
+
+        assert!(result.is_err(), "malformed .commit_hash must fail closed: {result:?}");
+    }
+
+    #[test]
+    fn test_check_zero_findings_state_adapter_uses_base_branch_when_commit_hash_absent() {
+        use domain::review_v2::{RequiredReason, ReviewState};
+        use usecase::review_v2::ReviewCheckZeroFindingsStatePort as _;
+
+        let _lock = cwd_lock().lock().unwrap();
+        let repo = setup_review_entrypoint_repo("check-zero-findings-absent-hash-2026");
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo._dir.path()).unwrap();
+        fs::remove_file(repo.track_dir.join(".commit_hash")).unwrap();
+        let track_id = TrackId::try_new(repo.track_id).unwrap();
+        let scope = ScopeName::Main(MainScopeName::new("cli_composition").unwrap());
+
+        let state = ReviewCheckZeroFindingsStateAdapter
+            .state_for(&track_id, &repo.items_dir, &scope)
+            .unwrap();
+
+        assert_eq!(state, Some(ReviewState::Required(RequiredReason::NotStarted)));
     }
 
     #[cfg(unix)]
@@ -1468,7 +1825,7 @@ exit 0
         let _cwd_guard = CwdGuard::save_current();
         std::env::set_current_dir(repo._dir.path()).unwrap();
 
-        let service = super::shim::ReviewServiceImpl;
+        let service = super::shim::review_service_impl();
 
         service
             .validate_scope(
@@ -1500,7 +1857,7 @@ exit 0
         let _cwd_guard = CwdGuard::save_current();
         std::env::set_current_dir(repo._dir.path()).unwrap();
 
-        let service = super::shim::ReviewServiceImpl;
+        let service = super::shim::review_service_impl();
 
         let briefing = service
             .get_briefing(
@@ -1533,7 +1890,7 @@ exit 0
         let _cwd_guard = CwdGuard::save_current();
         std::env::set_current_dir(repo._dir.path()).unwrap();
 
-        let service = super::shim::ReviewServiceImpl;
+        let service = super::shim::review_service_impl();
 
         let rendered = service
             .results(

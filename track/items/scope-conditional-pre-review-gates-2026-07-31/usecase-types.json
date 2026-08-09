@@ -386,10 +386,10 @@
           "is_async": false,
           "name": "new",
           "params": [
-            {
-              "name": "inner",
-              "ty": "Arc<dyn review_v2::ReviewService>"
-            },
+        {
+          "name": "inner",
+          "ty": "Arc<dyn ReviewService>"
+        },
             {
               "name": "dispatcher",
               "ty": "Arc<dyn PreReviewCommandDispatchService>"
@@ -1223,7 +1223,7 @@
     {
       "action": "add",
       "for_type": "PreReviewCommandGatedReviewInteractor",
-      "trait_ref": "review_v2::ReviewService"
+      "trait_ref": "ReviewService"
     },
     {
       "action": "add",
@@ -2016,9 +2016,55 @@
         "Sync"
       ]
     },
+    "ReviewCheckZeroFindingsStatePort": {
+      "action": "add",
+      "docs": "Synchronous-I/O secondary port for review-state loading (CN-06, AC-16).",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "state_for",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            },
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "scope",
+              "ty": "&domain::review_v2::ScopeName"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<Option<domain::review_v2::ReviewState>, domain::FreeText>"
+        }
+      ],
+      "module_path": "review_v2::check_zero_findings",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
     "ReviewService": {
       "action": "modify",
-      "docs": "Aggregate review application service extending the focused check-zero-findings service while retaining its pre-existing command-family methods (CN-06, AC-16).",
+      "docs": "Aggregate review application service retaining its pre-existing command-family methods independently of the focused check-zero-findings service (CN-06, AC-16).",
       "informal_grounds": [],
       "methods": [
         {
@@ -2255,7 +2301,6 @@
         }
       ],
       "supertrait_bounds": [
-        "ReviewCheckZeroFindingsService",
         "Send",
         "Sync"
       ]
@@ -4441,29 +4486,11 @@
     },
     "ReviewCheckZeroFindingsError": {
       "action": "add",
-      "docs": "Validation and state-evaluation failures for the per-scope final zero_findings query (CN-06, AC-16).",
+      "docs": "State-evaluation failures for the per-scope final zero_findings query (CN-06, AC-16).",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
         "variants": [
-          {
-            "name": "InvalidTrack",
-            "payload": {
-              "fields": [
-                "domain::FreeText"
-              ],
-              "kind": "tuple"
-            }
-          },
-          {
-            "name": "InvalidScope",
-            "payload": {
-              "fields": [
-                "domain::FreeText"
-              ],
-              "kind": "tuple"
-            }
-          },
           {
             "name": "EvaluationFailed",
             "payload": {
@@ -4505,34 +4532,16 @@
       },
       "methods": [
         {
-          "generics": [
-            {
-              "bounds": [],
-              "name": "F"
-            }
-          ],
           "has_default_impl": false,
           "is_async": false,
           "name": "new",
           "params": [
             {
-              "name": "build_fn",
-              "ty": "F"
+              "name": "state_port",
+              "ty": "Arc<dyn ReviewCheckZeroFindingsStatePort>"
             }
           ],
-          "returns": "Self",
-          "where_predicates": [
-            {
-              "lhs": "F",
-              "operator": "Bound",
-              "rhs": [
-                "Fn(&ReviewCheckZeroFindingsQuery) -> Result<ReviewCheckZeroFindingsOutcome, ReviewCheckZeroFindingsError>",
-                "Send",
-                "Sync",
-                "'static"
-              ]
-            }
-          ]
+          "returns": "Self"
         }
       ],
       "module_path": "review_v2::check_zero_findings",
@@ -4609,7 +4618,7 @@
           "fields": [
             {
               "name": "track",
-              "ty": "ReviewTrackSelector"
+              "ty": "domain::TrackId"
             },
             {
               "name": "items_dir",

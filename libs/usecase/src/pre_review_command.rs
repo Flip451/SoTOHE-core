@@ -406,6 +406,7 @@ mod tests {
         ProgramRunOutcome, ProgramRunnerError, ProgramRunnerPort,
     };
     use crate::review_v2::{
+        ReviewCheckZeroFindingsError, ReviewCheckZeroFindingsQuery, ReviewCheckZeroFindingsService,
         ReviewRunInput, ReviewRunLocalOutput, ReviewService, RunReviewError, RunReviewOutput,
     };
 
@@ -810,6 +811,15 @@ mod tests {
     }
 
     struct CountingReview(AtomicUsize);
+    impl ReviewCheckZeroFindingsService for CountingReview {
+        fn check_zero_findings(
+            &self,
+            _query: &ReviewCheckZeroFindingsQuery,
+        ) -> Result<crate::review_v2::ReviewCheckZeroFindingsOutcome, ReviewCheckZeroFindingsError>
+        {
+            panic!("not used")
+        }
+    }
     impl ReviewService for CountingReview {
         fn run_codex(&self, _input: ReviewRunInput) -> Result<RunReviewOutput, RunReviewError> {
             panic!("not used")

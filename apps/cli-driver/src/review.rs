@@ -8,12 +8,15 @@
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use usecase::review_v2::ReviewService;
 use usecase::review_v2::SubagentDispatchInstruction;
 use usecase::review_v2::aggregate_service::ReviewRunInput;
 use usecase::review_v2::run_review_fix::{
     RunReviewFixCommand, RunReviewFixError, RunReviewFixOutput, RunReviewFixService,
 };
+use usecase::review_v2::{
+    ReviewCheckZeroFindingsError, ReviewCheckZeroFindingsOutcome, ReviewCheckZeroFindingsQuery,
+};
+use usecase::review_v2::{ReviewCheckZeroFindingsService, ReviewService};
 
 use crate::render::CommandOutcome;
 
@@ -22,6 +25,37 @@ pub const SUBAGENT_DISPATCH_SENTINEL: &str = "SUBAGENT_DISPATCH_REQUIRED";
 
 /// Exit code for a review-fix subagent dispatch.
 pub const SUBAGENT_DISPATCH_EXIT_CODE: u8 = 64;
+
+/// Converts the check-zero-findings evaluation into the command's fail-closed
+/// exit-code contract.
+fn check_zero_findings_outcome_to_command_outcome(
+    outcome: ReviewCheckZeroFindingsOutcome,
+) -> CommandOutcome {
+    match outcome {
+        ReviewCheckZeroFindingsOutcome::CurrentFinalZeroFindings => CommandOutcome::success(Some(
+            "current final review verdict is zero_findings".to_owned(),
+        )),
+        ReviewCheckZeroFindingsOutcome::MissingFinalVerdict => CommandOutcome::failure(Some(
+            "no final review verdict exists for this scope".to_owned(),
+        )),
+        ReviewCheckZeroFindingsOutcome::StaleFinalVerdict => {
+            CommandOutcome::failure(Some("final review verdict is stale for this scope".to_owned()))
+        }
+        ReviewCheckZeroFindingsOutcome::FindingsRemain => {
+            CommandOutcome::failure(Some("final review verdict has findings remaining".to_owned()))
+        }
+    }
+}
+
+/// Maps both a completed check and an evaluation error to the command boundary.
+fn check_zero_findings_result_to_command_outcome(
+    result: Result<ReviewCheckZeroFindingsOutcome, ReviewCheckZeroFindingsError>,
+) -> CommandOutcome {
+    match result {
+        Ok(outcome) => check_zero_findings_outcome_to_command_outcome(outcome),
+        Err(error) => CommandOutcome::failure(Some(error.to_string())),
+    }
+}
 
 // ---------------------------------------------------------------------------
 // Input type
@@ -93,6 +127,9 @@ pub enum ReviewInput {
         /// Items directory (`track/items`).
         items_dir: PathBuf,
     },
+    /// Check whether one resolved track and scope have a current final
+    /// zero-findings review verdict.
+    CheckZeroFindings(ReviewCheckZeroFindingsQuery),
     /// Show review results: per-scope state summary, optional round history.
     Results {
         /// Track ID (auto-detected from branch if `None`).
@@ -161,17 +198,20 @@ pub enum ReviewInput {
 
 /// Primary adapter driver for the `review` command family.
 ///
-/// Holds a single injected `ReviewService` aggregate; exposes
-/// `handle(input) -> CommandOutcome`. One injected interactor — no per-service
-/// fields (D3/D4 cli_driver policy).
+/// Holds separately injected aggregate and check-zero-findings services;
+/// exposes `handle(input) -> CommandOutcome`.
 pub struct ReviewDriver {
     service: Arc<dyn ReviewService>,
+    check_zero_findings: Arc<dyn ReviewCheckZeroFindingsService>,
 }
 
 impl ReviewDriver {
-    /// Create a new `ReviewDriver` with a single injected aggregate service.
-    pub fn new(service: Arc<dyn ReviewService>) -> Self {
-        Self { service }
+    /// Create a new `ReviewDriver` with its aggregate and focused services.
+    pub fn new(
+        service: Arc<dyn ReviewService>,
+        check_zero_findings: Arc<dyn ReviewCheckZeroFindingsService>,
+    ) -> Self {
+        Self { service, check_zero_findings }
     }
 
     /// Handle a review command.
@@ -237,6 +277,7 @@ impl ReviewDriver {
             ReviewInput::CheckApproved { track_id, items_dir } => {
                 self.review_check_approved(track_id, items_dir)
             }
+            ReviewInput::CheckZeroFindings(query) => self.review_check_zero_findings(query),
             ReviewInput::Results {
                 track_id,
                 items_dir,
@@ -390,6 +431,12 @@ impl ReviewDriver {
             }
             Err(e) => CommandOutcome::failure(Some(e.to_string())),
         }
+    }
+
+    fn review_check_zero_findings(&self, query: ReviewCheckZeroFindingsQuery) -> CommandOutcome {
+        check_zero_findings_result_to_command_outcome(
+            self.check_zero_findings.check_zero_findings(&query),
+        )
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -608,23 +655,271 @@ fn json_str(s: &str) -> String {
 }
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used, clippy::expect_used)]
+#[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
     use std::path::PathBuf;
-    use std::sync::Arc;
+    use std::sync::{Arc, Mutex};
 
+    use domain::review_v2::{MainScopeName, ScopeName};
     use usecase::capability_exec::{ModelName, ReasoningEffort};
     use usecase::review_v2::run_review_fix::{
         RunReviewFixCommand, RunReviewFixError, RunReviewFixOutput, RunReviewFixService,
     };
     use usecase::review_v2::{
-        ReviewGroupName, ReviewRoundType, SubagentDispatchInstruction, SubagentName, TrackId,
+        ReviewCheckZeroFindingsError, ReviewCheckZeroFindingsOutcome, ReviewCheckZeroFindingsQuery,
+        ReviewCheckZeroFindingsService, ReviewGroupName, ReviewRoundType, ReviewService,
+        SubagentDispatchInstruction, SubagentName, TrackId,
     };
 
     use super::{
-        ReviewFixDriver, SUBAGENT_DISPATCH_EXIT_CODE, SUBAGENT_DISPATCH_SENTINEL,
-        subagent_dispatch_to_outcome,
+        ReviewDriver, ReviewFixDriver, ReviewInput, SUBAGENT_DISPATCH_EXIT_CODE,
+        SUBAGENT_DISPATCH_SENTINEL, check_zero_findings_outcome_to_command_outcome,
+        check_zero_findings_result_to_command_outcome, subagent_dispatch_to_outcome,
     };
+
+    struct UnusedReviewService;
+
+    impl ReviewService for UnusedReviewService {
+        fn run_codex(
+            &self,
+            _input: usecase::review_v2::ReviewRunInput,
+        ) -> Result<usecase::review_v2::RunReviewOutput, usecase::review_v2::RunReviewError>
+        {
+            panic!("check-zero-findings must not call the aggregate review service")
+        }
+
+        fn run_claude(
+            &self,
+            _input: usecase::review_v2::ReviewRunInput,
+        ) -> Result<usecase::review_v2::RunReviewOutput, usecase::review_v2::RunReviewError>
+        {
+            panic!("check-zero-findings must not call the aggregate review service")
+        }
+
+        fn run_local(
+            &self,
+            _model: Option<String>,
+            _timeout_seconds: u64,
+            _briefing_file: Option<PathBuf>,
+            _prompt: Option<String>,
+            _track_id: Option<String>,
+            _round_type: String,
+            _group: String,
+            _items_dir: PathBuf,
+        ) -> usecase::review_v2::ReviewRunLocalOutput {
+            panic!("check-zero-findings must not call the aggregate review service")
+        }
+
+        fn check_approved(
+            &self,
+            _track_id: String,
+            _items_dir: PathBuf,
+        ) -> Result<
+            usecase::review_v2::ReviewApprovalOutput,
+            usecase::review_v2::ReviewCheckApprovedError,
+        > {
+            panic!("check-zero-findings must not call the aggregate review service")
+        }
+
+        fn results(
+            &self,
+            _track_id: Option<String>,
+            _items_dir: PathBuf,
+            _scope: Option<String>,
+            _all: bool,
+            _limit: u32,
+            _round_type: String,
+            _no_hint: bool,
+        ) -> Result<String, usecase::review_v2::ReviewAuxError> {
+            panic!("check-zero-findings must not call the aggregate review service")
+        }
+
+        fn classify(
+            &self,
+            _paths: Vec<String>,
+            _track_id: Option<String>,
+            _items_dir: PathBuf,
+        ) -> Result<Vec<(String, String)>, usecase::review_v2::ReviewAuxError> {
+            panic!("check-zero-findings must not call the aggregate review service")
+        }
+
+        fn files(
+            &self,
+            _scope: String,
+            _track_id: Option<String>,
+            _items_dir: PathBuf,
+        ) -> Result<Vec<String>, usecase::review_v2::ReviewAuxError> {
+            panic!("check-zero-findings must not call the aggregate review service")
+        }
+
+        fn validate_scope(
+            &self,
+            _scope: String,
+            _track_id: Option<String>,
+            _items_dir: PathBuf,
+        ) -> Result<(), usecase::review_v2::ReviewAuxError> {
+            panic!("check-zero-findings must not call the aggregate review service")
+        }
+
+        fn get_briefing(
+            &self,
+            _scope: String,
+            _track_id: Option<String>,
+            _items_dir: PathBuf,
+        ) -> Result<Option<String>, usecase::review_v2::ReviewAuxError> {
+            panic!("check-zero-findings must not call the aggregate review service")
+        }
+
+        fn persist_commit_hash(
+            &self,
+            _track_id: String,
+            _workspace_root: PathBuf,
+        ) -> Result<String, usecase::commit_hash_persistence::CommitHashPersistenceError> {
+            panic!("check-zero-findings must not call the aggregate review service")
+        }
+    }
+
+    struct CapturingCheckZeroFindingsService {
+        received_query: Mutex<Option<ReviewCheckZeroFindingsQuery>>,
+        result: Mutex<Option<Result<ReviewCheckZeroFindingsOutcome, ReviewCheckZeroFindingsError>>>,
+    }
+
+    impl CapturingCheckZeroFindingsService {
+        fn new(
+            result: Result<ReviewCheckZeroFindingsOutcome, ReviewCheckZeroFindingsError>,
+        ) -> Self {
+            Self { received_query: Mutex::new(None), result: Mutex::new(Some(result)) }
+        }
+
+        fn received_query(&self) -> Option<ReviewCheckZeroFindingsQuery> {
+            self.received_query.lock().expect("capture lock is healthy").clone()
+        }
+    }
+
+    impl ReviewCheckZeroFindingsService for CapturingCheckZeroFindingsService {
+        fn check_zero_findings(
+            &self,
+            query: &ReviewCheckZeroFindingsQuery,
+        ) -> Result<ReviewCheckZeroFindingsOutcome, ReviewCheckZeroFindingsError> {
+            let mut received = self.received_query.lock().expect("capture lock is healthy");
+            assert!(received.is_none(), "driver must call focused service once");
+            *received = Some(query.clone());
+            self.result
+                .lock()
+                .expect("result lock is healthy")
+                .take()
+                .expect("driver must not call focused service twice")
+        }
+    }
+
+    fn check_zero_findings_query() -> ReviewCheckZeroFindingsQuery {
+        ReviewCheckZeroFindingsQuery {
+            track: TrackId::try_new("review-driver-check-2026").expect("valid test track ID"),
+            items_dir: PathBuf::from("track/items"),
+            scope: ScopeName::Main(MainScopeName::new("cli_driver").expect("valid test scope")),
+        }
+    }
+
+    fn review_driver_for_check(
+        result: Result<ReviewCheckZeroFindingsOutcome, ReviewCheckZeroFindingsError>,
+    ) -> (ReviewDriver, Arc<CapturingCheckZeroFindingsService>) {
+        let focused_service = Arc::new(CapturingCheckZeroFindingsService::new(result));
+        let driver = ReviewDriver::new(Arc::new(UnusedReviewService), focused_service.clone());
+        (driver, focused_service)
+    }
+
+    #[test]
+    fn test_review_driver_check_zero_findings_dispatches_success_to_focused_service() {
+        let query = check_zero_findings_query();
+        let (driver, focused_service) =
+            review_driver_for_check(Ok(ReviewCheckZeroFindingsOutcome::CurrentFinalZeroFindings));
+
+        let outcome = driver.handle(ReviewInput::CheckZeroFindings(query.clone()));
+
+        assert_eq!(focused_service.received_query(), Some(query));
+        assert_eq!(outcome.exit_code, 0);
+        assert!(outcome.stderr.is_none());
+    }
+
+    #[test]
+    fn test_review_driver_check_zero_findings_dispatches_non_success_to_focused_service() {
+        for result in [
+            Ok(ReviewCheckZeroFindingsOutcome::MissingFinalVerdict),
+            Ok(ReviewCheckZeroFindingsOutcome::StaleFinalVerdict),
+            Ok(ReviewCheckZeroFindingsOutcome::FindingsRemain),
+        ] {
+            let query = check_zero_findings_query();
+            let (driver, focused_service) = review_driver_for_check(result);
+
+            let outcome = driver.handle(ReviewInput::CheckZeroFindings(query.clone()));
+
+            assert_eq!(focused_service.received_query(), Some(query));
+            assert_ne!(outcome.exit_code, 0);
+            assert!(outcome.stderr.is_some());
+        }
+    }
+
+    #[test]
+    fn test_review_check_zero_findings_current_final_zero_findings_returns_success() {
+        let outcome = check_zero_findings_outcome_to_command_outcome(
+            ReviewCheckZeroFindingsOutcome::CurrentFinalZeroFindings,
+        );
+
+        assert_eq!(outcome.exit_code, 0);
+        assert!(outcome.stderr.is_none());
+    }
+
+    #[test]
+    fn test_review_check_zero_findings_missing_final_verdict_returns_nonzero_exit() {
+        let outcome = check_zero_findings_outcome_to_command_outcome(
+            ReviewCheckZeroFindingsOutcome::MissingFinalVerdict,
+        );
+
+        assert_ne!(outcome.exit_code, 0);
+        assert!(outcome.stderr.is_some());
+    }
+
+    #[test]
+    fn test_review_check_zero_findings_stale_final_verdict_returns_nonzero_exit() {
+        let outcome = check_zero_findings_outcome_to_command_outcome(
+            ReviewCheckZeroFindingsOutcome::StaleFinalVerdict,
+        );
+
+        assert_ne!(outcome.exit_code, 0);
+        assert!(outcome.stderr.is_some());
+    }
+
+    #[test]
+    fn test_review_check_zero_findings_findings_remain_returns_nonzero_exit() {
+        let outcome = check_zero_findings_outcome_to_command_outcome(
+            ReviewCheckZeroFindingsOutcome::FindingsRemain,
+        );
+
+        assert_ne!(outcome.exit_code, 0);
+        assert!(outcome.stderr.is_some());
+    }
+
+    #[test]
+    fn test_review_check_zero_findings_evaluation_failure_returns_nonzero_exit() {
+        let outcome = check_zero_findings_result_to_command_outcome(Err(
+            ReviewCheckZeroFindingsError::EvaluationFailed(domain::FreeText::new(
+                "review.json is malformed",
+            )),
+        ));
+
+        assert_ne!(outcome.exit_code, 0);
+        assert!(outcome.stderr.as_deref().is_some_and(|message| message.contains("malformed")));
+    }
+
+    #[test]
+    fn test_review_check_zero_findings_unconfigured_scope_returns_nonzero_exit() {
+        let outcome = check_zero_findings_outcome_to_command_outcome(
+            ReviewCheckZeroFindingsOutcome::MissingFinalVerdict,
+        );
+
+        assert_ne!(outcome.exit_code, 0);
+        assert!(outcome.stderr.is_some());
+    }
 
     struct CompletedFixService;
 

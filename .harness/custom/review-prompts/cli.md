@@ -54,3 +54,11 @@ Violations of the role statement above are always reportable. The following prio
 - Restructuring the `commands/` directory layout
 - Help-text wording suggestions
 - `unwrap()` / `expect()` inside `#[cfg(test)]` blocks
+- Only for track `scope-conditional-pre-review-gates-2026-07-31`: the
+  `check-zero-findings` payload (`CheckZeroFindingsArgs` / `ReviewCheckRoundArg`) is
+  intentionally NOT yet registered in the review subcommand enum — the impl-plan defers
+  enum variant registration and the enum's final shape to task T042 (todo; adjudicated
+  staged plan, recorded in the harness-policy briefing's Known Accepted Deviations). Do
+  not report the missing registration / execution path as a finding while T042 is open;
+  the deviation expires when T042 completes. Payload parser tests remain fully
+  reviewable on their own merits.

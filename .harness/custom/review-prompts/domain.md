@@ -48,3 +48,12 @@ Violations of the role statement above are always reportable. The following prio
 - Adding error variants the spec does not require
 - Restructuring module layout when the existing layout passes
   `cargo make check-layers` and respects the convention
+- Only for track `scope-conditional-pre-review-gates-2026-07-31`: the layer placement of
+  the PRE-EXISTING `CommitHashReader` / `CommitHashWriter` ports in
+  `libs/domain/src/review_v2/ports.rs` (introduced by an earlier track under the
+  review-system-v2 redesign ADR; see the ADR index).
+  A rollback-diagnoser verdict (2026-08-09) adjudicated relocation as out-of-diff for
+  this track: the placement conflict with the current Port-placement tie-break is to be
+  resolved by a dedicated ADR-routed track (recorded in the harness-policy briefing's
+  Known Accepted Deviations). Do not report the ports' domain placement as a finding in
+  this track; doc-only touches to the file remain reviewable.

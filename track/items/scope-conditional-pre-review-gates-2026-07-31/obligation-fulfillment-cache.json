@@ -9400,12 +9400,12 @@
       },
       "key": {
         "bound_tests_set_hash": "7d5ca0d3e4422a4c1260eed758293fc021525b37f8f5944c7275793d37d87b56",
-        "declaration_hash": "57155005aa88e7be297f2324a3d07cd561746823e2c62a43c32172fa4e11688c",
+        "declaration_hash": "0c3e6e51c3cb7d3f64a93e4ed942defbf1eb9a60ab66bc178c20e2fe2b3d9838",
         "anchor_text_hash": "8d34e5e09f55a8997a644feb9c062f2d14bb3789b47feb693c070f1c397c40aa"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "check_selected_chain_approved_via_driver(\n                track_id.to_owned(),\n                items_dir,\n                RefVerifyChainSelect::Chain1,\n            )\n        })\n        .unwrap();\n\n        assert_eq!(outcome.exit_code, 0, \"selected Chain-1 must be approved: {outcome:?}\");"
+        "citation": "assert_eq!(outcome.exit_code, 0, \"selected Chain-1 must be approved: {outcome:?}\");\n\nassert_eq!(outcome.exit_code, 1, \"stale Chain-1 cache must block: {outcome:?}\");\n\nassert_eq!(outcome.exit_code, 1, \"pending Chain-2 cache must block: {outcome:?}\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -9476,7 +9476,7 @@
       },
       "key": {
         "bound_tests_set_hash": "7d5ca0d3e4422a4c1260eed758293fc021525b37f8f5944c7275793d37d87b56",
-        "declaration_hash": "57155005aa88e7be297f2324a3d07cd561746823e2c62a43c32172fa4e11688c",
+        "declaration_hash": "0c3e6e51c3cb7d3f64a93e4ed942defbf1eb9a60ab66bc178c20e2fe2b3d9838",
         "anchor_text_hash": "10341447fc6871cfb7adaeeb10623b54eb7feaa360bb6ab8e8a7a7f563b9001f"
       },
       "verdict": {
@@ -10324,6 +10324,1001 @@
           "layer": "cli_composition",
           "module_path": "cli_composition::ref_verify::tests",
           "test_name": "test_ref_verify_check_approved_selected_chain2_failed_cache_exits_one"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewCheckZeroFindingsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCheckZeroFindingsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "6ca1c04006d503cb9c683e14c6448868d33fb60de3615819e9502e397db7691e",
+        "declaration_hash": "e5db7d6018a2c4c0257864c7621518b6e0df50e58bc9e9eb85d71840e5462de9",
+        "anchor_text_hash": "8d34e5e09f55a8997a644feb9c062f2d14bb3789b47feb693c070f1c397c40aa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(check_outcome.exit_code, 0, \"{check_outcome:?}\");\n...\nassert_eq!(interactor.check_zero_findings(&query).unwrap(), ReviewCheckZeroFindingsOutcome::StaleFinalVerdict);\n...\nassert_eq!(interactor.check_zero_findings(&query).unwrap(), ReviewCheckZeroFindingsOutcome::FindingsRemain);\n...\nassert_eq!(interactor.check_zero_findings(&query).unwrap(), ReviewCheckZeroFindingsOutcome::MissingFinalVerdict);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_evaluates_real_review_json_states"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_absent_review_json_returns_missing_final_verdict"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_empty_scope_returns_missing_final_verdict"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewCheckZeroFindingsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-16"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCheckZeroFindingsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "6ca1c04006d503cb9c683e14c6448868d33fb60de3615819e9502e397db7691e",
+        "declaration_hash": "e5db7d6018a2c4c0257864c7621518b6e0df50e58bc9e9eb85d71840e5462de9",
+        "anchor_text_hash": "10341447fc6871cfb7adaeeb10623b54eb7feaa360bb6ab8e8a7a7f563b9001f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            interactor.check_zero_findings(&query).unwrap(),\n            ReviewCheckZeroFindingsOutcome::StaleFinalVerdict\n        );\n\nassert_eq!(\n            interactor.check_zero_findings(&query).unwrap(),\n            ReviewCheckZeroFindingsOutcome::FindingsRemain\n        );\n\nassert_eq!(\n            interactor.check_zero_findings(&query).unwrap(),\n            ReviewCheckZeroFindingsOutcome::MissingFinalVerdict\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_evaluates_real_review_json_states"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_absent_review_json_returns_missing_final_verdict"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_empty_scope_returns_missing_final_verdict"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewCheckZeroFindingsService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCheckZeroFindingsService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:check_zero_findings"
+      },
+      "key": {
+        "bound_tests_set_hash": "5d19f2ed38a535771a1ad3ea93645b3eae4213c6f0799ecb530fcf55862633b9",
+        "declaration_hash": "be8b99f98acbcb5ea6d6059f371746a942284cac3519b7eaefdd64b753caa593",
+        "anchor_text_hash": "8d34e5e09f55a8997a644feb9c062f2d14bb3789b47feb693c070f1c397c40aa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(check_outcome.exit_code, 0, \"{check_outcome:?}\"); ... assert_eq!(interactor.check_zero_findings(&query).unwrap(), ReviewCheckZeroFindingsOutcome::StaleFinalVerdict); ... assert_eq!(interactor.check_zero_findings(&query).unwrap(), ReviewCheckZeroFindingsOutcome::FindingsRemain); ... assert_eq!(outcome.exit_code, 0); ... assert_ne!(outcome.exit_code, 0);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_evaluates_real_review_json_states"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_absent_review_json_returns_missing_final_verdict"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_empty_scope_returns_missing_final_verdict"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_current_final_zero_findings_returns_success"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_missing_final_verdict_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_stale_final_verdict_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_findings_remain_returns_nonzero_exit"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewCheckZeroFindingsService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-16"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCheckZeroFindingsService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:check_zero_findings"
+      },
+      "key": {
+        "bound_tests_set_hash": "5d19f2ed38a535771a1ad3ea93645b3eae4213c6f0799ecb530fcf55862633b9",
+        "declaration_hash": "be8b99f98acbcb5ea6d6059f371746a942284cac3519b7eaefdd64b753caa593",
+        "anchor_text_hash": "10341447fc6871cfb7adaeeb10623b54eb7feaa360bb6ab8e8a7a7f563b9001f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(check_outcome.exit_code, 0, \"{check_outcome:?}\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_evaluates_real_review_json_states"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_absent_review_json_returns_missing_final_verdict"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_empty_scope_returns_missing_final_verdict"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_current_final_zero_findings_returns_success"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_missing_final_verdict_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_stale_final_verdict_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_findings_remain_returns_nonzero_exit"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewDriver",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewDriver",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "fb62b89b9da055010d67c92157b01c1fcb2c71c6d825cd9d7205ea0ae3e9c018",
+        "declaration_hash": "8185a25c7fedae5576c2c380a405a44c05b9c97358bd30ca0b5fb5bbe814c682",
+        "anchor_text_hash": "8d34e5e09f55a8997a644feb9c062f2d14bb3789b47feb693c070f1c397c40aa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome.exit_code, 0); ... assert_ne!(outcome.exit_code, 0); ... assert_ne!(outcome.exit_code, 0, \"a current fast-only verdict must fail closed\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_driver_check_zero_findings_dispatches_success_to_focused_service"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_driver_check_zero_findings_dispatches_non_success_to_focused_service"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_review_driver_check_zero_findings_current_fast_only_verdict_returns_nonzero_exit"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewDriver",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-16"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewDriver",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-16"
+      },
+      "key": {
+        "bound_tests_set_hash": "fb62b89b9da055010d67c92157b01c1fcb2c71c6d825cd9d7205ea0ae3e9c018",
+        "declaration_hash": "8185a25c7fedae5576c2c380a405a44c05b9c97358bd30ca0b5fb5bbe814c682",
+        "anchor_text_hash": "10341447fc6871cfb7adaeeb10623b54eb7feaa360bb6ab8e8a7a7f563b9001f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome.exit_code, 0);\nassert!(outcome.stderr.is_none());\n\nassert_ne!(outcome.exit_code, 0);\nassert!(outcome.stderr.is_some());\n\nassert_ne!(outcome.exit_code, 0, \"a current fast-only verdict must fail closed\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_driver_check_zero_findings_dispatches_success_to_focused_service"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_driver_check_zero_findings_dispatches_non_success_to_focused_service"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_review_driver_check_zero_findings_current_fast_only_verdict_returns_nonzero_exit"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewCheckZeroFindingsStatePort",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCheckZeroFindingsStatePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:state_for"
+      },
+      "key": {
+        "bound_tests_set_hash": "7a777447f01e530513e9eb3b566f46854b8d594a3aaea477934d871b99059b30",
+        "declaration_hash": "de56fc0b4c9d3f9aa46f221655e1ce9ca743fa4a4c8f0bc75f164b9187b9faaf",
+        "anchor_text_hash": "8d34e5e09f55a8997a644feb9c062f2d14bb3789b47feb693c070f1c397c40aa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(interactor.check_zero_findings(&query).unwrap(),\n            ReviewCheckZeroFindingsOutcome::StaleFinalVerdict);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_evaluates_real_review_json_states"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_corrupt_review_json_returns_evaluation_failed"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_absent_review_json_returns_missing_final_verdict"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_empty_scope_returns_missing_final_verdict"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_state_adapter_rejects_symlinked_items_dir"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_state_adapter_rejects_malformed_commit_hash"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_state_adapter_uses_base_branch_when_commit_hash_absent"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewCheckZeroFindingsStatePort",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-16"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCheckZeroFindingsStatePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:state_for"
+      },
+      "key": {
+        "bound_tests_set_hash": "7a777447f01e530513e9eb3b566f46854b8d594a3aaea477934d871b99059b30",
+        "declaration_hash": "de56fc0b4c9d3f9aa46f221655e1ce9ca743fa4a4c8f0bc75f164b9187b9faaf",
+        "anchor_text_hash": "10341447fc6871cfb7adaeeb10623b54eb7feaa360bb6ab8e8a7a7f563b9001f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(interactor.check_zero_findings(&query).unwrap(), ReviewCheckZeroFindingsOutcome::StaleFinalVerdict); ... assert_eq!(interactor.check_zero_findings(&query).unwrap(), ReviewCheckZeroFindingsOutcome::FindingsRemain); ... assert_eq!(interactor.check_zero_findings(&query).unwrap(), ReviewCheckZeroFindingsOutcome::MissingFinalVerdict);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_evaluates_real_review_json_states"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_corrupt_review_json_returns_evaluation_failed"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_absent_review_json_returns_missing_final_verdict"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_empty_scope_returns_missing_final_verdict"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_state_adapter_rejects_symlinked_items_dir"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_state_adapter_rejects_malformed_commit_hash"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_state_adapter_uses_base_branch_when_commit_hash_absent"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewCheckZeroFindingsStateAdapter",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCheckZeroFindingsStateAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::review_v2::check_zero_findings::ReviewCheckZeroFindingsStatePort"
+      },
+      "key": {
+        "bound_tests_set_hash": "0020d9ab8bd7047ebb5c96c74c0c57a355f9cf2b3fc8b9c4abc8c8fb49973d62",
+        "declaration_hash": "b715d441e82dadbeadf8115ec24278a446470a232f532af6b91e14b4c739bec3",
+        "anchor_text_hash": "8d34e5e09f55a8997a644feb9c062f2d14bb3789b47feb693c070f1c397c40aa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(interactor.check_zero_findings(&query).unwrap(),\n            ReviewCheckZeroFindingsOutcome::StaleFinalVerdict);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_evaluates_real_review_json_states"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_empty_scope_returns_missing_final_verdict"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_absent_review_json_returns_missing_final_verdict"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_state_adapter_rejects_symlinked_items_dir"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_state_adapter_rejects_malformed_commit_hash"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_state_adapter_uses_base_branch_when_commit_hash_absent"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewCheckZeroFindingsStateAdapter",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-16"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCheckZeroFindingsStateAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::review_v2::check_zero_findings::ReviewCheckZeroFindingsStatePort"
+      },
+      "key": {
+        "bound_tests_set_hash": "0020d9ab8bd7047ebb5c96c74c0c57a355f9cf2b3fc8b9c4abc8c8fb49973d62",
+        "declaration_hash": "b715d441e82dadbeadf8115ec24278a446470a232f532af6b91e14b4c739bec3",
+        "anchor_text_hash": "10341447fc6871cfb7adaeeb10623b54eb7feaa360bb6ab8e8a7a7f563b9001f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(check_outcome.exit_code, 0, \"{check_outcome:?}\"); ... assert_eq!(interactor.check_zero_findings(&query).unwrap(), ReviewCheckZeroFindingsOutcome::StaleFinalVerdict); ... assert_eq!(interactor.check_zero_findings(&query).unwrap(), ReviewCheckZeroFindingsOutcome::FindingsRemain); ... assert_eq!(interactor.check_zero_findings(&query).unwrap(), ReviewCheckZeroFindingsOutcome::MissingFinalVerdict);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_evaluates_real_review_json_states"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_empty_scope_returns_missing_final_verdict"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_absent_review_json_returns_missing_final_verdict"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_state_adapter_rejects_symlinked_items_dir"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_state_adapter_rejects_malformed_commit_hash"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_state_adapter_uses_base_branch_when_commit_hash_absent"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewCheckZeroFindingsError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCheckZeroFindingsError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "ab083034588494945ad7bafdc2f0a5e220edf5dc436c8634545338dbb6b2e1a3",
+        "declaration_hash": "0a5f268eeb584919fb5f428b015a9a7d5d69a25c1b10af99827aeae8a70611eb",
+        "anchor_text_hash": "8d34e5e09f55a8997a644feb9c062f2d14bb3789b47feb693c070f1c397c40aa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            interactor.check_zero_findings(&query),\n            Err(ReviewCheckZeroFindingsError::EvaluationFailed(_))\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_evaluates_real_review_json_states"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_corrupt_review_json_returns_evaluation_failed"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_evaluation_failure_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_unconfigured_scope_returns_nonzero_exit"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewCheckZeroFindingsError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-16"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCheckZeroFindingsError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-16"
+      },
+      "key": {
+        "bound_tests_set_hash": "ab083034588494945ad7bafdc2f0a5e220edf5dc436c8634545338dbb6b2e1a3",
+        "declaration_hash": "0a5f268eeb584919fb5f428b015a9a7d5d69a25c1b10af99827aeae8a70611eb",
+        "anchor_text_hash": "10341447fc6871cfb7adaeeb10623b54eb7feaa360bb6ab8e8a7a7f563b9001f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            interactor.check_zero_findings(&query),\n            Err(ReviewCheckZeroFindingsError::EvaluationFailed(_))\n        ));\n\n        assert_ne!(outcome.exit_code, 0);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_evaluates_real_review_json_states"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_corrupt_review_json_returns_evaluation_failed"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_evaluation_failure_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_unconfigured_scope_returns_nonzero_exit"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewCheckZeroFindingsOutcome",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCheckZeroFindingsOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "b80928ba1cf5eb8e703583e4d2dcc30cbaa9957099992f4beeb12864fd7d9a52",
+        "declaration_hash": "03cad1a31dec52aa244afb9b89c623a3391384f3521e19dee8e6ad513120116f",
+        "anchor_text_hash": "8d34e5e09f55a8997a644feb9c062f2d14bb3789b47feb693c070f1c397c40aa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(check_outcome.exit_code, 0, \"{check_outcome:?}\"); ... assert_eq!(interactor.check_zero_findings(&query).unwrap(), ReviewCheckZeroFindingsOutcome::StaleFinalVerdict); ... assert_eq!(interactor.check_zero_findings(&query).unwrap(), ReviewCheckZeroFindingsOutcome::FindingsRemain); ... assert_ne!(outcome.exit_code, 0);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_evaluates_real_review_json_states"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_empty_scope_returns_missing_final_verdict"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_current_final_zero_findings_returns_success"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_missing_final_verdict_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_stale_final_verdict_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_findings_remain_returns_nonzero_exit"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewCheckZeroFindingsOutcome",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-16"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCheckZeroFindingsOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-16"
+      },
+      "key": {
+        "bound_tests_set_hash": "5d19f2ed38a535771a1ad3ea93645b3eae4213c6f0799ecb530fcf55862633b9",
+        "declaration_hash": "03cad1a31dec52aa244afb9b89c623a3391384f3521e19dee8e6ad513120116f",
+        "anchor_text_hash": "10341447fc6871cfb7adaeeb10623b54eb7feaa360bb6ab8e8a7a7f563b9001f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(check_outcome.exit_code, 0, \"{check_outcome:?}\");\n\nassert_eq!(outcome.exit_code, 0);\nassert!(outcome.stderr.is_none());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_evaluates_real_review_json_states"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_absent_review_json_returns_missing_final_verdict"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_empty_scope_returns_missing_final_verdict"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_current_final_zero_findings_returns_success"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_missing_final_verdict_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_stale_final_verdict_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_findings_remain_returns_nonzero_exit"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewCheckZeroFindingsQuery",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCheckZeroFindingsQuery",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "d9542fa28c687427dcfa9dd210dc91dbd3213b460d4543f33c125a50481bb167",
+        "declaration_hash": "040a2d4faed0fdc9670b59106380f363b0f86b45853109d3556be677f4a13e81",
+        "anchor_text_hash": "8d34e5e09f55a8997a644feb9c062f2d14bb3789b47feb693c070f1c397c40aa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(check_outcome.exit_code, 0, \"{check_outcome:?}\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_evaluates_real_review_json_states"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_empty_scope_returns_missing_final_verdict"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_missing_final_verdict_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_stale_final_verdict_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_findings_remain_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_unconfigured_scope_returns_nonzero_exit"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewCheckZeroFindingsQuery",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-16"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCheckZeroFindingsQuery",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-16"
+      },
+      "key": {
+        "bound_tests_set_hash": "6ca1c04006d503cb9c683e14c6448868d33fb60de3615819e9502e397db7691e",
+        "declaration_hash": "040a2d4faed0fdc9670b59106380f363b0f86b45853109d3556be677f4a13e81",
+        "anchor_text_hash": "10341447fc6871cfb7adaeeb10623b54eb7feaa360bb6ab8e8a7a7f563b9001f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(check_outcome.exit_code, 0, \"{check_outcome:?}\");\n...\nReviewCheckZeroFindingsOutcome::StaleFinalVerdict\n...\nReviewCheckZeroFindingsOutcome::FindingsRemain\n...\nReviewCheckZeroFindingsOutcome::MissingFinalVerdict"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_evaluates_real_review_json_states"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_absent_review_json_returns_missing_final_verdict"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_empty_scope_returns_missing_final_verdict"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CheckZeroFindingsArgs",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CheckZeroFindingsArgs",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "1d161188dcefce8758cbac351349b21bab21935d7c7a7b2f85fb2857974ab1fc",
+        "declaration_hash": "6c6a1ee71546031e9b06865c1f1e6ef6859e6d78286ed5ab41641f56935fefed",
+        "anchor_text_hash": "8d34e5e09f55a8997a644feb9c062f2d14bb3789b47feb693c070f1c397c40aa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(args.scope, \"usecase\");\n    assert_eq!(args.round, ReviewCheckRoundArg::Final);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::review::tests",
+          "test_name": "test_check_zero_findings_args_direct_payload_parser_accepts_literal_final_round"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_current_final_zero_findings_returns_success"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_missing_final_verdict_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_stale_final_verdict_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_findings_remain_returns_nonzero_exit"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CheckZeroFindingsArgs",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-16"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CheckZeroFindingsArgs",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-16"
+      },
+      "key": {
+        "bound_tests_set_hash": "1d161188dcefce8758cbac351349b21bab21935d7c7a7b2f85fb2857974ab1fc",
+        "declaration_hash": "6c6a1ee71546031e9b06865c1f1e6ef6859e6d78286ed5ab41641f56935fefed",
+        "anchor_text_hash": "10341447fc6871cfb7adaeeb10623b54eb7feaa360bb6ab8e8a7a7f563b9001f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let matches = command\n        .try_get_matches_from([\"check-zero-findings\", \"--scope\", \"usecase\", \"--round\", \"final\"])\n        .unwrap();\n    let args = <CheckZeroFindingsArgs as clap::FromArgMatches>::from_arg_matches(&matches).unwrap();\n\n    assert_eq!(args.scope, \"usecase\");\n    assert_eq!(args.round, ReviewCheckRoundArg::Final);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::review::tests",
+          "test_name": "test_check_zero_findings_args_direct_payload_parser_accepts_literal_final_round"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_current_final_zero_findings_returns_success"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_missing_final_verdict_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_stale_final_verdict_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_findings_remain_returns_nonzero_exit"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewCheckRoundArg",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCheckRoundArg",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "97206a3e2df60a82bbd55d9a136f4db9d62fbada0fc8e98be01968cddd636131",
+        "declaration_hash": "1500c4af0767d3b945afa7badfaad9e19561d3a7b6d2af4ea75090441584ce66",
+        "anchor_text_hash": "8d34e5e09f55a8997a644feb9c062f2d14bb3789b47feb693c070f1c397c40aa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(args.round, ReviewCheckRoundArg::Final);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::review::tests",
+          "test_name": "test_check_zero_findings_args_direct_payload_parser_accepts_literal_final_round"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewCheckRoundArg",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-16"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCheckRoundArg",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-16"
+      },
+      "key": {
+        "bound_tests_set_hash": "1b963791da1ca6e87f6b88315f2623b5b08f42dc83ad0bdad2eed5a65ae4671c",
+        "declaration_hash": "1500c4af0767d3b945afa7badfaad9e19561d3a7b6d2af4ea75090441584ce66",
+        "anchor_text_hash": "10341447fc6871cfb7adaeeb10623b54eb7feaa360bb6ab8e8a7a7f563b9001f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let matches = command\n        .try_get_matches_from([\"check-zero-findings\", \"--scope\", \"usecase\", \"--round\", \"final\"])\n        .unwrap();\n    let args = <CheckZeroFindingsArgs as clap::FromArgMatches>::from_arg_matches(&matches).unwrap();\n\n    assert_eq!(args.scope, \"usecase\");\n    assert_eq!(args.round, ReviewCheckRoundArg::Final);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::review::tests",
+          "test_name": "test_check_zero_findings_args_direct_payload_parser_accepts_literal_final_round"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::review::tests",
+          "test_name": "test_check_zero_findings_args_reject_non_final_or_missing_round"
         }
       ]
     }

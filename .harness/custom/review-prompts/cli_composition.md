@@ -77,3 +77,11 @@ Violations of the role statement above are always reportable. The following prio
 - Adding lifetime annotations the compiler does not require
 - Suggestions to inline or merge two `CompositionRoot` structs when the current
   split follows bounded-context lines
+- Only for track `scope-conditional-pre-review-gates-2026-07-31`: the PRE-EXISTING
+  review_v2 gated-entry pattern (`ReviewCompositionRoot::review_run_local` and the
+  interim `ReviewServiceImpl` shim in `apps/cli-composition/src/review_v2/`) — a user
+  adjudication (2026-07-22) deferred the review_v2 composition wire-only/render
+  remediation to a separate track. Do not report invoke-leak findings on that
+  pre-existing surface when the track's diff makes no semantic change to it (mechanical
+  constructor/wiring adjustments included). NEW invoke paths added by this track remain
+  fully reportable.

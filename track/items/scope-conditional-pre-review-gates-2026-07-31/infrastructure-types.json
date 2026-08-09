@@ -633,6 +633,11 @@
       "action": "add",
       "for_type": "FsRefVerifyAggregateAdapter",
       "trait_ref": "usecase::ref_verify::driver_service::RefVerifyCheckApprovedDriverService"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewCheckZeroFindingsStateAdapter",
+      "trait_ref": "usecase::review_v2::check_zero_findings::ReviewCheckZeroFindingsStatePort"
     }
   ],
   "traits": {},
@@ -1266,6 +1271,32 @@
         },
         {
           "anchor": "AC-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewCheckZeroFindingsStateAdapter": {
+      "action": "add",
+      "docs": "Review-state secondary adapter for check-zero-findings evaluation (CN-06, AC-16).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "review_v2::check_zero_findings",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]

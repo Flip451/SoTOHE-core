@@ -5,6 +5,7 @@
 
 pub mod aggregate_service;
 pub mod check_approved;
+pub mod check_zero_findings;
 pub mod cycle;
 pub mod error;
 pub mod ports;
@@ -21,6 +22,11 @@ pub use aggregate_service::{ReviewRunInput, ReviewService};
 pub use check_approved::{
     ReviewApprovalDecision, ReviewApprovalOutput, ReviewCheckApprovedError,
     ReviewCheckApprovedInteractor, ReviewCheckApprovedService,
+};
+pub use check_zero_findings::{
+    ReviewCheckZeroFindingsError, ReviewCheckZeroFindingsInteractor,
+    ReviewCheckZeroFindingsOutcome, ReviewCheckZeroFindingsQuery, ReviewCheckZeroFindingsService,
+    ReviewCheckZeroFindingsStatePort,
 };
 pub use cycle::ReviewCycle;
 pub use error::{DiffGetError, ReviewCycleError, ReviewHasherError, ReviewerError};

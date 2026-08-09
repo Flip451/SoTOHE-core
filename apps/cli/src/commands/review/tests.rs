@@ -575,3 +575,80 @@ fn resolve_reviewer_fast_round_mixed_provider_selects_fast_provider() {
     assert_eq!(resolved.provider, "codex", "fast round must use fast_provider");
     assert_eq!(resolved.model.as_deref(), Some("gpt-5.4-mini"));
 }
+#[test]
+fn test_check_zero_findings_args_accept_final_round_and_scope() {
+    use super::{CheckZeroFindingsArgs, ReviewCheckRoundArg};
+
+    // This local payload parser deliberately models the literal subcommand
+    // without registering it in `ReviewCommand`; T042 owns that enum change.
+    let payload = <CheckZeroFindingsArgs as clap::Args>::augment_args(clap::Command::new(
+        "check-zero-findings",
+    ));
+    let command = clap::Command::new("review").subcommand(payload);
+    let matches = command
+        .try_get_matches_from([
+            "review",
+            "check-zero-findings",
+            "--scope",
+            "usecase",
+            "--round",
+            "final",
+            "--track-id",
+            "check-track",
+        ])
+        .unwrap();
+    let (_, payload_matches) = matches.subcommand().unwrap();
+    let args =
+        <CheckZeroFindingsArgs as clap::FromArgMatches>::from_arg_matches(payload_matches).unwrap();
+
+    assert_eq!(args.scope, "usecase");
+    assert_eq!(args.round, ReviewCheckRoundArg::Final);
+    assert_eq!(args.track_id.as_deref(), Some("check-track"));
+    assert_eq!(args.items_dir, std::path::PathBuf::from("track/items"));
+}
+
+#[test]
+fn test_check_zero_findings_args_direct_payload_parser_accepts_literal_final_round() {
+    use super::{CheckZeroFindingsArgs, ReviewCheckRoundArg};
+
+    let command = <CheckZeroFindingsArgs as clap::Args>::augment_args(clap::Command::new(
+        "check-zero-findings",
+    ));
+    let matches = command
+        .try_get_matches_from(["check-zero-findings", "--scope", "usecase", "--round", "final"])
+        .unwrap();
+    let args = <CheckZeroFindingsArgs as clap::FromArgMatches>::from_arg_matches(&matches).unwrap();
+
+    assert_eq!(args.scope, "usecase");
+    assert_eq!(args.round, ReviewCheckRoundArg::Final);
+}
+
+#[test]
+fn test_check_zero_findings_args_reject_non_final_or_missing_round() {
+    use super::CheckZeroFindingsArgs;
+
+    let command = || {
+        let payload = <CheckZeroFindingsArgs as clap::Args>::augment_args(clap::Command::new(
+            "check-zero-findings",
+        ));
+        clap::Command::new("review").subcommand(payload)
+    };
+
+    assert!(
+        command()
+            .try_get_matches_from([
+                "review",
+                "check-zero-findings",
+                "--scope",
+                "usecase",
+                "--round",
+                "fast",
+            ])
+            .is_err()
+    );
+    assert!(
+        command()
+            .try_get_matches_from(["review", "check-zero-findings", "--scope", "usecase"])
+            .is_err()
+    );
+}

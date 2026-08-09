@@ -76,6 +76,35 @@ pub struct CheckApprovedArgs {
     track_id: Option<String>,
 }
 
+/// CLI arguments for `review check-zero-findings`.
+///
+/// Registration in [`ReviewCommand`] and execution wiring are deliberately
+/// owned by T042, which finalizes that command enum's shape.
+#[derive(Debug, Args)]
+pub struct CheckZeroFindingsArgs {
+    /// Path to the track items directory.
+    #[arg(long, default_value = "track/items")]
+    items_dir: PathBuf,
+
+    /// Track ID. When omitted, it is resolved from the current track branch.
+    #[arg(long)]
+    track_id: Option<String>,
+
+    /// Review scope whose final verdict is checked.
+    #[arg(long)]
+    scope: String,
+
+    /// The only convergence-eligible review round.
+    #[arg(long, value_enum)]
+    round: ReviewCheckRoundArg,
+}
+
+/// Round selector accepted by `review check-zero-findings`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, clap::ValueEnum)]
+pub enum ReviewCheckRoundArg {
+    Final,
+}
+
 /// Round-type filter for `sotp review results --round-type ...`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, clap::ValueEnum)]
 pub enum RoundTypeFilter {

@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-04T06:49:43Z",
-  "declaration_hash": "a3ab5c2693cc44402a67692cd144de6647e6e5c0efc008df0690dab35d4d88e6",
-  "implementation_input_hash": "4c26ad37dc2705784ee57d5a1010db378298df427619efd7f6dfaeafec6c720f",
+  "generated_at": "2026-08-09T08:03:56Z",
+  "declaration_hash": "f4ca2410935650910432cf33e29441657dbadf169b345a6b8fb3a7142b2946c0",
+  "implementation_input_hash": "ac6867389aea00d6cc742d80380ee59c498d6cee7a898891d911297befe79126",
   "signals": [
     {
       "type_name": "CapabilityExecRequest",
@@ -572,9 +572,9 @@
     {
       "type_name": "ReviewCheckZeroFindingsError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Debug",
         "Display",
         "Error"
@@ -583,18 +583,18 @@
     {
       "type_name": "ReviewCheckZeroFindingsInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "ReviewCheckZeroFindingsService"
       ]
     },
     {
       "type_name": "ReviewCheckZeroFindingsOutcome",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -604,9 +604,9 @@
     {
       "type_name": "ReviewCheckZeroFindingsQuery",
       "kind_tag": "query",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -616,8 +616,14 @@
     {
       "type_name": "ReviewCheckZeroFindingsService",
       "kind_tag": "application_service",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ReviewCheckZeroFindingsStatePort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "ReviewScopeSelection",

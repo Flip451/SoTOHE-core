@@ -137,7 +137,7 @@
         "role": "Interactor"
       },
       "brief": "Author a result test covering 'entry' of ReviewCheckZeroFindingsInteractor",
-      "declaration_hash": "3c20a4be5e3d4aef2d32639cfa4b54279796c47c5706e3a74e6468d6e76e4c72",
+      "declaration_hash": "e5db7d6018a2c4c0257864c7621518b6e0df50e58bc9e9eb85d71840e5462de9",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -559,6 +559,34 @@
     },
     {
       "id": {
+        "entry_key": "ReviewCheckZeroFindingsStatePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:state_for"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "ReviewCheckZeroFindingsStatePort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:state_for' of ReviewCheckZeroFindingsStatePort",
+      "declaration_hash": "de56fc0b4c9d3f9aa46f221655e1ce9ca743fa4a4c8f0bc75f164b9187b9faaf",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-06"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-16"
+        }
+      ]
+    },
+    {
+      "id": {
         "entry_key": "ReviewService",
         "obligation_kind": "result",
         "item_identifier": "trait_method:run_codex"
@@ -573,7 +601,7 @@
         "role": "ApplicationService"
       },
       "brief": "Author a result test covering 'trait_method:run_codex' of ReviewService",
-      "declaration_hash": "2522322032641c0ea6d5ef95e118ae2ae2395749aacf2bef8e0c2925ef2804f6",
+      "declaration_hash": "9032827300e74d316cff68a4088f24b0ce2f00c9466451c255957450ac67d9b3",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -601,7 +629,7 @@
         "role": "ApplicationService"
       },
       "brief": "Author a result test covering 'trait_method:run_claude' of ReviewService",
-      "declaration_hash": "2522322032641c0ea6d5ef95e118ae2ae2395749aacf2bef8e0c2925ef2804f6",
+      "declaration_hash": "9032827300e74d316cff68a4088f24b0ce2f00c9466451c255957450ac67d9b3",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -629,7 +657,7 @@
         "role": "ApplicationService"
       },
       "brief": "Author a result test covering 'trait_method:run_local' of ReviewService",
-      "declaration_hash": "2522322032641c0ea6d5ef95e118ae2ae2395749aacf2bef8e0c2925ef2804f6",
+      "declaration_hash": "9032827300e74d316cff68a4088f24b0ce2f00c9466451c255957450ac67d9b3",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -657,7 +685,7 @@
         "role": "ApplicationService"
       },
       "brief": "Author a result test covering 'trait_method:check_approved' of ReviewService",
-      "declaration_hash": "2522322032641c0ea6d5ef95e118ae2ae2395749aacf2bef8e0c2925ef2804f6",
+      "declaration_hash": "9032827300e74d316cff68a4088f24b0ce2f00c9466451c255957450ac67d9b3",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -685,7 +713,7 @@
         "role": "ApplicationService"
       },
       "brief": "Author a result test covering 'trait_method:results' of ReviewService",
-      "declaration_hash": "2522322032641c0ea6d5ef95e118ae2ae2395749aacf2bef8e0c2925ef2804f6",
+      "declaration_hash": "9032827300e74d316cff68a4088f24b0ce2f00c9466451c255957450ac67d9b3",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -713,7 +741,7 @@
         "role": "ApplicationService"
       },
       "brief": "Author a result test covering 'trait_method:classify' of ReviewService",
-      "declaration_hash": "2522322032641c0ea6d5ef95e118ae2ae2395749aacf2bef8e0c2925ef2804f6",
+      "declaration_hash": "9032827300e74d316cff68a4088f24b0ce2f00c9466451c255957450ac67d9b3",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -741,7 +769,7 @@
         "role": "ApplicationService"
       },
       "brief": "Author a result test covering 'trait_method:files' of ReviewService",
-      "declaration_hash": "2522322032641c0ea6d5ef95e118ae2ae2395749aacf2bef8e0c2925ef2804f6",
+      "declaration_hash": "9032827300e74d316cff68a4088f24b0ce2f00c9466451c255957450ac67d9b3",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -769,7 +797,7 @@
         "role": "ApplicationService"
       },
       "brief": "Author a result test covering 'trait_method:validate_scope' of ReviewService",
-      "declaration_hash": "2522322032641c0ea6d5ef95e118ae2ae2395749aacf2bef8e0c2925ef2804f6",
+      "declaration_hash": "9032827300e74d316cff68a4088f24b0ce2f00c9466451c255957450ac67d9b3",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -797,7 +825,7 @@
         "role": "ApplicationService"
       },
       "brief": "Author a result test covering 'trait_method:get_briefing' of ReviewService",
-      "declaration_hash": "2522322032641c0ea6d5ef95e118ae2ae2395749aacf2bef8e0c2925ef2804f6",
+      "declaration_hash": "9032827300e74d316cff68a4088f24b0ce2f00c9466451c255957450ac67d9b3",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -825,7 +853,7 @@
         "role": "ApplicationService"
       },
       "brief": "Author a result test covering 'trait_method:persist_commit_hash' of ReviewService",
-      "declaration_hash": "2522322032641c0ea6d5ef95e118ae2ae2395749aacf2bef8e0c2925ef2804f6",
+      "declaration_hash": "9032827300e74d316cff68a4088f24b0ce2f00c9466451c255957450ac67d9b3",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -1018,6 +1046,34 @@
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "AC-05"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ReviewCheckZeroFindingsStateAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::review_v2::check_zero_findings::ReviewCheckZeroFindingsStatePort"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "ReviewCheckZeroFindingsStateAdapter"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::review_v2::check_zero_findings::ReviewCheckZeroFindingsStatePort' of ReviewCheckZeroFindingsStateAdapter",
+      "declaration_hash": "b715d441e82dadbeadf8115ec24278a446470a232f532af6b91e14b4c739bec3",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-06"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-16"
         }
       ]
     },

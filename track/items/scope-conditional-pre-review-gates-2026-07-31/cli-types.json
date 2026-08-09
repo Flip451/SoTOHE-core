@@ -673,8 +673,25 @@
       "kind": {
         "kind": "struct",
         "shape": {
-          "fields": [],
-          "has_stripped_fields": true,
+          "fields": [
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "track_id",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "scope",
+              "ty": "String"
+            },
+            {
+              "name": "round",
+              "ty": "ReviewCheckRoundArg"
+            }
+          ],
+          "has_stripped_fields": false,
           "kind": "plain"
         }
       },

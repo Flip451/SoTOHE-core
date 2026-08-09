@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "111b1f97f7b6588268c56d9bac4d9fd5452b2c6698e83e6e58f2f8e115350d6a",
+  "catalogue_declaration_hash": "1293c720775c3bdf168bb2f26d6125ca42f5069fef322130775714aac5848880",
   "signals": [
     {
       "type_name": "CapabilityExecArgs",
@@ -15,7 +15,7 @@
     {
       "type_name": "CheckZeroFindingsArgs",
       "signal": "blue",
-      "entry_hash": "bc5b3b42414703b8efc789d3096f35cc37fa15ead549a0935a38b39f86ce9d42"
+      "entry_hash": "3112e8d13c8d031ef8669f08a3becfcb6a8f7918a4498f6c23da6bd27898d872"
     },
     {
       "type_name": "CliCommand",

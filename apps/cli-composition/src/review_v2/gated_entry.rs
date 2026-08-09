@@ -25,7 +25,7 @@ impl super::ReviewCompositionRoot {
         &self,
         input: ReviewRunLocalInput,
     ) -> Result<CommandOutcome, CompositionError> {
-        let inner = std::sync::Arc::new(shim::ReviewServiceImpl)
+        let inner = std::sync::Arc::new(shim::review_service_impl())
             as std::sync::Arc<dyn usecase::review_v2::aggregate_service::ReviewService>;
         let service = pre_review_command::gate_local_review_service(inner);
         let output = service.run_local(

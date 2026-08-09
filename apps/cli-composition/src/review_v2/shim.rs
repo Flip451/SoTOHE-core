@@ -12,8 +12,9 @@ use usecase::commit_hash_persistence::CommitHashPersistenceError;
 use usecase::review_v2::aggregate_service::{ReviewRunInput, ReviewService};
 use usecase::review_v2::review_aux::ReviewAuxError;
 use usecase::review_v2::{
-    ReviewApprovalOutput, ReviewCheckApprovedError, ReviewRunLocalOutput, RunReviewError,
-    RunReviewOutput,
+    ReviewApprovalOutput, ReviewCheckApprovedError, ReviewCheckZeroFindingsInteractor,
+    ReviewCheckZeroFindingsService, ReviewCheckZeroFindingsStatePort, ReviewRunLocalOutput,
+    RunReviewError, RunReviewOutput,
 };
 
 // ── Per-context composition root ──────────────────────────────────────────────
@@ -31,14 +32,13 @@ impl ReviewCompositionRoot {
 
     /// Construct a fully-wired [`cli_driver::review::ReviewDriver`].
     ///
-    /// Wires `ReviewServiceImpl` (which holds all 11 sub-services internally)
-    /// and injects it as a single `Arc<dyn ReviewService>` into the driver
-    /// (D3/D4 cli_driver policy). `run_local` is additionally gated by the
-    /// configured pre-review command dispatcher.
+    /// Wires the aggregate review service and focused check-zero-findings
+    /// service separately. `run_local` is additionally gated by the configured
+    /// pre-review command dispatcher.
     pub fn review_driver(&self) -> cli_driver::review::ReviewDriver {
-        let inner = Arc::new(ReviewServiceImpl) as Arc<dyn ReviewService>;
+        let inner = Arc::new(review_service_impl()) as Arc<dyn ReviewService>;
         let service = super::pre_review_command::gate_local_review_service(inner);
-        cli_driver::review::ReviewDriver::new(service)
+        cli_driver::review::ReviewDriver::new(service, check_zero_findings_service())
     }
 }
 
@@ -56,6 +56,16 @@ impl Default for ReviewCompositionRoot {
 /// All wiring complexity stays here; `ReviewDriver` holds only one
 /// `Arc<dyn ReviewService>`.
 pub(crate) struct ReviewServiceImpl;
+
+pub(super) fn review_service_impl() -> ReviewServiceImpl {
+    ReviewServiceImpl
+}
+
+fn check_zero_findings_service() -> Arc<dyn ReviewCheckZeroFindingsService> {
+    let state_port: Arc<dyn ReviewCheckZeroFindingsStatePort> =
+        Arc::new(infrastructure::review_v2::ReviewCheckZeroFindingsStateAdapter);
+    Arc::new(ReviewCheckZeroFindingsInteractor::new(state_port))
+}
 
 impl ReviewService for ReviewServiceImpl {
     fn run_codex(&self, input: ReviewRunInput) -> Result<RunReviewOutput, RunReviewError> {
@@ -269,12 +279,14 @@ mod tests {
         let production_source = source.split("#[cfg(test)]").next().unwrap();
 
         assert!(
-            production_source.contains("Arc::new(ReviewServiceImpl) as Arc<dyn ReviewService>")
+            production_source.contains("Arc::new(review_service_impl()) as Arc<dyn ReviewService>")
         );
         assert!(
             production_source
                 .contains("super::pre_review_command::gate_local_review_service(inner)")
         );
-        assert!(production_source.contains("cli_driver::review::ReviewDriver::new(service)"));
+        assert!(production_source.contains(
+            "cli_driver::review::ReviewDriver::new(service, check_zero_findings_service())"
+        ));
     }
 }

@@ -139,6 +139,44 @@ Violations of the role statement above are always reportable. The following prio
   the user adjudicated on 2026-08-03 to accept the cross-populated binding shape in this
   track and to resolve the granularity (method-level spec_refs + derive changes) in a
   separate track. It is not an accepted deviation for any other track or consumer.
+- **Conditional allowance — apply only when the review run's resolved Track ID is
+  exactly `scope-conditional-pre-review-gates-2026-07-31`; otherwise ignore.**
+  **Staged `check-zero-findings` registration**: task T038 lands the
+  `review check-zero-findings` usecase / driver / composition work and the CLI payload
+  WITHOUT registering the review subcommand enum variant; the impl-plan (Phase 3 SSoT)
+  assigns the review CLI enum's final shape to T042, and final-shape convergence of the
+  cli_driver review entries (`ReviewInput`, aggregate `ReviewService`) to T043. Factual
+  background: the batch-plan order is B7 = T038 → T042 → T040 → T041 → T043, and
+  rollback-diagnoser verdicts (2026-08-04) upheld the single-converging-owner split for
+  the shared enum. The driver dispatch and aggregate wiring are already implemented; the
+  only remaining suppression is the cli.md note (missing CLI enum registration /
+  execution path, owned by T042), which expires when T042 completes. The cli_driver.md
+  note only restates the attribution semantics (a T043 attribution asserts convergence
+  at completion, not pending change). It is not an accepted deviation for any other
+  track or consumer.
+- **Conditional allowance — apply only when the review run's resolved Track ID is
+  exactly `scope-conditional-pre-review-gates-2026-07-31`; otherwise ignore.**
+  **Pre-existing review_v2 composition surface**: a user adjudication (2026-07-22)
+  deferred the review_v2 composition wire-only/render remediation to a separate track.
+  The cli_composition briefing carries a matching track-limited note: invoke-leak
+  findings on the PRE-EXISTING review_v2 gated-entry surface
+  (`ReviewCompositionRoot::review_run_local`, the interim `ReviewServiceImpl` shim) are
+  not reported when this track's diff makes no semantic change to that surface;
+  NEW invoke paths added by this track remain fully reportable. The allowance expires
+  when the deferred remediation track lands. It is not an accepted deviation for any
+  other track or consumer.
+- **Conditional allowance — apply only when the review run's resolved Track ID is
+  exactly `scope-conditional-pre-review-gates-2026-07-31`; otherwise ignore.**
+  **Pre-existing CommitHashReader / CommitHashWriter domain placement**: a
+  rollback-diagnoser verdict (2026-08-09) adjudicated the layer relocation of these
+  pre-existing ports (`libs/domain/src/review_v2/ports.rs`, introduced by an earlier
+  track under the review-system-v2 redesign ADR; see the ADR index) as out-of-diff for
+  this track; the
+  placement-rule conflict is to be resolved by a dedicated ADR-routed track (adr-editor
+  reconciling the ADR with the current Port-placement tie-break, then a migration track).
+  The domain.md briefing carries a matching track-limited note. The allowance expires
+  when that ADR track lands. It is not an accepted deviation for any other track or
+  consumer.
 
 - **Conditional allowance — apply only when the review run's resolved Track ID is
   exactly `scope-conditional-pre-review-gates-2026-07-31`; otherwise, do not apply

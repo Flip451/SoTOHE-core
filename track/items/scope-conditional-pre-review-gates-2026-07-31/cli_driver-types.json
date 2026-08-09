@@ -532,7 +532,7 @@
     },
     "RefVerifyChainSelect": {
       "action": "reference",
-      "docs": "Driver-layer chain selector mapped from the ref-verify check-approved CLI argument (CN-06, AC-16).",
+      "docs": "Shared ref-verify chain selector (CN-06, AC-16).",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -575,7 +575,7 @@
     },
     "RefVerifyCheckApprovedInput": {
       "action": "modify",
-      "docs": "Driver input mapping the `ref-verify check-approved` arguments into the usecase boundary (CN-06, AC-16).",
+      "docs": "Driver input for `ref-verify check-approved` (CN-06, AC-16).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -628,6 +628,64 @@
       },
       "methods": [],
       "module_path": "ref_verify",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewDriver": {
+      "action": "modify",
+      "docs": "Primary review adapter (CN-06, AC-16).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "service",
+              "ty": "std::sync::Arc<dyn usecase::review_v2::ReviewService>"
+            },
+            {
+              "name": "check_zero_findings",
+              "ty": "std::sync::Arc<dyn usecase::review_v2::ReviewCheckZeroFindingsService>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [
+            {
+              "name": "input",
+              "ty": "ReviewInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "CommandOutcome"
+        }
+      ],
+      "module_path": "review",
       "role": {
         "PrimaryAdapter": {}
       },

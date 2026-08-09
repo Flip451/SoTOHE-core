@@ -35,11 +35,11 @@ pub struct ReviewRunInput {
 
 /// Aggregate primary port for the `review` command family.
 ///
-/// `ReviewDriver` holds exactly one `Arc<dyn ReviewService>` and delegates
-/// each `ReviewInput` variant to the corresponding method.  The concrete
-/// implementation (`ReviewServiceImpl` in `cli_composition`) wires all
-/// individual sub-services internally, keeping the wiring complexity out of
-/// the driver.
+/// `ReviewDriver` injects this aggregate separately from the focused
+/// check-zero-findings service so each input delegates to exactly one
+/// application service. The concrete implementation (`ReviewServiceImpl` in
+/// `cli_composition`) wires the aggregate methods, keeping that complexity out
+/// of the driver.
 pub trait ReviewService: Send + Sync {
     /// Run the Codex-backed reviewer.
     fn run_codex(&self, input: ReviewRunInput) -> Result<RunReviewOutput, RunReviewError>;

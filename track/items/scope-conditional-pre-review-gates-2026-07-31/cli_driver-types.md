@@ -24,4 +24,5 @@
 | CapabilityDriver | primary_adapter | reference | — | 🔵 | 🔵 |
 | PhaseCommandDriver | primary_adapter | add | — | 🔵 | 🔵 |
 | RefVerifyDriver | primary_adapter | reference | — | 🔵 | 🔵 |
+| ReviewDriver | primary_adapter | modify | — | 🔵 | 🔵 |
 

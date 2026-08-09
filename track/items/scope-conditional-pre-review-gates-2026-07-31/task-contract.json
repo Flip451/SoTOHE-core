@@ -179,6 +179,9 @@
       {"layer": "usecase", "entry_key": "ReviewCheckZeroFindingsOutcome"},
       {"layer": "usecase", "entry_key": "ReviewCheckZeroFindingsQuery"},
       {"layer": "usecase", "entry_key": "ReviewCheckZeroFindingsService"},
+      {"layer": "usecase", "entry_key": "ReviewCheckZeroFindingsStatePort"},
+      {"layer": "infrastructure", "entry_key": "ReviewCheckZeroFindingsStateAdapter"},
+      {"layer": "cli_driver", "entry_key": "ReviewDriver"},
       {"layer": "cli", "entry_key": "CheckZeroFindingsArgs"},
       {"layer": "cli", "entry_key": "ReviewCheckRoundArg"}
     ],

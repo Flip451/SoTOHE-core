@@ -2,6 +2,7 @@
 //!
 //! Implements usecase and domain port traits using git CLI and filesystem I/O.
 
+pub mod check_zero_findings;
 pub mod claude_reviewer;
 pub mod codex_reviewer;
 pub mod diff_getter;
@@ -11,9 +12,12 @@ pub mod review_fix_runner;
 pub mod scope_config_loader;
 mod session;
 
+pub use check_zero_findings::ReviewCheckZeroFindingsStateAdapter;
 pub use claude_reviewer::ClaudeReviewer;
 pub use codex_reviewer::CodexReviewer;
 pub use diff_getter::GitDiffGetter;
+pub(crate) use diff_getter::RootedGitDiffGetter;
+pub(crate) use hasher::RootedSystemReviewHasher;
 pub use hasher::SystemReviewHasher;
 pub use persistence::{FsCommitHashStore, FsReviewStore};
 pub use review_fix_runner::CodexReviewFixRunner;

@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-09T03:17:57Z",
-  "declaration_hash": "8e64995ed50572728f4d7adc3a41fa018897ac4ede062195991a2168bc5d60b4",
-  "implementation_input_hash": "6c7ff103f944e853b57ea72fd5ea61574518054433fc481c63bf7ebdb508be51",
+  "generated_at": "2026-08-09T11:38:51Z",
+  "declaration_hash": "0f24ff04358cfa9f11af3ca01b2505f3d97981499aa414ea3516bd0bd447239d",
+  "implementation_input_hash": "8814795f05a59eb9ec7934b85b8fe7b3e2fbcee82e8f02e8960a2f429b415e10",
   "signals": [
     {
       "type_name": "CommandArgumentDto",
@@ -219,6 +219,15 @@
         "Debug",
         "Default",
         "usecase::program_runner::ProgramRunnerPort"
+      ]
+    },
+    {
+      "type_name": "ReviewCheckZeroFindingsStateAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "usecase::review_v2::check_zero_findings::ReviewCheckZeroFindingsStatePort"
       ]
     },
     {

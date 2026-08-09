@@ -10,7 +10,7 @@
 | ProgramOutputStream | enum | add | Stdout, Stderr | 🔵 | 🔵 |
 | ProgramRunOutcome | enum | add | Exited, TimedOut, OutputLimitExceeded | 🔵 | 🔵 |
 | RefVerifyChainFilter | enum | reference | Chain1, Chain2, All | 🔵 | 🔵 |
-| ReviewCheckZeroFindingsOutcome | enum | add | CurrentFinalZeroFindings, MissingFinalVerdict, StaleFinalVerdict, FindingsRemain | 🟡 | 🔵 |
+| ReviewCheckZeroFindingsOutcome | enum | add | CurrentFinalZeroFindings, MissingFinalVerdict, StaleFinalVerdict, FindingsRemain | 🔵 | 🔵 |
 | ReviewScopeSelection | enum | add | Named, All | 🟡 | 🔵 |
 | ReviewScopeSelector | enum | add | Named, Other | 🔵 | 🔵 |
 | ReviewTrackSelector | enum | add | Explicit, CurrentBranch | 🔵 | 🔵 |
@@ -51,7 +51,7 @@
 | PreReviewCommandConfigValidationError | error_type | add | InvalidSchemaVersion, DuplicateScope | 🔵 | 🔵 |
 | PreReviewCommandDispatchError | error_type | add | Config, UnknownScope, TrackResolution, TrackMismatch, Runner | 🔵 | 🔵 |
 | ProgramRunnerError | error_type | add | SpawnFailed, WaitFailed, TerminateFailed | 🔵 | 🔵 |
-| ReviewCheckZeroFindingsError | error_type | add | InvalidTrack, InvalidScope, EvaluationFailed | 🟡 | 🔵 |
+| ReviewCheckZeroFindingsError | error_type | add | EvaluationFailed | 🔵 | 🔵 |
 
 ## Secondary Ports
 
@@ -61,6 +61,7 @@
 | PhaseCommandConfigLoaderPort | secondary_port | add | fn load(&self, repository_root: &std::path::Path) -> Result<PhaseCommandConfig, CommandConfigLoadError> | 🔵 | 🔵 |
 | PreReviewCommandConfigLoaderPort | secondary_port | add | fn load(&self, repository_root: &std::path::Path, track_id: &domain::TrackId) -> Result<PreReviewCommandConfig, CommandConfigLoadError> | 🔵 | 🔵 |
 | ProgramRunnerPort | secondary_port | add | fn run(&self, invocation: ProgramInvocation) -> Result<ProgramRunOutcome, ProgramRunnerError> | 🔵 | 🔵 |
+| ReviewCheckZeroFindingsStatePort | secondary_port | add | fn state_for(&self, track_id: &domain::TrackId, items_dir: &std::path::Path, scope: &domain::review_v2::ScopeName) -> Result<Option<domain::review_v2::ReviewState>, domain::FreeText> | 🔵 | 🔵 |
 
 ## Application Services
 
@@ -71,7 +72,7 @@
 | PreReviewCommandDispatchService | application_service | add | fn dispatch(&self, command: PreReviewCommandDispatchCommand) -> Result<PreReviewCommandDispatchOutcome, PreReviewCommandDispatchError> | 🔵 | 🔵 |
 | RefVerifyAggregateService | application_service | modify | fn run(&self, track_id: &str, items_dir: &std::path::Path) -> Result<RefVerifyRunOutcome, RefVerifyDriverError>, fn results(&self, track_id: &str, items_dir: &std::path::Path, chain: RefVerifyChainFilter, layer: RefVerifyLayerFilter, verdict: RefVerifyVerdictFilter) -> Result<RefVerifyResultsOutput, RefVerifyDriverError> | 🔵 | 🔵 |
 | RefVerifyCheckApprovedDriverService | application_service | modify | fn check_approved(&self, track_id: &str, items_dir: &std::path::Path, chain: RefVerifyChainFilter) -> Result<RefVerifyCheckApprovedOutcome, RefVerifyDriverError> | 🔵 | 🔵 |
-| ReviewCheckZeroFindingsService | application_service | add | fn check_zero_findings(&self, query: &ReviewCheckZeroFindingsQuery) -> Result<ReviewCheckZeroFindingsOutcome, ReviewCheckZeroFindingsError> | 🟡 | 🔵 |
+| ReviewCheckZeroFindingsService | application_service | add | fn check_zero_findings(&self, query: &ReviewCheckZeroFindingsQuery) -> Result<ReviewCheckZeroFindingsOutcome, ReviewCheckZeroFindingsError> | 🔵 | 🔵 |
 | ReviewService | application_service | modify | fn run_codex(&self, input: ReviewRunInput) -> Result<RunReviewOutput, RunReviewError>, fn run_claude(&self, input: ReviewRunInput) -> Result<RunReviewOutput, RunReviewError>, fn run_local(&self, model: Option<String>, timeout_seconds: u64, briefing_file: Option<std::path::PathBuf>, prompt: Option<String>, track_id: Option<String>, round_type: String, group: String, items_dir: std::path::PathBuf) -> ReviewRunLocalOutput, fn check_approved(&self, track_id: String, items_dir: std::path::PathBuf) -> Result<ReviewApprovalOutput, ReviewCheckApprovedError>, fn results(&self, track_id: Option<String>, items_dir: std::path::PathBuf, selection: ReviewScopeSelection, limit: u32, round_type: String, no_hint: bool) -> Result<String, ReviewAuxError>, fn classify(&self, paths: Vec<String>, track_id: Option<String>, items_dir: std::path::PathBuf) -> Result<Vec<(String, String)>, ReviewAuxError>, fn files(&self, scope: String, track_id: Option<String>, items_dir: std::path::PathBuf) -> Result<Vec<String>, ReviewAuxError>, fn validate_scope(&self, scope: String, track_id: Option<String>, items_dir: std::path::PathBuf) -> Result<(), ReviewAuxError>, fn get_briefing(&self, scope: String, track_id: Option<String>, items_dir: std::path::PathBuf) -> Result<Option<String>, ReviewAuxError>, fn persist_commit_hash(&self, track_id: String, workspace_root: std::path::PathBuf) -> Result<String, CommitHashPersistenceError> | 🟡 | 🔵 |
 
 ## Interactors
@@ -82,7 +83,7 @@
 | PhaseCommandInteractor | interactor | add | — | 🔵 | 🔵 |
 | PreReviewCommandDispatchInteractor | interactor | add | — | 🔵 | 🔵 |
 | PreReviewCommandGatedReviewInteractor | interactor | add | — | 🔵 | 🔵 |
-| ReviewCheckZeroFindingsInteractor | interactor | add | — | 🟡 | 🔵 |
+| ReviewCheckZeroFindingsInteractor | interactor | add | — | 🔵 | 🔵 |
 
 ## DTOs
 
@@ -109,5 +110,5 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | PhaseExplainQuery | query | add | — | 🔵 | 🔵 |
-| ReviewCheckZeroFindingsQuery | query | add | — | 🟡 | 🔵 |
+| ReviewCheckZeroFindingsQuery | query | add | — | 🔵 | 🔵 |
 

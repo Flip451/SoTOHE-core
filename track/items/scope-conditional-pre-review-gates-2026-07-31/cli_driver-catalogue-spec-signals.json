@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "abc8c2af7cc7511f7d7da53ff2aa9edb4de9e2d1eff74dd6195b73db52732fbd",
+  "catalogue_declaration_hash": "8ca97acb64b7f33cd52eadef6b73c7566b3b639e075f590941399817f7615428",
   "signals": [
     {
       "type_name": "CapabilityDriver",
@@ -35,17 +35,22 @@
     {
       "type_name": "RefVerifyChainSelect",
       "signal": "blue",
-      "entry_hash": "c982154cc9f6a52b22fa99dad473f87ae29cdb0d7d7f3d16ef70b795c2a78ca7"
+      "entry_hash": "411409e93ad2b9dbec98e4c1ee218a8efd197cd40533950936cae5c69fe1f2b8"
     },
     {
       "type_name": "RefVerifyCheckApprovedInput",
       "signal": "blue",
-      "entry_hash": "f98c25b89f701a192175107061cfb85b087eab81e836ec5991e48c745e889fcd"
+      "entry_hash": "2e43015288e671c73d57f0b87e08d79b0cadfea90d43b97a06fa6d87171eacb4"
     },
     {
       "type_name": "RefVerifyDriver",
       "signal": "blue",
       "entry_hash": "9cb087d80db87733487907e6de76b28705ecf070c2b53e2d6f6ff7c31a69c40d"
+    },
+    {
+      "type_name": "ReviewDriver",
+      "signal": "blue",
+      "entry_hash": "f70580dcc5043463ebb985b96216cfa2f86ef9a86f8c27db682061a9b6fa9d0e"
     },
     {
       "type_name": "ReviewInput",

@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-04T05:28:08Z",
-  "declaration_hash": "111b1f97f7b6588268c56d9bac4d9fd5452b2c6698e83e6e58f2f8e115350d6a",
-  "implementation_input_hash": "045f8da4d3b64c5acc9b77715a584325641b5e6155ffe4d6d0f66e30e8dc8229",
+  "generated_at": "2026-08-09T04:27:42Z",
+  "declaration_hash": "1293c720775c3bdf168bb2f26d6125ca42f5069fef322130775714aac5848880",
+  "implementation_input_hash": "caa094539776759b1ad69eae131c0c336035c5f5eff04d411c6ddce0ed25efab",
   "signals": [
     {
       "type_name": "CapabilityExecArgs",
@@ -19,9 +19,9 @@
     {
       "type_name": "CheckZeroFindingsArgs",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Args",
         "Debug",
         "FromArgMatches"
@@ -104,9 +104,9 @@
     {
       "type_name": "ReviewCheckRoundArg",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Copy",
         "Debug",
