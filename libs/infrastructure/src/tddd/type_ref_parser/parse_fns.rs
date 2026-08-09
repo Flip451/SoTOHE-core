@@ -5,25 +5,7 @@ use std::collections::HashMap;
 use rustdoc_types::{GenericBound, Id, Path, TraitBoundModifier, Type};
 use syn::visit::Visit;
 
-use super::alias_validity::{
-    reject_alias_invalid_nodes_in_bound, reject_alias_invalid_nodes_in_type,
-    reject_infer_placeholders_in_bound, reject_infer_placeholders_in_type,
-    reject_multiple_dyn_lifetimes_in_bound, reject_multiple_dyn_lifetimes_in_type,
-    reject_undeclared_lifetime_bound,
-};
-use super::bound_spelling::{
-    reject_attributed_bare_fn_args_in_bound, reject_attributed_bare_fn_args_in_type,
-    reject_attributed_binder_params_in_bound, reject_attributed_binder_params_in_type,
-    reject_bare_fn_variant_spellings_in_bound, reject_bare_fn_variant_spellings_in_type,
-    reject_deterministically_non_trait_bound, reject_empty_generic_argument_lists_in_bound,
-    reject_empty_generic_argument_lists_in_type, reject_non_final_dyn_lifetimes_in_bound,
-    reject_non_final_dyn_lifetimes_in_type, reject_parenthesized_bounds_in_bound,
-    reject_precise_capture_bound, reject_redundant_parenthesized_types_in_bound,
-    reject_redundant_parenthesized_types_in_type, reject_trailing_commas_in_bound,
-    reject_trailing_commas_in_type, reject_trailing_pluses_in_bound,
-    reject_trailing_pluses_in_type, reject_turbofish_generic_arguments_in_bound,
-};
-use super::const_modifier::reject_unsupported_const_bound_modifier;
+use super::closed_grammar::{enforce_closed_bound_grammar, enforce_closed_type_grammar};
 use super::constants::{PRIMITIVE_TYPES, UNRESOLVED_CRATE_ID};
 use super::generic_tokens;
 use super::helpers::{is_simple_const_expr, simple_const_block_expr};
@@ -126,20 +108,8 @@ where
     let syn_type: syn::Type = syn::parse_str(type_ref_str)
         .map_err(|e| format!("syn parse error for `{type_ref_str}`: {e}"))?;
     if preserve_prelude_spelling {
-        reject_redundant_parenthesized_types_in_type(&syn_type)?;
-        reject_empty_generic_argument_lists_in_type(&syn_type)?;
-        reject_non_final_dyn_lifetimes_in_type(&syn_type)?;
-        reject_multiple_dyn_lifetimes_in_type(&syn_type)?;
-        reject_attributed_bare_fn_args_in_type(&syn_type)?;
-        reject_attributed_binder_params_in_type(&syn_type)?;
-        reject_infer_placeholders_in_type(&syn_type)?;
-        reject_trailing_commas_in_type(&syn_type)?;
-        reject_trailing_pluses_in_type(&syn_type)?;
-        reject_bare_fn_variant_spellings_in_type(&syn_type)?;
-        reject_alias_invalid_nodes_in_type(&syn_type)?;
+        enforce_closed_type_grammar(type_ref_str, generic_params)?;
         reject_anonymous_const_blocks_in_type(&syn_type)?;
-        reject_raw_identifiers_in_type(&syn_type)?;
-        reject_unsupported_type_macros_in_type(&syn_type)?;
         reject_unsupported_array_lengths_in_type(&syn_type)?;
         reject_unsupported_const_arguments_in_type(&syn_type)?;
     }
@@ -173,9 +143,10 @@ pub(crate) fn validate_legacy_type_ref(
     Ok(())
 }
 
-/// Validates a type reference for lexical comparison. Unlike the general type
-/// validator, this also rejects array-length expressions that cannot be matched
-/// safely against rustdoc's normalized representation.
+/// Validates a type reference for lexical comparison through the closed
+/// acceptance grammar (`closed_grammar`): the syntax allowlist, the canonical
+/// round-trip check, and the expression-form limits for const arguments and
+/// array lengths.
 pub(crate) fn validate_lexical_type_ref(
     type_ref_str: &str,
     generic_params: &[&str],
@@ -183,20 +154,8 @@ pub(crate) fn validate_lexical_type_ref(
     validate_generic_identifier_ambiguities(type_ref_str, generic_params)?;
     let syntax: syn::Type = syn::parse_str(type_ref_str)
         .map_err(|e| format!("invalid type syntax '{type_ref_str}': {e}"))?;
-    reject_redundant_parenthesized_types_in_type(&syntax)?;
-    reject_empty_generic_argument_lists_in_type(&syntax)?;
-    reject_non_final_dyn_lifetimes_in_type(&syntax)?;
-    reject_multiple_dyn_lifetimes_in_type(&syntax)?;
-    reject_attributed_bare_fn_args_in_type(&syntax)?;
-    reject_attributed_binder_params_in_type(&syntax)?;
-    reject_infer_placeholders_in_type(&syntax)?;
-    reject_trailing_commas_in_type(&syntax)?;
-    reject_trailing_pluses_in_type(&syntax)?;
-    reject_bare_fn_variant_spellings_in_type(&syntax)?;
-    reject_alias_invalid_nodes_in_type(&syntax)?;
+    enforce_closed_type_grammar(type_ref_str, generic_params)?;
     reject_anonymous_const_blocks_in_type(&syntax)?;
-    reject_raw_identifiers_in_type(&syntax)?;
-    reject_unsupported_type_macros_in_type(&syntax)?;
     reject_unsupported_array_lengths_in_type(&syntax)?;
     reject_unsupported_const_arguments_in_type(&syntax)
 }
@@ -267,32 +226,14 @@ pub(crate) fn validate_lexical_generic_bound(
     generic_params: &[&str],
 ) -> Result<(), String> {
     validate_generic_identifier_ambiguities(bound_str, generic_params)?;
-    reject_unsupported_const_bound_modifier(bound_str)?;
     let syntax_str = bound_str.strip_prefix("~const ").map_or(bound_str, str::trim_start);
     let syn_bound: syn::TypeParamBound = syn::parse_str(syntax_str)
         .map_err(|e| format!("invalid bound syntax '{bound_str}': {e}"))?;
     if bound_str.starts_with("~const ") {
         validate_maybe_const_bound(bound_str, generic_params)?;
     }
-    reject_deterministically_non_trait_bound(&syn_bound, generic_params)?;
-    reject_precise_capture_bound(&syn_bound)?;
-    reject_turbofish_generic_arguments_in_bound(&syn_bound)?;
-    reject_empty_generic_argument_lists_in_bound(&syn_bound)?;
-    reject_parenthesized_bounds_in_bound(&syn_bound)?;
-    reject_redundant_parenthesized_types_in_bound(&syn_bound)?;
-    reject_non_final_dyn_lifetimes_in_bound(&syn_bound)?;
-    reject_multiple_dyn_lifetimes_in_bound(&syn_bound)?;
-    reject_attributed_bare_fn_args_in_bound(&syn_bound)?;
-    reject_attributed_binder_params_in_bound(&syn_bound)?;
-    reject_infer_placeholders_in_bound(&syn_bound)?;
-    reject_trailing_commas_in_bound(&syn_bound)?;
-    reject_trailing_pluses_in_bound(&syn_bound)?;
-    reject_bare_fn_variant_spellings_in_bound(&syn_bound)?;
-    reject_alias_invalid_nodes_in_bound(&syn_bound)?;
-    reject_undeclared_lifetime_bound(&syn_bound)?;
+    enforce_closed_bound_grammar(bound_str, generic_params)?;
     reject_anonymous_const_blocks_in_bound(&syn_bound)?;
-    reject_raw_identifiers_in_bound(&syn_bound)?;
-    reject_unsupported_type_macros_in_bound(&syn_bound)?;
     reject_unsupported_array_lengths_in_bound(&syn_bound)?;
     reject_unsupported_const_arguments_in_bound(&syn_bound)
 }
@@ -364,26 +305,8 @@ where
     let syn_bound: syn::TypeParamBound =
         syn::parse_str(bound_str).map_err(|e| format!("syn parse error for `{bound_str}`: {e}"))?;
     if preserve_prelude_spelling {
-        reject_deterministically_non_trait_bound(&syn_bound, generic_params)?;
-        reject_precise_capture_bound(&syn_bound)?;
-        reject_turbofish_generic_arguments_in_bound(&syn_bound)?;
-        reject_empty_generic_argument_lists_in_bound(&syn_bound)?;
-        reject_parenthesized_bounds_in_bound(&syn_bound)?;
-        reject_redundant_parenthesized_types_in_bound(&syn_bound)?;
-        reject_non_final_dyn_lifetimes_in_bound(&syn_bound)?;
-        reject_multiple_dyn_lifetimes_in_bound(&syn_bound)?;
-        reject_attributed_bare_fn_args_in_bound(&syn_bound)?;
-        reject_attributed_binder_params_in_bound(&syn_bound)?;
-        reject_infer_placeholders_in_bound(&syn_bound)?;
-        reject_trailing_commas_in_bound(&syn_bound)?;
-        reject_trailing_pluses_in_bound(&syn_bound)?;
-        reject_bare_fn_variant_spellings_in_bound(&syn_bound)?;
-        reject_alias_invalid_nodes_in_bound(&syn_bound)?;
-        reject_undeclared_lifetime_bound(&syn_bound)?;
+        enforce_closed_bound_grammar(bound_str, generic_params)?;
         reject_anonymous_const_blocks_in_bound(&syn_bound)?;
-        reject_unsupported_const_bound_modifier(bound_str)?;
-        reject_raw_identifiers_in_bound(&syn_bound)?;
-        reject_unsupported_type_macros_in_bound(&syn_bound)?;
         reject_unsupported_array_lengths_in_bound(&syn_bound)?;
         reject_unsupported_const_arguments_in_bound(&syn_bound)?;
     }
@@ -444,71 +367,6 @@ fn reject_anonymous_const_blocks_in_bound(syntax: &syn::TypeParamBound) -> Resul
     let mut visitor = AnonymousConstBlockVisitor::default();
     visitor.visit_type_param_bound(syntax);
     reject_if_anonymous_const_block_found(visitor.found)
-}
-
-/// Raw identifiers are normalized by `syn::Ident::to_string`, while rustdoc
-/// also exposes the normalized spelling.  The lexical path therefore rejects
-/// them at the boundary instead of silently comparing a lossy rendering.
-#[derive(Default)]
-struct RawIdentifierVisitor {
-    found: bool,
-}
-
-impl<'ast> Visit<'ast> for RawIdentifierVisitor {
-    fn visit_ident(&mut self, node: &'ast syn::Ident) {
-        self.found |= node.to_string().starts_with("r#");
-        syn::visit::visit_ident(self, node);
-    }
-}
-
-fn reject_raw_identifiers_in_type(syntax: &syn::Type) -> Result<(), String> {
-    let mut visitor = RawIdentifierVisitor::default();
-    visitor.visit_type(syntax);
-    reject_if_raw_identifier_found(visitor.found)
-}
-
-fn reject_raw_identifiers_in_bound(syntax: &syn::TypeParamBound) -> Result<(), String> {
-    let mut visitor = RawIdentifierVisitor::default();
-    visitor.visit_type_param_bound(syntax);
-    reject_if_raw_identifier_found(visitor.found)
-}
-
-/// Rejects type macros in lexical comparison paths. `syn` can identify the
-/// macro invocation but cannot expand it; converting it to `<unknown_type>`
-/// would make distinct expanded types compare equal.
-#[derive(Default)]
-struct UnsupportedTypeMacroVisitor {
-    found: bool,
-}
-
-impl<'ast> Visit<'ast> for UnsupportedTypeMacroVisitor {
-    fn visit_type_macro(&mut self, node: &'ast syn::TypeMacro) {
-        self.found = true;
-        syn::visit::visit_type_macro(self, node);
-    }
-}
-
-fn reject_unsupported_type_macros_in_type(syntax: &syn::Type) -> Result<(), String> {
-    let mut visitor = UnsupportedTypeMacroVisitor::default();
-    visitor.visit_type(syntax);
-    reject_if_unsupported_type_macro_found(visitor.found)
-}
-
-fn reject_unsupported_type_macros_in_bound(syntax: &syn::TypeParamBound) -> Result<(), String> {
-    let mut visitor = UnsupportedTypeMacroVisitor::default();
-    visitor.visit_type_param_bound(syntax);
-    reject_if_unsupported_type_macro_found(visitor.found)
-}
-
-fn reject_if_unsupported_type_macro_found(found: bool) -> Result<(), String> {
-    if found {
-        Err(
-            "type macros are not supported by lexical type comparison because their expansion cannot be represented"
-                .to_owned(),
-        )
-    } else {
-        Ok(())
-    }
 }
 
 /// Rejects array-length expressions whose spelling cannot be compared safely
@@ -642,14 +500,6 @@ fn reject_if_anonymous_const_block_found(found: bool) -> Result<(), String> {
     if found {
         Err("anonymous const/block expressions are not supported by lexical type comparison"
             .to_owned())
-    } else {
-        Ok(())
-    }
-}
-
-fn reject_if_raw_identifier_found(found: bool) -> Result<(), String> {
-    if found {
-        Err("raw identifiers are not supported by lexical type comparison".to_owned())
     } else {
         Ok(())
     }

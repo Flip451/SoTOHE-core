@@ -1122,6 +1122,18 @@ fn test_alias_lexical_gates_reject_original_lossy_spellings() {
 }
 
 #[test]
+fn test_alias_lexical_gates_reject_self_in_trait_bound_paths() {
+    for spelling in ["Self", "Outer<Item: Self>"] {
+        assert_bound_spelling_rejected(spelling);
+    }
+}
+
+#[test]
+fn test_alias_lexical_gates_reject_raw_identifiers_in_const_expressions() {
+    assert_alias_lexical_spelling_rejected_at_all_gates("Marker<{ r#N }>");
+}
+
+#[test]
 fn test_alias_lexical_gates_reject_additional_lossy_spellings() {
     for spelling in [
         "Outer<Item: Send +>",
@@ -1164,6 +1176,179 @@ fn test_alias_lexical_gates_reject_multiple_dyn_lifetimes() {
     // the converter keeps only the first, so a second lifetime must fail closed.
     assert_alias_lexical_spelling_rejected_at_all_gates("Outer<dyn Tr + 'static + 'static>");
     assert_alias_lexical_spelling_accepted_at_all_gates("Outer<dyn Tr + 'static>");
+}
+
+/// Bound-position-only corpus assertions: these spellings are not standalone
+/// `syn::Type` syntax, so only the two bound gates apply.
+fn assert_bound_spelling_rejected(spelling: &str) {
+    assert!(
+        validate_lexical_generic_bound(spelling, &[]).is_err(),
+        "the lexical generic-bound validator must reject: {spelling}"
+    );
+    assert!(
+        parse_generic_bound_with_generics_preserving_spelling(
+            spelling,
+            &no_local,
+            100,
+            &HashMap::new(),
+            &mut |_| 101,
+            &[],
+        )
+        .is_err(),
+        "the preserving generic-bound encoder must reject: {spelling}"
+    );
+}
+
+fn assert_bound_spelling_accepted(spelling: &str) {
+    assert!(
+        validate_lexical_generic_bound(spelling, &[]).is_ok(),
+        "the lexical generic-bound validator must accept: {spelling}"
+    );
+    assert!(
+        parse_generic_bound_with_generics_preserving_spelling(
+            spelling,
+            &no_local,
+            100,
+            &HashMap::new(),
+            &mut |_| 101,
+            &[],
+        )
+        .is_ok(),
+        "the preserving generic-bound encoder must accept: {spelling}"
+    );
+}
+
+/// Regression corpus for the 47 inline findings of PR #234 (2026-08-02 …
+/// 2026-08-05). The review spiral ended by closing the acceptance grammar
+/// (`closed_grammar`: canonical round-trip + syntax allowlist) instead of
+/// growing a per-finding denylist; this corpus fixes every grammar-relevant
+/// finding's input to its outcome under the two rules. Findings about
+/// parameter names, the domain linter, and the contract-map renderer are
+/// covered by their own dedicated tests and listed here only for
+/// completeness of the mapping.
+#[test]
+fn test_pr234_findings_regression_corpus_rejections() {
+    for spelling in [
+        // syntactically invalid bound (finding 1: `<T>`)
+        "<T>",
+        // explicit unit output (finding 10) — canonical form is `Fn()`
+        "Fn() -> ()",
+        // evaluated array length (finding 11) — canonical form is `[u8; 3]`
+        "Trait<[u8; 1 + 2]>",
+        // complex anonymous const block (finding 12)
+        "Trait<{ 1 + 2 }>",
+        // const method call in array length (finding 14)
+        "Trait<[u8; 10usize.pow(2)]>",
+        // named constant array length (finding 15)
+        "Trait<[u8; LEN]>",
+        // type macro (finding 16)
+        "Trait<ty!()>",
+        // explicit "Rust" ABI (finding 21) — canonical form omits `extern`
+        "Outer<extern \"Rust\" fn()>",
+        // relaxed non-Sized bound (finding 24)
+        "?Clone",
+        // turbofish arguments (finding 29)
+        "Tr::<u8>",
+        // parenthesized bound (finding 30)
+        "(Clone)",
+        // nested redundant parentheses (finding 31)
+        "Outer<(u8)>",
+        // precise capture (finding 32)
+        "use<T>",
+        // non-final trait-object lifetime (finding 33)
+        "Outer<dyn 'static + Tr>",
+        // attributed bare-fn parameter (finding 34)
+        "Outer<fn(#[cfg(any())] u8)>",
+        // trailing comma (finding 35)
+        "Tr<u8,>",
+        // undeclared lifetime bound (finding 36)
+        "'a",
+        // infer placeholder (finding 37)
+        "Outer<_>",
+        // attributed HRTB binder parameter (finding 38)
+        "for<#[allow(unused)] 'a> Tr<&'a u8>",
+        // trailing plus in a trait object (finding 39)
+        "Outer<dyn Send +>",
+        // explicit wildcard parameter name (finding 40) — canonical `fn(u8)`
+        "Outer<fn(_: u8)>",
+        // implicit C ABI (finding 41) — canonical `extern \"C\" fn()`
+        "Outer<extern fn()>",
+        // impl Trait in generic arguments (finding 42)
+        "Outer<impl Clone>",
+        // Self in an alias declaration (finding 43)
+        "Outer<Self>",
+        // second trait-object lifetime (finding 44)
+        "Outer<dyn Tr + 'static + 'static>",
+        // explicitly empty argument list (finding 45)
+        "Tr<>",
+    ] {
+        assert_alias_lexical_spelling_rejected_at_all_gates(spelling);
+    }
+
+    // Bound-position-only rejections (not standalone type syntax, or accepted
+    // as a type):
+    // placeholder reference lifetime (finding 27) — canonical `Fn(&str)`
+    assert_bound_spelling_rejected("Fn(&'_ str)");
+    // primitive as trait bound (finding 28) — `u8` stays a valid TYPE
+    assert_bound_spelling_rejected("u8");
+    assert!(validate_lexical_type_ref("u8", &["T"]).is_ok());
+}
+
+/// Accept side of the PR #234 corpus: the canonical counterparts and the
+/// conversion-fidelity findings (whose inputs must round-trip and enter the
+/// lexical comparison).
+#[test]
+fn test_pr234_findings_regression_corpus_acceptances() {
+    for spelling in [
+        // prelude spelling preserved (finding 4)
+        "Clone",
+        // nested HRTB binder preserved (finding 6)
+        "Into<Box<dyn for<'a> Fn(&'a str)>>",
+        // unnamed function-pointer parameter (finding 7)
+        "Trait<fn(u8)>",
+        // generic argument shadowing (finding 8)
+        "Into<T>",
+        // associated-type-constraint binder (finding 9)
+        "Outer<Item: for<'a> Tr<'a>>",
+        // canonical counterparts of rejected spellings
+        "Trait<[u8; 3]>",
+        // simple anonymous const block (finding 12, supported form)
+        "Trait<{ 1 }>",
+        // absolute path spelling preserved (findings 13 / 17)
+        "::std::clone::Clone",
+        "Into<::std::vec::Vec<T>>",
+        // signed and suffixed const literals (findings 18 / 19)
+        "Outer<-3>",
+        "Outer<3usize>",
+        // where-subject spelling (findings 20 / 22): `Vec<T>` stays `Vec<T>`
+        "Vec<T>",
+        // quoted non-enumerated ABI (finding 23)
+        "Outer<extern \"efiapi\" fn()>",
+        // raw pointer const (finding 25)
+        "Outer<*const u8>",
+        // canonical bare-fn / ABI spellings (findings 40 / 41)
+        "Outer<fn(u8)>",
+        "Outer<extern \"C\" fn()>",
+        // canonical trait-object spelling (findings 33 / 39 / 44)
+        "Outer<dyn Tr + 'static>",
+    ] {
+        assert_alias_lexical_spelling_accepted_at_all_gates(spelling);
+    }
+
+    // Bound-position-only acceptances (not standalone type syntax):
+    for spelling in [
+        // canonical Fn-sugar spellings (findings 10 / 27)
+        "Fn()", "Fn(&str)",
+        // Sized relaxation stays expressible (finding 24, supported form)
+        "?Sized", // static lifetime bound (finding 36, supported form)
+        "'static",
+    ] {
+        assert_bound_spelling_accepted(spelling);
+    }
+
+    // `~const Clone` (finding 22): accepted by the lexical bound validator;
+    // its deeper shape is owned by `validate_maybe_const_bound`.
+    assert!(validate_lexical_generic_bound("~const Clone", &[]).is_ok());
 }
 
 #[test]
@@ -1244,7 +1429,10 @@ fn test_parse_type_ref_associated_constraint_preserves_hrtb_binder() {
 
 #[test]
 fn test_parse_type_ref_fn_bound_explicit_unit_output_normalizes_to_none() {
-    let GenericBound::TraitBound { trait_, .. } =
+    // The representation cannot distinguish `Fn() -> ()` from `Fn()` (rustdoc
+    // emits an absent output for both), so the preserving gate rejects the
+    // non-canonical explicit-unit spelling under the closed grammar.
+    assert!(
         parse_generic_bound_with_generics_preserving_spelling(
             "Fn() -> ()",
             &no_local,
@@ -1253,8 +1441,21 @@ fn test_parse_type_ref_fn_bound_explicit_unit_output_normalizes_to_none() {
             &mut |_| 101,
             &[],
         )
-        .unwrap()
-    else {
+        .is_err(),
+        "explicit unit output is a non-canonical spelling and must fail closed"
+    );
+
+    // The legacy permissive parser keeps the normalization claim: an explicit
+    // unit output converts to rustdoc's absent output.
+    let GenericBound::TraitBound { trait_, .. } = parse_generic_bound_with_generics(
+        "Fn() -> ()",
+        &no_local,
+        100,
+        &HashMap::new(),
+        &mut |_| 101,
+        &[],
+    )
+    .unwrap() else {
         panic!("expected Fn trait bound");
     };
     let Some(GenericArgs::Parenthesized { output, .. }) = trait_.args.as_deref() else {

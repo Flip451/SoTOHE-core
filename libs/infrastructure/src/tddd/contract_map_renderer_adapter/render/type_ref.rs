@@ -16,8 +16,16 @@ use super::node_index::{NodeIndex, strip_generics};
 /// originate solely in `dyn Trait` bounds and resolve through the separate trait index.
 #[derive(Default)]
 struct TypeRefCandidates {
-    type_names: Vec<String>,
+    type_names: Vec<TypeCandidate>,
     trait_names: Vec<String>,
+}
+
+/// A type-path candidate together with the syntactic information needed to
+/// distinguish a relative generic projection from an absolute crate path.
+#[derive(Ord, PartialOrd, Eq, PartialEq)]
+struct TypeCandidate {
+    name: String,
+    is_absolute: bool,
 }
 
 /// Collect all leaf type-path names and `dyn Trait` bounds from a `syn::Type` AST.
@@ -86,7 +94,10 @@ fn collect_type_names_from_syn(ty: &syn::Type, candidates: &mut TypeRefCandidate
 
 /// Add one path to the ordinary type candidate stream and recurse into its arguments.
 fn collect_path_as_type_candidate(path: &syn::Path, candidates: &mut TypeRefCandidates) {
-    candidates.type_names.push(path_as_string(path));
+    candidates.type_names.push(TypeCandidate {
+        name: path_as_string(path),
+        is_absolute: path.leading_colon.is_some(),
+    });
     collect_path_generic_type_candidates(path, candidates);
 }
 
@@ -203,17 +214,21 @@ pub(crate) fn resolve_type_ref_node_ids_with_generics(
     // provided — `NodeIndex` does not hold a "Self" key (OS-04 / correctness).
     let mut resolved: Vec<String> = Vec::new();
     for candidate in &candidates.type_names {
-        if candidate == "Self" {
+        if candidate.name == "Self" {
             if let Some(id) = self_node_id {
                 push_unique_node_id(&mut resolved, id);
             }
             // If self_node_id is None, "Self" has no resolution — silent skip.
             continue;
         }
-        if generic_params.contains(&candidate.as_str()) {
+        // A declared parameter shadows catalogue types both as a bare name and
+        // as the root of a generic projection (`T::Item` is a projection on
+        // the parameter, never a qualified catalogue type).
+        let candidate_root = candidate.name.split("::").next().unwrap_or(candidate.name.as_str());
+        if !candidate.is_absolute && generic_params.contains(&candidate_root) {
             continue;
         }
-        if let Some(node_id) = node_index.resolve(candidate, current_crate) {
+        if let Some(node_id) = node_index.resolve(&candidate.name, current_crate) {
             push_unique_node_id(&mut resolved, node_id);
         }
     }
@@ -295,4 +310,28 @@ fn resolve_trait_ref_node_id<'a>(
 
     let key = (target_crate.to_string(), trait_name.to_string());
     trait_index.get(&key).map(|node_id| node_id.as_str())
+}
+
+#[cfg(test)]
+mod tests {
+    use std::collections::BTreeMap;
+
+    use super::{NodeIndex, resolve_type_ref_node_ids_with_generics};
+
+    #[test]
+    fn test_resolve_absolute_path_with_generic_named_as_crate() {
+        let mut node_index = NodeIndex::new();
+        node_index.insert("T", "Item", "T_Item".to_owned());
+
+        let resolved = resolve_type_ref_node_ids_with_generics(
+            "::T::Item",
+            &node_index,
+            &BTreeMap::new(),
+            "domain",
+            None,
+            &["T"],
+        );
+
+        assert_eq!(resolved, ["T_Item"]);
+    }
 }

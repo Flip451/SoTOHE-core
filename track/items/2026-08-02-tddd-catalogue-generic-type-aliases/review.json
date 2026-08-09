@@ -701,6 +701,20 @@
           "hash": "rvw1:sha256:86105ad62b3cd0e6857c5bf75bc4caa3a0b3f0ac6876a2be08ef0feb816502cd",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T02:56:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:632be6310f56ebe2426e2250f70b730402af4927d7d22e8d9999239e2a5c33f6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T02:58:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:632be6310f56ebe2426e2250f70b730402af4927d7d22e8d9999239e2a5c33f6",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -4456,6 +4470,49 @@
           "at": "2026-08-04T06:54:07Z",
           "findings": [],
           "hash": "rvw1:sha256:a60dfe3d85a822317e0dbdd237b0dd8d82db6959432f2a510833a0b24516b04f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-05T09:03:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6477547309ce25ada80eca0b76b3c420ffa4c185415e7c66592ce36363bf50a0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-05T09:20:07Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/type_ref.rs",
+              "line": 216,
+              "message": "Absolute paths lose their leading `::` before this filter. For an alias such as `Alias<T> = ::T::Item`, the candidate becomes `T::Item` and is incorrectly skipped as a generic projection, even though it names crate `T`; the contract map consequently omits the valid `alias_of` edge. Preserve path absoluteness or apply generic-root filtering only to relative paths.",
+              "severity": "P1"
+            },
+            {
+              "category": "input-validation",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/closed_grammar.rs",
+              "line": 292,
+              "message": "The `Self` rejection is limited to `syn::TypePath`. Trait-bound paths are visited directly as `syn::Path`, so bounds such as `Self` or `Outer<Item: Self>` pass both the allowlist and canonical round-trip, despite `Self` being invalid in a top-level type-alias declaration. Restore path-wide `Self` rejection.",
+              "severity": "P1"
+            },
+            {
+              "category": "input-validation",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/canonical_render.rs",
+              "line": 150,
+              "message": "Const expressions are re-emitted verbatim as their canonical form, while the new allowlist does not reject raw identifiers. Consequently `Marker<{ r#N }>` passes the round-trip and retained expression gates, replacing the deleted raw-identifier guard even though rustdoc normalization makes this spelling unsuitable for lexical comparison. Reject raw identifiers within accepted const expressions.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6477547309ce25ada80eca0b76b3c420ffa4c185415e7c66592ce36363bf50a0",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-05T09:33:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6a6507bf15f0c8ea34a89ab552e698c7c85bdb9af97afd13e668e132141e32eb",
           "type": "final",
           "verdict": "zero_findings"
         }

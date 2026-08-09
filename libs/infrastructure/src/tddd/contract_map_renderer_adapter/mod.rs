@@ -1265,6 +1265,76 @@ include_function_roles = []
     }
 
     #[test]
+    fn test_render_generic_rooted_alias_target_is_not_resolved_as_qualified_type() {
+        // `Alias<T> = T::Item` is a projection on the alias parameter. Even
+        // when another rendered catalogue is a crate literally named `T` with
+        // a type `Item`, the generic-rooted target must not resolve to that
+        // unrelated node.
+        use domain::tddd::catalogue_v2::identifiers::ParamName;
+        use domain::tddd::catalogue_v2::methods::MethodGenericParam;
+
+        let tmp = tempfile::tempdir().unwrap();
+        let path = write_style_config(tmp.path(), FULL_VALID_CONFIG);
+        let adapter = ContractMapRendererAdapter::new(path);
+        let opts = ContractMapRenderOptions::default();
+
+        let t_crate = CrateName::new("T").unwrap();
+        let t_layer = LayerId::try_new("usecase").unwrap();
+        let mut t_doc = CatalogueDocument::new(3, t_crate, t_layer.clone());
+        t_doc.insert_type(
+            TypeName::new("Item").unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                    None,
+                )),
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let crate_name = CrateName::new("domain").unwrap();
+        let layer = LayerId::try_new("domain").unwrap();
+        let mut doc = CatalogueDocument::new(3, crate_name, layer.clone());
+        doc.insert_type(
+            TypeName::new("UserId").unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::TypeAlias {
+                    target: TypeRef::new("T::Item").unwrap(),
+                    generics: vec![MethodGenericParam {
+                        name: ParamName::new("T").unwrap(),
+                        bounds: vec![],
+                    }],
+                },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let result = adapter.render(&[doc, t_doc], &[layer, t_layer], &opts).unwrap();
+        let output = result.content().as_ref();
+        assert!(
+            !output.contains("alias_of"),
+            "a generic-rooted alias target must not resolve to a same-named crate's type: \
+             {output}"
+        );
+    }
+
+    #[test]
     fn test_render_legacy_alias_parameter_shadows_declared_type() {
         // The same shadowing must apply when the alias parameter is declared in
         // the legacy entry-level generics field instead of the TypeAlias kind.
