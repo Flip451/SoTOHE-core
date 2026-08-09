@@ -6,7 +6,7 @@
 GO-01 → T001–T004, T010, T011, and T013.
 GO-02 → T005–T009 and T012.
 
-## Tasks (12/13 resolved)
+## Tasks (13/13 resolved)
 
 ### S1 — Guarded base merge
 
@@ -39,4 +39,4 @@ GO-02 → T005–T009 and T012.
 
 > Pin isolated baseline-worktree git operations to the main repository's current absolute hook path. IN-02; CN-05; AC-03; AC-10.
 
-- [~] **T013**: Pin every ephemeral base-merge worktree git operation in `libs/infrastructure/src/base_merge.rs` to the main repository's absolute current `.githooks` path, and add regression coverage. IN-02; CN-05; AC-03; AC-10.
+- [x] **T013**: Pin every ephemeral base-merge worktree git operation in `libs/infrastructure/src/base_merge.rs` to the main repository's absolute current `.githooks` path, and add regression coverage. IN-02; CN-05; AC-03; AC-10. (`037748e67a34f72bc18caaa352ccc884b507c596`)
