@@ -5062,6 +5062,35 @@
           "hash": "rvw1:sha256:c64cba036fc9bd73f9941b06cab59799e992be8f25cd6e20e21cbebd69794fe1",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T12:04:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:46cc5b49e278b7309b279c16c34e4d1654c0fc799f6f67db78bc27799935a9c8",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T12:09:33Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/helpers.rs",
+              "line": 404,
+              "message": "`syn::Lit::Byte` must remain accepted. Removing it makes every lexical gate reject `Outer<b'x'>`, and the new test locks in that false rejection. A byte literal has type `u8`, and `u8` is an allowed stable const-parameter type, so `struct Outer<const N: u8>; type A = Outer<b'x'>;` is valid and rustdoc-representable. Restore `Lit::Byte` while continuing to reject string, byte-string, and unit expressions. See the Rust Reference on [byte literals](https://doc.rust-lang.org/reference/expressions/literal-expr.html#byte-literal-expressions) and [const-generic parameter types](https://doc.rust-lang.org/reference/items/generics.html#const-generics).",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:46cc5b49e278b7309b279c16c34e4d1654c0fc799f6f67db78bc27799935a9c8",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T12:14:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:51fc674c28905935a6abdd679a7233ba84bcc35e63ddd8a52973e98b9efae637",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },

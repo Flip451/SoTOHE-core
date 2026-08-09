@@ -174,15 +174,21 @@ fn test_parse_type_ref_simple_const_blocks_match_rustdoc_spelling() {
         &["N"],
     )
     .unwrap();
-    let unit = parse_type_ref_with_generics_preserving_spelling(
-        "Marker<{ () }>",
-        &no_local,
-        100,
-        &HashMap::new(),
-        &mut |_| 101,
-        &[],
-    )
-    .unwrap();
+    // A unit const block would require an unstable const-parameter type
+    // (stable rustc permits only integer, `bool`, and `char`), so it is no
+    // longer representable on the preserving path.
+    assert!(
+        parse_type_ref_with_generics_preserving_spelling(
+            "Marker<{ () }>",
+            &no_local,
+            100,
+            &HashMap::new(),
+            &mut |_| 101,
+            &[],
+        )
+        .is_err(),
+        "a unit const block must be rejected on the preserving path"
+    );
     let const_expr = |ty: Type| {
         let Type::ResolvedPath(path) = ty else {
             panic!("expected Marker resolved path");
@@ -197,7 +203,6 @@ fn test_parse_type_ref_simple_const_blocks_match_rustdoc_spelling() {
     };
     assert_eq!(const_expr(literal), "{ 1 }");
     assert_eq!(const_expr(generic), "{ N }");
-    assert_eq!(const_expr(unit), "{ () }");
 }
 
 #[test]
@@ -1149,6 +1154,21 @@ fn test_alias_lexical_gates_reject_reserved_bare_fn_parameter_names() {
     ] {
         assert_alias_lexical_spelling_accepted_at_all_gates(spelling);
     }
+}
+
+#[test]
+fn test_alias_lexical_gates_reject_unstable_const_literal_kinds() {
+    // A byte literal has type `u8` and is therefore a stable const argument.
+    // Strings and byte strings require unstable const-parameter types, so no
+    // compiler-validated rustdoc output can carry them.
+    assert_alias_lexical_spelling_rejected_at_all_gates("Outer<\"x\">");
+    assert_alias_lexical_spelling_rejected_at_all_gates("Outer<b\"x\">");
+    assert_alias_lexical_spelling_accepted_at_all_gates("Outer<b'x'>");
+    assert_alias_lexical_spelling_accepted_at_all_gates("Marker<5>");
+    assert_alias_lexical_spelling_accepted_at_all_gates("Marker<'\\x78'>");
+    // `()` in argument position is the unit TYPE argument (`T: Into<()>` is
+    // stable), not a const literal, and stays accepted.
+    assert_alias_lexical_spelling_accepted_at_all_gates("Outer<()>");
 }
 
 #[test]

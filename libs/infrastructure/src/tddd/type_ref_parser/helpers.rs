@@ -396,14 +396,16 @@ pub(super) fn simple_const_block_expr(block: &syn::ExprBlock) -> Option<&syn::Ex
 
 pub(super) fn is_simple_const_expr(expr: &syn::Expr) -> bool {
     match expr {
-        syn::Expr::Lit(lit) => matches!(
-            lit.lit,
-            syn::Lit::Int(_)
-                | syn::Lit::Str(_)
-                | syn::Lit::Bool(_)
-                | syn::Lit::Char(_)
-                | syn::Lit::Byte(_)
-        ),
+        // Stable rustc permits integer, `bool`, and `char` const-generic
+        // parameter types. A byte literal has type `u8`, so it is an integer
+        // const argument; strings, byte strings, and the unit tuple require
+        // unstable const-parameter types.
+        syn::Expr::Lit(lit) => {
+            matches!(
+                lit.lit,
+                syn::Lit::Int(_) | syn::Lit::Bool(_) | syn::Lit::Char(_) | syn::Lit::Byte(_)
+            )
+        }
         syn::Expr::Path(path) => {
             path.qself.is_none()
                 && path
@@ -412,7 +414,6 @@ pub(super) fn is_simple_const_expr(expr: &syn::Expr) -> bool {
                     .iter()
                     .all(|segment| matches!(segment.arguments, syn::PathArguments::None))
         }
-        syn::Expr::Tuple(tuple) => tuple.elems.is_empty(),
         syn::Expr::Unary(unary) => {
             matches!(unary.op, syn::UnOp::Neg(_))
                 && matches!(&*unary.expr, syn::Expr::Lit(lit) if matches!(lit.lit, syn::Lit::Int(_)))
