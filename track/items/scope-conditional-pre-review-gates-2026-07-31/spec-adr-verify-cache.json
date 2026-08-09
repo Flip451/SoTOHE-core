@@ -738,6 +738,75 @@
       }
     },
     {
+      "claim_hash": "3b3dd76911bde35b84bff50a13a491737d0aeb1e535177f590b6d3b5bde3925a",
+      "evidence_hash": "33cc2dba5ce0c832364f9749b70fb4af1fe77a8c805879c10f7846d6ea220519",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`[--scope <name>|--all]              # 既定: --all`"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-15",
+          "text_label": "`bin/sotp review results` の scope selection boundary は `Named(validated ScopeName)` または `All` の排他的な表現とする。`All` は明示的な `--all` または selector omission で選ばれ、`scope_config.all_scope_names()` が返す configured scope universe 全体を列挙する。`Named` は validated `--scope <name>` で選ばれ、その scope だけを表示する。`--scope` と `--all` の同時指定、および invalid scope 名は受理しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "3b3dd76911bde35b84bff50a13a491737d0aeb1e535177f590b6d3b5bde3925a",
+      "evidence_hash": "33cc2dba5ce0c832364f9749b70fb4af1fe77a8c805879c10f7846d6ea220519",
+      "verdict": {
+        "kind": "pass",
+        "citation": "出力の scope 一覧は **`scope_config.all_scope_names()` が返す scope universe を完全に列挙する**"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-15",
+          "text_label": "`bin/sotp review results` の scope selection boundary は `Named(validated ScopeName)` または `All` の排他的な表現とする。`All` は明示的な `--all` または selector omission で選ばれ、`scope_config.all_scope_names()` が返す configured scope universe 全体を列挙する。`Named` は validated `--scope <name>` で選ばれ、その scope だけを表示する。`--scope` と `--all` の同時指定、および invalid scope 名は受理しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "3b3dd76911bde35b84bff50a13a491737d0aeb1e535177f590b6d3b5bde3925a",
+      "evidence_hash": "900d7f24b56a8e6fa3286287a980b24dbe2cc6b9914ba62861f7c06a83e1d1bc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp review results` の scope selection は `All | Named(validated ScopeName)` とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-15",
+          "text_label": "`bin/sotp review results` の scope selection boundary は `Named(validated ScopeName)` または `All` の排他的な表現とする。`All` は明示的な `--all` または selector omission で選ばれ、`scope_config.all_scope_names()` が返す configured scope universe 全体を列挙する。`Named` は validated `--scope <name>` で選ばれ、その scope だけを表示する。`--scope` と `--all` の同時指定、および invalid scope 名は受理しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-08-10-0814-review-results-scope-selection.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
       "claim_hash": "07a396adf15accfc8f609dae5115bf3b6b38a3129c93664c94f2742080865d26",
       "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
       "verdict": {
@@ -1838,6 +1907,75 @@
         "data": {
           "file_path": "knowledge/adr/2026-04-28-1905-review-results-command.md",
           "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "c87d0438c984e9cb4da639fc81b4d6d55b7f5db795a4ec037844e860f6ffb2e9",
+      "evidence_hash": "33cc2dba5ce0c832364f9749b70fb4af1fe77a8c805879c10f7846d6ea220519",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`[--scope <name>|--all]              # 既定: --all`"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-18",
+          "text_label": "`bin/sotp review results --scope <scope>` は validated `ScopeName` の `Named` selection としてその scope だけを表示し、`--all` または selector omission は `All` selection として `scope_config.all_scope_names()` が返す configured scope universe 全体を表示する。`--scope` と `--all` を同時に指定する input、または invalid scope 名は受理しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "c87d0438c984e9cb4da639fc81b4d6d55b7f5db795a4ec037844e860f6ffb2e9",
+      "evidence_hash": "33cc2dba5ce0c832364f9749b70fb4af1fe77a8c805879c10f7846d6ea220519",
+      "verdict": {
+        "kind": "pass",
+        "citation": "出力の scope 一覧は **`scope_config.all_scope_names()` が返す scope universe を完全に列挙する**。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-18",
+          "text_label": "`bin/sotp review results --scope <scope>` は validated `ScopeName` の `Named` selection としてその scope だけを表示し、`--all` または selector omission は `All` selection として `scope_config.all_scope_names()` が返す configured scope universe 全体を表示する。`--scope` と `--all` を同時に指定する input、または invalid scope 名は受理しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "c87d0438c984e9cb4da639fc81b4d6d55b7f5db795a4ec037844e860f6ffb2e9",
+      "evidence_hash": "900d7f24b56a8e6fa3286287a980b24dbe2cc6b9914ba62861f7c06a83e1d1bc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`All` は明示的な `--all` または selector の省略で選ばれ、`scope_config.all_scope_names()` が返す scope universe を省略なく完全に列挙する。\\n- `Named(validated ScopeName)` は `--scope <name>` で選ばれ、検証済みの選択 scope だけを表示する。\\n- `--scope <name>` と `--all` の同時指定は、どちらかへ暗黙に優先順位を付けず拒否する。\\n- `--scope <name>` の値は query の前に `ScopeName` の形式を検証し、さらに検証済みの値が `scope_config.all_scope_names()` の返す scope universe に属することを検証する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-18",
+          "text_label": "`bin/sotp review results --scope <scope>` は validated `ScopeName` の `Named` selection としてその scope だけを表示し、`--all` または selector omission は `All` selection として `scope_config.all_scope_names()` が返す configured scope universe 全体を表示する。`--scope` と `--all` を同時に指定する input、または invalid scope 名は受理しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-08-10-0814-review-results-scope-selection.md",
+          "decision_id": "D1"
         }
       }
     }

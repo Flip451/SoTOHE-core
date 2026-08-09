@@ -240,7 +240,7 @@
     },
     {
       "id": "T043",
-      "description": "`ReviewScopeSelection` への results-selection enum migration を usecase、CLI driver、CLI callers と tests に実装する。CN-06、AC-16。",
+      "description": "`ReviewScopeSelection` への results-selection enum migration と `ReviewScopeSelectionValidationError` を usecase に実装し、`apps/cli-driver/src/review.rs` の `ReviewResultsInput` 境界 conversion、CLI callers と tests を更新する。IN-15、AC-18。",
       "status": "todo",
       "depends_on": [
         "T042"
@@ -255,7 +255,8 @@
     {
       "id": "T040",
       "description": "`.harness/config/phase-commands.json` を phase ごとの convergence matrix に更新し、`apps/cli/src/commands/phase.rs` に phase-entry fixture / integration tests を追加する。IN-12、CN-06、AC-14、AC-16。",
-      "status": "in_progress",
+      "status": "done",
+      "commit_hash": "3fa648d673b5d4d72853905f4c009f33819fbb7d",
       "depends_on": [
         "T038",
         "T039",
@@ -265,7 +266,7 @@
     {
       "id": "T041",
       "description": "`.harness/workflows/track/{plan,spec-design,type-design,impl-plan,adr2pr}.md`、`.claude/commands/track/{plan,spec-design,type-design,impl-plan,adr2pr}.md`、`.agents/skills/track-{plan,spec-design,type-design,impl-plan,adr2pr}/SKILL.md` の phase-writer launch sites を `bin/sotp phase enter <phase-id>` に更新し、direct writer dispatch を除去する。workflow-level static regression check を追加する。IN-13、AC-15。",
-      "status": "todo",
+      "status": "in_progress",
       "depends_on": [
         "T040"
       ]

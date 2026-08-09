@@ -1,7 +1,7 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-09T19:48:45Z",
-  "declaration_hash": "f27633871081f642a8dd9d58312f16baf44ab4df29f2bd03ec7163b0bcbaf3ff",
+  "generated_at": "2026-08-09T21:47:31Z",
+  "declaration_hash": "871d0f8d65cad4efd92ed2f644f09c39b3637df564d1ffbcdb77a5d34e86a30a",
   "implementation_input_hash": "ff8f81856a453635c2511f1d6f03cea59d9643afa60aaff11eeffd0bf2211c28",
   "signals": [
     {
@@ -646,6 +646,17 @@
         "Debug",
         "Eq",
         "PartialEq"
+      ]
+    },
+    {
+      "type_name": "ReviewScopeSelectionValidationError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
       ]
     },
     {

@@ -4107,11 +4107,11 @@
       }
     },
     {
-      "claim_hash": "8339c73b2c758968797776d2b157f2e7cc5a87a5a56380ad90a25e424a6c9d3f",
-      "evidence_hash": "8fa587f6b3cb186fc083494e54ed3db92fa82015011b1fec6c54d72cfb0b3e46",
+      "claim_hash": "431f96e973bf466ec26ddfe0a55a2626963684bdff0073e91f01c1f7724bc1f9",
+      "evidence_hash": "3b3dd76911bde35b84bff50a13a491737d0aeb1e535177f590b6d3b5bde3925a",
       "verdict": {
         "kind": "pass",
-        "citation": "`bin/sotp review check-zero-findings --scope <scope> --round final` は指定 scope の current artifact に対応する final review verdict が `zero_findings` の場合だけ zero を返す。"
+        "citation": "scope selection boundary は `Named(validated ScopeName)` または `All` の排他的な表現とする。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -4124,18 +4124,18 @@
       "evidence_origin": {
         "kind": "spec_element",
         "data": {
-          "section": "constraint",
-          "element_id": "CN-06",
-          "text_label": "pre-entry matrix で使う public check command は exit code で判定可能でなければならない。`bin/sotp review check-zero-findings --scope <scope> --round final` は指定 scope の current artifact に対応する final review verdict が `zero_findings` の場合だけ zero を返す。`bin/sotp ref-verify check-approved --chain <1|2>` は指定 Chain の current production reference pair が全て verified pass の場合だけ zero を返す。display-only result command を convergence 判定に使わず、未解決、stale、または対象外 chain の状態で false success を返さない。"
+          "section": "in_scope",
+          "element_id": "IN-15",
+          "text_label": "`bin/sotp review results` の scope selection boundary は `Named(validated ScopeName)` または `All` の排他的な表現とする。`All` は明示的な `--all` または selector omission で選ばれ、`scope_config.all_scope_names()` が返す configured scope universe 全体を列挙する。`Named` は validated `--scope <name>` で選ばれ、その scope だけを表示する。`--scope` と `--all` の同時指定、および invalid scope 名は受理しない。"
         }
       }
     },
     {
-      "claim_hash": "8339c73b2c758968797776d2b157f2e7cc5a87a5a56380ad90a25e424a6c9d3f",
-      "evidence_hash": "94934398148874b5290b24f7a6cf5b694fb5081a27244d13290a946a74a4abea",
+      "claim_hash": "431f96e973bf466ec26ddfe0a55a2626963684bdff0073e91f01c1f7724bc1f9",
+      "evidence_hash": "c87d0438c984e9cb4da639fc81b4d6d55b7f5db795a4ec037844e860f6ffb2e9",
       "verdict": {
         "kind": "pass",
-        "citation": "`bin/sotp review check-zero-findings --scope <scope> --round final` returns zero only for a current final `zero_findings` verdict for that scope"
+        "citation": "`bin/sotp review results --scope <scope>` は validated `ScopeName` の `Named` selection としてその scope だけを表示し、`--all` または selector omission は `All` selection として"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -4149,8 +4149,56 @@
         "kind": "spec_element",
         "data": {
           "section": "acceptance_criteria",
-          "element_id": "AC-16",
-          "text_label": "`bin/sotp review check-zero-findings --scope <scope> --round final` returns zero only for a current final `zero_findings` verdict for that scope, and non-zero for absent, stale, non-final, or findings-present review state. `bin/sotp ref-verify check-approved --chain <1|2>` returns zero only when the selected Chain's current production reference pairs are all verified pass, and non-zero when any selected pair is absent, stale, pending, or failed. Both commands are usable as literal pre-entry argv without parsing display output."
+          "element_id": "AC-18",
+          "text_label": "`bin/sotp review results --scope <scope>` は validated `ScopeName` の `Named` selection としてその scope だけを表示し、`--all` または selector omission は `All` selection として `scope_config.all_scope_names()` が返す configured scope universe 全体を表示する。`--scope` と `--all` を同時に指定する input、または invalid scope 名は受理しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5355163152d493aacf07d8958f8c9bd45fb4bb112f991e29367f6c0fd99ecf9e",
+      "evidence_hash": "3b3dd76911bde35b84bff50a13a491737d0aeb1e535177f590b6d3b5bde3925a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`--scope` と `--all` の同時指定、および invalid scope 名は受理しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "ReviewScopeSelectionValidationError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-15",
+          "text_label": "`bin/sotp review results` の scope selection boundary は `Named(validated ScopeName)` または `All` の排他的な表現とする。`All` は明示的な `--all` または selector omission で選ばれ、`scope_config.all_scope_names()` が返す configured scope universe 全体を列挙する。`Named` は validated `--scope <name>` で選ばれ、その scope だけを表示する。`--scope` と `--all` の同時指定、および invalid scope 名は受理しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5355163152d493aacf07d8958f8c9bd45fb4bb112f991e29367f6c0fd99ecf9e",
+      "evidence_hash": "c87d0438c984e9cb4da639fc81b4d6d55b7f5db795a4ec037844e860f6ffb2e9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`--scope` と `--all` を同時に指定する input、または invalid scope 名は受理しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "ReviewScopeSelectionValidationError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-18",
+          "text_label": "`bin/sotp review results --scope <scope>` は validated `ScopeName` の `Named` selection としてその scope だけを表示し、`--all` または selector omission は `All` selection として `scope_config.all_scope_names()` が返す configured scope universe 全体を表示する。`--scope` と `--all` を同時に指定する input、または invalid scope 名は受理しない。"
         }
       }
     },
@@ -5235,11 +5283,11 @@
       }
     },
     {
-      "claim_hash": "7477c927c9c508eea40f2737be701b52e7bd73f9ccd690d69313fab4a7354017",
-      "evidence_hash": "8fa587f6b3cb186fc083494e54ed3db92fa82015011b1fec6c54d72cfb0b3e46",
+      "claim_hash": "96a7fa349b09a2b317342d701ae7c3418452eda4bc9cc700f55fede91947bb81",
+      "evidence_hash": "3b3dd76911bde35b84bff50a13a491737d0aeb1e535177f590b6d3b5bde3925a",
       "verdict": {
         "kind": "pass",
-        "citation": "pre-entry matrix で使う public check command は exit code で判定可能でなければならない。`bin/sotp review check-zero-findings --scope <scope> --round final` は指定 scope の current artifact に対応する final review verdict が `zero_findings` の場合だけ zero を返す。`bin/sotp ref-verify check-approved --chain <1|2>` は指定 Chain の current production reference pair が全て verified pass の場合だけ zero を返す。"
+        "citation": "`bin/sotp review results` の scope selection boundary は `Named(validated ScopeName)` または `All` の排他的な表現とする。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -5252,18 +5300,18 @@
       "evidence_origin": {
         "kind": "spec_element",
         "data": {
-          "section": "constraint",
-          "element_id": "CN-06",
-          "text_label": "pre-entry matrix で使う public check command は exit code で判定可能でなければならない。`bin/sotp review check-zero-findings --scope <scope> --round final` は指定 scope の current artifact に対応する final review verdict が `zero_findings` の場合だけ zero を返す。`bin/sotp ref-verify check-approved --chain <1|2>` は指定 Chain の current production reference pair が全て verified pass の場合だけ zero を返す。display-only result command を convergence 判定に使わず、未解決、stale、または対象外 chain の状態で false success を返さない。"
+          "section": "in_scope",
+          "element_id": "IN-15",
+          "text_label": "`bin/sotp review results` の scope selection boundary は `Named(validated ScopeName)` または `All` の排他的な表現とする。`All` は明示的な `--all` または selector omission で選ばれ、`scope_config.all_scope_names()` が返す configured scope universe 全体を列挙する。`Named` は validated `--scope <name>` で選ばれ、その scope だけを表示する。`--scope` と `--all` の同時指定、および invalid scope 名は受理しない。"
         }
       }
     },
     {
-      "claim_hash": "7477c927c9c508eea40f2737be701b52e7bd73f9ccd690d69313fab4a7354017",
-      "evidence_hash": "94934398148874b5290b24f7a6cf5b694fb5081a27244d13290a946a74a4abea",
+      "claim_hash": "96a7fa349b09a2b317342d701ae7c3418452eda4bc9cc700f55fede91947bb81",
+      "evidence_hash": "c87d0438c984e9cb4da639fc81b4d6d55b7f5db795a4ec037844e860f6ffb2e9",
       "verdict": {
         "kind": "pass",
-        "citation": "`bin/sotp review check-zero-findings --scope <scope> --round final` returns zero only for a current final `zero_findings` verdict for that scope, and non-zero for absent, stale, non-final, or findings-present review state."
+        "citation": "`bin/sotp review results --scope <scope>` は validated `ScopeName` の `Named` selection としてその scope だけを表示し、`--all` または selector omission は `All` selection として `scope_config.all_scope_names()` が返す configured scope universe 全体を表示する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -5277,8 +5325,8 @@
         "kind": "spec_element",
         "data": {
           "section": "acceptance_criteria",
-          "element_id": "AC-16",
-          "text_label": "`bin/sotp review check-zero-findings --scope <scope> --round final` returns zero only for a current final `zero_findings` verdict for that scope, and non-zero for absent, stale, non-final, or findings-present review state. `bin/sotp ref-verify check-approved --chain <1|2>` returns zero only when the selected Chain's current production reference pairs are all verified pass, and non-zero when any selected pair is absent, stale, pending, or failed. Both commands are usable as literal pre-entry argv without parsing display output."
+          "element_id": "AC-18",
+          "text_label": "`bin/sotp review results --scope <scope>` は validated `ScopeName` の `Named` selection としてその scope だけを表示し、`--all` または selector omission は `All` selection として `scope_config.all_scope_names()` が返す configured scope universe 全体を表示する。`--scope` と `--all` を同時に指定する input、または invalid scope 名は受理しない。"
         }
       }
     }

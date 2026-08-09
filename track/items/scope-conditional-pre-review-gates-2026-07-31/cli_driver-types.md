@@ -18,6 +18,7 @@
 | PhaseIdArg | dto | add | — | 🔵 | 🔵 |
 | RefVerifyCheckApprovedInput | dto | modify | — | 🔵 | 🔵 |
 | ReviewCheckZeroFindingsInput | dto | add | — | 🔵 | 🔵 |
+| ReviewResultsInput | dto | add | — | 🟡 | 🔵 |
 
 ## Primary Adapters
 

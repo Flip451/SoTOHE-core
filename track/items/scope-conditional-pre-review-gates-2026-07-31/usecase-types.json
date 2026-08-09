@@ -550,6 +550,27 @@
         }
       ],
       "type_name": "ReviewCheckZeroFindingsQuery"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "scope",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "all",
+              "ty": "bool"
+            }
+          ],
+          "returns": "Result<Self, ReviewScopeSelectionValidationError>"
+        }
+      ],
+      "type_name": "ReviewScopeSelection"
     }
   ],
   "layer": "usecase",
@@ -1575,6 +1596,18 @@
     {
       "for_type": "ReviewCheckZeroFindingsEvaluationError",
       "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "ReviewScopeSelectionValidationError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ReviewScopeSelectionValidationError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "ReviewScopeSelectionValidationError",
+      "trait_ref": "core::error::Error"
     }
   ],
   "traits": {
@@ -2126,7 +2159,7 @@
     },
     "ReviewService": {
       "action": "modify",
-      "docs": "Aggregate review application service retaining its pre-existing command-family methods independently of the focused check-zero-findings service (CN-06, AC-16).",
+      "docs": "Aggregate review application service (IN-15, AC-18).",
       "informal_grounds": [],
       "methods": [
         {
@@ -2354,11 +2387,11 @@
       },
       "spec_refs": [
         {
-          "anchor": "CN-06",
+          "anchor": "IN-15",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         },
         {
-          "anchor": "AC-16",
+          "anchor": "AC-18",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ],
@@ -4796,7 +4829,7 @@
     },
     "ReviewScopeSelection": {
       "action": "add",
-      "docs": "Application-boundary value selecting one validated review scope or all scopes; the enum makes mutually exclusive selections unrepresentable (CN-06, AC-16).",
+      "docs": "Review results scope-selection boundary value (IN-15, AC-18).",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -4825,11 +4858,51 @@
       },
       "spec_refs": [
         {
-          "anchor": "CN-06",
+          "anchor": "IN-15",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         },
         {
-          "anchor": "AC-16",
+          "anchor": "AC-18",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewScopeSelectionValidationError": {
+      "action": "add",
+      "docs": "Review scope-selection validation error (IN-15, AC-18).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ScopeAndAll",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "InvalidScope",
+            "payload": {
+              "fields": [
+                "DiagnosticText"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "review_v2::review_aux",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-15",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-18",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]

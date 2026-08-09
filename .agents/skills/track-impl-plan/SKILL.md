@@ -25,11 +25,9 @@ or failure-recovery procedures here.
 
 ### (3) Sub-workflow and capability invocation
 
-- The implementation plan authoring is delegated to the `impl-planner` capability via
-  `bin/sotp capability exec impl-planner --host codex --briefing-file <path>`; the dispatcher
-  resolves the provider from `.harness/config/agent-profiles.json`. Invoke
-  `.codex/agents/impl-planner.toml` in-host only when the dispatcher returns
-  `CAPABILITY_EXEC_OUTCOME: delegate-in-host`.
+- Write the configured briefing, then run `bin/sotp phase enter impl-plan`. Phase entry runs
+  its declared convergence checks and launches the configured writer only after they pass. Do
+  not launch the writer from this skill.
 - This skill is single-shot per the workflow SSoT: on a task-coverage gate ERROR, report the
   gate verdict and error details back to the caller (`$track-plan`), which owns re-invocation
   and the `max_retry` counter. Do not re-dispatch `impl-planner` from inside this skill.

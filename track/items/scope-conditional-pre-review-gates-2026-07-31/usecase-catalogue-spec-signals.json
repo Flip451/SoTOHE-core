@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "f27633871081f642a8dd9d58312f16baf44ab4df29f2bd03ec7163b0bcbaf3ff",
+  "catalogue_declaration_hash": "871d0f8d65cad4efd92ed2f644f09c39b3637df564d1ffbcdb77a5d34e86a30a",
   "signals": [
     {
       "type_name": "CapabilityExecInteractor",
@@ -265,7 +265,12 @@
     {
       "type_name": "ReviewScopeSelection",
       "signal": "blue",
-      "entry_hash": "8339c73b2c758968797776d2b157f2e7cc5a87a5a56380ad90a25e424a6c9d3f"
+      "entry_hash": "431f96e973bf466ec26ddfe0a55a2626963684bdff0073e91f01c1f7724bc1f9"
+    },
+    {
+      "type_name": "ReviewScopeSelectionValidationError",
+      "signal": "blue",
+      "entry_hash": "5355163152d493aacf07d8958f8c9bd45fb4bb112f991e29367f6c0fd99ecf9e"
     },
     {
       "type_name": "ReviewScopeSelector",
@@ -345,7 +350,7 @@
     {
       "type_name": "ReviewService",
       "signal": "blue",
-      "entry_hash": "7477c927c9c508eea40f2737be701b52e7bd73f9ccd690d69313fab4a7354017"
+      "entry_hash": "96a7fa349b09a2b317342d701ae7c3418452eda4bc9cc700f55fede91947bb81"
     }
   ]
 }

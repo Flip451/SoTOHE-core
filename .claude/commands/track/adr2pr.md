@@ -24,16 +24,17 @@ filename is recorded as that track's init baseline.
 - **Phase 0 input forwarding**: when Step 1 invokes
   `/track:init <feature> --primary-adr <file>`, pass both resolved, user-confirmed inputs
   explicitly. Do not re-select or derive either value in `init`.
-- **Phase writer capabilities** (`spec-designer` / `type-designer` / `impl-planner` /
-  `adr-editor` for back-and-forth escalation) — dispatch every invocation through
-  `bin/sotp capability exec <capability> --host claude --briefing-file <path>`. The dispatcher
-  resolves `capabilities.<name>.provider` internally from `.harness/config/agent-profiles.json`
-  and either completes the provider dispatch or returns
-  `CAPABILITY_EXEC_OUTCOME: delegate-in-host`. Only on that outcome invoke the Agent tool
-  (`subagent_type: "<capability>"`, `run_in_background: true`) with the briefing path and
-  discipline body as the task prompt. Never invoke a capability's Agent-tool subagent without
-  that delegation outcome; this adapter must not resolve or assume the provider itself. Pass
-  `--resume` only when continuing the same assignment (`.claude/rules/orchestration.md`).
+- **Phase writer entry** — after preparing its configured briefing, enter Phase 1–3 through
+  `bin/sotp phase enter spec-design`, `bin/sotp phase enter type-design`, or
+  `bin/sotp phase enter impl-plan`. Do not launch a phase writer from this adapter; phase
+  entry owns the configured writer launch. Back-and-forth `adr-editor` / `adr-diagnoser`
+  dispatch remains capability-specific: invoke
+  `bin/sotp capability exec adr-editor --host claude --briefing-file <path>` or
+  `bin/sotp capability exec adr-diagnoser --host claude --briefing-file <path>`. The
+  dispatcher resolves each provider from `.harness/config/agent-profiles.json`; only on
+  `CAPABILITY_EXEC_OUTCOME: delegate-in-host` invoke the matching Claude Agent tool with the
+  briefing path and discipline body. Pass `--resume` only when continuing the same assignment
+  (`.claude/rules/orchestration.md`).
 - **Interaction boundaries**: honor the workflow SSoT's user-interaction and terminal-state
   rules; this adapter does not restate them.
 - **Phase 0 governing convention**: apply

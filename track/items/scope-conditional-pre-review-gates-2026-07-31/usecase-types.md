@@ -54,6 +54,7 @@
 | ProgramRunnerError | error_type | add | SpawnFailed, WaitFailed, TerminateFailed | 🔵 | 🔵 |
 | ReviewCheckZeroFindingsEvaluationError | error_type | add | EvaluationFailed | 🔵 | 🔵 |
 | ReviewCheckZeroFindingsValidationError | error_type | add | InvalidTrackId, InvalidScope | 🔵 | 🔵 |
+| ReviewScopeSelectionValidationError | error_type | add | ScopeAndAll, InvalidScope | 🟡 | 🔵 |
 
 ## Secondary Ports
 

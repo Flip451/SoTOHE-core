@@ -203,8 +203,10 @@
     ],
     "T043": [
       {"layer": "usecase", "entry_key": "ReviewScopeSelection"},
+      {"layer": "usecase", "entry_key": "ReviewScopeSelectionValidationError"},
       {"layer": "usecase", "entry_key": "ReviewService"},
-      {"layer": "cli_driver", "entry_key": "ReviewInput"}
+      {"layer": "cli_driver", "entry_key": "ReviewInput"},
+      {"layer": "cli_driver", "entry_key": "ReviewResultsInput"}
     ],
     "T039": [
       {"layer": "usecase", "entry_key": "RefVerifyChainFilter"},

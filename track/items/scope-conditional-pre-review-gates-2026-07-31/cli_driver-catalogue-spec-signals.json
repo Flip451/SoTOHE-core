@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "b05cc4b1e7fff4b8d11e7fe4a3254bf9a8ea7b8412e74c2e9e5f7b344414fe68",
+  "catalogue_declaration_hash": "6fa42747316f61e889da9feaea6dbdffbfaa45e0ed3faff07763d0a8ab9e32b4",
   "signals": [
     {
       "type_name": "CapabilityDriver",
@@ -65,7 +65,12 @@
     {
       "type_name": "ReviewInput",
       "signal": "blue",
-      "entry_hash": "ab9b00ef96b6a5e51142c1826319dffb67347f6e8420cd77a97277bc91e3f444"
+      "entry_hash": "221230ff9c46a0a2879ade5bc3472caefa55ec3e8bd9d8f906225b8130d8043c"
+    },
+    {
+      "type_name": "ReviewResultsInput",
+      "signal": "blue",
+      "entry_hash": "8dc1b906b590e164c40f53d8d0823fd8c573164731f3d676537b0edfcc95c4a5"
     }
   ]
 }

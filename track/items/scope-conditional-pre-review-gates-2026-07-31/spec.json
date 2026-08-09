@@ -247,6 +247,24 @@
             "anchor": "D6"
           }
         ]
+      },
+      {
+        "id": "IN-15",
+        "text": "`bin/sotp review results` の scope selection boundary は `Named(validated ScopeName)` または `All` の排他的な表現とする。`All` は明示的な `--all` または selector omission で選ばれ、`scope_config.all_scope_names()` が返す configured scope universe 全体を列挙する。`Named` は validated `--scope <name>` で選ばれ、その scope だけを表示する。`--scope` と `--all` の同時指定、および invalid scope 名は受理しない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+            "anchor": "D2"
+          },
+          {
+            "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+            "anchor": "D4"
+          },
+          {
+            "file": "knowledge/adr/2026-08-10-0814-review-results-scope-selection.md",
+            "anchor": "D1"
+          }
+        ]
       }
     ],
     "out_of_scope": [
@@ -620,6 +638,24 @@
           "anchor": "D6"
         }
       ]
+    },
+    {
+      "id": "AC-18",
+      "text": "`bin/sotp review results --scope <scope>` は validated `ScopeName` の `Named` selection としてその scope だけを表示し、`--all` または selector omission は `All` selection として `scope_config.all_scope_names()` が返す configured scope universe 全体を表示する。`--scope` と `--all` を同時に指定する input、または invalid scope 名は受理しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+          "anchor": "D4"
+        },
+        {
+          "file": "knowledge/adr/2026-08-10-0814-review-results-scope-selection.md",
+          "anchor": "D1"
+        }
+      ]
     }
   ],
   "related_conventions": [
@@ -633,7 +669,7 @@
     }
   ],
   "signals": {
-    "blue": 48,
+    "blue": 50,
     "yellow": 0,
     "red": 0
   }

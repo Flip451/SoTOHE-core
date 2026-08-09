@@ -123,6 +123,55 @@
         }
       ],
       "type_name": "ReviewCheckZeroFindingsInput"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "scope",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "all",
+              "ty": "bool"
+            },
+            {
+              "name": "limit",
+              "ty": "u32"
+            },
+            {
+              "name": "round_type",
+              "ty": "String"
+            },
+            {
+              "name": "no_hint",
+              "ty": "bool"
+            }
+          ],
+          "returns": "Result<Self, usecase::review_v2::review_aux::ReviewScopeSelectionValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "into_parts",
+          "params": [],
+          "receiver": "self",
+          "returns": "(Option<String>, std::path::PathBuf, usecase::review_v2::review_aux::ReviewScopeSelection, u32, String, bool)"
+        }
+      ],
+      "type_name": "ReviewResultsInput"
     }
   ],
   "layer": "cli_driver",
@@ -263,6 +312,14 @@
       "action": "add",
       "for_type": "ReviewCheckZeroFindingsInput",
       "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ReviewResultsInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ReviewResultsInput",
+      "trait_ref": "core::clone::Clone"
     }
   ],
   "traits": {},
@@ -276,7 +333,7 @@
         "shape": {
           "fields": [],
           "has_stripped_fields": true,
-        "kind": "plain"
+          "kind": "plain"
         }
       },
       "methods": [
@@ -745,7 +802,7 @@
         "shape": {
           "fields": [],
           "has_stripped_fields": true,
-        "kind": "tuple"
+          "kind": "tuple"
         }
       },
       "methods": [],
@@ -828,7 +885,7 @@
     },
     "ReviewInput": {
       "action": "modify",
-      "docs": "Review command-family driver input using typed check-zero-findings and mutually exclusive results-scope selection boundaries (CN-06, AC-16).",
+      "docs": "Review command-family driver input (CN-06, AC-16, IN-15, AC-18).",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -904,12 +961,7 @@
             "name": "Results",
             "payload": {
               "fields": [
-                "Option<String>",
-                "std::path::PathBuf",
-                "usecase::review_v2::review_aux::ReviewScopeSelection",
-                "u32",
-                "String",
-                "bool"
+                "ReviewResultsInput"
               ],
               "kind": "tuple"
             }
@@ -982,6 +1034,42 @@
         },
         {
           "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-15",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-18",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewResultsInput": {
+      "action": "add",
+      "docs": "Review results driver input DTO (IN-15, AC-18).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "review",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-15",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-18",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]

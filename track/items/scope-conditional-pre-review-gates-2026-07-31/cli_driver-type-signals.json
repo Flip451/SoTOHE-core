@@ -1,7 +1,7 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-09T19:26:08Z",
-  "declaration_hash": "b05cc4b1e7fff4b8d11e7fe4a3254bf9a8ea7b8412e74c2e9e5f7b344414fe68",
+  "generated_at": "2026-08-09T21:47:31Z",
+  "declaration_hash": "6fa42747316f61e889da9feaea6dbdffbfaa45e0ed3faff07763d0a8ab9e32b4",
   "implementation_input_hash": "59ea3142ddb2b3a486ec7269a360a4b785b704801c5fa164721e879c56ee68f8",
   "signals": [
     {
@@ -83,6 +83,16 @@
       "kind_tag": "enum",
       "signal": "yellow",
       "found_type": true
+    },
+    {
+      "type_name": "ReviewResultsInput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug"
+      ]
     },
     {
       "type_name": "CapabilityDriver",

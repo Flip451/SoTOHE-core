@@ -771,11 +771,11 @@
       }
     },
     {
-      "claim_hash": "ab9b00ef96b6a5e51142c1826319dffb67347f6e8420cd77a97277bc91e3f444",
+      "claim_hash": "221230ff9c46a0a2879ade5bc3472caefa55ec3e8bd9d8f906225b8130d8043c",
       "evidence_hash": "8fa587f6b3cb186fc083494e54ed3db92fa82015011b1fec6c54d72cfb0b3e46",
       "verdict": {
         "kind": "pass",
-        "citation": "`bin/sotp review check-zero-findings --scope <scope> --round final` は指定 scope の current artifact に対応する final review verdict が `zero_findings` の場合だけ zero を返す。`bin/sotp ref-verify check-approved --chain <1|2>` は指定 Chain の current production reference pair が全て verified pass の場合だけ zero を返す。"
+        "citation": "pre-entry matrix で使う public check command は exit code で判定可能でなければならない。`bin/sotp review check-zero-findings --scope <scope> --round final` は指定 scope の current artifact に対応する final review verdict が `zero_findings` の場合だけ zero を返す。`bin/sotp ref-verify check-approved --chain <1|2>` は指定 Chain の current production reference pair が全て verified pass の場合だけ zero を返す。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -795,7 +795,7 @@
       }
     },
     {
-      "claim_hash": "ab9b00ef96b6a5e51142c1826319dffb67347f6e8420cd77a97277bc91e3f444",
+      "claim_hash": "221230ff9c46a0a2879ade5bc3472caefa55ec3e8bd9d8f906225b8130d8043c",
       "evidence_hash": "94934398148874b5290b24f7a6cf5b694fb5081a27244d13290a946a74a4abea",
       "verdict": {
         "kind": "pass",
@@ -815,6 +815,102 @@
           "section": "acceptance_criteria",
           "element_id": "AC-16",
           "text_label": "`bin/sotp review check-zero-findings --scope <scope> --round final` returns zero only for a current final `zero_findings` verdict for that scope, and non-zero for absent, stale, non-final, or findings-present review state. `bin/sotp ref-verify check-approved --chain <1|2>` returns zero only when the selected Chain's current production reference pairs are all verified pass, and non-zero when any selected pair is absent, stale, pending, or failed. Both commands are usable as literal pre-entry argv without parsing display output."
+        }
+      }
+    },
+    {
+      "claim_hash": "221230ff9c46a0a2879ade5bc3472caefa55ec3e8bd9d8f906225b8130d8043c",
+      "evidence_hash": "3b3dd76911bde35b84bff50a13a491737d0aeb1e535177f590b6d3b5bde3925a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp review results` の scope selection boundary は `Named(validated ScopeName)` または `All` の排他的な表現とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "ReviewInput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-15",
+          "text_label": "`bin/sotp review results` の scope selection boundary は `Named(validated ScopeName)` または `All` の排他的な表現とする。`All` は明示的な `--all` または selector omission で選ばれ、`scope_config.all_scope_names()` が返す configured scope universe 全体を列挙する。`Named` は validated `--scope <name>` で選ばれ、その scope だけを表示する。`--scope` と `--all` の同時指定、および invalid scope 名は受理しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "221230ff9c46a0a2879ade5bc3472caefa55ec3e8bd9d8f906225b8130d8043c",
+      "evidence_hash": "c87d0438c984e9cb4da639fc81b4d6d55b7f5db795a4ec037844e860f6ffb2e9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp review results --scope <scope>` は validated `ScopeName` の `Named` selection としてその scope だけを表示し、`--all` または selector omission は `All` selection として `scope_config.all_scope_names()` が返す configured scope universe 全体を表示する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "ReviewInput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-18",
+          "text_label": "`bin/sotp review results --scope <scope>` は validated `ScopeName` の `Named` selection としてその scope だけを表示し、`--all` または selector omission は `All` selection として `scope_config.all_scope_names()` が返す configured scope universe 全体を表示する。`--scope` と `--all` を同時に指定する input、または invalid scope 名は受理しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8dc1b906b590e164c40f53d8d0823fd8c573164731f3d676537b0edfcc95c4a5",
+      "evidence_hash": "3b3dd76911bde35b84bff50a13a491737d0aeb1e535177f590b6d3b5bde3925a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp review results` の scope selection boundary は `Named(validated ScopeName)` または `All` の排他的な表現とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "ReviewResultsInput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-15",
+          "text_label": "`bin/sotp review results` の scope selection boundary は `Named(validated ScopeName)` または `All` の排他的な表現とする。`All` は明示的な `--all` または selector omission で選ばれ、`scope_config.all_scope_names()` が返す configured scope universe 全体を列挙する。`Named` は validated `--scope <name>` で選ばれ、その scope だけを表示する。`--scope` と `--all` の同時指定、および invalid scope 名は受理しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8dc1b906b590e164c40f53d8d0823fd8c573164731f3d676537b0edfcc95c4a5",
+      "evidence_hash": "c87d0438c984e9cb4da639fc81b4d6d55b7f5db795a4ec037844e860f6ffb2e9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp review results --scope <scope>` は validated `ScopeName` の `Named` selection としてその scope だけを表示し、`--all` または selector omission は `All` selection として `scope_config.all_scope_names()` が返す configured scope universe 全体を表示する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "ReviewResultsInput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-18",
+          "text_label": "`bin/sotp review results --scope <scope>` は validated `ScopeName` の `Named` selection としてその scope だけを表示し、`--all` または selector omission は `All` selection として `scope_config.all_scope_names()` が返す configured scope universe 全体を表示する。`--scope` と `--all` を同時に指定する input、または invalid scope 名は受理しない。"
         }
       }
     }

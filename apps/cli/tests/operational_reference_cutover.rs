@@ -153,6 +153,7 @@ fn expected_dispatch_markers(path: &str) -> &[&str] {
     match path {
         ".claude/settings.json" => &["bin/sotp capability exec", "Bash(bin/sotp capability:*)"],
         ".codex/rules/default.rules" => &["[\"bin/sotp\", \"capability\", \"exec\"]"],
+        ".claude/commands/track/impl-plan.md" => &["bin/sotp phase enter impl-plan"],
         _ => &["capability exec"],
     }
 }

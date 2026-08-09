@@ -35,12 +35,14 @@ or failure-recovery procedures here.
 ### (3) Sub-workflow and capability invocation
 
 - Sub-workflows are invoked by their Codex skill name (e.g. `$track-init`, `$track-review`, etc.).
-- Capabilities (spec-designer, type-designer, impl-planner, adr-editor) are dispatched through
-  `bin/sotp capability exec <capability> --host codex --briefing-file <path>`; the dispatcher
-  resolves `capabilities.<name>.provider` from `.harness/config/agent-profiles.json`. Only when
-  it returns `CAPABILITY_EXEC_OUTCOME: delegate-in-host` invoke the matching
-  `.codex/agents/<name>.toml` agent in-host. Never invoke a `.toml` agent without that
-  delegation outcome; this skill must not resolve or assume the provider itself.
+- Phase writers enter only through `bin/sotp phase enter spec-design`,
+  `bin/sotp phase enter type-design`, or `bin/sotp phase enter impl-plan` after their configured
+  briefings are prepared. Do not launch phase writers from this skill; phase entry owns the
+  configured writer launch. For back-and-forth escalation, invoke
+  `bin/sotp capability exec adr-editor --host codex --briefing-file <path>` or
+  `bin/sotp capability exec adr-diagnoser --host codex --briefing-file <path>`. Invoke the
+  matching `.codex/agents/<capability>.toml` in-host only on
+  `CAPABILITY_EXEC_OUTCOME: delegate-in-host`.
   `review-fix-lead` keeps its typed-pipeline route (`cargo make track-local-review-fix`), which
   resolves the provider internally.
 

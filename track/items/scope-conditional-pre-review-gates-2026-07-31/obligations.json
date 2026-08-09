@@ -601,15 +601,15 @@
         "role": "ApplicationService"
       },
       "brief": "Author a result test covering 'trait_method:run_codex' of ReviewService",
-      "declaration_hash": "9032827300e74d316cff68a4088f24b0ce2f00c9466451c255957450ac67d9b3",
+      "declaration_hash": "93818802f0ec58fbefbb0920725c1ef0ae20c7e998447324c87c8318d8f60d47",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "CN-06"
+          "element_id": "IN-15"
         },
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-16"
+          "element_id": "AC-18"
         }
       ]
     },
@@ -629,15 +629,15 @@
         "role": "ApplicationService"
       },
       "brief": "Author a result test covering 'trait_method:run_claude' of ReviewService",
-      "declaration_hash": "9032827300e74d316cff68a4088f24b0ce2f00c9466451c255957450ac67d9b3",
+      "declaration_hash": "93818802f0ec58fbefbb0920725c1ef0ae20c7e998447324c87c8318d8f60d47",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "CN-06"
+          "element_id": "IN-15"
         },
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-16"
+          "element_id": "AC-18"
         }
       ]
     },
@@ -657,15 +657,15 @@
         "role": "ApplicationService"
       },
       "brief": "Author a result test covering 'trait_method:run_local' of ReviewService",
-      "declaration_hash": "9032827300e74d316cff68a4088f24b0ce2f00c9466451c255957450ac67d9b3",
+      "declaration_hash": "93818802f0ec58fbefbb0920725c1ef0ae20c7e998447324c87c8318d8f60d47",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "CN-06"
+          "element_id": "IN-15"
         },
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-16"
+          "element_id": "AC-18"
         }
       ]
     },
@@ -685,15 +685,15 @@
         "role": "ApplicationService"
       },
       "brief": "Author a result test covering 'trait_method:check_approved' of ReviewService",
-      "declaration_hash": "9032827300e74d316cff68a4088f24b0ce2f00c9466451c255957450ac67d9b3",
+      "declaration_hash": "93818802f0ec58fbefbb0920725c1ef0ae20c7e998447324c87c8318d8f60d47",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "CN-06"
+          "element_id": "IN-15"
         },
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-16"
+          "element_id": "AC-18"
         }
       ]
     },
@@ -713,15 +713,15 @@
         "role": "ApplicationService"
       },
       "brief": "Author a result test covering 'trait_method:results' of ReviewService",
-      "declaration_hash": "9032827300e74d316cff68a4088f24b0ce2f00c9466451c255957450ac67d9b3",
+      "declaration_hash": "93818802f0ec58fbefbb0920725c1ef0ae20c7e998447324c87c8318d8f60d47",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "CN-06"
+          "element_id": "IN-15"
         },
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-16"
+          "element_id": "AC-18"
         }
       ]
     },
@@ -741,15 +741,15 @@
         "role": "ApplicationService"
       },
       "brief": "Author a result test covering 'trait_method:classify' of ReviewService",
-      "declaration_hash": "9032827300e74d316cff68a4088f24b0ce2f00c9466451c255957450ac67d9b3",
+      "declaration_hash": "93818802f0ec58fbefbb0920725c1ef0ae20c7e998447324c87c8318d8f60d47",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "CN-06"
+          "element_id": "IN-15"
         },
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-16"
+          "element_id": "AC-18"
         }
       ]
     },
@@ -769,15 +769,15 @@
         "role": "ApplicationService"
       },
       "brief": "Author a result test covering 'trait_method:files' of ReviewService",
-      "declaration_hash": "9032827300e74d316cff68a4088f24b0ce2f00c9466451c255957450ac67d9b3",
+      "declaration_hash": "93818802f0ec58fbefbb0920725c1ef0ae20c7e998447324c87c8318d8f60d47",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "CN-06"
+          "element_id": "IN-15"
         },
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-16"
+          "element_id": "AC-18"
         }
       ]
     },
@@ -797,15 +797,15 @@
         "role": "ApplicationService"
       },
       "brief": "Author a result test covering 'trait_method:validate_scope' of ReviewService",
-      "declaration_hash": "9032827300e74d316cff68a4088f24b0ce2f00c9466451c255957450ac67d9b3",
+      "declaration_hash": "93818802f0ec58fbefbb0920725c1ef0ae20c7e998447324c87c8318d8f60d47",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "CN-06"
+          "element_id": "IN-15"
         },
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-16"
+          "element_id": "AC-18"
         }
       ]
     },
@@ -825,15 +825,15 @@
         "role": "ApplicationService"
       },
       "brief": "Author a result test covering 'trait_method:get_briefing' of ReviewService",
-      "declaration_hash": "9032827300e74d316cff68a4088f24b0ce2f00c9466451c255957450ac67d9b3",
+      "declaration_hash": "93818802f0ec58fbefbb0920725c1ef0ae20c7e998447324c87c8318d8f60d47",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "CN-06"
+          "element_id": "IN-15"
         },
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-16"
+          "element_id": "AC-18"
         }
       ]
     },
@@ -853,15 +853,15 @@
         "role": "ApplicationService"
       },
       "brief": "Author a result test covering 'trait_method:persist_commit_hash' of ReviewService",
-      "declaration_hash": "9032827300e74d316cff68a4088f24b0ce2f00c9466451c255957450ac67d9b3",
+      "declaration_hash": "93818802f0ec58fbefbb0920725c1ef0ae20c7e998447324c87c8318d8f60d47",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "CN-06"
+          "element_id": "IN-15"
         },
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-16"
+          "element_id": "AC-18"
         }
       ]
     },
