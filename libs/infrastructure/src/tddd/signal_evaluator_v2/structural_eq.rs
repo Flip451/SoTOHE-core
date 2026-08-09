@@ -170,19 +170,25 @@ fn type_alias_generics_lexically_equal(
     a: &rustdoc_types::Generics,
     b: &rustdoc_types::Generics,
 ) -> bool {
-    if a.params.len() != b.params.len()
-        || !a
-            .params
+    // The catalogue schema cannot declare lifetime parameters: an alias whose
+    // source declares them records the lifetimes lexically in the target
+    // (accepted target lifetime policy), so lifetime parameters are excluded
+    // from this comparison instead of surfacing as an arity mismatch for
+    // every implementation of the accepted contract.
+    let a_params = non_lifetime_params(a);
+    let b_params = non_lifetime_params(b);
+    if a_params.len() != b_params.len()
+        || !a_params
             .iter()
-            .zip(&b.params)
+            .zip(&b_params)
             .all(|(left, right)| type_alias_param_lexically_equal(left, right))
     {
         return false;
     }
 
     let parameter_names: BTreeSet<&str> =
-        a.params.iter().map(|param| param.name.as_str()).collect();
-    for (left, right) in a.params.iter().zip(&b.params) {
+        a_params.iter().map(|param| param.name.as_str()).collect();
+    for (left, right) in a_params.iter().zip(&b_params) {
         let (Ok(left_bounds), Ok(right_bounds)) = (
             type_alias_bounds_for_parameter(a, &left.name),
             type_alias_bounds_for_parameter(b, &right.name),
@@ -201,6 +207,16 @@ fn type_alias_generics_lexically_equal(
         ),
         (Ok(left), Ok(right)) if left == right
     )
+}
+
+/// The alias generic parameters that participate in the lexical comparison:
+/// every kind except lifetimes, which the catalogue schema cannot declare.
+fn non_lifetime_params(generics: &rustdoc_types::Generics) -> Vec<&rustdoc_types::GenericParamDef> {
+    generics
+        .params
+        .iter()
+        .filter(|param| !matches!(param.kind, rustdoc_types::GenericParamDefKind::Lifetime { .. }))
+        .collect()
 }
 
 fn type_alias_param_lexically_equal(
@@ -1038,6 +1054,55 @@ mod tests {
 
     /// A TypeAlias carrying the same ordered parameter names and bound notation on both
     /// sides must compare structurally equal.
+    #[test]
+    fn test_type_alias_lifetime_parameters_excluded_from_generics_comparison() {
+        // The catalogue schema cannot declare lifetime parameters: an alias
+        // whose source declares them records the lifetimes lexically in the
+        // target, so the rustdoc-side lifetime parameters must not count
+        // toward the generic comparison.
+        let make_lifetime_param = || GenericParamDef {
+            name: "'a".to_string(),
+            kind: GenericParamDefKind::Lifetime { outlives: vec![] },
+        };
+        let a_alias = make_type_alias_item(
+            Id(10),
+            Type::Primitive("String".to_string()),
+            vec![make_type_param("T", vec![])],
+        );
+        let b_alias = make_type_alias_item(
+            Id(20),
+            Type::Primitive("String".to_string()),
+            vec![make_lifetime_param(), make_type_param("T", vec![])],
+        );
+        assert!(
+            items_structurally_equal(
+                &a_alias,
+                &b_alias,
+                &HashMap::new(),
+                &HashMap::new(),
+                "my_crate",
+            ),
+            "rustdoc-side lifetime parameters must be excluded from the alias generics comparison"
+        );
+
+        // A genuine type-parameter arity difference stays a mismatch.
+        let c_alias = make_type_alias_item(
+            Id(30),
+            Type::Primitive("String".to_string()),
+            vec![make_lifetime_param(), make_type_param("T", vec![]), make_type_param("U", vec![])],
+        );
+        assert!(
+            !items_structurally_equal(
+                &a_alias,
+                &c_alias,
+                &HashMap::new(),
+                &HashMap::new(),
+                "my_crate",
+            ),
+            "a real type-parameter arity difference must stay a mismatch"
+        );
+    }
+
     #[test]
     fn test_type_alias_same_ordered_generic_name_and_bound_notation_compares_equal() {
         let params = vec![
