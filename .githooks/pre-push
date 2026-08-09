@@ -1,2 +1,6 @@
 #!/bin/sh
-exec "$(git rev-parse --show-toplevel)/bin/sotp" hook dispatch git-pre-push "$@"
+# Resolve bin/sotp from the main repository, not the current worktree:
+# ephemeral linked worktrees (e.g. the guarded base-merge cleanup worktree)
+# do not contain the gitignored binary, so --show-toplevel would fail there.
+sotp_common=$(git rev-parse --path-format=absolute --git-common-dir) || exit 1
+exec "${sotp_common%/.git}/bin/sotp" hook dispatch git-pre-push "$@"
