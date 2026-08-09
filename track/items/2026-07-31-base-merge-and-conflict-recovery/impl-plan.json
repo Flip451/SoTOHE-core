@@ -1,120 +1,11 @@
 {
-  "schema_version": 2,
-  "tasks": [
-    {
-      "id": "T001",
-      "description": "Add `BaseBranchName`, `BaseMergeDirection`, `BaseMergeDirectionError`, and `derive_base_merge_direction` in `libs/domain/src/branch_strategy.rs`, updating `TrackMetadata` in `libs/domain/src/track.rs`; add regression coverage. D1; IN-01.",
-      "status": "done",
-      "commit_hash": "daf758c60802d14be799f267826bec46a2cd8782"
-    },
-    {
-      "id": "T002",
-      "description": "Add `libs/usecase/src/base_merge.rs` with `BaseMergeContextPort`, `BaseMergeGitPort`, `BaseMergeCleanupPort`, `BaseMergeService`, `BaseMergeInteractor`, command, outcomes, and errors; export it from `libs/usecase/src/lib.rs` and add regression coverage. D1; IN-01; IN-02; OS-01; CN-01; CN-02; AC-01; AC-02; AC-03; AC-04.",
-      "status": "done",
-      "commit_hash": "a5259acf836d40408c7940ef73798a2f76ba721e",
-      "depends_on": [
-        "T001"
-      ]
-    },
-    {
-      "id": "T003",
-      "description": "Add `FsBaseMergeContextAdapter` and `FsBaseMergeGitAdapter` in `libs/infrastructure/src/base_merge.rs`; export the module from `libs/infrastructure/src/lib.rs` and add focused adapter regression coverage. D1; IN-01; IN-02; OS-01; CN-01; AC-01; AC-02; AC-03; AC-04.",
-      "status": "done",
-      "commit_hash": "80437ad2",
-      "depends_on": [
-        "T002",
-        "T010"
-      ]
-    },
-    {
-      "id": "T004",
-      "description": "Add `BaseMergeInput` and `TrackDriver` handling in `apps/cli-driver/src/track.rs`, the `TrackCommand` variant and `execute` dispatch in `apps/cli/src/commands/track/{mod.rs,dispatch.rs}`, and `TrackCompositionRoot::track_driver` wiring in `apps/cli-composition/src/track/composition_root.rs`; add command regression coverage. D1; IN-01; OS-01; CN-01; AC-01; AC-02; AC-03; AC-04.",
-      "status": "done",
-      "commit_hash": "18b2e9a8",
-      "depends_on": [
-        "T003"
-      ]
-    },
-    {
-      "id": "T005",
-      "description": "Add `.harness/workflows/track/recover.md`, `.claude/commands/track/recover.md`, and `.agents/skills/track-recover/SKILL.md` for the `recover` command surface; add workflow/adapter conformance coverage. D2; IN-03; OS-02; CN-02; AC-04; AC-05.",
-      "status": "done",
-      "commit_hash": "18b2e9a8",
-      "depends_on": [
-        "T003"
-      ]
-    },
-    {
-      "id": "T006",
-      "description": "Add `libs/usecase/src/git_stash.rs` with `GitStashPort`, `GitStashService`, `GitStashInteractor`, command, and error; add `FsGitStashAdapter` in `libs/infrastructure/src/git_cli/stash_adapter.rs`, wire `GitDriver` and `GitStashInput` in `apps/cli-driver/src/git.rs`, and add `GitCommand`, `GitStashAction`, and `execute` integration in `apps/cli/src/commands/git.rs` with composition wiring in `apps/cli-composition/src/git.rs`; add regression coverage. D3; IN-04; AC-06.",
-      "status": "done",
-      "commit_hash": "4e72b48a9371a977700f2dc8e74cae90f4828466"
-    },
-    {
-      "id": "T007",
-      "description": "At the domain boundary, modify `BaselineHash`, `TypeSignalsCacheKey`, `TypeSignalsDocument`, and `decide_type_signals_reuse` in `libs/domain/src/tddd/type_signals_doc.rs`; migrate every domain-local constructor and caller to supply and compare the three-hash cache key, with regression coverage. T008 owns the usecase port/service/interactor migrations and T009 owns the infrastructure adapter/codec migrations. D4; IN-05; OS-03; CN-03; CN-04; AC-07; AC-08; AC-09.",
-      "status": "done",
-      "commit_hash": "daf758c60802d14be799f267826bec46a2cd8782"
-    },
-    {
-      "id": "T008",
-      "description": "At the usecase boundary, modify `TypeSignalsError` in `libs/usecase/src/type_signals/service.rs`, `TypeSignalsExecutionError` and `TypeSignalsExecutorPort` in `ports.rs`, and `TypeSignalsInteractor` in `interactor.rs`; migrate every usecase constructor and caller, with regression coverage in `interactor/tests.rs`. T007 owns domain constructors and T009 owns adapter/codec callers. D4; IN-05; OS-03; CN-03; CN-04; AC-07; AC-08; AC-09.",
-      "status": "done",
-      "commit_hash": "daf758c60802d14be799f267826bec46a2cd8782",
-      "depends_on": [
-        "T007"
-      ]
-    },
-    {
-      "id": "T009",
-      "description": "At the infrastructure boundary, modify `EvaluateSignalsError` and preserve the public `execute_type_signals_for_layer` evaluator entrypoint in `type_signals_evaluator.rs`, and modify `TypeSignalsExecutorAdapter` in `libs/infrastructure/src/tddd/type_signals_executor_adapter.rs` and `baseline_hash`, `decode`, and `encode` in `type_signals_codec.rs`; migrate every adapter and codec constructor/caller, with evaluator/adapter/codec regression coverage. T007 owns domain constructors and T008 owns usecase port/interactor callers. D4; IN-05; OS-03; CN-03; CN-04; AC-07; AC-08; AC-09.",
-      "status": "done",
-      "commit_hash": "daf758c60802d14be799f267826bec46a2cd8782",
-      "depends_on": [
-        "T008"
-      ]
-    },
-    {
-      "id": "T010",
-      "description": "Update `BaseMergeAttemptOutcome`, `BaseMergeError`, `BaseMergeCleanupRequest`, `PostMergeCleanupError`, `ViewsRegenerationError`, `BaselineReplacementError`, `SyncBaseRecordError`, the base-merge cleanup and git ports, `SyncBaseRecordSchemaVersion` and `SyncBaseRecord` DTO/schema entries, and the sync-base record adapter with their regression coverage. D1; IN-02; IN-06; CN-05; CN-06; CN-07; AC-03; AC-10; AC-11; AC-12.",
-      "status": "done",
-      "commit_hash": "80437ad2",
-      "depends_on": [
-        "T002"
-      ]
-    },
-    {
-      "id": "T011",
-      "description": "Add `FsBaseMergeCleanupAdapter` in `libs/infrastructure/src/base_merge.rs` and focused cleanup adapter regression coverage. D1; IN-02; IN-06; CN-02; CN-05; CN-06; CN-07; AC-03; AC-04; AC-10; AC-11; AC-12.",
-      "status": "done",
-      "commit_hash": "80437ad2",
-      "depends_on": [
-        "T003"
-      ]
-    },
-    {
-      "id": "T012",
-      "description": "Update `infrastructure::verify::spec_states::check_impl_catalog_from_signals_file` in `libs/infrastructure/src/verify/spec_states.rs` to accept explicit baseline-path and catalogue-hash inputs; update `TrackBlobReader` in `libs/usecase/src/merge_gate.rs` and `GitShowTrackBlobReader` in `libs/infrastructure/src/verify/merge_gate_adapter.rs` to read implementation-input hashes with catalogue declarations; update `SystemSignalCommandAdapter::run_catalogue_check` in `libs/infrastructure/src/signal.rs`, migrate callers, and add regression coverage. D4; IN-05; OS-03; CN-03; CN-04; AC-07; AC-09.",
-      "status": "in_progress",
-      "commit_hash": null,
-      "depends_on": [
-        "T008",
-        "T009"
-      ]
-    }
-  ],
   "plan": {
-    "summary": [
-      "GO-01 → T001–T004, T010, and T011.",
-      "GO-02 → T005–T009 and T012."
-    ],
     "sections": [
       {
-        "id": "S1",
-        "title": "Guarded base merge",
         "description": [
           "Modify `libs/domain/src/branch_strategy.rs`, `libs/usecase/src/base_merge.rs`, `libs/infrastructure/src/base_merge.rs`, and the named track CLI surfaces through T001–T004, T010, and T011. D1; IN-01; IN-02; IN-06; CN-05; CN-06; CN-07; AC-01; AC-02; AC-03; AC-04; AC-10; AC-11; AC-12."
         ],
+        "id": "S1",
         "task_ids": [
           "T001",
           "T002",
@@ -122,32 +13,141 @@
           "T003",
           "T011",
           "T004"
-        ]
+        ],
+        "title": "Guarded base merge"
       },
       {
-        "id": "S2",
-        "title": "Conflict recovery and guarded stash",
         "description": [
           "Add `.harness/workflows/track/recover.md`, its named Claude/Codex adapters, `libs/usecase/src/git_stash.rs`, and the named stash adapters in T006. D2; D3; IN-03; IN-04; AC-05; AC-06."
         ],
+        "id": "S2",
         "task_ids": [
           "T005",
           "T006"
-        ]
+        ],
+        "title": "Conflict recovery and guarded stash"
       },
       {
-        "id": "S3",
-        "title": "Baseline-hash-aware type signals",
         "description": [
           "Modify `libs/domain/src/tddd/type_signals_doc.rs`, `libs/usecase/src/type_signals/{service.rs,ports.rs,interactor.rs}`, and `libs/infrastructure/src/tddd/{type_signals_executor_adapter.rs,type_signals_codec.rs}`; update `TrackBlobReader` in `libs/usecase/src/merge_gate.rs` and `check_impl_catalog_from_signals_file` in `libs/infrastructure/src/verify/spec_states.rs` through T012. D4; IN-05; AC-07; AC-08; AC-09."
         ],
+        "id": "S3",
         "task_ids": [
           "T007",
           "T008",
           "T009",
           "T012"
-        ]
+        ],
+        "title": "Baseline-hash-aware type signals"
       }
+    ],
+    "summary": [
+      "GO-01 → T001–T004, T010, and T011.",
+      "GO-02 → T005–T009 and T012."
     ]
-  }
+  },
+  "schema_version": 2,
+  "tasks": [
+    {
+      "commit_hash": "daf758c60802d14be799f267826bec46a2cd8782",
+      "description": "Add `BaseBranchName`, `BaseMergeDirection`, `BaseMergeDirectionError`, and `derive_base_merge_direction` in `libs/domain/src/branch_strategy.rs`, updating `TrackMetadata` in `libs/domain/src/track.rs`; add regression coverage. D1; IN-01.",
+      "id": "T001",
+      "status": "done"
+    },
+    {
+      "commit_hash": "a5259acf836d40408c7940ef73798a2f76ba721e",
+      "depends_on": [
+        "T001"
+      ],
+      "description": "Add `libs/usecase/src/base_merge.rs` with `BaseMergeContextPort`, `BaseMergeGitPort`, `BaseMergeCleanupPort`, `BaseMergeService`, `BaseMergeInteractor`, command, outcomes, and errors; export it from `libs/usecase/src/lib.rs` and add regression coverage. D1; IN-01; IN-02; OS-01; CN-01; CN-02; AC-01; AC-02; AC-03; AC-04.",
+      "id": "T002",
+      "status": "done"
+    },
+    {
+      "commit_hash": "80437ad2",
+      "depends_on": [
+        "T002",
+        "T010"
+      ],
+      "description": "Add `FsBaseMergeContextAdapter` and `FsBaseMergeGitAdapter` in `libs/infrastructure/src/base_merge.rs`; export the module from `libs/infrastructure/src/lib.rs` and add focused adapter regression coverage. D1; IN-01; IN-02; OS-01; CN-01; AC-01; AC-02; AC-03; AC-04.",
+      "id": "T003",
+      "status": "done"
+    },
+    {
+      "commit_hash": "18b2e9a8",
+      "depends_on": [
+        "T003"
+      ],
+      "description": "Add `BaseMergeInput` and `TrackDriver` handling in `apps/cli-driver/src/track.rs`, the `TrackCommand` variant and `execute` dispatch in `apps/cli/src/commands/track/{mod.rs,dispatch.rs}`, and `TrackCompositionRoot::track_driver` wiring in `apps/cli-composition/src/track/composition_root.rs`; add command regression coverage. D1; IN-01; OS-01; CN-01; AC-01; AC-02; AC-03; AC-04.",
+      "id": "T004",
+      "status": "done"
+    },
+    {
+      "commit_hash": "18b2e9a8",
+      "depends_on": [
+        "T003"
+      ],
+      "description": "Add `.harness/workflows/track/recover.md`, `.claude/commands/track/recover.md`, and `.agents/skills/track-recover/SKILL.md` for the `recover` command surface; add workflow/adapter conformance coverage. D2; IN-03; OS-02; CN-02; AC-04; AC-05.",
+      "id": "T005",
+      "status": "done"
+    },
+    {
+      "commit_hash": "4e72b48a9371a977700f2dc8e74cae90f4828466",
+      "description": "Add `libs/usecase/src/git_stash.rs` with `GitStashPort`, `GitStashService`, `GitStashInteractor`, command, and error; add `FsGitStashAdapter` in `libs/infrastructure/src/git_cli/stash_adapter.rs`, wire `GitDriver` and `GitStashInput` in `apps/cli-driver/src/git.rs`, and add `GitCommand`, `GitStashAction`, and `execute` integration in `apps/cli/src/commands/git.rs` with composition wiring in `apps/cli-composition/src/git.rs`; add regression coverage. D3; IN-04; AC-06.",
+      "id": "T006",
+      "status": "done"
+    },
+    {
+      "commit_hash": "daf758c60802d14be799f267826bec46a2cd8782",
+      "description": "At the domain boundary, modify `BaselineHash`, `TypeSignalsCacheKey`, `TypeSignalsDocument`, and `decide_type_signals_reuse` in `libs/domain/src/tddd/type_signals_doc.rs`; migrate every domain-local constructor and caller to supply and compare the three-hash cache key, with regression coverage. T008 owns the usecase port/service/interactor migrations and T009 owns the infrastructure adapter/codec migrations. D4; IN-05; OS-03; CN-03; CN-04; AC-07; AC-08; AC-09.",
+      "id": "T007",
+      "status": "done"
+    },
+    {
+      "commit_hash": "daf758c60802d14be799f267826bec46a2cd8782",
+      "depends_on": [
+        "T007"
+      ],
+      "description": "At the usecase boundary, modify `TypeSignalsError` in `libs/usecase/src/type_signals/service.rs`, `TypeSignalsExecutionError` and `TypeSignalsExecutorPort` in `ports.rs`, and `TypeSignalsInteractor` in `interactor.rs`; migrate every usecase constructor and caller, with regression coverage in `interactor/tests.rs`. T007 owns domain constructors and T009 owns adapter/codec callers. D4; IN-05; OS-03; CN-03; CN-04; AC-07; AC-08; AC-09.",
+      "id": "T008",
+      "status": "done"
+    },
+    {
+      "commit_hash": "daf758c60802d14be799f267826bec46a2cd8782",
+      "depends_on": [
+        "T008"
+      ],
+      "description": "At the infrastructure boundary, modify `EvaluateSignalsError` and preserve the public `execute_type_signals_for_layer` evaluator entrypoint in `type_signals_evaluator.rs`, and modify `TypeSignalsExecutorAdapter` in `libs/infrastructure/src/tddd/type_signals_executor_adapter.rs` and `baseline_hash`, `decode`, and `encode` in `type_signals_codec.rs`; migrate every adapter and codec constructor/caller, with evaluator/adapter/codec regression coverage. T007 owns domain constructors and T008 owns usecase port/interactor callers. D4; IN-05; OS-03; CN-03; CN-04; AC-07; AC-08; AC-09.",
+      "id": "T009",
+      "status": "done"
+    },
+    {
+      "commit_hash": "80437ad2",
+      "depends_on": [
+        "T002"
+      ],
+      "description": "Update `BaseMergeAttemptOutcome`, `BaseMergeError`, `BaseMergeCleanupRequest`, `PostMergeCleanupError`, `ViewsRegenerationError`, `BaselineReplacementError`, `SyncBaseRecordError`, the base-merge cleanup and git ports, `SyncBaseRecordSchemaVersion` and `SyncBaseRecord` DTO/schema entries, and the sync-base record adapter with their regression coverage. D1; IN-02; IN-06; CN-05; CN-06; CN-07; AC-03; AC-10; AC-11; AC-12.",
+      "id": "T010",
+      "status": "done"
+    },
+    {
+      "commit_hash": "80437ad2",
+      "depends_on": [
+        "T003"
+      ],
+      "description": "Add `FsBaseMergeCleanupAdapter` in `libs/infrastructure/src/base_merge.rs` and focused cleanup adapter regression coverage. D1; IN-02; IN-06; CN-02; CN-05; CN-06; CN-07; AC-03; AC-04; AC-10; AC-11; AC-12.",
+      "id": "T011",
+      "status": "done"
+    },
+    {
+      "commit_hash": "b307b114c7493685fa1514d6b4673cc98319dc6a",
+      "depends_on": [
+        "T008",
+        "T009"
+      ],
+      "description": "Update `infrastructure::verify::spec_states::check_impl_catalog_from_signals_file` in `libs/infrastructure/src/verify/spec_states.rs` to accept explicit baseline-path and catalogue-hash inputs; update `TrackBlobReader` in `libs/usecase/src/merge_gate.rs` and `GitShowTrackBlobReader` in `libs/infrastructure/src/verify/merge_gate_adapter.rs` to read implementation-input hashes with catalogue declarations; update `SystemSignalCommandAdapter::run_catalogue_check` in `libs/infrastructure/src/signal.rs`, migrate callers, and add regression coverage. D4; IN-05; OS-03; CN-03; CN-04; AC-07; AC-09.",
+      "id": "T012",
+      "status": "done"
+    }
+  ]
 }
