@@ -665,7 +665,11 @@ mod tests {
     }
 
     #[test]
-    fn test_type_method_with_keyword_enclosing_generic_is_rejected() {
+    fn test_type_method_with_keyword_enclosing_generic_decodes() {
+        // rustdoc normalizes `r#type` to `type`, so a pre-existing non-alias
+        // entry legitimately records a keyword generic name. The non-keyword
+        // restriction applies only in alias validation (spec OUT-01 keeps
+        // non-alias generic declarations out of scope).
         let json = r#"{
   "schema_version": 5,
   "crate_name": "domain",
@@ -679,21 +683,30 @@ mod tests {
       "methods": [
         {
           "name": "get",
-          "returns": "type",
-          "where_predicates": [{ "lhs": "type", "rhs": ["Clone"] }]
+          "returns": "u8"
         }
       ]
     }
   },
   "traits": {},
-  "functions": {}
+  "functions": {
+    "domain::keyword_fn": {
+      "action": "add",
+      "role": "FreeFunction",
+      "generics": [{ "name": "type", "bounds": [] }],
+      "params": [],
+      "returns": "u8"
+    }
+  }
 }"#;
-        let error = CatalogueDocumentCodec::decode(json, "domain").unwrap_err();
-        assert!(matches!(
-            error,
-            CatalogueDocumentCodecError::InvalidEntry { ref entry_name, ref reason }
-                if entry_name == "Container" && reason.contains("generic param name")
-        ));
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let entry = doc.types().values().next().unwrap();
+        assert_eq!(entry.generics()[0].name.as_str(), "type");
+        let function = doc.functions().values().next().unwrap();
+        assert_eq!(function.generics()[0].name.as_str(), "type");
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
+        assert_eq!(doc, doc2, "keyword generic name must round-trip for non-alias entries");
     }
 
     #[test]
@@ -1060,7 +1073,8 @@ mod tests {
         let err = CatalogueDocumentCodec::decode(json, "domain").unwrap_err();
         assert!(
             matches!(err, CatalogueDocumentCodecError::InvalidEntry { ref entry_name, ref reason }
-                if entry_name == "BadAlias" && reason.contains("path-context keyword")),
+                if entry_name == "BadAlias"
+                    && reason.contains("not a plain non-keyword Rust identifier")),
             "unexpected error: {err:?}"
         );
     }
@@ -1463,8 +1477,11 @@ mod tests {
     }
 
     #[test]
-    fn test_trait_nested_keyword_generic_context_is_rejected() {
-        // Keyword generic declarations are rejected at the lexical codec boundary.
+    fn test_trait_with_keyword_generic_in_context_decodes() {
+        // A keyword generic name (rustdoc-normalized `r#type`) in the declared
+        // context must not fail sibling bound / where / assoc validation for a
+        // non-alias entry: the context is not re-validated on the shared
+        // paths, only in alias validation (spec OUT-01).
         let json = r#"{
   "schema_version": 5,
   "crate_name": "domain",
@@ -1474,31 +1491,38 @@ mod tests {
     "KeywordTrait": {
       "action": "add",
       "role": { "SecondaryPort": {} },
-      "generics": [{ "name": "type", "bounds": [] }],
-      "supertrait_bounds": ["Parent<type>"],
+      "generics": [{ "name": "type", "bounds": [] }, { "name": "T", "bounds": ["Clone"] }],
+      "supertrait_bounds": ["Parent"],
       "methods": [
         {
           "name": "get",
-          "returns": "type",
-          "where_predicates": [{ "lhs": "type", "rhs": ["Clone"] }]
+          "returns": "u8",
+          "where_predicates": [{ "lhs": "T", "rhs": ["Send"] }]
         }
       ],
       "assoc_types": [
-        { "name": "Item", "bounds": ["Parent<type>"], "default": "type" }
+        { "name": "Item", "bounds": ["Clone"], "default": "u8" }
       ],
       "assoc_consts": [
-        { "name": "VALUE", "ty": "type" }
+        { "name": "VALUE", "ty": "u8" }
       ]
     }
   },
   "functions": {}
 }"#;
-        let error = CatalogueDocumentCodec::decode(json, "domain").unwrap_err();
-        assert!(matches!(
-            error,
-            CatalogueDocumentCodecError::InvalidEntry { ref entry_name, ref reason }
-                if entry_name == "KeywordTrait" && reason.contains("generic param name")
-        ));
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let entry = doc.traits().values().next().unwrap();
+        assert_eq!(entry.generics()[0].name.as_str(), "type");
+        assert_eq!(entry.generics()[1].bounds[0].as_str(), "Clone");
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
+        assert_eq!(doc, doc2, "keyword generic context must round-trip for non-alias entries");
+        // The acceptance must survive the full DTO-to-evaluator flow: the
+        // structural encoder processes bounds / returns with the same context.
+        use domain::tddd::CatalogueToExtendedCratePort;
+        crate::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec::new()
+            .encode(doc2)
+            .expect("keyword generic context must survive the extended-crate encoding");
     }
 
     #[test]
@@ -3339,7 +3363,39 @@ mod tests {
     }
 
     #[test]
-    fn test_inherent_method_with_keyword_enclosing_generic_is_rejected() {
+    fn test_trait_with_keyword_generic_and_maybe_const_bound_decodes() {
+        // The shared `~const` shape check must not re-validate the declared
+        // context's spelling: a keyword generic name (rustdoc-normalized
+        // `r#type`) plus a `~const` bound on a sibling parameter stays
+        // decodable for non-alias entries (spec OUT-01).
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {
+    "MaybeConstTrait": {
+      "action": "add",
+      "role": { "SecondaryPort": {} },
+      "generics": [{ "name": "type", "bounds": [] }, { "name": "T", "bounds": ["~const Clone"] }],
+      "methods": []
+    }
+  },
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let entry = doc.traits().values().next().unwrap();
+        assert_eq!(entry.generics()[1].bounds[0].as_str(), "~const Clone");
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
+        assert_eq!(doc, doc2, "keyword context with `~const` bound must round-trip");
+    }
+
+    #[test]
+    fn test_inherent_method_with_keyword_enclosing_generic_decodes() {
+        // Impl generics keep the parent's shape-only name validation for
+        // non-alias entries (spec OUT-01); only alias validation rejects
+        // keyword generic names.
         let json = r#"{
   "schema_version": 5,
   "crate_name": "domain",
@@ -3354,19 +3410,18 @@ mod tests {
       "methods": [
         {
           "name": "get",
-          "returns": "type",
-          "where_predicates": [{ "lhs": "type", "rhs": ["Clone"] }]
+          "returns": "u8"
         }
       ]
     }
   ]
 }"#;
-        let error = CatalogueDocumentCodec::decode(json, "domain").unwrap_err();
-        assert!(matches!(
-            error,
-            CatalogueDocumentCodecError::InvalidEntry { ref entry_name, ref reason }
-                if entry_name == "Container" && reason.contains("generic param name")
-        ));
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let impl_block = &doc.inherent_impls()[0];
+        assert_eq!(impl_block.impl_generics[0].name.as_str(), "type");
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
+        assert_eq!(doc, doc2, "keyword impl generic must round-trip for non-alias entries");
     }
 
     #[test]

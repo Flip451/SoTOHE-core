@@ -71,16 +71,10 @@ pub(super) fn validate_generic_params_for_encode(
         .collect::<Vec<_>>();
     let mut seen = outer_generic_names.iter().copied().collect::<HashSet<_>>();
     for generic in generics {
-        if !is_valid_generic_param_name(generic.name.as_str()) {
-            return Err(CatalogueDocumentCodecError::InvalidEntry {
-                entry_name: entry_name.to_owned(),
-                reason: format!(
-                    "generic param name '{}' is not a valid Rust identifier \
-                     (must match [a-zA-Z_][a-zA-Z0-9_]* and must not be '_' or a path-context keyword)",
-                    generic.name.as_str()
-                ),
-            });
-        }
+        // Shape validity is guaranteed by the domain `ParamName` type; the
+        // non-keyword restriction applies only in alias validation
+        // (`validate_type_alias_generics`), so keyword names decoded from
+        // pre-existing non-alias entries re-encode symmetrically.
         if !seen.insert(generic.name.as_str()) {
             return Err(CatalogueDocumentCodecError::InvalidEntry {
                 entry_name: entry_name.to_owned(),

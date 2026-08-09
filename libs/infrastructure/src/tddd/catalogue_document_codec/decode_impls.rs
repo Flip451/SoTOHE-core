@@ -23,10 +23,7 @@ use super::dto::{
     BoundOpDto, FunctionEntryDto, InherentImplDeclDto, MethodDeclarationDto, MethodGenericParamDto,
     ParamDto, WherePredicateDeclDto,
 };
-use super::validate::{
-    is_valid_generic_param_name, validate_bound_str_with_generics,
-    validate_type_ref_str_with_generics,
-};
+use super::validate::{validate_bound_str_with_generics, validate_type_ref_str_with_generics};
 
 pub(super) fn method_generics_from_dtos(
     entry_name: &str,
@@ -53,13 +50,11 @@ pub(super) fn method_generics_from_dtos_with_outer_generics(
     let generics: Vec<MethodGenericParam> = dtos
         .into_iter()
         .map(|g| {
-            if !is_valid_generic_param_name(&g.name) {
-                return Err(err(format!(
-                    "generic param name '{}' is not a valid Rust identifier \
-                     (must match [a-zA-Z_][a-zA-Z0-9_]* and must not be '_' or a path-context keyword)",
-                    g.name
-                )));
-            }
+            // Non-alias entries keep the parent's shape-only name validation
+            // (`ParamName`): rustdoc normalizes `r#type` to `type`, so a
+            // keyword name is a legitimate pre-existing representation here.
+            // The non-keyword restriction applies only in alias validation
+            // (`validate_type_alias_generic_names`), per spec OUT-01.
             let name = ParamName::new(&g.name).map_err(|_| {
                 if g.name.is_empty() {
                     err("generic param name must not be empty".to_owned())

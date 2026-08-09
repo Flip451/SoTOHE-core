@@ -106,10 +106,13 @@ where
     F: Fn(&str) -> Option<Id>,
     G: FnMut(String) -> u32,
 {
-    validate_generic_identifier_ambiguities(type_ref_str, generic_params)?;
     let syn_type: syn::Type = syn::parse_str(type_ref_str)
         .map_err(|e| format!("syn parse error for `{type_ref_str}`: {e}"))?;
     if preserve_prelude_spelling {
+        // Context-spelling validation is lexical-path-only: non-alias entries
+        // keep the parent's tolerance of keyword generic names (spec OUT-01),
+        // so the accepted representation survives the DTO-to-evaluator flow.
+        validate_generic_identifier_ambiguities(type_ref_str, generic_params)?;
         enforce_closed_type_grammar(type_ref_str, generic_params)?;
         reject_anonymous_const_blocks_in_type(&syn_type)?;
         reject_unsupported_array_lengths_in_type(&syn_type)?;
@@ -183,12 +186,14 @@ pub(crate) fn validate_lexical_alias_target(
 /// Validates the representable shape of a `~const` bound without imposing the
 /// lexical renderer's stricter nested-expression rules. This shared gate is
 /// used before alias-specific validation so non-alias bounds retain their
-/// historical acceptance of syn-parseable generic arguments.
+/// historical acceptance of syn-parseable generic arguments. The declared
+/// context's SPELLING is not validated here (non-alias entries keep keyword
+/// tolerance, spec OUT-01); the alias path pre-validates it in
+/// [`validate_lexical_generic_bound`].
 pub(crate) fn validate_maybe_const_bound(
     bound_str: &str,
     generic_params: &[&str],
 ) -> Result<(), String> {
-    validate_generic_identifier_ambiguities(bound_str, generic_params)?;
     let syntax_str = bound_str
         .strip_prefix("~const ")
         .ok_or_else(|| "missing `~const` bound modifier".to_owned())?
@@ -321,10 +326,12 @@ where
     F: Fn(&str) -> Option<Id>,
     G: FnMut(String) -> u32,
 {
-    validate_generic_identifier_ambiguities(bound_str, generic_params)?;
     let syn_bound: syn::TypeParamBound =
         syn::parse_str(bound_str).map_err(|e| format!("syn parse error for `{bound_str}`: {e}"))?;
     if preserve_prelude_spelling {
+        // Context-spelling validation is lexical-path-only: non-alias entries
+        // keep the parent's tolerance of keyword generic names (spec OUT-01).
+        validate_generic_identifier_ambiguities(bound_str, generic_params)?;
         enforce_closed_bound_grammar(bound_str, generic_params)?;
         reject_anonymous_const_blocks_in_bound(&syn_bound)?;
         reject_unsupported_array_lengths_in_bound(&syn_bound)?;

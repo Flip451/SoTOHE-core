@@ -43,9 +43,9 @@ pub(crate) use helpers::{core_canonical_path, std_canonical_path};
 pub(crate) use parse_fns::{
     parse_generic_bound_with_generics, parse_generic_bound_with_generics_preserving_spelling,
     parse_syn_type, parse_syn_type_param_bound, parse_type_ref, parse_type_ref_with_generics,
-    parse_type_ref_with_generics_preserving_spelling, validate_generic_identifier_ambiguities,
-    validate_legacy_type_ref, validate_lexical_alias_target, validate_lexical_generic_bound,
-    validate_lexical_type_ref, validate_maybe_const_bound,
+    parse_type_ref_with_generics_preserving_spelling, validate_legacy_type_ref,
+    validate_lexical_alias_target, validate_lexical_generic_bound, validate_lexical_type_ref,
+    validate_maybe_const_bound,
 };
 
 // ---------------------------------------------------------------------------

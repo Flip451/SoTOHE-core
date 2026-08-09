@@ -7,9 +7,8 @@
 use domain::tddd::catalogue_v2::{BoundOp, MethodGenericParam, WherePredicateDecl};
 
 use crate::tddd::type_ref_parser::{
-    is_plain_generic_param_name, validate_generic_identifier_ambiguities, validate_legacy_type_ref,
-    validate_lexical_alias_target, validate_lexical_generic_bound, validate_lexical_type_ref,
-    validate_maybe_const_bound,
+    is_plain_generic_param_name, validate_legacy_type_ref, validate_lexical_alias_target,
+    validate_lexical_generic_bound, validate_lexical_type_ref, validate_maybe_const_bound,
 };
 
 use super::CatalogueDocumentCodecError;
@@ -30,8 +29,9 @@ use super::CatalogueDocumentCodecError;
 ///
 /// Returns an error string with the `syn` parse error message if `bound_str` is
 /// not a valid Rust type param bound syntax.
-/// The generic context is checked lexically; no syntax-dependent rewriting is
-/// attempted before `syn` parses the supplied bound.
+/// The generic context is NOT re-validated here: shared (non-alias) callers
+/// keep the parent's tolerance of keyword parameter names (spec OUT-01), and
+/// the alias lexical gates run their own context validation.
 pub(super) fn validate_bound_str_with_generics(
     bound_str: &str,
     generic_params: &[&str],
@@ -39,7 +39,6 @@ pub(super) fn validate_bound_str_with_generics(
     if bound_str.starts_with("~const ") {
         return validate_maybe_const_bound(bound_str, generic_params);
     }
-    validate_generic_identifier_ambiguities(bound_str, generic_params)?;
     syn::parse_str::<syn::TypeParamBound>(bound_str)
         .map(|_| ())
         .map_err(|e| format!("invalid bound syntax '{}': {e}", bound_str))
@@ -58,6 +57,27 @@ pub(super) fn is_valid_generic_param_name(name: &str) -> bool {
 /// invokes this adapter-boundary validation after conversion so raw, keyword,
 /// and wildcard spellings produce the same `InvalidEntry` error shape as other
 /// malformed fields.
+/// Rejects keyword / raw generic parameter names for a type alias BEFORE the
+/// shared DTO conversion runs, so the alias-specific name error fires
+/// regardless of the entry's bound contents. The shared conversion itself
+/// stays keyword-tolerant for non-alias entries (spec OUT-01).
+pub(super) fn validate_type_alias_generic_name_strs<'names>(
+    entry_name: &str,
+    names: impl Iterator<Item = &'names str>,
+) -> Result<(), CatalogueDocumentCodecError> {
+    for name in names {
+        if !is_valid_generic_param_name(name) {
+            return Err(CatalogueDocumentCodecError::InvalidEntry {
+                entry_name: entry_name.to_owned(),
+                reason: format!(
+                    "generic param name '{name}' is not a plain non-keyword Rust identifier"
+                ),
+            });
+        }
+    }
+    Ok(())
+}
+
 pub(super) fn validate_type_alias_generic_names(
     entry_name: &str,
     generics: &[MethodGenericParam],
@@ -166,9 +186,8 @@ pub(super) fn validate_type_alias_target(
 /// normalization is performed at this boundary.
 pub(super) fn validate_type_ref_str_with_generics(
     type_str: &str,
-    generic_params: &[&str],
+    _generic_params: &[&str],
 ) -> Result<(), String> {
-    validate_generic_identifier_ambiguities(type_str, generic_params)?;
     syn::parse_str::<syn::Type>(type_str)
         .map(|_| ())
         .map_err(|e| format!("invalid type syntax '{}': {e}", type_str))

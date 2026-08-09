@@ -25,8 +25,9 @@ use super::dto::{
 };
 use super::dto_slots::{EntrySlotDto, TombstoneDto};
 use super::validate::{
-    validate_bound_str_with_generics, validate_type_alias_generic_names,
-    validate_type_alias_target, validate_type_alias_where_predicates,
+    validate_bound_str_with_generics, validate_type_alias_generic_name_strs,
+    validate_type_alias_generic_names, validate_type_alias_target,
+    validate_type_alias_where_predicates,
 };
 use crate::tddd::spec_ground_codec::{informal_grounds_from_dtos, spec_refs_from_dtos};
 // Keep the path-only validator referenced for callers outside top-level impl slots.
@@ -190,6 +191,9 @@ pub(super) fn type_entry_from_dto(
     let role = data_role_from_dto(name, dto.role)?;
 
     let kind = type_kind_from_dto(name, dto.kind)?;
+    if matches!(&kind, TypeKindV2::TypeAlias { .. }) {
+        validate_type_alias_generic_name_strs(name, dto.generics.iter().map(|g| g.name.as_str()))?;
+    }
     let generics = method_generics_from_dtos(name, dto.generics)?;
     if matches!(&kind, TypeKindV2::TypeAlias { .. }) {
         validate_type_alias_generic_names(name, &generics)?;
@@ -281,6 +285,7 @@ fn type_kind_from_dto(
         TypeKindDto::TypeAlias { target, generics } => {
             let target = TypeRef::new(target.clone())
                 .map_err(|e| err(format!("invalid type_alias target '{}': {e}", target)))?;
+            validate_type_alias_generic_name_strs(name, generics.iter().map(|g| g.name.as_str()))?;
             let generics = method_generics_from_dtos(name, generics)?;
             validate_type_alias_generic_names(name, &generics)?;
             Ok(TypeKindV2::TypeAlias { target, generics })

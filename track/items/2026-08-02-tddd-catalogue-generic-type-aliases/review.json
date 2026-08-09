@@ -4741,6 +4741,49 @@
           "hash": "rvw1:sha256:5d7c3d909d34f2a5a433b1eb8613a2866b04237972471085e98498712a037443",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T07:08:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:959af1800d16e55a3b5384e22f155365f47d245659b4f9e7491e7f61410e9f15",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T07:16:30Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/mod.rs",
+              "line": 46,
+              "message": "Removing this re-export does not narrow parser-side keyword rejection. The non-preserving `parse_type_ref_with_generics` and `parse_generic_bound_with_generics` paths still invoke `validate_generic_identifier_ambiguities` unconditionally, so a catalogue now accepted with generic name `type` later fails `CatalogueToExtendedCrateCodec::encode` when processing context-aware fields or bounds—even unrelated values such as `u8` or `Clone`. Restrict that validation to alias/preserving-spelling paths so the restored behavior survives the full DTO-to-evaluator flow.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/validate.rs",
+              "line": 40,
+              "message": "The `~const` branch still passes the complete generic context to `validate_maybe_const_bound`, which re-runs keyword-name validation. Therefore a non-alias declaration containing generic `type` and a `~const Clone` bound still fails decode/encode, despite the shared validator's stated shape-only behavior. Perform the shared `~const` syntax check without validating the declaration context; alias-specific validation can enforce the stricter rule afterward.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:959af1800d16e55a3b5384e22f155365f47d245659b4f9e7491e7f61410e9f15",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T07:27:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:509892380d8a51f0bdc904a4ed8478189d26668207d346358c374c78c7655b3f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T07:33:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:509892380d8a51f0bdc904a4ed8478189d26668207d346358c374c78c7655b3f",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },

@@ -199,7 +199,7 @@
       },
       "key": {
         "anchor_text_hash": "3669f1fd310cc9cd7b5ccfb6b5b9a3f72079949b8c1e4dfb7662ab171cfbf799",
-        "bound_tests_set_hash": "3ea517d4762010794e92412482e6c3a9b880fb96d29714c272812fce38f56a4d",
+        "bound_tests_set_hash": "cac66159426ad9ee44d111fb085a66421edd613d29fb7a0bc3159895424b1744",
         "declaration_hash": "4a84e5ff2041b5b39abf5267dd60d1cd013687473165920ede0e73588bc19fce"
       },
       "obligation_id": {
@@ -208,7 +208,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(matches!(result, Ok(violations) if violations.is_empty()));\n\nassert!(matches!(\n            result,\n            Err(CatalogueLinterError::InvalidTypeAliasGenericParameterName {\n                alias_name,\n                parameter_name,\n            }) if alias_name.as_str() == \"KeywordAlias\" && parameter_name.as_str() == \"type\"\n        ));\n\nErr(CatalogueLinterError::DuplicateTypeAliasGenericParameter {\n                alias_name,\n                parameter_name,\n            }) if alias_name.as_str() == \"DuplicateAlias\" && parameter_name.as_str() == \"T\"",
+        "citation": "assert!(matches!(result, Ok(violations) if violations.is_empty())); ... assert!(matches!(result, Err(CatalogueLinterError::DuplicateTypeAliasGenericParameter { alias_name, parameter_name, }) if alias_name.as_str() == \"DuplicateAlias\" && parameter_name.as_str() == \"T\")); ... assert!(matches!(result, Err(CatalogueLinterError::ScanFailed( PrimitiveOccurrenceScanError::ParseFailure { type_ref } )) if type_ref.as_str() == malformed_bound));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -545,7 +545,7 @@
       },
       "key": {
         "anchor_text_hash": "8d3283d1c4f863ebbd4f2651f55ce831a5c2527b9ac7c99d61671cd0140929ce",
-        "bound_tests_set_hash": "3ea517d4762010794e92412482e6c3a9b880fb96d29714c272812fce38f56a4d",
+        "bound_tests_set_hash": "cac66159426ad9ee44d111fb085a66421edd613d29fb7a0bc3159895424b1744",
         "declaration_hash": "4a84e5ff2041b5b39abf5267dd60d1cd013687473165920ede0e73588bc19fce"
       },
       "obligation_id": {
@@ -554,7 +554,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "\"assert!(matches!(result, Ok(violations) if violations.is_empty()));\" and \"Err(CatalogueLinterError::InvalidTypeAliasGenericParameterName { alias_name, parameter_name, })\"",
+        "citation": "assert!(matches!(result, Ok(violations) if violations.is_empty())); ... assert!(matches!(result, Err(CatalogueLinterError::InvalidTypeAliasGenericParameterName { alias_name, parameter_name, }) if alias_name.as_str() == \"KeywordAlias\" && parameter_name.as_str() == \"type\"));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -737,7 +737,7 @@
       },
       "key": {
         "anchor_text_hash": "44c181e097d06c33658028ef1d86b3bde7673a6fecc2778a9036de3aedfeb06a",
-        "bound_tests_set_hash": "378f1d831f57931328645c39880b74ebe73771874adf89fa5e9d5ea7f0cb5b66",
+        "bound_tests_set_hash": "4d4b4cae3652022457261d51b3aff5b1da99d45e533a66d90cd6da577dcaf206",
         "declaration_hash": "938fc16eb72e26e723ec50a7070ef4c50eada1715a2b324b0775ca6851b35fb1"
       },
       "obligation_id": {
@@ -746,7 +746,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "TypeKindV2::TypeAlias { target: TypeRef::new(\"String\").unwrap(), generics: vec![] },\n...\nassert!(matches!(result, Ok(violations) if violations.is_empty()));",
+        "citation": "let result =\n            evaluate_catalogue_lint(&[], &all_catalogues, &target_layer, &StubPrimitiveScanner);\n\n        assert!(matches!(result, Ok(violations) if violations.is_empty()));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
