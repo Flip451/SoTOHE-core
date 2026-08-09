@@ -236,7 +236,20 @@ fn type_alias_bounds_for_parameter(
     generics: &rustdoc_types::Generics,
     name: &str,
 ) -> Result<Vec<String>, serde_json::Error> {
-    use rustdoc_types::{GenericParamDefKind, Type, WherePredicate};
+    use rustdoc_types::{GenericBound, GenericParamDef, GenericParamDefKind, Type, WherePredicate};
+
+    // Each entry's signature pairs the bound with the predicate-level HRTB
+    // binder (`where for<'a> T: Clone` records `'a` in
+    // `BoundPredicate.generic_params`), so a binder difference is a lexical
+    // mismatch. An inline parameter bound has no predicate binder and pairs
+    // with the empty list, keeping the accepted inline-vs-where storage
+    // equivalence intact.
+    fn binder_scoped_signature(
+        binder: &[GenericParamDef],
+        bound: &GenericBound,
+    ) -> Result<String, serde_json::Error> {
+        type_alias_lexical_signature(&(binder, bound))
+    }
 
     let inline_bounds = generics
         .params
@@ -248,14 +261,17 @@ fn type_alias_bounds_for_parameter(
         })
         .into_iter()
         .flatten()
-        .map(type_alias_lexical_signature);
-    let where_bounds =
-        generics.where_predicates.iter().filter_map(|predicate| match predicate {
-            WherePredicate::BoundPredicate {
-                type_: Type::Generic(predicate_name), bounds, ..
-            } if predicate_name == name => Some(bounds.iter().map(type_alias_lexical_signature)),
-            _ => None,
-        });
+        .map(|bound| binder_scoped_signature(&[], bound));
+    let where_bounds = generics.where_predicates.iter().filter_map(|predicate| match predicate {
+        WherePredicate::BoundPredicate {
+            type_: Type::Generic(predicate_name),
+            bounds,
+            generic_params,
+        } if predicate_name == name => {
+            Some(bounds.iter().map(|bound| binder_scoped_signature(generic_params, bound)))
+        }
+        _ => None,
+    });
 
     inline_bounds.chain(where_bounds.flatten()).collect()
 }
@@ -1235,6 +1251,61 @@ mod tests {
                 "my_crate",
             ),
             "equivalent non-parameter predicates must ignore graph-local rustdoc IDs"
+        );
+    }
+
+    /// Builds an alias whose single parameter `T` carries a where-predicate
+    /// bound `Clone` under the given predicate-level HRTB binder.
+    fn make_alias_with_predicate_binder(id: Id, binder: Vec<GenericParamDef>) -> Item {
+        make_type_alias_item_with_generics(
+            id,
+            Type::Primitive("String".to_string()),
+            Generics {
+                params: vec![make_type_param("T", vec![])],
+                where_predicates: vec![rustdoc_types::WherePredicate::BoundPredicate {
+                    type_: Type::Generic("T".to_string()),
+                    bounds: vec![make_trait_bound("Clone")],
+                    generic_params: binder,
+                }],
+            },
+        )
+    }
+
+    /// `where for<'a> T: Clone` and `where T: Clone` differ lexically; rustdoc
+    /// records the binder in `BoundPredicate.generic_params`, so the alias
+    /// signature must include it.
+    #[test]
+    fn test_type_alias_predicate_binder_difference_is_mismatch() {
+        let binder = || {
+            vec![GenericParamDef {
+                name: "'a".to_string(),
+                kind: GenericParamDefKind::Lifetime { outlives: vec![] },
+            }]
+        };
+        let bound_alias = make_alias_with_predicate_binder(Id(10), binder());
+        let plain_alias = make_alias_with_predicate_binder(Id(20), vec![]);
+
+        assert!(
+            !items_structurally_equal(
+                &bound_alias,
+                &plain_alias,
+                &HashMap::new(),
+                &HashMap::new(),
+                "my_crate",
+            ),
+            "a predicate-level HRTB binder difference must compare unequal"
+        );
+
+        let matching_alias = make_alias_with_predicate_binder(Id(30), binder());
+        assert!(
+            items_structurally_equal(
+                &bound_alias,
+                &matching_alias,
+                &HashMap::new(),
+                &HashMap::new(),
+                "my_crate",
+            ),
+            "identical predicate-level binders must compare equal"
         );
     }
 
