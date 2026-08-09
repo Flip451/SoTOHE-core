@@ -4842,6 +4842,146 @@
           "hash": "rvw1:sha256:f102e555aa996639570ed7ea8702a904a6460da107bb588550c36707965c766f",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T09:20:12Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/structural_eq.rs",
+              "line": 352,
+              "message": "`collect_bound_lifetimes` drops `GenericBound::Use(_)`, but `use<'a>` is a lifetime occurrence in an `impl Trait` target. Consequently an alias such as `type Alias<'a> = impl Trait + use<'a>` is treated as having an uncarried `'a` parameter and mismatches the equivalent side, despite the collector's stated requirement to cover impl-trait bounds. Match `PreciseCapturingArg::Lifetime` and add a regression test.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:397e2bdb46f03c65d6b8a750319d2c9e474f6485efb5b2d8ef2bb1812bb69c64",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T09:25:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bb6f04e7935bfcfbb13b589afbb6920db29823dacfedb719c9547421ab93824d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T09:31:34Z",
+          "findings": [
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/structural_eq.rs",
+              "line": 320,
+              "message": "The lifetime traversal skips `AssocItemConstraint.args` and inspects only `constraint.binding`. A valid target such as `dyn Outer<Item<'a> = String>` therefore fails to recognize `'a` as target-carried, leaving the rustdoc lifetime parameter in the comparison and producing a false mismatch. Traverse each constraint's own generic arguments before its binding.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/structural_eq.rs",
+              "line": 248,
+              "message": "The added lifetime-collector block increases the production portion of this module to 722 lines before `#[cfg(test)]`, exceeding the repository's 700-line maximum. Extract the traversal helpers into a cohesive sibling module.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:bb6f04e7935bfcfbb13b589afbb6920db29823dacfedb719c9547421ab93824d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T09:38:56Z",
+          "findings": [
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/structural_eq.rs",
+              "line": 50,
+              "message": "`format_type` omits `AssocItemConstraint.args`, while the new collector now uses those arguments to exclude lifetime declarations. Consequently, catalogue target `dyn Outer<Item<'a> = String>` and implementation target `dyn Outer<Item<'b> = String>` render identically, each side removes its own carried lifetime, and the aliases incorrectly compare equal despite the lexical lifetime-name difference. Compare alias targets with an encoding that includes associated-item arguments and add an asymmetric regression test.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/structural_eq.rs",
+              "line": 248,
+              "message": "The production section now contains 725 lines before `#[cfg(test)]`, exceeding the repository's 700-line maximum. Extract the lifetime traversal helpers into a cohesive sibling module.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1c297db446490768935b9c01ea9ac245b6ab5d02b8cf2cbe6b84930eed704b1a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T09:45:53Z",
+          "findings": [
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/structural_eq.rs",
+              "line": 253,
+              "message": "The production section now contains 730 lines before `#[cfg(test)]`, exceeding the repository's 700-line maximum. Extract the lifetime traversal helpers into a cohesive sibling module.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c217118c61301c29cfa6b5a444b1d790699f8f46da6b562ddce5509b8121b19a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T09:58:00Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/structural_eq.rs",
+              "line": 53,
+              "message": "The TypeAlias target comparison now uses `type_alias_lexical_signature` directly, which preserves `Path.path` verbatim. Catalogue parsing stores multi-segment targets such as `std::vec::Vec<T>` with the full path, while rustdoc-side paths are short-name normalized (the existing `format_type` path explicitly exists to preserve A/C symmetry). These otherwise equivalent aliases therefore compare unequal and emit false mismatches. Normalize target paths consistently or retain the symmetric formatter while separately comparing the lifetime-carrying lexical details.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e5f26c35c2efce0d10b1cd0a5ffb2600cfc9b2d5d0ce1ca076a9bc44bcb402a1",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T10:04:24Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/structural_eq.rs",
+              "line": 203,
+              "message": "`normalize_alias_target_paths` only normalizes objects under the `resolved_path` key. Alias targets can also carry paths in `DynTrait.traits[*].trait`, `GenericBound::TraitBound.trait`, and `QualifiedPath.trait`; those qualified catalogue paths remain unchanged while rustdoc uses short names. Equivalent targets such as `dyn std::fmt::Display` or `impl std::fmt::Display` can therefore produce false mismatches despite the stated short-path symmetry. Normalize all target path-bearing forms and add coverage for dyn/impl-trait targets.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6cefd50de2df5f25400e61bb33cc336b832bb956dadbe1d81e91d19a9a28c291",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T10:10:40Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/target_lifetimes.rs",
+              "line": 119,
+              "message": "The lifetime collector skips all binder metadata: `FunctionPointer.sig.generic_params`, `DynTrait`/`PolyTrait.generic_params`, and `GenericBound::TraitBound.generic_params`. Although binder declarations themselves must not be collected, nested bound uses can reference an outer alias lifetime (for example a binder type parameter bound containing `&'a`), and those occurrences are target-carried. They are currently missed, so valid aliases can falsely retain `'a` in the generic-parameter comparison and mismatch. Traverse binder parameter bounds/default/type fields while excluding declared lifetime names.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:41bee5c76cede5236ce55d08cd9f009079472755472f9f1bccf0611585e9843f",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T10:16:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:051e2e8c5a46b3374a58632af8774b2c1409ca13075e024644a360975384c263",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T10:21:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:051e2e8c5a46b3374a58632af8774b2c1409ca13075e024644a360975384c263",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },

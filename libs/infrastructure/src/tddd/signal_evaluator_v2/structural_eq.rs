@@ -17,6 +17,7 @@ use super::format::{format_type, format_type_strip_type_params};
 use super::generics_eq::{
     fn_sigs_structurally_equal, generics_structurally_equal, traits_structurally_equal,
 };
+use super::target_lifetimes::collect_type_lifetimes;
 
 // Re-export so callers (tests, phase2) can access via this module path.
 pub(super) use super::generics_eq::build_trait_method_map;
@@ -47,8 +48,13 @@ pub(super) fn items_structurally_equal(
             enums_structurally_equal(ea, eb, a_index, b_index)
         }
         (ItemEnum::TypeAlias(ta), ItemEnum::TypeAlias(tb)) => {
-            format_type(&ta.type_) == format_type(&tb.type_)
-                && type_alias_generics_lexically_equal(&ta.generics, &tb.generics)
+            type_alias_targets_lexically_equal(&ta.type_, &tb.type_)
+                && type_alias_generics_lexically_equal(
+                    &ta.generics,
+                    &ta.type_,
+                    &tb.generics,
+                    &tb.type_,
+                )
         }
         (ItemEnum::Trait(ta), ItemEnum::Trait(tb)) => {
             traits_structurally_equal(ta, tb, a_index, b_index)
@@ -157,6 +163,68 @@ pub(super) fn items_structurally_equal(
     }
 }
 
+/// Compares alias targets while retaining the established catalogue/rustdoc
+/// short-path symmetry.
+///
+/// The lexical signature keeps lifetime and generic-argument spelling needed
+/// by alias declarations. Every rustdoc `Path::path` is the exception:
+/// catalogue parsing can retain a qualified external path while rustdoc uses
+/// its short name, and the former `format_type` comparison treated those forms
+/// alike. Normalize only that representation difference after serializing the
+/// target.
+fn type_alias_targets_lexically_equal(a: &rustdoc_types::Type, b: &rustdoc_types::Type) -> bool {
+    let (Ok(a_signature), Ok(b_signature)) =
+        (type_alias_lexical_signature(a), type_alias_lexical_signature(b))
+    else {
+        return false;
+    };
+    let (Ok(mut a_value), Ok(mut b_value)) = (
+        serde_json::from_str::<serde_json::Value>(&a_signature),
+        serde_json::from_str::<serde_json::Value>(&b_signature),
+    ) else {
+        return false;
+    };
+    normalize_alias_target_paths(&mut a_value);
+    normalize_alias_target_paths(&mut b_value);
+    a_value == b_value
+}
+
+/// Reduces every serialized rustdoc `Path` name to its last segment.
+///
+/// The caller has already produced the alias lexical signature, so rustdoc
+/// IDs and the signature's other deliberate normalizations remain intact.
+/// A serialized `Path` is the only target object with both `path` and `args`;
+/// this covers resolved paths and trait paths in dyn, impl-trait, qualified,
+/// and nested bound forms without changing other target strings.
+fn normalize_alias_target_paths(value: &mut serde_json::Value) {
+    match value {
+        serde_json::Value::Array(values) => {
+            for value in values {
+                normalize_alias_target_paths(value);
+            }
+        }
+        serde_json::Value::Object(values) => {
+            if values.contains_key("args") {
+                if let Some(short_name) = values
+                    .get("path")
+                    .and_then(serde_json::Value::as_str)
+                    .and_then(|path| path.rsplit("::").next())
+                    .map(ToOwned::to_owned)
+                {
+                    values.insert("path".to_owned(), serde_json::Value::String(short_name));
+                }
+            }
+            for value in values.values_mut() {
+                normalize_alias_target_paths(value);
+            }
+        }
+        serde_json::Value::Null
+        | serde_json::Value::Bool(_)
+        | serde_json::Value::Number(_)
+        | serde_json::Value::String(_) => {}
+    }
+}
+
 /// Compares type-alias generics as the catalogue declares them.
 ///
 /// Function, trait, and impl generics use the name-independent where-form
@@ -168,15 +236,18 @@ pub(super) fn items_structurally_equal(
 /// locations.
 fn type_alias_generics_lexically_equal(
     a: &rustdoc_types::Generics,
+    a_target: &rustdoc_types::Type,
     b: &rustdoc_types::Generics,
+    b_target: &rustdoc_types::Type,
 ) -> bool {
     // The catalogue schema cannot declare lifetime parameters: an alias whose
     // source declares them records the lifetimes lexically in the target
-    // (accepted target lifetime policy), so lifetime parameters are excluded
-    // from this comparison instead of surfacing as an arity mismatch for
-    // every implementation of the accepted contract.
-    let a_params = non_lifetime_params(a);
-    let b_params = non_lifetime_params(b);
+    // (accepted target lifetime policy). A lifetime parameter is therefore
+    // excluded from this comparison ONLY when its name appears in that side's
+    // target — a lifetime parameter the target does not carry (an unused
+    // declaration) is unrecorded information and stays a mismatch.
+    let a_params = comparable_alias_params(a, a_target);
+    let b_params = comparable_alias_params(b, b_target);
     if a_params.len() != b_params.len()
         || !a_params
             .iter()
@@ -209,13 +280,27 @@ fn type_alias_generics_lexically_equal(
     )
 }
 
-/// The alias generic parameters that participate in the lexical comparison:
-/// every kind except lifetimes, which the catalogue schema cannot declare.
-fn non_lifetime_params(generics: &rustdoc_types::Generics) -> Vec<&rustdoc_types::GenericParamDef> {
+/// The alias generic parameters that participate in the lexical comparison.
+///
+/// A lifetime parameter is excluded only when the alias TARGET carries its
+/// name (the catalogue schema cannot declare lifetime parameters, so a
+/// source-declared lifetime is recorded lexically in the target). A lifetime
+/// parameter the target does not mention — an unused declaration — stays in
+/// the list and therefore surfaces as a mismatch against a side that does not
+/// declare it.
+fn comparable_alias_params<'generics>(
+    generics: &'generics rustdoc_types::Generics,
+    target: &rustdoc_types::Type,
+) -> Vec<&'generics rustdoc_types::GenericParamDef> {
+    let mut target_lifetimes: BTreeSet<String> = BTreeSet::new();
+    collect_type_lifetimes(target, &mut target_lifetimes);
     generics
         .params
         .iter()
-        .filter(|param| !matches!(param.kind, rustdoc_types::GenericParamDefKind::Lifetime { .. }))
+        .filter(|param| {
+            !matches!(param.kind, rustdoc_types::GenericParamDefKind::Lifetime { .. })
+                || !target_lifetimes.contains(&param.name)
+        })
         .collect()
 }
 
@@ -585,8 +670,9 @@ mod tests {
     use std::collections::HashMap;
 
     use rustdoc_types::{
-        FunctionHeader, FunctionSignature, GenericArg, GenericArgs, GenericBound, GenericParamDef,
-        GenericParamDefKind, Generics, Id, Impl, Item, ItemEnum, Path, Struct, StructKind,
+        AssocItemConstraint, AssocItemConstraintKind, DynTrait, FunctionHeader, FunctionSignature,
+        GenericArg, GenericArgs, GenericBound, GenericParamDef, GenericParamDefKind, Generics, Id,
+        Impl, Item, ItemEnum, Path, PolyTrait, PreciseCapturingArg, Struct, StructKind, Term,
         TraitBoundModifier, Type, TypeAlias, Visibility,
     };
 
@@ -1058,21 +1144,22 @@ mod tests {
     fn test_type_alias_lifetime_parameters_excluded_from_generics_comparison() {
         // The catalogue schema cannot declare lifetime parameters: an alias
         // whose source declares them records the lifetimes lexically in the
-        // target, so the rustdoc-side lifetime parameters must not count
-        // toward the generic comparison.
-        let make_lifetime_param = || GenericParamDef {
-            name: "'a".to_string(),
+        // target, so a rustdoc-side lifetime parameter CARRIED BY THE TARGET
+        // must not count toward the generic comparison.
+        let make_lifetime_param = |name: &str| GenericParamDef {
+            name: name.to_string(),
             kind: GenericParamDefKind::Lifetime { outlives: vec![] },
         };
-        let a_alias = make_type_alias_item(
-            Id(10),
-            Type::Primitive("String".to_string()),
-            vec![make_type_param("T", vec![])],
-        );
+        let target = || Type::BorrowedRef {
+            lifetime: Some("'a".to_string()),
+            is_mutable: false,
+            type_: Box::new(Type::Generic("T".to_string())),
+        };
+        let a_alias = make_type_alias_item(Id(10), target(), vec![make_type_param("T", vec![])]);
         let b_alias = make_type_alias_item(
             Id(20),
-            Type::Primitive("String".to_string()),
-            vec![make_lifetime_param(), make_type_param("T", vec![])],
+            target(),
+            vec![make_lifetime_param("'a"), make_type_param("T", vec![])],
         );
         assert!(
             items_structurally_equal(
@@ -1082,14 +1169,39 @@ mod tests {
                 &HashMap::new(),
                 "my_crate",
             ),
-            "rustdoc-side lifetime parameters must be excluded from the alias generics comparison"
+            "a target-carried lifetime parameter must be excluded from the alias generics \
+             comparison"
+        );
+
+        // A lifetime parameter the target does NOT carry is unrecorded
+        // declaration information: `type Alias = String` must not compare
+        // equal to `type Alias<'unused> = String`.
+        let plain = make_type_alias_item(Id(30), Type::Primitive("String".to_string()), vec![]);
+        let unused_lifetime = make_type_alias_item(
+            Id(40),
+            Type::Primitive("String".to_string()),
+            vec![make_lifetime_param("'unused")],
+        );
+        assert!(
+            !items_structurally_equal(
+                &plain,
+                &unused_lifetime,
+                &HashMap::new(),
+                &HashMap::new(),
+                "my_crate",
+            ),
+            "a lifetime parameter the target does not carry must stay a mismatch"
         );
 
         // A genuine type-parameter arity difference stays a mismatch.
         let c_alias = make_type_alias_item(
-            Id(30),
-            Type::Primitive("String".to_string()),
-            vec![make_lifetime_param(), make_type_param("T", vec![]), make_type_param("U", vec![])],
+            Id(50),
+            target(),
+            vec![
+                make_lifetime_param("'a"),
+                make_type_param("T", vec![]),
+                make_type_param("U", vec![]),
+            ],
         );
         assert!(
             !items_structurally_equal(
@@ -1100,6 +1212,195 @@ mod tests {
                 "my_crate",
             ),
             "a real type-parameter arity difference must stay a mismatch"
+        );
+    }
+
+    #[test]
+    fn test_type_alias_qualified_target_path_matches_rustdoc_short_name() {
+        let target = |path: &str| {
+            Type::ResolvedPath(Path {
+                path: path.to_string(),
+                id: Id(55),
+                args: Some(Box::new(GenericArgs::AngleBracketed {
+                    args: vec![GenericArg::Type(Type::Generic("T".to_string()))],
+                    constraints: vec![],
+                })),
+            })
+        };
+        let catalogue_alias = make_type_alias_item(
+            Id(56),
+            target("std::vec::Vec"),
+            vec![make_type_param("T", vec![])],
+        );
+        let rustdoc_alias =
+            make_type_alias_item(Id(57), target("Vec"), vec![make_type_param("T", vec![])]);
+
+        assert!(
+            items_structurally_equal(
+                &catalogue_alias,
+                &rustdoc_alias,
+                &HashMap::new(),
+                &HashMap::new(),
+                "my_crate",
+            ),
+            "a qualified catalogue alias target must match rustdoc's short path name"
+        );
+    }
+
+    #[test]
+    fn test_type_alias_dyn_and_impl_trait_target_paths_match_rustdoc_short_names() {
+        let trait_path = |path: &str| Path { path: path.to_string(), id: Id(58), args: None };
+        let dyn_target = |path: &str| {
+            Type::DynTrait(DynTrait {
+                traits: vec![PolyTrait { trait_: trait_path(path), generic_params: vec![] }],
+                lifetime: None,
+            })
+        };
+        let impl_trait_target = |path: &str| {
+            Type::ImplTrait(vec![GenericBound::TraitBound {
+                trait_: trait_path(path),
+                generic_params: vec![],
+                modifier: TraitBoundModifier::None,
+            }])
+        };
+
+        for (catalogue_target, rustdoc_target, target_kind) in [
+            (dyn_target("std::fmt::Display"), dyn_target("Display"), "dyn-trait"),
+            (impl_trait_target("std::fmt::Display"), impl_trait_target("Display"), "impl-trait"),
+        ] {
+            let catalogue_alias = make_type_alias_item(Id(59), catalogue_target, vec![]);
+            let rustdoc_alias = make_type_alias_item(Id(60), rustdoc_target, vec![]);
+            assert!(
+                items_structurally_equal(
+                    &catalogue_alias,
+                    &rustdoc_alias,
+                    &HashMap::new(),
+                    &HashMap::new(),
+                    "my_crate",
+                ),
+                "a qualified catalogue {target_kind} target must match rustdoc's short path name"
+            );
+        }
+    }
+
+    #[test]
+    fn test_type_alias_precise_capture_lifetime_is_carried_by_impl_trait_target() {
+        let lifetime_param = GenericParamDef {
+            name: "'a".to_string(),
+            kind: GenericParamDefKind::Lifetime { outlives: vec![] },
+        };
+        let target = || {
+            Type::ImplTrait(vec![GenericBound::Use(vec![PreciseCapturingArg::Lifetime(
+                "'a".to_string(),
+            )])])
+        };
+        let catalogue_alias = make_type_alias_item(Id(60), target(), vec![]);
+        let rustdoc_alias = make_type_alias_item(Id(70), target(), vec![lifetime_param]);
+
+        assert!(
+            items_structurally_equal(
+                &catalogue_alias,
+                &rustdoc_alias,
+                &HashMap::new(),
+                &HashMap::new(),
+                "my_crate",
+            ),
+            "a precise-capture lifetime in an impl-trait target must exclude its declaration \
+             from the alias generics comparison"
+        );
+    }
+
+    #[test]
+    fn test_type_alias_lifetime_in_associated_item_arguments_is_target_carried() {
+        let target = || {
+            Type::ResolvedPath(Path {
+                path: "Outer".to_string(),
+                id: Id(80),
+                args: Some(Box::new(GenericArgs::AngleBracketed {
+                    args: vec![],
+                    constraints: vec![AssocItemConstraint {
+                        name: "Item".to_string(),
+                        args: Some(Box::new(GenericArgs::AngleBracketed {
+                            args: vec![GenericArg::Lifetime("'a".to_string())],
+                            constraints: vec![],
+                        })),
+                        binding: AssocItemConstraintKind::Equality(Term::Type(Type::Primitive(
+                            "String".to_string(),
+                        ))),
+                    }],
+                })),
+            })
+        };
+        let catalogue_alias = make_type_alias_item(Id(90), target(), vec![]);
+        let rustdoc_alias = make_type_alias_item(
+            Id(100),
+            target(),
+            vec![GenericParamDef {
+                name: "'a".to_string(),
+                kind: GenericParamDefKind::Lifetime { outlives: vec![] },
+            }],
+        );
+
+        assert!(
+            items_structurally_equal(
+                &catalogue_alias,
+                &rustdoc_alias,
+                &HashMap::new(),
+                &HashMap::new(),
+                "my_crate",
+            ),
+            "a lifetime in associated-item generic arguments must exclude its declaration from \
+             the alias generics comparison"
+        );
+    }
+
+    #[test]
+    fn test_type_alias_lifetime_in_associated_item_arguments_stays_lexical() {
+        let target = |lifetime: &str| {
+            Type::ResolvedPath(Path {
+                path: "Outer".to_string(),
+                id: Id(110),
+                args: Some(Box::new(GenericArgs::AngleBracketed {
+                    args: vec![],
+                    constraints: vec![AssocItemConstraint {
+                        name: "Item".to_string(),
+                        args: Some(Box::new(GenericArgs::AngleBracketed {
+                            args: vec![GenericArg::Lifetime(lifetime.to_string())],
+                            constraints: vec![],
+                        })),
+                        binding: AssocItemConstraintKind::Equality(Term::Type(Type::Primitive(
+                            "String".to_string(),
+                        ))),
+                    }],
+                })),
+            })
+        };
+        let a_alias = make_type_alias_item(
+            Id(120),
+            target("'a"),
+            vec![GenericParamDef {
+                name: "'a".to_string(),
+                kind: GenericParamDefKind::Lifetime { outlives: vec![] },
+            }],
+        );
+        let b_alias = make_type_alias_item(
+            Id(130),
+            target("'b"),
+            vec![GenericParamDef {
+                name: "'b".to_string(),
+                kind: GenericParamDefKind::Lifetime { outlives: vec![] },
+            }],
+        );
+
+        assert!(
+            !items_structurally_equal(
+                &a_alias,
+                &b_alias,
+                &HashMap::new(),
+                &HashMap::new(),
+                "my_crate",
+            ),
+            "associated-item lifetime arguments must remain lexical in alias targets"
         );
     }
 

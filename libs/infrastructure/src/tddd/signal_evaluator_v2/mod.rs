@@ -71,6 +71,7 @@ pub(super) mod phase2;
 pub(super) mod resolution;
 pub(super) mod resolve_type;
 pub(super) mod structural_eq;
+pub(super) mod target_lifetimes;
 
 #[cfg(test)]
 pub(super) mod tests;
