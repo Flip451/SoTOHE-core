@@ -970,7 +970,7 @@ mod tests {
       "role": { "ValueObject": {} },
       "kind": {
         "kind": "type_alias",
-        "target": "Box<T>",
+        "target": "Result<T, U>",
         "generics": [
           { "name": "T", "bounds": ["Sized"] },
           { "name": "U", "bounds": [] }
@@ -1080,6 +1080,45 @@ mod tests {
                 if entry_name == "BadAlias"
                     && reason.contains("not a plain non-keyword Rust identifier")),
             "unexpected error: {err:?}"
+        );
+    }
+
+    #[test]
+    fn test_decode_type_alias_rejects_unused_type_parameter() {
+        // Rustc refuses an alias whose declared type parameter never occurs
+        // in the target (E0091), even when it appears in bounds or where
+        // predicates — the codec must not admit an uncompilable contract.
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "UnusedParamAlias": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "type_alias",
+        "target": "String",
+        "generics": [{ "name": "T", "bounds": ["Clone"] }]
+      }
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+        let error = CatalogueDocumentCodec::decode(json, "domain").unwrap_err();
+        assert!(
+            matches!(error, CatalogueDocumentCodecError::InvalidEntry { ref entry_name, ref reason }
+                if entry_name == "UnusedParamAlias"
+                    && reason.contains("not used in the alias target")),
+            "unexpected error: {error:?}"
+        );
+
+        // A target that uses the parameter stays decodable.
+        let used = json.replace("\"String\"", "\"Vec<T>\"");
+        assert!(
+            CatalogueDocumentCodec::decode(&used, "domain").is_ok(),
+            "a target using the declared parameter must stay decodable"
         );
     }
 

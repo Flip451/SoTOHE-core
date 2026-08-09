@@ -165,8 +165,24 @@ fn test_parse_type_ref_simple_const_blocks_match_rustdoc_spelling() {
         &[],
     )
     .unwrap();
+    // A const block rooted at a DECLARED type parameter is rustc's
+    // type-used-as-value error (E0423): the schema has no const-parameter
+    // declaration, so `{ N }` with `N` declared cannot compile.
+    assert!(
+        parse_type_ref_with_generics_preserving_spelling(
+            "Marker<{ N }>",
+            &no_local,
+            100,
+            &HashMap::new(),
+            &mut |_| 101,
+            &["N"],
+        )
+        .is_err(),
+        "a const block over a declared type parameter must be rejected"
+    );
+    // A free-standing const name stays representable (open-world consts).
     let generic = parse_type_ref_with_generics_preserving_spelling(
-        "Marker<{ N }>",
+        "Marker<{ LEN }>",
         &no_local,
         100,
         &HashMap::new(),
@@ -202,7 +218,7 @@ fn test_parse_type_ref_simple_const_blocks_match_rustdoc_spelling() {
         constant.expr.clone()
     };
     assert_eq!(const_expr(literal), "{ 1 }");
-    assert_eq!(const_expr(generic), "{ N }");
+    assert_eq!(const_expr(generic), "{ LEN }");
 }
 
 #[test]
@@ -1154,6 +1170,57 @@ fn test_alias_lexical_gates_reject_reserved_bare_fn_parameter_names() {
     ] {
         assert_alias_lexical_spelling_accepted_at_all_gates(spelling);
     }
+}
+
+#[test]
+fn test_alias_lexical_gates_reject_type_params_used_as_const_values() {
+    // The schema has no const-parameter declaration, so a const expression
+    // rooted at a declared type parameter is rustc's type-used-as-value
+    // error (E0423); free-standing const names stay representable.
+    assert!(validate_lexical_type_ref("Marker<{ N }>", &["N"]).is_err());
+    assert!(validate_lexical_type_ref("[u8; N]", &["N"]).is_err());
+    assert!(validate_lexical_type_ref("Marker<{ LEN }>", &["T"]).is_ok());
+    // Array lengths keep their existing literal-only allowlist.
+    assert!(validate_lexical_type_ref("[u8; 4]", &["T"]).is_ok());
+}
+
+#[test]
+fn test_alias_lexical_gates_reject_type_params_used_as_associated_const_values() {
+    let spelling = "Outer<FLAG = { N }>";
+    assert!(validate_lexical_generic_bound(spelling, &["N"]).is_err());
+    assert!(validate_lexical_type_ref(spelling, &["N"]).is_err());
+    assert!(
+        parse_generic_bound_with_generics_preserving_spelling(
+            spelling,
+            &no_local,
+            100,
+            &HashMap::new(),
+            &mut |_| 101,
+            &["N"],
+        )
+        .is_err()
+    );
+    assert!(
+        parse_type_ref_with_generics_preserving_spelling(
+            spelling,
+            &no_local,
+            100,
+            &HashMap::new(),
+            &mut |_| 101,
+            &["N"],
+        )
+        .is_err()
+    );
+}
+
+#[test]
+fn test_alias_lexical_gates_reject_nested_relaxed_bounds() {
+    // Rustc permits a relaxed bound only directly on a type parameter of
+    // the closest item: nested positions (trait objects, associated-item
+    // constraints) are rejected.
+    assert_alias_lexical_spelling_rejected_at_all_gates("Outer<dyn Tr + ?Sized>");
+    assert_bound_spelling_rejected("Outer<Item: ?Sized>");
+    assert_bound_spelling_accepted("?Sized");
 }
 
 #[test]

@@ -63,6 +63,10 @@ pub(crate) fn enforce_closed_bound_grammar(
         syn::parse_str(stripped).map_err(|e| format!("invalid bound syntax '{bound_str}': {e}"))?;
 
     let mut visitor = AllowlistVisitor::new(generic_params);
+    // Rustc permits a relaxed bound only directly on a type parameter of the
+    // closest item: the ROOT position of a bound string qualifies, nested
+    // positions (dyn objects, associated-item constraints, …) never do.
+    visitor.relaxed_bound_allowed = true;
     visitor.visit_type_param_bound(&syn_bound);
     visitor.finish()?;
 
@@ -287,6 +291,8 @@ struct AllowlistVisitor<'params, 'names> {
     /// Lifetime names (without `'`) introduced by enclosing `for<>` binders.
     lifetime_scope: Vec<String>,
     lifetime_policy: LifetimePolicy,
+    /// `?Sized` is valid only at a direct alias-parameter bound.
+    relaxed_bound_allowed: bool,
     rejection: Option<String>,
 }
 
@@ -299,7 +305,13 @@ impl<'params, 'names> AllowlistVisitor<'params, 'names> {
         generic_params: &'params [&'names str],
         lifetime_policy: LifetimePolicy,
     ) -> Self {
-        Self { generic_params, lifetime_scope: vec![], lifetime_policy, rejection: None }
+        Self {
+            generic_params,
+            lifetime_scope: vec![],
+            lifetime_policy,
+            relaxed_bound_allowed: false,
+            rejection: None,
+        }
     }
 
     fn finish(self) -> Result<(), String> {
@@ -312,6 +324,36 @@ impl<'params, 'names> AllowlistVisitor<'params, 'names> {
     fn reject(&mut self, detail: &str) {
         if self.rejection.is_none() {
             self.rejection = Some(format!("{UNSUPPORTED_SYNTAX}: {detail}"));
+        }
+    }
+
+    fn check_const_expr_not_declared_type_param(&mut self, expr: &syn::Expr) {
+        match expr {
+            syn::Expr::Path(path) => {
+                if path.qself.is_none()
+                    && path.path.leading_colon.is_none()
+                    && path.path.segments.len() == 1
+                {
+                    if let Some(segment) = path.path.segments.first() {
+                        let name = segment.ident.to_string();
+                        if self.generic_params.contains(&name.as_str()) {
+                            self.reject(&format!(
+                                "const expression uses declared type parameter `{name}` as a \
+                                 value (rustc E0423)"
+                            ));
+                        }
+                    }
+                }
+            }
+            syn::Expr::Block(block) => {
+                if let [syn::Stmt::Expr(inner, None)] = block.block.stmts.as_slice() {
+                    self.check_const_expr_not_declared_type_param(inner);
+                }
+            }
+            syn::Expr::Unary(unary) => {
+                self.check_const_expr_not_declared_type_param(&unary.expr);
+            }
+            _ => {}
         }
     }
 
@@ -509,11 +551,34 @@ impl<'ast, 'params, 'names> Visit<'ast> for AllowlistVisitor<'params, 'names> {
             if !is_sized {
                 self.reject("`?` may only relax the `Sized` bound");
             }
+            // Rustc permits a relaxed bound only directly on a type
+            // parameter of the closest item; nested positions (dyn
+            // objects, associated-item constraints, impl-trait lists)
+            // are rejected.
+            if !self.relaxed_bound_allowed {
+                self.reject("`?Sized` is only valid as a direct type-parameter bound");
+            }
         }
+        // Anything below this bound is a nested position.
+        self.relaxed_bound_allowed = false;
         self.check_trait_path(&node.path);
         let added = self.enter_binder(node.lifetimes.as_ref());
         self.visit_path(&node.path);
         self.exit_binder(added);
+    }
+
+    fn visit_generic_argument(&mut self, node: &'ast syn::GenericArgument) {
+        if let syn::GenericArgument::Const(expr)
+        | syn::GenericArgument::AssocConst(syn::AssocConst { value: expr, .. }) = node
+        {
+            self.check_const_expr_not_declared_type_param(expr);
+        }
+        syn::visit::visit_generic_argument(self, node);
+    }
+
+    fn visit_type_array(&mut self, node: &'ast syn::TypeArray) {
+        self.check_const_expr_not_declared_type_param(&node.len);
+        syn::visit::visit_type_array(self, node);
     }
 
     fn visit_type_bare_fn(&mut self, node: &'ast syn::TypeBareFn) {

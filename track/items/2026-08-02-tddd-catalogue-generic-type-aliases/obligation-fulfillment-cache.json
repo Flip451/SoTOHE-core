@@ -27,7 +27,7 @@
       },
       "key": {
         "anchor_text_hash": "b5c4e1ef74408f7d6a32ecf89167e5ea79bdfc5a5169784ea8a478fe4407f178",
-        "bound_tests_set_hash": "401c297e28110ddf96e167b788748d2b2b966d7da350ab316bc21102734efcb4",
+        "bound_tests_set_hash": "7eefbc5441a33d25a9bef2e0583d78aa02f27540d80df19ad089db8632c6966b",
         "declaration_hash": "4a84e5ff2041b5b39abf5267dd60d1cd013687473165920ede0e73588bc19fce"
       },
       "obligation_id": {
@@ -68,7 +68,7 @@
       },
       "key": {
         "anchor_text_hash": "8791a798644a610c019eb471c43e11b82932ac4f447c8372dcbeefc75df0956c",
-        "bound_tests_set_hash": "388b368b24116d96f370e4e976665f962a6f7a2fb4ef3ae58278209b1dfac877",
+        "bound_tests_set_hash": "596458f628d36e57b27958ee6e72cc20e8fa02645fa5a4f00eb8dc2fe91a0599",
         "declaration_hash": "4a84e5ff2041b5b39abf5267dd60d1cd013687473165920ede0e73588bc19fce"
       },
       "obligation_id": {
@@ -77,7 +77,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "let doc = CatalogueDocumentCodec::decode(json, \"domain\").unwrap();\n        let entry = doc.types().values().next().unwrap();\n        let TypeKindV2::TypeAlias { target, generics } = entry.kind() else {\n            panic!(\"expected TypeAlias kind\");\n        };\n        assert_eq!(target.as_str(), \"Result<T, DomainError>\");\n        assert_eq!(generics.len(), 1);\n        assert_eq!(generics[0].name.as_str(), \"T\");\n        assert_eq!(\n            generics[0].bounds.iter().map(TypeRef::as_str).collect::<Vec<_>>(),\n            vec![\"Clone\", \"Send\"]\n        );\n\n        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();\n        let value: serde_json::Value = serde_json::from_str(&encoded).unwrap();\n        assert_eq!(value[\"types\"][\"ValueAlias\"][\"kind\"][\"target\"], \"String\");\n        assert!(value[\"types\"][\"ValueAlias\"][\"kind\"].get(\"generics\").is_none());\n\n        let round_tripped = CatalogueDocumentCodec::decode(&encoded, \"domain\").unwrap();\n        assert_eq!(round_tripped, doc);",
+        "citation": "let doc = CatalogueDocumentCodec::decode(json, \"domain\").unwrap();\n        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();\n        let round_tripped = CatalogueDocumentCodec::decode(&encoded, \"domain\").unwrap();\n        assert_eq!(round_tripped, doc);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -281,7 +281,7 @@
       },
       "key": {
         "anchor_text_hash": "44c181e097d06c33658028ef1d86b3bde7673a6fecc2778a9036de3aedfeb06a",
-        "bound_tests_set_hash": "833ef0e9249e35d9a29d2af45d44daf713c95a3083d385a64a56038ae81e51ce",
+        "bound_tests_set_hash": "56cec682c7ec95138bdd3dbcb5af82f6730a2de9ac07c774278e780057d99812",
         "declaration_hash": "4a84e5ff2041b5b39abf5267dd60d1cd013687473165920ede0e73588bc19fce"
       },
       "obligation_id": {
@@ -414,7 +414,7 @@
       },
       "key": {
         "anchor_text_hash": "47402f138cf7ca2a1fb6e4af7b00745664ca3c0f20815f428f754dc57dfeba7f",
-        "bound_tests_set_hash": "0dd5fab452e116d441ea04cbe9306f218e9d5b9157c601880e8b07fbaada05a2",
+        "bound_tests_set_hash": "d694532f7606aa7dfaeb1b2cdd6a36f796df1455adbefe832d0ec3a112e2f67a",
         "declaration_hash": "4a84e5ff2041b5b39abf5267dd60d1cd013687473165920ede0e73588bc19fce"
       },
       "obligation_id": {
@@ -423,7 +423,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(matches!(\n            entry.kind(),\n            TypeKindV2::TypeAlias { generics, .. } if generics.is_empty()\n        ));\n\n        assert_eq!(value[\"types\"][\"ValueAlias\"][\"kind\"][\"target\"], \"String\");\n        assert!(value[\"types\"][\"ValueAlias\"][\"kind\"].get(\"generics\").is_none());\n\n        assert_eq!(generics.len(), 1);\n        assert_eq!(generics[0].name.as_str(), \"T\");\n        assert_eq!(\n            generics[0].bounds.iter().map(TypeRef::as_str).collect::<Vec<_>>(),\n            vec![\"Clone\", \"Send\"]\n        );\n\n        assert_eq!(round_tripped, doc);",
+        "citation": "assert!(matches!(\n            entry.kind(),\n            TypeKindV2::TypeAlias { generics, .. } if generics.is_empty()\n        ));\n\n        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();\n        let value: serde_json::Value = serde_json::from_str(&encoded).unwrap();\n        assert_eq!(value[\"types\"][\"ValueAlias\"][\"kind\"][\"target\"], \"String\");\n        assert!(value[\"types\"][\"ValueAlias\"][\"kind\"].get(\"generics\").is_none());\n\n        let TypeKindV2::TypeAlias { target, generics } = entry.kind() else {\n            panic!(\"expected TypeAlias kind\");\n        };\n        assert_eq!(target.as_str(), \"Result<T, DomainError>\");\n        assert_eq!(generics.len(), 1);\n        assert_eq!(generics[0].name.as_str(), \"T\");\n        assert_eq!(\n            generics[0].bounds.iter().map(TypeRef::as_str).collect::<Vec<_>>(),\n            vec![\"Clone\", \"Send\"]\n        );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"

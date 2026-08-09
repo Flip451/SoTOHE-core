@@ -257,7 +257,54 @@ pub(super) fn validate_type_alias_target(
     validation.map_err(|error| CatalogueDocumentCodecError::InvalidEntry {
         entry_name: entry_name.to_owned(),
         reason: format!("invalid type alias target: {error}"),
-    })
+    })?;
+    validate_type_alias_params_used(entry_name, target, generic_params)
+}
+
+/// Rejects declared type parameters that the alias TARGET never uses: rustc
+/// refuses the declaration outright (E0091), even when the parameter appears
+/// in bounds or where predicates, so the codec must not admit a contract no
+/// implementation can compile.
+fn validate_type_alias_params_used(
+    entry_name: &str,
+    target: &str,
+    generic_params: &[&str],
+) -> Result<(), CatalogueDocumentCodecError> {
+    if generic_params.is_empty() {
+        return Ok(());
+    }
+    let target_type = syn::parse_str::<syn::Type>(target).map_err(|error| {
+        CatalogueDocumentCodecError::InvalidEntry {
+            entry_name: entry_name.to_owned(),
+            reason: format!("invalid type alias target: {error}"),
+        }
+    })?;
+    struct PathRootCollector {
+        used: std::collections::BTreeSet<String>,
+    }
+    impl<'ast> syn::visit::Visit<'ast> for PathRootCollector {
+        fn visit_path(&mut self, node: &'ast syn::Path) {
+            if node.leading_colon.is_none() {
+                if let Some(first) = node.segments.first() {
+                    self.used.insert(first.ident.to_string());
+                }
+            }
+            syn::visit::visit_path(self, node);
+        }
+    }
+    let mut collector = PathRootCollector { used: std::collections::BTreeSet::new() };
+    syn::visit::Visit::visit_type(&mut collector, &target_type);
+    for param in generic_params {
+        if !collector.used.contains(*param) {
+            return Err(CatalogueDocumentCodecError::InvalidEntry {
+                entry_name: entry_name.to_owned(),
+                reason: format!(
+                    "type parameter `{param}` is not used in the alias target (rustc E0091)"
+                ),
+            });
+        }
+    }
+    Ok(())
 }
 
 /// Validates that `type_str` is syntactically well-formed as a Rust type expression

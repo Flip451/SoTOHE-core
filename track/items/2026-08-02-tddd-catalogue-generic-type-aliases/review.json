@@ -5091,6 +5091,57 @@
           "hash": "rvw1:sha256:51fc674c28905935a6abdd679a7233ba84bcc35e63ddd8a52973e98b9efae637",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T12:39:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c4da464ca87f749f7e3f7437bb85be89da0ba5478da7bd43f3c1081d823d3e2c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T12:47:01Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/closed_grammar.rs",
+              "line": 576,
+              "message": "The E0423 guard handles positional `Const` arguments but not `GenericArgument::AssocConst`. Consequently, an alias bound such as `Outer<FLAG = { N }>` can pass the closed grammar when `N` is a declared type parameter, although rustc rejects it as a type used as a value. Apply the same check to `assoc_const.value` and add an all-gates regression test.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/closed_grammar.rs",
+              "line": 333,
+              "message": "This change grows `closed_grammar.rs` to 708 production lines, exceeding the repository’s 700-line module maximum. Extract the new const-expression validation or another cohesive helper into a submodule.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c4da464ca87f749f7e3f7437bb85be89da0ba5478da7bd43f3c1081d823d3e2c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T12:55:18Z",
+          "findings": [
+            {
+              "category": "error handling",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/validate.rs",
+              "line": 277,
+              "message": "`validate_type_alias_params_used` silently turns a `syn::Type` parse failure into `Ok(())`. Even though the caller currently validates syntax first, this is a fail-open adapter path and violates the repository’s explicit no-silent-error-swallowing rule. Propagate the parse failure as `InvalidEntry` (or pass the already-parsed type into this helper).",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:2973a83f5977ec08d6fc43fea4aed156a9b43c5e9f0939274cdd7d2a3431412f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T13:00:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:92c2e462ae3f4b421b6faed631e81c542bab2a0c43d64b08559b921bb2a3dda7",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
