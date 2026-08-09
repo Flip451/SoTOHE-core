@@ -1175,6 +1175,26 @@ fn test_alias_lexical_gates_reject_reserved_bare_fn_parameter_names() {
 }
 
 #[test]
+fn test_alias_lexical_gates_reject_known_non_trait_types_as_bounds() {
+    // Rustc rejects a bound naming a known standard-library struct / enum
+    // (E0404, "expected trait, found struct"): only the exact std / core
+    // canonical paths resolve DEFINITIVELY, so only those reject.
+    assert_bound_spelling_rejected("std::vec::Vec<u8>");
+    assert_bound_spelling_rejected("std::string::String");
+    assert_bound_spelling_rejected("core::vec::Vec<u8>");
+    assert_bound_spelling_rejected("core::option::Option<u8>");
+    // Nested trait positions (trait objects) apply the same rule.
+    assert_alias_lexical_spelling_rejected_at_all_gates("Outer<dyn std::vec::Vec<u8>>");
+    assert_alias_lexical_spelling_rejected_at_all_gates("Outer<dyn core::vec::Vec<u8>>");
+    // A bare short name stays open-world: the trait-path resolver checks
+    // local catalogue items first, so `Vec` may name a local trait.
+    assert_bound_spelling_accepted("Vec<u8>");
+    // Known traits keep both spellings.
+    assert_bound_spelling_accepted("Clone");
+    assert_bound_spelling_accepted("std::clone::Clone");
+}
+
+#[test]
 fn test_alias_lexical_gates_reject_type_params_used_as_const_values() {
     // The schema has no const-parameter declaration, so a const expression
     // rooted at a declared type parameter is rustc's type-used-as-value
@@ -1534,6 +1554,13 @@ fn test_pr234_findings_regression_corpus_rejections() {
 /// lexical comparison).
 #[test]
 fn test_pr234_findings_regression_corpus_acceptances() {
+    // where-subject spelling (findings 20 / 22): `Vec<T>` stays `Vec<T>` in
+    // TYPE positions; as a trait BOUND it is rustc E0404 (a later round) and
+    // is therefore asserted for the type gate only.
+    assert!(
+        validate_lexical_type_ref("Vec<T>", &["T"]).is_ok(),
+        "the lexical type validator must accept the where-subject spelling `Vec<T>`"
+    );
     for spelling in [
         // prelude spelling preserved (finding 4)
         "Clone",
@@ -1555,8 +1582,6 @@ fn test_pr234_findings_regression_corpus_acceptances() {
         // signed and suffixed const literals (findings 18 / 19)
         "Outer<-3>",
         "Outer<3usize>",
-        // where-subject spelling (findings 20 / 22): `Vec<T>` stays `Vec<T>`
-        "Vec<T>",
         // quoted non-enumerated ABI (finding 23)
         "Outer<extern \"efiapi\" fn()>",
         // raw pointer const (finding 25)

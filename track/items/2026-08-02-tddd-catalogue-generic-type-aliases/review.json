@@ -5156,6 +5156,64 @@
           "hash": "rvw1:sha256:8e4066e769c2e4a5765778e2b52e424ea93662cba17fec79ae7aa0228b12d9e7",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T13:49:14Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/closed_grammar.rs",
+              "line": 265,
+              "message": "`core::vec::Vec` (and analogous canonical core paths such as `core::option::Option`) is not rejected: `core_canonical_path(\"Vec\")` returns `core::Vec`, so `known_non_trait_type` returns `None` and an invalid E0404 trait bound passes the closed grammar. Add correct core canonical paths or explicitly map these types, with regression tests.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:8503c57b9574c1a9975bec2290e44f6cd1c1c2b24e2cd1ade157566e757a9438",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T13:53:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:83f1c40ea51387d69b8f1605f9ba839cd5daf7370caab368663b951512fab3b5",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T13:59:05Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/closed_grammar.rs",
+              "line": 261,
+              "message": "Every single-segment known name is rejected without resolver context. The real trait-path resolver checks local catalogue items first, so a valid local trait such as `trait Vec<T>` used by `T: Vec<u8>` is incorrectly rejected as std's struct. `Formatter` is an even clearer case: it is not in `STD_PRELUDE_TYPES`, yet bare `Formatter` is rejected despite being open-world. Only reject short names proven to resolve to std, or pass local-resolution knowledge into this check.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/closed_grammar.rs",
+              "line": 229,
+              "message": "This change grows the production-only module from 696 to 775 lines, exceeding the repository's explicit 700-line maximum. Extract the standard non-trait path table and lookup logic into a focused submodule/helper.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:83f1c40ea51387d69b8f1605f9ba839cd5daf7370caab368663b951512fab3b5",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T14:12:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b23079306fb37d33a1987d2d6938dc5e96876bc36cd912baaacb8ae15a909f33",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T14:15:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b23079306fb37d33a1987d2d6938dc5e96876bc36cd912baaacb8ae15a909f33",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },

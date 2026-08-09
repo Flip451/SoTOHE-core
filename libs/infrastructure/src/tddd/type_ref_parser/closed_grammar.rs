@@ -33,15 +33,12 @@
 //! identified with their canonical form: the lexical contract is defined
 //! over the rustdoc representation, not over unobservable source bytes.
 
-use std::collections::HashMap;
-
 use proc_macro2::TokenStream;
-use rustdoc_types::Id;
 use syn::visit::Visit;
 
 use super::canonical_render::{render_bound, render_type};
 use super::constants::PRIMITIVE_TYPES;
-use super::parse_ctx::ParseCtx;
+use super::dummy_context::{convert_bound_with_dummy_context, convert_type_with_dummy_context};
 
 const NON_CANONICAL: &str = "non-canonical spelling: the catalogue must use the canonical form of the declaration \
      (the spelling rustdoc itself emits); this variant is normalized away by the \
@@ -131,73 +128,6 @@ fn tokens_match(a: &str, b: &str) -> bool {
     tokens_a.to_string() == tokens_b.to_string()
 }
 
-fn convert_bound_with_dummy_context(
-    syn_bound: &syn::TypeParamBound,
-    generic_params: &[&str],
-) -> rustdoc_types::GenericBound {
-    with_dummy_context(generic_params, |ctx| match syn_bound {
-        syn::TypeParamBound::Lifetime(lt) => {
-            rustdoc_types::GenericBound::Outlives(format!("'{}", lt.ident))
-        }
-        syn::TypeParamBound::Trait(tb) => {
-            let modifier = match tb.modifier {
-                syn::TraitBoundModifier::None => rustdoc_types::TraitBoundModifier::None,
-                syn::TraitBoundModifier::Maybe(_) => rustdoc_types::TraitBoundModifier::Maybe,
-            };
-            let generic_params_rendered =
-                super::parse_ctx::bound_lifetimes_to_generic_params(tb.lifetimes.as_ref());
-            let trait_path = ctx.resolve_trait_bound_path(&tb.path);
-            rustdoc_types::GenericBound::TraitBound {
-                trait_: trait_path,
-                generic_params: generic_params_rendered,
-                modifier,
-            }
-        }
-        syn::TypeParamBound::PreciseCapture(capture) => {
-            super::precise_capture::convert_precise_capture(capture)
-        }
-        _ => rustdoc_types::GenericBound::TraitBound {
-            trait_: rustdoc_types::Path {
-                path: "<unsupported_bound>".to_owned(),
-                id: Id(u32::MAX),
-                args: None,
-            },
-            generic_params: vec![],
-            modifier: rustdoc_types::TraitBoundModifier::None,
-        },
-    })
-}
-
-fn convert_type_with_dummy_context(
-    syn_type: &syn::Type,
-    generic_params: &[&str],
-) -> rustdoc_types::Type {
-    with_dummy_context(generic_params, |ctx| ctx.convert_type(syn_type))
-}
-
-/// Runs a conversion with inert resolver context. Resolution affects only
-/// graph IDs and external-crate registration, never the preserved spelling,
-/// so the canonical rendering is identical to the real encoding pass.
-fn with_dummy_context<R>(
-    generic_params: &[&str],
-    convert: impl FnOnce(&mut ParseCtx<'_, fn(&str) -> Option<Id>, Box<dyn FnMut(String) -> u32>>) -> R,
-) -> R {
-    fn no_local(_name: &str) -> Option<Id> {
-        None
-    }
-    let external_crate_ids: HashMap<String, u32> = HashMap::new();
-    let mut emit: Box<dyn FnMut(String) -> u32> = Box::new(|_name: String| 0);
-    let mut ctx = ParseCtx {
-        resolve_local: &(no_local as fn(&str) -> Option<Id>),
-        external_crate_ids: &external_crate_ids,
-        emit_external_crate: &mut emit,
-        std_crate_id: 0,
-        generic_params,
-        preserve_prelude_spelling: true,
-    };
-    convert(&mut ctx)
-}
-
 // ---------------------------------------------------------------------------
 // Rule B — syntax allowlist visitor
 // ---------------------------------------------------------------------------
@@ -222,6 +152,7 @@ fn is_reserved_declared_lifetime_name(name: &str) -> bool {
     matches!(name, "_" | "self" | "Self" | "super" | "crate")
 }
 
+/// Standard-library types (structs / enums) that a trait-position path can
 /// Whether a spelling is unavailable as a bare function-pointer parameter
 /// name in the current Rust edition. Weak keywords remain valid identifiers in
 /// this context (`raw`, `safe`, `union`, and `macro_rules`), so this must not
@@ -456,7 +387,11 @@ impl<'params, 'names> AllowlistVisitor<'params, 'names> {
     }
 
     /// A trait-position path must be able to name a trait: single-segment
-    /// primitives and paths rooted at a declared generic parameter cannot.
+    /// primitives, paths rooted at a declared generic parameter, and exact
+    /// std / core canonical paths of KNOWN standard-library non-trait types
+    /// (rustc E0404, "expected trait, found struct") cannot. Bare short names
+    /// stay open-world — the trait-path resolver checks local catalogue items
+    /// first, so `T: Vec<u8>` may legitimately name a local trait.
     fn check_trait_path(&mut self, path: &syn::Path) {
         let Some(first) = path.segments.first() else {
             self.reject("empty trait path");
@@ -470,6 +405,12 @@ impl<'params, 'names> AllowlistVisitor<'params, 'names> {
             && self.generic_params.iter().any(|generic| *generic == first_name)
         {
             self.reject("a declared generic parameter cannot be used as a trait bound");
+        }
+        if let Some(known) = super::non_trait_paths::known_non_trait_type(path) {
+            self.reject(&format!(
+                "`{known}` is a standard-library type, not a trait, and cannot be used as a \
+                 trait bound (rustc E0404)"
+            ));
         }
     }
 }
