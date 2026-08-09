@@ -1206,12 +1206,15 @@ fn test_alias_target_grammar_accepts_source_declarable_named_lifetimes_only() {
         "Unicode lifetime names valid in source declarations must stay valid in generic alias targets"
     );
     assert!(
-        validate_lexical_alias_target("&'r#async T", &["T"]).is_ok(),
-        "raw keyword lifetime names valid in source declarations must stay valid in generic alias targets"
-    );
-    assert!(
         validate_lexical_alias_target("&'async T", &["T"]).is_ok(),
         "rustdoc-normalized keyword lifetime names must stay valid in generic alias targets"
+    );
+    // Raw spellings never appear in rustdoc output (`'r#async` normalizes to
+    // `'async`), so retaining them would guarantee a chain mismatch: the
+    // normalized spelling is the one accepted representation.
+    assert!(
+        validate_lexical_alias_target("&'r#async T", &["T"]).is_err(),
+        "a raw lifetime spelling must be rejected in favor of its normalized form"
     );
     // Anonymous and reserved lifetime names are not valid in a type-alias
     // signature, while bound / subject positions keep the scoped rule.
@@ -1243,14 +1246,26 @@ fn test_lexical_gates_reject_reserved_lifetime_binder_declarations() {
 }
 
 #[test]
-fn test_closed_grammar_normalizes_raw_lifetime_names_in_hrtb_scopes() {
+fn test_closed_grammar_rejects_raw_lifetime_spellings_in_hrtb_scopes() {
+    // rustdoc 1.95 normalizes `'r#async` to `'async` in both the binder and
+    // its uses, so a raw catalogue spelling can never match the observed
+    // representation: the lexical boundary rejects it toward the normalized
+    // form instead of retaining bytes that guarantee a chain mismatch.
     assert!(
-        validate_lexical_generic_bound("for<'r#a> Fn(&'a ())", &["T"]).is_ok(),
-        "a use of a raw-named binder lifetime must resolve through its ordinary spelling"
+        validate_lexical_generic_bound("for<'r#async> Tr<&'r#async u8>", &["T"]).is_err(),
+        "a raw binder lifetime and its raw uses must be rejected"
     );
     assert!(
-        validate_lexical_generic_bound("for<'a, 'r#a> Fn(&'a ())", &["T"]).is_err(),
-        "a raw-named binder lifetime must not bypass duplicate-declaration rejection"
+        validate_lexical_generic_bound("for<'r#a> Fn(&'a ())", &["T"]).is_err(),
+        "a raw binder declaration must be rejected even when its uses are normalized"
+    );
+    assert!(
+        validate_lexical_generic_bound("for<'a> Fn(&'r#a ())", &["T"]).is_err(),
+        "a raw lifetime use must be rejected even under a normalized binder"
+    );
+    assert!(
+        validate_lexical_generic_bound("for<'async> Tr<&'async u8>", &["T"]).is_ok(),
+        "the rustdoc-normalized keyword spelling must stay accepted"
     );
 }
 

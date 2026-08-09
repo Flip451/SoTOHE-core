@@ -208,24 +208,18 @@ enum LifetimePolicy {
     /// Bound / where positions: only `'static` or binder-introduced names.
     ScopedOnly,
     /// Alias targets: source-declarable named lifetimes (the schema cannot
-    /// declare lifetime parameters, so targets carry them lexically); `'_`
-    /// and Rust's reserved lifetime names stay rejected.
+    /// declare lifetime parameters, so targets carry them lexically); `'_`,
+    /// Rust's reserved lifetime names, and raw spellings (never
+    /// rustdoc-observable) stay rejected.
     AnyNamed,
-}
-
-/// The lifetime name used for Rust declaration/scope comparison. Raw
-/// identifiers and their ordinary spelling name the same lifetime.
-fn normalized_lifetime_name(name: &str) -> &str {
-    name.strip_prefix("r#").unwrap_or(name)
 }
 
 /// Whether a lifetime spelling is reserved where a source declaration must
 /// introduce a user-defined lifetime. `syn` validates token syntax; this
 /// closes the remaining rustc-reserved names while leaving keyword and Unicode
-/// lifetime names available.
+/// lifetime names available. Raw spellings are rejected before this check.
 fn is_reserved_declared_lifetime_name(name: &str) -> bool {
-    matches!(normalized_lifetime_name(name), "_" | "self" | "Self" | "super" | "crate")
-        || name == "r#static"
+    matches!(name, "_" | "self" | "Self" | "super" | "crate")
 }
 
 struct AllowlistVisitor<'params, 'names> {
@@ -261,15 +255,29 @@ impl<'params, 'names> AllowlistVisitor<'params, 'names> {
         }
     }
 
+    /// Rejects raw lifetime spellings: rustdoc normalizes `'r#async` to
+    /// `'async` in its output, so a raw spelling in the catalogue can never
+    /// match the observed representation. The normalized spelling is the one
+    /// accepted representation of a raw source declaration.
+    fn check_raw_lifetime_spelling(&mut self, name: &str) -> bool {
+        if let Some(stripped) = name.strip_prefix("r#") {
+            self.reject(&format!(
+                "raw lifetime `'{name}` never appears in rustdoc output (it normalizes to \
+                 `'{stripped}`); use the normalized spelling"
+            ));
+            return true;
+        }
+        false
+    }
+
     fn check_lifetime_use(&mut self, lifetime: &syn::Lifetime) {
         let name = lifetime.ident.to_string();
-        let normalized_name = normalized_lifetime_name(&name);
+        if self.check_raw_lifetime_spelling(&name) {
+            return;
+        }
         match self.lifetime_policy {
             LifetimePolicy::ScopedOnly => {
-                if name == "r#static"
-                    || (normalized_name != "static"
-                        && !self.lifetime_scope.iter().any(|scoped| scoped == normalized_name))
-                {
+                if name != "static" && !self.lifetime_scope.contains(&name) {
                     self.reject(&format!(
                         "lifetime `'{name}` is neither `'static` nor introduced by a visible \
                          `for<>` binder"
@@ -279,8 +287,8 @@ impl<'params, 'names> AllowlistVisitor<'params, 'names> {
             LifetimePolicy::AnyNamed => {
                 // `syn` has already checked lifetime-token syntax.  These
                 // are the remaining reserved forms that rustc does not allow
-                // in lifetime declarations; raw keyword names such as
-                // `'r#async` remain source-declarable and are accepted.
+                // in lifetime declarations; rustdoc-normalized keyword names
+                // such as `'async` remain accepted.
                 if is_reserved_declared_lifetime_name(&name) {
                     self.reject(&format!(
                         "lifetime `'{name}` is not valid in a type-alias signature"
@@ -312,18 +320,22 @@ impl<'params, 'names> AllowlistVisitor<'params, 'names> {
                     // A binder must DECLARE fresh names: reserved names are
                     // rejected by rustc (E0262), and a name already in scope is
                     // a duplicate or shadowing declaration (E0403 / E0496).
+                    // Raw spellings are rejected as never rustdoc-observable.
                     let name = lifetime_param.lifetime.ident.to_string();
-                    let normalized_name = normalized_lifetime_name(&name);
-                    if normalized_name == "static" || is_reserved_declared_lifetime_name(&name) {
-                        self.reject(&format!("`'{name}` cannot be declared by a `for<>` binder"));
+                    if !self.check_raw_lifetime_spelling(&name) {
+                        if name == "static" || is_reserved_declared_lifetime_name(&name) {
+                            self.reject(&format!(
+                                "`'{name}` cannot be declared by a `for<>` binder"
+                            ));
+                        }
+                        if self.lifetime_scope.contains(&name) {
+                            self.reject(&format!(
+                                "binder lifetime `'{name}` duplicates or shadows a lifetime \
+                                 already in scope"
+                            ));
+                        }
                     }
-                    if self.lifetime_scope.iter().any(|scoped| scoped == normalized_name) {
-                        self.reject(&format!(
-                            "binder lifetime `'{name}` duplicates or shadows a lifetime already \
-                             in scope"
-                        ));
-                    }
-                    self.lifetime_scope.push(normalized_name.to_owned());
+                    self.lifetime_scope.push(name);
                     added += 1;
                 }
                 syn::GenericParam::Type(_) | syn::GenericParam::Const(_) => {

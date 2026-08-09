@@ -57,6 +57,100 @@ pub(super) fn is_valid_generic_param_name(name: &str) -> bool {
 /// invokes this adapter-boundary validation after conversion so raw, keyword,
 /// and wildcard spellings produce the same `InvalidEntry` error shape as other
 /// malformed fields.
+/// Rejects more than one relaxed (`?`-prefixed) bound per alias parameter.
+/// Rustc refuses `T: ?Sized + ?Sized` (E0203) whether the duplicates are
+/// inline, in the where clause, or split across both, so the codec must not
+/// admit an alias contract no implementation can compile. Non-alias entries
+/// keep the legacy per-bound surface (spec OUT-01).
+pub(super) fn validate_type_alias_relaxed_bounds(
+    entry_name: &str,
+    generics: &[MethodGenericParam],
+    where_predicates: &[WherePredicateDecl],
+) -> Result<(), CatalogueDocumentCodecError> {
+    for generic in generics {
+        let inline = generic
+            .bounds
+            .iter()
+            .map(|bound| is_relaxed_bound(bound.as_str()))
+            .try_fold(0usize, |count, relaxed| relaxed.map(|relaxed| count + usize::from(relaxed)))
+            .map_err(|error| invalid_relaxed_bound_syntax(entry_name, error))?;
+        let in_where = where_predicates
+            .iter()
+            .try_fold(0usize, |count, predicate| {
+                if !matches!(predicate.operator, BoundOp::Bound) {
+                    return Ok(count);
+                }
+                predicate_targets_generic_param(predicate.lhs.as_str(), generic.name.as_str())
+                    .and_then(|matches| {
+                        if !matches {
+                            return Ok(count);
+                        }
+                        predicate.rhs.iter().try_fold(count, |count, bound| {
+                            is_relaxed_bound(bound.as_str())
+                                .map(|relaxed| count + usize::from(relaxed))
+                        })
+                    })
+            })
+            .map_err(|error| invalid_relaxed_bound_syntax(entry_name, error))?;
+        if inline + in_where > 1 {
+            return Err(CatalogueDocumentCodecError::InvalidEntry {
+                entry_name: entry_name.to_owned(),
+                reason: format!(
+                    "type parameter `{}` has more than one relaxed bound (rustc E0203); \
+                     duplicate `?Sized` bounds cannot compile",
+                    generic.name.as_str()
+                ),
+            });
+        }
+    }
+    Ok(())
+}
+
+fn invalid_relaxed_bound_syntax(entry_name: &str, error: String) -> CatalogueDocumentCodecError {
+    CatalogueDocumentCodecError::InvalidEntry {
+        entry_name: entry_name.to_owned(),
+        reason: format!("invalid type alias relaxed bound: {error}"),
+    }
+}
+
+/// Returns whether `bound` is a relaxed bound according to its parsed Rust
+/// syntax, rather than its source bytes. The closed grammar deliberately
+/// accepts token-equivalent comments and whitespace, neither of which may
+/// change whether `?Sized` counts toward rustc E0203.
+fn is_relaxed_bound(bound: &str) -> Result<bool, String> {
+    let syntax_str = bound.strip_prefix("~const ").map_or(bound, str::trim_start);
+    let parsed = syn::parse_str::<syn::TypeParamBound>(syntax_str)
+        .map_err(|error| format!("invalid bound syntax '{bound}': {error}"))?;
+    Ok(matches!(
+        parsed,
+        syn::TypeParamBound::Trait(syn::TraitBound {
+            modifier: syn::TraitBoundModifier::Maybe(_),
+            ..
+        })
+    ))
+}
+
+/// Returns whether `lhs` parses as precisely the declared generic parameter.
+/// This semantic comparison accepts the same token-equivalent whitespace and
+/// comments as the lexical grammar while excluding paths, projections, and
+/// type arguments that do not name the parameter itself.
+fn predicate_targets_generic_param(lhs: &str, generic_name: &str) -> Result<bool, String> {
+    let parsed = syn::parse_str::<syn::Type>(lhs)
+        .map_err(|error| format!("invalid where predicate lhs '{lhs}': {error}"))?;
+    let syn::Type::Path(type_path) = parsed else {
+        return Ok(false);
+    };
+    let path = type_path.path;
+    let Some(segment) = path.segments.first() else {
+        return Ok(false);
+    };
+    Ok(type_path.qself.is_none()
+        && path.leading_colon.is_none()
+        && path.segments.len() == 1
+        && segment.ident == generic_name
+        && matches!(segment.arguments, syn::PathArguments::None))
+}
+
 /// Rejects keyword / raw generic parameter names for a type alias BEFORE the
 /// shared DTO conversion runs, so the alias-specific name error fires
 /// regardless of the entry's bound contents. The shared conversion itself

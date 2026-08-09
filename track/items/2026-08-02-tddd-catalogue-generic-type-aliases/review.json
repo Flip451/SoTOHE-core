@@ -4784,6 +4784,50 @@
           "hash": "rvw1:sha256:509892380d8a51f0bdc904a4ed8478189d26668207d346358c374c78c7655b3f",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T08:03:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e2a17e635c818260a63267216b92c8f75818f21b3e5251049eb87be62d6bcb8d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T08:11:06Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/validate.rs",
+              "line": 76,
+              "message": "The new E0203 gate compares lexical fields as raw strings even though the closed grammar accepts token-equivalent whitespace and comments. For example, inline `?Sized` plus `where` LHS `\" T \"` and RHS `\"?Sized\"` bypasses the exact LHS comparison; a bound such as `\"/*comment*/ ?Sized\"` similarly bypasses `starts_with('?')`. Both decode and encode can therefore admit duplicate relaxed bounds. Parse or token-normalize the LHS and bounds before matching and counting them.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e2a17e635c818260a63267216b92c8f75818f21b3e5251049eb87be62d6bcb8d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T08:22:32Z",
+          "findings": [
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/validate.rs",
+              "line": 121,
+              "message": "`is_relaxed_bound` reparses every alias bound directly as `syn::TypeParamBound`, but the alias grammar intentionally accepts `~const Trait` after stripping the modifier. Consequently, a valid generic alias containing `~const Clone` now fails both decode and encode as an invalid relaxed-bound syntax even though it contains no relaxed bound. Strip and validate the supported `~const` prefix before classifying the bound.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e12771df4d98c4a3e18c1783b43a8978d8a4f5fee07630ee7a5e1c00754205fd",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T08:29:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9d3a89d1cf50597422eabe2d314b9e9565aeb9d2eee15e6a6d450afb0cad74d4",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },

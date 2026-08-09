@@ -29,8 +29,9 @@ use super::dto_roles::{
 use super::dto_slots::{EntrySlotDto, TombstoneDto};
 use super::encode_validate::{validate_generic_params_for_encode, validate_type_alias_generics};
 use super::validate::{
-    validate_bound_str_with_generics, validate_type_alias_target,
-    validate_type_alias_where_predicates, validate_type_ref_str_with_generics,
+    validate_bound_str_with_generics, validate_type_alias_relaxed_bounds,
+    validate_type_alias_target, validate_type_alias_where_predicates,
+    validate_type_ref_str_with_generics,
 };
 
 // ---------------------------------------------------------------------------
@@ -176,11 +177,18 @@ pub(super) fn type_entry_to_dto(
         .map(|method| method_decl_to_dto_with_outer_generics(method, &effective_generic_names))
         .collect::<Result<_, _>>()?;
     let kind = type_kind_to_dto(entry_name, entry.kind(), entry.generics())?;
-    if matches!(entry.kind(), TypeKindV2::TypeAlias { .. }) {
+    if let TypeKindV2::TypeAlias { generics: alias_generics, .. } = entry.kind() {
         validate_type_alias_where_predicates(
             entry_name,
             entry.where_predicates(),
             &effective_generic_names,
+        )?;
+        let effective_generics =
+            if alias_generics.is_empty() { entry.generics() } else { alias_generics.as_slice() };
+        validate_type_alias_relaxed_bounds(
+            entry_name,
+            effective_generics,
+            entry.where_predicates(),
         )?;
     }
     let where_predicates = entry

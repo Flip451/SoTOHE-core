@@ -7,8 +7,8 @@ use domain::tddd::catalogue_v2::entries::{TraitEntry, TypeEntry};
 use domain::tddd::catalogue_v2::identifiers::{DocString, FieldName, VariantName};
 use domain::tddd::catalogue_v2::variants::{FieldDecl, VariantDecl, VariantPayload};
 use domain::tddd::catalogue_v2::{
-    CatalogueDocument, CrateName, DeletionRecord, FunctionPath, ItemAction, MethodName, ModulePath,
-    TraitImplDeclV2, TraitName, TypeName, TypeRef,
+    CatalogueDocument, CrateName, DeletionRecord, FunctionPath, ItemAction, MethodGenericParam,
+    MethodName, ModulePath, TraitImplDeclV2, TraitName, TypeName, TypeRef,
 };
 use std::str::FromStr;
 
@@ -26,8 +26,8 @@ use super::dto::{
 use super::dto_slots::{EntrySlotDto, TombstoneDto};
 use super::validate::{
     validate_bound_str_with_generics, validate_type_alias_generic_name_strs,
-    validate_type_alias_generic_names, validate_type_alias_target,
-    validate_type_alias_where_predicates,
+    validate_type_alias_generic_names, validate_type_alias_relaxed_bounds,
+    validate_type_alias_target, validate_type_alias_where_predicates,
 };
 use crate::tddd::spec_ground_codec::{informal_grounds_from_dtos, spec_refs_from_dtos};
 // Keep the path-only validator referenced for callers outside top-level impl slots.
@@ -222,8 +222,11 @@ pub(super) fn type_entry_from_dto(
         .collect::<Result<Vec<_>, _>>()?;
     let where_predicates =
         where_predicates_from_dtos_with_generics(name, dto.where_predicates, &generic_names)?;
-    if matches!(&kind, TypeKindV2::TypeAlias { .. }) {
+    if let TypeKindV2::TypeAlias { generics: alias_generics, .. } = &kind {
         validate_type_alias_where_predicates(name, &where_predicates, &generic_names)?;
+        let effective_generics: &[MethodGenericParam] =
+            if alias_generics.is_empty() { &generics } else { alias_generics };
+        validate_type_alias_relaxed_bounds(name, effective_generics, &where_predicates)?;
     }
 
     let module_path = if dto.module_path.is_empty() {

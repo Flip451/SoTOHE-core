@@ -843,10 +843,14 @@ mod tests {
             "a Unicode named target lifetime must stay decodable (lexical lifetime convention)"
         );
 
+        // Raw spellings never appear in rustdoc output (they normalize to the
+        // plain keyword form), so retaining them would guarantee a chain
+        // mismatch: the normalized spelling below is the one representation.
         let raw_keyword_lifetime = json.replace("\"T<u8>\"", "\"&'r#async T\"");
+        let error = CatalogueDocumentCodec::decode(&raw_keyword_lifetime, "domain").unwrap_err();
         assert!(
-            CatalogueDocumentCodec::decode(&raw_keyword_lifetime, "domain").is_ok(),
-            "a raw keyword target lifetime must stay decodable when valid in source"
+            error.to_string().contains("invalid type alias target"),
+            "a raw target lifetime spelling must fail at decode, got: {error}"
         );
 
         let normalized_keyword_lifetime = json.replace("\"T<u8>\"", "\"&'async T\"");
@@ -1076,6 +1080,137 @@ mod tests {
                 if entry_name == "BadAlias"
                     && reason.contains("not a plain non-keyword Rust identifier")),
             "unexpected error: {err:?}"
+        );
+    }
+
+    #[test]
+    fn test_decode_type_alias_rejects_duplicate_relaxed_bounds() {
+        // rustc E0203 permits at most one relaxed bound per parameter,
+        // whether the duplicates are inline, split into the where clause, or
+        // both — the codec must not admit a contract that cannot compile.
+        let inline_duplicates = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "RelaxedAlias": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "type_alias",
+        "target": "*const T",
+        "generics": [{ "name": "T", "bounds": ["?Sized", "?Sized"] }]
+      }
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+        let error = CatalogueDocumentCodec::decode(inline_duplicates, "domain").unwrap_err();
+        assert!(
+            matches!(error, CatalogueDocumentCodecError::InvalidEntry { ref entry_name, ref reason }
+                if entry_name == "RelaxedAlias" && reason.contains("more than one relaxed bound")),
+            "unexpected error: {error:?}"
+        );
+
+        let split_duplicates = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "RelaxedAlias": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "type_alias",
+        "target": "*const T",
+        "generics": [{ "name": "T", "bounds": ["?Sized"] }]
+      },
+      "where_predicates": [
+        { "lhs": "T", "rhs": ["?Sized"], "operator": "Bound" }
+      ]
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+        let error = CatalogueDocumentCodec::decode(split_duplicates, "domain").unwrap_err();
+        assert!(
+            matches!(error, CatalogueDocumentCodecError::InvalidEntry { ref entry_name, ref reason }
+                if entry_name == "RelaxedAlias" && reason.contains("more than one relaxed bound")),
+            "unexpected error: {error:?}"
+        );
+
+        // The closed grammar accepts comments and whitespace as token-equivalent
+        // spellings. They must not let an otherwise duplicate `?Sized` evade
+        // the E0203 aggregation.
+        let lexical_variant_duplicates = split_duplicates.replace(
+            "\"lhs\": \"T\", \"rhs\": [\"?Sized\"]",
+            "\"lhs\": \" /* parameter */ T \", \"rhs\": [\"/* relaxed */ ?Sized\"]",
+        );
+        let error =
+            CatalogueDocumentCodec::decode(&lexical_variant_duplicates, "domain").unwrap_err();
+        assert!(
+            matches!(error, CatalogueDocumentCodecError::InvalidEntry { ref entry_name, ref reason }
+                if entry_name == "RelaxedAlias" && reason.contains("more than one relaxed bound")),
+            "unexpected error: {error:?}"
+        );
+
+        // A single relaxed bound stays valid.
+        let single = inline_duplicates.replace("\"?Sized\", \"?Sized\"", "\"?Sized\"");
+        assert!(
+            CatalogueDocumentCodec::decode(&single, "domain").is_ok(),
+            "a single `?Sized` bound must stay decodable"
+        );
+
+        // A supported non-relaxed `~const` bound is not part of the E0203
+        // count and must continue through both codec directions.
+        let maybe_const = single.replace("\"?Sized\"", "\"~const Clone\"");
+        let document = CatalogueDocumentCodec::decode(&maybe_const, "domain").unwrap();
+        assert!(
+            CatalogueDocumentCodec::encode(&document).is_ok(),
+            "a non-relaxed `~const` bound must stay encodable"
+        );
+    }
+
+    #[test]
+    fn test_encode_type_alias_rejects_token_equivalent_duplicate_relaxed_bounds() {
+        let mut doc = CatalogueDocument::new(
+            SCHEMA_VERSION,
+            CrateName::new("domain").unwrap(),
+            LayerId::try_new("domain").unwrap(),
+        );
+        doc.insert_type(
+            TypeName::new("RelaxedAlias").unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::TypeAlias {
+                    target: TypeRef::new("*const T").unwrap(),
+                    generics: vec![MethodGenericParam {
+                        name: ParamName::new("T").unwrap(),
+                        bounds: vec![TypeRef::new("?Sized").unwrap()],
+                    }],
+                },
+                vec![],
+                vec![],
+                vec![WherePredicateDecl {
+                    lhs: TypeRef::new("/* parameter */ T").unwrap(),
+                    rhs: vec![TypeRef::new("/* relaxed */ ?Sized").unwrap()],
+                    operator: BoundOp::Bound,
+                }],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let error = CatalogueDocumentCodec::encode(&doc).unwrap_err();
+        assert!(
+            matches!(error, CatalogueDocumentCodecError::InvalidEntry { ref entry_name, ref reason }
+                if entry_name == "RelaxedAlias" && reason.contains("more than one relaxed bound")),
+            "unexpected error: {error:?}"
         );
     }
 
