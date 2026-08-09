@@ -19,8 +19,11 @@ use crate::spec;
 use crate::tddd::catalogue_document_codec::{CatalogueDocumentCodec, CatalogueDocumentCodecError};
 use crate::tddd::type_signals_codec;
 use crate::track::symlink_guard::reject_symlinks_below;
+use crate::track_artifact::{TrackArtifactReadError, read_track_artifact};
 use crate::type_catalogue_render;
 use crate::verify::tddd_layers::{LoadTdddLayersError, load_tddd_layers};
+
+const MAX_TYPE_BASELINE_BYTES: u64 = 64 * 1024 * 1024;
 
 /// Renders `plan.md` and `registry.md` from metadata.json and writes changed files atomically.
 ///
@@ -356,13 +359,39 @@ pub fn sync_rendered_views(
                                             let current = type_signals_codec::declaration_hash(
                                                 catalogue_content.as_bytes(),
                                             );
-                                            if *sd.cache_key().declaration_hash() == current {
+                                            let baseline_is_fresh = match read_track_artifact(
+                                                &root.join(TRACK_ITEMS_DIR),
+                                                track.id(),
+                                                &binding.baseline_file(),
+                                                MAX_TYPE_BASELINE_BYTES,
+                                            ) {
+                                                // A fresh checkout may not have a local baseline
+                                                // authority. Preserve the existing declaration-
+                                                // only rendering in that case.
+                                                Err(TrackArtifactReadError::NotFound) => true,
+                                                // Once a baseline path is present, it is an
+                                                // authority for display too. Any read failure
+                                                // (including a symlink, non-regular file,
+                                                // oversized, or invalid UTF-8 file) makes the
+                                                // signal document unavailable rather than
+                                                // allowing stale emojis through.
+                                                Err(TrackArtifactReadError::Failed(_)) => false,
+                                                Ok(baseline) => {
+                                                    *sd.cache_key().baseline_hash()
+                                                        == type_signals_codec::baseline_hash(
+                                                            baseline.as_bytes(),
+                                                        )
+                                                }
+                                            };
+                                            if *sd.cache_key().declaration_hash() == current
+                                                && baseline_is_fresh
+                                            {
                                                 Some(sd.signals().to_vec())
                                             } else {
                                                 eprintln!(
-                                                    "warning: ignoring stale {} for {} \
-                                                     (declaration_hash mismatch) — rendered \
-                                                     signal column will fall back to `—`",
+                                                    "warning: ignoring stale or unavailable {} for {} \
+                                                     (declaration/baseline freshness mismatch) — \
+                                                     rendered signal column will fall back to `—`",
                                                     binding.signal_file(),
                                                     track_dir.display()
                                                 );

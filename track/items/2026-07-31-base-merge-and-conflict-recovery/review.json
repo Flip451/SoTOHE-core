@@ -2110,6 +2110,42 @@
           "hash": "rvw1:sha256:488ac800f903d98dadb68bd976befaa09f8753e8c74246227827509ec96157e8",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T16:01:53Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 65,
+              "message": "`plan.sections[].description` for S6 restates the behavior contract (“render stale present-baseline type-signal documents as unavailable rather than reproducing their stale display status”) instead of limiting the section text to target + operation + anchor cite. Remove the behavioral prose and retain the AC/IN/CN anchors.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 205,
+              "message": "Task T015 restates the behavior contract (“with a mismatched present-baseline hash as unavailable using the existing placeholder, while preserving structural-absence behavior”) in prose. Per `.harness/policies/no-upstream-restatement.md`, retain the target, operation, and anchors without re-explaining upstream behavior.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a683c3f701d64ee3adb38b003b449b46abfa6d54f7119f15d4d65b223109f658",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T16:04:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9f8653ee91190d4cebec16d1015187d113a039ec791ec7322a29c485f102f7c7",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T16:08:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9f8653ee91190d4cebec16d1015187d113a039ec791ec7322a29c485f102f7c7",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -4300,6 +4336,35 @@
           "at": "2026-08-09T13:10:01Z",
           "findings": [],
           "hash": "rvw1:sha256:62b01dbb1b3cc83ee81706e1cbf230c1a555248997b6f33cb44fe142f7405cd6",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T15:40:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cf727aff4cc8200bdf826b7039ceca9c9e97ef1f26bfdf6816ce28b2378e9c96",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T15:47:15Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/track/render/sync.rs",
+              "line": 379,
+              "message": "`bounded_read_utf8_file` applies the capability-definition limit of 4 MiB, but valid rustdoc baselines are accepted up to 64 MiB. The current track already contains matching baselines between 5.9 MiB and 18.4 MiB, so this branch marks them unavailable and permanently renders `—` despite fresh cache hashes. Use a symlink-safe reader or streaming hash with the baseline limit, and cover a matching baseline larger than 4 MiB.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:cf727aff4cc8200bdf826b7039ceca9c9e97ef1f26bfdf6816ce28b2378e9c96",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T15:58:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ed2c3df1129c23dbb5e94c09af71725da5cd183e6ae0a6f24ef7e8a6a9bdd0bc",
           "type": "final",
           "verdict": "zero_findings"
         }

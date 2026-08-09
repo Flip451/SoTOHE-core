@@ -4,9 +4,9 @@
 ## Summary
 
 GO-01 → T001–T004, T010, T011, T013, and T014.
-GO-02 → T005–T009 and T012.
+GO-02 → T005–T009, T012, and T015.
 
-## Tasks (14/14 resolved)
+## Tasks (14/15 resolved)
 
 ### S1 — Guarded base merge
 
@@ -46,3 +46,9 @@ GO-02 → T005–T009 and T012.
 > Resolve the develop 83c64c2e apps/cli conflict and execute recovery baseline-currency capture. AC-04.
 
 - [x] **T014**: Integrate the second base merge (develop 83c64c2e) by resolving the existing conflict hunks in `apps/cli/src/commands/track/mod.rs` and `apps/cli/src/main.rs`, then run `bin/sotp track baseline-capture --source-workspace <exact-merged-base-disposable-clone>` to refresh the active track's per-layer `<layer>-types-baseline.json` files after recovery review. AC-04. (`e44e0e56`)
+
+### S6 — Baseline-fresh rendered signals
+
+> Update type-signals rendering in `libs/infrastructure/src/track/render/sync.rs` and add focused regression coverage. IN-05; CN-03; CN-04; AC-07; AC-09.
+
+- [~] **T015**: Update type-signals rendering in `libs/infrastructure/src/track/render/sync.rs` and add focused regression coverage. IN-05; CN-03; CN-04; AC-07; AC-09.

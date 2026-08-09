@@ -85,6 +85,7 @@
       {"layer": "infrastructure", "entry_key": "infrastructure::verify::spec_states::check_impl_catalog_from_signals_file"}
     ],
     "T013": [],
-    "T014": []
+    "T014": [],
+    "T015": []
   }
 }
