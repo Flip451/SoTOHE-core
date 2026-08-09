@@ -218,3 +218,9 @@ rollback-diagnoser の ADR routing を受けた D4 改訂の承認を User に�
 test-obligation は verifier の理由シフト型振動が TypeSignalsError 系 voluntary edge で 3 巡続いたため、(1) AC-07 は error enum が cache 比較 promise を証明できないという categorical Substitution と判定し、type-designer が entry の spec_refs から AC-07 を除去・voluntary record を削除、(2) 残る record 群は「error channel + lifecycle + 成分感度」の同一 superset を全 record に一括適用して閉鎖した。TrackBlobReader 系 edge にも同じ成分感度 union を拡張し、evaluate 320/320 pass・check passed で収束。types scope の no-upstream-restatement P1 ×2 は type-designer が docs を citation 形式へ圧縮して解消。最終的に 8 scope すべて final zero_findings で approved。
 
 merge 裁定への追加確認事項: delta ADR D1 の第 2 改訂（nightly 可用性の probe 分解、旧 features-baseline proxy ゲートの置換）、TypeSignalsError の AC-07 spec_refs 除去。
+
+## 2026-08-09: merge-2 統合レビューでの thin-bin 指摘の処置
+
+cli scope の final reviewer が、develop から取り込んだ tracing レーン（PR #238）の main.rs telemetry オーケストレーションを CLI thin-bin contract 違反として指摘した。これは originating lane で審査済みの設計であり、本 track の統合ラウンドの管轄外と裁定（briefing の Known Accepted Deviations に明記）。thin-bin contract との整合は follow-up track / merge 裁定の確認事項として記録する。
+
+cli_driver final も同 class の 3 P1（telemetry の context capture / archive routing / completion-eligibility の usecase 移設要求）を報告した。いずれも PR #238 の設計への再審理であり、cli main.rs の thin-bin 指摘と併せて follow-up track 候補として記録し、統合ラウンドでは Known Accepted Deviation とした。

@@ -3,10 +3,10 @@
 
 ## Summary
 
-GO-01 → T001–T004, T010, T011, and T013.
+GO-01 → T001–T004, T010, T011, T013, and T014.
 GO-02 → T005–T009 and T012.
 
-## Tasks (13/13 resolved)
+## Tasks (13/14 resolved)
 
 ### S1 — Guarded base merge
 
@@ -40,3 +40,9 @@ GO-02 → T005–T009 and T012.
 > Pin isolated baseline-worktree git operations to the main repository's current absolute hook path. IN-02; CN-05; AC-03; AC-10.
 
 - [x] **T013**: Pin every ephemeral base-merge worktree git operation in `libs/infrastructure/src/base_merge.rs` to the main repository's absolute current `.githooks` path, and add regression coverage. IN-02; CN-05; AC-03; AC-10. (`037748e67a34f72bc18caaa352ccc884b507c596`)
+
+### S5 — Second guarded base-merge integration
+
+> Resolve the develop 83c64c2e apps/cli conflict and execute recovery baseline-currency capture. AC-04.
+
+- [~] **T014**: Integrate the second base merge (develop 83c64c2e) by resolving the existing conflict hunks in `apps/cli/src/commands/track/mod.rs` and `apps/cli/src/main.rs`, then run `bin/sotp track baseline-capture --source-workspace <exact-merged-base-disposable-clone>` to refresh the active track's per-layer `<layer>-types-baseline.json` files after recovery review. AC-04.

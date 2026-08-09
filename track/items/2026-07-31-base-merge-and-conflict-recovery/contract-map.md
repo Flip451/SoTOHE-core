@@ -443,7 +443,6 @@ subgraph cli["cli"]
     T20_cli_cli_TrackCommand_CatalogueImplSignals[CatalogueImplSignals]
     T20_cli_cli_TrackCommand_SwitchBase[SwitchBase]
     T20_cli_cli_TrackCommand_MergeBase[MergeBase]
-    T20_cli_cli_TrackCommand_items_dir([items_dir])
   end
   F35_cli_cli_cli__commands__git__execute[[execute]]
   F74_cli_cli_cli__commands__track__dispatch__dispatch_track_cmd_with_base_merge[[dispatch_track_cmd_with_base_merge]]
@@ -740,7 +739,6 @@ class T20_cli_cli_TrackCommand_Lint variant_node
 class T20_cli_cli_TrackCommand_CatalogueImplSignals variant_node
 class T20_cli_cli_TrackCommand_SwitchBase variant_node
 class T20_cli_cli_TrackCommand_MergeBase variant_node
-class T20_cli_cli_TrackCommand_items_dir method_node
 class T20_cli_cli_TrackCommand__self dto
 class F35_cli_cli_cli__commands__git__execute free_function
 class F35_cli_cli_cli__commands__git__execute function_node

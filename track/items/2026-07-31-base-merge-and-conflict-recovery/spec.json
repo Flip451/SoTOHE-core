@@ -51,10 +51,14 @@
         {
           "anchor": "D3",
           "file": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md"
+        },
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-09-1210-base-owned-catalogue-deltas-conflict-recovery.md"
         }
       ],
       "id": "AC-04",
-      "text": "When a guarded base merge conflicts, the orchestrator drives the canonical recovery workflow through editing, zero-findings review, and guarded commit without running clean-merge cleanup."
+      "text": "When a guarded base merge conflicts, it yields the conflicted outcome, performs no clean-merge cleanup, and surfaces the canonical recovery workflow entry point. The recovery workflow that the orchestrator drives then performs writer-routed conflict editing, applicable chain-limited zero-findings review, sanctioned type-baseline capture from a disposable clone of the exact merged base commit, and guarded commit. Its post-review capture restores the comparison authority for base-owned, source-identical catalogue deltas without duplicating their originating ownership; it does not update `.sync-base.json`, publish a retained tree, or regenerate derived views."
     },
     {
       "adr_refs": [

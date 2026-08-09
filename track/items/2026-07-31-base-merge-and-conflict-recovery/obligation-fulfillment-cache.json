@@ -9899,6 +9899,31 @@
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
           "test_name": "test_base_merge_execute_sync_record_generation_validation_replacement_fail_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_source_workspace_is_passed_to_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_dotdot_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_symlinked_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::baseline_capture::tests",
+          "test_name": "test_capture_worktree_flow_items_dir_outside_source_workspace_not_rejected"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::tddd::baseline::tests",
+          "test_name": "test_baseline_capture_source_workspace_in_different_tree_is_not_rejected_by_containment"
         }
       ],
       "edge_id": {
@@ -9910,7 +9935,7 @@
       },
       "key": {
         "anchor_text_hash": "008a36faed29453afb25460ea4db3d92210eddc427c7d565839f29f1cce2e93e",
-        "bound_tests_set_hash": "2efa6af7961508811e857f30b74ec7809609414644e627ba0244c6ddce10e84a",
+        "bound_tests_set_hash": "0748b68ee9c51ce9efc0bd9e2ce961196b2d2f181ee0c4d71499486d764a81b1",
         "declaration_hash": "a32eca11e5762fdf6def09788dc2c7992c0841b913ae400f83a450d17002b662"
       },
       "obligation_id": {
@@ -9919,7 +9944,7 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "assert!(matches!(error, BaseMergeError::ActiveTrackMismatch { current, expected }\n            if current.as_ref() == \"track/other-track\" && expected.as_ref() == \"track/merge-track\"));\n        assert!(git_calls.lock().unwrap().is_empty());\n        assert!(cleanup_calls.lock().unwrap().is_empty());\n\n        assert!(matches!(error, BaseMergeError::Context(detail)\n            if detail.as_str() == \"requested source 'release' differs from snapshot base 'snapshot-base'\"));\n        assert!(git_calls.lock().unwrap().is_empty());\n        assert!(cleanup_calls.lock().unwrap().is_empty());",
+        "citation": "assert_eq!(git_calls.lock().unwrap().as_slice(), &[MergeCall { workspace_root: PathBuf::from(\"/workspace\"), source: fixture.snapshot_base, target: fixture.active_track, }]); ... assert!(matches!(error, BaseMergeError::ActiveTrackMismatch { current, expected } if current.as_ref() == \"track/other-track\" && expected.as_ref() == \"track/merge-track\")); ... assert!(matches!(error, BaseMergeError::Context(detail) if detail.as_str() == \"requested source 'release' differs from snapshot base 'snapshot-base'\"));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -9980,6 +10005,31 @@
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
           "test_name": "test_base_merge_execute_sync_record_generation_validation_replacement_fail_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_source_workspace_is_passed_to_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_dotdot_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_symlinked_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::baseline_capture::tests",
+          "test_name": "test_capture_worktree_flow_items_dir_outside_source_workspace_not_rejected"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::tddd::baseline::tests",
+          "test_name": "test_baseline_capture_source_workspace_in_different_tree_is_not_rejected_by_containment"
         }
       ],
       "edge_id": {
@@ -9991,7 +10041,7 @@
       },
       "key": {
         "anchor_text_hash": "c559fb6f4b5ad1f203c8e09b92c1767750c2f7613e52b36514d5a2bfa919ed24",
-        "bound_tests_set_hash": "2efa6af7961508811e857f30b74ec7809609414644e627ba0244c6ddce10e84a",
+        "bound_tests_set_hash": "0748b68ee9c51ce9efc0bd9e2ce961196b2d2f181ee0c4d71499486d764a81b1",
         "declaration_hash": "a32eca11e5762fdf6def09788dc2c7992c0841b913ae400f83a450d17002b662"
       },
       "obligation_id": {
@@ -10061,6 +10111,31 @@
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
           "test_name": "test_base_merge_execute_sync_record_generation_validation_replacement_fail_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_source_workspace_is_passed_to_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_dotdot_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_symlinked_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::baseline_capture::tests",
+          "test_name": "test_capture_worktree_flow_items_dir_outside_source_workspace_not_rejected"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::tddd::baseline::tests",
+          "test_name": "test_baseline_capture_source_workspace_in_different_tree_is_not_rejected_by_containment"
         }
       ],
       "edge_id": {
@@ -10072,7 +10147,7 @@
       },
       "key": {
         "anchor_text_hash": "bbbb8b0ae8e121225a1f2c7388f5aa303e348da890d769ed1323f1fac625ca34",
-        "bound_tests_set_hash": "2efa6af7961508811e857f30b74ec7809609414644e627ba0244c6ddce10e84a",
+        "bound_tests_set_hash": "0748b68ee9c51ce9efc0bd9e2ce961196b2d2f181ee0c4d71499486d764a81b1",
         "declaration_hash": "a32eca11e5762fdf6def09788dc2c7992c0841b913ae400f83a450d17002b662"
       },
       "obligation_id": {
@@ -10081,7 +10156,7 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "assert!(matches!(error, BaseMergeError::Context(detail)\n            if detail.as_str() == \"reverse-direction merge context is rejected\"));\n\nassert!(matches!(error, BaseMergeError::Context(detail)\n            if detail.as_str() == \"non-track current branch context is rejected\"));\n\nassert!(matches!(error, BaseMergeError::Context(detail)\n            if detail.as_str() == \"requested source 'release' differs from snapshot base 'snapshot-base'\"));",
+        "citation": "assert!(matches!(error, BaseMergeError::Context(detail)\n            if detail.as_str() == \"reverse-direction merge context is rejected\"));\n        assert!(git_calls.lock().unwrap().is_empty());\n        assert!(cleanup_calls.lock().unwrap().is_empty());\n\nassert!(matches!(error, BaseMergeError::Context(detail)\n            if detail.as_str() == \"non-track current branch context is rejected\"));\n        assert!(git_calls.lock().unwrap().is_empty());\n        assert!(cleanup_calls.lock().unwrap().is_empty());\n\nassert!(matches!(error, BaseMergeError::Context(detail)\n            if detail.as_str() == \"requested source 'release' differs from snapshot base 'snapshot-base'\"));\n        assert!(git_calls.lock().unwrap().is_empty());\n        assert!(cleanup_calls.lock().unwrap().is_empty());",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -10142,6 +10217,31 @@
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
           "test_name": "test_base_merge_execute_sync_record_generation_validation_replacement_fail_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_source_workspace_is_passed_to_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_dotdot_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_symlinked_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::baseline_capture::tests",
+          "test_name": "test_capture_worktree_flow_items_dir_outside_source_workspace_not_rejected"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::tddd::baseline::tests",
+          "test_name": "test_baseline_capture_source_workspace_in_different_tree_is_not_rejected_by_containment"
         }
       ],
       "edge_id": {
@@ -10153,7 +10253,7 @@
       },
       "key": {
         "anchor_text_hash": "40f4d9f0d37fa58dfb35671b5faada2feea33e0d3a44c57a471647c25bc0d4f5",
-        "bound_tests_set_hash": "2efa6af7961508811e857f30b74ec7809609414644e627ba0244c6ddce10e84a",
+        "bound_tests_set_hash": "0748b68ee9c51ce9efc0bd9e2ce961196b2d2f181ee0c4d71499486d764a81b1",
         "declaration_hash": "a32eca11e5762fdf6def09788dc2c7992c0841b913ae400f83a450d17002b662"
       },
       "obligation_id": {
@@ -10162,7 +10262,7 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "assert!(matches!(error, BaseMergeError::ActiveTrackMismatch { current, expected }\n            if current.as_ref() == \"track/other-track\" && expected.as_ref() == \"track/merge-track\"));\n        assert!(git_calls.lock().unwrap().is_empty());\n...\nassert!(matches!(error, BaseMergeError::Context(detail)\n            if detail.as_str() == \"requested source 'release' differs from snapshot base 'snapshot-base'\"));\n        assert!(git_calls.lock().unwrap().is_empty());",
+        "citation": "assert!(matches!(error, BaseMergeError::ActiveTrackMismatch { current, expected }\n            if current.as_ref() == \"track/other-track\" && expected.as_ref() == \"track/merge-track\"));\n        assert!(git_calls.lock().unwrap().is_empty());\n        assert!(cleanup_calls.lock().unwrap().is_empty());\n\n        let git_calls = Arc::new(Mutex::new(Vec::new()));\n        let cleanup_calls = Arc::new(Mutex::new(Vec::new()));\n        let interactor = BaseMergeInteractor::new(\n            Arc::new(SnapshotSourceMismatchContext),\n            Arc::new(RecordingGit { response: GitResponse::Clean, calls: Arc::clone(&git_calls) }),\n            Arc::new(RecordingCleanup { calls: Arc::clone(&cleanup_calls), failure: None }),\n        );\n\n        let error = interactor.execute(command()).unwrap_err();\n\n        assert!(matches!(error, BaseMergeError::Context(detail)\n            if detail.as_str() == \"requested source 'release' differs from snapshot base 'snapshot-base'\"));\n        assert!(git_calls.lock().unwrap().is_empty());\n        assert!(cleanup_calls.lock().unwrap().is_empty());",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -10223,6 +10323,31 @@
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
           "test_name": "test_base_merge_execute_sync_record_generation_validation_replacement_fail_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_source_workspace_is_passed_to_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_dotdot_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_symlinked_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::baseline_capture::tests",
+          "test_name": "test_capture_worktree_flow_items_dir_outside_source_workspace_not_rejected"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::tddd::baseline::tests",
+          "test_name": "test_baseline_capture_source_workspace_in_different_tree_is_not_rejected_by_containment"
         }
       ],
       "edge_id": {
@@ -10234,7 +10359,7 @@
       },
       "key": {
         "anchor_text_hash": "f18c851ca6bcb1742ea5111e940f5b4d764e8a3f5972d5c76b358096ed16f950",
-        "bound_tests_set_hash": "2efa6af7961508811e857f30b74ec7809609414644e627ba0244c6ddce10e84a",
+        "bound_tests_set_hash": "0748b68ee9c51ce9efc0bd9e2ce961196b2d2f181ee0c4d71499486d764a81b1",
         "declaration_hash": "a32eca11e5762fdf6def09788dc2c7992c0841b913ae400f83a450d17002b662"
       },
       "obligation_id": {
@@ -10243,7 +10368,7 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "assert!(matches!(error, BaseMergeError::Context(detail)\n            if detail.as_str() == \"reverse-direction merge context is rejected\"));\n        assert!(git_calls.lock().unwrap().is_empty());\n        assert!(cleanup_calls.lock().unwrap().is_empty());\n\n        assert!(matches!(error, BaseMergeError::ActiveTrackMismatch { current, expected }\n            if current.as_ref() == \"track/other-track\" && expected.as_ref() == \"track/merge-track\"));\n        assert!(git_calls.lock().unwrap().is_empty());\n        assert!(cleanup_calls.lock().unwrap().is_empty());\n\n        assert!(matches!(error, BaseMergeError::Context(detail)\n            if detail.as_str() == \"requested source 'release' differs from snapshot base 'snapshot-base'\"));\n        assert!(git_calls.lock().unwrap().is_empty());\n        assert!(cleanup_calls.lock().unwrap().is_empty());",
+        "citation": "assert!(matches!(error, BaseMergeError::Context(detail)\n            if detail.as_str() == \"reverse-direction merge context is rejected\"));\n        assert!(git_calls.lock().unwrap().is_empty());\n        assert!(cleanup_calls.lock().unwrap().is_empty());\n\n        assert!(matches!(error, BaseMergeError::Context(detail)\n            if detail.as_str() == \"non-track current branch context is rejected\"));\n        assert!(git_calls.lock().unwrap().is_empty());\n        assert!(cleanup_calls.lock().unwrap().is_empty());\n\n        assert!(matches!(error, BaseMergeError::Context(detail)\n            if detail.as_str() == \"requested source 'release' differs from snapshot base 'snapshot-base'\"));\n        assert!(git_calls.lock().unwrap().is_empty());\n        assert!(cleanup_calls.lock().unwrap().is_empty());",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -10304,6 +10429,31 @@
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
           "test_name": "test_base_merge_execute_sync_record_generation_validation_replacement_fail_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_source_workspace_is_passed_to_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_dotdot_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_symlinked_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::baseline_capture::tests",
+          "test_name": "test_capture_worktree_flow_items_dir_outside_source_workspace_not_rejected"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::tddd::baseline::tests",
+          "test_name": "test_baseline_capture_source_workspace_in_different_tree_is_not_rejected_by_containment"
         }
       ],
       "edge_id": {
@@ -10315,7 +10465,7 @@
       },
       "key": {
         "anchor_text_hash": "8fa63a343c348aeac0df772579e983f222f64ff76b2f90fdc2bae85abf103a14",
-        "bound_tests_set_hash": "2efa6af7961508811e857f30b74ec7809609414644e627ba0244c6ddce10e84a",
+        "bound_tests_set_hash": "0748b68ee9c51ce9efc0bd9e2ce961196b2d2f181ee0c4d71499486d764a81b1",
         "declaration_hash": "a32eca11e5762fdf6def09788dc2c7992c0841b913ae400f83a450d17002b662"
       },
       "obligation_id": {
@@ -10324,7 +10474,7 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "assert_eq!(outcome, BaseMergeOutcome::Completed);\nassert_eq!(\n    cleanup_calls.iter().map(|call| call.stage).collect::<Vec<_>>(),\n    vec![CleanupStage::Views, CleanupStage::Baseline, CleanupStage::SyncBaseStamp]\n);",
+        "citation": "assert_eq!(\n            cleanup_calls.iter().map(|call| call.stage).collect::<Vec<_>>(),\n            vec![CleanupStage::Views, CleanupStage::Baseline, CleanupStage::SyncBaseStamp]\n        );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -10385,6 +10535,31 @@
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
           "test_name": "test_base_merge_execute_sync_record_generation_validation_replacement_fail_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_source_workspace_is_passed_to_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_dotdot_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_symlinked_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::baseline_capture::tests",
+          "test_name": "test_capture_worktree_flow_items_dir_outside_source_workspace_not_rejected"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::tddd::baseline::tests",
+          "test_name": "test_baseline_capture_source_workspace_in_different_tree_is_not_rejected_by_containment"
         }
       ],
       "edge_id": {
@@ -10395,8 +10570,8 @@
         "entry_key": "BaseMergeInteractor"
       },
       "key": {
-        "anchor_text_hash": "ae93f16b8b5af6d307d274a5c694b4ac052045cff1123092ed79af420e71bad1",
-        "bound_tests_set_hash": "2efa6af7961508811e857f30b74ec7809609414644e627ba0244c6ddce10e84a",
+        "anchor_text_hash": "404eb1317e7a391b74093b947f2d7831350cfa502637d295daad934efc0c68c4",
+        "bound_tests_set_hash": "0748b68ee9c51ce9efc0bd9e2ce961196b2d2f181ee0c4d71499486d764a81b1",
         "declaration_hash": "a32eca11e5762fdf6def09788dc2c7992c0841b913ae400f83a450d17002b662"
       },
       "obligation_id": {
@@ -10405,7 +10580,7 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "assert_eq!(outcome, BaseMergeOutcome::Conflicted);\nassert_eq!(git_calls.lock().unwrap().len(), 1);\nassert!(cleanup_calls.lock().unwrap().is_empty());",
+        "citation": "assert_eq!(outcome, BaseMergeOutcome::Conflicted);\n        assert_eq!(git_calls.lock().unwrap().len(), 1);\n        assert!(cleanup_calls.lock().unwrap().is_empty());",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -10466,6 +10641,31 @@
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
           "test_name": "test_base_merge_execute_sync_record_generation_validation_replacement_fail_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_source_workspace_is_passed_to_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_dotdot_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_symlinked_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::baseline_capture::tests",
+          "test_name": "test_capture_worktree_flow_items_dir_outside_source_workspace_not_rejected"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::tddd::baseline::tests",
+          "test_name": "test_baseline_capture_source_workspace_in_different_tree_is_not_rejected_by_containment"
         }
       ],
       "edge_id": {
@@ -10477,7 +10677,7 @@
       },
       "key": {
         "anchor_text_hash": "94cd89ee88ae29b2d2034ebc97ab9f63217d17250a55a77d97d2546302a8e43e",
-        "bound_tests_set_hash": "2efa6af7961508811e857f30b74ec7809609414644e627ba0244c6ddce10e84a",
+        "bound_tests_set_hash": "0748b68ee9c51ce9efc0bd9e2ce961196b2d2f181ee0c4d71499486d764a81b1",
         "declaration_hash": "a32eca11e5762fdf6def09788dc2c7992c0841b913ae400f83a450d17002b662"
       },
       "obligation_id": {
@@ -10486,7 +10686,7 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "assert_eq!(state.sync_base_record.as_ref(), Some(&exact_base_commit));\n        assert_eq!(state.idempotent_sync_retries, 1);",
+        "citation": "assert_eq!(cleanup_calls.iter().map(|call| call.stage).collect::<Vec<_>>(), vec![CleanupStage::Views, CleanupStage::Baseline, CleanupStage::SyncBaseStamp]); ... assert_eq!(state.idempotent_sync_retries, 1); ... SyncRecordFailure::Generation, SyncRecordFailure::Validation, SyncRecordFailure::Replacement",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -10547,6 +10747,31 @@
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
           "test_name": "test_base_merge_execute_sync_record_generation_validation_replacement_fail_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_source_workspace_is_passed_to_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_dotdot_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_symlinked_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::baseline_capture::tests",
+          "test_name": "test_capture_worktree_flow_items_dir_outside_source_workspace_not_rejected"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::tddd::baseline::tests",
+          "test_name": "test_baseline_capture_source_workspace_in_different_tree_is_not_rejected_by_containment"
         }
       ],
       "edge_id": {
@@ -10558,7 +10783,7 @@
       },
       "key": {
         "anchor_text_hash": "0701cfad6fdaeeb90c4bf352edab6dc4fe39450ed89a722db81c70f8c1600827",
-        "bound_tests_set_hash": "2efa6af7961508811e857f30b74ec7809609414644e627ba0244c6ddce10e84a",
+        "bound_tests_set_hash": "0748b68ee9c51ce9efc0bd9e2ce961196b2d2f181ee0c4d71499486d764a81b1",
         "declaration_hash": "a32eca11e5762fdf6def09788dc2c7992c0841b913ae400f83a450d17002b662"
       },
       "obligation_id": {
@@ -10567,7 +10792,7 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "assert_eq!(\n            *cleanup_calls.lock().unwrap(),\n            vec![\n                CleanupCall { stage: CleanupStage::Views, request: cleanup_request() },\n                CleanupCall { stage: CleanupStage::Baseline, request: cleanup_request() },\n                CleanupCall { stage: CleanupStage::SyncBaseStamp, request: cleanup_request() },\n            ]\n        );\n...\nassert_eq!(outcome, BaseMergeOutcome::Conflicted);\n        assert!(cleanup_calls.lock().unwrap().is_empty());",
+        "citation": "assert_eq!(\n            *cleanup_calls.lock().unwrap(),\n            vec![\n                CleanupCall { stage: CleanupStage::Views, request: cleanup_request() },\n                CleanupCall { stage: CleanupStage::Baseline, request: cleanup_request() },\n                CleanupCall { stage: CleanupStage::SyncBaseStamp, request: cleanup_request() },\n            ]\n        );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -10628,6 +10853,31 @@
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
           "test_name": "test_base_merge_execute_sync_record_generation_validation_replacement_fail_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_source_workspace_is_passed_to_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_dotdot_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_symlinked_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::baseline_capture::tests",
+          "test_name": "test_capture_worktree_flow_items_dir_outside_source_workspace_not_rejected"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::tddd::baseline::tests",
+          "test_name": "test_baseline_capture_source_workspace_in_different_tree_is_not_rejected_by_containment"
         }
       ],
       "edge_id": {
@@ -10639,7 +10889,7 @@
       },
       "key": {
         "anchor_text_hash": "8f72df7566d25066016278de5e0f6d20ef327f95a6f72e7f2d2de2b00cc5e843",
-        "bound_tests_set_hash": "2efa6af7961508811e857f30b74ec7809609414644e627ba0244c6ddce10e84a",
+        "bound_tests_set_hash": "0748b68ee9c51ce9efc0bd9e2ce961196b2d2f181ee0c4d71499486d764a81b1",
         "declaration_hash": "a32eca11e5762fdf6def09788dc2c7992c0841b913ae400f83a450d17002b662"
       },
       "obligation_id": {
@@ -10648,7 +10898,7 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "assert_eq!(state.sync_base_record.as_ref(), Some(&exact_base_commit));\nassert_eq!(state.idempotent_sync_retries, 1);",
+        "citation": "assert_eq!(interactor.execute(command()).unwrap(), BaseMergeOutcome::Completed);\n        assert_eq!(interactor.execute(command()).unwrap(), BaseMergeOutcome::Completed);\n\n        let state = state.lock().unwrap();\n        assert_eq!(state.sync_base_record.as_ref(), Some(&exact_base_commit));\n        assert_eq!(state.idempotent_sync_retries, 1);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -10709,6 +10959,31 @@
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
           "test_name": "test_base_merge_execute_sync_record_generation_validation_replacement_fail_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_source_workspace_is_passed_to_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_dotdot_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_symlinked_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::baseline_capture::tests",
+          "test_name": "test_capture_worktree_flow_items_dir_outside_source_workspace_not_rejected"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::tddd::baseline::tests",
+          "test_name": "test_baseline_capture_source_workspace_in_different_tree_is_not_rejected_by_containment"
         }
       ],
       "edge_id": {
@@ -10720,7 +10995,7 @@
       },
       "key": {
         "anchor_text_hash": "2f8501ce2880b06ce24e84c087b1539e8bdfef95c479944a0d0853e85ec77cc5",
-        "bound_tests_set_hash": "2efa6af7961508811e857f30b74ec7809609414644e627ba0244c6ddce10e84a",
+        "bound_tests_set_hash": "0748b68ee9c51ce9efc0bd9e2ce961196b2d2f181ee0c4d71499486d764a81b1",
         "declaration_hash": "a32eca11e5762fdf6def09788dc2c7992c0841b913ae400f83a450d17002b662"
       },
       "obligation_id": {
@@ -10729,7 +11004,7 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "assert_eq!(outcome, BaseMergeOutcome::Conflicted);\nassert!(cleanup_calls.lock().unwrap().is_empty());\n\nlet error = interactor.execute(command()).unwrap_err();\n\nassert!(match (failure, error) {\n    (\n        CleanupStage::Views,\n        BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Views(error)),\n    ) => {\n        matches!(error, ViewsRegenerationError::Regeneration(detail) if detail.as_str() == \"cleanup failed\")\n    }\n    (\n        CleanupStage::Baseline,\n        BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Baseline(error)),\n    ) => {\n        matches!(error, BaselineReplacementError::Generation(detail) if detail.as_str() == \"cleanup failed\")\n    }\n    (\n        CleanupStage::SyncBaseStamp,\n        BaseMergeError::PostMergeCleanup(PostMergeCleanupError::SyncBaseStamp(error)),\n    ) => {\n        matches!(error, SyncBaseRecordError::Write(detail) if detail.as_str() == \"cleanup failed\")\n    }\n    _ => false,\n});",
+        "citation": "assert_eq!(outcome, BaseMergeOutcome::Conflicted);\n        assert_eq!(git_calls.lock().unwrap().len(), 1);\n        assert!(cleanup_calls.lock().unwrap().is_empty());\n\nassert!(match (failure, error) {\n                (\n                    CleanupStage::Views,\n                    BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Views(error)),\n                ) => {\n                    matches!(error, ViewsRegenerationError::Regeneration(detail) if detail.as_str() == \"cleanup failed\")\n                }\n                (\n                    CleanupStage::Baseline,\n                    BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Baseline(error)),\n                ) => {\n                    matches!(error, BaselineReplacementError::Generation(detail) if detail.as_str() == \"cleanup failed\")\n                }\n                (\n                    CleanupStage::SyncBaseStamp,\n                    BaseMergeError::PostMergeCleanup(PostMergeCleanupError::SyncBaseStamp(error)),\n                ) => {\n                    matches!(error, SyncBaseRecordError::Write(detail) if detail.as_str() == \"cleanup failed\")\n                }\n                _ => false,\n            });\n            assert_eq!(git_calls.lock().unwrap().len(), 1);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -10845,6 +11120,31 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
           "test_name": "test_execute_type_signals_successful_replacement_uses_atomic_write_path"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_source_workspace_is_passed_to_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_dotdot_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_symlinked_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::baseline_capture::tests",
+          "test_name": "test_capture_worktree_flow_items_dir_outside_source_workspace_not_rejected"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::tddd::baseline::tests",
+          "test_name": "test_baseline_capture_source_workspace_in_different_tree_is_not_rejected_by_containment"
         }
       ],
       "edge_id": {
@@ -10856,7 +11156,7 @@
       },
       "key": {
         "anchor_text_hash": "c559fb6f4b5ad1f203c8e09b92c1767750c2f7613e52b36514d5a2bfa919ed24",
-        "bound_tests_set_hash": "b3daaf6d107234ef46c6564d9c86e2c1725729e770da34a52e5d617e3132e108",
+        "bound_tests_set_hash": "39c685b4c9c402a408a35a23356e6fff20dd69eb24fe2dfa9e5d3a38600d1a80",
         "declaration_hash": "97c07519443c0bc67f584ffa7ad9a8a0f2e15fa4a57b6c5d7db574a11c1b2073"
       },
       "obligation_id": {
@@ -10865,7 +11165,7 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "assert_eq!(*cleanup_calls.lock().unwrap(), vec![ CleanupCall { stage: CleanupStage::Views, request: cleanup_request() }, CleanupCall { stage: CleanupStage::Baseline, request: cleanup_request() }, CleanupCall { stage: CleanupStage::SyncBaseStamp, request: cleanup_request() }, ]); ... add_commit_pinned_worktree( root, &worktree, &CommitHash::try_new(expected_commit.clone()).unwrap(), ).unwrap(); ... assert_eq!(current_commit(&worktree, \"HEAD^{commit}\"), expected_commit); ... assert!(features.is_file(), \"atomic publication must retain the complete active track\"); ... assert_eq!(stamp.base_commit, stamp_request.base_commit);",
+        "citation": "assert_eq!(*cleanup_calls.lock().unwrap(), vec![ CleanupCall { stage: CleanupStage::Views, request: cleanup_request() }, CleanupCall { stage: CleanupStage::Baseline, request: cleanup_request() }, CleanupCall { stage: CleanupStage::SyncBaseStamp, request: cleanup_request() }, ]); ... assert_eq!(call.request.base_commit, exact_base_commit); ... assert!(track_dir.join(\"plan.md\").is_file(), \"view regeneration must publish plan.md\"); ... assert!(replacement.is_dir(), \"recovery slot must retain the prior track\"); ... assert_eq!(stamp.base_commit, stamp_request.base_commit);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -10981,6 +11281,31 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
           "test_name": "test_execute_type_signals_successful_replacement_uses_atomic_write_path"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_source_workspace_is_passed_to_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_dotdot_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_symlinked_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::baseline_capture::tests",
+          "test_name": "test_capture_worktree_flow_items_dir_outside_source_workspace_not_rejected"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::tddd::baseline::tests",
+          "test_name": "test_baseline_capture_source_workspace_in_different_tree_is_not_rejected_by_containment"
         }
       ],
       "edge_id": {
@@ -10992,7 +11317,7 @@
       },
       "key": {
         "anchor_text_hash": "8fa63a343c348aeac0df772579e983f222f64ff76b2f90fdc2bae85abf103a14",
-        "bound_tests_set_hash": "b3daaf6d107234ef46c6564d9c86e2c1725729e770da34a52e5d617e3132e108",
+        "bound_tests_set_hash": "39c685b4c9c402a408a35a23356e6fff20dd69eb24fe2dfa9e5d3a38600d1a80",
         "declaration_hash": "97c07519443c0bc67f584ffa7ad9a8a0f2e15fa4a57b6c5d7db574a11c1b2073"
       },
       "obligation_id": {
@@ -11001,7 +11326,7 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "\"cleanup_calls.iter().map(|call| call.stage).collect::<Vec<_>>(),\\n            vec![CleanupStage::Views, CleanupStage::Baseline, CleanupStage::SyncBaseStamp]\"; \"assert_eq!(current_commit(&worktree, \\\"HEAD^{commit}\\\"), expected_commit)\"; \"assert!(features.is_file(), \\\"atomic publication must retain the complete active track\\\")\"; \"assert!(\\n            !published_baseline.contains(\\\"AdvancedDevelopOnlyMarker\\\"),\\n            \\\"the advanced develop branch must not be resolved after the merge commit is fixed\\\"\\n        )\"; \"assert!(\\n            !recovery_slot.exists(),\\n            \\\"successful SyncBase publication must prune the recovery copy\\\"\\n        )\"",
+        "citation": "assert_eq!(cleanup_calls.lock().unwrap().as_slice(), &[CleanupCall { stage: CleanupStage::Views, request: cleanup_request() }, CleanupCall { stage: CleanupStage::Baseline, request: cleanup_request() }, CleanupCall { stage: CleanupStage::SyncBaseStamp, request: cleanup_request() },]);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -11117,6 +11442,31 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
           "test_name": "test_execute_type_signals_successful_replacement_uses_atomic_write_path"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_source_workspace_is_passed_to_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_dotdot_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_symlinked_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::baseline_capture::tests",
+          "test_name": "test_capture_worktree_flow_items_dir_outside_source_workspace_not_rejected"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::tddd::baseline::tests",
+          "test_name": "test_baseline_capture_source_workspace_in_different_tree_is_not_rejected_by_containment"
         }
       ],
       "edge_id": {
@@ -11127,8 +11477,8 @@
         "entry_key": "BaseMergeCleanupPort"
       },
       "key": {
-        "anchor_text_hash": "ae93f16b8b5af6d307d274a5c694b4ac052045cff1123092ed79af420e71bad1",
-        "bound_tests_set_hash": "b3daaf6d107234ef46c6564d9c86e2c1725729e770da34a52e5d617e3132e108",
+        "anchor_text_hash": "404eb1317e7a391b74093b947f2d7831350cfa502637d295daad934efc0c68c4",
+        "bound_tests_set_hash": "39c685b4c9c402a408a35a23356e6fff20dd69eb24fe2dfa9e5d3a38600d1a80",
         "declaration_hash": "97c07519443c0bc67f584ffa7ad9a8a0f2e15fa4a57b6c5d7db574a11c1b2073"
       },
       "obligation_id": {
@@ -11253,6 +11603,31 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
           "test_name": "test_execute_type_signals_successful_replacement_uses_atomic_write_path"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_source_workspace_is_passed_to_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_dotdot_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_symlinked_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::baseline_capture::tests",
+          "test_name": "test_capture_worktree_flow_items_dir_outside_source_workspace_not_rejected"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::tddd::baseline::tests",
+          "test_name": "test_baseline_capture_source_workspace_in_different_tree_is_not_rejected_by_containment"
         }
       ],
       "edge_id": {
@@ -11264,7 +11639,7 @@
       },
       "key": {
         "anchor_text_hash": "94cd89ee88ae29b2d2034ebc97ab9f63217d17250a55a77d97d2546302a8e43e",
-        "bound_tests_set_hash": "b3daaf6d107234ef46c6564d9c86e2c1725729e770da34a52e5d617e3132e108",
+        "bound_tests_set_hash": "39c685b4c9c402a408a35a23356e6fff20dd69eb24fe2dfa9e5d3a38600d1a80",
         "declaration_hash": "97c07519443c0bc67f584ffa7ad9a8a0f2e15fa4a57b6c5d7db574a11c1b2073"
       },
       "obligation_id": {
@@ -11273,7 +11648,7 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "\"assert_eq!(call.request.base_commit, exact_base_commit);\"; \"vec![CleanupStage::Views, CleanupStage::Baseline, CleanupStage::SyncBaseStamp]\"; \"retrying the same sync-base value must not rewrite the stamp\"; \"Err(SyncBaseRecordError::Generation(detail))\"; \"Err(SyncBaseRecordError::Validation(_))\"; \"Err(SyncBaseRecordError::Write(_))\"; \"Err(SyncBaseRecordError::Replacement(_))\"",
+        "citation": "assert_eq!(call.request.base_commit, exact_base_commit);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -11389,6 +11764,31 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
           "test_name": "test_execute_type_signals_successful_replacement_uses_atomic_write_path"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_source_workspace_is_passed_to_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_dotdot_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_symlinked_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::baseline_capture::tests",
+          "test_name": "test_capture_worktree_flow_items_dir_outside_source_workspace_not_rejected"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::tddd::baseline::tests",
+          "test_name": "test_baseline_capture_source_workspace_in_different_tree_is_not_rejected_by_containment"
         }
       ],
       "edge_id": {
@@ -11400,7 +11800,7 @@
       },
       "key": {
         "anchor_text_hash": "0701cfad6fdaeeb90c4bf352edab6dc4fe39450ed89a722db81c70f8c1600827",
-        "bound_tests_set_hash": "b3daaf6d107234ef46c6564d9c86e2c1725729e770da34a52e5d617e3132e108",
+        "bound_tests_set_hash": "39c685b4c9c402a408a35a23356e6fff20dd69eb24fe2dfa9e5d3a38600d1a80",
         "declaration_hash": "97c07519443c0bc67f584ffa7ad9a8a0f2e15fa4a57b6c5d7db574a11c1b2073"
       },
       "obligation_id": {
@@ -11409,7 +11809,7 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "\"cleanup_calls.lock().unwrap(),\\n            vec![\\n                CleanupCall { stage: CleanupStage::Views, request: cleanup_request() },\\n                CleanupCall { stage: CleanupStage::Baseline, request: cleanup_request() },\\n                CleanupCall { stage: CleanupStage::SyncBaseStamp, request: cleanup_request() },\\n            ]\"; \"assert!(cleanup_calls.lock().unwrap().is_empty());\"; \"assert_eq!(state.type_signals_cache, \\\"current-type-signals-cache\\\");\"",
+        "citation": "assert_eq!(\n            *cleanup_calls.lock().unwrap(),\n            vec![\n                CleanupCall { stage: CleanupStage::Views, request: cleanup_request() },\n                CleanupCall { stage: CleanupStage::Baseline, request: cleanup_request() },\n                CleanupCall { stage: CleanupStage::SyncBaseStamp, request: cleanup_request() },\n            ]\n        );\n\n        assert_eq!(outcome, BaseMergeOutcome::Conflicted);\n        assert_eq!(git_calls.lock().unwrap().len(), 1);\n        assert!(cleanup_calls.lock().unwrap().is_empty());\n\n        assert_eq!(state.type_signals_cache, \"current-type-signals-cache\");",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -11525,6 +11925,31 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
           "test_name": "test_execute_type_signals_successful_replacement_uses_atomic_write_path"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_source_workspace_is_passed_to_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_dotdot_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_symlinked_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::baseline_capture::tests",
+          "test_name": "test_capture_worktree_flow_items_dir_outside_source_workspace_not_rejected"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::tddd::baseline::tests",
+          "test_name": "test_baseline_capture_source_workspace_in_different_tree_is_not_rejected_by_containment"
         }
       ],
       "edge_id": {
@@ -11536,7 +11961,7 @@
       },
       "key": {
         "anchor_text_hash": "d5e6be0352d264e24422b08e522cd2fa714eb06575771f564fde0ddad0d1c7a0",
-        "bound_tests_set_hash": "b3daaf6d107234ef46c6564d9c86e2c1725729e770da34a52e5d617e3132e108",
+        "bound_tests_set_hash": "39c685b4c9c402a408a35a23356e6fff20dd69eb24fe2dfa9e5d3a38600d1a80",
         "declaration_hash": "97c07519443c0bc67f584ffa7ad9a8a0f2e15fa4a57b6c5d7db574a11c1b2073"
       },
       "obligation_id": {
@@ -11596,6 +12021,71 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::base_merge::tests",
           "test_name": "test_fs_base_merge_cleanup_adapter_writes_v1_idempotently_and_replaces_later_commit"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_source_workspace_is_passed_to_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_dotdot_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_symlinked_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::baseline_capture::tests",
+          "test_name": "test_capture_worktree_flow_items_dir_outside_source_workspace_not_rejected"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::tddd::baseline::tests",
+          "test_name": "test_baseline_capture_source_workspace_in_different_tree_is_not_rejected_by_containment"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_sync_record_generation_validation_replacement_fail_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_sync_record_write_failure_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::sync_base::tests",
+          "test_name": "test_write_sync_base_record_atomically_replaces_existing_record_without_partial_or_temp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_generation_failure_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_rejects_malformed_or_non_regular_stamp_without_replacing_prior_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_sync_stamp_rejects_symlinked_recovery_root"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_rejects_symlinked_sync_stamp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_rejects_symlinked_items_root_for_sync_stamp"
         }
       ],
       "edge_id": {
@@ -11607,7 +12097,7 @@
       },
       "key": {
         "anchor_text_hash": "c559fb6f4b5ad1f203c8e09b92c1767750c2f7613e52b36514d5a2bfa919ed24",
-        "bound_tests_set_hash": "b89bec4b89f85ef3e47010d932fa9d6b6cee0fda43c745a67cd86089024e6605",
+        "bound_tests_set_hash": "2d40d89b2f0af0934f957362987228f5f5dbeeccc8cb2496954e07a022ee9330",
         "declaration_hash": "97c07519443c0bc67f584ffa7ad9a8a0f2e15fa4a57b6c5d7db574a11c1b2073"
       },
       "obligation_id": {
@@ -11667,6 +12157,71 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::base_merge::tests",
           "test_name": "test_fs_base_merge_cleanup_adapter_writes_v1_idempotently_and_replaces_later_commit"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_source_workspace_is_passed_to_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_dotdot_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_symlinked_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::baseline_capture::tests",
+          "test_name": "test_capture_worktree_flow_items_dir_outside_source_workspace_not_rejected"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::tddd::baseline::tests",
+          "test_name": "test_baseline_capture_source_workspace_in_different_tree_is_not_rejected_by_containment"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_sync_record_generation_validation_replacement_fail_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_sync_record_write_failure_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::sync_base::tests",
+          "test_name": "test_write_sync_base_record_atomically_replaces_existing_record_without_partial_or_temp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_generation_failure_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_rejects_malformed_or_non_regular_stamp_without_replacing_prior_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_sync_stamp_rejects_symlinked_recovery_root"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_rejects_symlinked_sync_stamp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_rejects_symlinked_items_root_for_sync_stamp"
         }
       ],
       "edge_id": {
@@ -11678,7 +12233,7 @@
       },
       "key": {
         "anchor_text_hash": "8fa63a343c348aeac0df772579e983f222f64ff76b2f90fdc2bae85abf103a14",
-        "bound_tests_set_hash": "b89bec4b89f85ef3e47010d932fa9d6b6cee0fda43c745a67cd86089024e6605",
+        "bound_tests_set_hash": "2d40d89b2f0af0934f957362987228f5f5dbeeccc8cb2496954e07a022ee9330",
         "declaration_hash": "97c07519443c0bc67f584ffa7ad9a8a0f2e15fa4a57b6c5d7db574a11c1b2073"
       },
       "obligation_id": {
@@ -11687,7 +12242,7 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "assert_eq!(cleanup_calls.lock().unwrap(), vec![ CleanupCall { stage: CleanupStage::Views, request: cleanup_request() }, CleanupCall { stage: CleanupStage::Baseline, request: cleanup_request() }, CleanupCall { stage: CleanupStage::SyncBaseStamp, request: cleanup_request() }, ]); ... assert_eq!(std::fs::read_to_string(&baseline).unwrap(), \"replacement-baseline\"); ... write_sync_base_record_atomically(&stamp_request).unwrap(); ... assert!(!replacement.exists(), \"successful SyncBase must remove the recovery slot\");",
+        "citation": "assert_eq!(cleanup_calls.lock().unwrap(), vec![ CleanupCall { stage: CleanupStage::Views, request: cleanup_request() }, CleanupCall { stage: CleanupStage::Baseline, request: cleanup_request() }, CleanupCall { stage: CleanupStage::SyncBaseStamp, request: cleanup_request() }, ]); ... assert_eq!(cleanup_calls.iter().map(|call| call.stage).collect::<Vec<_>>(), vec![CleanupStage::Views, CleanupStage::Baseline, CleanupStage::SyncBaseStamp]); ... assert_eq!(current_commit(&worktree, \"HEAD^{commit}\"), expected_commit); ... assert_eq!(std::fs::read_to_string(&baseline).unwrap(), \"replacement-baseline\"); ... assert_eq!(stamp.base_commit, stamp_request.base_commit);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -11738,6 +12293,71 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::base_merge::tests",
           "test_name": "test_fs_base_merge_cleanup_adapter_writes_v1_idempotently_and_replaces_later_commit"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_source_workspace_is_passed_to_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_dotdot_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_symlinked_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::baseline_capture::tests",
+          "test_name": "test_capture_worktree_flow_items_dir_outside_source_workspace_not_rejected"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::tddd::baseline::tests",
+          "test_name": "test_baseline_capture_source_workspace_in_different_tree_is_not_rejected_by_containment"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_sync_record_generation_validation_replacement_fail_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_sync_record_write_failure_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::sync_base::tests",
+          "test_name": "test_write_sync_base_record_atomically_replaces_existing_record_without_partial_or_temp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_generation_failure_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_rejects_malformed_or_non_regular_stamp_without_replacing_prior_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_sync_stamp_rejects_symlinked_recovery_root"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_rejects_symlinked_sync_stamp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_rejects_symlinked_items_root_for_sync_stamp"
         }
       ],
       "edge_id": {
@@ -11748,8 +12368,8 @@
         "entry_key": "BaseMergeCleanupPort"
       },
       "key": {
-        "anchor_text_hash": "ae93f16b8b5af6d307d274a5c694b4ac052045cff1123092ed79af420e71bad1",
-        "bound_tests_set_hash": "b89bec4b89f85ef3e47010d932fa9d6b6cee0fda43c745a67cd86089024e6605",
+        "anchor_text_hash": "404eb1317e7a391b74093b947f2d7831350cfa502637d295daad934efc0c68c4",
+        "bound_tests_set_hash": "2d40d89b2f0af0934f957362987228f5f5dbeeccc8cb2496954e07a022ee9330",
         "declaration_hash": "97c07519443c0bc67f584ffa7ad9a8a0f2e15fa4a57b6c5d7db574a11c1b2073"
       },
       "obligation_id": {
@@ -11809,6 +12429,71 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::base_merge::tests",
           "test_name": "test_fs_base_merge_cleanup_adapter_writes_v1_idempotently_and_replaces_later_commit"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_source_workspace_is_passed_to_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_dotdot_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_symlinked_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::baseline_capture::tests",
+          "test_name": "test_capture_worktree_flow_items_dir_outside_source_workspace_not_rejected"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::tddd::baseline::tests",
+          "test_name": "test_baseline_capture_source_workspace_in_different_tree_is_not_rejected_by_containment"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_sync_record_generation_validation_replacement_fail_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_sync_record_write_failure_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::sync_base::tests",
+          "test_name": "test_write_sync_base_record_atomically_replaces_existing_record_without_partial_or_temp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_generation_failure_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_rejects_malformed_or_non_regular_stamp_without_replacing_prior_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_sync_stamp_rejects_symlinked_recovery_root"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_rejects_symlinked_sync_stamp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_rejects_symlinked_items_root_for_sync_stamp"
         }
       ],
       "edge_id": {
@@ -11820,7 +12505,7 @@
       },
       "key": {
         "anchor_text_hash": "94cd89ee88ae29b2d2034ebc97ab9f63217d17250a55a77d97d2546302a8e43e",
-        "bound_tests_set_hash": "b89bec4b89f85ef3e47010d932fa9d6b6cee0fda43c745a67cd86089024e6605",
+        "bound_tests_set_hash": "2d40d89b2f0af0934f957362987228f5f5dbeeccc8cb2496954e07a022ee9330",
         "declaration_hash": "97c07519443c0bc67f584ffa7ad9a8a0f2e15fa4a57b6c5d7db574a11c1b2073"
       },
       "obligation_id": {
@@ -11829,7 +12514,7 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "assert_eq!(cleanup_calls.iter().map(|call| call.stage).collect::<Vec<_>>(), vec![CleanupStage::Views, CleanupStage::Baseline, CleanupStage::SyncBaseStamp]); ... assert_eq!(call.request.base_commit, exact_base_commit); ... assert_eq!(std::fs::read(&stamp).unwrap(), first_bytes, \"retrying the same sync-base value must not rewrite the stamp\");",
+        "citation": "assert_eq!(cleanup_calls.iter().map(|call| call.stage).collect::<Vec<_>>(), vec![CleanupStage::Views, CleanupStage::Baseline, CleanupStage::SyncBaseStamp]); ... assert_eq!(call.request.base_commit, exact_base_commit); ... \"retrying the same sync-base value must not rewrite the stamp\" ... SyncRecordFailure::Generation ... SyncRecordFailure::Validation ... SyncRecordFailure::Replacement ... SyncBaseRecordError::Write",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -11880,6 +12565,71 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::base_merge::tests",
           "test_name": "test_fs_base_merge_cleanup_adapter_writes_v1_idempotently_and_replaces_later_commit"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_source_workspace_is_passed_to_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_dotdot_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_symlinked_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::baseline_capture::tests",
+          "test_name": "test_capture_worktree_flow_items_dir_outside_source_workspace_not_rejected"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::tddd::baseline::tests",
+          "test_name": "test_baseline_capture_source_workspace_in_different_tree_is_not_rejected_by_containment"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_sync_record_generation_validation_replacement_fail_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_sync_record_write_failure_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::sync_base::tests",
+          "test_name": "test_write_sync_base_record_atomically_replaces_existing_record_without_partial_or_temp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_generation_failure_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_rejects_malformed_or_non_regular_stamp_without_replacing_prior_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_sync_stamp_rejects_symlinked_recovery_root"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_rejects_symlinked_sync_stamp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_rejects_symlinked_items_root_for_sync_stamp"
         }
       ],
       "edge_id": {
@@ -11891,7 +12641,7 @@
       },
       "key": {
         "anchor_text_hash": "0701cfad6fdaeeb90c4bf352edab6dc4fe39450ed89a722db81c70f8c1600827",
-        "bound_tests_set_hash": "b89bec4b89f85ef3e47010d932fa9d6b6cee0fda43c745a67cd86089024e6605",
+        "bound_tests_set_hash": "2d40d89b2f0af0934f957362987228f5f5dbeeccc8cb2496954e07a022ee9330",
         "declaration_hash": "97c07519443c0bc67f584ffa7ad9a8a0f2e15fa4a57b6c5d7db574a11c1b2073"
       },
       "obligation_id": {
@@ -11900,7 +12650,7 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "assert_eq!(*cleanup_calls.lock().unwrap(), vec![ CleanupCall { stage: CleanupStage::Views, request: cleanup_request() }, CleanupCall { stage: CleanupStage::Baseline, request: cleanup_request() }, CleanupCall { stage: CleanupStage::SyncBaseStamp, request: cleanup_request() }, ]); ... assert!(cleanup_calls.lock().unwrap().is_empty()); ... assert_eq!(state.type_signals_cache, \"current-type-signals-cache\");",
+        "citation": "\"cleanup_calls.lock().unwrap(),\\n            vec![\\n                CleanupCall { stage: CleanupStage::Views, request: cleanup_request() },\\n                CleanupCall { stage: CleanupStage::Baseline, request: cleanup_request() },\\n                CleanupCall { stage: CleanupStage::SyncBaseStamp, request: cleanup_request() },\\n            ]\"; \"assert_eq!(*cleanup_calls.lock().unwrap(),\\n            vec![\\n                CleanupCall { stage: CleanupStage::Views, request: cleanup_request() },\\n                CleanupCall { stage: CleanupStage::Baseline, request: cleanup_request() },\\n                CleanupCall { stage: CleanupStage::SyncBaseStamp, request: cleanup_request() },\\n            ]);\\n    }\"; \"assert!(cleanup_calls.lock().unwrap().is_empty());\"; \"assert_eq!(std::fs::read_to_string(&type_signals).unwrap(), \\\"preserved-cache\\\");\"",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -11951,6 +12701,71 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::base_merge::tests",
           "test_name": "test_fs_base_merge_cleanup_adapter_writes_v1_idempotently_and_replaces_later_commit"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_source_workspace_is_passed_to_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_dotdot_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_symlinked_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::baseline_capture::tests",
+          "test_name": "test_capture_worktree_flow_items_dir_outside_source_workspace_not_rejected"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::tddd::baseline::tests",
+          "test_name": "test_baseline_capture_source_workspace_in_different_tree_is_not_rejected_by_containment"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_sync_record_generation_validation_replacement_fail_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_sync_record_write_failure_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::sync_base::tests",
+          "test_name": "test_write_sync_base_record_atomically_replaces_existing_record_without_partial_or_temp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_generation_failure_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_rejects_malformed_or_non_regular_stamp_without_replacing_prior_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_sync_stamp_rejects_symlinked_recovery_root"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_rejects_symlinked_sync_stamp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_rejects_symlinked_items_root_for_sync_stamp"
         }
       ],
       "edge_id": {
@@ -11962,7 +12777,7 @@
       },
       "key": {
         "anchor_text_hash": "d5e6be0352d264e24422b08e522cd2fa714eb06575771f564fde0ddad0d1c7a0",
-        "bound_tests_set_hash": "b89bec4b89f85ef3e47010d932fa9d6b6cee0fda43c745a67cd86089024e6605",
+        "bound_tests_set_hash": "2d40d89b2f0af0934f957362987228f5f5dbeeccc8cb2496954e07a022ee9330",
         "declaration_hash": "97c07519443c0bc67f584ffa7ad9a8a0f2e15fa4a57b6c5d7db574a11c1b2073"
       },
       "obligation_id": {
@@ -11971,7 +12786,7 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "assert_eq!(state.active_baseline, \"prior-valid-baseline\");",
+        "citation": "assert!(match (failure, result) { (BaselineFailure::Generation, Err(BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Baseline(BaselineReplacementError::Generation(detail))))) => detail.as_str() == \"baseline generation failed\", (BaselineFailure::Validation, Err(BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Baseline(BaselineReplacementError::Validation(detail))))) => detail.as_str() == \"baseline validation failed\", (BaselineFailure::Publish, Err(BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Baseline(BaselineReplacementError::Publish(detail))))) => detail.as_str() == \"replacement publication failed\", _ => false, }); ... assert_eq!(state.active_baseline, \"prior-valid-baseline\");",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -12037,6 +12852,61 @@
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
           "test_name": "test_base_merge_execute_sync_record_write_failure_fails_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_source_workspace_is_passed_to_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_dotdot_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_symlinked_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::baseline_capture::tests",
+          "test_name": "test_capture_worktree_flow_items_dir_outside_source_workspace_not_rejected"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::tddd::baseline::tests",
+          "test_name": "test_baseline_capture_source_workspace_in_different_tree_is_not_rejected_by_containment"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::sync_base::tests",
+          "test_name": "test_write_sync_base_record_atomically_replaces_existing_record_without_partial_or_temp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_generation_failure_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_rejects_malformed_or_non_regular_stamp_without_replacing_prior_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_sync_stamp_rejects_symlinked_recovery_root"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_rejects_symlinked_sync_stamp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_rejects_symlinked_items_root_for_sync_stamp"
         }
       ],
       "edge_id": {
@@ -12048,7 +12918,7 @@
       },
       "key": {
         "anchor_text_hash": "c559fb6f4b5ad1f203c8e09b92c1767750c2f7613e52b36514d5a2bfa919ed24",
-        "bound_tests_set_hash": "a358d835409b84d0e5fbcda6c18d503c495af6866a49f7244904e90611826fe2",
+        "bound_tests_set_hash": "0fb77d4c619bef91e33ce9aad0eb0a786010b7770ab76b20e49fb88c32c53653",
         "declaration_hash": "97c07519443c0bc67f584ffa7ad9a8a0f2e15fa4a57b6c5d7db574a11c1b2073"
       },
       "obligation_id": {
@@ -12057,7 +12927,7 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "\"CleanupStage::Views, CleanupStage::Baseline, CleanupStage::SyncBaseStamp\"; \"assert_eq!(stamp.base_commit, stamp_request.base_commit);\"; \"assert!(exchanged);\"",
+        "citation": "assert_eq!(cleanup_calls.lock().unwrap().as_slice(), &[CleanupCall { stage: CleanupStage::Views, request: cleanup_request() }, CleanupCall { stage: CleanupStage::Baseline, request: cleanup_request() }, CleanupCall { stage: CleanupStage::SyncBaseStamp, request: cleanup_request() },]);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -12123,6 +12993,61 @@
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
           "test_name": "test_base_merge_execute_sync_record_write_failure_fails_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_source_workspace_is_passed_to_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_dotdot_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_symlinked_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::baseline_capture::tests",
+          "test_name": "test_capture_worktree_flow_items_dir_outside_source_workspace_not_rejected"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::tddd::baseline::tests",
+          "test_name": "test_baseline_capture_source_workspace_in_different_tree_is_not_rejected_by_containment"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::sync_base::tests",
+          "test_name": "test_write_sync_base_record_atomically_replaces_existing_record_without_partial_or_temp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_generation_failure_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_rejects_malformed_or_non_regular_stamp_without_replacing_prior_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_sync_stamp_rejects_symlinked_recovery_root"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_rejects_symlinked_sync_stamp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_rejects_symlinked_items_root_for_sync_stamp"
         }
       ],
       "edge_id": {
@@ -12134,7 +13059,7 @@
       },
       "key": {
         "anchor_text_hash": "8fa63a343c348aeac0df772579e983f222f64ff76b2f90fdc2bae85abf103a14",
-        "bound_tests_set_hash": "a358d835409b84d0e5fbcda6c18d503c495af6866a49f7244904e90611826fe2",
+        "bound_tests_set_hash": "0fb77d4c619bef91e33ce9aad0eb0a786010b7770ab76b20e49fb88c32c53653",
         "declaration_hash": "97c07519443c0bc67f584ffa7ad9a8a0f2e15fa4a57b6c5d7db574a11c1b2073"
       },
       "obligation_id": {
@@ -12209,6 +13134,61 @@
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
           "test_name": "test_base_merge_execute_sync_record_write_failure_fails_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_source_workspace_is_passed_to_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_dotdot_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_symlinked_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::baseline_capture::tests",
+          "test_name": "test_capture_worktree_flow_items_dir_outside_source_workspace_not_rejected"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::tddd::baseline::tests",
+          "test_name": "test_baseline_capture_source_workspace_in_different_tree_is_not_rejected_by_containment"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::sync_base::tests",
+          "test_name": "test_write_sync_base_record_atomically_replaces_existing_record_without_partial_or_temp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_generation_failure_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_rejects_malformed_or_non_regular_stamp_without_replacing_prior_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_sync_stamp_rejects_symlinked_recovery_root"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_rejects_symlinked_sync_stamp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_rejects_symlinked_items_root_for_sync_stamp"
         }
       ],
       "edge_id": {
@@ -12219,8 +13199,8 @@
         "entry_key": "BaseMergeCleanupPort"
       },
       "key": {
-        "anchor_text_hash": "ae93f16b8b5af6d307d274a5c694b4ac052045cff1123092ed79af420e71bad1",
-        "bound_tests_set_hash": "a358d835409b84d0e5fbcda6c18d503c495af6866a49f7244904e90611826fe2",
+        "anchor_text_hash": "404eb1317e7a391b74093b947f2d7831350cfa502637d295daad934efc0c68c4",
+        "bound_tests_set_hash": "0fb77d4c619bef91e33ce9aad0eb0a786010b7770ab76b20e49fb88c32c53653",
         "declaration_hash": "97c07519443c0bc67f584ffa7ad9a8a0f2e15fa4a57b6c5d7db574a11c1b2073"
       },
       "obligation_id": {
@@ -12295,6 +13275,61 @@
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
           "test_name": "test_base_merge_execute_sync_record_write_failure_fails_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_source_workspace_is_passed_to_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_dotdot_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_symlinked_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::baseline_capture::tests",
+          "test_name": "test_capture_worktree_flow_items_dir_outside_source_workspace_not_rejected"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::tddd::baseline::tests",
+          "test_name": "test_baseline_capture_source_workspace_in_different_tree_is_not_rejected_by_containment"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::sync_base::tests",
+          "test_name": "test_write_sync_base_record_atomically_replaces_existing_record_without_partial_or_temp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_generation_failure_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_rejects_malformed_or_non_regular_stamp_without_replacing_prior_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_sync_stamp_rejects_symlinked_recovery_root"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_rejects_symlinked_sync_stamp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_rejects_symlinked_items_root_for_sync_stamp"
         }
       ],
       "edge_id": {
@@ -12306,7 +13341,7 @@
       },
       "key": {
         "anchor_text_hash": "94cd89ee88ae29b2d2034ebc97ab9f63217d17250a55a77d97d2546302a8e43e",
-        "bound_tests_set_hash": "a358d835409b84d0e5fbcda6c18d503c495af6866a49f7244904e90611826fe2",
+        "bound_tests_set_hash": "0fb77d4c619bef91e33ce9aad0eb0a786010b7770ab76b20e49fb88c32c53653",
         "declaration_hash": "97c07519443c0bc67f584ffa7ad9a8a0f2e15fa4a57b6c5d7db574a11c1b2073"
       },
       "obligation_id": {
@@ -12315,7 +13350,7 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "assert_eq!(call.request.base_commit, exact_base_commit); ... vec![CleanupStage::Views, CleanupStage::Baseline, CleanupStage::SyncBaseStamp]; ... assert_eq!(state.idempotent_sync_retries, 1); ... SyncRecordFailure::Generation ... SyncRecordFailure::Validation ... SyncRecordFailure::Replacement ... SyncRecordFailure::Write",
+        "citation": "assert_eq!(cleanup_calls.iter().map(|call| call.stage).collect::<Vec<_>>(), vec![CleanupStage::Views, CleanupStage::Baseline, CleanupStage::SyncBaseStamp]); ... assert_eq!(call.request.base_commit, exact_base_commit); ... assert_eq!(interactor.execute(command()).unwrap(), BaseMergeOutcome::Completed); assert_eq!(interactor.execute(command()).unwrap(), BaseMergeOutcome::Completed); ... SyncBaseRecordError::Generation ... SyncBaseRecordError::Validation ... SyncBaseRecordError::Write ... SyncBaseRecordError::Replacement",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -12381,6 +13416,61 @@
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
           "test_name": "test_base_merge_execute_sync_record_write_failure_fails_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_source_workspace_is_passed_to_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_dotdot_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_symlinked_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::baseline_capture::tests",
+          "test_name": "test_capture_worktree_flow_items_dir_outside_source_workspace_not_rejected"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::tddd::baseline::tests",
+          "test_name": "test_baseline_capture_source_workspace_in_different_tree_is_not_rejected_by_containment"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::sync_base::tests",
+          "test_name": "test_write_sync_base_record_atomically_replaces_existing_record_without_partial_or_temp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_generation_failure_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_rejects_malformed_or_non_regular_stamp_without_replacing_prior_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_sync_stamp_rejects_symlinked_recovery_root"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_rejects_symlinked_sync_stamp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_rejects_symlinked_items_root_for_sync_stamp"
         }
       ],
       "edge_id": {
@@ -12392,7 +13482,7 @@
       },
       "key": {
         "anchor_text_hash": "0701cfad6fdaeeb90c4bf352edab6dc4fe39450ed89a722db81c70f8c1600827",
-        "bound_tests_set_hash": "a358d835409b84d0e5fbcda6c18d503c495af6866a49f7244904e90611826fe2",
+        "bound_tests_set_hash": "0fb77d4c619bef91e33ce9aad0eb0a786010b7770ab76b20e49fb88c32c53653",
         "declaration_hash": "97c07519443c0bc67f584ffa7ad9a8a0f2e15fa4a57b6c5d7db574a11c1b2073"
       },
       "obligation_id": {
@@ -12401,7 +13491,7 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "\"cleanup_calls.lock().unwrap(),\\n            vec![\\n                CleanupCall { stage: CleanupStage::Views, request: cleanup_request() },\\n                CleanupCall { stage: CleanupStage::Baseline, request: cleanup_request() },\\n                CleanupCall { stage: CleanupStage::SyncBaseStamp, request: cleanup_request() },\\n            ]\"; \"assert!(cleanup_calls.lock().unwrap().is_empty());\"; \"assert_eq!(state.type_signals_cache, \\\"current-type-signals-cache\\\");\"; \"assert_eq!(std::fs::read_to_string(&type_signals).unwrap(), \\\"preserved-cache\\\");\"",
+        "citation": "\"cleanup_calls.lock().unwrap(),\\n            vec![\\n                CleanupCall { stage: CleanupStage::Views, request: cleanup_request() },\\n                CleanupCall { stage: CleanupStage::Baseline, request: cleanup_request() },\\n                CleanupCall { stage: CleanupStage::SyncBaseStamp, request: cleanup_request() },\\n            ]\"; \"assert!(cleanup_calls.lock().unwrap().is_empty());\"; \"assert_eq!(state.type_signals_cache, \\\"current-type-signals-cache\\\");\"",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -12467,6 +13557,61 @@
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
           "test_name": "test_base_merge_execute_sync_record_write_failure_fails_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_source_workspace_is_passed_to_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_dotdot_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_symlinked_source_workspace_returns_symlink_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::baseline_capture::tests",
+          "test_name": "test_capture_worktree_flow_items_dir_outside_source_workspace_not_rejected"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::tddd::baseline::tests",
+          "test_name": "test_baseline_capture_source_workspace_in_different_tree_is_not_rejected_by_containment"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::sync_base::tests",
+          "test_name": "test_write_sync_base_record_atomically_replaces_existing_record_without_partial_or_temp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_generation_failure_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_rejects_malformed_or_non_regular_stamp_without_replacing_prior_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_sync_stamp_rejects_symlinked_recovery_root"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_rejects_symlinked_sync_stamp"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_rejects_symlinked_items_root_for_sync_stamp"
         }
       ],
       "edge_id": {
@@ -12478,7 +13623,7 @@
       },
       "key": {
         "anchor_text_hash": "d5e6be0352d264e24422b08e522cd2fa714eb06575771f564fde0ddad0d1c7a0",
-        "bound_tests_set_hash": "a358d835409b84d0e5fbcda6c18d503c495af6866a49f7244904e90611826fe2",
+        "bound_tests_set_hash": "0fb77d4c619bef91e33ce9aad0eb0a786010b7770ab76b20e49fb88c32c53653",
         "declaration_hash": "97c07519443c0bc67f584ffa7ad9a8a0f2e15fa4a57b6c5d7db574a11c1b2073"
       },
       "obligation_id": {
@@ -12487,7 +13632,7 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "assert!(match (failure, result) { (BaselineFailure::Generation, Err(BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Baseline(BaselineReplacementError::Generation(detail), ))), ) => detail.as_str() == \"baseline generation failed\", (BaselineFailure::Validation, Err(BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Baseline(BaselineReplacementError::Validation(detail), ))), ) => detail.as_str() == \"baseline validation failed\", (BaselineFailure::Publish, Err(BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Baseline(BaselineReplacementError::Publish(detail), ))), ) => detail.as_str() == \"replacement publication failed\", _ => false, }); ... assert_eq!(state.active_baseline, \"prior-valid-baseline\");",
+        "citation": "assert!(match (failure, result) {\n    (BaselineFailure::Generation, Err(BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Baseline(BaselineReplacementError::Generation(detail))))) => detail.as_str() == \"baseline generation failed\",\n    (BaselineFailure::Validation, Err(BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Baseline(BaselineReplacementError::Validation(detail))))) => detail.as_str() == \"baseline validation failed\",\n    (BaselineFailure::Publish, Err(BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Baseline(BaselineReplacementError::Publish(detail))))) => detail.as_str() == \"replacement publication failed\",\n    _ => false,\n});\nlet state = state.lock().unwrap();\nassert_eq!(state.active_baseline, \"prior-valid-baseline\");",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -12772,6 +13917,31 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::base_merge::tests",
           "test_name": "test_fs_base_merge_git_merges_snapshot_source_with_exact_base_commit"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_git_preserves_typed_conflicts_without_cleanup"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_git_rejects_pre_existing_merge_in_progress"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_git_rejects_malformed_pre_existing_merge_head"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_git_rejects_pre_existing_unmerged_paths"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_adjudicate_merge_after_runner_error_requires_matching_merge_head_and_unmerged_paths"
         }
       ],
       "edge_id": {
@@ -12783,7 +13953,7 @@
       },
       "key": {
         "anchor_text_hash": "40f4d9f0d37fa58dfb35671b5faada2feea33e0d3a44c57a471647c25bc0d4f5",
-        "bound_tests_set_hash": "5efa193adff8c93057305955145f8d05f313353b04431869180988ac4a4da42a",
+        "bound_tests_set_hash": "bef2906756b0b5abe06bb1e1e55ab726e89fc7f3ae12ac0967bd4a66d4f750e2",
         "declaration_hash": "d97b65dbbee5dc01993a48ab1d7101de0315b654adffdb5c84e9e3d836ce0a2d"
       },
       "obligation_id": {
@@ -12792,7 +13962,7 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "\"target: fixture.active_track\"; \"source: fixture.snapshot_base\"; \"git(root, &[\\\"switch\\\", \\\"--quiet\\\", \\\"develop\\\"]);\"; \"the reverse direction must not be merged\"; \"branch\\\": \\\"track/a-different-track\\\"; \"the merge must not start\"; \"write_metadata(root, \\\"adapter-test\\\", \\\"release\\\")\"",
+        "citation": "assert_eq!(\n            git_calls.lock().unwrap().as_slice(),\n            &[MergeCall {\n                workspace_root: PathBuf::from(\"/workspace\"),\n                source: fixture.snapshot_base,\n                target: fixture.active_track,\n            }]\n        );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -12853,6 +14023,31 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::base_merge::tests",
           "test_name": "test_fs_base_merge_git_merges_snapshot_source_with_exact_base_commit"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_git_preserves_typed_conflicts_without_cleanup"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_git_rejects_pre_existing_merge_in_progress"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_git_rejects_malformed_pre_existing_merge_head"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_git_rejects_pre_existing_unmerged_paths"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_adjudicate_merge_after_runner_error_requires_matching_merge_head_and_unmerged_paths"
         }
       ],
       "edge_id": {
@@ -12863,8 +14058,8 @@
         "entry_key": "BaseMergeGitPort"
       },
       "key": {
-        "anchor_text_hash": "ae93f16b8b5af6d307d274a5c694b4ac052045cff1123092ed79af420e71bad1",
-        "bound_tests_set_hash": "5efa193adff8c93057305955145f8d05f313353b04431869180988ac4a4da42a",
+        "anchor_text_hash": "404eb1317e7a391b74093b947f2d7831350cfa502637d295daad934efc0c68c4",
+        "bound_tests_set_hash": "bef2906756b0b5abe06bb1e1e55ab726e89fc7f3ae12ac0967bd4a66d4f750e2",
         "declaration_hash": "d97b65dbbee5dc01993a48ab1d7101de0315b654adffdb5c84e9e3d836ce0a2d"
       },
       "obligation_id": {
@@ -12873,7 +14068,7 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "assert_eq!(outcome, BaseMergeOutcome::Conflicted);\nassert_eq!(git_calls.lock().unwrap().len(), 1);\nassert!(cleanup_calls.lock().unwrap().is_empty());",
+        "citation": "assert_eq!(outcome, BaseMergeOutcome::Conflicted);\n        assert_eq!(git_calls.lock().unwrap().len(), 1);\n        assert!(cleanup_calls.lock().unwrap().is_empty());",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -12934,6 +14129,31 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::base_merge::tests",
           "test_name": "test_fs_base_merge_git_merges_snapshot_source_with_exact_base_commit"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_git_preserves_typed_conflicts_without_cleanup"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_git_rejects_pre_existing_merge_in_progress"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_git_rejects_malformed_pre_existing_merge_head"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_git_rejects_pre_existing_unmerged_paths"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_adjudicate_merge_after_runner_error_requires_matching_merge_head_and_unmerged_paths"
         }
       ],
       "edge_id": {
@@ -12945,7 +14165,7 @@
       },
       "key": {
         "anchor_text_hash": "c559fb6f4b5ad1f203c8e09b92c1767750c2f7613e52b36514d5a2bfa919ed24",
-        "bound_tests_set_hash": "5efa193adff8c93057305955145f8d05f313353b04431869180988ac4a4da42a",
+        "bound_tests_set_hash": "bef2906756b0b5abe06bb1e1e55ab726e89fc7f3ae12ac0967bd4a66d4f750e2",
         "declaration_hash": "d97b65dbbee5dc01993a48ab1d7101de0315b654adffdb5c84e9e3d836ce0a2d"
       },
       "obligation_id": {
@@ -12954,7 +14174,7 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "assert_eq!(\n            outcome,\n            BaseMergeAttemptOutcome::Clean {\n                base_commit: CommitHash::try_new(expected_commit).unwrap()\n            }\n        );",
+        "citation": "assert_eq!(\n            outcome,\n            BaseMergeAttemptOutcome::Clean {\n                base_commit: CommitHash::try_new(expected_commit).unwrap()\n            }\n        );\n        assert!(root.join(\"base.txt\").is_file(), \"the base branch content must be merged\");",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -13015,6 +14235,31 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::base_merge::tests",
           "test_name": "test_fs_base_merge_git_merges_snapshot_source_with_exact_base_commit"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_git_preserves_typed_conflicts_without_cleanup"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_git_rejects_pre_existing_merge_in_progress"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_git_rejects_malformed_pre_existing_merge_head"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_git_rejects_pre_existing_unmerged_paths"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_adjudicate_merge_after_runner_error_requires_matching_merge_head_and_unmerged_paths"
         }
       ],
       "edge_id": {
@@ -13026,7 +14271,7 @@
       },
       "key": {
         "anchor_text_hash": "94cd89ee88ae29b2d2034ebc97ab9f63217d17250a55a77d97d2546302a8e43e",
-        "bound_tests_set_hash": "5efa193adff8c93057305955145f8d05f313353b04431869180988ac4a4da42a",
+        "bound_tests_set_hash": "bef2906756b0b5abe06bb1e1e55ab726e89fc7f3ae12ac0967bd4a66d4f750e2",
         "declaration_hash": "d97b65dbbee5dc01993a48ab1d7101de0315b654adffdb5c84e9e3d836ce0a2d"
       },
       "obligation_id": {
@@ -13096,6 +14341,31 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::base_merge::tests",
           "test_name": "test_fs_base_merge_git_merges_snapshot_source_with_exact_base_commit"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_git_preserves_typed_conflicts_without_cleanup"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_git_rejects_pre_existing_merge_in_progress"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_git_rejects_malformed_pre_existing_merge_head"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_git_rejects_pre_existing_unmerged_paths"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_adjudicate_merge_after_runner_error_requires_matching_merge_head_and_unmerged_paths"
         }
       ],
       "edge_id": {
@@ -13107,7 +14377,7 @@
       },
       "key": {
         "anchor_text_hash": "8fa63a343c348aeac0df772579e983f222f64ff76b2f90fdc2bae85abf103a14",
-        "bound_tests_set_hash": "5efa193adff8c93057305955145f8d05f313353b04431869180988ac4a4da42a",
+        "bound_tests_set_hash": "bef2906756b0b5abe06bb1e1e55ab726e89fc7f3ae12ac0967bd4a66d4f750e2",
         "declaration_hash": "d97b65dbbee5dc01993a48ab1d7101de0315b654adffdb5c84e9e3d836ce0a2d"
       },
       "obligation_id": {
@@ -13116,7 +14386,7 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "\"assert_eq!(outcome, BaseMergeOutcome::Completed);\" ... \"vec![CleanupStage::Views, CleanupStage::Baseline, CleanupStage::SyncBaseStamp]\" ... \"assert_eq!(call.request.base_commit, exact_base_commit);\"",
+        "citation": "assert_eq!(\n            outcome,\n            BaseMergeAttemptOutcome::Clean {\n                base_commit: CommitHash::try_new(expected_commit).unwrap()\n            }\n        );\n        assert!(root.join(\"base.txt\").is_file(), \"the base branch content must be merged\");",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -13177,6 +14447,31 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::base_merge::tests",
           "test_name": "test_fs_base_merge_git_merges_snapshot_source_with_exact_base_commit"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_git_preserves_typed_conflicts_without_cleanup"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_git_rejects_pre_existing_merge_in_progress"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_git_rejects_malformed_pre_existing_merge_head"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_git_rejects_pre_existing_unmerged_paths"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_adjudicate_merge_after_runner_error_requires_matching_merge_head_and_unmerged_paths"
         }
       ],
       "edge_id": {
@@ -13188,7 +14483,7 @@
       },
       "key": {
         "anchor_text_hash": "8f72df7566d25066016278de5e0f6d20ef327f95a6f72e7f2d2de2b00cc5e843",
-        "bound_tests_set_hash": "5efa193adff8c93057305955145f8d05f313353b04431869180988ac4a4da42a",
+        "bound_tests_set_hash": "bef2906756b0b5abe06bb1e1e55ab726e89fc7f3ae12ac0967bd4a66d4f750e2",
         "declaration_hash": "d97b65dbbee5dc01993a48ab1d7101de0315b654adffdb5c84e9e3d836ce0a2d"
       },
       "obligation_id": {
@@ -13197,7 +14492,7 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "assert_eq!(\n            outcome,\n            BaseMergeAttemptOutcome::Clean {\n                base_commit: CommitHash::try_new(expected_commit).unwrap()\n            }\n        );",
+        "citation": "assert_eq!(call.request.track_id.as_ref(), \"merge-track\"); assert_eq!(call.request.base_branch.as_str(), \"snapshot-base\"); assert_eq!(call.request.base_commit, exact_base_commit); ... assert_eq!(interactor.execute(command()).unwrap(), BaseMergeOutcome::Completed); assert_eq!(interactor.execute(command()).unwrap(), BaseMergeOutcome::Completed); ... assert_eq!(state.sync_base_record.as_ref(), Some(&exact_base_commit)); assert_eq!(state.idempotent_sync_retries, 1); ... assert_eq!(state.sync_base_record.as_ref(), Some(&later_commit)); assert_ne!(state.sync_base_record.as_ref(), Some(&first_commit));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -14401,7 +15696,7 @@
         "entry_key": "BaseMergeAttemptOutcome"
       },
       "key": {
-        "anchor_text_hash": "ae93f16b8b5af6d307d274a5c694b4ac052045cff1123092ed79af420e71bad1",
+        "anchor_text_hash": "404eb1317e7a391b74093b947f2d7831350cfa502637d295daad934efc0c68c4",
         "bound_tests_set_hash": "1e86a21d753f8e59975164816b046b8705e7c8d93775bf30233a1eb20e9d88a2",
         "declaration_hash": "e05ac1ef2594b576088db8ffee43e1fde9b340d17434b603a870ab1b0d505399"
       },
@@ -15425,7 +16720,7 @@
         "entry_key": "FsBaseMergeGitAdapter"
       },
       "key": {
-        "anchor_text_hash": "ae93f16b8b5af6d307d274a5c694b4ac052045cff1123092ed79af420e71bad1",
+        "anchor_text_hash": "404eb1317e7a391b74093b947f2d7831350cfa502637d295daad934efc0c68c4",
         "bound_tests_set_hash": "2366c81c5a4cfa1e2251c128b8daa8aae36aafc291da837e0e37904283bd1fdf",
         "declaration_hash": "38aab258620c13e291a84314901e6f9bef31c465e11b90baa75652ff01efc9b0"
       },
@@ -15435,7 +16730,7 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "assert_eq!(outcome, BaseMergeAttemptOutcome::Conflicted);",
+        "citation": "assert_eq!(outcome, BaseMergeAttemptOutcome::Conflicted); ... assert!(String::from_utf8_lossy(&status.stdout).contains(\"UU conflict.txt\"));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -18052,7 +19347,7 @@
         "entry_key": "FsBaseMergeCleanupAdapter"
       },
       "key": {
-        "anchor_text_hash": "ae93f16b8b5af6d307d274a5c694b4ac052045cff1123092ed79af420e71bad1",
+        "anchor_text_hash": "404eb1317e7a391b74093b947f2d7831350cfa502637d295daad934efc0c68c4",
         "bound_tests_set_hash": "be3d3c64d93257529ee6ad553d46a3ccfc3f3cdbad60265649215843bfe2a71e",
         "declaration_hash": "dfabb7568ce168db1a202efd8f60d84fc1d27bfe3ebee189440e70f653fc330e"
       },
@@ -18911,7 +20206,7 @@
         "entry_key": "TrackDriver"
       },
       "key": {
-        "anchor_text_hash": "ae93f16b8b5af6d307d274a5c694b4ac052045cff1123092ed79af420e71bad1",
+        "anchor_text_hash": "404eb1317e7a391b74093b947f2d7831350cfa502637d295daad934efc0c68c4",
         "bound_tests_set_hash": "212ec9cb72f5383dd7d8c973b7f50b369d9a5b0ea27294f875bf6c16ee898ec0",
         "declaration_hash": "a141e5064fc2d4ea1ab6b859fe37df1ea49e94bd34639ae1cf6ab5b2817321be"
       },
@@ -18921,13 +20216,18 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(\n            outcome.stderr.as_deref(),\n            Some(\n                \"base merge conflicted; continue with the recover workflow (/track:recover on Claude Code, $track-recover on Codex)\"\n            )\n        );",
+        "citation": "assert_eq!(outcome.exit_code, 1); ... assert_eq!(outcome.stderr.as_deref(), Some(\"base merge conflicted; continue with the recover workflow (/track:recover on Claude Code, $track-recover on Codex)\")); ... assert_ne!(outcome.stdout.as_deref(), Some(\"base merge completed\"));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
     {
       "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::tests",
+          "test_name": "test_track_command_merge_base_is_argument_free"
+        },
         {
           "layer": "cli",
           "module_path": "cli::commands::track::dispatch::tests",
@@ -18953,8 +20253,8 @@
       },
       "key": {
         "anchor_text_hash": "008a36faed29453afb25460ea4db3d92210eddc427c7d565839f29f1cce2e93e",
-        "bound_tests_set_hash": "f8a3e870fd20f3db25c9e53f55e71dbe183f65d66f2acd75dfa59fa92ad513b9",
-        "declaration_hash": "97c764041df80293e4f295faa78f2626f9e7b24491526392cbd2740c8309dc56"
+        "bound_tests_set_hash": "d1c2b95cf1dd67d35982ddbf5f1fe0247077ae4839e2ff81ecdb9e95f038b306",
+        "declaration_hash": "23197c7455f305849ceb0628133ea0870ab1d29b06fb0d4caff62cbe8a94ec0b"
       },
       "obligation_id": {
         "entry_key": "TrackCommand",
@@ -18962,7 +20262,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(outcome.stderr.as_deref().unwrap().contains(\"does not match active track\")); ... assert!(git_calls.lock().unwrap().is_empty()); ... assert!(outcome.stderr.as_deref().unwrap().contains(\"differs from snapshot base 'develop'\")); ... assert!(git_calls.lock().unwrap().is_empty());",
+        "citation": "assert!(outcome.stderr.as_deref().unwrap().contains(\"does not match active track\")); ... assert!(git_calls.lock().unwrap().is_empty()); ... assert!(outcome.stderr.as_deref().unwrap().contains(\"differs from snapshot base 'develop'\"));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -18973,6 +20273,136 @@
           "layer": "cli",
           "module_path": "cli::commands::track::dispatch::tests",
           "test_name": "test_track_command_merge_base_dispatches_argument_free_workspace_to_completed_outcome"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_passes_snapshot_direction_and_workspace_to_git_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_skips_clean_merge_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_baseline_replacement_preserves_type_signals_cache"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_baseline_generation_validation_and_publish_failures_preserve_prior_baseline"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_baseline_restoration_failure_fails_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_propagates_exact_commit_to_every_cleanup_request"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_cleanup_failure_preserves_each_failed_stage"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_sync_record_retry_is_idempotent_for_exact_commit"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_sync_record_later_commit_replaces_prior_record"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_sync_record_generation_validation_replacement_fail_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_sync_record_write_failure_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_writes_v1_idempotently_and_replaces_later_commit"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_baseline_replacement_isolated_at_exact_commit_and_atomically_published"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_regenerates_views_replaces_pinned_baselines_and_preserves_type_signals"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_rejects_concurrent_non_baseline_write_and_preserves_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_retains_writer_lock_until_sync_base_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_publication_failure_preserves_prior_complete_track"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_validation_failure_preserves_prior_complete_track"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_restoration_failure_stays_typed_and_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_generation_failure_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_base_merge_interactor_sync_stamp_failure_preserves_complete_published_track"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_base_merge_retry_reconciles_retained_recovery_after_telemetry_drift"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_adapter_rejects_malformed_or_non_regular_stamp_without_replacing_prior_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_sync_stamp_is_schema_versioned_and_idempotent"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_sync_stamp_rejects_symlinked_recovery_root"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_successful_replacement_uses_atomic_write_path"
         }
       ],
       "edge_id": {
@@ -18984,8 +20414,8 @@
       },
       "key": {
         "anchor_text_hash": "c559fb6f4b5ad1f203c8e09b92c1767750c2f7613e52b36514d5a2bfa919ed24",
-        "bound_tests_set_hash": "2135a746cc0d1bbb2425bd43aab653341138cb04c0b136b118cd68447a53374a",
-        "declaration_hash": "97c764041df80293e4f295faa78f2626f9e7b24491526392cbd2740c8309dc56"
+        "bound_tests_set_hash": "78acd60fe821fbf75fbc70fd9defe55bd025c9189e8c4b3d44177029d172542e",
+        "declaration_hash": "23197c7455f305849ceb0628133ea0870ab1d29b06fb0d4caff62cbe8a94ec0b"
       },
       "obligation_id": {
         "entry_key": "TrackCommand",
@@ -18993,13 +20423,23 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "let result = dispatch_track_cmd_with_base_merge(TrackCommand::MergeBase, |input| {\n            assert_eq!(input.workspace_root, PathBuf::from(\".\"));\n            cli_driver::CommandOutcome::success(Some(\"base merge completed\".to_owned()))\n        });",
+        "citation": "\"assert_eq!(current_commit(&worktree, \\\"HEAD^{commit}\\\"), expected_commit);\" ... \"assert!(track_dir.join(\\\"plan.md\\\").is_file(), \\\"view regeneration must publish plan.md\\\");\" ... \"assert!(published_baseline.contains(\\\"CleanupFixture\\\"), \\\"the published baseline must come from the requested commit\\\");\" ... \"assert_eq!(record.base_commit, record_request.base_commit);\"",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
     {
       "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_render_base_merge_result_conflicted_requires_recovery"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_handle_base_merge_renders_conflict_recovery_handoff"
+        },
         {
           "layer": "cli",
           "module_path": "cli::commands::track::dispatch::tests",
@@ -19015,8 +20455,8 @@
       },
       "key": {
         "anchor_text_hash": "04ee06225d2dde855bd2ce4384bd448922a1ef5d7cb6550b5f702ec87f32e137",
-        "bound_tests_set_hash": "fd30a61c628c5bc8fbb354f9b5e43be6105131066e4e18070445c61a3fc28712",
-        "declaration_hash": "97c764041df80293e4f295faa78f2626f9e7b24491526392cbd2740c8309dc56"
+        "bound_tests_set_hash": "af6852abd46ba9d4349a07d9a1899869fcdb7c3c14ce7fc4608a5e61b2cf15a4",
+        "declaration_hash": "23197c7455f305849ceb0628133ea0870ab1d29b06fb0d4caff62cbe8a94ec0b"
       },
       "obligation_id": {
         "entry_key": "TrackCommand",
@@ -19024,7 +20464,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "let result = dispatch_track_cmd_with_base_merge(TrackCommand::MergeBase, |_| {\n            cli_driver::CommandOutcome::failure(Some(\n                \"base merge conflicted; continue with /track:recover\".to_owned(),\n            ))\n        });\n\n        let error = result.unwrap_err().to_string();\n        assert!(error.contains(\"/track:recover\"));",
+        "citation": "assert!(claude_adapter.contains(\"Operational SSoT: `.harness/workflows/track/recover.md`\")); ... assert!(codex_adapter.contains(\"canonical recover workflow is `.harness/workflows/track/recover.md`\")); ... assert!(error.contains(\"/track:recover\"));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -19057,7 +20497,7 @@
       "key": {
         "anchor_text_hash": "40f4d9f0d37fa58dfb35671b5faada2feea33e0d3a44c57a471647c25bc0d4f5",
         "bound_tests_set_hash": "5f64d2f184d0040a1a24e7a6824ad434d83fccd90357e6b981095b4240d00245",
-        "declaration_hash": "97c764041df80293e4f295faa78f2626f9e7b24491526392cbd2740c8309dc56"
+        "declaration_hash": "23197c7455f305849ceb0628133ea0870ab1d29b06fb0d4caff62cbe8a94ec0b"
       },
       "obligation_id": {
         "entry_key": "TrackCommand",
@@ -19093,7 +20533,7 @@
       "key": {
         "anchor_text_hash": "f18c851ca6bcb1742ea5111e940f5b4d764e8a3f5972d5c76b358096ed16f950",
         "bound_tests_set_hash": "b9d41532fac766769afe8e8933cfb3af449beb98aebafdcaa63a587f0e53ee43",
-        "declaration_hash": "97c764041df80293e4f295faa78f2626f9e7b24491526392cbd2740c8309dc56"
+        "declaration_hash": "23197c7455f305849ceb0628133ea0870ab1d29b06fb0d4caff62cbe8a94ec0b"
       },
       "obligation_id": {
         "entry_key": "TrackCommand",
@@ -19101,7 +20541,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "driver.handle_base_merge(BaseMergeInput { workspace_root: workspace.clone() });\n\nassert_eq!(outcome.exit_code, 1);\nassert!(\n    outcome.stderr.as_deref().unwrap().contains(\"differs from snapshot base 'develop'\")\n);\nassert!(git_calls.lock().unwrap().is_empty());",
+        "citation": "assert!(\n            outcome.stderr.as_deref().unwrap().contains(\"differs from snapshot base 'develop'\")\n        );\n        assert!(git_calls.lock().unwrap().is_empty());",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -19124,7 +20564,7 @@
       "key": {
         "anchor_text_hash": "8fa63a343c348aeac0df772579e983f222f64ff76b2f90fdc2bae85abf103a14",
         "bound_tests_set_hash": "2135a746cc0d1bbb2425bd43aab653341138cb04c0b136b118cd68447a53374a",
-        "declaration_hash": "97c764041df80293e4f295faa78f2626f9e7b24491526392cbd2740c8309dc56"
+        "declaration_hash": "23197c7455f305849ceb0628133ea0870ab1d29b06fb0d4caff62cbe8a94ec0b"
       },
       "obligation_id": {
         "entry_key": "TrackCommand",
@@ -19132,7 +20572,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "dispatch_track_cmd_with_base_merge(TrackCommand::MergeBase, |input| {\n            assert_eq!(input.workspace_root, PathBuf::from(\".\"));\n            cli_driver::CommandOutcome::success(Some(\"base merge completed\".to_owned()))\n        });",
+        "citation": "let result = dispatch_track_cmd_with_base_merge(TrackCommand::MergeBase, |input| {\n            assert_eq!(input.workspace_root, PathBuf::from(\".\"));\n            cli_driver::CommandOutcome::success(Some(\"base merge completed\".to_owned()))\n        });\n\n        assert_eq!(result.unwrap(), ExitCode::SUCCESS);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -19153,9 +20593,9 @@
         "entry_key": "TrackCommand"
       },
       "key": {
-        "anchor_text_hash": "ae93f16b8b5af6d307d274a5c694b4ac052045cff1123092ed79af420e71bad1",
+        "anchor_text_hash": "404eb1317e7a391b74093b947f2d7831350cfa502637d295daad934efc0c68c4",
         "bound_tests_set_hash": "fd30a61c628c5bc8fbb354f9b5e43be6105131066e4e18070445c61a3fc28712",
-        "declaration_hash": "97c764041df80293e4f295faa78f2626f9e7b24491526392cbd2740c8309dc56"
+        "declaration_hash": "23197c7455f305849ceb0628133ea0870ab1d29b06fb0d4caff62cbe8a94ec0b"
       },
       "obligation_id": {
         "entry_key": "TrackCommand",
@@ -19163,7 +20603,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(error.contains(\"/track:recover\"));\n        assert!(!error.contains(\"base merge completed\"));",
+        "citation": "let result = dispatch_track_cmd_with_base_merge(TrackCommand::MergeBase, |_| {\n            cli_driver::CommandOutcome::failure(Some(\n                \"base merge conflicted; continue with /track:recover\".to_owned(),\n            ))\n        });\n\n        let error = result.unwrap_err().to_string();\n        assert!(error.contains(\"/track:recover\"));\n        assert!(!error.contains(\"base merge completed\"));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"

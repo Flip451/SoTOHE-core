@@ -322,17 +322,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "9e9abe7181b71316e54964a1694e1196b70e7705e3e78b819044365c33947b16",
+      "evidence_hash": "3a5065ab5c4b29cf9d6b4431b9582f1c7327f37294f0ab952bfe38de5ef07daf",
       "evidence_origin": {
         "data": {
           "element_id": "AC-04",
           "section": "acceptance_criteria",
-          "text_label": "When a guarded base merge conflicts, the orchestrator drives the canonical recovery workflow through editing, zero-findings review, and guarded commit without running clean-merge cleanup."
+          "text_label": "When a guarded base merge conflicts, it yields the conflicted outcome, performs no clean-merge cleanup, and surfaces the canonical recovery workflow entry point. The recovery workflow that the orchestrator drives then performs writer-routed conflict editing, applicable chain-limited zero-findings review, sanctioned type-baseline capture from a disposable clone of the exact merged base commit, and guarded commit. Its post-review capture restores the comparison authority for base-owned, source-identical catalogue deltas without duplicating their originating ownership; it does not update `.sync-base.json`, publish a retained tree, or regenerate derived views."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "When a guarded base merge conflicts, the orchestrator drives the canonical recovery workflow through editing, zero-findings review, and guarded commit without running clean-merge cleanup.",
+        "citation": "When a guarded base merge conflicts, it yields the conflicted outcome, performs no clean-merge cleanup, and surfaces the canonical recovery workflow entry point.",
         "kind": "pass"
       }
     }

@@ -89,7 +89,8 @@ pub use branch_strategy::BranchStrategyPort;
 pub use telemetry::{
     ArchivedTrackTelemetryCommand, ArchivedTrackTelemetryError, ArchivedTrackTelemetryInteractor,
     ArchivedTrackTelemetryPort, ArchivedTrackTelemetryService, TelemetryAggregateService,
-    TelemetryEmitDynamicPort, TelemetryReportPort,
+    TelemetryArchivedService, TelemetryEmitDynamicPort, TelemetryEmitService, TelemetryReportPort,
+    TelemetryReportService,
 };
 
 use std::sync::Arc;

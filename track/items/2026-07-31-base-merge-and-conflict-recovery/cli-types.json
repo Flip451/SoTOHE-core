@@ -627,16 +627,7 @@
           }
         ]
       },
-      "methods": [
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "items_dir",
-          "params": [],
-          "receiver": "&self",
-          "returns": "std::path::PathBuf"
-        }
-      ],
+      "methods": [],
       "module_path": "commands::track",
       "role": {
         "Dto": {}

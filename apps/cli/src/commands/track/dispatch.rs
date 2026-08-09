@@ -25,8 +25,6 @@ use crate::commands::track::{
 /// `CliError`, and `None` on success.  The error message is also printed to
 /// stderr so user-visible output is unchanged from `execute`.
 ///
-/// This variant exists so that `execute_track_with_telemetry` in `main.rs` can
-/// populate `NonZeroExit.error_chain` (IN-03) without a second dispatch round.
 #[allow(clippy::too_many_lines)]
 pub fn execute_with_error_chain(cmd: TrackCommand) -> (ExitCode, Option<String>) {
     use crate::CliError;
@@ -43,6 +41,7 @@ pub fn execute_with_error_chain(cmd: TrackCommand) -> (ExitCode, Option<String>)
 }
 
 /// Public entry point for callers that do not need the error chain string.
+#[allow(dead_code)]
 pub fn execute(cmd: TrackCommand) -> ExitCode {
     execute_with_error_chain(cmd).0
 }

@@ -1,0 +1,558 @@
+{
+  "schema_version": 1,
+  "layer": "cli",
+  "entries": [
+    {
+      "claim_hash": "b6451176ac3df31477d32d60e2be7252f963dea0ef3e06fc0fdadfda642bf81e",
+      "evidence_hash": "9cbde1c8c1b48cacc5d0d024f910428fca90be5b2b70829f6b6062574add4d66",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track ブランチ上で完了した、track が解決できる純表示系ではない `sotp` コマンドを共通の entry point で計装し、完了時にコマンド identity、所要時間、および exit 結果を観測する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "track ブランチ上で完了した、track が解決できる純表示系ではない `sotp` コマンドを共通の entry point で計装し、完了時にコマンド identity、所要時間、および exit 結果を観測する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b6451176ac3df31477d32d60e2be7252f963dea0ef3e06fc0fdadfda642bf81e",
+      "evidence_hash": "7f63c4775a20c1ebcb13ce2fb395e5a2b3aa361f7ca28a0cde89e84bcef2634c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track ブランチ上で完了した、track が解決できる純表示系ではないコマンドの観測イベントを、通常は既存の track-local `track/items/<track-id>/logs/telemetry.jsonl` へ追記する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "track ブランチ上で完了した、track が解決できる純表示系ではないコマンドの観測イベントを、通常は既存の track-local `track/items/<track-id>/logs/telemetry.jsonl` へ追記する。`track archive` の成功時だけは、既存ログが track とともに archive へ移動するため `track/archive/<track-id>/logs/telemetry.jsonl` へ追記し、active 側のログを再作成しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b6451176ac3df31477d32d60e2be7252f963dea0ef3e06fc0fdadfda642bf81e",
+      "evidence_hash": "34dba8d9b16331a0bcdb9d8d3ba20ba4c919233af0e5a3f16e1e69b04f290639",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track ブランチ上で、track が解決できる純表示系ではない任意の `sotp` コマンドが完了すると、同じ track の `telemetry.jsonl` にコマンド identity、所要時間、および exit 結果を含むイベントが追記される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "track ブランチ上で、track が解決できる純表示系ではない任意の `sotp` コマンドが完了すると、同じ track の `telemetry.jsonl` にコマンド identity、所要時間、および exit 結果を含むイベントが追記される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "85696249ca6fdb1f349b96ec108a32d27c2bc3a1eec22af67a2b6dd101fd4531",
+      "evidence_hash": "9cbde1c8c1b48cacc5d0d024f910428fca90be5b2b70829f6b6062574add4d66",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track ブランチ上で完了した、track が解決できる純表示系ではない `sotp` コマンドを共通の entry point で計装し、完了時にコマンド identity、所要時間、および exit 結果を観測する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogueLintCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "track ブランチ上で完了した、track が解決できる純表示系ではない `sotp` コマンドを共通の entry point で計装し、完了時にコマンド identity、所要時間、および exit 結果を観測する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "85696249ca6fdb1f349b96ec108a32d27c2bc3a1eec22af67a2b6dd101fd4531",
+      "evidence_hash": "7f63c4775a20c1ebcb13ce2fb395e5a2b3aa361f7ca28a0cde89e84bcef2634c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track ブランチ上で完了した、track が解決できる純表示系ではないコマンドの観測イベントを、通常は既存の track-local `track/items/<track-id>/logs/telemetry.jsonl` へ追記する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogueLintCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "track ブランチ上で完了した、track が解決できる純表示系ではないコマンドの観測イベントを、通常は既存の track-local `track/items/<track-id>/logs/telemetry.jsonl` へ追記する。`track archive` の成功時だけは、既存ログが track とともに archive へ移動するため `track/archive/<track-id>/logs/telemetry.jsonl` へ追記し、active 側のログを再作成しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "85696249ca6fdb1f349b96ec108a32d27c2bc3a1eec22af67a2b6dd101fd4531",
+      "evidence_hash": "34dba8d9b16331a0bcdb9d8d3ba20ba4c919233af0e5a3f16e1e69b04f290639",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track ブランチ上で、track が解決できる純表示系ではない任意の `sotp` コマンドが完了すると、同じ track の `telemetry.jsonl` にコマンド identity、所要時間、および exit 結果を含むイベントが追記される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogueLintCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "track ブランチ上で、track が解決できる純表示系ではない任意の `sotp` コマンドが完了すると、同じ track の `telemetry.jsonl` にコマンド identity、所要時間、および exit 結果を含むイベントが追記される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "1185512fa86b65c1011c5fd04f53acce432356801205153e40c997ad1f77dc63",
+      "evidence_hash": "9cbde1c8c1b48cacc5d0d024f910428fca90be5b2b70829f6b6062574add4d66",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track ブランチ上で完了した、track が解決できる純表示系ではない `sotp` コマンドを共通の entry point で計装し、完了時にコマンド identity、所要時間、および exit 結果を観測する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/cli-types.json",
+          "section_key": "types",
+          "entry_key": "TrackCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "track ブランチ上で完了した、track が解決できる純表示系ではない `sotp` コマンドを共通の entry point で計装し、完了時にコマンド identity、所要時間、および exit 結果を観測する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "1185512fa86b65c1011c5fd04f53acce432356801205153e40c997ad1f77dc63",
+      "evidence_hash": "34dba8d9b16331a0bcdb9d8d3ba20ba4c919233af0e5a3f16e1e69b04f290639",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track ブランチ上で、track が解決できる純表示系ではない任意の `sotp` コマンドが完了すると、同じ track の `telemetry.jsonl` にコマンド identity、所要時間、および exit 結果を含むイベントが追記される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/cli-types.json",
+          "section_key": "types",
+          "entry_key": "TrackCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "track ブランチ上で、track が解決できる純表示系ではない任意の `sotp` コマンドが完了すると、同じ track の `telemetry.jsonl` にコマンド identity、所要時間、および exit 結果を含むイベントが追記される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "3ce057802f8125a11aef7c14506a5e011ff78a5db060ea86706b57f654b4440e",
+      "evidence_hash": "9cbde1c8c1b48cacc5d0d024f910428fca90be5b2b70829f6b6062574add4d66",
+      "verdict": {
+        "kind": "pass",
+        "citation": "コマンド identity"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::command_identity_from_args"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "track ブランチ上で完了した、track が解決できる純表示系ではない `sotp` コマンドを共通の entry point で計装し、完了時にコマンド identity、所要時間、および exit 結果を観測する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "3ce057802f8125a11aef7c14506a5e011ff78a5db060ea86706b57f654b4440e",
+      "evidence_hash": "34dba8d9b16331a0bcdb9d8d3ba20ba4c919233af0e5a3f16e1e69b04f290639",
+      "verdict": {
+        "kind": "pass",
+        "citation": "同じ track の `telemetry.jsonl` にコマンド identity、所要時間、および exit 結果を含むイベントが追記される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::command_identity_from_args"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "track ブランチ上で、track が解決できる純表示系ではない任意の `sotp` コマンドが完了すると、同じ track の `telemetry.jsonl` にコマンド identity、所要時間、および exit 結果を含むイベントが追記される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c0045c1e5d76b37e12628915289145cf566530e7defae9ba0c1d2f0a20dd5db0",
+      "evidence_hash": "9cbde1c8c1b48cacc5d0d024f910428fca90be5b2b70829f6b6062574add4d66",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track ブランチ上で完了した、track が解決できる純表示系ではない `sotp` コマンドを共通の entry point で計装し、完了時にコマンド identity、所要時間、および exit 結果を観測する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::run_cli"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "track ブランチ上で完了した、track が解決できる純表示系ではない `sotp` コマンドを共通の entry point で計装し、完了時にコマンド identity、所要時間、および exit 結果を観測する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c0045c1e5d76b37e12628915289145cf566530e7defae9ba0c1d2f0a20dd5db0",
+      "evidence_hash": "34dba8d9b16331a0bcdb9d8d3ba20ba4c919233af0e5a3f16e1e69b04f290639",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track ブランチ上で、track が解決できる純表示系ではない任意の `sotp` コマンドが完了すると、同じ track の `telemetry.jsonl` にコマンド identity、所要時間、および exit 結果を含むイベントが追記される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::run_cli"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "track ブランチ上で、track が解決できる純表示系ではない任意の `sotp` コマンドが完了すると、同じ track の `telemetry.jsonl` にコマンド identity、所要時間、および exit 結果を含むイベントが追記される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "76e2cde61161314fe2573ca4d98ed73a3d9d42196e00f8fee83984b0664f98e8",
+      "evidence_hash": "9cbde1c8c1b48cacc5d0d024f910428fca90be5b2b70829f6b6062574add4d66",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track ブランチ上で完了した、track が解決できる純表示系ではない `sotp` コマンドを共通の entry point で計装し、完了時にコマンド identity、所要時間、および exit 結果を観測する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::run_cli_with"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "track ブランチ上で完了した、track が解決できる純表示系ではない `sotp` コマンドを共通の entry point で計装し、完了時にコマンド identity、所要時間、および exit 結果を観測する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "76e2cde61161314fe2573ca4d98ed73a3d9d42196e00f8fee83984b0664f98e8",
+      "evidence_hash": "34dba8d9b16331a0bcdb9d8d3ba20ba4c919233af0e5a3f16e1e69b04f290639",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track ブランチ上で、track が解決できる純表示系ではない任意の `sotp` コマンドが完了すると、同じ track の `telemetry.jsonl` にコマンド identity、所要時間、および exit 結果を含むイベントが追記される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::run_cli_with"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "track ブランチ上で、track が解決できる純表示系ではない任意の `sotp` コマンドが完了すると、同じ track の `telemetry.jsonl` にコマンド identity、所要時間、および exit 結果を含むイベントが追記される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b5129e12628ba2b9a1ac3b65df66fea930f168465ca56c20ae544ced710da0cd",
+      "evidence_hash": "9cbde1c8c1b48cacc5d0d024f910428fca90be5b2b70829f6b6062574add4d66",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track ブランチ上で完了した、track が解決できる純表示系ではない `sotp` コマンドを共通の entry point で計装し、完了時にコマンド identity、所要時間、および exit 結果を観測する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::emit_archived_track_subcommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "track ブランチ上で完了した、track が解決できる純表示系ではない `sotp` コマンドを共通の entry point で計装し、完了時にコマンド identity、所要時間、および exit 結果を観測する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b5129e12628ba2b9a1ac3b65df66fea930f168465ca56c20ae544ced710da0cd",
+      "evidence_hash": "7f63c4775a20c1ebcb13ce2fb395e5a2b3aa361f7ca28a0cde89e84bcef2634c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`track archive` の成功時だけは、既存ログが track とともに archive へ移動するため `track/archive/<track-id>/logs/telemetry.jsonl` へ追記し、active 側のログを再作成しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::emit_archived_track_subcommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "track ブランチ上で完了した、track が解決できる純表示系ではないコマンドの観測イベントを、通常は既存の track-local `track/items/<track-id>/logs/telemetry.jsonl` へ追記する。`track archive` の成功時だけは、既存ログが track とともに archive へ移動するため `track/archive/<track-id>/logs/telemetry.jsonl` へ追記し、active 側のログを再作成しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6f62fff98ccc05b6365a9e5ed726b3cdd800f09c8ac31a9344f3c357476889ea",
+      "evidence_hash": "9cbde1c8c1b48cacc5d0d024f910428fca90be5b2b70829f6b6062574add4d66",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track ブランチ上で完了した、track が解決できる純表示系ではない `sotp` コマンドを共通の entry point で計装し、完了時にコマンド identity、所要時間、および exit 結果を観測する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::execute_track_with_telemetry"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "track ブランチ上で完了した、track が解決できる純表示系ではない `sotp` コマンドを共通の entry point で計装し、完了時にコマンド identity、所要時間、および exit 結果を観測する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6f62fff98ccc05b6365a9e5ed726b3cdd800f09c8ac31a9344f3c357476889ea",
+      "evidence_hash": "34dba8d9b16331a0bcdb9d8d3ba20ba4c919233af0e5a3f16e1e69b04f290639",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track ブランチ上で、track が解決できる純表示系ではない任意の `sotp` コマンドが完了すると、同じ track の `telemetry.jsonl` にコマンド identity、所要時間、および exit 結果を含むイベントが追記される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::execute_track_with_telemetry"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "track ブランチ上で、track が解決できる純表示系ではない任意の `sotp` コマンドが完了すると、同じ track の `telemetry.jsonl` にコマンド identity、所要時間、および exit 結果を含むイベントが追記される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6f62fff98ccc05b6365a9e5ed726b3cdd800f09c8ac31a9344f3c357476889ea",
+      "evidence_hash": "9cbde1c8c1b48cacc5d0d024f910428fca90be5b2b70829f6b6062574add4d66",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track ブランチ上で完了した、track が解決できる純表示系ではない `sotp` コマンドを共通の entry point で計装し、完了時にコマンド identity、所要時間、および exit 結果を観測する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::is_display_only_track_command"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "track ブランチ上で完了した、track が解決できる純表示系ではない `sotp` コマンドを共通の entry point で計装し、完了時にコマンド identity、所要時間、および exit 結果を観測する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6f62fff98ccc05b6365a9e5ed726b3cdd800f09c8ac31a9344f3c357476889ea",
+      "evidence_hash": "34dba8d9b16331a0bcdb9d8d3ba20ba4c919233af0e5a3f16e1e69b04f290639",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track ブランチ上で、track が解決できる純表示系ではない任意の `sotp` コマンドが完了すると"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::is_display_only_track_command"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "track ブランチ上で、track が解決できる純表示系ではない任意の `sotp` コマンドが完了すると、同じ track の `telemetry.jsonl` にコマンド identity、所要時間、および exit 結果を含むイベントが追記される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "21e5a23992a4f6dc965ad36b31e8dcd48f549ac740907f1bececfc6b2ec9a05c",
+      "evidence_hash": "9cbde1c8c1b48cacc5d0d024f910428fca90be5b2b70829f6b6062574add4d66",
+      "verdict": {
+        "kind": "pass",
+        "citation": "共通の entry point で計装し、完了時にコマンド identity、所要時間、および exit 結果を観測する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::telemetry_dir_override_is_set"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "track ブランチ上で完了した、track が解決できる純表示系ではない `sotp` コマンドを共通の entry point で計装し、完了時にコマンド identity、所要時間、および exit 結果を観測する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6f62fff98ccc05b6365a9e5ed726b3cdd800f09c8ac31a9344f3c357476889ea",
+      "evidence_hash": "9cbde1c8c1b48cacc5d0d024f910428fca90be5b2b70829f6b6062574add4d66",
+      "verdict": {
+        "kind": "pass",
+        "citation": "コマンド identity、所要時間、および exit 結果を観測する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::track_command_label"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "track ブランチ上で完了した、track が解決できる純表示系ではない `sotp` コマンドを共通の entry point で計装し、完了時にコマンド identity、所要時間、および exit 結果を観測する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6f62fff98ccc05b6365a9e5ed726b3cdd800f09c8ac31a9344f3c357476889ea",
+      "evidence_hash": "34dba8d9b16331a0bcdb9d8d3ba20ba4c919233af0e5a3f16e1e69b04f290639",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track ブランチ上で、track が解決できる純表示系ではない任意の `sotp` コマンドが完了すると、同じ track の `telemetry.jsonl` にコマンド identity、所要時間、および exit 結果を含むイベントが追記される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::track_command_label"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "track ブランチ上で、track が解決できる純表示系ではない任意の `sotp` コマンドが完了すると、同じ track の `telemetry.jsonl` にコマンド identity、所要時間、および exit 結果を含むイベントが追記される。"
+        }
+      }
+    }
+  ]
+}

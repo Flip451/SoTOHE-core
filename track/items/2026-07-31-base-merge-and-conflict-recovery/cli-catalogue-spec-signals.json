@@ -1,5 +1,5 @@
 {
-  "catalogue_declaration_hash": "b689bf0c1d67cd634ccb9e4758b4ddc7f0de76fbbbb7090f0b04a357d29b454e",
+  "catalogue_declaration_hash": "91e038d98ef99427a1ee9db03d6a56f8fa850d3f06e6feba8c1a7d9972c1646a",
   "schema_version": 1,
   "signals": [
     {
@@ -13,7 +13,7 @@
       "type_name": "GitStashAction"
     },
     {
-      "entry_hash": "534768f9825d6898e01508cf18bd4cc4be1f9500a0ee38bb547454e8de68ccc1",
+      "entry_hash": "96a5a5803acdb412819895c4d161a8368e38a13c355b19bc2bfe17434e3eb0c0",
       "signal": "blue",
       "type_name": "TrackCommand"
     },

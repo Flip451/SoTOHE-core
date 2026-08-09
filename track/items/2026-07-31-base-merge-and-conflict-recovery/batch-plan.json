@@ -99,6 +99,16 @@
         {"scope": "infrastructure", "production_lines": 30, "test_lines": 75}
       ],
       "oversize_justification": null
+    },
+    {
+      "task_id": "T014",
+      "scope_estimates": [
+        {"scope": "usecase", "production_lines": 300, "test_lines": 130},
+        {"scope": "infrastructure", "production_lines": 125, "test_lines": 80},
+        {"scope": "cli_driver", "production_lines": 120, "test_lines": 80},
+        {"scope": "cli", "production_lines": 150, "test_lines": 100}
+      ],
+      "oversize_justification": null
     }
   ],
   "batches": [
@@ -108,6 +118,7 @@
     {"id": "B4", "task_ids": ["T011", "T004", "T005"]},
     {"id": "B5", "task_ids": ["T006"]},
     {"id": "B6", "task_ids": ["T012"]},
-    {"id": "B7", "task_ids": ["T013"]}
+    {"id": "B7", "task_ids": ["T013"]},
+    {"id": "B8", "task_ids": ["T014"]}
   ]
 }

@@ -122,6 +122,35 @@
           "hash": "rvw1:sha256:79e853a5ba5570b01ced19bfd8cee1d4a1889f45b2edf066310091eeca540fa4",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T12:32:00Z",
+          "findings": [
+            {
+              "category": "branch-wide consistency",
+              "file": "knowledge/adr/README.md",
+              "line": 160,
+              "message": "`2026-07-29-0839-sotp-tracing-instrumentation.md` が追加されていますが、README の ADR 索引に対応する行がありません。索引からこの ADR を辿れず、ADR ファイルと README の一覧が不整合です。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1bc6f2c294ca3340c8456f8acc5004f386b2871bc3067db134b2ca1feda544a3",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T12:33:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ea5bbb7cfb0a5b26dbed9bff35879c5e6b784f85b1c459d7dd30cd01e386acbc",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T12:38:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ea5bbb7cfb0a5b26dbed9bff35879c5e6b784f85b1c459d7dd30cd01e386acbc",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -226,6 +255,42 @@
           "hash": "rvw1:sha256:83cba9023ac3ce3b16b455c95ed668f336aa92ff6c52c1acadac55f74f43f7d3",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T12:32:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:30b017e382f3240aa51892d09276773d1fd007d2463e3ee9f0f58fcbfb475826",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T12:40:48Z",
+          "findings": [
+            {
+              "category": "architecture",
+              "file": "apps/cli/src/main.rs",
+              "line": 186,
+              "message": "The bin now owns a multi-step telemetry workflow: it derives telemetry context, begins a completion, dispatches the application command, and then completes telemetry. This also leaves command-classification policy in `main.rs`. Under the CLI thin-bin contract, this orchestration belongs behind a `cli_driver`/`cli_composition` driver; the bin should only parse typed input, call `handle`, and emit the outcome.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:30b017e382f3240aa51892d09276773d1fd007d2463e3ee9f0f58fcbfb475826",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T12:45:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:30b017e382f3240aa51892d09276773d1fd007d2463e3ee9f0f58fcbfb475826",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T12:48:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:30b017e382f3240aa51892d09276773d1fd007d2463e3ee9f0f58fcbfb475826",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -298,6 +363,20 @@
           "at": "2026-08-03T12:39:47Z",
           "findings": [],
           "hash": "rvw1:sha256:a18cbd4bb3606aa62c2369a9cb93654aa035dceb3d2c76869327efccc2c387ee",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T12:50:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d91a3f3c3a13d0fbad5a1dfc87b2f9e5a8a98cc05e65b796cc6bfde989c4059c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T12:56:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d91a3f3c3a13d0fbad5a1dfc87b2f9e5a8a98cc05e65b796cc6bfde989c4059c",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -387,6 +466,56 @@
           "at": "2026-08-04T04:44:21Z",
           "findings": [],
           "hash": "rvw1:sha256:c4906e5182fc9916db8bed34a3fff012211673123dde5c33671222716c19626b",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T12:59:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ad4a90ad46281a37bd380b767cf0a799fc4dfd8ab8a52e2f70ed70a9740bcb5d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T13:07:27Z",
+          "findings": [
+            {
+              "category": "architecture_boundary",
+              "file": "apps/cli-driver/src/telemetry.rs",
+              "line": 208,
+              "message": "`begin_completion` invokes `context_resolver` before `handle`, so a command request crosses a second driver-owned collaborator in addition to `TelemetryAggregateService`; composition supplies the infrastructure branch resolver directly. This violates the typed-input → one use-case interactor → render contract. Move context capture behind the single use-case application service/port.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture_orchestration",
+              "file": "apps/cli-driver/src/telemetry.rs",
+              "line": 276,
+              "message": "`telemetry_complete` chooses `emit_archived` versus `emit_completed` from command identity, exit status, and archive policy. This is runtime multi-use-case routing in the adapter. Submit one typed completion command to a use-case application service and let it own active/archive routing.",
+              "severity": "P1"
+            },
+            {
+              "category": "business_logic",
+              "file": "apps/cli-driver/src/telemetry.rs",
+              "line": 356,
+              "message": "`completion_eligible` and `telemetry_track_display_only` encode the application admission rule as hard-coded command-family allow/deny lists. This business policy belongs in a use-case application service; the driver should only translate typed input, invoke, and render.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ad4a90ad46281a37bd380b767cf0a799fc4dfd8ab8a52e2f70ed70a9740bcb5d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T13:10:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ad4a90ad46281a37bd380b767cf0a799fc4dfd8ab8a52e2f70ed70a9740bcb5d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T13:14:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ad4a90ad46281a37bd380b767cf0a799fc4dfd8ab8a52e2f70ed70a9740bcb5d",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -1907,6 +2036,64 @@
           "at": "2026-08-09T10:25:09Z",
           "findings": [],
           "hash": "rvw1:sha256:2cf5840e47d26a8f3dc1b6c46353c8291420f92cf87bc5a1420dcdb599df4852",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T12:54:31Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 55,
+              "message": "S5 restates AC-04’s behavioral contract (“recovery baseline-currency capture without duplicating originating ownership”) instead of limiting the plan section to target, operation, and anchor. Remove the contract prose and retain an AC-04 reference.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 186,
+              "message": "T014 repeats AC-04’s behavioral contract (“recovery baseline-currency capture without duplicating originating ownership”). Keep only the concrete target/operation and AC-04 anchor.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4b76311db59a790734d1e582aeb2b749fda7f30d92d46ce1c1129cc787c0b59e",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T12:57:23Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 186,
+              "message": "T014 remains non-executable: it names the `apps/cli` directory and a generic “recovery baseline-currency capture,” but no target file or symbol for the capture. Specify the concrete conflicted file(s)/artifact(s) to modify, while retaining the AC-04 anchor.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4b530447427492a7824426d9f9ca79de13280f804112ead9f514249b7bc91058",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T13:05:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:600748cd966619a1518b90c32caf579285cd5adcf0dbaa600d5872f14a78ab1d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T13:17:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b3e63fd8fea83521d428026c6ff3e8d0c551c9918ce2d41c0db8d38ac21e4f45",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T13:20:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b3e63fd8fea83521d428026c6ff3e8d0c551c9918ce2d41c0db8d38ac21e4f45",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -4065,6 +4252,42 @@
           "hash": "rvw1:sha256:e61f4970aff38d39a5fe0d0609affb9afe68b1a1dc5253fbf32d0d4ebca135a5",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T12:46:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:942d27f05c1736760a36017adff7a36fe9a583075f75aaeff54ea8d5269bfd5a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T12:59:10Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/telemetry/report_adapter.rs",
+              "line": 236,
+              "message": "The default `track/items` case is eventually anchored to the repository root, but this earlier check inspects `<cwd>/track/items`. When invoked from a repository subdirectory, an unrelated symlink or non-directory `track` entry there makes `emit_active` fail and silently drops the required completion event even though `<repo>/track/items` is valid. Validate only the repository-root-anchored path for the default case.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "libs/infrastructure/src/telemetry/report_adapter.rs",
+              "line": 681,
+              "message": "This test depends on the ambient repository and branch, silently skips on non-track branches, and overwrites the real active track's `telemetry.jsonl`. Restoring the saved bytes can discard telemetry appended concurrently. Use a temporary Git repository and track branch so the test is independent and cannot corrupt workspace diagnostics.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:942d27f05c1736760a36017adff7a36fe9a583075f75aaeff54ea8d5269bfd5a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T13:10:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:62b01dbb1b3cc83ee81706e1cbf230c1a555248997b6f33cb44fe142f7405cd6",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -4718,6 +4941,94 @@
           "hash": "rvw1:sha256:bd1cf846aa5d9d849238f129f4c5c53f9547519d67cae945fe54fe2ac6309e6b",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T13:22:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0efe2a5d3776d556c57052fa9fc09014d49b973a39e1a7005293f3aadab0b016",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T13:30:51Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 48,
+              "message": "The CN-06 sync-writer evidence is bound to the wrong trait method. The direct atomic-write, generation, validation, replacement, and symlink tests were added to the adjacent `replace_baselines` record, while `write_sync_base_record` retains only interactor/mock-level coverage. Because those tests directly exercise `write_sync_base_record(_atomically)` and `SyncBaseRecordError`, the actual writer contract remains unbound despite the structural check passing. Bind the direct writer tests to this record.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0efe2a5d3776d556c57052fa9fc09014d49b973a39e1a7005293f3aadab0b016",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T13:51:37Z",
+          "findings": [
+            {
+              "category": "test-obligation",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 46,
+              "message": "`bin/sotp test-obligation check --track-id 2026-07-31-base-merge-and-conflict-recovery` fails with stale verdicts for `BaseMergeCleanupPort` × `CN-06`; the binding file contains neither a fulfillment/voluntary binding nor a waiver for that edge, so the current obligations gate is not green.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c102ab1f0a914a3569966aa433313a5cd6c3cd79a54bbedbe6e019750218446c",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T14:25:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d7f910e9cca1ba3981eca9948f77dc52ead2d0a4f58ca907b79d4259eb05e4e7",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T14:29:51Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 171,
+              "message": "The briefing’s claimed parse-test rebind is missing: this file contains no reference to `test_track_command_merge_base_is_argument_free`. The currently bound dispatch test constructs `TrackCommand::MergeBase` directly, so it cannot verify that Clap still parses `track merge-base` without arguments. Bind the renamed parser test to the relevant `TrackCommand` edge records so the argument-free CLI contract remains covered.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d7f910e9cca1ba3981eca9948f77dc52ead2d0a4f58ca907b79d4259eb05e4e7",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T14:39:54Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 170,
+              "message": "The new parser-test binding has not been re-evaluated. `bin/sotp test-obligation check` currently fails with `TestChanged` for `TrackCommand` × `IN-01` because its frozen verdict still covers the previous test set; therefore the briefing’s 320/320 pass is stale for the current file. Run the host-owned obligation evaluation and confirm `check` passes before approval.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:2ee85d7205eff360deec136a78a6b2b265fa1fec53ed361a005815afe09a5bed",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T14:44:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2ee85d7205eff360deec136a78a6b2b265fa1fec53ed361a005815afe09a5bed",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T14:46:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2ee85d7205eff360deec136a78a6b2b265fa1fec53ed361a005815afe09a5bed",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -4872,6 +5183,20 @@
           "at": "2026-08-09T09:06:44Z",
           "findings": [],
           "hash": "rvw1:sha256:fbb955135518a402f9dfd1008cd1d779e58aace58a8522ea9a49dc784fbf0fa8",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T12:40:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e1fdb5e432febab2a46abf24ba3dd65dfe41cd2310e14b1d6999733333823de0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T12:42:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e1fdb5e432febab2a46abf24ba3dd65dfe41cd2310e14b1d6999733333823de0",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -5606,6 +5931,20 @@
           "hash": "rvw1:sha256:ce4fd9fc42a3c602577016a1036041925662ef6e7acd9a737f566d76d3d1f363",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T12:44:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:96dc8c0a5a97d72680af95f796e31a7671d8020078fccfabe90b0b206ff9c798",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T12:51:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:96dc8c0a5a97d72680af95f796e31a7671d8020078fccfabe90b0b206ff9c798",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -5786,6 +6125,27 @@
           "at": "2026-08-09T07:47:00Z",
           "findings": [],
           "hash": "rvw1:sha256:e64ab34630ba844fed0be21dcf9df9cc810c7915edf7f98f4573a597a4a71c77",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T13:12:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:41e3bb7caa1a054a7e0f786e1264ceb9d9e18c33e4a5b6ae3e4b4e073a33c604",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T13:14:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:41e3bb7caa1a054a7e0f786e1264ceb9d9e18c33e4a5b6ae3e4b4e073a33c604",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T13:22:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:41e3bb7caa1a054a7e0f786e1264ceb9d9e18c33e4a5b6ae3e4b4e073a33c604",
           "type": "final",
           "verdict": "zero_findings"
         }

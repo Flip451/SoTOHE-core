@@ -153,7 +153,7 @@
         "entry_key": "BaseMergeError"
       },
       "key": {
-        "anchor_text_hash": "ae93f16b8b5af6d307d274a5c694b4ac052045cff1123092ed79af420e71bad1",
+        "anchor_text_hash": "404eb1317e7a391b74093b947f2d7831350cfa502637d295daad934efc0c68c4",
         "declaration_hash": "e607701a4e54cf73d62f72c0400bfee63c7842771f21812e4f2b113055b427c0",
         "waived_reason_hash": "c18a578e29299335039b40b3c25142adfa4016e3d539e78d5f718bdf54a20e2f"
       },
@@ -163,7 +163,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "\"Error type returned by the guarded base-merge application service.\"",
+        "citation": "Error type returned by the guarded base-merge application service.",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -273,7 +273,7 @@
         "entry_key": "BaseMergeGitError"
       },
       "key": {
-        "anchor_text_hash": "ae93f16b8b5af6d307d274a5c694b4ac052045cff1123092ed79af420e71bad1",
+        "anchor_text_hash": "404eb1317e7a391b74093b947f2d7831350cfa502637d295daad934efc0c68c4",
         "declaration_hash": "1fa1982e64b9150eaff67bda63fcd06cbe3086c44e4047508ea858c61016fae3",
         "waived_reason_hash": "6588159324fb7ab2bd190af6e3a0542f0c3af39166867239a9839aba922d30cb"
       },
@@ -283,7 +283,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "\"Git-process failure carrying opaque adapter diagnostics.\"",
+        "citation": "Git-process failure carrying opaque adapter diagnostics.",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -393,7 +393,7 @@
         "entry_key": "BaseMergeService"
       },
       "key": {
-        "anchor_text_hash": "ae93f16b8b5af6d307d274a5c694b4ac052045cff1123092ed79af420e71bad1",
+        "anchor_text_hash": "404eb1317e7a391b74093b947f2d7831350cfa502637d295daad934efc0c68c4",
         "declaration_hash": "1531029a561c3fcb3df1584a8b97686956f9e29cbf7baaca84f288a0b12435fc",
         "waived_reason_hash": "6fd29fb7daf6bde7c3fd2d5b06d09bb5fcf04f5d358b1a4338139e1f6b3ede18"
       },
@@ -441,7 +441,7 @@
         "entry_key": "BaseMergeOutcome"
       },
       "key": {
-        "anchor_text_hash": "ae93f16b8b5af6d307d274a5c694b4ac052045cff1123092ed79af420e71bad1",
+        "anchor_text_hash": "404eb1317e7a391b74093b947f2d7831350cfa502637d295daad934efc0c68c4",
         "declaration_hash": "d39d07f581772cedd86402619946b7d3a68230f5fcd29a6603d83dd0ce6a9737",
         "waived_reason_hash": "0ac972a755997168d93738fface37db91ae30eceb16e0657e082c2434b31e6e6"
       },
@@ -451,7 +451,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "\"BaseMergeOutcome has no operation or state for executing or completing the downstream conflict-recovery workflow\"",
+        "citation": "\"variants: [VariantDecl { name: VariantName(Identifier(\\\"Completed\\\")), payload: Unit }, VariantDecl { name: VariantName(Identifier(\\\"Conflicted\\\")), payload: Unit }]\"",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"

@@ -15,13 +15,17 @@ fn hook_command(args: &[&str], guarded_git_token: Option<&str>) -> Command {
 }
 
 fn run_hook(args: &[&str], guarded_git_token: Option<&str>) -> Output {
+    let temporary_directory = tempfile::TempDir::new().unwrap();
     let mut command = hook_command(args, guarded_git_token);
+    command.current_dir(temporary_directory.path());
     command.stdin(Stdio::null());
     command.output().unwrap()
 }
 
 fn run_hook_with_stdin(args: &[&str], guarded_git_token: Option<&str>, stdin: &[u8]) -> Output {
+    let temporary_directory = tempfile::TempDir::new().unwrap();
     let mut command = hook_command(args, guarded_git_token);
+    command.current_dir(temporary_directory.path());
     command.stdin(Stdio::piped());
 
     let mut child = command.spawn().unwrap();

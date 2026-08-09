@@ -194,3 +194,50 @@ pub(super) fn read_regular_file_bounded(
     }
     Ok(content)
 }
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used)]
+mod tests {
+    use super::*;
+    use domain::branch_strategy::BaseBranchName;
+    use domain::{CommitHash, TrackId};
+    use std::fs;
+    use std::path::Path;
+
+    fn request(workspace_root: &Path, base_commit: &str) -> BaseMergeCleanupRequest {
+        BaseMergeCleanupRequest {
+            workspace_root: workspace_root.to_path_buf(),
+            track_id: TrackId::try_new("cleanup-test").unwrap(),
+            base_branch: BaseBranchName::try_new("develop".to_owned()).unwrap(),
+            base_commit: CommitHash::try_new(base_commit.to_owned()).unwrap(),
+        }
+    }
+
+    #[test]
+    fn test_write_sync_base_record_atomically_replaces_existing_record_without_partial_or_temp() {
+        let fixture = tempfile::tempdir().unwrap();
+        let track_dir = fixture.path().join("track/items/cleanup-test");
+        fs::create_dir_all(&track_dir).unwrap();
+        let stamp = track_dir.join(".sync-base.json");
+        let temporary_replacement =
+            track_dir.join(format!(".tmp-.sync-base.json-{}", std::process::id()));
+        let first = request(fixture.path(), "0123456789abcdef");
+        let later = request(fixture.path(), "fedcba9876543210");
+
+        write_sync_base_record_atomically(&first).unwrap();
+        let prior = fs::read(&stamp).unwrap();
+
+        fs::create_dir(&temporary_replacement).unwrap();
+        let failed = write_sync_base_record_atomically(&later);
+        assert!(matches!(failed, Err(SyncBaseRecordError::Replacement(_))));
+        assert_eq!(fs::read(&stamp).unwrap(), prior);
+        fs::remove_dir(&temporary_replacement).unwrap();
+
+        write_sync_base_record_atomically(&later).unwrap();
+        assert_eq!(
+            fs::read_to_string(&stamp).unwrap(),
+            r#"{"schema_version":"v1","track_id":"cleanup-test","base_branch":"develop","base_commit":"fedcba9876543210"}"#
+        );
+        assert!(!temporary_replacement.exists());
+    }
+}

@@ -130,6 +130,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [catalogue の適用範囲を実装の追加・変更に一致させる](2026-07-28-1024-catalogue-scope-is-implementation-delta.md) | Proposed | 2026-07-28 |
 | [sotp 生成 JSON のキー順を決定的にする](2026-07-29-0839-deterministic-json-serialization.md) | Proposed | 2026-07-29 |
 | [信号機 Yellow/Red 内訳を横断列挙する signal report コマンドを追加する](2026-07-29-0839-signal-report-command.md) | Proposed | 2026-07-29 |
+| [全 sotp コマンドに tracing 計装を入れ横断分析可能にする](2026-07-29-0839-sotp-tracing-instrumentation.md) | Proposed | 2026-07-29 |
 | [signal report の発生単位データ取得方針](2026-07-31-2134-signal-report-occurrence-source.md) | Proposed | 2026-07-31 |
 | [型カタログ作成の「生成 + 注釈」への移行 — 意図入力スキャフォールディング API](2026-07-02-1345-catalogue-generation-annotation.md) | — | 2026-07-02 |
 | [テスト義務ゲートと obligation-fulfillment 意味論検証 — SoT chain 第三リンクの意味論検証の完成](2026-07-02-0359-test-obligation-and-fulfillment-gate.md) | Proposed | 2026-07-02 |
@@ -177,6 +178,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [per-task commit hash の記録時に repository 実在と HEAD 到達可能性を要求する](2026-07-30-2101-per-task-commit-hash-record-time-validation.md) | Accepted | 2026-07-30 |
 | [clean な base merge 後の baseline 再取得と同期状態の原子的 lifecycle を定める](2026-08-02-0715-base-merge-cleanup-state.md) | Accepted | 2026-08-02 |
 | [type-signals の権威照合は権威が存在する文脈に限定する](2026-08-05-1035-type-signals-authority-availability-boundary.md) | Proposed | 2026-08-05 |
+| [conflict recovery 中の base-owned catalogue delta は exact merged base baseline で照合する](2026-08-09-1210-base-owned-catalogue-deltas-conflict-recovery.md) | Proposed | 2026-08-09 |
 
 ### ADR 運用
 

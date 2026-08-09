@@ -48,7 +48,7 @@ pub struct FixLocalArgs {
 
     /// Path to track items directory (used for branch auto-resolve when `--track-id` is omitted).
     #[arg(long, default_value = "track/items")]
-    pub(super) items_dir: PathBuf,
+    pub(crate) items_dir: PathBuf,
 }
 
 /// Build the driver input from already-resolved args.

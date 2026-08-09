@@ -1,0 +1,53 @@
+{
+  "track_id": "2026-08-01-sotp-tracing-instrumentation",
+  "entries": [
+    {
+      "edge_id": {
+        "entry_key": "CommandTraceValueError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandTraceValueError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "waived_reason_hash": "8b42a10437df745679341848615e69c55134ba90e89005d542fe3418535c7ec2",
+        "declaration_hash": "706609e45ffe3f3d1e607f6e3c16dff3e560b709f9632dbb5b521cdc4148a345",
+        "anchor_text_hash": "c2c7f968ad201efcf6c2b0e52aa82c94b1eb77f3361dde7b9293d7a063785050"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Constructor errors with explicit owners: SotpCommandIdentity::try_new produces EmptyCommandIdentity; CommandExecutionMetric::new produces ZeroExecutions or FailureCountExceedsExecutions; CommandFailureRateBasisPoints::try_new produces FailureRateOutOfRange."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandTraceValueError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandTraceValueError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "waived_reason_hash": "618d89a9a9d76aa914afafc7ff05ddfd1bdbdb4dc471d5059c9a8c645261013f",
+        "declaration_hash": "706609e45ffe3f3d1e607f6e3c16dff3e560b709f9632dbb5b521cdc4148a345",
+        "anchor_text_hash": "7c54b1065f0715eca63ef37b6909f20b93abf04a62b2fa7e396598f46916355d"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Constructor errors with explicit owners"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    }
+  ]
+}
